@@ -26,12 +26,47 @@ var (
 		regexp.MustCompile(`(?i)sign\s+up\s+for|newsletter|cookie\s+policy|privacy\s+policy|terms\s+of\s+use`),
 		regexp.MustCompile(`(?i)^(transportation|news|tech|science|entertainment|gaming|reviews|features)(\s+(news|tech|science|entertainment|gaming|reviews|features)){1,}\b`),
 		regexp.MustCompile(`(?i)\b(leaked|cracked)\b.*\b(phone|item|fragment|copy|tail)\b`),
+		regexp.MustCompile(`(?i)^\s*share\s+this\s+page\s*$`),
+		regexp.MustCompile(`(?i)^\s*enter\s+url\s+or\s+id\s+to\s+unroll\b`),
+		regexp.MustCompile(`(?i)^\s*how\s+to\s+get\s+url\s+link\s+on\s+x\b`),
+		regexp.MustCompile(`(?i)^\s*missing\s+some\s+tweet\s+in\s+this\s+thread\?\s*$`),
+		regexp.MustCompile(`(?i)^\s*keep\s+current\s+with\b`),
+		regexp.MustCompile(`(?i)^\s*this\s+thread\s+may\s+be\s+removed\s+anytime\b`),
+		regexp.MustCompile(`(?i)^\s*support\s+us\s*$`),
+		regexp.MustCompile(`(?i)^\s*become\s+a\s+premium\s+member\b`),
+		regexp.MustCompile(`(?i)^\s*donate\s+via\s+paypal\b`),
+		regexp.MustCompile(`(?i)^\s*(bitcoin|ethereum|usdt|crypto)\s+(donation\s+)?(address|copy)\b`),
+		regexp.MustCompile(`(?i)^\s*(copy\s+)?(bc1|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|0x[0-9a-f]{40})\b`),
 	}
 	readableContaminationPatterns = append(append([]*regexp.Regexp{}, readableTailMarkerPatterns...), readableDropLinePatterns...)
 	inlineSocialPromptRE          = regexp.MustCompile(`(?i)\bfollow\s+us\s+on\s+(twitter|x)\s+for\s+more\s+newsletters?\b`)
 	repeatedDirtyLeadRE           = regexp.MustCompile(`(?i)\bsummary-like\s+lead\s+repeated\s+by\s+the\s+site\s+summary-like\s+lead\s+repeated\s+by\s+the\s+site\b`)
 	pdfPayloadLeadRE              = regexp.MustCompile(`(?i)^%pdf-\d`)
 )
+
+func isUnusableReadablePayload(value string) bool {
+	words := strings.Fields(strings.ToLower(strings.ReplaceAll(value, "\u00a0", " ")))
+	if len(words) == 0 || len(words) > 140 {
+		return false
+	}
+	normalized := strings.Join(words, " ")
+	markers := 0
+	for _, marker := range []string{
+		"javascript is not available",
+		"please enable javascript",
+		"continue using x. com",
+		"continue using x.com",
+		"supported browser",
+		"help center",
+		"© x corp",
+		"x corp",
+	} {
+		if strings.Contains(normalized, marker) {
+			markers++
+		}
+	}
+	return markers >= 2 || strings.Contains(normalized, "javascript is not available") && strings.Contains(normalized, "continue using x")
+}
 
 func isReadableTextContentType(contentType string) bool {
 	contentType = strings.TrimSpace(contentType)
@@ -83,6 +118,9 @@ func sanitizeReadablePayloadText(value string) (string, bool) {
 		return "", false
 	}
 	if pdfPayloadLeadRE.MatchString(value) || strings.ContainsRune(value, '\uFFFD') {
+		return "", true
+	}
+	if isUnusableReadablePayload(value) {
 		return "", true
 	}
 	paragraphs := splitReadableParagraphs(value)

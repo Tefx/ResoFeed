@@ -134,6 +134,40 @@ func TestPromptValidationKeyPointsRejectUnsupportedNonNumericClaims(t *testing.T
 	}
 }
 
+func TestPromptValidationSourceGroundingNormalizesPercentSpacing(t *testing.T) {
+	for _, pct := range []string{"59.0%", "66.0%", "34.8%", "28.8%", "74.2%"} {
+		t.Run(pct, func(t *testing.T) {
+			sourcePct := strings.Replace(pct, ".", ". ", 1)
+			_, err := validateSummaryOutputForPersistenceWithPrompt(validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
+				out.Summary = "The model reported " + pct + " on the benchmark."
+				out.CoreInsight = "The " + pct + " benchmark result is source-grounded."
+			}), promptingV21Item{
+				AvailableTextSource: "fresh_full_text",
+				AvailableText:       "The benchmark table lists " + sourcePct + " for the model.",
+				TargetLanguage:      ProcessingLanguageEnglish,
+			})
+			if err != nil {
+				t.Fatalf("validate normalized percent %s returned error: %v", pct, err)
+			}
+		})
+	}
+}
+
+func TestPromptValidationSourceGroundingRejectsInventedPercent(t *testing.T) {
+	_, err := validateSummaryOutputForPersistenceWithPrompt(validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
+		out.Summary = "The model reported 99.0% on the benchmark."
+		out.CoreInsight = "The 99.0% benchmark result is not in the source."
+	}), promptingV21Item{
+		AvailableTextSource: "fresh_full_text",
+		AvailableText:       "The benchmark table lists 59. 0% for the model.",
+		TargetLanguage:      ProcessingLanguageEnglish,
+	})
+	var validationErr PromptValidationError
+	if !errors.As(err, &validationErr) || validationErr.Code != PromptValidationPromptInjectionLeakage || validationErr.Field != "source_grounding" {
+		t.Fatalf("validation error = %T %[1]v, want source_grounding rejection for invented percent", err)
+	}
+}
+
 func TestPromptValidationRetryOneNormalThenOneRepair(t *testing.T) {
 	ctx := context.Background()
 	var attempts int

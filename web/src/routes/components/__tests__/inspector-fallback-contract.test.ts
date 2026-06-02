@@ -113,4 +113,60 @@ describe('Inspector fallback/source evidence contract', () => {
       expect(within(inspector).queryByLabelText('Core insight')).not.toBeInTheDocument();
     }
   );
+
+  it('localizes safe target-language diagnostic subcodes without exposing the raw backend code', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'safe-target-language-diagnostic-contract',
+      title: 'Safe target language diagnostic contract item',
+      last_reprocess_status: 'failed',
+      last_reprocess_error_code: 'decode_error',
+      last_reprocess_error_message: 'decode_error:language_invalid:target_language'
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    expect(within(inspector).getByText('失败 · 解码错误 · 目标语言不匹配 · 已保留现有摘要和要点')).toBeVisible();
+    expect(within(inspector).getByText('上次重处理失败 · 解码错误 · 目标语言不匹配 · 已保留现有摘要和要点')).toBeVisible();
+    expect(inspector).not.toHaveTextContent('decode_error:language_invalid:target_language');
+  });
+
+  it('localizes safe source-grounding diagnostic subcodes in Chinese', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'safe-source-grounding-diagnostic-contract',
+      title: 'Safe source grounding diagnostic contract item',
+      last_reprocess_status: 'failed',
+      last_reprocess_error_code: 'decode_error',
+      last_reprocess_error_message: 'decode_error:source_grounding'
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    expect(within(inspector).getByText('失败 · 解码错误 · 来源校验 · 已保留现有摘要和要点')).toBeVisible();
+    expect(within(inspector).getByText('上次重处理失败 · 解码错误 · 来源校验 · 已保留现有摘要和要点')).toBeVisible();
+    expect(inspector).not.toHaveTextContent('decode_error:source_grounding');
+  });
+
+  it('falls back safely for unknown unsafe-looking reprocess messages', () => {
+    const unsafeMessage = 'provider_payload: prompt=<system>raw model output leaked</system>';
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'unsafe-reprocess-message-fallback-contract',
+      title: 'Unsafe reprocess message fallback contract item',
+      last_reprocess_status: 'failed',
+      last_reprocess_error_code: 'decode_error',
+      last_reprocess_error_message: unsafeMessage
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    expect(within(inspector).getByText('失败 · 解码错误 · 已保留现有摘要和要点')).toBeVisible();
+    expect(within(inspector).getByText('上次重处理失败 · 解码错误 · 已保留现有摘要和要点')).toBeVisible();
+    expect(inspector).not.toHaveTextContent(unsafeMessage);
+    expect(inspector).not.toHaveTextContent('raw model output leaked');
+  });
 });

@@ -88,6 +88,17 @@
     timeout: { en: 'timeout', zh: '超时' }
   };
 
+  const safeReprocessDiagnosticLabels: Record<string, { en: string; zh: string }> = {
+    'decode_error:language_invalid:target_language': { en: 'decode error · target language mismatch', zh: '解码错误 · 目标语言不匹配' },
+    'decode_error:schema_invalid:key_points': { en: 'decode error · schema mismatch', zh: '解码错误 · 结构不匹配' },
+    'decode_error:schema_invalid': { en: 'decode error · schema mismatch', zh: '解码错误 · 结构不匹配' },
+    'decode_error:source_grounding': { en: 'decode error · source grounding check', zh: '解码错误 · 来源校验' },
+    'decode_error:prompt_injection_leakage:source_grounding': { en: 'decode error · source grounding check', zh: '解码错误 · 来源校验' },
+    'decode_error:browser_placeholder': { en: 'source unavailable · browser placeholder', zh: '正文不可用 · 浏览器占位页' },
+    'decode_error:key_points_invalid': { en: 'decode error · key points invalid', zh: '解码错误 · 要点不合规' },
+    decode_error: { en: 'decode error', zh: '解码错误' }
+  };
+
   function isModelFailureStatus(status: ModelStatus): status is Exclude<ModelStatus, 'ok' | 'summary_unavailable'> {
     return status !== 'ok' && status !== 'summary_unavailable';
   }
@@ -95,6 +106,20 @@
   function modelFailureLabel(status: Exclude<ModelStatus, 'ok' | 'summary_unavailable'>): string {
     const label = modelFailureStatusLabels[status];
     return localizedChrome(label.en, label.zh);
+  }
+
+  function safeReprocessDiagnosticLabel(message: string | null): string | null {
+    if (!message) return null;
+    const label = safeReprocessDiagnosticLabels[message];
+    return label ? localizedChrome(label.en, label.zh) : null;
+  }
+
+  function latestAttemptErrorLabel(value: InspectableItem, message: string | null): string {
+    const safeDiagnostic = safeReprocessDiagnosticLabel(message);
+    if (safeDiagnostic) return safeDiagnostic;
+    if (message) return localizedChrome('decode error', '解码错误');
+    if (value.last_reprocess_error_code === 'decode_error') return localizedChrome('decode error', '解码错误');
+    return localizedChrome('attempt error', '尝试错误');
   }
 
   function decodeEntities(text: string): string {
@@ -570,14 +595,14 @@
   function latestAttemptFailureText(value: InspectableItem): string | null {
     if (value.last_reprocess_status !== 'failed') return null;
     const message = readableText(value.last_reprocess_error_message);
-    if (message) return message;
-    const code = value.last_reprocess_error_code === 'decode_error' ? localizedChrome('decode error', '解码错误') : localizedChrome('attempt error', '尝试错误');
+    const code = latestAttemptErrorLabel(value, message);
     return localizedChrome(`last re-ingest failed · ${code} · existing summary and key points preserved`, `上次重处理失败 · ${code} · 已保留现有摘要和要点`);
   }
 
   function attemptFrontmatterText(value: InspectableItem): string | null {
     if (!latestAttemptFailureText(value)) return null;
-    const code = value.last_reprocess_error_code === 'decode_error' ? localizedChrome('decode error', '解码错误') : localizedChrome('attempt error', '尝试错误');
+    const message = readableText(value.last_reprocess_error_message);
+    const code = latestAttemptErrorLabel(value, message);
     return localizedChrome(`failed · ${code} · preserved`, `失败 · ${code} · 已保留现有摘要和要点`);
   }
 

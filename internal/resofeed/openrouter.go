@@ -442,7 +442,7 @@ func validatePromptSourceGrounding(out OpenRouterSummaryOutput, item promptingV2
 	if out.ModelStatus != modelStatusOK {
 		return nil
 	}
-	sourceText := strings.ToLower(strings.Join([]string{item.SourceItemTitle, item.SourceTitle, item.URL, item.AvailableText}, "\n"))
+	sourceText := normalizeSourceGroundingText(strings.Join([]string{item.SourceItemTitle, item.SourceTitle, item.URL, item.AvailableText}, "\n"))
 	if strings.TrimSpace(sourceText) == "" {
 		return nil
 	}
@@ -455,7 +455,7 @@ func validatePromptSourceGrounding(out OpenRouterSummaryOutput, item promptingV2
 }
 
 func unsupportedNumericClaims(out OpenRouterSummaryOutput, lowerSource string) []string {
-	fields := strings.ToLower(joinSummaryOutputFields(out))
+	fields := normalizeSourceGroundingText(joinSummaryOutputFields(out))
 	re := regexp.MustCompile(`\b\d+(?:\.\d+)?%`)
 	matches := re.FindAllString(fields, -1)
 	if len(matches) == 0 {
@@ -473,6 +473,12 @@ func unsupportedNumericClaims(out OpenRouterSummaryOutput, lowerSource string) [
 		}
 	}
 	return unsupported
+}
+
+func normalizeSourceGroundingText(value string) string {
+	value = strings.ToLower(value)
+	value = regexp.MustCompile(`\b(\d+)\.\s+(\d+)%`).ReplaceAllString(value, `$1.$2%`)
+	return regexp.MustCompile(`\s+`).ReplaceAllString(value, " ")
 }
 
 func joinSummaryOutputFields(out OpenRouterSummaryOutput) string {

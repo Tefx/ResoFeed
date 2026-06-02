@@ -216,6 +216,115 @@ func TestReprocessLibraryCanceledFetchPreservesReadableFieldsAndItemFTS(t *testi
 	assertStaleReadableFTS(t, ctx, db, "item_canceled")
 }
 
+func TestReprocessFallsBackToFeedExcerptWhenFetchedOrStoredTextIsXPlaceholder(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><main>JavaScript is not available. Please enable JavaScript or switch to a supported browser to continue using x.com. Help Center © X Corp.</main></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_x_reprocess", server.URL+"/feed.xml", "X Reprocess")
+	now := time.Now().UTC().Format(time.RFC3339)
+	placeholder := "JavaScript is not available. Please enable JavaScript or switch to a supported browser to continue using x.com. Help Center © X Corp."
+	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, canonical_url, title, summary, core_insight, feed_excerpt, extracted_text, value_tier, first_seen_at, extraction_status, model_status) values ('item_x_placeholder', 'src_x_reprocess', ?, ?, ?, 'PRIOR title item_x_placeholder', 'PRIOR summary item_x_placeholder', 'PRIOR insight item_x_placeholder', 'RSS fallback excerpt with MiniMax M3 facts', ?, 'prior-tier', ?, 'full', 'ok')`, server.URL+"/feed.xml", server.URL+"/article", nullableString(server.URL+"/canonical"), placeholder, now)
+	if err != nil {
+		t.Fatalf("seed placeholder item: %v", err)
+	}
+	assertReprocessIndexReady(t, ctx, db)
+
+	llm := &reprocessCaptureLLM{}
+	resp, err := reprocessLibraryFresh(ctx, db, llm)
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompleted || resp.Reprocess.ItemsUpdated != 1 {
+		t.Fatalf("result = %+v, want one updated item", resp.Reprocess)
+	}
+	input := llm.inputs["item_x_placeholder"]
+	if !strings.Contains(input.AvailableText, "RSS fallback excerpt with MiniMax M3 facts") {
+		t.Fatalf("LLM available_text = %q, want RSS fallback excerpt", input.AvailableText)
+	}
+	if strings.Contains(input.AvailableText, "JavaScript is not available") {
+		t.Fatalf("LLM received X placeholder: %q", input.AvailableText)
+	}
+	if input.AvailableTextSource != "rss_excerpt" {
+		t.Fatalf("LLM available_text_source = %q, want rss_excerpt", input.AvailableTextSource)
+	}
+}
+
+func TestReprocessFailedValidationStoresSafeDiagnosticSubcode(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-safe-diagnostic"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>available body for safe diagnostic persistence</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_safe_diag", server.URL+"/feed.xml", "Safe Diagnostic")
+	seedReprocessItem(t, ctx, db, "item_safe_diag", "src_safe_diag", server.URL+"/article", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	resp, err := reprocessLibraryFresh(ctx, db, actualContextInvalidReingestLLM{})
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsFailed != 1 || resp.Reprocess.ItemsPreservedFailures != 1 {
+		t.Fatalf("result = %+v, want preserved decode_error failure", resp.Reprocess)
+	}
+	var code, message string
+	if err := db.QueryRowContext(ctx, `select coalesce(last_reprocess_error_code, ''), coalesce(last_reprocess_error_message, '') from items where id = 'item_safe_diag'`).Scan(&code, &message); err != nil {
+		t.Fatalf("read safe diagnostic: %v", err)
+	}
+	if code != string(ReprocessErrorDecodeError) || message != "decode_error:language_invalid:target_language" {
+		t.Fatalf("diagnostic = code %q message %q, want safe language subcode", code, message)
+	}
+	for _, leaked := range []string{"English summary", "English insight", "available body", "system prompt", "sk-", "SECRET"} {
+		if strings.Contains(message, leaked) {
+			t.Fatalf("safe diagnostic leaked %q in %q", leaked, message)
+		}
+	}
+}
+
+func TestReprocessLLMValidationErrorStoresSafeDiagnosticSubcode(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-llm-safe-diagnostic"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>available body for wrapped LLM validation diagnostic persistence</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_llm_safe_diag", server.URL+"/feed.xml", "LLM Safe Diagnostic")
+	seedReprocessItem(t, ctx, db, "item_llm_safe_diag", "src_llm_safe_diag", server.URL+"/article", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	resp, err := reprocessLibraryFresh(ctx, db, wrappedPromptValidationErrorLLM{})
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompletedWithErrors || resp.Reprocess.ItemsFailed != 1 || resp.Reprocess.ItemsPreservedFailures != 1 {
+		t.Fatalf("result = %+v, want preserved decode_error failure", resp.Reprocess)
+	}
+	var code, message string
+	if err := db.QueryRowContext(ctx, `select coalesce(last_reprocess_error_code, ''), coalesce(last_reprocess_error_message, '') from items where id = 'item_llm_safe_diag'`).Scan(&code, &message); err != nil {
+		t.Fatalf("read safe diagnostic: %v", err)
+	}
+	if code != string(ReprocessErrorDecodeError) || message != "decode_error:language_invalid:target_language" {
+		t.Fatalf("diagnostic = code %q message %q, want safe language subcode", code, message)
+	}
+	for _, leaked := range []string{"available body", "system prompt", "OpenRouter", "provider raw", "SECRET", "sk-"} {
+		if strings.Contains(message, leaked) {
+			t.Fatalf("safe diagnostic leaked %q in %q", leaked, message)
+		}
+	}
+}
+
 func TestReprocessLibraryPreservesReadableFieldsWhenLLMUnavailableOrNonOK(t *testing.T) {
 	ctx := context.Background()
 	for _, tc := range []struct {
@@ -443,7 +552,13 @@ type reprocessStatusLLM struct {
 	status string
 }
 
+type reprocessCaptureLLM struct {
+	inputs map[string]OpenRouterSummaryInput
+}
+
 type actualContextInvalidReingestLLM struct{}
+
+type wrappedPromptValidationErrorLLM struct{}
 
 type literalTitleCaptureLLM struct {
 	titles map[string]string
@@ -475,6 +590,15 @@ func (actualContextInvalidReingestLLM) TranslateSteering(context.Context, OpenRo
 	return OpenRouterSteeringOutput{}, nil
 }
 
+func (wrappedPromptValidationErrorLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	validationErr := promptValidationError(PromptValidationLanguageInvalid, "target_language", errors.New("provider raw prompt/model text must not persist"))
+	return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, fmt.Errorf("openrouter summarize item: %w", validationErr)
+}
+
+func (wrappedPromptValidationErrorLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
+
 func (l reprocessStatusLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
 	out := ccrTestSummaryOutput("Fallback title", "Fallback summary.", "Fallback insight.", "high")
 	out.ModelStatus = l.status
@@ -482,6 +606,26 @@ func (l reprocessStatusLLM) SummarizeItem(context.Context, OpenRouterSummaryInpu
 }
 
 func (l reprocessStatusLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
+
+func (l *reprocessCaptureLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	if l.inputs == nil {
+		l.inputs = map[string]OpenRouterSummaryInput{}
+	}
+	l.inputs[input.ItemID] = input
+	out := ccrTestSummaryOutput("processed "+input.ItemID, "RSS fallback excerpt with MiniMax M3 facts.", "MiniMax M3 facts remain source-grounded.", "high")
+	out.KeyPoints = []string{
+		"RSS fallback excerpt with MiniMax M3 facts point one.",
+		"RSS fallback excerpt with MiniMax M3 facts point two.",
+		"RSS fallback excerpt with MiniMax M3 facts point three.",
+	}
+	out.FeedExcerpt = input.AvailableText
+	out.ExtractedText = input.AvailableText
+	return out, nil
+}
+
+func (l *reprocessCaptureLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	return OpenRouterSteeringOutput{}, nil
 }
 

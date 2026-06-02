@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -311,7 +312,13 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 		}
 		status := classifyModelFailureStatus(err, out.ModelStatus)
 		code := reprocessErrorCodeForModelStatus(status)
-		return failedReprocessOutcome(sourceURL, code, string(code), status), nil
+		errorMessage := string(code)
+		if code == ReprocessErrorDecodeError {
+			if diagnostic := safePromptValidationDiagnostic(err); diagnostic != string(ReprocessErrorDecodeError) {
+				errorMessage = diagnostic
+			}
+		}
+		return failedReprocessOutcome(sourceURL, code, errorMessage, status), nil
 	}
 	validationOut := out
 	if isUnusableReprocessOutputTitle(validationOut.Title) {
@@ -319,7 +326,7 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 	}
 	out, err = validateSummaryOutputForPersistenceWithPrompt(validationOut, compiled.UserPayload.Item)
 	if err != nil {
-		return failedReprocessOutcome(sourceURL, ReprocessErrorDecodeError, string(ReprocessErrorDecodeError), modelStatusDecodeError), nil
+		return failedReprocessOutcome(sourceURL, ReprocessErrorDecodeError, safePromptValidationDiagnostic(err), modelStatusDecodeError), nil
 	}
 	modelStatus := mapModelStatus(out.ModelStatus)
 	if modelStatus != modelStatusOK {
@@ -525,7 +532,9 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bool) {
 	if item.extractedText.Valid {
 		if text := strings.TrimSpace(item.extractedText.String); text != "" {
-			return fallbackReprocessSourceURL(item), text, "stored_extracted_text", true
+			if !isUnusableReadablePayload(text) {
+				return fallbackReprocessSourceURL(item), text, "stored_extracted_text", true
+			}
 		}
 	}
 	if item.feedExcerpt.Valid {
@@ -534,6 +543,34 @@ func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bo
 		}
 	}
 	return "", "", "", false
+}
+
+func safePromptValidationDiagnostic(err error) string {
+	var validationErr PromptValidationError
+	if !errors.As(err, &validationErr) || validationErr.Code == "" {
+		return string(ReprocessErrorDecodeError)
+	}
+	field := safePromptValidationField(validationErr.Field)
+	if field == "" {
+		return fmt.Sprintf("%s:%s", ReprocessErrorDecodeError, validationErr.Code)
+	}
+	return fmt.Sprintf("%s:%s:%s", ReprocessErrorDecodeError, validationErr.Code, field)
+}
+
+func safePromptValidationField(field string) string {
+	field = strings.TrimSpace(field)
+	if field == "" {
+		return ""
+	}
+	field = regexp.MustCompile(`\[\d+\]`).ReplaceAllString(field, "")
+	field = strings.NewReplacer(".", "_", "-", "_").Replace(field)
+	var b strings.Builder
+	for _, r := range field {
+		if r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '_' {
+			b.WriteRune(r)
+		}
+	}
+	return strings.ToLower(b.String())
 }
 
 func reprocessErrorCodeForModelStatus(status string) ReprocessErrorCode {

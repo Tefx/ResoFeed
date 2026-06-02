@@ -627,8 +627,10 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 	item.ExtractedText = nullableString(extracted)
 	item.ExtractionStatus = extractionStatus
 	available := extracted
+	availableTextSource := "fresh_full_text"
 	if strings.TrimSpace(available) == "" {
 		available = stringValue(item.FeedExcerpt)
+		availableTextSource = "rss_excerpt"
 	}
 	available, _ = sanitizeReadablePayloadText(available)
 	if strings.TrimSpace(available) == "" {
@@ -642,13 +644,13 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
-	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
+	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableTextSource: availableTextSource, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
 	if err != nil {
 		item.ModelStatus = classifyModelFailureStatus(err, out.ModelStatus)
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
-	compiled, compileErr := compilePromptingV21SummaryPrompt(OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
+	compiled, compileErr := compilePromptingV21SummaryPrompt(OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableTextSource: availableTextSource, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
 	if compileErr != nil {
 		item.ModelStatus = modelStatusDecodeError
 		if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
@@ -769,7 +771,7 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 		return "", extractionStatusOriginalNA
 	}
 	cleaned, _ := sanitizeReadablePayloadText(extracted)
-	if strings.TrimSpace(cleaned) == "" {
+	if strings.TrimSpace(cleaned) == "" || isUnusableReadablePayload(cleaned) {
 		if strings.TrimSpace(fallback) != "" {
 			return "", extractionStatusPartial
 		}

@@ -50,6 +50,40 @@ func TestSanitizeReadablePayloadTextKeepsCleanArticleBody(t *testing.T) {
 	}
 }
 
+func TestSanitizeReadablePayloadTextDropsThreadReaderChromeKeepsTweetFacts(t *testing.T) {
+	dirty := strings.Join([]string{
+		"Share this page",
+		"Enter URL or ID to Unroll",
+		"MiniMax M3 scored 59. 0% SWE-Bench Pro in the posted comparison.",
+		"MiniMax Sparse Attention is described as reducing inference cost.",
+		"50% off standard usage was announced for launch week.",
+		"How to get URL link on X",
+		"Missing some Tweet in this thread?",
+		"Keep Current with Thread Reader",
+		"This Thread may be Removed Anytime",
+		"Support us",
+		"Become a Premium Member",
+		"Donate via Paypal",
+		"Ethereum donation address copy",
+		"0x0123456789abcdef0123456789abcdef01234567",
+	}, "\n")
+
+	cleaned, changed := sanitizeReadablePayloadText(dirty)
+	if !changed {
+		t.Fatalf("sanitizeReadablePayloadText changed=false, want ThreadReader chrome removed")
+	}
+	for _, want := range []string{"MiniMax M3", "59. 0% SWE-Bench Pro", "MiniMax Sparse Attention", "50% off standard usage"} {
+		if !strings.Contains(cleaned, want) {
+			t.Fatalf("cleaned payload lost fact %q: %q", want, cleaned)
+		}
+	}
+	for _, forbidden := range []string{"Share this page", "Enter URL or ID to Unroll", "How to get URL link on X", "Missing some Tweet", "Keep Current with", "This Thread may be Removed Anytime", "Support us", "Premium Member", "Donate via Paypal", "donation address", "0x012345"} {
+		if strings.Contains(cleaned, forbidden) {
+			t.Fatalf("cleaned payload still contains chrome %q: %q", forbidden, cleaned)
+		}
+	}
+}
+
 func TestSanitizeReadablePayloadTextRejectsPDFGarbage(t *testing.T) {
 	pdfLike := "%PDF-1.7\n%����\n1 0 obj\n<< /Type /Catalog >>\nendobj"
 	cleaned, changed := sanitizeReadablePayloadText(pdfLike)

@@ -92,6 +92,52 @@ func TestExtractArticleTextRejectsPDFPayloads(t *testing.T) {
 	}
 }
 
+func TestExtractArticleTextRejectsXJavaScriptUnavailablePage(t *testing.T) {
+	t.Parallel()
+
+	page := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><main>JavaScript is not available. Please enable JavaScript or switch to a supported browser to continue using x.com. Help Center © X Corp.</main></body></html>`)
+	}))
+	defer page.Close()
+
+	text, status := extractArticleText(context.Background(), page.URL, "rss fallback excerpt")
+	if status != extractionStatusPartial || text != "" {
+		t.Fatalf("X JS placeholder with fallback = (%q, %q), want empty/partial_extraction", text, status)
+	}
+
+	text, status = extractArticleText(context.Background(), page.URL, "")
+	if status != extractionStatusOriginalNA || text != "" {
+		t.Fatalf("X JS placeholder without fallback = (%q, %q), want empty/original_unavailable", text, status)
+	}
+}
+
+func TestBuildItemUsesRSSExcerptWhenFetchReturnsXJavaScriptUnavailablePage(t *testing.T) {
+	t.Parallel()
+
+	page := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><main>JavaScript is not available. Please enable JavaScript or switch to a supported browser to continue using x. com. Help Center © X Corp.</main></body></html>`)
+	}))
+	defer page.Close()
+
+	llm := &recordingIngestLLM{}
+	item, err := buildItem(context.Background(), Source{ID: "src_x", URL: "https://feed.example/rss.xml", Title: "X Feed"}, feedEntry{ID: "x-js", Title: "RSS title", URL: page.URL, Description: "RSS excerpt with MiniMax M3 benchmark facts."}, llm, ProcessingLanguageEnglish)
+	if err != nil {
+		t.Fatalf("buildItem returned error: %v", err)
+	}
+	if item.ModelStatus != modelStatusOK {
+		t.Fatalf("item model_status = %q, want ok", item.ModelStatus)
+	}
+	if !strings.Contains(llm.last.AvailableText, "RSS excerpt with MiniMax M3") {
+		t.Fatalf("LLM available_text = %q, want RSS excerpt", llm.last.AvailableText)
+	}
+	if strings.Contains(llm.last.AvailableText, "JavaScript is not available") {
+		t.Fatalf("LLM received X placeholder: %q", llm.last.AvailableText)
+	}
+	if llm.last.AvailableTextSource == "fresh_full_text" {
+		t.Fatalf("LLM source marker = %q, want fallback marker", llm.last.AvailableTextSource)
+	}
+}
+
 func TestExtractArticleTextRejectsSniffedBinaryPayloads(t *testing.T) {
 	t.Parallel()
 
@@ -279,6 +325,25 @@ func (failingGemini) SummarizeItem(context.Context, OpenRouterSummaryInput) (Ope
 
 func (failingGemini) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	return OpenRouterSteeringOutput{}, context.DeadlineExceeded
+}
+
+type recordingIngestLLM struct {
+	last OpenRouterSummaryInput
+}
+
+func (l *recordingIngestLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	l.last = input
+	out := ccrTestSummaryOutput("RSS title", "RSS excerpt with MiniMax M3 benchmark facts.", "MiniMax M3 benchmark facts matter.", "high")
+	out.KeyPoints = []string{
+		"RSS excerpt with MiniMax M3 benchmark facts point one.",
+		"RSS excerpt with MiniMax M3 benchmark facts point two.",
+		"RSS excerpt with MiniMax M3 benchmark facts point three.",
+	}
+	return out, nil
+}
+
+func (l *recordingIngestLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
 }
 
 type ingestFakeState struct {
