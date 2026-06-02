@@ -89,7 +89,9 @@
   };
 
   const safeReprocessDiagnosticLabels: Record<string, { en: string; zh: string }> = {
-    'decode_error:language_invalid:target_language': { en: 'decode error · target language mismatch', zh: '解码错误 · 目标语言不匹配' },
+    'decode_error:language_invalid:summary': { en: 'decode error · summary language mismatch', zh: '解码错误 · 摘要语言不匹配' },
+    'decode_error:language_invalid:core_insight': { en: 'decode error · insight language mismatch', zh: '解码错误 · 洞察语言不匹配' },
+    'decode_error:language_invalid:key_points': { en: 'decode error · key points language mismatch', zh: '解码错误 · 要点语言不匹配' },
     'decode_error:schema_invalid:key_points': { en: 'decode error · schema mismatch', zh: '解码错误 · 结构不匹配' },
     'decode_error:schema_invalid': { en: 'decode error · schema mismatch', zh: '解码错误 · 结构不匹配' },
     'decode_error:source_grounding': { en: 'decode error · source grounding check', zh: '解码错误 · 来源校验' },
@@ -594,14 +596,14 @@
 
   function latestAttemptFailureText(value: InspectableItem): string | null {
     if (value.last_reprocess_status !== 'failed') return null;
-    const message = readableText(value.last_reprocess_error_message);
+    const message = value.last_reprocess_error_message;
     const code = latestAttemptErrorLabel(value, message);
     return localizedChrome(`last re-ingest failed · ${code} · existing summary and key points preserved`, `上次重处理失败 · ${code} · 已保留现有摘要和要点`);
   }
 
   function attemptFrontmatterText(value: InspectableItem): string | null {
     if (!latestAttemptFailureText(value)) return null;
-    const message = readableText(value.last_reprocess_error_message);
+    const message = value.last_reprocess_error_message;
     const code = latestAttemptErrorLabel(value, message);
     return localizedChrome(`failed · ${code} · preserved`, `失败 · ${code} · 已保留现有摘要和要点`);
   }

@@ -114,22 +114,27 @@ describe('Inspector fallback/source evidence contract', () => {
     }
   );
 
-  it('localizes safe target-language diagnostic subcodes without exposing the raw backend code', () => {
+  it.each([
+    ['summary', '解码错误 · 摘要语言不匹配'],
+    ['core_insight', '解码错误 · 洞察语言不匹配'],
+    ['key_points', '解码错误 · 要点语言不匹配']
+  ] as const)('localizes safe field-specific language diagnostic %s without exposing the raw backend code', (field, label) => {
+    const rawCode = `decode_error:language_invalid:${field}`;
     const detail: ItemDetail = {
       ...baseDetail,
-      id: 'safe-target-language-diagnostic-contract',
-      title: 'Safe target language diagnostic contract item',
+      id: `safe-field-language-diagnostic-${field}`,
+      title: `Safe field language diagnostic ${field}`,
       last_reprocess_status: 'failed',
       last_reprocess_error_code: 'decode_error',
-      last_reprocess_error_message: 'decode_error:language_invalid:target_language'
+      last_reprocess_error_message: rawCode
     };
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = screen.getByRole('complementary', { name: detail.title });
-    expect(within(inspector).getByText('失败 · 解码错误 · 目标语言不匹配 · 已保留现有摘要和要点')).toBeVisible();
-    expect(within(inspector).getByText('上次重处理失败 · 解码错误 · 目标语言不匹配 · 已保留现有摘要和要点')).toBeVisible();
-    expect(inspector).not.toHaveTextContent('decode_error:language_invalid:target_language');
+    expect(within(inspector).getByText(`失败 · ${label} · 已保留现有摘要和要点`)).toBeVisible();
+    expect(within(inspector).getByText(`上次重处理失败 · ${label} · 已保留现有摘要和要点`)).toBeVisible();
+    expect(inspector).not.toHaveTextContent(rawCode);
   });
 
   it('localizes safe source-grounding diagnostic subcodes in Chinese', () => {

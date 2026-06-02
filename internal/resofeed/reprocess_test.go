@@ -279,7 +279,7 @@ func TestReprocessFailedValidationStoresSafeDiagnosticSubcode(t *testing.T) {
 	if err := db.QueryRowContext(ctx, `select coalesce(last_reprocess_error_code, ''), coalesce(last_reprocess_error_message, '') from items where id = 'item_safe_diag'`).Scan(&code, &message); err != nil {
 		t.Fatalf("read safe diagnostic: %v", err)
 	}
-	if code != string(ReprocessErrorDecodeError) || message != "decode_error:language_invalid:target_language" {
+	if code != string(ReprocessErrorDecodeError) || message != "decode_error:language_invalid:summary" {
 		t.Fatalf("diagnostic = code %q message %q, want safe language subcode", code, message)
 	}
 	for _, leaked := range []string{"English summary", "English insight", "available body", "system prompt", "sk-", "SECRET"} {
@@ -315,7 +315,7 @@ func TestReprocessLLMValidationErrorStoresSafeDiagnosticSubcode(t *testing.T) {
 	if err := db.QueryRowContext(ctx, `select coalesce(last_reprocess_error_code, ''), coalesce(last_reprocess_error_message, '') from items where id = 'item_llm_safe_diag'`).Scan(&code, &message); err != nil {
 		t.Fatalf("read safe diagnostic: %v", err)
 	}
-	if code != string(ReprocessErrorDecodeError) || message != "decode_error:language_invalid:target_language" {
+	if code != string(ReprocessErrorDecodeError) || message != "decode_error:language_invalid:summary" {
 		t.Fatalf("diagnostic = code %q message %q, want safe language subcode", code, message)
 	}
 	for _, leaked := range []string{"available body", "system prompt", "OpenRouter", "provider raw", "SECRET", "sk-"} {
@@ -583,7 +583,7 @@ func (l *literalTitleCaptureLLM) TranslateSteering(context.Context, OpenRouterSt
 }
 
 func (actualContextInvalidReingestLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{LocalizedTitle: "English title", Title: "English title", Summary: "English summary that should fail Chinese validation.", CoreInsight: "English insight.", FeedExcerpt: "English excerpt", ExtractedText: "English extracted text", KeyPoints: []string{"English source-backed point one.", "English source-backed point two.", "English source-backed point three."}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+	return OpenRouterSummaryOutput{LocalizedTitle: "English localized title that should fail Chinese validation", Title: "English localized title that should fail Chinese validation", Summary: "English summary that should fail Chinese validation.", CoreInsight: "English insight.", FeedExcerpt: "English excerpt", ExtractedText: "English extracted text", KeyPoints: []string{"English source-backed point one.", "English source-backed point two.", "English source-backed point three."}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 }
 
 func (actualContextInvalidReingestLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
@@ -591,7 +591,7 @@ func (actualContextInvalidReingestLLM) TranslateSteering(context.Context, OpenRo
 }
 
 func (wrappedPromptValidationErrorLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	validationErr := promptValidationError(PromptValidationLanguageInvalid, "target_language", errors.New("provider raw prompt/model text must not persist"))
+	validationErr := promptValidationError(PromptValidationLanguageInvalid, "summary", errors.New("provider raw prompt/model text must not persist"))
 	return OpenRouterSummaryOutput{ModelStatus: modelStatusDecodeError}, fmt.Errorf("openrouter summarize item: %w", validationErr)
 }
 

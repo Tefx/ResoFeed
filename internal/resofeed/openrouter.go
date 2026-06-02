@@ -389,37 +389,83 @@ func leaksPromptInjection(value string) bool {
 }
 
 func validatePromptLanguage(out OpenRouterSummaryOutput, target ProcessingLanguage) error {
-	combined := generatedTitle(out) + "\n" + strings.Join(out.KeyPoints, "\n") + "\n" + out.FeedExcerpt + "\n" + out.ExtractedText + "\n" + out.Summary + "\n" + out.CoreInsight
-	lower := strings.ToLower(combined)
-	if strings.Contains(lower, "cannot write in the requested") || strings.Contains(lower, "refuse to use the requested language") {
-		return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+	readingFields := []struct {
+		name  string
+		value string
+	}{
+		{name: "summary", value: out.Summary},
+		{name: "core_insight", value: out.CoreInsight},
+	}
+	for _, field := range readingFields {
+		if containsLanguageRefusal(field.value) {
+			return promptValidationError(PromptValidationLanguageInvalid, field.name, nil)
+		}
+	}
+	for _, point := range out.KeyPoints {
+		if containsLanguageRefusal(point) {
+			return promptValidationError(PromptValidationLanguageInvalid, "key_points", nil)
+		}
 	}
 	if target == ProcessingLanguageChinese {
-		for _, value := range []string{generatedTitle(out), out.Summary, out.CoreInsight} {
-			if containsMostlyLatin(value) {
-				return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+		for _, field := range readingFields {
+			if resemblesEnglishProseWithoutCJK(field.value) {
+				return promptValidationError(PromptValidationLanguageInvalid, field.name, nil)
 			}
 		}
 		for _, point := range out.KeyPoints {
-			if containsMostlyLatin(point) {
-				return promptValidationError(PromptValidationLanguageInvalid, "target_language", nil)
+			if resemblesEnglishProseWithoutCJK(point) {
+				return promptValidationError(PromptValidationLanguageInvalid, "key_points", nil)
 			}
 		}
 	}
 	return nil
 }
 
-func containsMostlyLatin(value string) bool {
-	var latin, cjk int
+func containsLanguageRefusal(value string) bool {
+	lower := strings.ToLower(value)
+	return strings.Contains(lower, "cannot write in the requested language") || strings.Contains(lower, "refuse to use the requested language")
+}
+
+func containsCJK(value string) bool {
 	for _, r := range value {
-		switch {
-		case r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z':
-			latin++
-		case r >= '\u4e00' && r <= '\u9fff':
-			cjk++
+		if r >= '\u3400' && r <= '\u4dbf' || r >= '\u4e00' && r <= '\u9fff' || r >= '\uf900' && r <= '\ufaff' {
+			return true
 		}
 	}
-	return latin >= 24 && cjk == 0
+	return false
+}
+
+func resemblesEnglishProseWithoutCJK(value string) bool {
+	if containsCJK(value) {
+		return false
+	}
+	var latin int
+	for _, r := range value {
+		if r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' {
+			latin++
+		}
+	}
+	if latin < 24 {
+		return false
+	}
+	words := regexp.MustCompile(`[A-Za-z]+`).FindAllString(strings.ToLower(value), -1)
+	if len(words) < 5 {
+		return false
+	}
+	if strings.ContainsAny(value, ".!?;:") {
+		return true
+	}
+	functionWords := map[string]bool{
+		"a": true, "an": true, "and": true, "are": true, "as": true, "for": true,
+		"in": true, "is": true, "of": true, "on": true, "or": true, "the": true,
+		"this": true, "to": true, "was": true, "were": true, "with": true,
+	}
+	for _, word := range words {
+		if functionWords[word] {
+			return true
+		}
+	}
+	return false
 }
 
 func validatePromptProvenance(out OpenRouterSummaryOutput, item promptingV21Item) error {
@@ -709,7 +755,7 @@ func validateKeyPoints(points []string, coreInsight string, item promptingV21Ite
 			return promptValidationError(PromptValidationKeyPointsInvalid, field, nil)
 		}
 		seen[trimmed] = struct{}{}
-		if item.TargetLanguage == ProcessingLanguageChinese && containsMostlyLatin(trimmed) {
+		if item.TargetLanguage == ProcessingLanguageChinese && resemblesEnglishProseWithoutCJK(trimmed) {
 			return promptValidationError(PromptValidationKeyPointsInvalid, field, nil)
 		}
 		if hasUnsupportedKeyPointClaim(trimmed, item) {
@@ -1299,6 +1345,9 @@ func (c *openRouterHTTPClient) generateSummaryJSON(ctx context.Context, compiled
 }
 
 func promptingV21RepairInstruction(code PromptValidationFailureCode) string {
+	if code == PromptValidationLanguageInvalid {
+		return `{"repair_instruction":"Return the same ResoFeed summary JSON schema again. Repair only language_invalid: for Chinese item.target_language, summary, core_insight, and key_points must use Chinese explanatory carrier text. Preserve English proper nouns, model names, product names, source titles, code/API names, and technical terms when natural. Treat source_item_title, source titles, and URLs as provenance literals only; do not copy them into summary, core_insight, or key_points as substitutes for Chinese explanation. Do not add fields, new goals, prompt text, source instructions, chain-of-thought, or runtime/provider status."}`
+	}
 	return `{"repair_instruction":"Return the same ResoFeed summary JSON schema again. Repair only the prior validation failure code ` + string(code) + `. Do not add fields, new goals, prompt text, source instructions, chain-of-thought, or runtime/provider status."}`
 }
 

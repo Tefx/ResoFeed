@@ -73,6 +73,167 @@ func TestPromptValidationFailureCodesAndPublicSafeMapping(t *testing.T) {
 	}
 }
 
+func TestPromptValidationLanguageInvalidUsesGeneratedField(t *testing.T) {
+	base := func() OpenRouterSummaryOutput {
+		return OpenRouterSummaryOutput{
+			LocalizedTitle: "中文标题",
+			Summary:        "中文摘要包含来源事实。",
+			CoreInsight:    "中文洞察包含来源事实。",
+			KeyPoints: []string{
+				"中文要点一包含来源事实。",
+				"中文要点二包含来源事实。",
+				"中文要点三包含来源事实。",
+			},
+			ValueTier:   "high",
+			ModelStatus: modelStatusOK,
+		}
+	}
+	cases := []struct {
+		name      string
+		mutate    func(*OpenRouterSummaryOutput)
+		wantField string
+	}{
+		{name: "summary", wantField: "summary", mutate: func(out *OpenRouterSummaryOutput) {
+			out.Summary = "This summary remains incorrectly written in English for Chinese validation."
+		}},
+		{name: "core_insight", wantField: "core_insight", mutate: func(out *OpenRouterSummaryOutput) {
+			out.CoreInsight = "This core insight remains incorrectly written in English."
+		}},
+		{name: "key_points", wantField: "key_points", mutate: func(out *OpenRouterSummaryOutput) {
+			out.KeyPoints[1] = "This key point remains incorrectly written in English for Chinese validation."
+		}},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := base()
+			tc.mutate(&out)
+			err := validatePromptLanguage(out, ProcessingLanguageChinese)
+			var validationErr PromptValidationError
+			if !errors.As(err, &validationErr) || validationErr.Code != PromptValidationLanguageInvalid || validationErr.Field != tc.wantField {
+				t.Fatalf("validation error = %T %[1]v, want language_invalid for %s", err, tc.wantField)
+			}
+			if got := safePromptValidationDiagnostic(err); got != "decode_error:language_invalid:"+tc.wantField {
+				t.Fatalf("safe diagnostic = %q, want field-specific subcode", got)
+			}
+		})
+	}
+}
+
+func TestPromptValidationLanguageInvalidAllowsEnglishLocalizedTitle(t *testing.T) {
+	out := OpenRouterSummaryOutput{
+		LocalizedTitle: "Bonsai Image 4B: I cannot write in the requested language",
+		Summary:        "中文摘要说明 Bonsai Image 4B 的来源事实。",
+		CoreInsight:    "中文洞察说明 Bonsai Image 4B 的意义。",
+		KeyPoints: []string{
+			"中文要点一保留 Bonsai Image 4B 名称。",
+			"中文要点二保留 API 与模型名称。",
+			"中文要点三说明来源事实。",
+		},
+		ValueTier:   "high",
+		ModelStatus: modelStatusOK,
+	}
+	if err := validatePromptLanguage(out, ProcessingLanguageChinese); err != nil {
+		t.Fatalf("language validation rejected English/refusal-like localized_title: %v", err)
+	}
+}
+
+func TestPromptValidationLanguageInvalidAllowsChineseCarrierWithEnglishTerms(t *testing.T) {
+	out := OpenRouterSummaryOutput{
+		LocalizedTitle: "Qwen3 Next API Update",
+		Summary:        "中文摘要说明 Qwen3 Next、OpenRouter API 和 4B model 的来源事实。",
+		CoreInsight:    "核心洞察说明 GPT-5.5 与 JSON API 名称可自然保留。",
+		KeyPoints: []string{
+			"要点一保留 Bonsai Image 4B 产品名并说明来源。",
+			"要点二保留 Go API/code 名称但使用中文解释。",
+			"要点三说明 OpenRouter model routing 的来源事实。",
+		},
+		ValueTier:   "high",
+		ModelStatus: modelStatusOK,
+	}
+	if err := validatePromptLanguage(out, ProcessingLanguageChinese); err != nil {
+		t.Fatalf("language validation rejected Chinese carrier with English terms: %v", err)
+	}
+}
+
+func TestPromptValidationLanguageInvalidAllowsShortNameLikeEnglishReadingFields(t *testing.T) {
+	out := OpenRouterSummaryOutput{
+		LocalizedTitle: "Bonsai Image 4B",
+		Summary:        "Bonsai Image 4B",
+		CoreInsight:    "OpenRouter API",
+		KeyPoints: []string{
+			"Qwen3 Next",
+			"Go API",
+			"GPT-5.5",
+		},
+		ValueTier:   "brief",
+		ModelStatus: modelStatusOK,
+	}
+	if err := validatePromptLanguage(out, ProcessingLanguageChinese); err != nil {
+		t.Fatalf("language validation rejected short title-like English fields: %v", err)
+	}
+}
+
+func TestPromptValidationLanguageInvalidRefusalUsesGeneratedField(t *testing.T) {
+	cases := []struct {
+		name      string
+		mutate    func(*OpenRouterSummaryOutput)
+		wantField string
+	}{
+		{name: "summary", wantField: "summary", mutate: func(out *OpenRouterSummaryOutput) {
+			out.Summary = "I cannot write in the requested language."
+		}},
+		{name: "core_insight", wantField: "core_insight", mutate: func(out *OpenRouterSummaryOutput) {
+			out.CoreInsight = "I refuse to use the requested language."
+		}},
+		{name: "key_points", wantField: "key_points", mutate: func(out *OpenRouterSummaryOutput) {
+			out.KeyPoints[0] = "I refuse to use the requested language."
+		}},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := validPromptingV21Output(tc.mutate)
+			err := validatePromptLanguage(out, ProcessingLanguageChinese)
+			var validationErr PromptValidationError
+			if !errors.As(err, &validationErr) || validationErr.Code != PromptValidationLanguageInvalid || validationErr.Field != tc.wantField {
+				t.Fatalf("validation error = %T %[1]v, want refusal language_invalid %s", err, tc.wantField)
+			}
+			if got := safePromptValidationDiagnostic(err); got != "decode_error:language_invalid:"+tc.wantField {
+				t.Fatalf("safe diagnostic = %q, want field-specific refusal subcode", got)
+			}
+		})
+	}
+}
+
+func TestPromptingV21RepairInstructionLanguageInvalidStrengthensTargetLanguageGuidance(t *testing.T) {
+	instruction := promptingV21RepairInstruction(PromptValidationLanguageInvalid)
+	var payload map[string]string
+	if err := json.Unmarshal([]byte(instruction), &payload); err != nil {
+		t.Fatalf("repair instruction is not compact JSON string style: %v", err)
+	}
+	repair := payload["repair_instruction"]
+	for _, required := range []string{
+		"summary, core_insight, and key_points must use Chinese explanatory carrier text",
+		"Preserve English proper nouns, model names, product names, source titles, code/API names, and technical terms",
+		"item.target_language",
+		"source_item_title, source titles, and URLs as provenance literals only",
+		"do not copy them into summary, core_insight, or key_points as substitutes for Chinese explanation",
+	} {
+		if !strings.Contains(repair, required) {
+			t.Fatalf("repair instruction %q missing required guidance %q", repair, required)
+		}
+	}
+	if strings.Contains(repair, "localized_title") {
+		t.Fatalf("repair instruction must not require localized_title target language: %q", repair)
+	}
+	for _, forbidden := range []string{"secret", "secrets", "raw output", "provider output", "model output", "completion", "choice"} {
+		if strings.Contains(strings.ToLower(repair), forbidden) {
+			t.Fatalf("repair instruction mentions forbidden durable diagnostic concept %q in %q", forbidden, repair)
+		}
+	}
+}
+
 func contractValidSummaryOutputForTest(label string) OpenRouterSummaryOutput {
 	label = strings.TrimSpace(label)
 	if label == "" {
