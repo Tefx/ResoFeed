@@ -259,7 +259,8 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (await page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ }).count() === 0) note(violations, 'F25', 'Source Ledger omits required [RUN INGEST] manual action control');
   if (!/\[DELETE\]/.test(ledgerText)) note(violations, 'F26', `delete action is not visible canonical [DELETE]: ${ledgerText}`);
   if (!/\[IMPORT OPML\]/.test(ledgerText) || !/\[FETCH\]/.test(ledgerText)) note(violations, 'F27', `OPML import and fetch actions are not visible canonical bracket labels: ${ledgerText}`);
-  if (/imported \d+ sources; folders flattened/.test(ledgerText) && !/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', 'import-complete status is shown as a default/import action substitute');
+  // DEVIATION RECORD: type=test_error; artifact=full-ui-design-conformance.expected-red.spec.ts; what_changed=OPML receipt scan uses `OPML outlines flattened`; why=folder product semantics are forbidden and OPML outline flattening is the bounded import receipt; impact=the import-action substitution check remains equivalent.
+  if (/imported \d+ sources; OPML outlines flattened/.test(ledgerText) && !/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', 'import-complete status is shown as a default/import action substitute');
   if (!/\[EXPORT STATE\]/.test(ledgerText) || !/\[IMPORT STATE\]/.test(ledgerText)) note(violations, 'F35', `state actions are not canonical bracket labels: ${ledgerText}`);
   if (!/https?:\/\//.test(ledgerText)) note(violations, 'F29', `source URL column/value is not visible in ledger rows: ${ledgerText}`);
   if (!/src:\s*ResoFeed E2E Local Source/.test(ledgerText) || !/last_fetch:\s*\d{2}:\d{2}:\d{2}/.test(ledgerText)) note(violations, 'F24', `source row grammar lacks src/last_fetch fields: ${ledgerText}`);

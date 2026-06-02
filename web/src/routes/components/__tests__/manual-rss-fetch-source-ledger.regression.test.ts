@@ -197,7 +197,8 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(appCss).toMatch(/\.bracket-action\s*\{[\s\S]*cursor:\s*pointer;/);
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action--delete');
-    expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
+    // DEVIATION RECORD: type=test_error; artifact=manual-rss-fetch-source-ledger.regression.test.ts; what_changed=negative OPML receipt assertion uses `OPML outlines flattened`; why=folder terminology is stale and forbidden; impact=manual fetch still proves no unrelated OPML import receipt appears.
+    expect(within(ledger).queryByText('imported 3 sources; OPML outlines flattened')).not.toBeInTheDocument();
     expect(ledger.querySelector('[class*="spinner"], [class*="progress"], [class*="animate"]')).toBeNull();
   });
 

@@ -245,7 +245,9 @@ describe('expected-red processing language and reprocess rendering contracts', (
       }
     });
     expect(screen.getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
-    expect(screen.getByText('src: Example Source')).toHaveTextContent('src: Example Source');
+    // DEVIATION RECORD: type=test_error; artifact=processing-language-reprocess.expected-red.test.ts; what_changed=feed source assertion now requires literal visible source value without repeated `src:` prefix while preserving the `Source: Example Source` accessible label; why=DESIGN.FEED.NO_REPEATED_PREFIXES and DESIGN.SOURCE_IDENTIFIERS require no repeated visual reader prefixes but unchanged, screen-reader-readable source provenance; impact=coverage is tightened to catch stale visual `src:` regressions instead of requiring forbidden reader chrome.
+    expect(screen.getByText('Example Source')).toHaveAttribute('translate', 'no');
+    expect(screen.queryByText('src: Example Source')).not.toBeInTheDocument();
 
     render(Inspector, { props: { item: expectedRedDetail, mode: 'desktop-split' } });
     const inspector = screen.getByRole('complementary', { name: expectedRedDetail.title });

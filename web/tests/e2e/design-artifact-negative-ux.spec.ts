@@ -48,7 +48,7 @@ const assertionTable = [
   '| --- | --- | --- |',
   '| Required artifact screenshots exist for owner-token, first-use, today-list, source-ledger, selected-item, selected-hover, inspector-clean, inspector-raw-expanded/provenance, llm-error, search, and mobile views. | docs/UI_REGRESSION_CONTRACT.md:117-136 | JSON manifest plus attached PNG screenshots. |',
   '| Primary feed/Inspector/Search text must not expose `{ "@context"`, huge JSON, parser dumps, `<script>`, or `<style>`. | docs/UI_REGRESSION_CONTRACT.md:92-99 and 138-150 | Text extracted from primary content selectors only. |',
-  '| Product UI must not introduce unread/folder/tag/settings, onboarding wizard, mascot/SaaS/AI-magic, purple AI trust palette, or internal design-positioning copy. | docs/DESIGN.md:263, 523-533; docs/DESIGN_VISION.md:63-68 | Main shell text after allowlisted `folders flattened` receipt removal. |',
+  '| Product UI must not introduce unread/folder/tag/settings, onboarding wizard, mascot/SaaS/AI-magic, purple AI trust palette, or internal design-positioning copy. | docs/DESIGN.md:263, 523-533; docs/DESIGN_VISION.md:63-68 | Main shell text after allowlisted `OPML outlines flattened` receipt removal. |',
   '| TODAY and SOURCE LEDGER nav clicks must activate the intended panel and leave wrong panels inactive. | docs/UI_REGRESSION_CONTRACT.md:17-29 and 138-144 | `data-surface`, `.active-panel`, and pointer topmost checks. |',
   '| Raw/provenance payload artifacts require a labelled disclosure/expanded secondary provenance surface, not primary wall text. | docs/UI_REGRESSION_CONTRACT.md:78-99 and 130-132 | `details`/`summary` or equivalent labelled raw/provenance disclosure is required. |'
 ].join('\n');
@@ -128,7 +128,8 @@ async function seedFeedFromOpml(page: Page, opmlPath: string): Promise<void> {
   const sourceRow = page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' }).first();
   if (!(await sourceRow.first().isVisible().catch(() => false))) {
     await page.locator('#opml-file').setInputFiles(opmlPath);
-    await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+    // DEVIATION RECORD: type=test_error; artifact=design-artifact-negative-ux.spec.ts; what_changed=OPML receipt expects/allows `OPML outlines flattened`; why=folder terminology is forbidden by product/design negative-space authority; impact=negative UX scan still proves import completion and no forbidden surfaces.
+    await expect(page.getByText('imported 1 sources; OPML outlines flattened')).toBeVisible();
   }
   const runIngestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
   await expect(runIngestButton).toBeVisible();
@@ -154,7 +155,7 @@ async function assertPrimaryTextIsClean(page: Page): Promise<void> {
 
 async function assertForbiddenUxCopyAbsent(page: Page): Promise<void> {
   const shellText = ((await page.locator('main.contract-shell').innerText()) || '')
-    .replace(/folders flattened/gi, '<allowed-opml-flattened-receipt>');
+    .replace(/OPML outlines flattened/gi, '<allowed-opml-flattened-receipt>');
   expect(shellText, 'no unread/folder/tag/settings/onboarding/SaaS/AI-magic/product-metaphor copy').not.toMatch(
     /\bunread\b|\bfolders?\b|\btags?\b|\bsettings?\b|mark all read|archive bin|onboarding wizard|mascot|confetti|ghost|AI[- ]magic|purple AI trust palette|Analyst'?s Workbench|Archival Index|low-fatigue|single-tenant|no SaaS chrome/i
   );
@@ -206,7 +207,7 @@ test('design artifact manifest captures required ResoFeed UI contract states', a
 
   await activateSurfaceMenuEntry(page, 'SOURCE LEDGER');
   await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-  await expect(page.getByText(/imported 1 sources; folders flattened|skipped 1 existing sources/)).toBeVisible();
+  await expect(page.getByText(/imported 1 sources; OPML outlines flattened|skipped 1 existing sources/)).toBeVisible();
   await captureArtifact(page, testInfo, manifest, 'source-ledger', 'Ledger active with OPML import receipt and flattened source row.');
 
   const runIngestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });

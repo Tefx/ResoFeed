@@ -125,7 +125,8 @@ test('expected-red keyboard a11y Source Ledger OPML state with manual fetch cont
   expect.soft(opmlBox?.width ?? 0, 'OPML import control has detectable keyboard hit width').toBeGreaterThanOrEqual(44);
   expect.soft(opmlBox?.height ?? 0, 'OPML import control has detectable keyboard hit height').toBeGreaterThanOrEqual(44);
   await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-  await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
+    // DEVIATION RECORD: type=test_error; artifact=keyboard-a11y.expected-red.spec.ts; what_changed=OPML import receipt expects `OPML outlines flattened`; why=folder terminology is forbidden while source-subscription outline flattening remains; impact=keyboard OPML proof still waits for import completion.
+    await expect(page.getByText(/imported \d+ sources; OPML outlines flattened/)).toBeVisible();
 
   await focusAndAudit(page.getByRole('button', { name: '[RUN INGEST]' }), 'Source Ledger run ingest action');
   await focusAndAudit(page.getByRole('button', { name: '[FETCH]' }).first(), 'Source Ledger fetch source action');

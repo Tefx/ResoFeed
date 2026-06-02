@@ -252,7 +252,8 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
     const ledger = page.locator('.source-ledger');
     const importInput = ledger.locator('#opml-file');
     await importInput.setInputFiles({ name: 'azrct.opml', mimeType: 'text/xml', buffer: Buffer.from(opmlFixture) });
-    await expect(ledger.getByText('imported 1 sources; folders flattened')).toBeVisible();
+    // DEVIATION RECORD: type=test_error; artifact=azrct-audit-zh-repair.regression.spec.ts; what_changed=OPML receipt expects `OPML outlines flattened`; why=folder product semantics are forbidden while OPML outline flattening remains; impact=zh audit setup still proves successful import.
+    await expect(ledger.getByText('imported 1 sources; OPML outlines flattened')).toBeVisible();
     expect(calls.filter((call) => call === 'POST /api/sources/import-opml')).toHaveLength(1);
     expect(calls.filter((call) => call === 'POST /api/ingest'), 'OPML import must not call runIngest()/POST /api/ingest').toHaveLength(0);
   });

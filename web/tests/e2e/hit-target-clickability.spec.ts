@@ -55,7 +55,8 @@ async function prepareImportedFeed(page: Page, ownerToken: string, opmlPath: str
   const sourceRow = page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' }).first();
   if (!(await sourceRow.isVisible())) {
     await page.locator('#opml-file').setInputFiles(opmlPath);
-    await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
+    // DEVIATION RECORD: type=test_error; artifact=hit-target-clickability.spec.ts; what_changed=OPML import receipt expects `OPML outlines flattened`; why=folder terminology is forbidden product-surface drift; impact=hit-target setup still waits on successful OPML import.
+    await expect(page.getByText(/imported \d+ sources; OPML outlines flattened/)).toBeVisible();
   }
   const runIngestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
   await expect(runIngestButton).toBeVisible();

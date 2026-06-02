@@ -41,7 +41,8 @@ export async function importFixtureAndIngest(page: Page, runInfo: E2ERunInfo): P
   const sourceText = page.getByTestId('source-row').filter({ hasText: /ResoFeed E2E Local Source/ });
   if (!(await sourceText.isVisible().catch(() => false))) {
     await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-    await expect(page.getByText(/imported \d+ sources; folders flattened/)).toBeVisible();
+    // DEVIATION RECORD: type=test_error; artifact=keyboard-a11y-helpers.ts; what_changed=shared OPML helper expects `OPML outlines flattened`; why=folder terminology is forbidden product-surface drift; impact=helper still proves successful OPML import before keyboard checks proceed.
+    await expect(page.getByText(/imported \d+ sources; OPML outlines flattened/)).toBeVisible();
     await expect(sourceText).toBeVisible({ timeout: 15_000 });
   }
   const runIngest = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });

@@ -160,7 +160,8 @@ async function visibleText(locator: Locator): Promise<string> {
 }
 
 async function expectVisiblePrimaryCopyClean(locator: Locator, label: string): Promise<void> {
-  const text = (await visibleText(locator)).replace(/imported \d+ sources; folders flattened/gi, '');
+  // DEVIATION RECORD: type=test_error; artifact=ui-navigation-hover-inspector-repair.expected-red.spec.ts; what_changed=OPML receipt allowlist uses `OPML outlines flattened`; why=folder terminology is forbidden product-surface drift while OPML outline flattening remains the source-import behavior; impact=negative navigation scan remains scoped without allowing folder UI copy.
+  const text = (await visibleText(locator)).replace(/imported \d+ sources; OPML outlines flattened/gi, '');
   expect(text, `${label} visible primary copy must avoid forbidden product-language drift`).not.toMatch(forbiddenPrimaryCopy);
 }
 

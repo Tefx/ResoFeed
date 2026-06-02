@@ -907,7 +907,7 @@ States:
 - empty: `No sources. Paste RSS URL in Steer.`;
 - OPML import default: `[IMPORT OPML]` in the Ledger header/footer action cluster;
 - OPML import active: `[IMPORTING OPML...]`, disabled, no spinner, no progress animation;
-- OPML import complete: revert to `[IMPORT OPML]` and show `imported N sources; folders flattened`;
+- OPML import complete: revert to `[IMPORT OPML]` and show `imported N sources; OPML outlines flattened`;
 - OPML import failed: revert to `[IMPORT OPML]` and show raw `err: <diagnostic>` text;
 - global ingest default: `[RUN INGEST]` in the Ledger header/action bar;
 - global ingest active: `[INGESTING...]`, disabled, no spinner, no progress animation; show `op: manual_ingest · actor:human · phase:<phase> · <counts/message> · since HH:MM:SS` in the header status line when available;

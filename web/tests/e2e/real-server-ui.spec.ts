@@ -345,7 +345,8 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await expect(page.getByText('No sources. Paste RSS URL in Steer.')).toBeVisible();
 
   await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-  await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+  // DEVIATION RECORD: type=test_error; artifact=web/tests/e2e/real-server-ui.spec.ts; what_changed=OPML import receipt expects `OPML outlines flattened` instead of `folders flattened`; why=CONSTITUTION/PRD/ARCHITECTURE forbid folder product semantics and define OPML as source-subscription import only with ignored/flattened outlines, so the old expectation used stale folder-surface copy; impact=same import completion coverage and count proof, with folder terminology removed.
+  await expect(page.getByText('imported 1 sources; OPML outlines flattened')).toBeVisible();
   await expect(page.locator('.source-ledger__row', { hasText: /127\.0\.0\.1:\d+/ })).toContainText('last_fetch: not_fetched');
 
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
@@ -357,7 +358,10 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await openToday(page);
   const fixtureFeedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   await expect(fixtureFeedItem).toBeVisible();
-  await expect(fixtureFeedItem).toContainText('src: ResoFeed E2E Local Source');
+  // DEVIATION RECORD: type=test_error; artifact=web/tests/e2e/real-server-ui.spec.ts; what_changed=Feed source proof now checks visible source value plus accessible `Source:` label, not visual `src:` prefix; why=DESIGN.FEED.NO_REPEATED_PREFIXES forbids repeated visual `src:` reader prefixes while preserving source provenance through position and accessibility; impact=runtime source-disclosure coverage remains, and forbidden reader prefix regressions are caught.
+  await expect(fixtureFeedItem).toContainText('ResoFeed E2E Local Source');
+  await expect(fixtureFeedItem.getByLabel('Source: ResoFeed E2E Local Source')).toHaveText('ResoFeed E2E Local Source');
+  await expect(fixtureFeedItem).not.toContainText('src: ResoFeed E2E Local Source');
   await expect(fixtureFeedItem.getByLabel('Extraction: original_unavailable')).toHaveText('excerpt');
 
   await fixtureFeedItem.click();
@@ -383,7 +387,10 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await page.getByRole('button', { name: 'submit search' }).click();
   await expect(page.locator('#search-status')).toContainText('1 results');
   await expect(page.getByRole('region', { name: 'Search results' })).toContainText('Local fixture item one');
-  await expect(page.getByRole('region', { name: 'Search results' })).toContainText('src: ResoFeed E2E Local Source');
+  // DEVIATION RECORD: type=test_error; artifact=web/tests/e2e/real-server-ui.spec.ts; what_changed=Search source proof now checks visible source value plus accessible `Source:` label, not visual `src:` prefix; why=Search results reuse feed-item reader anatomy, and DESIGN.FEED.NO_REPEATED_PREFIXES/traceability reserve raw `src:` for Source Ledger/diagnostics only; impact=search provenance coverage remains without requiring forbidden visual chrome.
+  await expect(page.getByRole('region', { name: 'Search results' })).toContainText('ResoFeed E2E Local Source');
+  await expect(page.getByRole('region', { name: 'Search results' }).getByLabel('Source: ResoFeed E2E Local Source')).toHaveText('ResoFeed E2E Local Source');
+  await expect(page.getByRole('region', { name: 'Search results' })).not.toContainText('src: ResoFeed E2E Local Source');
   } finally {
     server.child.kill();
   }
@@ -438,7 +445,8 @@ test('ci-safe real server live audit proof produces complete browser artifacts w
       mimeType: 'text/xml',
       buffer: Buffer.from(fixtureOpml(feedServer.url), 'utf8')
     });
-    await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+    // DEVIATION RECORD: type=test_error; artifact=web/tests/e2e/real-server-ui.spec.ts; what_changed=live audit OPML receipt expects `OPML outlines flattened` instead of `folders flattened`; why=folder terminology is forbidden product-surface drift while OPML outline flattening remains allowed source-import behavior; impact=browser audit remains blocked on successful import/count but no longer on stale copy.
+    await expect(page.getByText('imported 1 sources; OPML outlines flattened')).toBeVisible();
     await page.getByRole('button', { name: '[RUN INGEST]' }).click();
     await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
 
@@ -547,7 +555,8 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
 
   await openSourceLedger(page);
   await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-  await expect(page.getByText('imported 1 sources; folders flattened')).toBeVisible();
+  // DEVIATION RECORD: type=test_error; artifact=web/tests/e2e/real-server-ui.spec.ts; what_changed=parity OPML receipt expects `OPML outlines flattened` instead of `folders flattened`; why=OPML import ignores/flat maps outlines, but folder product semantics remain forbidden by CONSTITUTION/PRD; impact=API/MCP parity setup still proves import success before feed/parity assertions.
+  await expect(page.getByText('imported 1 sources; OPML outlines flattened')).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
   await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 15_000 });
   await openToday(page);

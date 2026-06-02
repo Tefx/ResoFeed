@@ -29,7 +29,8 @@ async function ensureSeededItem(page: Page, runInfo: { artifactRoot: string; fix
   await steer(page, 'source ledger');
   await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
   await page.locator('#opml-file').setInputFiles(path.join(runInfo.artifactRoot, 'fixtures', 'flattened.opml'));
-  await expect(page.getByText(/imported \d+ sources; folders flattened|skipped \d+ existing sources/)).toBeVisible();
+  // DEVIATION RECORD: type=test_error; artifact=prd-pbar-expected-red-browser-gaps.spec.ts; what_changed=OPML import receipt expects `OPML outlines flattened`; why=authority forbids folders as product semantics and OPML import only flattens outlines; impact=import/skipped receipt coverage remains unchanged.
+  await expect(page.getByText(/imported \d+ sources; OPML outlines flattened|skipped \d+ existing sources/)).toBeVisible();
   const feedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   const ingestButton = page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ });
   await expect(ingestButton).toBeVisible();

@@ -567,7 +567,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(ledger).getByText(`last_fetch: ${formatLocalClockTime(expectedRedSource.last_fetch_at)}`)).toBeVisible();
     expect(within(ledger).getByText('[EXPORT STATE]')).toBeVisible();
     expect(within(ledger).getByText('[IMPORT STATE]')).toBeVisible();
-    expect(within(ledger).queryByText('imported 3 sources; folders flattened')).not.toBeInTheDocument();
+    // DEVIATION RECORD: type=test_error; artifact=rendering-expected-red.test.ts; what_changed=negative OPML receipt assertion uses `OPML outlines flattened`; why=folder terminology is stale and forbidden; impact=rendering proof still rejects unrelated import receipt presence.
+    expect(within(ledger).queryByText('imported 3 sources; OPML outlines flattened')).not.toBeInTheDocument();
 
     await user.click(within(ledger).getByRole('button', { name: 'Delete source: Example Source' }));
     expect(within(ledger).getByRole('button', { name: 'confirm delete source: Example Source' })).toBeVisible();
