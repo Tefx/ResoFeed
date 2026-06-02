@@ -872,8 +872,7 @@ details.surface-nav button:focus-visible {
   gap: var(--rf-space-row);
   align-items: start;
   border-block-end: 1px solid var(--rf-color-rule);
-  /* [DEVIATION]: The compact runtime contract caps rows at 112px; reducing only vertical padding preserves the feed scan row without changing typography, clamping, or the 44px Resonate target. */
-  padding: 10px var(--rf-space-row) 9px 0;
+  padding: var(--rf-space-row) var(--rf-space-row) 11px 0;
 }
 
 .contract-feed-item::before {
@@ -929,6 +928,7 @@ details.surface-nav button:focus-visible {
 .contract-feed-meta .feed-meta-extraction,
 .contract-feed-meta .feed-meta-secondary,
 .contract-feed-meta .feed-meta-agent,
+.contract-feed-meta .feed-meta-grouped,
 .contract-search-time-label {
   flex: 0 0 auto;
 }

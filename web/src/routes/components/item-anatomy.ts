@@ -223,6 +223,25 @@ export function itemCompactPreviewText(item: ItemSummary, language: ProcessingLa
   return preview || itemSummaryText(item, language);
 }
 
+function stripReaderRowForbiddenText(text: string): string {
+  return text
+    .replace(/https?:\/\/\S+|www\.\S+/giu, ' ')
+    .replace(/(?:^|[\s·])(?:Key Points?|要点|核心洞察)\s*[:：]?/giu, ' ')
+    .replace(/(?:^|\s)(?:[-*•‣]|\d+[.)、])\s+/gu, ' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
+}
+
+export function itemReaderRowPreviewText(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
+  const chrome = itemAnatomyChrome(language);
+  const preview = itemCompactPreviewText(item, language);
+  const compactSegments = preview
+    .split(' · ')
+    .map((segment) => stripReaderRowForbiddenText(segment))
+    .filter((segment) => segment.length > 0);
+  return compactSegments.join(' · ') || chrome.summaryUnavailable;
+}
+
 export function itemTimestamp(item: ItemSummary): Rfc3339UtcString | null {
   return itemDisplayTimestamp(item);
 }
@@ -286,6 +305,17 @@ export function itemPriorityLabel(item: ItemSummary, language: ProcessingLanguag
   if (item.model_status !== 'ok') return `${chrome.qualityPrefix}: ${itemExtractionLabel(item.extraction_status, language)}`;
   if (item.extraction_status !== 'full') return `${chrome.qualityPrefix}: ${itemExtractionLabel(item.extraction_status, language)}`;
   return chrome.sourceBacked;
+}
+
+export function itemReaderRowPriorityToken(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
+  const chrome = itemAnatomyChrome(language).priority;
+  if (item.value_tier) return chrome.valueTier[item.value_tier] ?? item.value_tier;
+  if (item.model_status !== 'ok' || item.extraction_status !== 'full') return itemExtractionLabel(item.extraction_status, language);
+  return language === 'zh' ? '来源支持' : 'source-backed';
+}
+
+export function itemHasAuthoritativeGrouping(item: ItemSummary): boolean {
+  return Boolean(item.story_key || item.duplicate_of_item_id);
 }
 
 export function shouldShowTimeGroup(items: ItemSummary[], index: number, now = new Date()): boolean {

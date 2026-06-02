@@ -1,6 +1,6 @@
 <script lang="ts">
   import { itemDisplayTimestamp, processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage } from '$lib/api-contract';
-  import { compareItemsByTimeGroup, itemAgeLabel, itemAnatomyChrome, itemCompactPreviewText, itemExtractionLabel, itemLocalizedDisplayTitle, itemPriorityLabel, itemSourceProvenanceTitle, itemSummaryProvenanceLabel, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { compareItemsByTimeGroup, itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemHasAuthoritativeGrouping, itemLocalizedDisplayTitle, itemReaderRowPreviewText, itemReaderRowPriorityToken, itemSourceProvenanceTitle, itemSummaryProvenanceLabel, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -62,7 +62,19 @@
   function titleDistinctionLabel(item: ItemSummary): string {
     return language === 'zh'
       ? `来源标题 ${itemSourceProvenanceTitle(item)}`
-      : `Source title: ${itemSourceProvenanceTitle(item)}`;
+      : `Original item title ${itemSourceProvenanceTitle(item)}`;
+  }
+
+  function sourceProvenanceLabel(item: ItemSummary): string {
+    const source = chrome.feed.sourceAria(item.source_title);
+    const sourceItemTitle = titleDistinctionLabel(item);
+    return itemSourceProvenanceTitle(item) === itemLocalizedDisplayTitle(item, language) ? source : `${source}; ${sourceItemTitle}`;
+  }
+
+  function groupingLabel(item: ItemSummary): string {
+    return language === 'zh'
+      ? `同组故事：后端权威分组 ${item.story_key ?? item.duplicate_of_item_id ?? ''}`.trim()
+      : `Grouped story: authoritative backend grouping ${item.story_key ?? item.duplicate_of_item_id ?? ''}`.trim();
   }
 
   function resonanceLabel(item: ItemSummary): string {
@@ -72,12 +84,7 @@
 
   function feedPreviewText(item: ItemSummary): string {
     if (item.title === 'Model error keeps raw terse status') return chrome.summaryUnavailable;
-    const preview = itemCompactPreviewText(item, language);
-    const compactSegments = preview
-      .split(' · ')
-      .map((segment) => segment.trim())
-      .filter((segment) => segment.length > 0 && !/要点|核心洞察|Key Points/i.test(segment));
-    return compactSegments.join(' · ') || preview.replace(/要点|核心洞察|Key Points/gi, '').replace(/\s+/g, ' ').trim();
+    return itemReaderRowPreviewText(item, language);
   }
 </script>
 
@@ -93,14 +100,14 @@
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">
-            <span class="feed-meta-source" aria-label={chrome.feed.sourceAria(item.source_title)} translate={sourceTitleTranslate}>{item.source_title}</span>
-            {#if itemSourceProvenanceTitle(item) !== itemLocalizedDisplayTitle(item, language)}
-              <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-source-title" aria-label={titleDistinctionLabel(item)} translate="no"><span>{itemSourceProvenanceTitle(item)}</span></span>
-            {/if}
+            <span class="feed-meta-source" aria-label={sourceProvenanceLabel(item)} translate={sourceTitleTranslate}>{item.source_title}</span>
             <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={chrome.feed.ageAria(itemAgeLabel(item, feedTimeGroupReference, language))}>{itemAgeLabel(item, feedTimeGroupReference, language)}</span>
             <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={chrome.feed.extractionAria(item.extraction_status)}>{itemExtractionLabel(item.extraction_status, language)}</span>
             <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.summaryProvenanceAria(itemSummaryProvenanceLabel(item, language))}>{itemSummaryProvenanceLabel(item, language)}</span>
-            <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.priorityAria(itemPriorityLabel(item, language))}>{itemPriorityLabel(item, language)}</span>
+            <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.priorityAria(itemReaderRowPriorityToken(item, language))}>{itemReaderRowPriorityToken(item, language)}</span>
+            {#if itemHasAuthoritativeGrouping(item)}
+              <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-grouped" aria-label={groupingLabel(item)}>{language === 'zh' ? '同组' : 'grouped'}</span>
+            {/if}
             {#if item.external_surfaced_at}
               <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-agent" aria-label={chrome.feed.externallySurfacedByAgent}>agent:external</span>
             {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage, type SearchResponse } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
-  import { itemAgeLabel, itemAnatomyChrome, itemCompactPreviewText, itemExtractionLabel, itemLocalizedDisplayTitle, itemPriorityLabel, itemSourceBackedProvenanceLabel, itemSourceProvenanceTitle, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemHasAuthoritativeGrouping, itemLocalizedDisplayTitle, itemReaderRowPreviewText, itemReaderRowPriorityToken, itemSourceBackedProvenanceLabel, itemSourceProvenanceTitle, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -48,7 +48,7 @@
       resultsList: '搜索结果条目',
       inspect: (title: string) => `检查搜索结果：${title}`,
       sourceItemTitle: (title: string) => `来源标题 ${title}`,
-      extractionPrefix: '提取：',
+      extractionPrefix: '',
       resonate: (item: ItemSummary) => item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`
     }
     : {
@@ -69,10 +69,22 @@
       resultsRegion: 'Search results',
       resultsList: 'Search result items',
       inspect: (title: string) => `Inspect search result: ${title}`,
-      sourceItemTitle: (title: string) => `Source title: ${title}`,
-      extractionPrefix: 'extraction: ',
+      sourceItemTitle: (title: string) => `Original item title ${title}`,
+      extractionPrefix: '',
       resonate: (item: ItemSummary) => item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`
     });
+
+  function sourceProvenanceLabel(item: ItemSummary): string {
+    const source = chrome.search.sourceAria(item.source_title);
+    const sourceItemTitle = searchChrome.sourceItemTitle(itemSourceProvenanceTitle(item));
+    return itemSourceProvenanceTitle(item) === itemLocalizedDisplayTitle(item, language) ? source : `${source}; ${sourceItemTitle}`;
+  }
+
+  function groupingLabel(item: ItemSummary): string {
+    return language === 'zh'
+      ? `同组故事：后端权威分组 ${item.story_key ?? item.duplicate_of_item_id ?? ''}`.trim()
+      : `Grouped story: authoritative backend grouping ${item.story_key ?? item.duplicate_of_item_id ?? ''}`.trim();
+  }
 
   $effect(() => {
     if (!query) {
@@ -192,9 +204,7 @@
             onclick={() => void openInspector(item)}
           >
             <p class="contract-label contract-feed-meta contract-search-meta-primary">
-              <span class="feed-meta-source" aria-label={chrome.search.sourceAria(item.source_title)} translate={sourceTitleTranslate}>{item.source_title}</span>
-              <span aria-hidden="true">·</span>
-              <span class="feed-meta-source-title" aria-label={searchChrome.sourceItemTitle(itemSourceProvenanceTitle(item))} translate="no"><span>{itemSourceProvenanceTitle(item)}</span></span>
+              <span class="feed-meta-source" aria-label={sourceProvenanceLabel(item)} translate={sourceTitleTranslate}>{item.source_title}</span>
               <span aria-hidden="true">·</span>
               <span class="feed-meta-age" aria-label={chrome.search.ageAria(itemAgeLabel(item, new Date(), language))}>{itemAgeLabel(item, new Date(), language)}</span>
               {#if shouldShowTimeGroup(results, index)}
@@ -205,13 +215,16 @@
               <span class="feed-meta-extraction" aria-label={chrome.search.extractionAria(itemExtractionLabel(item.extraction_status, language))}>{searchChrome.extractionPrefix}{itemExtractionLabel(item.extraction_status, language)}</span>
               <span>{chrome.search.matchLexicalIndex}</span>
               <span>{language === 'zh' ? itemSourceBackedProvenanceLabel(language) : chrome.search.provenanceSourceBacked}</span>
-              <span aria-label={chrome.search.priorityAria(itemPriorityLabel(item, language))}>{itemPriorityLabel(item, language)}</span>
+              <span aria-label={chrome.search.priorityAria(itemReaderRowPriorityToken(item, language))}>{itemReaderRowPriorityToken(item, language)}</span>
+              {#if itemHasAuthoritativeGrouping(item)}
+                <span aria-label={groupingLabel(item)}>{language === 'zh' ? '同组' : 'grouped'}</span>
+              {/if}
               {#if item.external_surfaced_at}
                 <span aria-label={chrome.search.externallySurfacedByAgent}>agent:external</span>
               {/if}
             </p>
             <p class="contract-feed-title" aria-label={language === 'zh' ? `本地化标题：${itemLocalizedDisplayTitle(item, language)}` : `Localized title: ${itemLocalizedDisplayTitle(item, language)}`}>{itemLocalizedDisplayTitle(item, language)}</p>
-            <p class="contract-feed-summary">{itemCompactPreviewText(item, language)}</p>
+            <p class="contract-feed-summary">{itemReaderRowPreviewText(item, language)}</p>
           </button>
           <button
             class="contract-resonate"
