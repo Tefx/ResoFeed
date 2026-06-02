@@ -1,0 +1,32 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt": source ledger
+  - region "SOURCE LEDGER surface":
+    - button "back to TODAY"
+    - region "SOURCE LEDGER":
+      - heading "SOURCE LEDGER" [level=1]
+      - text: "last_ingest: 04:26:36"
+      - button "[RUN INGEST]"
+      - button "[IMPORT OPML]"
+      - group "State portability":
+        - button "[EXPORT STATE]"
+        - button "[IMPORT STATE]"
+        - text: State JSON import file
+        - button "Choose state JSON / State JSON import file"
+        - text: import replaces active sources, rules, and stars
+      - text: imported 1 sources; OPML outlines flattened
+      - list:
+        - listitem:
+          - text: "src: Live Audit Source · status: ok · last_fetch: 04:26:36 url: http://127.0.0.1:49486/policy-feed.xml last_fetch: 04:26:36"
+          - button "[FETCH] Fetch source Live Audit Source": "[FETCH]"
+          - 'button "Delete source: Live Audit Source"': "[DELETE]"
+          - group: "[DETAILS]"

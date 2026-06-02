@@ -1,0 +1,11 @@
+{
+  "steering-receipt": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui--parity-bro-7ff5c-are-one-real-server-fixture-chromium-ci-safe/real-server-live-audit-proof/steering-receipt.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui--parity-bro-7ff5c-are-one-real-server-fixture-chromium-ci-safe/real-server-live-audit-proof/steering-receipt.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required applied: steering updated · rules:1 [UNDO] Independent scroll region TODAY feed Today feed items ResoFeed E2E Local Source · 1m · excerpt · fallback · excerpt TODAY Local fixture item one summary unavailable ★ INSPECTOR ResoFeed E2E Local Source · excerpt Local fixture item one Localized title: Local fixture item one ORIGINAL Local fixture item one LINKS Article ↗ ·Feed ↗ AI STATUS fallback unavailable · original unavailable · quality: original_unavailable ATTEMPT failed · attempt error · preserved target-language processing incomplete · summary/core unavailable summary provenance: fallback unavailable · quality: original_unavailable summary: unavailable original unavailable ITEM RE-INGEST [RE-INGEST ITEM] re-ingest complete · search unchanged Source text (collapsed) · source text: source details why: fresh from configured source"
+  }
+}

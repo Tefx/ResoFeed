@@ -1,0 +1,24 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt": today
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - paragraph: TODAY feed
+    - region "Today feed items":
+      - text: Today feed items
+      - list "Today feed items":
+        - listitem:
+          - 'button "Open Inspector for: Live audit item one"':
+            - paragraph: Live Audit Source TODAY
+            - paragraph: Live audit item one
+            - paragraph: Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. · Source text remains readable.
+          - 'button "Resonate item: Live audit item one"': ☆

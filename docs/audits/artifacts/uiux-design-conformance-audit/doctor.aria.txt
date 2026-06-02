@@ -1,0 +1,14 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - region "/doctor":
+    - heading "/doctor" [level=2]
+    - log "/doctor diagnostics": "rss: ok openrouter: ok item_transform_failures:0 openrouter: provider_reachable:true configured_model=account_default openrouter: model_resolved:true resolved_model=openrouter/e2e-deterministic openrouter: item_transform_failures:0 openrouter: current_item_transform_failures=0 historic_item_transform_failures=0 openrouter: live_summary_successes=0 fallback_only_current_summaries=0 openrouter: health_classification=unresolved_product_regression fallback_provenance: item_transform_failures:0 summary=none fallback_provenance: item=item_1b0da16cffc4a919f46d15eca0042af4 summary=model model_status=ok extraction_status=partial_extraction search_fts: ok extraction: failures=1 extraction: item=item_1b0da16cffc4a919f46d15eca0042af4 source=src_b0273324ae27cf3334ec29c24cc57a20 status=partial_extraction title=Live audit item one ingest: last_run=2026-06-02T04:26:36Z ingest: first_fetch_limit=50"

@@ -1,0 +1,57 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt":
+    - text: "applied: steering updated · rules:1"
+    - button "[UNDO]"
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - paragraph: TODAY feed
+    - region "Today feed items":
+      - text: Today feed items
+      - list "Today feed items":
+        - listitem:
+          - 'button "Open Inspector for: Local fixture item one"':
+            - paragraph: ResoFeed E2E Local Source 1m excerpt fallback excerpt TODAY
+            - paragraph: Local fixture item one
+            - paragraph: summary unavailable
+          - 'button "Remove resonance: Local fixture item one / Resonate item: Local fixture item one" [pressed]': ★
+  - region "INSPECTOR independent scroll":
+    - complementary "INSPECTOR":
+      - complementary "Local fixture item one":
+        - paragraph: INSPECTOR
+        - paragraph: ResoFeed E2E Local Source · excerpt
+        - heading "Local fixture item one" [level=2]
+        - term: ORIGINAL
+        - definition: Local fixture item one
+        - term: LINKS
+        - definition:
+          - link "original link":
+            - /url: http://127.0.0.1:49442/e2e-feed.xml
+            - text: Article ↗
+          - link "feed link":
+            - /url: http://127.0.0.1:49442/e2e-feed.xml
+            - text: Feed ↗
+        - term: AI STATUS
+        - definition: "fallback unavailable · original unavailable · quality: original_unavailable"
+        - term: ATTEMPT
+        - definition: failed · attempt error · preserved
+        - paragraph: target-language processing incomplete · summary/core unavailable
+        - paragraph: "summary provenance: fallback unavailable · quality: original_unavailable"
+        - paragraph: "summary: unavailable"
+        - status: original unavailable
+        - region "Item re-ingest":
+          - paragraph: ITEM RE-INGEST
+          - button "[RE-INGEST ITEM]"
+          - status "Item re-ingest status": re-ingest complete · search unchanged
+        - group "Source text": "Source text (collapsed) · source text:"
+        - group "Source details": source details
+        - paragraph: "why: fresh from configured source"

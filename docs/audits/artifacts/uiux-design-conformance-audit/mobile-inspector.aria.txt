@@ -1,0 +1,53 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - region "Steer route preview"
+  - text: Steer route preview URL required
+  - status "Steer receipt": today
+  - region "INSPECTOR independent scroll":
+    - button "back to TODAY"
+    - complementary "INSPECTOR":
+      - complementary "Live audit item one":
+        - paragraph: INSPECTOR
+        - paragraph: Live Audit Source · source excerpt · high
+        - 'button "Resonate item: Live audit item one"': ☆
+        - heading "Live audit item one" [level=2]
+        - term: ORIGINAL
+        - definition: Live audit item one
+        - term: LINKS
+        - definition:
+          - link "original link":
+            - /url: https://live-audit.example.test/items/one
+            - text: Article ↗
+          - link "feed link":
+            - /url: http://127.0.0.1:49486/policy-feed.xml
+            - text: Feed ↗
+        - term: AI STATUS
+        - definition: "model-backed · source excerpt · quality: high"
+        - paragraph: "source text: RSS excerpt only · summary provenance: model-backed"
+        - paragraph: "summary provenance: model-backed · quality: high"
+        - paragraph: "source text: RSS excerpt only"
+        - region "Summary":
+          - paragraph: Summary
+          - paragraph: Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces.
+        - region "Core insight":
+          - paragraph: Core insight
+          - paragraph: Source text remains readable.
+        - region "Key points":
+          - paragraph: Key points
+          - list:
+            - listitem: Source text remains available.
+            - listitem: Source text is preserved for review.
+            - listitem: Source excerpt supports lexical retrieval.
+        - region "Item re-ingest":
+          - paragraph: ITEM RE-INGEST
+          - button "[RE-INGEST ITEM]"
+        - group "Source text": "Source text (collapsed) · source excerpt:"
+        - group "Source details": source details
+        - paragraph: "why: fresh from configured source"

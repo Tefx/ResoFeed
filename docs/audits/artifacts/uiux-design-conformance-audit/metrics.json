@@ -1,0 +1,65 @@
+{
+  "today-populated-item": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/today-populated-item.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/today-populated-item.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today Independent scroll region TODAY feed Today feed items Live Audit Source · 1m · source excerpt · model-backed · high TODAY Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. · Source text remains readable. ☆ INSPECTOR Live Audit Source · source excerpt · high Live audit item one Localized title: Live audit item one ORIGINAL Live audit item one LINKS Article ↗ ·Feed ↗ AI STATUS model-backed · source excerpt · quality: high source text: RSS excerpt only · summary provenance: model-backed summary provenance: model-backed · quality: high source text: RSS excerpt only Summary Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. Core insight Source text remains readable. Key points Source text remains available. Source text is preserved for review. So"
+  },
+  "inspector": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/inspector.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/inspector.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today Independent scroll region TODAY feed Today feed items Live Audit Source · 1m · source excerpt · model-backed · high TODAY Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. · Source text remains readable. ☆ INSPECTOR Live Audit Source · source excerpt · high Live audit item one Localized title: Live audit item one ORIGINAL Live audit item one LINKS Article ↗ ·Feed ↗ AI STATUS model-backed · source excerpt · quality: high source text: RSS excerpt only · summary provenance: model-backed summary provenance: model-backed · quality: high source text: RSS excerpt only Summary Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. Core insight Source text remains readable. Key points Source text remains available. Source text is preserved for review. So"
+  },
+  "search": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/search.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/search.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required retrieval: lexical search Independent scroll region TODAY feed SEARCH Plain text query [SEARCH] FILTERS 1 results Live Audit Source · may 15 EARLIER source excerpt match: lexical index provenance: source-backed high Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. · Source text remains readable. ☆ INSPECTOR Live Audit Source · source excerpt · high Live audit item one Localized title: Live audit item one ORIGINAL Live audit item one LINKS Article ↗ ·Feed ↗ AI STATUS model-backed · source excerpt · quality: high source text: RSS excerpt only · summary provenance: model-backed summary provenance: model-backed · quality: high source text: RSS excerpt only Summary Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. Core insight Source text remains rea"
+  },
+  "doctor": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/doctor.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/doctor.aria.txt",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required /doctor rss: ok openrouter: ok item_transform_failures:0 openrouter: provider_reachable:true configured_model=account_default openrouter: model_resolved:true resolved_model=openrouter/e2e-deterministic openrouter: item_transform_failures:0 openrouter: current_item_transform_failures=0 historic_item_transform_failures=0 openrouter: live_summary_successes=0 fallback_only_current_summaries=0 openrouter: health_classification=unresolved_product_regression fallback_provenance: item_transform_failures:0 summary=none fallback_provenance: item=item_1b0da16cffc4a919f46d15eca0042af4 summary=model model_status=ok extraction_status=partial_extraction search_fts: ok extraction: failures=1 extraction: item=item_1b0da16cffc4a919f46d15eca0042af4 source=src_b0273324ae27cf3334ec29c24cc57a20 status=partial_extraction title=Live audit item one ingest: last_run=2026-06-02T04:26:36Z ingest: first_fetch_limit=50 "
+  },
+  "mobile-feed": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-feed.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-feed.aria.txt",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today Independent scroll region TODAY feed Today feed items Live Audit Source · · TODAY Live audit item one Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. · Source text remains readable. ☆"
+  },
+  "mobile-inspector": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-inspector.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-inspector.aria.txt",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required today back to TODAY INSPECTOR Live Audit Source · source excerpt · high ☆ Live audit item one Localized title: Live audit item one ORIGINAL Live audit item one LINKS Article ↗ ·Feed ↗ AI STATUS model-backed · source excerpt · quality: high source text: RSS excerpt only · summary provenance: model-backed summary provenance: model-backed · quality: high source text: RSS excerpt only Summary Live audit item one proves real serve, OPML import, manual ingest, Today, Inspector, Search, Doctor, and mobile surfaces. Core insight Source text remains readable. Key points Source text remains available. Source text is preserved for review. Source excerpt supports lexical retrieval. ITEM RE-INGEST [RE-INGEST ITEM] Source text (collapsed) · source excerpt: source details why: fresh from configured source"
+  },
+  "mobile-source-ledger": {
+    "screenshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-source-ledger.png",
+    "accessibilitySnapshot": "/Users/tefx/Projects/ResoFeed/.test-artifacts/playwright/test-output/real-server-ui-ci-safe-rea-0c245--without-API-route-fixtures-chromium-ci-safe/real-server-live-audit-proof/mobile-source-ledger.aria.txt",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "visibleText": "skip to feed Steer or paste RSS URL > RESOFEED Steer route preview URL required source ledger back to TODAY SOURCE LEDGER last_ingest: 04:26:36 [RUN INGEST] [IMPORT OPML] [EXPORT STATE] [IMPORT STATE] State JSON import file import replaces active sources, rules, and stars imported 1 sources; OPML outlines flattened src: Live Audit Source · status: ok · last_fetch: 04:26:36 url: http://127.0.0.1:49486/policy-feed.xml last_fetch: 04:26:36 [FETCH] [DELETE] [DETAILS]"
+  }
+}
