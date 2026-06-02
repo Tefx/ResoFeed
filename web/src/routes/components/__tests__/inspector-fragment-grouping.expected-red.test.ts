@@ -90,7 +90,7 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
 
     const inspector = screen.getByRole('complementary', { name: selectedFragmentDetail.title });
     expect(within(inspector).getByRole('heading', { name: selectedFragmentDetail.title })).toBeVisible();
-    expect(within(inspector).getAllByText(unrelatedFragmentItems[0].url).length).toBeGreaterThan(0);
+    expect(within(inspector).getByRole('link', { name: 'original link' })).toHaveAttribute('href', unrelatedFragmentItems[0].url);
 
     expect(inspector.querySelector('.contract-grouped-sources')).not.toBeInTheDocument();
     expect(within(inspector).queryByText('Grouped story with 50 source items')).not.toBeInTheDocument();
@@ -158,11 +158,61 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
 
     const inspector = screen.getByRole('complementary', { name: authoritativeDetail.title });
     expect(within(inspector).getByText('Grouped story with 2 source items')).toBeVisible();
-    expect(within(inspector).getByText(selectedGroupedItem.title)).toBeVisible();
+    expect(within(inspector).getAllByText(selectedGroupedItem.title).length).toBeGreaterThan(0);
     expect(inspector.querySelector('.contract-grouped-sources')).toHaveTextContent(duplicateGroupedItem.title);
   });
 
-  it('preserves true same-article URL fallback for non-synthetic fragments', () => {
+  it('does not infer exact same URLs across sources as grouped without backend authority', () => {
+    const sharedArticleUrl = 'https://example.com/research/exact-story';
+    const selectedExactUrl: ItemDetail = {
+      ...unrelatedFragmentItems[0],
+      id: 'item_exact_url_selected',
+      source_id: 'src_exact_url_primary',
+      source_title: 'Primary Source',
+      url: sharedArticleUrl,
+      title: 'Exact URL selected item',
+      story_key: null,
+      duplicate_of_item_id: null,
+      feed_excerpt: 'Exact URL selected excerpt.',
+      extracted_text: 'Exact URL selected body.',
+      provenance: {
+        source_url: 'https://example.com/feed.xml',
+        canonical_url: null,
+        original_url: sharedArticleUrl,
+        story_key: null,
+        duplicate_of_item_id: null,
+        grouped_source_items: []
+      }
+    };
+    const exactUrlCandidate: ItemSummary = {
+      ...unrelatedFragmentItems[1],
+      id: 'item_exact_url_candidate',
+      source_id: 'src_exact_url_secondary',
+      source_title: 'Secondary Source',
+      url: sharedArticleUrl,
+      title: 'Exact URL candidate item',
+      story_key: null,
+      duplicate_of_item_id: null
+    };
+
+    render(Inspector, {
+      props: {
+        item: selectedExactUrl,
+        mode: 'desktop-split',
+        groupedSourceCandidates: [selectedExactUrl, exactUrlCandidate],
+        sources: [
+          { ...tldrSource, id: 'src_exact_url_primary', url: 'https://example.com/feed.xml', title: 'Primary Source' },
+          { ...tldrSource, id: 'src_exact_url_secondary', url: 'https://secondary.example/feed.xml', title: 'Secondary Source' }
+        ]
+      }
+    });
+
+    const inspector = screen.getByRole('complementary', { name: selectedExactUrl.title });
+    expect(inspector.querySelector('.contract-grouped-sources')).not.toBeInTheDocument();
+    expect(within(inspector).queryByText('Grouped story with 2 source items')).not.toBeInTheDocument();
+  });
+
+  it('does not infer same normalized URLs across sources as grouped without backend authority', () => {
     const sameArticleBase = 'https://example.com/research/story';
     const selectedSameArticle: ItemDetail = {
       ...unrelatedFragmentItems[0],
@@ -171,6 +221,8 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
       source_title: 'Primary Source',
       url: `${sameArticleBase}?utm_source=feed#comments`,
       title: 'Same article selected item',
+      story_key: null,
+      duplicate_of_item_id: null,
       feed_excerpt: 'Same article selected excerpt.',
       extracted_text: 'Same article selected body.',
       provenance: {
@@ -188,7 +240,9 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
       source_id: 'src_same_article_secondary',
       source_title: 'Secondary Source',
       url: `${sameArticleBase}?ref=rss#section`,
-      title: 'Same article candidate item'
+      title: 'Same article candidate item',
+      story_key: null,
+      duplicate_of_item_id: null
     };
 
     render(Inspector, {
@@ -204,7 +258,87 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
     });
 
     const inspector = screen.getByRole('complementary', { name: selectedSameArticle.title });
+    expect(inspector.querySelector('.contract-grouped-sources')).not.toBeInTheDocument();
+    expect(within(inspector).queryByText('Grouped story with 2 source items')).not.toBeInTheDocument();
+  });
+
+  it('preserves backend-authoritative story_key grouping from candidates', () => {
+    const selectedStory: ItemDetail = {
+      ...unrelatedFragmentItems[0],
+      id: 'item_story_key_selected',
+      title: 'Story key selected item',
+      story_key: 'story_key_backend_authority',
+      duplicate_of_item_id: null,
+      feed_excerpt: 'Story key selected excerpt.',
+      extracted_text: 'Story key selected body.',
+      provenance: {
+        source_url: tldrFeedUrl,
+        canonical_url: null,
+        original_url: unrelatedFragmentItems[0].url,
+        story_key: 'story_key_backend_authority',
+        duplicate_of_item_id: null,
+        grouped_source_items: []
+      }
+    };
+    const storyCandidate: ItemSummary = {
+      ...unrelatedFragmentItems[1],
+      id: 'item_story_key_candidate',
+      title: 'Story key candidate item',
+      story_key: 'story_key_backend_authority',
+      duplicate_of_item_id: null
+    };
+
+    render(Inspector, {
+      props: {
+        item: selectedStory,
+        mode: 'desktop-split',
+        groupedSourceCandidates: [selectedStory, storyCandidate],
+        sources: [tldrSource]
+      }
+    });
+
+    const inspector = screen.getByRole('complementary', { name: selectedStory.title });
     expect(within(inspector).getByText('Grouped story with 2 source items')).toBeVisible();
-    expect(inspector.querySelector('.contract-grouped-sources')).toHaveTextContent(sameArticleCandidate.title);
+    expect(inspector.querySelector('.contract-grouped-sources')).toHaveTextContent(storyCandidate.title);
+  });
+
+  it('preserves backend-authoritative duplicate_of_item_id grouping from candidates', () => {
+    const parentCandidate: ItemSummary = {
+      ...unrelatedFragmentItems[1],
+      id: 'item_duplicate_parent',
+      title: 'Duplicate parent item',
+      story_key: null,
+      duplicate_of_item_id: null
+    };
+    const selectedDuplicate: ItemDetail = {
+      ...unrelatedFragmentItems[0],
+      id: 'item_duplicate_selected',
+      title: 'Duplicate selected item',
+      story_key: null,
+      duplicate_of_item_id: parentCandidate.id,
+      feed_excerpt: 'Duplicate selected excerpt.',
+      extracted_text: 'Duplicate selected body.',
+      provenance: {
+        source_url: tldrFeedUrl,
+        canonical_url: null,
+        original_url: unrelatedFragmentItems[0].url,
+        story_key: null,
+        duplicate_of_item_id: parentCandidate.id,
+        grouped_source_items: []
+      }
+    };
+
+    render(Inspector, {
+      props: {
+        item: selectedDuplicate,
+        mode: 'desktop-split',
+        groupedSourceCandidates: [selectedDuplicate, parentCandidate],
+        sources: [tldrSource]
+      }
+    });
+
+    const inspector = screen.getByRole('complementary', { name: selectedDuplicate.title });
+    expect(within(inspector).getByText('Grouped story with 2 source items')).toBeVisible();
+    expect(inspector.querySelector('.contract-grouped-sources')).toHaveTextContent(parentCandidate.title);
   });
 });
