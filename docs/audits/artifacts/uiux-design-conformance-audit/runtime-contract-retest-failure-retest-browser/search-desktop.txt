@@ -1,0 +1,103 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+Steer route preview
+URL required
+retrieval: lexical search
+Independent scroll region
+
+TODAY feed
+
+SEARCH
+Plain text query
+[SEARCH]
+FILTERS
+
+3 results
+
+Example Source
+·
+1m
+TODAY
+
+full
+match: lexical index
+provenance: source-backed
+high
+grouped
+agent:external
+
+Today source-backed anatomy item
+
+Useful source-backed summary for the desktop feed row. · Core insight is available.
+
+☆
+
+Example Source
+·
+1d
+YESTERDAY
+
+source excerpt
+match: lexical index
+provenance: source-backed
+source excerpt
+grouped
+
+Yesterday fallback anatomy item
+
+Source-backed feed excerpt for fallback rendering.
+
+☆
+
+Example Source
+·
+3d
+EARLIER
+
+full
+match: lexical index
+provenance: source-backed
+source-backed
+grouped
+
+Earlier compact anatomy item
+
+Earlier item keeps the row grammar shared.
+
+★
+
+INSPECTOR
+
+Example Source · full · high
+
+Today source-backed anatomy item
+
+Localized title: Today source-backed anatomy item
+
+ORIGINAL
+Today source-backed anatomy item
+LINKS
+Article ↗ ·Feed ↗
+AI STATUS
+model-backed · full · quality: high
+
+source text: full · summary provenance: model-backed
+
+summary provenance: model-backed · quality: high
+
+Summary
+
+Useful source-backed summary for the desktop feed row.
+
+Core insight
+
+Core insight is available.
+
+Source text (collapsed) · source text:
+source details
+
+why: fresh from configured source
+
+provenance: story story_today · duplicate none

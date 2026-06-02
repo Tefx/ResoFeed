@@ -1,0 +1,38 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu":
+      - text: RESOFEED
+      - paragraph: NAV
+      - button "TODAY"
+      - button "SOURCE LEDGER" [pressed]
+      - paragraph: OPERATIONS
+      - status: "[INGESTING...] · op: manual_ingest · actor:human · phase:submitting_ingest · manual ingest pending · since 04:49:43"
+      - button "Processing language English; set Chinese": "LANG: EN"
+      - text: Existing readable item content will be rewritten. Source identifiers remain unchanged.
+      - button "Reprocess existing library and rebuild search index": "[REPROCESS LIBRARY]"
+  - status "Steer route preview"
+  - text: Steer route preview URL required
+  - region "SOURCE LEDGER surface":
+    - region "SOURCE LEDGER":
+      - heading "SOURCE LEDGER" [level=1]
+      - 'status "[INGESTING...] · op: manual_ingest · actor:human · phase:submitting_ingest · manual ingest pending · since 04:49:43"'
+      - button "[INGESTING...]" [disabled]
+      - button "[IMPORT OPML]"
+      - group "State portability":
+        - button "[EXPORT STATE]"
+        - button "[IMPORT STATE]"
+        - text: State JSON import file
+        - button "Choose state JSON / State JSON import file"
+        - text: import replaces active sources, rules, and stars
+      - list:
+        - listitem:
+          - text: "src: Operation Utility Fixture · status: ok · last_fetch: 11:00:00 url: https://feeds.example.test/operation-utility.xml last_fetch: 11:00:00"
+          - button "[FETCH] Fetch source Operation Utility Fixture": "[FETCH]"
+          - 'button "Delete source: Operation Utility Fixture"': "[DELETE]"
+          - group: "[DETAILS]"

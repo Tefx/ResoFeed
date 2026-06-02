@@ -1,0 +1,36 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu":
+      - text: RESOFEED
+      - paragraph: NAV
+      - button "TODAY" [pressed]
+      - button "SOURCE LEDGER"
+      - paragraph: OPERATIONS
+      - button "Processing language English; set Chinese": "LANG: EN"
+      - text: Existing readable item content will be rewritten. Source identifiers remain unchanged.
+      - button "Reprocess existing library and rebuild search index": "[REPROCESS LIBRARY]"
+  - status "Steer route preview"
+  - text: Steer route preview URL required
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - paragraph: TODAY feed
+    - region "Today feed items":
+      - text: Today feed items
+      - list "Today feed items":
+        - listitem:
+          - 'button "Open Inspector for: Operation utility rendered contract item"':
+            - paragraph: Operation Utility Fixture 1m full model-backed high grouped TODAY
+            - paragraph: Operation utility rendered contract item
+            - paragraph: Rendered fixture summary for operation utility placement. · Operation utility status must be contextual, not a global idle strip.
+          - 'button "Resonate item: Operation utility rendered contract item"': ☆
+  - region "INSPECTOR independent scroll":
+    - complementary "INSPECTOR":
+      - complementary "Operation utility rendered contract item":
+        - paragraph: INSPECTOR
+        - alert: "err: not_found: not found: /api/items/item_operation_utility_contract"

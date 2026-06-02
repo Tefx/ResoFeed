@@ -1,0 +1,63 @@
+- main "RESOFEED":
+  - link "skip to feed":
+    - /url: "#today-feed"
+  - form "Steer":
+    - text: Steer or paste RSS URL
+    - textbox "Steer or paste RSS URL":
+      - /placeholder: Steer or paste RSS URL...
+  - navigation "RESOFEED surfaces":
+    - group "RESOFEED surface menu": RESOFEED
+  - status "Steer route preview"
+  - text: Steer route preview URL required
+  - region "TODAY surface independent scroll":
+    - text: Independent scroll region
+    - paragraph: TODAY feed
+    - region "Today feed items":
+      - text: Today feed items
+      - list "Today feed items":
+        - listitem:
+          - 'button "Open Inspector for: Audit fallback source disclosure target"':
+            - paragraph: Audit Literal Source 1m full fallback full TODAY
+            - paragraph: Audit fallback source disclosure target
+            - paragraph: Audit RSS source excerpt is readable only after disclosure expansion.
+          - 'button "Resonate item: Audit fallback source disclosure target"': ☆
+        - listitem:
+          - 'button "Open Inspector for: Audit model-backed source text target"':
+            - paragraph: Audit Literal Source 1m full model-backed source-backed
+            - paragraph: Audit model-backed source text target
+            - paragraph: Audit model-backed summary is present. · Audit model-backed core insight is present.
+          - 'button "Resonate item: Audit model-backed source text target"': ☆
+  - region "INSPECTOR independent scroll":
+    - complementary "INSPECTOR":
+      - complementary "Audit model-backed source text target":
+        - paragraph: INSPECTOR
+        - paragraph: Audit Literal Source · full
+        - heading "Audit model-backed source text target" [level=2]
+        - term: ORIGINAL
+        - definition: Audit model-backed source text target
+        - term: LINKS
+        - definition:
+          - link "original link":
+            - /url: https://news.example.test/audit-model-backed-source-text
+            - text: Article ↗
+          - link "feed link":
+            - /url: https://feeds.example.test/audit-inspector.xml
+            - text: Feed ↗
+        - term: AI STATUS
+        - definition: "model-backed · full · quality: full"
+        - paragraph: "source text: full · summary provenance: model-backed"
+        - paragraph: "summary provenance: model-backed · quality: full"
+        - region "Summary":
+          - paragraph: Summary
+          - paragraph: Audit model-backed summary is present.
+        - region "Core insight":
+          - paragraph: Core insight
+          - paragraph: Audit model-backed core insight is present.
+        - region "Item re-ingest":
+          - paragraph: ITEM RE-INGEST
+          - button "[RE-INGEST ITEM]"
+        - group "Source text":
+          - text: "Source text (collapsed) · source text:"
+          - paragraph: Audit full source text becomes readable when the Source text disclosure expands.
+        - group "Source details": source details
+        - paragraph: "why: fresh from configured source"

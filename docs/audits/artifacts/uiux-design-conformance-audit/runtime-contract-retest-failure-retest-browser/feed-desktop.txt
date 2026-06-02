@@ -1,0 +1,104 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+Steer route preview
+URL required
+Independent scroll region
+
+TODAY feed
+
+Today feed items
+
+Example Source
+·
+1m
+·
+full
+·
+model-backed
+·
+high
+·
+grouped
+·
+agent:external
+TODAY
+
+Today source-backed anatomy item
+
+Useful source-backed summary for the desktop feed row. · Core insight is available.
+
+☆
+
+Example Source
+·
+1d
+·
+source excerpt
+·
+fallback
+·
+source excerpt
+·
+grouped
+YESTERDAY
+
+Yesterday fallback anatomy item
+
+Source-backed feed excerpt for fallback rendering.
+
+☆
+
+Example Source
+·
+3d
+·
+full
+·
+model-backed
+·
+source-backed
+·
+grouped
+EARLIER
+
+Earlier compact anatomy item
+
+Earlier item keeps the row grammar shared.
+
+★
+
+INSPECTOR
+
+Example Source · full · high
+
+Today source-backed anatomy item
+
+Localized title: Today source-backed anatomy item
+
+ORIGINAL
+Today source-backed anatomy item
+LINKS
+Article ↗ ·Feed ↗
+AI STATUS
+model-backed · full · quality: high
+
+source text: full · summary provenance: model-backed
+
+summary provenance: model-backed · quality: high
+
+Summary
+
+Useful source-backed summary for the desktop feed row.
+
+Core insight
+
+Core insight is available.
+
+Source text (collapsed) · source text:
+source details
+
+why: fresh from configured source
+
+provenance: story story_today · duplicate none

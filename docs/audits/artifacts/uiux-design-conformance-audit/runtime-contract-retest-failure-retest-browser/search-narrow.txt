@@ -1,0 +1,63 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+Steer route preview
+URL required
+retrieval: lexical search
+back to TODAY
+SEARCH
+Plain text query
+[SEARCH]
+FILTERS
+
+3 results
+
+Example Source
+·
+TODAY
+
+full
+match: lexical index
+provenance: source-backed
+high
+grouped
+agent:external
+
+Today source-backed anatomy item
+
+Useful source-backed summary for the desktop feed row. · Core insight is available.
+
+☆
+
+Example Source
+·
+YESTERDAY
+
+source excerpt
+match: lexical index
+provenance: source-backed
+source excerpt
+grouped
+
+Yesterday fallback anatomy item
+
+Source-backed feed excerpt for fallback rendering.
+
+☆
+
+Example Source
+·
+EARLIER
+
+full
+match: lexical index
+provenance: source-backed
+source-backed
+grouped
+
+Earlier compact anatomy item
+
+Earlier item keeps the row grammar shared.
+
+★

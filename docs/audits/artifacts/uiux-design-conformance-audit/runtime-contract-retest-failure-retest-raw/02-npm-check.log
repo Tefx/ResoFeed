@@ -1,0 +1,8 @@
+
+> resofeed-web@0.1.0 check
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in workspace: /Users/tefx/Projects/ResoFeed/.vectl/worktrees/uiux-token-shell-reader-gate-evidence-remediation/web
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings

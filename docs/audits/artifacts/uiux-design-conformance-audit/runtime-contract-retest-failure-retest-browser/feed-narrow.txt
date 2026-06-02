@@ -1,0 +1,51 @@
+skip to feed
+Steer or paste RSS URL
+>
+RESOFEED
+Steer route preview
+URL required
+Independent scroll region
+
+TODAY feed
+
+Today feed items
+
+Example Source
+·
+·
+·
+grouped
+·
+TODAY
+
+Today source-backed anatomy item
+
+Useful source-backed summary for the desktop feed row. · Core insight is available.
+
+☆
+
+Example Source
+·
+·
+·
+grouped
+YESTERDAY
+
+Yesterday fallback anatomy item
+
+Source-backed feed excerpt for fallback rendering.
+
+☆
+
+Example Source
+·
+·
+·
+grouped
+EARLIER
+
+Earlier compact anatomy item
+
+Earlier item keeps the row grammar shared.
+
+★
