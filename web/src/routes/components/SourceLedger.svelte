@@ -71,8 +71,8 @@
       ingestComplete: '抓取完成',
       ingestFailed: '抓取失败',
       fetchFailed: '抓取失败',
-      importComplete: (count: number) => `已导入 ${count} 个来源；文件夹已扁平化`,
-      importCompleteFallback: '已导入来源；文件夹已扁平化',
+      importComplete: (count: number) => `已导入 ${count} 个来源；OPML 大纲已扁平化`,
+      importCompleteFallback: '已导入来源；OPML 大纲已扁平化',
       importFailed: 'err: 导入失败',
       deleting: (title: string) => `正在删除 ${title}`,
       deleted: (title: string) => `已删除 ${title}`,
@@ -104,8 +104,8 @@
       ingestComplete: 'ingest complete',
       ingestFailed: 'ingest failed',
       fetchFailed: 'fetch failed',
-      importComplete: (count: number) => `imported ${count} sources; folders flattened`,
-      importCompleteFallback: 'imported sources; folders flattened',
+      importComplete: (count: number) => `imported ${count} sources; OPML outlines flattened`,
+      importCompleteFallback: 'imported sources; OPML outlines flattened',
       importFailed: 'err: import failed',
       deleting: (title: string) => `deleting ${title}`,
       deleted: (title: string) => `deleted ${title}`,
@@ -273,7 +273,7 @@
       if (importInput) importInput.value = '';
     } catch (error) {
       statusText = sources.length > 0 && error instanceof Error && /bad_request/i.test(error.message)
-        ? `imported ${sources.length} sources; folders flattened`
+        ? `imported ${sources.length} sources; OPML outlines flattened`
         : error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.importFailed);
     } finally {
       isImportingOpml = false;

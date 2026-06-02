@@ -521,6 +521,7 @@
     } catch (error) {
       // docs/ARCHITECTURE.md defines missing processing_language as effective `en`; keep the served feed usable when older/focused fixtures omit the runtime-language route.
       if (error instanceof ResoFeedApiError) {
+        if (error.status === 401) throw error;
         return { code: 'en', label: 'English' };
       }
       throw error;
