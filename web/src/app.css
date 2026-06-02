@@ -1183,18 +1183,18 @@ details.surface-nav button:focus-visible {
   font: var(--rf-typography-payload);
 }
 
-.inspector-key-points-list {
+.inspector-points-list {
   margin: 0;
   padding-inline-start: var(--rf-space-lg);
   font: var(--rf-typography-payload);
 }
 
-.inspector-key-points-section {
+.inspector-points-section {
   max-width: 68ch;
   margin-block-start: var(--rf-space-md);
 }
 
-.inspector-key-points-list li {
+.inspector-points-list li {
   padding-block: var(--rf-space-xs);
   overflow-wrap: anywhere;
 }

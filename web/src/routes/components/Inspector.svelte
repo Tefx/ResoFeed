@@ -36,7 +36,7 @@
   let pending = $state(false);
   let reingestModel = $state('default');
   let reingestPrompt = $state('');
-  let reingestState = $state<'idle' | 'submitting' | 'completed' | 'replayed' | 'conflict' | 'failed'>('idle');
+  let reingestState = $state<'idle' | 'confirming' | 'submitting' | 'completed' | 'replayed' | 'conflict' | 'failed'>('idle');
   let reingestStatus = $state('');
   let reingestConfiguring = $state(false);
   let reingestToggle = $state<HTMLButtonElement | undefined>();
@@ -69,10 +69,6 @@
   function titleText(text: string | null | undefined): string | null {
     const normalized = text?.replace(/\s+/g, ' ').trim();
     return normalized ? normalized : null;
-  }
-
-  function sourceTitleLine(value: InspectableItem): string {
-    return localizedChrome(`Source title: ${sourceProvenanceTitle(value)}`, `来源标题 ${sourceProvenanceTitle(value)}`);
   }
 
   function localizedChrome(en: string, zh: string): string {
@@ -478,6 +474,13 @@
     return localizedChrome('source text: full', '来源文本：全文');
   }
 
+  function extractionFrontmatterToken(value: InspectableItem): string {
+    if (value.extraction_status === 'partial_extraction') return localizedChrome('source excerpt', '来源摘录');
+    if (value.extraction_status === 'original_unavailable') return localizedChrome('original unavailable', '原文不可用');
+    if (value.extraction_status === 'summary_unavailable') return localizedChrome('summary unavailable', '摘要不可用');
+    return localizedChrome('full', '全文');
+  }
+
   function sourceEvidenceText(value: InspectableItem): string | null {
     if ('feed_excerpt' in value) {
       const extractedText = readableText(value.extracted_text);
@@ -545,13 +548,14 @@
     return `src: ${value.source_title} · ${extraction}${tier}`;
   }
 
-  function aiStatusFrontmatter(value: InspectableItem): string {
-    const quality = value.value_tier ? `quality: ${value.value_tier}` : `quality: ${value.extraction_status}`;
-    return `${summaryProvenanceDisclosure(value)} · ${extractionDisclosure(value)} · ${quality}`;
+  function summaryProvenanceFrontmatterToken(value: InspectableItem): string {
+    if (hasModelBackedText(value)) return localizedChrome('model-backed', '模型支持');
+    return summaryText(value) ? localizedChrome('feed excerpt fallback', '订阅摘录回退') : localizedChrome('fallback unavailable', '回退不可用');
   }
 
-  function attemptFrontmatter(value: InspectableItem): string {
-    return latestAttemptFailureText(value) ?? localizedChrome('none', '无');
+  function aiStatusFrontmatter(value: InspectableItem): string {
+    const quality = value.value_tier ? `quality: ${value.value_tier}` : `quality: ${value.extraction_status}`;
+    return `${summaryProvenanceFrontmatterToken(value)} · ${extractionFrontmatterToken(value)} · ${quality}`;
   }
 
   function attemptFrontmatterClass(value: InspectableItem): string {
@@ -622,6 +626,7 @@
 
   async function openReingestConfig(): Promise<void> {
     reingestConfiguring = true;
+    reingestState = 'confirming';
     await tick();
     reingestModelSelect?.focus();
   }
@@ -740,22 +745,22 @@
       <dd class="inspector-frontmatter__literal" translate="no">{sourceProvenanceTitle(item)}</dd>
       <dt>LINKS</dt>
       <dd>
-        <a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate} aria-label={language === 'zh' ? `原文链接：${originalHref(item)}，来源：${item.source_title}` : `Article link: ${originalHref(item)}; source: ${item.source_title}`}>{localizedChrome('Article ↗', '原文 ↗')}</a>
+        <a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate} aria-label={localizedChrome('original link', '原文链接')} title={language === 'zh' ? `原文链接：${originalHref(item)}，来源：${item.source_title}` : `original link: ${originalHref(item)}; source: ${item.source_title}`}>{localizedChrome('Article ↗', '原文 ↗')}</a>
         {#if sourceFeedUrl(item)}
-          <span aria-hidden="true"> · </span><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('Feed ↗', '来源 ↗')}</a>
+          <span aria-hidden="true"> · </span><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={localizedChrome('feed link', '来源链接')} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('Feed ↗', '来源 ↗')}</a>
         {/if}
       </dd>
       <dt>AI STATUS</dt>
       <dd>{aiStatusFrontmatter(item)}</dd>
-      <dt>ATTEMPT</dt>
-      <dd class={attemptFrontmatterClass(item)}>{attemptFrontmatter(item)}</dd>
+      {#if latestAttemptFailureText(item)}
+        <dt>ATTEMPT</dt>
+        <dd class={attemptFrontmatterClass(item)}>{latestAttemptFailureText(item)}</dd>
+      {/if}
     </dl>
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
-    <p class="inspector-evidence-line">
-      {summaryProvenanceDisclosure(item)} · quality: {item.value_tier ?? item.extraction_status}
-    </p>
+    <p class="visually-hidden">{summaryProvenanceDisclosure(item)} · quality: {item.value_tier ?? item.extraction_status}</p>
     {#if item.extraction_status === 'partial_extraction'}
       <p class="visually-hidden">{extractionDisclosure(item)}</p>
     {/if}
@@ -763,7 +768,7 @@
     {@const generatedCoreInsight = generatedCoreInsightText(item)}
     {#if generatedSummary}
       <section class="inspector-text-section" aria-label={localizedChrome('Summary', '摘要')}>
-        <p class="inspector-section-label">{localizedChrome('summary:', '摘要：')}</p>
+        <p class="inspector-section-label">{localizedChrome('Summary', '摘要：')}</p>
         <p class="inspector-section-copy">{generatedSummary}</p>
       </section>
     {:else}
@@ -771,15 +776,15 @@
     {/if}
     {#if generatedCoreInsight}
       <section class="inspector-text-section" aria-label={localizedChrome('Core insight', '核心洞察')}>
-        <p class="inspector-section-label">{localizedChrome('core insight:', '核心洞察：')}</p>
+        <p class="inspector-section-label">{localizedChrome('Core insight', '核心洞察：')}</p>
         <p class="inspector-section-copy">{generatedCoreInsight}</p>
       </section>
     {/if}
     {@const keyPoints = structuredKeyPoints(item)}
     {#if keyPoints.length >= 3 && keyPoints.length <= 5}
-      <section class="inspector-key-points-section" aria-label={localizedChrome('Key points', '要点')}>
-        <p class="inspector-section-label">{localizedChrome('key points:', '要点：')}</p>
-        <ul class="inspector-key-points-list">
+      <section class="inspector-points-section" aria-label={localizedChrome('Key points', '要点')}>
+        <p class="inspector-section-label">{localizedChrome('Key points', '要点：')}</p>
+        <ul class="inspector-points-list">
           {#each keyPoints as point}
             <li>{point}</li>
           {/each}
@@ -826,20 +831,19 @@
     {@const evidenceText = sourceEvidenceText(item)}
     {#if isFallbackEvidenceState(item) && evidenceText}
       <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Source evidence', '出处记录')}>
-        <summary class="inspector-section-label">{readingSectionLabel(item)}</summary>
+        <summary class="inspector-section-label">{localizedChrome('Source evidence (collapsed)', '出处记录（已折叠）')} · {readingSectionLabel(item)}</summary>
         <p class="inspector-source-evidence">{evidenceText}</p>
       </details>
     {:else}
       <details class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
-        <summary class="inspector-section-label">{readingSectionLabel(item)}</summary>
+        <summary class="inspector-section-label">{localizedChrome('Source text (collapsed)', '来源文本（已折叠）')} · {readingSectionLabel(item)}</summary>
         <p class="inspector-reading">{detailText(item)}</p>
       </details>
     {/if}
     <details class="contract-source-details" aria-label={localizedChrome('Source details', '来源详情')}>
       <summary>{localizedChrome('source details', '来源详情')}</summary>
-      <pre translate="no">source_url: {sourceFeedUrl(item) ?? 'unavailable'}
-original_url: {originalHref(item)}{#if 'provenance' in item && item.provenance.canonical_url}
-canonical_url: {item.provenance.canonical_url}{/if}</pre>
+      <p translate="no">{sourceProvenanceTitle(item)}</p>
+      <p><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate} aria-label={language === 'zh' ? `原文详情链接：${item.source_title}` : `source detail article link: ${item.source_title}`} title={language === 'zh' ? `原文链接：${originalHref(item)}，来源：${item.source_title}` : `original link: ${originalHref(item)}; source: ${item.source_title}`}>{localizedChrome('Article ↗', '原文 ↗')}</a>{#if sourceFeedUrl(item)}<span aria-hidden="true"> · </span><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源详情链接：${item.source_title}` : `source detail feed link: ${item.source_title}`} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('Feed ↗', '来源 ↗')}</a>{/if}</p>
     </details>
     <p class="contract-muted">{localizedChrome('why: fresh from configured source', '为什么：来自已配置来源的新条目')}</p>
     {@const groupedItems = groupedSourceItems(item)}
