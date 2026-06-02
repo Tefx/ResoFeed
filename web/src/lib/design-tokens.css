@@ -20,6 +20,15 @@
   --rf-color-warning: #7e5b00;
   --rf-color-success: #276749;
 
+  --rf-color-current-background: var(--rf-color-background);
+  --rf-color-current-surface: var(--rf-color-surface);
+  --rf-color-current-surface-active: var(--rf-color-surface-active);
+  --rf-color-current-text: var(--rf-color-text);
+  --rf-color-current-muted: var(--rf-color-muted);
+  --rf-color-current-border: var(--rf-color-border);
+  --rf-color-current-rule: var(--rf-color-rule);
+  --rf-color-current-focus: var(--rf-color-focus);
+
   --rf-typography-chrome: 500 14px/20px 'JetBrains Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   --rf-typography-metadata: 500 12px/16px 'JetBrains Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   --rf-typography-feed-title: 600 18px/24px Newsreader, Georgia, 'Times New Roman', serif;
@@ -48,8 +57,55 @@
 
   --rf-component-app-shell-background-color: var(--rf-color-background);
   --rf-component-app-shell-text-color: var(--rf-color-primary);
+  --rf-component-steer-input-background-color: var(--rf-color-background);
+  --rf-component-steer-input-text-color: var(--rf-color-text);
+  --rf-component-steer-input-muted-color: var(--rf-color-muted);
+  --rf-component-feed-item-background-color: var(--rf-color-background);
+  --rf-component-feed-item-text-color: var(--rf-color-text);
+  --rf-component-feed-item-muted-color: var(--rf-color-muted);
+  --rf-component-feed-item-selected-marker-color: var(--rf-color-border-dark);
   --rf-component-inspector-pane-background-color: var(--rf-color-surface);
   --rf-component-inspector-pane-text-color: var(--rf-color-text);
+  --rf-component-source-ledger-background-color: var(--rf-color-surface);
+  --rf-component-source-ledger-text-color: var(--rf-color-text);
   --rf-component-diagnostic-output-background-color: var(--rf-color-primary);
   --rf-component-diagnostic-output-text-color: var(--rf-color-text-dark);
+  --rf-component-bracket-action-rest-background-color: var(--rf-color-surface);
+  --rf-component-bracket-action-rest-text-color: var(--rf-color-muted);
+  --rf-component-status-error-text-color: var(--rf-color-danger);
+  --rf-component-status-warning-text-color: var(--rf-color-warning);
+  --rf-component-status-success-text-color: var(--rf-color-success);
+  --rf-component-focus-ring-color: var(--rf-color-focus);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rf-color-current-background: var(--rf-color-background-dark);
+    --rf-color-current-surface: var(--rf-color-surface-dark);
+    --rf-color-current-surface-active: #2a2d27;
+    --rf-color-current-text: var(--rf-color-text-dark);
+    --rf-color-current-muted: var(--rf-color-muted-dark);
+    --rf-color-current-border: var(--rf-color-border-dark);
+    --rf-color-current-rule: var(--rf-color-border-dark);
+    --rf-color-current-focus: var(--rf-color-focus-dark);
+
+    --rf-component-app-shell-background-color: var(--rf-color-background-dark);
+    --rf-component-app-shell-text-color: var(--rf-color-text-dark);
+    --rf-component-steer-input-background-color: var(--rf-color-background-dark);
+    --rf-component-steer-input-text-color: var(--rf-color-text-dark);
+    --rf-component-steer-input-muted-color: var(--rf-color-muted-dark);
+    --rf-component-feed-item-background-color: var(--rf-color-background-dark);
+    --rf-component-feed-item-text-color: var(--rf-color-text-dark);
+    --rf-component-feed-item-muted-color: var(--rf-color-muted-dark);
+    --rf-component-feed-item-selected-marker-color: var(--rf-color-focus-dark);
+    --rf-component-inspector-pane-background-color: var(--rf-color-surface-dark);
+    --rf-component-inspector-pane-text-color: var(--rf-color-text-dark);
+    --rf-component-source-ledger-background-color: var(--rf-color-surface-dark);
+    --rf-component-source-ledger-text-color: var(--rf-color-text-dark);
+    --rf-component-diagnostic-output-background-color: var(--rf-color-surface-dark);
+    --rf-component-diagnostic-output-text-color: var(--rf-color-text-dark);
+    --rf-component-bracket-action-rest-background-color: var(--rf-color-surface-dark);
+    --rf-component-bracket-action-rest-text-color: var(--rf-color-muted-dark);
+    --rf-component-focus-ring-color: var(--rf-color-focus-dark);
+  }
 }

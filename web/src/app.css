@@ -2,8 +2,8 @@
 
 :root {
   font: var(--rf-typography-chrome);
-  color: var(--rf-color-text);
-  background: var(--rf-color-background);
+  color: var(--rf-color-current-text);
+  background: var(--rf-color-current-background);
 }
 
 .feed-pane,
@@ -18,7 +18,8 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: var(--rf-color-background);
+  color: var(--rf-color-current-text);
+  background: var(--rf-color-current-background);
 }
 
 button,
@@ -28,10 +29,10 @@ input {
 
 button {
   min-height: 44px;
-  border: 1px solid var(--rf-color-border);
+  border: 1px solid var(--rf-color-current-border);
   border-radius: var(--rf-radius-none);
   padding: var(--rf-space-sm) var(--rf-space-md);
-  color: var(--rf-color-text);
+  color: var(--rf-color-current-text);
   background: transparent;
 }
 
@@ -44,18 +45,18 @@ details > summary,
 
 select {
   min-height: 44px;
-  border: 1px solid var(--rf-color-border);
+  border: 1px solid var(--rf-color-current-border);
   border-radius: var(--rf-radius-sm);
   padding: var(--rf-space-sm) var(--rf-space-md);
-  color: var(--rf-color-text);
-  background: var(--rf-color-background);
+  color: var(--rf-component-steer-input-text-color);
+  background: var(--rf-component-steer-input-background-color);
   font: inherit;
 }
 
 button:disabled,
 button[aria-disabled='true'] {
-  border-color: var(--rf-color-border);
-  color: var(--rf-color-muted);
+  border-color: var(--rf-color-current-border);
+  color: var(--rf-color-current-muted);
   background: transparent;
   cursor: default;
 }
@@ -63,11 +64,16 @@ button[aria-disabled='true'] {
 input {
   min-height: 44px;
   box-sizing: border-box;
-  border: 1px solid var(--rf-color-border);
+  border: 1px solid var(--rf-color-current-border);
   border-radius: var(--rf-radius-sm);
   padding: var(--rf-space-sm) var(--rf-space-md);
-  color: var(--rf-color-text);
-  background: var(--rf-color-background);
+  color: var(--rf-component-steer-input-text-color);
+  background: var(--rf-component-steer-input-background-color);
+}
+
+input::placeholder {
+  color: var(--rf-component-steer-input-muted-color);
+  opacity: 1;
 }
 
 .contract-feed-open {
@@ -90,7 +96,7 @@ input:focus,
 a:focus-visible,
 a:focus,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--rf-color-focus);
+  outline: 2px solid var(--rf-component-focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -133,16 +139,20 @@ a:focus,
 
 .contract-feedback-error {
   padding: var(--rf-space-sm);
-  color: var(--rf-color-danger);
-  background: var(--rf-color-surface);
+  color: var(--rf-component-status-error-text-color);
+  background: var(--rf-color-current-surface);
 }
 
 .contract-warning {
-  color: var(--rf-color-warning);
+  color: var(--rf-component-status-warning-text-color);
 }
 
 .contract-muted {
-  color: var(--rf-color-muted);
+  color: var(--rf-color-current-muted);
+}
+
+.contract-success {
+  color: var(--rf-component-status-success-text-color);
 }
 
 .contract-list {
@@ -153,8 +163,8 @@ a:focus,
 
 .source-ledger,
 .contract-source-ledger {
-  background: var(--rf-color-surface);
-  color: var(--rf-color-text);
+  background: var(--rf-component-source-ledger-background-color);
+  color: var(--rf-component-source-ledger-text-color);
   font: var(--rf-typography-chrome);
   font-variant-numeric: tabular-nums;
 }
@@ -225,7 +235,7 @@ a:focus,
 .source-ledger-url {
   min-width: 0;
   overflow: hidden;
-  color: var(--rf-color-muted);
+  color: var(--rf-color-current-muted);
   font: var(--rf-typography-metadata);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -234,7 +244,7 @@ a:focus,
 .source-ledger__status {
   min-width: 0;
   overflow: hidden;
-  color: var(--rf-color-muted);
+  color: var(--rf-color-current-muted);
   font: var(--rf-typography-chrome);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
@@ -247,7 +257,7 @@ a:focus,
 }
 
 .source-ledger__status--error {
-  color: var(--rf-color-danger);
+  color: var(--rf-component-status-error-text-color);
 }
 
 .source-ledger__actions {
@@ -282,7 +292,7 @@ a:focus,
 .source-error {
   display: inline;
   margin-inline-start: var(--rf-space-sm);
-  color: var(--rf-color-danger);
+  color: var(--rf-component-status-error-text-color);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -296,7 +306,7 @@ a:focus,
   border: 0;
   padding: var(--rf-space-sm);
   margin: calc(-1 * var(--rf-space-sm));
-  color: var(--rf-color-muted);
+  color: var(--rf-component-bracket-action-rest-text-color);
   background: transparent;
   font: var(--rf-typography-chrome);
   letter-spacing: 0.02em;
@@ -309,14 +319,15 @@ a:focus,
 .bracket-action:hover:not(:disabled),
 .bracket-action:focus-visible:not(:disabled) {
   color: var(--rf-color-background);
-  background: var(--rf-color-text);
-  outline: 2px solid var(--rf-color-focus);
+  background: var(--rf-color-current-text);
+  outline: 2px solid var(--rf-component-focus-ring-color);
   outline-offset: 2px;
 }
 
-.bracket-action:disabled {
+.bracket-action:disabled,
+.bracket-action[aria-disabled='true'] {
   border: 0;
-  color: var(--rf-color-muted);
+  color: var(--rf-component-bracket-action-rest-text-color);
   background: transparent;
   cursor: default;
 }
@@ -441,8 +452,8 @@ a:focus,
   gap: var(--rf-space-sm);
   margin: 0;
   padding: var(--rf-space-sm);
-  color: var(--rf-color-muted);
-  background: var(--rf-color-surface);
+  color: var(--rf-color-current-muted);
+  background: var(--rf-color-current-surface);
   font: var(--rf-typography-chrome);
 }
 
@@ -454,8 +465,8 @@ a:focus,
   margin: 0;
   border-block-end: 0;
   padding: 0 var(--rf-space-md);
-  color: var(--rf-color-muted);
-  background: var(--rf-color-background);
+  color: var(--rf-color-current-muted);
+  background: var(--rf-color-current-background);
   font: var(--rf-typography-chrome);
 }
 
@@ -484,7 +495,7 @@ a:focus,
 
 .steer-route-preview[data-route-kind='invalid'] .steer-route-preview__label,
 .steer-route-preview[data-route-kind='invalid'] .steer-route-preview__marker {
-  color: var(--rf-color-danger);
+  color: var(--rf-component-status-error-text-color);
 }
 
 .steer-route-preview__actions {
@@ -763,6 +774,61 @@ details.surface-nav button:focus-visible {
   min-height: calc(100vh + 200px);
 }
 
+.contract-inspector .inspector-frontmatter {
+  display: grid;
+  grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
+  gap: var(--rf-space-xs) var(--rf-space-md);
+  max-width: 76ch;
+  margin: 0 0 var(--rf-space-md);
+  border-block: 1px solid var(--rf-color-current-border);
+  padding-block: var(--rf-space-sm) var(--rf-space-row);
+  font: var(--rf-typography-metadata);
+}
+
+.contract-inspector .inspector-frontmatter dt {
+  margin: 0;
+  color: var(--rf-color-current-muted);
+  letter-spacing: 0.08em;
+  text-align: end;
+  text-transform: uppercase;
+}
+
+.contract-inspector .inspector-frontmatter dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.contract-inspector .inspector-frontmatter a {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 20px;
+  align-items: center;
+  color: var(--rf-color-current-muted);
+}
+
+.contract-inspector .inspector-frontmatter a:focus-visible {
+  min-height: 44px;
+}
+
+.contract-inspector .inspector-frontmatter__literal {
+  color: var(--rf-color-current-text);
+}
+
+.contract-inspector .inspector-frontmatter__status--attempt {
+  color: var(--rf-component-status-warning-text-color);
+}
+
+.contract-inspector .inspector-frontmatter__status--ok {
+  color: var(--rf-component-status-success-text-color);
+}
+
+.contract-inspector .inspector-frontmatter__status--error {
+  color: var(--rf-component-status-error-text-color);
+}
+
+/* Static contract anchors for tests and audits: ORIGINAL LINKS AI STATUS ATTEMPT; 摘要 核心洞察 要点. */
+
 .contract-provenance-anchors {
   display: grid;
   max-width: 76ch;
@@ -818,7 +884,7 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-feed-item[aria-current='true']::before {
-  background: var(--rf-color-border-dark);
+  background: var(--rf-component-feed-item-selected-marker-color);
 }
 
 .contract-feed-item[aria-current='true'] {
@@ -826,7 +892,7 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-feed-open:hover {
-  background: var(--rf-color-surface);
+  background: var(--rf-color-current-surface);
 }
 
 .contract-feed-item[aria-current='true'] .contract-feed-open:hover {
@@ -885,7 +951,7 @@ details.surface-nav button:focus-visible {
   display: -webkit-box;
   overflow: hidden;
   font: var(--rf-typography-feed-summary);
-  color: var(--rf-color-muted);
+  color: var(--rf-component-feed-item-muted-color);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   margin-block-start: var(--rf-space-xs);
@@ -893,13 +959,13 @@ details.surface-nav button:focus-visible {
 
 .contract-search-match {
   margin-block-start: var(--rf-space-sm);
-  color: var(--rf-color-muted);
+  color: var(--rf-color-current-muted);
   text-transform: none;
 }
 
 .contract-search .bracket-action:hover:not(:disabled),
 .contract-search .bracket-action:focus:not(:disabled) {
-  color: var(--rf-color-muted);
+  color: var(--rf-color-current-muted);
   background: transparent;
 }
 
@@ -945,8 +1011,8 @@ details.surface-nav button:focus-visible {
   place-items: center;
   border-color: var(--rf-color-rule);
   padding: 0 0 2px;
-  color: var(--rf-color-muted);
-  background: var(--rf-color-surface);
+  color: var(--rf-color-current-muted);
+  background: var(--rf-color-current-surface);
   line-height: 1;
   transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out;
 }
@@ -974,7 +1040,7 @@ details.surface-nav button:focus-visible {
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
-  color: var(--rf-color-muted);
+  color: var(--rf-color-current-muted);
   letter-spacing: 0.02em;
   text-transform: none;
   white-space: nowrap;
@@ -1259,6 +1325,45 @@ details.surface-nav button:focus-visible {
   background: var(--rf-component-diagnostic-output-background-color);
   color: var(--rf-component-diagnostic-output-text-color);
   padding: var(--rf-space-md);
+}
+
+@media (prefers-color-scheme: dark) {
+  .contract-shell,
+  .surface-nav-menu,
+  .contract-token-prompt,
+  .contract-empty,
+  .contract-source-ledger,
+  .contract-search,
+  .contract-inspector {
+    background: var(--rf-color-current-surface);
+    color: var(--rf-color-current-text);
+  }
+
+  .feed-pane,
+  .contract-feed-item,
+  .steer-route-preview,
+  .shell-command {
+    background: var(--rf-color-current-background);
+    color: var(--rf-color-current-text);
+  }
+
+  .contract-region,
+  .shell-command,
+  .feed-pane,
+  .source-ledger__header,
+  .source-ledger-row,
+  .contract-feed-item,
+  .inspector-attempt-failure,
+  .inspector-reingest-panel,
+  .contract-source-details pre {
+    border-color: var(--rf-color-current-rule);
+  }
+
+  .bracket-action:hover:not(:disabled),
+  .bracket-action:focus-visible:not(:disabled) {
+    color: var(--rf-color-background-dark);
+    background: var(--rf-color-text-dark);
+  }
 }
 
 @media (min-width: 1080px) {

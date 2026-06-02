@@ -16,10 +16,10 @@
   const chrome = $derived(language === 'zh'
     ? {
       group: '状态可携带性',
-      exportState: '[导出状态]',
-      exporting: '[正在导出状态...]',
-      importState: '[导入状态]',
-      importing: '[正在导入状态...]',
+      exportState: '[EXPORT STATE]',
+      exporting: '[EXPORTING STATE...]',
+      importState: '[IMPORT STATE]',
+      importing: '[IMPORTING STATE...]',
       input: '状态 JSON 导入输入',
       warning: '导入会替换活动来源、规则和星标',
       imported: '导入完成',

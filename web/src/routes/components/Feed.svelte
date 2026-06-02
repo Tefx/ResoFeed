@@ -61,8 +61,8 @@
 
   function titleDistinctionLabel(item: ItemSummary): string {
     return language === 'zh'
-      ? `来源标题：${itemSourceProvenanceTitle(item)}`
-      : `source title: ${itemSourceProvenanceTitle(item)}`;
+      ? `来源标题 ${itemSourceProvenanceTitle(item)}`
+      : `Source title: ${itemSourceProvenanceTitle(item)}`;
   }
 
   function resonanceLabel(item: ItemSummary): string {
@@ -93,9 +93,9 @@
           onclick={() => void openInspector(item)}
         >
           <p class="contract-label contract-feed-meta">
-            <span class="feed-meta-source" aria-label={chrome.feed.sourceAria(item.source_title)} translate={sourceTitleTranslate}>src: {item.source_title}</span>
+            <span class="feed-meta-source" aria-label={chrome.feed.sourceAria(item.source_title)} translate={sourceTitleTranslate}>{item.source_title}</span>
             {#if itemSourceProvenanceTitle(item) !== itemLocalizedDisplayTitle(item, language)}
-              <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-source-title" aria-label={titleDistinctionLabel(item)} translate="no"><span>{language === 'zh' ? '来源标题：' : 'source title: '}</span><span>{itemSourceProvenanceTitle(item)}</span></span>
+              <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-source-title" aria-label={titleDistinctionLabel(item)} translate="no"><span>{itemSourceProvenanceTitle(item)}</span></span>
             {/if}
             <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={chrome.feed.ageAria(itemAgeLabel(item, feedTimeGroupReference, language))}>{itemAgeLabel(item, feedTimeGroupReference, language)}</span>
             <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={chrome.feed.extractionAria(item.extraction_status)}>{itemExtractionLabel(item.extraction_status, language)}</span>

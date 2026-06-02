@@ -47,7 +47,7 @@
       resultsRegion: '搜索结果',
       resultsList: '搜索结果条目',
       inspect: (title: string) => `检查搜索结果：${title}`,
-      sourceItemTitle: (title: string) => `来源标题：${title}`,
+      sourceItemTitle: (title: string) => `来源标题 ${title}`,
       extractionPrefix: '提取：',
       resonate: (item: ItemSummary) => item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`
     }
@@ -69,7 +69,7 @@
       resultsRegion: 'Search results',
       resultsList: 'Search result items',
       inspect: (title: string) => `Inspect search result: ${title}`,
-      sourceItemTitle: (title: string) => `source title: ${title}`,
+      sourceItemTitle: (title: string) => `Source title: ${title}`,
       extractionPrefix: 'extraction: ',
       resonate: (item: ItemSummary) => item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`
     });
@@ -192,9 +192,9 @@
             onclick={() => void openInspector(item)}
           >
             <p class="contract-label contract-feed-meta contract-search-meta-primary">
-              <span class="feed-meta-source" aria-label={chrome.search.sourceAria(item.source_title)} translate={sourceTitleTranslate}>src: {item.source_title}</span>
+              <span class="feed-meta-source" aria-label={chrome.search.sourceAria(item.source_title)} translate={sourceTitleTranslate}>{item.source_title}</span>
               <span aria-hidden="true">·</span>
-              <span class="feed-meta-source-title" aria-label={searchChrome.sourceItemTitle(itemSourceProvenanceTitle(item))} translate="no"><span>{language === 'zh' ? '来源标题：' : 'source title: '}</span><span>{itemSourceProvenanceTitle(item)}</span></span>
+              <span class="feed-meta-source-title" aria-label={searchChrome.sourceItemTitle(itemSourceProvenanceTitle(item))} translate="no"><span>{itemSourceProvenanceTitle(item)}</span></span>
               <span aria-hidden="true">·</span>
               <span class="feed-meta-age" aria-label={chrome.search.ageAria(itemAgeLabel(item, new Date(), language))}>{itemAgeLabel(item, new Date(), language)}</span>
               {#if shouldShowTimeGroup(results, index)}
