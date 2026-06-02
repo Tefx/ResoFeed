@@ -598,6 +598,12 @@
     return localizedChrome(`last re-ingest failed · ${code} · existing summary and key points preserved`, `上次重处理失败 · ${code} · 已保留现有摘要和要点`);
   }
 
+  function attemptFrontmatterText(value: InspectableItem): string | null {
+    if (!latestAttemptFailureText(value)) return null;
+    const code = value.last_reprocess_error_code === 'decode_error' ? localizedChrome('decode error', '解码错误') : localizedChrome('attempt error', '尝试错误');
+    return localizedChrome(`failed · ${code} · preserved`, `失败 · ${code} · 已保留现有摘要和要点`);
+  }
+
   function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {
     const candidate = error.body.error.details.current_operation;
     if (typeof candidate === 'object' && candidate !== null && !Array.isArray(candidate) && 'running' in candidate) {
@@ -752,9 +758,9 @@
       </dd>
       <dt>AI STATUS</dt>
       <dd>{aiStatusFrontmatter(item)}</dd>
-      {#if latestAttemptFailureText(item)}
+      {#if attemptFrontmatterText(item)}
         <dt>ATTEMPT</dt>
-        <dd class={attemptFrontmatterClass(item)}>{latestAttemptFailureText(item)}</dd>
+        <dd class={attemptFrontmatterClass(item)}>{attemptFrontmatterText(item)}</dd>
       {/if}
     </dl>
     <p class="inspector-status-line inspector-evidence-line">
