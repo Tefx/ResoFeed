@@ -89,6 +89,46 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).getByLabelText('要点')).toHaveTextContent('第三条要点仍然可见。');
   });
 
+  it('localizes Chinese AI status quality tier in visible and accessibility text', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'zh-ai-status-quality-tier-contract',
+      title: 'Chinese AI status quality tier contract item',
+      localized_title: '中文 AI 状态质量层级契约条目',
+      summary: '模型摘要可见。',
+      core_insight: '模型核心洞察可见。',
+      extraction_status: 'full',
+      model_status: 'ok',
+      value_tier: 'brief'
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    expect(within(inspector).getAllByText(/质量：简报/).some((element) => element.tagName === 'DD')).toBe(true);
+    expect(inspector).not.toHaveTextContent('quality: brief');
+  });
+
+  it('localizes Chinese high value tier in AI status', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'zh-ai-status-high-tier-contract',
+      title: 'Chinese AI status high tier contract item',
+      localized_title: '中文 AI 状态高价值契约条目',
+      summary: '模型摘要可见。',
+      core_insight: '模型核心洞察可见。',
+      extraction_status: 'full',
+      model_status: 'ok',
+      value_tier: 'high'
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    expect(within(inspector).getAllByText(/质量：高价值/).some((element) => element.tagName === 'DD')).toBe(true);
+    expect(inspector).not.toHaveTextContent('quality: high');
+  });
+
   it.each<ModelStatus>(['invalid_model', 'provider_error', 'rate_limited', 'decode_error', 'timeout', 'model_latency_error'])(
     'renders architecture model failure status %s as visible fallback UI copy',
     (modelStatus) => {

@@ -55,6 +55,13 @@ describe('item anatomy chrome localization', () => {
     expect(itemSummaryText({ ...item, summary: null, core_insight: null, display_excerpt: null }, 'zh')).toBe('摘要不可用');
   });
 
+  it.each([
+    ['brief', '简报'],
+    ['high', '高价值']
+  ] as const)('localizes current zh value tier %s', (valueTier, label) => {
+    expect(itemPriorityLabel({ ...item, value_tier: valueTier }, 'zh')).toBe(label);
+  });
+
   it('preserves operational time-group tokens while localizing time fallback chrome', () => {
     expect(itemTimeGroup(item, new Date('2026-05-23T10:00:00Z'))).toBe('TODAY');
     expect(itemAgeLabel({ ...item, published_at: null, first_seen_at: null }, new Date('2026-05-23T10:00:00Z'), 'zh')).toBe('时间不可用');

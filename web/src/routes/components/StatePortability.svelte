@@ -13,6 +13,7 @@
   let portabilityState = $state<PortabilityState>('idle');
   let statusText = $state('');
   let stateInput = $state<HTMLInputElement | undefined>();
+  const stateFileName = 'state.json';
   const chrome = $derived(language === 'zh'
     ? {
       group: '状态可携带性',
@@ -36,10 +37,11 @@
       input: 'Choose state JSON',
       warning: 'import replaces active sources, rules, and stars',
       imported: 'import complete',
-      exported: 'exported state bundle',
+      exported: `exported ${stateFileName}`,
       importFailed: 'err: import failed',
       exportFailed: 'err: export failed'
     });
+
   const browserStateInputLabel = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom') && language === 'en' ? 'Choose state JSON / State JSON import file' : chrome.input);
   const browserStateVisibleLabel = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom') && language === 'en' ? 'State JSON import file' : chrome.input);
 
@@ -76,7 +78,7 @@
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = 'resofeed-state-bundle.json';
+      anchor.download = stateFileName;
       anchor.click();
       URL.revokeObjectURL(url);
       portabilityState = 'export-complete';

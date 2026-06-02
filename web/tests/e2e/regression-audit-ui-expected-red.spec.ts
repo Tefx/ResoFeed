@@ -202,7 +202,8 @@ test.describe('regression audit UI expected-red coverage', () => {
 
     await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('search compact metadata');
     await page.getByRole('button', { name: 'apply' }).click();
-    await expect(page.locator('.utility-surface[aria-label="Search surface"]')).toHaveClass(/active-panel/);
+    await expect(page.locator('.shell-grid[data-surface="search"]')).toBeVisible();
+    await expect(page.locator('.feed-pane.active-panel[aria-label="Search surface independent scroll"]')).toBeVisible();
 
     const desktopSubmitControls = page.locator('.contract-search-form button[type="submit"]:visible');
     await expect(desktopSubmitControls, 'desktop Search must expose exactly one visible submit control').toHaveCount(1);

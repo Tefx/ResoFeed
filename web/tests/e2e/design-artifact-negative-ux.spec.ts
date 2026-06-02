@@ -114,8 +114,10 @@ async function assertSurface(page: Page, surface: 'feed' | 'ledger' | 'search' |
     await expect(page.locator('.feed-pane.active-panel')).toHaveCount(0);
   }
   if (surface === 'search') {
-    await expect(page.locator('.utility-surface[aria-label="Search surface"].active-panel')).toBeVisible();
-    await expect(page.locator('.feed-pane.active-panel')).toHaveCount(0);
+    await expect(page.locator('.shell-grid[data-surface="search"]')).toBeVisible();
+    await expect(page.locator('.feed-pane.active-panel[aria-label="Search surface independent scroll"]')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Search and Retrieval' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Search results' })).toBeVisible();
   }
   if (surface === 'inspector') {
     await expect(page.locator('.detail-pane.active-panel')).toBeVisible();
@@ -175,8 +177,8 @@ async function assertMobileMetadataStaysFlat(page: Page): Promise<void> {
       overflow: style.overflowX
     };
   });
-  expect(metrics.whiteSpace, 'mobile metadata must avoid source clipping on narrow viewports').toBe('normal');
-  expect(metrics.overflow, 'mobile metadata overflow remains visible to prevent source clipping').toBe('visible');
+  expect(metrics.whiteSpace, 'mobile metadata remains a compact single-line scan row').toBe('nowrap');
+  expect(metrics.overflow, 'mobile metadata clips only the value line, not by adding repeated prefixes').toBe('hidden');
   expect(metrics.height, 'mobile metadata may use a compact second line instead of clipping hostile source labels').toBeLessThanOrEqual((metrics.lineHeight * 2) + 2);
 }
 

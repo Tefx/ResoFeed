@@ -3,6 +3,7 @@
   import { processingLanguageRuntimeContract, type CurrentOperationInfo, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type ModelStatus, type OpenRouterModelOption, type Source } from '$lib/api-contract';
   import { ResoFeedApiError } from '$lib/api-client';
   import { operationDetails } from '$lib/current-operation';
+  import { itemAnatomyChrome } from './item-anatomy';
 
   type InspectorMode = 'desktop-split' | 'mobile-route';
   type InspectableItem = ItemSummary | ItemDetail;
@@ -542,13 +543,13 @@
     return value.title === 'Browser i18n re-ingest target' ? 'INSPECTOR' : '检查器';
   }
 
-  function reingestPanelLabel(value: InspectableItem): string {
-    return language === 'zh' && /Simon Willison/u.test(value.source_title) ? '本文重处理' : 'Item re-ingest';
+  function reingestPanelLabel(): string {
+    return localizedChrome('Item re-ingest', '本文重处理');
   }
 
   function provenanceDisclosure(value: InspectableItem): string {
     const extraction = localizedChrome(extractionLabel(value.extraction_status), extractionLabelZh(value.extraction_status));
-    const tier = value.value_tier ? ` · ${value.value_tier}` : '';
+    const tier = value.value_tier ? ` · ${qualityValueLabel(value)}` : '';
     return `src: ${value.source_title} · ${extraction}${tier}`;
   }
 
@@ -558,8 +559,14 @@
   }
 
   function aiStatusFrontmatter(value: InspectableItem): string {
-    const quality = value.value_tier ? `quality: ${value.value_tier}` : `quality: ${value.extraction_status}`;
+    const quality = localizedChrome(`quality: ${qualityValueLabel(value)}`, `质量：${qualityValueLabel(value)}`);
     return `${summaryProvenanceFrontmatterToken(value)} · ${extractionFrontmatterToken(value)} · ${quality}`;
+  }
+
+  function qualityValueLabel(value: InspectableItem): string {
+    const chrome = itemAnatomyChrome(language);
+    if (value.value_tier) return chrome.priority.valueTier[value.value_tier] ?? value.value_tier;
+    return localizedChrome(value.extraction_status, extractionLabelZh(value.extraction_status));
   }
 
   function attemptFrontmatterClass(value: InspectableItem): string {
@@ -582,7 +589,15 @@
   }
 
   function sourceA11yName(title: string): string {
-    return /inspector/i.test(title) ? 'source title' : title;
+    return title;
+  }
+
+  function sourceTitleProvenanceText(title: string): string {
+    return title;
+  }
+
+  function sectionLabelText(en: 'summary' | 'core insight' | 'source text', zh: '摘要' | '核心洞察' | '来源文本'): string {
+    return language === 'zh' ? `${zh}：` : `${en}:`;
   }
 
   function structuredKeyPoints(value: InspectableItem): string[] {
@@ -735,8 +750,8 @@
     <p class="contract-feedback-error" role="alert">{error}</p>
   {:else if item}
     <div class="inspector-header-row">
-      <p class="visually-hidden inspector-provenance" aria-label={`${localizedChrome('Provenance', '来源')}${language === 'zh' ? '：' : ': '}${/inspector/i.test(item.source_title) ? 'source title' : provenanceDisclosure(item)}`}>
-        <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>{item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}${language === 'zh' ? '：' : ': '}${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${item.value_tier}` : ''}
+      <p class="visually-hidden inspector-provenance" aria-label={`${localizedChrome('Provenance', '来源')}${language === 'zh' ? '：' : ': '}${provenanceDisclosure(item)}`}>
+        <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>{item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}${language === 'zh' ? '：' : ': '}${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${qualityValueLabel(item)}` : ''}
       </p>
       {#if mode === 'mobile-route' && onResonanceToggle}
         <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={browserLegacyEnglishA11y() ? (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`) : language === 'zh' ? (item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`) : (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`)} onclick={() => void toggleResonance()}>
@@ -752,13 +767,15 @@
     {/if}
     <dl class="inspector-frontmatter" aria-label={localizedChrome('Inspector frontmatter', '检查器出处')}>
       <dt>ORIGINAL</dt>
-      <dd class="inspector-frontmatter__literal" translate="no">{sourceProvenanceTitle(item)}</dd>
+       <dd class="inspector-frontmatter__literal" translate="no">{sourceTitleProvenanceText(sourceProvenanceTitle(item))}</dd>
       <dt>LINKS</dt>
       <dd>
-        <a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate} aria-label={localizedChrome('original link', '原文链接')} title={language === 'zh' ? `原文链接：${originalHref(item)}，来源：${item.source_title}` : `original link: ${originalHref(item)}; source: ${item.source_title}`}>{localizedChrome('Article ↗', '原文 ↗')}</a>
-        {#if sourceFeedUrl(item)}
-          <span aria-hidden="true"> · </span><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={localizedChrome('feed link', '来源链接')} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('Feed ↗', '来源 ↗')}</a>
-        {/if}
+        <p class="inspector-link-row">
+           <a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate} aria-label={localizedChrome('original link', '原文链接')} title={language === 'zh' ? `原文链接：${originalHref(item)}，来源：${item.source_title}` : `original link: ${originalHref(item)}; source: ${item.source_title}`}>{localizedChrome('original link', '原文链接')}</a>
+           {#if sourceFeedUrl(item)}
+             <span aria-hidden="true"> · </span><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={localizedChrome('feed link', '来源链接')} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('feed link', '来源链接')}</a>
+           {/if}
+        </p>
       </dd>
       <dt>AI STATUS</dt>
       <dd>{aiStatusFrontmatter(item)}</dd>
@@ -770,7 +787,7 @@
     <p class="inspector-status-line inspector-evidence-line">
       {processingStateLine(item)}
     </p>
-    <p class="visually-hidden">{summaryProvenanceDisclosure(item)} · quality: {item.value_tier ?? item.extraction_status}</p>
+    <p class="visually-hidden">{summaryProvenanceDisclosure(item)} · {localizedChrome(`quality: ${qualityValueLabel(item)}`, `质量：${qualityValueLabel(item)}`)}</p>
     {#if item.extraction_status === 'partial_extraction'}
       <p class="visually-hidden">{extractionDisclosure(item)}</p>
     {/if}
@@ -778,7 +795,7 @@
     {@const generatedCoreInsight = generatedCoreInsightText(item)}
     {#if generatedSummary}
       <section class="inspector-text-section" aria-label={localizedChrome('Summary', '摘要')}>
-        <p class="inspector-section-label">{localizedChrome('Summary', '摘要：')}</p>
+        <p class="inspector-section-label">{sectionLabelText('summary', '摘要')}</p>
         <p class="inspector-section-copy">{generatedSummary}</p>
       </section>
     {:else}
@@ -786,7 +803,7 @@
     {/if}
     {#if generatedCoreInsight}
       <section class="inspector-text-section" aria-label={localizedChrome('Core insight', '核心洞察')}>
-        <p class="inspector-section-label">{localizedChrome('Core insight', '核心洞察：')}</p>
+        <p class="inspector-section-label">{sectionLabelText('core insight', '核心洞察')}</p>
         <p class="inspector-section-copy">{generatedCoreInsight}</p>
       </section>
     {/if}
@@ -806,7 +823,7 @@
       <p class="inspector-attempt-failure" role="status" aria-live="polite">{attemptFailure}</p>
     {/if}
     {#if showReingest}
-      <section class="inspector-reingest-panel" aria-label={reingestPanelLabel(item)} data-contract="inspector-reingest">
+      <section class="inspector-reingest-panel" aria-label={reingestPanelLabel()} data-contract="inspector-reingest">
         <p class="inspector-section-label">{localizedChrome('ITEM RE-INGEST', '本文重处理')}</p>
         {#if reingestConfiguring}
           <label class="inspector-reingest-field">
@@ -846,14 +863,16 @@
       </details>
     {:else}
       <details class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
-        <summary class="inspector-section-label">{localizedChrome('Source text (collapsed)', '来源文本（已折叠）')} · {readingSectionLabel(item)}</summary>
+        <summary class="inspector-section-label">{sectionLabelText('source text', '来源文本')}</summary>
         <p class="inspector-reading">{detailText(item)}</p>
       </details>
     {/if}
     <details class="contract-source-details" aria-label={localizedChrome('Source details', '来源详情')}>
       <summary>{localizedChrome('source details', '来源详情')}</summary>
-      <p translate="no">{sourceProvenanceTitle(item)}</p>
-      <p><a class="inspector-original-link" href={originalHref(item)} target="_blank" rel="noreferrer noopener" translate={originalUrlTranslate} aria-label={language === 'zh' ? `原文详情链接：${item.source_title}` : `source detail article link: ${item.source_title}`} title={language === 'zh' ? `原文链接：${originalHref(item)}，来源：${item.source_title}` : `original link: ${originalHref(item)}; source: ${item.source_title}`}>{localizedChrome('Article ↗', '原文 ↗')}</a>{#if sourceFeedUrl(item)}<span aria-hidden="true"> · </span><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源详情链接：${item.source_title}` : `source detail feed link: ${item.source_title}`} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('Feed ↗', '来源 ↗')}</a>{/if}</p>
+      <p translate="no">{sourceTitleProvenanceText(sourceProvenanceTitle(item))}</p>
+      {#if sourceFeedUrl(item)}
+        <p><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源详情链接：${item.source_title}` : `source detail feed link: ${item.source_title}`} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('feed link', '来源链接')}</a></p>
+      {/if}
     </details>
     <p class="contract-muted">{localizedChrome('why: fresh from configured source', '为什么：来自已配置来源的新条目')}</p>
     {@const groupedItems = groupedSourceItems(item)}

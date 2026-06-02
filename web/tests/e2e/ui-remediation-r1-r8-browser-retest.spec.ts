@@ -188,7 +188,7 @@ async function openInspectorFor(page: Page, item: DirtyCorpusItem, sourceId: str
   await feedItem.click();
   const inspector = page.getByRole('complementary', { name: item.title });
   await expect(inspector.getByRole('heading', { name: item.title })).toBeFocused();
-  await expect(inspector.getByText('src: Dirty Inspector Corpus')).toBeVisible();
+  await expect(inspector.getByLabel('Source: Dirty Inspector Corpus')).toHaveText('Dirty Inspector Corpus');
   await expect(inspector.getByRole('link', { name: 'original link' })).toBeVisible();
   return inspector;
 }
@@ -213,7 +213,8 @@ test('R1-R8 Inspector browser retest preserves R1 prose while keeping dirty payl
     expect(r1PrimaryText, `R1 collapsed to repeated fallback: ${r1PrimaryText}`).not.toMatch(/summary unavailable\s+summary unavailable/i);
 
     await runSteerCommand(page, 'search Readable', 'retrieval: lexical search');
-    await expect(page.locator('.utility-surface[aria-label="Search surface"]')).toHaveClass(/active-panel/);
+    await expect(page.locator('.shell-grid[data-surface="search"]')).toBeVisible();
+    await expect(page.locator('.feed-pane.active-panel[aria-label="Search surface independent scroll"]')).toBeVisible();
     await expect(page.locator('.contract-search-form button[type="submit"]:visible')).toHaveCount(1);
     await expect(page.getByRole('status').filter({ hasText: 'retrieval: lexical search' })).toBeVisible();
 

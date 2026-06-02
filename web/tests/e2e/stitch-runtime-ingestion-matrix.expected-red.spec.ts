@@ -142,7 +142,8 @@ test.describe('expected red: Stitch runtime ingestion matrix browser DOM gaps', 
     await expect(page.getByRole('navigation', { name: 'RESOFEED surfaces' })).not.toContainText(/settings|profile|provider|chat|RAG|syncing\.\.\.|RETRY/i);
 
     const feedRow = page.locator('article.contract-feed-item').filter({ hasText: item.localized_title });
-    await expect(feedRow).toContainText('src: Matrix Source');
+    await expect(feedRow).toContainText('Matrix Source');
+    await expect(feedRow).not.toContainText('src: Matrix Source');
     await expect(feedRow).not.toContainText(/要点|key points|^- |^\d+\./im);
     await expect(feedRow.locator('ul, ol, li')).toHaveCount(0);
 

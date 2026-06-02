@@ -106,7 +106,7 @@ test('Inspector primary body hides screenshot-family raw source, navigation, and
     await expect(page.getByRole('heading', { name: POLLUTED_TITLE })).toBeFocused();
 
     const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
-    await expect(inspector.getByText(`src: ${SOURCE_TITLE}`)).toBeVisible();
+    await expect(inspector.getByLabel(`Source: ${SOURCE_TITLE}`)).toHaveText(SOURCE_TITLE);
     await expect(inspector.getByRole('link', { name: 'original link' })).toBeVisible();
 
     const primaryBody = primaryInspectorBody(page);

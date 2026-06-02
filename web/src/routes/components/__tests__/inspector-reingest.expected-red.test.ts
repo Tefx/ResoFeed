@@ -313,7 +313,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     expect(within(inspector).getByText('摘要：')).toBeVisible();
     expect(within(inspector).getByText('核心洞察：')).toBeVisible();
     expect(within(inspector).getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
-    const panel = within(inspector).getByLabelText('Item re-ingest');
+    const panel = within(inspector).getByLabelText('本文重处理');
 
     expect(within(panel).getByText('本文重处理')).toBeVisible();
     await user.click(within(panel).getByRole('button', { name: '[重新处理本文]' }));

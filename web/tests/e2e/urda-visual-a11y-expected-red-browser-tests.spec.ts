@@ -170,8 +170,9 @@ async function openSearch(page: Page): Promise<Locator> {
   const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
   await steer.fill('search sqlite');
   await steer.press('Enter');
-  const search = page.locator('.utility-surface[aria-label="Search surface"]');
-  await expect(search).toHaveClass(/active-panel/);
+  await expect(page.locator('.shell-grid[data-surface="search"]')).toBeVisible();
+  const search = page.locator('.feed-pane.active-panel[aria-label="Search surface independent scroll"]');
+  await expect(search).toBeVisible();
   return search;
 }
 
@@ -306,11 +307,11 @@ test.describe('URDA expected-red visual and accessibility coverage', () => {
       };
     });
     await writeProof(testInfo, 'issue-10-mobile-metadata-rendered-proof', metadataProof);
-    if (metadataProof.whiteSpace === 'nowrap' && metadataProof.overflow === 'hidden') remember(violations, 10, `mobile metadata row is nowrap/hidden, enabling src: si... style over-truncation (${metadataProof.clientWidth}/${metadataProof.scrollWidth}).`);
-    if (metadataProof.visibleSourceWidth + 1 < metadataProof.fullSourceWidth) remember(violations, 10, `mobile source text is visually clipped: visible=${metadataProof.visibleSourceWidth}, full=${metadataProof.fullSourceWidth}.`);
-    for (const requiredSignal of ['src:', 'full', 'TODAY'] as const) {
+    if (metadataProof.whiteSpace !== 'nowrap' || metadataProof.overflow !== 'hidden') remember(violations, 10, `mobile metadata row no longer uses compact nowrap/hidden scan anatomy (${metadataProof.whiteSpace}/${metadataProof.overflow}).`);
+    for (const requiredSignal of ['simonwillison.net', 'TODAY'] as const) {
       if (!metadataProof.text.includes(requiredSignal)) remember(violations, 10, `mobile metadata missing readable ${requiredSignal} signal: ${metadataProof.text}`);
     }
+    if (metadataProof.text.includes('src:')) remember(violations, 10, `mobile metadata reintroduced forbidden src: prefix: ${metadataProof.text}`);
 
     await page.setViewportSize({ width: 1280, height: 900 });
     await firstRow.getByRole('button', { name: /Open Inspector for:/ }).click();

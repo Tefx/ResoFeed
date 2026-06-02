@@ -182,7 +182,7 @@ test('blind proof: zh model-list route parity and successful item re-ingest coll
   await expect(inspector.getByLabel(/Source: Literal Source Identifier/u)).toHaveAttribute('translate', 'no');
   await expect(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
 
-  const panel = inspector.getByLabel('Item re-ingest');
+  const panel = inspector.getByLabel('本文重处理');
   await panel.getByRole('button', { name: '[重新处理本文]' }).click();
   await expect(panel.getByText(/模型列表：2 个 OpenRouter 模型可用|model list: 2 OpenRouter models available/iu)).toBeVisible();
   await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
@@ -240,7 +240,7 @@ test('blind proof: negative re-ingest error keeps correction controls and avoids
   await page.goto('/');
   await page.getByRole('button', { name: `打开检查器：${item.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
-  const panel = inspector.getByLabel('Item re-ingest');
+  const panel = inspector.getByLabel('本文重处理');
   await panel.getByRole('button', { name: '[重新处理本文]' }).click();
   await panel.getByLabel('一次性提示').fill('保留这个失败后的修正提示。');
   await panel.getByRole('button', { name: '[确认重处理]' }).click();

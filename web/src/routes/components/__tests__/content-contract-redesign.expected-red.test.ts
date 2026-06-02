@@ -112,13 +112,13 @@ describe('expected red: content contract redesign frontend runtime gaps', () => 
     expectTypeOf<ItemDetail>().toHaveProperty('last_reprocess_at');
   });
 
-  it('ac22_title_distinction.feed: Feed visibly distinguishes localized display title from literal source/provenance title', () => {
+  it('ac22_title_distinction.feed: Feed accessibly distinguishes localized display title from literal source/provenance title without extra row text', () => {
     const feed = renderFeed();
 
     expect(within(feed).getByText(localizedTitle)).toBeVisible();
-    expect(within(feed).getByText(sourceTitle)).toBeVisible();
     expect(within(feed).getByLabelText(`本地化标题：${localizedTitle}`)).toBeVisible();
-    expect(within(feed).getByLabelText(`来源标题：${sourceTitle}`)).toBeVisible();
+    expect(within(feed).getByLabelText(new RegExp(`来源：.*来源标题：${sourceTitle}`, 'u'))).toBeVisible();
+    expect(within(feed).queryByText(sourceTitle)).not.toBeInTheDocument();
   });
 
   it('Feed renders only localized title plus summary/core preview and excludes key_points, bullets, numbers, and inferred mini-lists', () => {
@@ -151,7 +151,7 @@ describe('expected red: content contract redesign frontend runtime gaps', () => 
     expect(within(inspector).getByRole('heading', { name: localizedTitle })).toBeVisible();
     expect(within(inspector).getByLabelText(`本地化标题：${localizedTitle}`)).toBeVisible();
     expect(within(inspector).getByLabelText(`来源标题：${sourceTitle}`)).toBeVisible();
-    expect(within(inspector).getByText(sourceTitle)).toBeVisible();
+    expect(within(inspector).getAllByText(sourceTitle)[0]).toBeVisible();
   });
 
   it('Failed re-ingest line is localized and attempt-scoped while preserved content remains visible', () => {
@@ -164,7 +164,7 @@ describe('expected red: content contract redesign frontend runtime gaps', () => 
     for (const point of keyPoints) expect(within(inspector).getByText(point)).toBeVisible();
   });
 
-  it('ac22_title_distinction.search_result: Search result visibly/accessibly distinguishes localized display title from source title', async () => {
+  it('ac22_title_distinction.search_result: Search result accessibly distinguishes localized display title from source title without extra row text', async () => {
     const searchResponse: SearchResponse = {
       items: [contentContractItem],
       query: { q: 'Manus', source: null, from: null, to: null, resonated: null, limit: 50 }
@@ -180,7 +180,8 @@ describe('expected red: content contract redesign frontend runtime gaps', () => 
 
     const results = await screen.findByRole('list', { name: '搜索结果条目' });
     expect(within(results).getByText(localizedTitle)).toBeVisible();
-    expect(within(results).getByLabelText(`来源标题：${sourceTitle}`)).toBeVisible();
+    expect(within(results).getByLabelText(new RegExp(`来源：.*来源标题：${sourceTitle}`, 'u'))).toBeVisible();
+    expect(within(results).queryByText(sourceTitle)).not.toBeInTheDocument();
   });
 
   it('ac22_title_distinction.provenance_context: provenance context keeps literal source title visible and distinguishable', () => {

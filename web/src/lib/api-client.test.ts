@@ -118,7 +118,8 @@ describe('ResoFeed API client and rendered sinks', () => {
     render(SearchRetrieval, { props: { items: search.items, query: search.query.q, onSearch: async () => search } });
     const searchRegion = screen.getByRole('region', { name: 'Search and Retrieval' });
     expect(within(searchRegion).getAllByText('match: lexical index')[0]).toBeVisible();
-    expect(within(searchRegion).getAllByText('src: Example Source')[0]).toBeVisible();
+    expect(within(searchRegion).getAllByText('Example Source')[0]).toBeVisible();
+    expect(within(searchRegion).queryByText('src: Example Source')).not.toBeInTheDocument();
 
     render(StatePortability, { props: { onExportState: async () => state, onImportState: async () => {} } });
     expect(screen.getByRole('group', { name: 'State portability' })).toHaveTextContent(

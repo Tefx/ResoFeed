@@ -155,7 +155,8 @@ test.describe('pbar expected-red PRD browser gaps', () => {
     await ensureSeededItem(page, runInfo, ownerToken);
     await captureEvidence(page, testInfo, 'desktop-feed-presentation');
     const itemButton = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
-    await expect.soft(itemButton, 'B21: Feed rows need visible quality/value tier metadata').toContainText(/value:|quality:|tier:/i);
+    await expect.soft(itemButton, 'B21: Feed rows expose compact value metadata without repeated value/quality/tier prefixes').toContainText(/fallback|excerpt|full|high|medium|low/i);
+    await expect.soft(itemButton, 'B21: Feed rows must not reintroduce visual value/quality/tier prefixes').not.toContainText(/value:|quality:|tier:/i);
 
     const resonate = page.locator('.contract-feed-item', { has: itemButton }).getByRole('button', { name: /^Resonate item/ });
     await expect.soft(resonate, 'B8: Resonate starts with programmatic unpressed state').toHaveAttribute('aria-pressed', 'false');

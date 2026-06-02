@@ -77,7 +77,7 @@ describe('desktop split-pane Inspector re-ingest wiring', () => {
     });
 
     const inspector = screen.getByRole('complementary', { name: 'SQLite FTS 改变排序契约' });
-    expect(within(inspector).getByLabelText('Item re-ingest')).toBeVisible();
+    expect(within(inspector).getByLabelText('本文重处理')).toBeVisible();
     expect(within(inspector).getByRole('button', { name: '[重新处理本文]' })).toBeVisible();
   });
 
@@ -95,7 +95,7 @@ describe('desktop split-pane Inspector re-ingest wiring', () => {
       await fireEvent.click(openInspector);
 
       await waitFor(() => expect(screen.getByRole('complementary', { name: /SQLite FTS 改变排序契约/u })).toBeVisible());
-      expect(screen.getByLabelText('Item re-ingest')).toBeVisible();
+      expect(screen.getByLabelText('本文重处理')).toBeVisible();
       expect(screen.getByRole('button', { name: '[重新处理本文]' })).toBeVisible();
     }
   });

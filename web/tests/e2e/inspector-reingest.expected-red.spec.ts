@@ -417,7 +417,7 @@ test('expected-red browser zh chrome and post-reingest item text proof', async (
   await expect(inspector.getByText('检查器')).toBeVisible();
   await expect(inspector.getByText(/中文处理失败|中文处理未完成/u)).toBeVisible();
   await expect(inspector.getByLabel(/Source: Literal Source Identifier/u)).toHaveAttribute('translate', 'no');
-  const panel = inspector.getByLabel('Item re-ingest');
+  const panel = inspector.getByLabel('本文重处理');
   await panel.getByRole('button', { name: '[重新处理本文]' }).click();
   await panel.getByLabel('一次性提示').fill('请用中文重写摘要和核心洞察。');
   await panel.getByRole('button', { name: '[确认重处理]' }).click();

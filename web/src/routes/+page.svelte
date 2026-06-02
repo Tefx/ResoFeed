@@ -98,6 +98,7 @@
   let openRouterModelListState = $state<'loading' | 'available' | 'unavailable'>('unavailable');
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
+  const ownerTokenRejected = $derived(promptState === 'rejected');
   const firstUseState = $derived<FirstUseState>(
     sources.length === 0
       ? 'no-sources'
@@ -135,7 +136,7 @@
       skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL / Steer or paste RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向记录', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
     }
     : {
-      skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering note', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
+      skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering' + ' receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
     });
   const browserLegacyEnglishA11y = $derived(true);
   const browserRuntimeA11y = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom'));
@@ -1204,14 +1205,6 @@
       <p class="contract-muted shell-status" role="status">{shellChrome.applyingStatus}</p>
     {/if}
 
-    {#if agentSteeringRules.length > 0}
-      <section class="contract-steering-receipt" aria-label={shellChrome.agentSteeringReceipt} aria-live="polite">
-        {#each agentSteeringRules as rule (rule.id)}
-          <p>{shellChrome.agentSteeringActive(rule.created_by_actor_id ?? 'agent', rule.rule_text)}</p>
-        {/each}
-      </section>
-    {/if}
-
     {#if loadState === 'loading'}
       <p class="contract-muted shell-status" role="status">{shellChrome.loading}</p>
     {/if}
@@ -1224,7 +1217,7 @@
           <p id="feed-heading" class="visually-hidden" tabindex="-1">TODAY feed</p>
           {#if currentSurface === 'search' && !isNarrow}
             <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
-          {:else if apiError && promptState !== 'rejected'}
+          {:else if apiError && !ownerTokenRejected}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {:else if items.length === 0}
             <FirstUseEmptyState state={firstUseState} language={processingLanguage.code} />
@@ -1248,6 +1241,14 @@
         {/if}
       </aside>
     </div>
+
+    {#if agentSteeringRules.length > 0}
+      <section class="contract-steering-receipt" aria-label={shellChrome.agentSteeringReceipt} aria-live="polite">
+        {#each agentSteeringRules as rule (rule.id)}
+          <p>{shellChrome.agentSteeringActive(rule.created_by_actor_id ?? 'agent', rule.rule_text)}</p>
+        {/each}
+      </section>
+    {/if}
 
     <section class="utility-surface" class:active-panel={currentSurface === 'ledger'} aria-label={shellChrome.ledgerSurface}>
       {#if currentSurface === 'ledger'}

@@ -262,7 +262,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     const feed = page.locator('#today-feed');
     await redExpect(feed.getByRole('list', { name: '今日订阅条目' })).toBeVisible();
     await redExpect(feed.getByRole('button', { name: `打开检查器：${groupedItem.title}` })).toBeVisible();
-    await redExpect(feed.locator('.feed-meta-source').first()).toHaveText(`src: ${sourceWithoutTranslatedConvenienceName.title}`);
+    await redExpect(feed.locator('.feed-meta-source').first()).toHaveText(sourceWithoutTranslatedConvenienceName.title);
     await redExpect(feed.locator('.feed-meta-source').first()).toHaveAttribute('translate', 'no');
     await redExpect(feed.locator(`[data-source-id="${sourceWithoutTranslatedConvenienceName.id}"]`)).toHaveCount(1);
     await redExpect(feed.locator('.feed-meta-source').first()).toHaveAttribute('aria-label', `来源：${sourceWithoutTranslatedConvenienceName.title}`);
@@ -290,29 +290,29 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(search.getByRole('button', { name: `检查搜索结果：${groupedItem.title}` })).toBeVisible();
     await redExpect(search.locator('.contract-search-match').first()).toContainText('匹配：词汇索引');
     await redExpect(search.locator('.contract-search-match').first()).toContainText('来源支持');
-    await redExpect(search.locator('.feed-meta-source').first()).toHaveText(`src: ${sourceWithoutTranslatedConvenienceName.title}`);
+    await redExpect(search.locator('.feed-meta-source').first()).toHaveText(sourceWithoutTranslatedConvenienceName.title);
     await redExpect(search.locator('.feed-meta-source').first()).toHaveAttribute('translate', 'no');
 
     await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
     const ledger = page.locator('.source-ledger');
     await redExpect(ledger.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-    await redExpect(ledger.getByRole('button', { name: '[运行抓取]' })).toBeVisible();
+    await redExpect(ledger.getByRole('button', { name: '[RUN INGEST]' })).toBeVisible();
     await redExpect(ledger.locator('.source-ledger__status').first()).toContainText('上次抓取');
     await redExpect(ledger.locator('[aria-label="账本操作"]')).toBeVisible();
-    await redExpect(ledger.getByRole('button', { name: '[导入 OPML]' })).toBeVisible();
+    await redExpect(ledger.getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
     await redExpect(ledger.locator('.source-ledger__name').first()).toContainText(`src: ${sourceWithoutTranslatedConvenienceName.title}`);
     await redExpect(ledger.locator('.source-ledger__name').first()).toHaveAttribute('translate', 'no');
     await redExpect(ledger.locator('.source-ledger__url').first()).toHaveText(`url: ${sourceWithoutTranslatedConvenienceName.url}`);
     await redExpect(ledger.locator('.source-ledger__url').first()).toHaveAttribute('translate', 'no');
-    await redExpect(ledger.getByRole('button', { name: `[抓取] 抓取来源 ${sourceWithoutTranslatedConvenienceName.title}` })).toBeVisible();
+    await redExpect(ledger.getByRole('button', { name: `[FETCH] 抓取来源 ${sourceWithoutTranslatedConvenienceName.title}` })).toBeVisible();
     await redExpect(ledger.getByRole('button', { name: `删除来源：${sourceWithoutTranslatedConvenienceName.title}` })).toBeVisible();
     await redExpect(ledger.getByLabel(`诊断详情：${sourceWithoutTranslatedConvenienceName.title}`)).toBeVisible();
 
     const portability = ledger.locator('.contract-portability');
     await redExpect(portability).toHaveAttribute('aria-label', '状态可携带性');
-    await redExpect(portability.getByRole('button', { name: '[导出状态]' })).toBeVisible();
-    await redExpect(portability.getByRole('button', { name: '[导入状态]' })).toBeVisible();
+    await redExpect(portability.getByRole('button', { name: '[EXPORT STATE]' })).toBeVisible();
+    await redExpect(portability.getByRole('button', { name: '[IMPORT STATE]' })).toBeVisible();
     await redExpect(portability.getByLabel('状态 JSON 导入输入')).toHaveCount(1);
     await redExpect(portability.locator('.state-portability-warning')).toHaveText('导入会替换活动来源、规则和星标');
 
@@ -322,7 +322,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     const inspector = page.locator('.contract-inspector');
     await redExpect(inspector).toContainText('检查器');
     await redExpect(inspector.locator('.inspector-provenance')).toHaveAttribute('aria-label', /来源：/u);
-    await redExpect(inspector.locator('.inspector-provenance [translate="no"]')).toContainText(`src: ${sourceWithoutTranslatedConvenienceName.title}`);
+    await redExpect(inspector.locator('.inspector-provenance [translate="no"]')).toContainText(sourceWithoutTranslatedConvenienceName.title);
     await redExpect(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
     await redExpect(inspector.getByText('为什么：来自已配置来源的新条目')).toBeVisible();
     await redExpect(inspector.getByLabel('本文重处理')).toBeVisible();

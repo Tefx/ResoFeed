@@ -77,7 +77,7 @@ func PreviewSteering(ctx context.Context, db *sql.DB, llm LLMClient, req SteerPr
 			}
 			translated, err := llm.TranslateSteering(ctx, OpenRouterSteeringInput{Command: command, ActorKind: req.ActorKind, ActiveRules: active})
 			if err != nil {
-				return SteerPreviewResult{}, fmt.Errorf("preview steering translation: %w", err)
+				return SteerPreviewResult{Preview: preview}, nil
 			}
 			translated = normalizeOpenRouterSteeringOutput(translated)
 			if translated.InterpretedAs != "" {

@@ -107,7 +107,7 @@ describe('content contract UI surfaces', () => {
     const row = screen.getByRole('listitem');
     expect(within(row).getByText(item.localized_title ?? '')).toBeVisible();
     // DEVIATION RECORD: type=test_error; artifact=web/src/routes/components/__tests__/content-contract-surfaces.test.ts; what_changed=Feed provenance assertion now checks accessible source/title provenance without requiring the forbidden visual/readout-style `来源标题：` prefix; why=DESIGN.md:486-487,528-532,730,747 and 1033/1058 forbid repeated reader prefixes in Feed while preserving accessible provenance; impact=stronger positive a11y provenance plus visual-prefix regression guard.
-    expect(within(row).getByLabelText(new RegExp(`来源标题\\s+${item.source_item_title}`, 'u'))).toBeVisible();
+    expect(within(row).getByLabelText(new RegExp(`来源：.*来源标题：${item.source_item_title}`, 'u'))).toBeVisible();
     expect(row).not.toHaveTextContent(`来源标题：${item.source_item_title}`);
     expect(within(row).getByText(/这篇文章说明.*AI 初创公司的退出路径/u)).toBeVisible();
     for (const point of item.key_points) {
@@ -157,7 +157,7 @@ describe('content contract UI surfaces', () => {
     const result = await screen.findByRole('listitem');
     expect(within(result).getByText(item.localized_title ?? '')).toBeVisible();
     // DEVIATION RECORD: type=test_error; artifact=web/src/routes/components/__tests__/content-contract-surfaces.test.ts; what_changed=Search provenance assertion mirrors Feed anatomy by checking accessible source/title provenance and absence of the forbidden repeated visual `来源标题：` prefix; why=Search results reuse Feed reader anatomy under DESIGN.SEARCH and DESIGN.FEED.NO_REPEATED_PREFIXES; impact=search source provenance remains positively covered without weakening visual-prefix prohibition.
-    expect(within(result).getByLabelText(new RegExp(`来源标题\\s+${item.source_item_title}`, 'u'))).toBeVisible();
+    expect(within(result).getByLabelText(new RegExp(`来源：.*来源标题：${item.source_item_title}`, 'u'))).toBeVisible();
     expect(result).not.toHaveTextContent(`来源标题：${item.source_item_title}`);
   });
 

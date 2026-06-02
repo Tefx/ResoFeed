@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -94,6 +95,37 @@ func TestSRDCTHTTPPreviewSteerExpectedRedRoutePrecedenceAndBoundaries(t *testing
 				}
 			}
 		})
+	}
+}
+
+func TestSRDCTHTTPPreviewSteerPolicyLLMFailureFallsBackReadOnly(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedSRDCTSteerState(t, ctx, db)
+	llm := &srdctFailingSteeringLLM{}
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
+
+	before := srdctTableCounts(t, ctx, db)
+	recorder := httptest.NewRecorder()
+	router.ServeHTTP(recorder, srdctAuthorizedJSON(http.MethodPost, "/api/steer/preview", srdctPreviewBody(t, "push more source-backed SQLite runtime analysis")))
+	srdctWantStatus(t, recorder, http.StatusOK, "policy preview falls back safely when OpenRouter translation fails")
+
+	var parsed SteerPreviewResult
+	if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal fallback policy preview: %v; body=%s", err, recorder.Body.String())
+	}
+	if parsed.Preview.RouteKind != SteerRoutePolicy || parsed.Preview.InterpretedAs != "no_safe_policy_change" || parsed.Preview.WillMutate || len(parsed.Preview.ChangedRules) != 0 {
+		t.Fatalf("fallback policy preview = %+v, want policy no_safe_policy_change, will_mutate=false, changed_rules=[]", parsed.Preview)
+	}
+	if !strings.Contains(parsed.Preview.Message, "not applied: no safe product-valid steering rule remained") {
+		t.Fatalf("fallback policy preview message = %q, want safe fallback message", parsed.Preview.Message)
+	}
+	if llm.calls != 1 {
+		t.Fatalf("TranslateSteering calls = %d, want 1 for policy-route preview", llm.calls)
+	}
+	after := srdctTableCounts(t, ctx, db)
+	if before != after {
+		t.Fatalf("fallback policy preview changed durable state counts: before=%+v after=%+v", before, after)
 	}
 }
 
@@ -462,4 +494,17 @@ func (l *srdctCountingSteeringLLM) SummarizeItem(context.Context, OpenRouterSumm
 func (l *srdctCountingSteeringLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	l.calls++
 	return l.out, nil
+}
+
+type srdctFailingSteeringLLM struct {
+	calls int
+}
+
+func (l *srdctFailingSteeringLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{}, nil
+}
+
+func (l *srdctFailingSteeringLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	l.calls++
+	return OpenRouterSteeringOutput{}, errors.New("openrouter translation unavailable")
 }

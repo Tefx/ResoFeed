@@ -109,7 +109,7 @@ describe('UIUX expected-red design contract coverage', () => {
     expectPresent(src, /ORIGINAL[\s\S]*LINKS[\s\S]*AI STATUS[\s\S]*ATTEMPT/u, 'DESIGN.INSPECTOR.FRONTMATTER_ORDER');
     expectPresent(src, /摘要[\s\S]*核心洞察[\s\S]*要点/u, 'DESIGN.INSPECTOR.FRONTMATTER_ORDER');
     expectAbsent(src, /条目 URL|来源 URL|item url|source url|canonical url|original url|>\s*\{item\.url\}\s*</iu, 'DESIGN.INSPECTOR.COMPACT_EVIDENCE_LINKS');
-    expectPresent(src, /原文\s*↗|Article\s*↗|Feed\s*↗|来源\s*↗/u, 'DESIGN.INSPECTOR.COMPACT_EVIDENCE_LINKS');
+    expectPresent(src, /original link|feed link|原文链接|来源链接/u, 'DESIGN.INSPECTOR.COMPACT_EVIDENCE_LINKS');
   });
 
   it('DESIGN.INSPECTOR.REINGEST.* requires Inspector-only item scope, authority copy, clearing, focus/live-region states, failed preservation, and source disclosure', () => {

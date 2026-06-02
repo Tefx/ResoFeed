@@ -608,7 +608,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(search).getByLabelText('Result limit')).toHaveValue('50');
     expect(within(search).getByRole('status')).toHaveTextContent('1 results');
     expect(within(search).getByText('match: lexical index')).toBeVisible();
-    expect(within(search).getByText('src: Example Source')).toBeVisible();
+    expect(within(search).getByText('Example Source')).toBeVisible();
+    expect(within(search).queryByText('src: Example Source')).not.toBeInTheDocument();
   });
 
   it('renders search results with shared feed anatomy, compact dates, fallback excerpts, and actions', async () => {

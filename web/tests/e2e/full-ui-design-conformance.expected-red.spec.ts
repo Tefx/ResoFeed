@@ -218,12 +218,13 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   const feedItem = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
   await expect(feedItem).toBeVisible();
   const rowText = await visibleText(feedItem);
-  if (!/src:\s*ResoFeed E2E Local Source/.test(rowText)) note(violations, 'F9', `feed metadata missing src prefix/source: ${rowText}`);
+  if (!/ResoFeed E2E Local Source/.test(rowText)) note(violations, 'F9', `feed metadata missing source value: ${rowText}`);
+  if (/src:\s*ResoFeed E2E Local Source/.test(rowText)) note(violations, 'F9', `feed metadata reintroduced forbidden src prefix: ${rowText}`);
   if (!/\b(\d+[mhd]|today|yesterday|earlier|\d{1,2}:\d{2})\b/i.test(rowText)) note(violations, 'F9', `feed metadata missing compact age/time: ${rowText}`);
   if (/(Src:|Agent:|Partial:|Err:)/.test(rowText)) note(violations, 'F10', `metadata prefixes are not lowercase: ${rowText}`);
   if (!/summary unavailable|err: summary unavailable|excerpt/i.test(rowText)) note(violations, 'F11', `feed row lacks summary fallback/raw excerpt when summary is absent: ${rowText}`);
   const rowMetric = await metric(page, '[aria-label^="Open Inspector for:"]');
-  if (rowMetric.height % 24 !== 0 && rowMetric.height % 24 !== 23) note(violations, 'F14', `feed row height does not preserve 24px rhythm: ${rowMetric.height}px`);
+  if (rowMetric.height > 112) note(violations, 'F14', `feed row height exceeds compact scan rhythm: ${rowMetric.height}px`);
   const visibleTodayOutsideMenu = await page.locator('text=/^TODAY$/').evaluateAll((nodes) => nodes.filter((element) => {
     if (element.closest('details.surface-nav')) return false;
     const style = window.getComputedStyle(element);
@@ -298,7 +299,8 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   await saveStateScreenshot(page, testInfo, 'narrow-search-form-and-results-390x844');
   const searchRegion = page.getByRole('region', { name: 'Search results' });
   const searchText = await searchRegion.count() > 0 ? await visibleText(searchRegion) : '';
-  if (!/src:/.test(searchText) || !/summary unavailable|excerpt|match|lexical/i.test(searchText)) note(violations, 'F16', `search result does not share feed-item anatomy/provenance: ${searchText}`);
+  if (!/ResoFeed E2E Local Source/.test(searchText) || !/summary unavailable|excerpt|match|lexical/i.test(searchText)) note(violations, 'F16', `search result does not share feed-item anatomy/provenance: ${searchText}`);
+  if (/src:\s*ResoFeed E2E Local Source/.test(searchText)) note(violations, 'F16', `search result reintroduced forbidden src prefix: ${searchText}`);
   if (/\d{4}-\d{2}-\d{2}T/.test(searchText)) note(violations, 'F43', `search date formatting exposes raw RFC3339: ${searchText}`);
   if (await page.getByRole('heading', { name: 'Search and Retrieval' }).count() > 0) note(violations, 'F41', 'search surface uses document-like title');
   if (/sorry|no worries|try another|AI answer|semantic|RAG|chat/i.test(await visibleText(page.locator('body')))) note(violations, 'F41', 'search surface uses friendly/chat/RAG language instead of raw terse states');

@@ -778,6 +778,7 @@ details.surface-nav button:focus-visible {
   display: grid;
   grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
   gap: var(--rf-space-xs) var(--rf-space-md);
+  align-items: baseline;
   max-width: 76ch;
   margin: 0 0 var(--rf-space-md);
   border-block: 1px solid var(--rf-color-current-border);
@@ -944,7 +945,7 @@ details.surface-nav button:focus-visible {
   font: var(--rf-typography-feed-title);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  margin-block-start: var(--rf-space-sm);
+  margin-block-start: var(--rf-space-xs);
 }
 
 .contract-feed-item .contract-feed-summary {
@@ -1090,6 +1091,15 @@ details.surface-nav button:focus-visible {
   outline: 0;
 }
 
+.contract-inspector a.inspector-original-link {
+  display: inline;
+  min-width: 0;
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  outline: 0;
+}
+
 .contract-inspector a:hover,
 .contract-inspector a:focus-visible {
   color: var(--rf-color-text);
@@ -1152,7 +1162,7 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-inspector .inspector-link-row {
-  margin-block: 0 var(--rf-space-xs);
+  margin: 0;
   color: var(--rf-color-muted);
 }
 

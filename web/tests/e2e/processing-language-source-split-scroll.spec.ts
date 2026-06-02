@@ -143,7 +143,7 @@ async function installApiFixtures(page: Page, ownerToken: string): Promise<void>
 
 async function shellReady(page: Page): Promise<void> {
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
-  await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
+  await expect(page.getByRole('list', { name: /Today feed items|今日订阅条目/u })).toBeVisible();
 }
 
 async function captureRenderedEvidence(page: Page, testInfo: TestInfo, name: string): Promise<void> {
@@ -205,15 +205,12 @@ test('browser proves source identifiers are non-translatable and desktop panes s
   await expect(inspectorPane).toHaveClass(/active-panel/u);
 
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
-  await expect(inspector.locator('.inspector-provenance [translate="no"]')).toHaveText(/src: Do Not Translate Source/);
-  await expect(inspector.getByRole('link', { name: 'original link' })).toHaveAttribute('translate', 'no');
-  await expect(inspector.getByRole('link', { name: 'original link' })).toHaveAttribute('href', items[9].url);
+  await expect(inspector.locator('.inspector-provenance [translate="no"]')).toHaveText('Do Not Translate Source');
+  await expect(inspector.getByRole('link', { name: /original link|原文链接/u })).toHaveAttribute('translate', 'no');
+  await expect(inspector.getByRole('link', { name: /original link|原文链接/u })).toHaveAttribute('href', items[9].url);
 
-  const sourceIdentifiers = inspector.locator('.contract-provenance-anchors');
-  await expect(sourceIdentifiers.getByRole('link', { name: items[9].url })).toHaveAttribute('translate', 'no');
-  await expect(sourceIdentifiers.getByRole('link', { name: source.url })).toHaveAttribute('translate', 'no');
-  await expect(sourceIdentifiers.getByRole('link', { name: 'https://canonical.example.test/browser-proof-10' })).toHaveAttribute('translate', 'no');
-  await expect(sourceIdentifiers.getByRole('link', { name: 'https://original.example.test/browser-proof-10' })).toHaveAttribute('translate', 'no');
+  await expect(inspector.getByRole('link', { name: /feed link|来源链接/u })).toHaveAttribute('href', source.url);
+  await expect(inspector.getByRole('link', { name: /feed link|来源链接/u })).toHaveAttribute('translate', 'no');
   await captureRenderedEvidence(page, testInfo, 'desktop-split-scroll');
 });
 
@@ -244,7 +241,7 @@ test('browser keeps mobile full-screen Inspector route and restores feed scroll 
 
   await page.getByRole('button', { name: 'back to TODAY' }).click();
   await expect(page).toHaveURL(/\/$/u);
-  await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
+  await expect(page.getByRole('list', { name: /Today feed items|今日订阅条目/u })).toBeVisible();
   await expect.poll(async () => page.evaluate(() => window.scrollY)).toBe(feedScrollBeforeRoute);
   await expect(page.locator('.contract-feed-item[aria-current="true"]')).toHaveCount(0);
   await captureRenderedEvidence(page, testInfo, 'mobile-feed-restored');

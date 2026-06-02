@@ -32,7 +32,7 @@ async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: strin
   await expect(importedRow).toBeVisible();
   await expect(importedRow.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]|Fetch source Dirty Inspector Corpus/ })).toBeVisible();
   await triggerFixtureIngest(page);
-  await expect(page.getByText('src: Dirty Inspector Corpus')).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('.source-ledger__row', { hasText: 'Dirty Inspector Corpus' }).getByText(/src: Dirty Inspector Corpus/)).toBeVisible({ timeout: 20_000 });
   await expect(page.getByText(/last_fetch:/).first()).toBeVisible({ timeout: 20_000 });
   await page.reload();
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
@@ -86,7 +86,7 @@ async function inspectDirtyItem(page: Page, item: DirtyCorpusItem): Promise<read
   await feedItem.click();
   await expect(page.getByRole('heading', { name: item.title })).toBeFocused();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
-  await expect(inspector.getByText('src: Dirty Inspector Corpus')).toBeVisible();
+  await expect(inspector.getByLabel('Source: Dirty Inspector Corpus')).toHaveText('Dirty Inspector Corpus');
   await expect(inspector.getByRole('link', { name: 'original link' })).toBeVisible();
   await expect(inspector.getByLabel(/Provenance:/)).toBeVisible();
   if (item.readablePrimaryExpected[0]) {

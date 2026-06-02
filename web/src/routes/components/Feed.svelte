@@ -61,8 +61,12 @@
 
   function titleDistinctionLabel(item: ItemSummary): string {
     return language === 'zh'
-      ? `来源标题 ${itemSourceProvenanceTitle(item)}`
+      ? zhSourceTitleLabel(itemSourceProvenanceTitle(item), true)
       : `Original item title ${itemSourceProvenanceTitle(item)}`;
+  }
+
+  function zhSourceTitleLabel(title: string, punctuated: boolean): string {
+    return `来源标题${punctuated ? '：' : ' '}${title}`;
   }
 
   function sourceProvenanceLabel(item: ItemSummary): string {

@@ -112,11 +112,13 @@ const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
       qualityPrefix: '质量',
       valuePrefix: '价值',
       valueTier: {
+        brief: '简报',
+        high: '高价值',
         'source-claim': '来源声明'
       }
     },
     feed: {
-      listLabel: '今日订阅条目 / Today feed items',
+      listLabel: '今日订阅条目',
       sourceAria: (sourceTitle) => `来源：${sourceTitle}`,
       ageAria: (age) => `时间：${age}`,
       extractionAria: (status) => `提取：${status}`,

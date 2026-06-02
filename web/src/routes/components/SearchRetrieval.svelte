@@ -47,7 +47,7 @@
       resultsRegion: '搜索结果',
       resultsList: '搜索结果条目',
       inspect: (title: string) => `检查搜索结果：${title}`,
-      sourceItemTitle: (title: string) => `来源标题 ${title}`,
+      sourceItemTitle: (title: string) => `来源标题：${title}`,
       extractionPrefix: '',
       resonate: (item: ItemSummary) => item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`
     }

@@ -311,7 +311,9 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
     await expect.soft(inspector).toContainText('检查器');
     await expect.soft(inspector).toContainText('来源文本：仅 RSS 摘录');
     await expect.soft(inspector).toContainText('摘要来源：模型支持');
-    await expect.soft(inspector.getByRole('link', { name: zhItem.url }).first()).toHaveAttribute('translate', 'no');
-    await expect.soft(inspector.getByRole('link', { name: source.url })).toHaveAttribute('translate', 'no');
+    await expect.soft(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('href', zhItem.url);
+    await expect.soft(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
+    await expect.soft(inspector.getByRole('link', { name: '来源链接' }).first()).toHaveAttribute('href', source.url);
+    await expect.soft(inspector.getByRole('link', { name: '来源链接' }).first()).toHaveAttribute('translate', 'no');
   });
 });
