@@ -86,9 +86,26 @@ const items = [
   }
 ] as const;
 
-async function installMockApi(page: Page): Promise<void> {
+async function installMockApi(page: Page, language: 'en' | 'zh' = 'en'): Promise<void> {
   await page.route('**/api/**', async (route) => {
     const url = new URL(route.request().url());
+    if (url.pathname === '/api/runtime/language') return route.fulfill({ json: { language: language === 'zh' ? { code: 'zh', label: '中文' } : { code: 'en', label: 'English' } } });
+    if (url.pathname === '/api/runtime/operation') {
+      return route.fulfill({
+        json: {
+          operation: {
+            running: false,
+            kind: null,
+            actor_kind: null,
+            phase: null,
+            count: null,
+            message: null,
+            started_at: null,
+            updated_at: null
+          }
+        }
+      });
+    }
     if (url.pathname === '/api/sources') return route.fulfill({ json: { sources: [source] } });
     if (url.pathname === '/api/feed/today') return route.fulfill({ json: { items } });
     if (url.pathname === '/api/steer/active') return route.fulfill({ json: { rules: [] } });
@@ -128,6 +145,22 @@ test('feed/search anatomy rendered proof across desktop and narrow viewports', a
   await saveProof(page, 'feed-desktop');
 
   await page.setViewportSize({ width: 390, height: 844 });
+  const mobileChrome = page.locator('.shell-command > .surface-nav .surface-nav-label');
+  await expect(mobileChrome).toHaveText('RESOFEED');
+  const mobileChromeBox = await mobileChrome.boundingBox();
+  expect(mobileChromeBox, 'narrow TODAY keeps visible top RESOFEED chrome').not.toBeNull();
+  expect(mobileChromeBox?.height ?? 0, 'top chrome is not visually clipped to a hidden 1px label').toBeGreaterThanOrEqual(20);
+  expect(mobileChromeBox?.y ?? Number.POSITIVE_INFINITY, 'top chrome stays at the viewport top').toBeLessThanOrEqual(8);
+
+  const mobileSteer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await expect(mobileSteer).toBeVisible();
+  const mobileSteerBox = await mobileSteer.boundingBox();
+  expect(mobileSteerBox, 'bottom command input remains reachable on narrow TODAY').not.toBeNull();
+  expect(mobileSteerBox?.y ?? 0, 'Steer input remains in the bottom command affordance').toBeGreaterThan(700);
+
+  const firstFeedRowBox = await page.locator('.contract-feed-item').first().boundingBox();
+  expect(firstFeedRowBox, 'narrow feed rows render below top chrome').not.toBeNull();
+  expect(firstFeedRowBox?.y ?? 0, 'feed rows do not start underneath top RESOFEED chrome').toBeGreaterThan((mobileChromeBox?.y ?? 0) + (mobileChromeBox?.height ?? 0));
   await saveProof(page, 'feed-narrow');
 
   await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('search fallback');
@@ -141,4 +174,57 @@ test('feed/search anatomy rendered proof across desktop and narrow viewports', a
 
   await page.setViewportSize({ width: 1280, height: 900 });
   await saveProof(page, 'search-desktop');
+});
+
+test('Escape from Search returns to TODAY and clears search state in English and Chinese', async ({ page, ownerToken }) => {
+  for (const language of ['en', 'zh'] as const) {
+    await page.unroute('**/api/**').catch(() => undefined);
+    await installMockApi(page, language);
+    await page.addInitScript(
+      ({ token, lang }) => {
+        window.localStorage.setItem('resofeed.ownerToken', token);
+        if (lang === 'zh') window.localStorage.setItem('resofeed.e2e.preAuthLanguage', JSON.stringify({ code: 'zh', label: '中文' }));
+      },
+      { token: ownerToken, lang: language }
+    );
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.getByRole('textbox', { name: /Steer|导向/ }).fill('search fallback');
+    await page.getByRole('button', { name: 'apply' }).click();
+    await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'search');
+    await expect(page).toHaveURL(/\?search=fallback/);
+    await expect(page.getByText(language === 'zh' ? '检索：词汇搜索' : 'retrieval: lexical search')).toBeVisible();
+
+    await page.locator('.contract-search').focus();
+    await page.keyboard.press('Escape');
+
+    await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'feed');
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole('region', { name: language === 'zh' ? '搜索与检索' : 'Search and Retrieval' })).toBeHidden();
+    await expect(page.getByText(language === 'zh' ? '检索：词汇搜索' : 'retrieval: lexical search')).toHaveCount(0);
+  }
+});
+
+test('desktop Search auto-selects first result and clears stale Inspector when results are empty', async ({ page, ownerToken }) => {
+  await installMockApi(page);
+  await page.addInitScript((token) => window.localStorage.setItem('resofeed.ownerToken', token), ownerToken);
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Today source-backed anatomy item' })).toBeVisible();
+
+  await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('search fallback');
+  await page.getByRole('button', { name: 'apply' }).click();
+  await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'search');
+  await expect(page.getByRole('button', { name: 'Inspect search result: Today source-backed anatomy item' })).toBeVisible();
+  await expect(page.locator('.contract-search-result').first()).toHaveAttribute('aria-current', 'true');
+  await expect(page.getByRole('heading', { name: 'Today source-backed anatomy item' })).toBeVisible();
+
+  await page.route('**/api/search**', async (route) => route.fulfill({ json: { items: [], query: { q: 'nohits', source: null, from: null, to: null, resonated: null, limit: 50 } } }));
+  await page.getByRole('textbox', { name: 'Plain text query' }).fill('nohits');
+  await page.getByRole('button', { name: 'submit search' }).click();
+  await expect(page.getByText('no results')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Today source-backed anatomy item' })).toHaveCount(0);
+  await expect(page.locator('.inspector-empty-placeholder')).toBeVisible();
 });

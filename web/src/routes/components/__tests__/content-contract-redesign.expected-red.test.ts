@@ -125,7 +125,7 @@ describe('expected red: content contract redesign frontend runtime gaps', () => 
     const feed = renderFeed();
 
     expect(within(feed).getByText(localizedTitle)).toBeVisible();
-    expect(within(feed).getByText(/跨境 AI 并购/)).toBeVisible();
+    expect(within(feed).getByText(/AI 初创公司的退出路径正在被地缘监管重新定价/u)).toBeVisible();
     for (const point of keyPoints) expect(within(feed).queryByText(point)).not.toBeInTheDocument();
     expect(feed.textContent ?? '').not.toMatch(/(?:^|\n|\s)(?:•|-|\d+[.)])\s*监管/u);
     expect(feed.querySelectorAll('ul,ol,li')).toHaveLength(0);

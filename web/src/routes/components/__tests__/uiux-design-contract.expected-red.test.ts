@@ -150,7 +150,7 @@ describe('UIUX expected-red design contract coverage', () => {
     }
     expectAbsent(src, /\[运行抓取\]|\[抓取\]|\[导入 OPML\]|\[导出状态\]|\[导入状态\]|\[删除\]|\[详情\]/u, 'DESIGN.SOURCE_LEDGER.RAW_PROVENANCE_EXCEPTION');
     expectPresent(src, /source_url:|feed_url:|url:\s*\{source\.url\}|err:/u, 'DESIGN.SOURCE_LEDGER.RAW_PROVENANCE_EXCEPTION');
-    expectPresent(src, /import replaces active sources, rules, and stars/u, 'DESIGN.STATE_PORTABILITY.ACTIVE_ONLY');
+    expectPresent(src, /Import State replaces active sources, rules, and stars/u, 'DESIGN.STATE_PORTABILITY.ACTIVE_ONLY');
     expectAbsent(src, /reading history|command history|activity ledger|persistent search|sync|merge|settings|receipt/i, 'DESIGN.STATE_PORTABILITY.ACTIVE_ONLY');
   });
 

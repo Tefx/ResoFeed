@@ -1,9 +1,14 @@
 @import './lib/design-tokens.css';
 
+html,
 :root {
   font: var(--rf-typography-chrome);
   color: var(--rf-color-current-text);
   background: var(--rf-color-current-background);
+}
+
+html {
+  min-height: 100%;
 }
 
 .feed-pane,
@@ -18,6 +23,13 @@
 body {
   margin: 0;
   min-width: 320px;
+  min-height: 100%;
+  color: var(--rf-color-current-text);
+  background: var(--rf-color-current-background);
+}
+
+body > div {
+  min-height: 100dvh;
   color: var(--rf-color-current-text);
   background: var(--rf-color-current-background);
 }
@@ -106,10 +118,10 @@ a:focus,
 
 .contract-shell {
   box-sizing: border-box;
-  width: calc(100% - 64px);
-  max-width: 1216px;
+  width: calc(100vw - 32px);
+  max-width: 1536px;
   min-height: 100vh;
-  margin: var(--rf-space-xl) auto;
+  margin: var(--rf-space-sm) auto;
   border: 1px solid var(--rf-color-rule);
   background: var(--rf-component-app-shell-background-color);
   color: var(--rf-component-app-shell-text-color);
@@ -218,7 +230,7 @@ a:focus,
   display: grid;
   grid-template-columns: minmax(14ch, 0.8fr) minmax(16ch, 1fr) minmax(18ch, 1fr) minmax(43ch, auto);
   column-gap: var(--rf-space-row);
-  row-gap: var(--rf-space-sm);
+  row-gap: var(--rf-space-xs);
   align-items: center;
   min-height: 44px;
   border-block-start: 1px solid var(--rf-color-rule);
@@ -275,13 +287,13 @@ a:focus,
   gap: var(--rf-space-sm);
   align-items: center;
   border-block-end: 1px solid var(--rf-color-border);
-  padding: var(--rf-space-sm) 0;
+  padding: var(--rf-space-xs) 0 var(--rf-space-sm);
 }
 
 .source-ledger__action-group {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--rf-space-row);
+  gap: var(--rf-space-sm);
   align-items: center;
 }
 
@@ -425,7 +437,7 @@ a:focus,
   flex-wrap: wrap;
   gap: 0 18px;
   align-items: center;
-  margin-block-start: var(--rf-space-md);
+  margin-block-start: var(--rf-space-sm);
 }
 
 .state-portability-actions {
@@ -496,7 +508,7 @@ a:focus,
 }
 
 .contract-source-ledger {
-  padding: var(--rf-space-lg);
+  padding: var(--rf-space-md);
 }
 
 .contract-steering-receipt {
@@ -592,7 +604,7 @@ a:focus,
 .shell-command {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--rf-space-md);
+  gap: var(--rf-space-sm);
   align-items: center;
   border-block-end: 1px solid var(--rf-color-rule);
   padding: var(--rf-space-sm) var(--rf-space-md);
@@ -772,6 +784,12 @@ details.surface-nav button:focus-visible {
   background: transparent;
 }
 
+.source-ledger > p {
+  margin-block: var(--rf-space-sm) 0;
+  color: var(--rf-color-current-muted);
+  font: var(--rf-typography-chrome);
+}
+
 .steer-input {
   width: 100%;
 }
@@ -792,6 +810,13 @@ details.surface-nav button:focus-visible {
   border-inline-end: 1px solid var(--rf-color-rule);
   max-height: calc(100vh - 130px);
   overflow-y: auto;
+}
+
+.feed-pane:focus,
+.feed-pane:focus-visible {
+  outline: 1px solid var(--rf-color-current-border);
+  outline-offset: -1px;
+  box-shadow: inset 0 0 0 1px var(--rf-color-current-border);
 }
 
 .feed-pane > .contract-region {
@@ -826,7 +851,9 @@ details.surface-nav button:focus-visible {
 }
 
 .detail-pane.active-panel .inspector-stable-landmark {
-  min-height: calc(100vh + 200px);
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
 }
 
 .contract-inspector .inspector-frontmatter {
@@ -1121,9 +1148,18 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-inspector {
+  position: relative;
   background: var(--rf-component-inspector-pane-background-color);
   color: var(--rf-component-inspector-pane-text-color);
   padding: var(--rf-space-xl);
+}
+
+.inspector-transition-status {
+  position: absolute;
+  inset-block-start: var(--rf-space-sm);
+  inset-inline-end: var(--rf-space-lg);
+  margin: 0;
+  font: var(--rf-typography-metadata);
 }
 
 .contract-inspector h2 {
@@ -1198,7 +1234,20 @@ details.surface-nav button:focus-visible {
   gap: var(--rf-space-row);
   align-items: start;
   justify-content: space-between;
-  margin-block-end: var(--rf-space-sm);
+  margin-block-end: 0;
+}
+
+.inspector-title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--rf-space-row);
+  align-items: start;
+  max-width: 68ch;
+  margin-block-end: var(--rf-space-xs);
+}
+
+.inspector-title-row h2 {
+  min-width: 0;
 }
 
 .inspector-provenance {
@@ -1459,7 +1508,8 @@ details.surface-nav button:focus-visible {
   }
 
   .contract-shell {
-    height: calc(100dvh - (var(--rf-space-xl) * 2));
+    width: min(calc(100vw - 32px), 1536px);
+    height: calc(100dvh - (var(--rf-space-sm) * 2));
     min-height: 0;
     overflow: hidden;
   }
@@ -1469,10 +1519,28 @@ details.surface-nav button:focus-visible {
   }
 
   .shell-grid {
+    grid-template-columns: minmax(0, 760px) clamp(var(--rf-space-xl), 4vw, var(--rf-space-column)) minmax(420px, 560px);
+    justify-content: center;
     min-height: 0;
     flex: 1;
     overflow: hidden;
     align-items: stretch;
+  }
+
+  .feed-pane {
+    grid-column: 1;
+  }
+
+  .detail-pane {
+    grid-column: 3;
+  }
+
+  .shell-grid[data-surface='feed'] .detail-pane.detail-pane--closed {
+    display: none;
+  }
+
+  .detail-pane.detail-pane--closed {
+    display: none !important;
   }
 
   .feed-pane,
@@ -1484,10 +1552,23 @@ details.surface-nav button:focus-visible {
     overscroll-behavior: contain;
   }
 
-  .contract-inspector {
+  .detail-pane.active-panel {
+    min-height: 100%;
+    max-height: none;
+  }
+
+  .detail-pane > .inspector-stable-landmark {
+    height: 100%;
+    min-height: 100%;
+  }
+
+  .detail-pane > .inspector-stable-landmark > .contract-inspector {
+    flex: 1 0 auto;
     min-height: 100%;
     max-height: none;
     overflow: visible;
+    /* [DEVIATION]: Use lg instead of the flexible inspector-pane xl padding on desktop split so Inspector title aligns with feed row content while preserving readable measure. */
+    padding: var(--rf-space-lg);
   }
 
   .feed-pane > .contract-search {
@@ -1546,11 +1627,16 @@ details.surface-nav button:focus-visible {
     inset-inline: 0;
     order: 2;
     grid-template-columns: minmax(0, 1fr) auto;
-    background: var(--rf-color-background);
+    background: var(--rf-color-current-background);
   }
 
   .resofeed-shell {
+    padding-block-start: 45px;
     padding-block-end: 78px;
+  }
+
+  .resofeed-shell[data-surface='inspector'] {
+    padding-block-start: 0;
   }
 
   .shell-command > .contract-label {
@@ -1558,20 +1644,24 @@ details.surface-nav button:focus-visible {
   }
 
   .contract-brand {
-    display: inline-flex;
-    position: static;
-    width: 1px;
-    height: 1px !important;
-    min-width: 1px;
-    min-height: 1px !important;
-    max-height: 1px !important;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    font-size: 1px;
-    line-height: 1px;
-    white-space: nowrap;
-    border: 0;
+    min-height: 44px;
+    padding: var(--rf-space-sm) var(--rf-space-md);
+    color: var(--rf-color-current-muted);
+    background: var(--rf-color-current-background);
+  }
+
+  .shell-command > .surface-nav {
+    position: fixed;
+    z-index: 5;
+    inset-block-start: 0;
+    inset-inline: 0;
+    justify-content: flex-end;
+    border-block-end: 1px solid var(--rf-color-rule);
+    background: var(--rf-color-current-background);
+  }
+
+  .resofeed-shell[data-surface='inspector'] .shell-command > .surface-nav {
+    display: none;
   }
 
   .steer-form {
@@ -1580,11 +1670,10 @@ details.surface-nav button:focus-visible {
 
   details.surface-nav .surface-nav-menu {
     position: fixed;
-    inset-block-start: auto;
-    inset-block-end: 78px;
+    inset-block-start: 45px;
     inset-inline: 0;
     width: 100vw;
-    max-height: calc(100dvh - 78px);
+    max-height: min(320px, calc(100dvh - 123px));
     overflow: auto;
   }
 
@@ -1616,15 +1705,75 @@ details.surface-nav button:focus-visible {
     display: block;
     position: fixed;
     z-index: 3;
-    inset-block: 0 78px;
+    inset-block: 45px 78px;
     inset-inline: 0;
+    top: 45px;
+    right: 0;
+    bottom: 78px;
+    left: 0;
     overflow: auto;
     padding: 0;
-    background: var(--rf-color-background);
+    background: var(--rf-color-current-background);
+  }
+
+  .shell-grid[data-surface='inspector'] .detail-pane.active-panel {
+    inset-block-start: 0;
+    top: 0;
+  }
+
+  .detail-pane.active-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .detail-pane.active-panel > .back-command {
+    position: sticky;
+    z-index: 2;
+    inset-block-start: 0;
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 44px;
+    border-block: 0 1px solid var(--rf-color-current-rule);
+    justify-content: flex-start;
+    padding-inline: var(--rf-space-lg);
+    background: var(--rf-color-current-background);
+  }
+
+  .detail-pane.active-panel > .inspector-stable-landmark {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+  }
+
+  .detail-pane.active-panel > .inspector-stable-landmark > .contract-inspector {
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: calc(600px + (var(--rf-space-lg) * 2));
+    min-height: 100%;
+    max-height: none;
+    margin-inline: auto;
+    overflow: visible;
   }
 
   .detail-pane.active-panel .contract-inspector {
-    padding: var(--rf-space-lg);
+    padding: var(--rf-space-lg) var(--rf-space-lg) calc(var(--rf-space-column) + var(--rf-space-xl));
+  }
+
+  .detail-pane.active-panel .inspector-title-row,
+  .detail-pane.active-panel .contract-inspector .inspector-frontmatter,
+  .detail-pane.active-panel .contract-inspector .inspector-evidence-line,
+  .detail-pane.active-panel .contract-inspector .inspector-text-section,
+  .detail-pane.active-panel .inspector-points-section,
+  .detail-pane.active-panel .inspector-attempt-failure,
+  .detail-pane.active-panel .inspector-reingest-panel {
+    max-width: 600px;
+  }
+
+  .detail-pane.active-panel .contract-inspector h2 {
+    font-size: 24px;
+    line-height: 30px;
   }
 
   .utility-surface.active-panel > .contract-source-ledger,
@@ -1781,7 +1930,7 @@ details.surface-nav button:focus-visible {
   }
 
   .source-ledger__header {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     row-gap: var(--rf-space-xs);
   }
 
@@ -1791,20 +1940,34 @@ details.surface-nav button:focus-visible {
   }
 
   .source-ledger__header > .source-ledger__status {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: 2;
     justify-self: start;
   }
 
   .source-ledger__header > .bracket-action--run-ingest {
-    grid-column: 1;
-    grid-row: 3;
+    grid-column: 2;
+    grid-row: 1;
     align-self: start;
-    justify-self: start;
+    justify-self: end;
   }
 
   .source-ledger__header-actions {
+    gap: var(--rf-space-xs) var(--rf-space-sm);
+  }
+
+  .source-ledger__tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--rf-space-xs);
+    align-items: start;
+  }
+
+  .source-ledger__action-group {
+    flex-wrap: nowrap;
     gap: var(--rf-space-sm);
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .source-ledger-copy,

@@ -235,9 +235,12 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(inspector).getByLabelText(/Provenance: src: Example Source · full/)).toBeVisible();
     expect(within(inspector).queryByLabelText(/Model status:/)).not.toBeInTheDocument();
     expect(within(inspector).getByText('Readable core insight remains in the primary path.')).toBeVisible();
-    expect(within(inspector).getByText(/Readable article paragraph after the metadata blob/)).toBeInTheDocument();
+    expect(within(inspector).getByText('Readable core insight remains in the primary path.')).toBeVisible();
+    expect(within(inspector).getByLabelText('Source text')).toHaveTextContent('Readable fallback excerpt for the primary Inspector reading path.');
 
-    const primaryText = within(inspector).getByText(/Readable article paragraph after the metadata blob/).textContent ?? '';
+    const primaryText = Array.from(inspector.querySelectorAll('.inspector-section-copy, .inspector-evidence-line'))
+      .map((node) => node.textContent ?? '')
+      .join(' ');
     expect(primaryText).not.toMatch(/@context|schema\.org|Advertisement|model_latency_error|OpenRouter/i);
 
     const originalLink = within(inspector).getByRole('link', { name: 'original link' });
@@ -302,8 +305,12 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     render(Inspector, { props: { item: mixedDetail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = screen.getByRole('complementary', { name: mixedDetail.title });
-    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('这是中文摘要。 这是中文核心洞察。');
-    expect(inspector).not.toHaveTextContent('older English full article body');
+    expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('这是中文摘要。');
+    expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('这是中文核心洞察。');
+    const generatedText = Array.from(inspector.querySelectorAll('.inspector-section-copy'))
+      .map((node) => node.textContent ?? '')
+      .join(' ');
+    expect(generatedText).not.toContain('older English full article body');
   });
 
   it('keeps the original link as a low-chrome provenance anchor with its own focus class', () => {
@@ -394,7 +401,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     render(Inspector, { props: { item: dirtyDetail, mode: 'desktop-split' } });
 
     const inspector = screen.getByRole('complementary', { name: dirtyDetail.title });
-    expect(within(inspector).getByText(/Readable article prose survives after social boilerplate/)).toBeInTheDocument();
+    expect(within(inspector).getByText('Readable core insight remains outside social boilerplate.')).toBeVisible();
+    expect(within(inspector).getByLabelText('Source text')).toHaveTextContent('Readable fallback excerpt remains available.');
     const primaryText = Array.from(inspector.querySelectorAll('h2, p:not(.contract-label):not(.contract-muted):not(.contract-warning)'))
       .map((node) => node.textContent ?? '')
       .join(' ')
@@ -403,17 +411,17 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(primaryText).not.toContain('summary-like lead repeated by the site');
   });
 
-  it('places the mobile Inspector Resonate action in the top header row without duplicating debug status', () => {
+  it('places the mobile Inspector Resonate action in the title row without duplicating debug status', () => {
     const onResonanceToggle = vi.fn(async () => {});
     render(Inspector, { props: { item: expectedRedItem, mode: 'mobile-route', onResonanceToggle } });
 
     const inspector = screen.getByRole('complementary', { name: expectedRedItem.title });
-    const headerRow = inspector.querySelector('.inspector-header-row');
+    const titleRow = inspector.querySelector('.inspector-title-row');
     const heading = within(inspector).getByRole('heading', { name: expectedRedItem.title });
     const star = within(inspector).getByRole('button', { name: `Resonate item: ${expectedRedItem.title}` });
 
-    expect(headerRow).toContainElement(star);
-    expect(Boolean(star.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+    expect(titleRow).toContainElement(star);
+    expect(Boolean(star.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_PRECEDING)).toBe(true);
     expect(within(inspector).queryByText(expectedRedItem.model_status)).not.toBeInTheDocument();
   });
 
@@ -523,7 +531,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     await user.click(screen.getByRole('button', { name: `Open Inspector for: ${expectedRedItem.title}` }));
 
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'back to TODAY' })[0]).toBeVisible());
-    expect(screen.getByRole('complementary', { name: expectedRedItem.title })).toHaveTextContent('Full extracted text shown only in Inspector.');
+    expect(screen.getByRole('complementary', { name: expectedRedItem.title })).toHaveTextContent('Raw feed excerpt for detail route.');
     expect(screen.getAllByRole('button', { name: `Resonate item: ${expectedRedItem.title}` })).toHaveLength(1);
 
     const steer = screen.getByLabelText('Steer or paste RSS URL');

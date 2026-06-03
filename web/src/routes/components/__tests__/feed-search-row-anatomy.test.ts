@@ -124,8 +124,8 @@ describe('Feed/Search compact row anatomy', () => {
 
   it('keeps desktop Search as a full-height workflow slice instead of a 260px widget', () => {
     const css = readFileSync(resolve(__dirname, '../../../app.css'), 'utf8');
-    expect(css).toMatch(/\.feed-pane\s*>\s*\.contract-search\s*\{[\s\S]*height:\s*calc\(100vh - 178px\);/u);
-    expect(css).toMatch(/\.feed-pane\s*>\s*\.contract-search\s*>\s*\.contract-search-results-region\s*,[\s\S]*flex:\s*1 1 auto;[\s\S]*overflow-y:\s*auto;/u);
+    expect(css).toMatch(/\.feed-pane\s*>\s*\.contract-search\s*\{[\s\S]*min-height:\s*100%;[\s\S]*height:\s*auto;/u);
+    expect(css).toMatch(/\.feed-pane\s*>\s*\.contract-search\s*>\s*\.contract-search-results-region\s*,[\s\S]*flex:\s*1 1 auto;[\s\S]*min-height:\s*0;/u);
     expect(css).not.toContain('min(260px, calc(100vh - 178px))');
   });
 

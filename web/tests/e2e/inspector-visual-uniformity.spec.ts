@@ -34,7 +34,7 @@ type OriginalLinkStyle = TypographyStyle & {
 };
 
 type InspectorStyleSnapshot = {
-  readonly statusLine: TypographyStyle;
+  readonly aiStatusValue: TypographyStyle;
   readonly sectionLabel: TypographyStyle;
   readonly sectionBody: TypographyStyle;
   readonly originalLink: OriginalLinkStyle;
@@ -167,15 +167,15 @@ async function inspectorStyleSnapshot(inspector: Locator): Promise<InspectorStyl
       };
     }
 
-    const statusLine = element.querySelector('.inspector-status-line');
+    const aiStatusValue = element.querySelector('.inspector-frontmatter dd[aria-label^="AI status:"]');
     const sectionLabel = element.querySelector('.inspector-section-label');
     const sectionBody = element.querySelector('.inspector-section-copy');
     const originalLink = element.querySelector('.inspector-original-link');
-    if (!statusLine || !sectionLabel || !sectionBody || !originalLink) throw new Error('Inspector style target missing');
+    if (!aiStatusValue || !sectionLabel || !sectionBody || !originalLink) throw new Error('Inspector style target missing');
     const linkStyle = window.getComputedStyle(originalLink);
     const linkRect = originalLink.getBoundingClientRect();
     return {
-      statusLine: typographyStyle(statusLine),
+      aiStatusValue: typographyStyle(aiStatusValue),
       sectionLabel: typographyStyle(sectionLabel),
       sectionBody: typographyStyle(sectionBody),
       originalLink: {
@@ -218,22 +218,26 @@ test('Inspector provenance/source metadata typography is uniform for full and so
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
 
   const fullInspector = await openItem(page, 'Full extraction model backed item');
-  await expect(fullInspector.locator('.inspector-status-line')).toHaveText('source text: full · summary provenance: model-backed');
+  await expect(fullInspector.locator('.inspector-frontmatter dt').filter({ hasText: 'AI STATUS' })).toBeVisible();
+  await expect(fullInspector.locator('.inspector-frontmatter dd[aria-label^="AI status:"]')).toHaveText('model-backed · full · quality: high');
+  await expect(fullInspector.locator('.inspector-status-line')).toHaveCount(0);
   const fullStyles = await inspectorStyleSnapshot(fullInspector);
   const fullScreenshot = await screenshotInspector(fullInspector, testInfo, 'inspector-full-model-backed');
 
   const excerptInspector = await openItem(page, 'Source excerpt model backed item');
-  await expect(excerptInspector.locator('.inspector-status-line')).toHaveText('source text: RSS excerpt only · summary provenance: model-backed');
+  await expect(excerptInspector.locator('.inspector-frontmatter dt').filter({ hasText: 'AI STATUS' })).toBeVisible();
+  await expect(excerptInspector.locator('.inspector-frontmatter dd[aria-label^="AI status:"]')).toHaveText('model-backed · source excerpt · quality: source-claim');
+  await expect(excerptInspector.locator('.inspector-status-line')).toHaveCount(0);
   const excerptStyles = await inspectorStyleSnapshot(excerptInspector);
   const excerptScreenshot = await screenshotInspector(excerptInspector, testInfo, 'inspector-source-excerpt-model-backed');
 
-  expect.soft(excerptStyles.statusLine, 'provenance/source-text line typography must match across extraction states').toEqual(fullStyles.statusLine);
+  expect.soft(excerptStyles.aiStatusValue, 'AI STATUS frontmatter value typography must match across extraction states').toEqual(fullStyles.aiStatusValue);
   expect.soft(excerptStyles.sectionLabel, 'section label typography must match across extraction states').toEqual(fullStyles.sectionLabel);
   expect.soft(excerptStyles.sectionBody, 'section body typography must match across extraction states').toEqual(fullStyles.sectionBody);
   expect.soft(excerptStyles.originalLink, 'original link low-chrome typography and box model must match across extraction states').toEqual(fullStyles.originalLink);
 
-  expect(fullStyles.statusLine.fontSize).toBe('12px');
-  expect(fullStyles.statusLine.lineHeight).toBe('16px');
+  expect(fullStyles.aiStatusValue.fontSize).toBe('12px');
+  expect(fullStyles.aiStatusValue.lineHeight).toBe('16px');
   expect(fullStyles.sectionLabel.fontSize).toBe('12px');
   expect(fullStyles.sectionLabel.lineHeight).toBe('16px');
   expect(fullStyles.sectionBody.fontSize).toBe('18px');
@@ -252,4 +256,101 @@ test('Inspector provenance/source metadata typography is uniform for full and so
     body: JSON.stringify({ fullScreenshot, excerptScreenshot }, null, 2),
     contentType: 'application/json'
   });
+});
+
+test('narrow Inspector keeps Resonate in the title row with readable measure and command-bar clearance', async ({ page, ownerToken }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await installFixtureApi(page, ownerToken);
+  await page.goto('/');
+  await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
+
+  const inspector = await openItem(page, 'Full extraction model backed item');
+  await expect(page).toHaveURL(/\/items\/item_full_model_backed$/);
+
+  const titleRow = inspector.locator('.inspector-title-row');
+  await expect(titleRow.getByRole('heading', { name: 'Full extraction model backed item' })).toBeVisible();
+  await expect(titleRow.getByRole('button', { name: 'Resonate item: Full extraction model backed item' })).toBeVisible();
+  await expect(inspector.locator('.inspector-header-row .contract-resonate')).toHaveCount(0);
+
+  const layout = await page.evaluate(() => {
+    const shellCommand = document.querySelector('.shell-command');
+    const detailPane = document.querySelector('.detail-pane.active-panel');
+    const inspectorElement = document.querySelector('.contract-inspector');
+    const title = document.querySelector('.inspector-title-row h2');
+    const frontmatter = document.querySelector('.inspector-frontmatter');
+    if (!shellCommand || !detailPane || !inspectorElement || !title || !frontmatter) throw new Error('narrow Inspector layout target missing');
+
+    const commandRect = shellCommand.getBoundingClientRect();
+    const detailRect = detailPane.getBoundingClientRect();
+    const inspectorRect = inspectorElement.getBoundingClientRect();
+    const titleStyle = window.getComputedStyle(title);
+    const frontmatterStyle = window.getComputedStyle(frontmatter);
+
+    return {
+      commandTop: commandRect.top,
+      detailBottom: detailRect.bottom,
+      inspectorWidth: inspectorRect.width,
+      titleFontSize: titleStyle.fontSize,
+      titleLineHeight: titleStyle.lineHeight,
+      frontmatterColumns: frontmatterStyle.gridTemplateColumns
+    };
+  });
+
+  expect(layout.inspectorWidth).toBeLessThanOrEqual(390);
+  expect(layout.titleFontSize).toBe('24px');
+  expect(layout.titleLineHeight).toBe('30px');
+  expect(layout.frontmatterColumns).toContain('px');
+  expect(layout.detailBottom).toBeLessThanOrEqual(layout.commandTop + 1);
+
+  const screenshotPath = await screenshotInspector(inspector, testInfo, 'narrow-inspector-title-row-measure');
+  await testInfo.attach('narrow-inspector-layout.json', {
+    body: JSON.stringify({ ...layout, screenshotPath }, null, 2),
+    contentType: 'application/json'
+  });
+});
+
+test('desktop item switch keeps Inspector mounted while new detail loads', async ({ page, ownerToken }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await installFixtureApi(page, ownerToken);
+  await page.route('**/api/items/item_excerpt_model_backed', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return route.fulfill({ json: { item: detailFor('item_excerpt_model_backed') } });
+  });
+
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Full extraction model backed item' })).toBeVisible();
+
+  const before = await page.locator('.contract-inspector').evaluate((element) => {
+    const title = element.querySelector('h2');
+    const frontmatter = element.querySelector('.inspector-frontmatter');
+    const body = element.querySelector('.inspector-section-copy');
+    if (!title || !frontmatter || !body) throw new Error('initial Inspector geometry target missing');
+    return {
+      titleTop: title.getBoundingClientRect().top,
+      frontmatterTop: frontmatter.getBoundingClientRect().top,
+      bodyTop: body.getBoundingClientRect().top
+    };
+  });
+
+  await page.getByRole('button', { name: 'Open Inspector for: Source excerpt model backed item' }).click();
+  await expect(page.locator('.contract-inspector')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Full extraction model backed item' })).toBeVisible();
+  await expect(page.locator('.inspector-transition-status')).toBeVisible();
+
+  const during = await page.locator('.contract-inspector').evaluate((element) => {
+    const title = element.querySelector('h2');
+    const frontmatter = element.querySelector('.inspector-frontmatter');
+    const body = element.querySelector('.inspector-section-copy');
+    if (!title || !frontmatter || !body) throw new Error('loading Inspector geometry target missing');
+    return {
+      titleTop: title.getBoundingClientRect().top,
+      frontmatterTop: frontmatter.getBoundingClientRect().top,
+      bodyTop: body.getBoundingClientRect().top
+    };
+  });
+
+  expect(during.titleTop).toBe(before.titleTop);
+  expect(during.frontmatterTop).toBe(before.frontmatterTop);
+  expect(during.bodyTop).toBe(before.bodyTop);
+  await expect(page.getByRole('heading', { name: 'Source excerpt model backed item' })).toBeFocused();
 });

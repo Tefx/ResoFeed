@@ -67,6 +67,50 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).queryByLabelText('Source evidence')).not.toBeInTheDocument();
   });
 
+  it('binds the mobile Resonate action to the article title row without a standalone header block', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'mobile-title-row-resonate-contract',
+      title: 'Mobile title row resonate contract item',
+      summary: 'Model-backed digest remains visible.',
+      core_insight: 'The star belongs to the article entity hierarchy.',
+      extraction_status: 'full',
+      model_status: 'ok',
+      is_resonated: false
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'mobile-route', onResonanceToggle: () => undefined } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const heading = within(inspector).getByRole('heading', { name: detail.title });
+    const resonate = within(inspector).getByRole('button', { name: `Resonate item: ${detail.title}` });
+    const titleRow = heading.closest('.inspector-title-row');
+
+    expect(titleRow).not.toBeNull();
+    expect(titleRow).toContainElement(resonate);
+    expect(resonate).toHaveAttribute('aria-pressed', 'false');
+    expect(inspector.querySelector('.inspector-header-row .contract-resonate')).not.toBeInTheDocument();
+  });
+
+  it('normalizes literal escaped newlines in generated Summary copy', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'literal-escaped-newline-summary-contract',
+      title: 'Literal escaped newline summary contract item',
+      summary: 'Generated summary first sentence.\\n\\nGenerated summary second sentence.',
+      core_insight: 'Generated core insight remains visible.',
+      extraction_status: 'full',
+      model_status: 'ok'
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const summary = within(inspector).getByLabelText('Summary');
+    expect(summary).toHaveTextContent('Generated summary first sentence. Generated summary second sentence.');
+    expect(summary).not.toHaveTextContent('\\n');
+  });
+
   it('never falls back to generated summary or core insight in Source Text when source evidence is absent', () => {
     const generatedOnlyDetail: ItemDetail = {
       ...baseDetail,
@@ -87,8 +131,77 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Generated summary must remain only in Summary.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Generated core insight must remain only in Core insight.');
     expect(within(inspector).queryByLabelText('Source text')).not.toBeInTheDocument();
-    expect(within(inspector).getByText('Source text unavailable; use original link.')).toHaveClass('contract-muted');
+    expect(within(inspector).queryByText('Source text unavailable; use original link.')).not.toBeInTheDocument();
     expect(within(inspector).getByRole('link', { name: 'original link' })).toBeVisible();
+  });
+
+  it('does not render unavailable source text for full OK rows with generated content but no stored evidence', () => {
+    const generatedOnlyFullDetail: ItemDetail = {
+      ...baseDetail,
+      id: 'full-ok-generated-only-source-evidence-contract',
+      title: 'Full OK generated only source evidence contract item',
+      summary: 'Generated summary is present but not source evidence.',
+      core_insight: 'Generated core insight is present but not source evidence.',
+      key_points: ['Generated key point one.', 'Generated key point two.', 'Generated key point three.'],
+      extraction_status: 'full',
+      model_status: 'ok',
+      extracted_text: null,
+      feed_excerpt: null,
+      display_excerpt: null
+    };
+
+    render(Inspector, { props: { item: generatedOnlyFullDetail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: generatedOnlyFullDetail.title });
+    expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('Generated summary is present but not source evidence.');
+    expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('Generated core insight is present but not source evidence.');
+    expect(within(inspector).queryByLabelText('来源文本')).not.toBeInTheDocument();
+    expect(within(inspector).queryByText('来源文本不可用；请使用原文链接。')).not.toBeInTheDocument();
+    expect(within(inspector).getByText('模型支持 · 原文未存 · 质量：高价值')).toBeVisible();
+    expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 原文未存，质量 高价值"]')).toBeVisible();
+  });
+
+  it('keeps full source text disclosure and full AI status when extracted text is stored', () => {
+    const fullEvidenceDetail: ItemDetail = {
+      ...baseDetail,
+      id: 'full-ok-extracted-text-source-evidence-contract',
+      title: 'Full OK extracted text source evidence contract item',
+      summary: 'Model-backed summary remains visible.',
+      core_insight: 'Model-backed core insight remains visible.',
+      extraction_status: 'full',
+      model_status: 'ok',
+      extracted_text: 'Persisted extracted article source evidence remains auditable.',
+      feed_excerpt: null,
+      display_excerpt: null
+    };
+
+    render(Inspector, { props: { item: fullEvidenceDetail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: fullEvidenceDetail.title });
+    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('Persisted extracted article source evidence remains auditable.');
+    expect(within(inspector).getByText('模型支持 · 全文 · 质量：高价值')).toBeVisible();
+  });
+
+  it('keeps partial RSS excerpt source disclosure when feed excerpt is stored', () => {
+    const partialEvidenceDetail: ItemDetail = {
+      ...baseDetail,
+      id: 'partial-ok-feed-excerpt-source-evidence-contract',
+      title: 'Partial OK feed excerpt source evidence contract item',
+      summary: 'Model-backed summary remains visible.',
+      core_insight: 'Model-backed core insight remains visible.',
+      extraction_status: 'partial_extraction',
+      model_status: 'ok',
+      extracted_text: null,
+      feed_excerpt: 'RSS excerpt source evidence remains auditable.',
+      display_excerpt: null
+    };
+
+    render(Inspector, { props: { item: partialEvidenceDetail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: partialEvidenceDetail.title });
+    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('RSS excerpt source evidence remains auditable.');
+    expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
+    expect(inspector).not.toHaveTextContent('来源文本不可用；请使用原文链接。');
   });
 
   it('does not mark generated content unavailable when only the original article is unavailable', () => {

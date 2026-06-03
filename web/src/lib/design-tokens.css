@@ -97,7 +97,7 @@
     --rf-component-feed-item-background-color: var(--rf-color-background-dark);
     --rf-component-feed-item-text-color: var(--rf-color-text-dark);
     --rf-component-feed-item-muted-color: var(--rf-color-muted-dark);
-    --rf-component-feed-item-selected-marker-color: var(--rf-color-focus-dark);
+    --rf-component-feed-item-selected-marker-color: var(--rf-color-border-dark);
     --rf-component-inspector-pane-background-color: var(--rf-color-surface-dark);
     --rf-component-inspector-pane-text-color: var(--rf-color-text-dark);
     --rf-component-source-ledger-background-color: var(--rf-color-surface-dark);

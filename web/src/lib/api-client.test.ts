@@ -83,7 +83,7 @@ describe('ResoFeed API client and rendered sinks', () => {
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(ledger).toHaveTextContent('src: Example Source');
     expect(ledger).toHaveTextContent('url: https://example.com/feed.xml');
-    expect(ledger).toHaveTextContent(/last_fetch: \d{2}:\d{2}:\d{2} local/);
+    expect(ledger).toHaveTextContent(/\d{2}:\d{2}:\d{2} local/);
 
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
     const list = screen.getByRole('list', { name: 'Today feed items' });

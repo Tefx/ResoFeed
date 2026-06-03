@@ -23,7 +23,7 @@
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
-    | { kind: 'receipt'; text: string; undo?: SteerUndoTarget }
+    | { kind: 'receipt'; text: string; undo?: SteerUndoTarget; route?: SteerRouteEchoKind }
     | { kind: 'doctor'; text: string }
     | { kind: 'error'; text: string };
   type SteerRouteEchoKind = 'idle' | 'add-source' | 'search' | 'doctor' | 'steer-rule' | 'invalid';
@@ -46,6 +46,7 @@
   const idleOperationPollMs = 5000;
 
   let ownerToken = $state('');
+  let tokenHydrated = $state(false);
   let promptState = $state<OwnerTokenPromptState>('empty');
   let loadState = $state<ApiLoadState>('idle');
   let apiError = $state<string | null>(null);
@@ -56,6 +57,7 @@
   let feedLoadingMore = $state(false);
   let sources = $state<Source[]>([]);
   let selectedItemId = $state<string | null>(null);
+  let selectedItemPreview = $state<ItemSummary | null>(null);
   let selectedItemDetail = $state<ItemDetail | null>(null);
   let inspectorState = $state<ApiLoadState>('idle');
   let inspectorError = $state<string | null>(null);
@@ -96,6 +98,7 @@
   let suppressFeedScrollRecording = false;
   let openRouterModels = $state<OpenRouterModelOption[]>([]);
   let openRouterModelListState = $state<'loading' | 'available' | 'unavailable'>('unavailable');
+  let itemDetailRequestSequence = 0;
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const ownerTokenRejected = $derived(promptState === 'rejected');
@@ -107,7 +110,11 @@
         : 'feed-temporarily-empty'
   );
 
-  const selectedItemSummary = $derived(items.find((item) => item.id === selectedItemId) ?? items[0] ?? null);
+  const selectedItemSummary = $derived(
+    selectedItemPreview?.id === selectedItemId
+      ? selectedItemPreview
+      : items.find((item) => item.id === selectedItemId) ?? null
+  );
   const inspectorItem = $derived(selectedItemDetail ?? selectedItemSummary);
   const selectedFeedItemId = $derived(!isNarrow || currentSurface === 'inspector' ? selectedItemId : null);
   const feedPaneInactive = $derived(currentSurface !== 'feed' && (isNarrow || (currentSurface !== 'inspector' && currentSurface !== 'search')));
@@ -246,10 +253,22 @@
     // DESIGN.md requires independent keyboard-scrollable Feed and Inspector panes; runtime style preserves that behavior in rendered test environments that do not apply app.css.
     if (feedPaneElement) feedPaneElement.style.overflowY = 'auto';
     if (detailPaneElement) {
+      const narrowRoute = window.matchMedia('(max-width: 1079px)').matches;
       detailPaneElement.style.overflowY = 'auto';
-      detailPaneElement.style.maxHeight = 'calc(100vh - 130px)';
+      detailPaneElement.style.maxHeight = narrowRoute ? 'none' : 'calc(100vh - 130px)';
+      if (narrowRoute) detailPaneElement.style.minHeight = '0';
       const stableLandmark = detailPaneElement.querySelector<HTMLElement>('.inspector-stable-landmark');
-      if (stableLandmark) stableLandmark.style.minHeight = 'calc(100vh + 200px)';
+      if (stableLandmark) {
+        stableLandmark.style.display = 'flex';
+        stableLandmark.style.flexDirection = 'column';
+        stableLandmark.style.minHeight = '100%';
+        const inspectorSurface = stableLandmark.querySelector<HTMLElement>('.contract-inspector');
+        if (inspectorSurface) {
+          inspectorSurface.style.flex = '1 0 auto';
+          inspectorSurface.style.minHeight = '100%';
+          inspectorSurface.style.maxHeight = 'none';
+        }
+      }
     }
   }
 
@@ -273,6 +292,94 @@
   async function focusSurfaceAndRestoreFeed(surface: Surface): Promise<void> {
     await focusActiveSurface(surface);
     if (surface === 'feed') await restoreFeedScrollPosition();
+  }
+
+  function focusIsInsideTextEntry(): boolean {
+    const active = document.activeElement;
+    if (!(active instanceof HTMLElement)) return false;
+    if (active.isContentEditable) return true;
+    return active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active instanceof HTMLSelectElement;
+  }
+
+  function resetSearchSurfaceState(): void {
+    searchSeedQuery = '';
+    steerCommand = '';
+    preservedSearchWindowScrollY = 0;
+    if (steerFeedback.kind === 'receipt' && steerFeedback.route === 'search') steerFeedback = { kind: 'idle' };
+  }
+
+  function setSelectedItemPreview(item: ItemSummary | null): void {
+    selectedItemPreview = item;
+  }
+
+  function clearSelectedInspectorContext(): void {
+    selectedItemId = null;
+    selectedItemPreview = null;
+    selectedItemDetail = null;
+    inspectorState = 'idle';
+    inspectorError = null;
+    itemDetailRequestSequence += 1;
+  }
+
+  function reconcileSelectedFeedItem(feedItems: ItemSummary[]): void {
+    const routeItemId = itemIdForPath(window.location.pathname);
+    if (routeItemId) {
+      selectedItemId = routeItemId;
+      selectedItemPreview = feedItems.find((item) => item.id === routeItemId) ?? selectedItemPreview;
+      return;
+    }
+    if (currentSurface === 'search') return;
+    const selectedStillVisible = selectedItemId ? feedItems.some((item) => item.id === selectedItemId) : false;
+    if (selectedStillVisible) {
+      selectedItemPreview = feedItems.find((item) => item.id === selectedItemId) ?? selectedItemPreview;
+      return;
+    }
+    const firstItem = feedItems[0] ?? null;
+    selectedItemId = firstItem?.id ?? null;
+    selectedItemPreview = firstItem;
+    if (!firstItem) selectedItemDetail = null;
+  }
+
+  function focusFeedFromDesktopInspector(): void {
+    void tick().then(() => feedPaneElement?.focus({ preventScroll: true }));
+  }
+
+  function handleGlobalEscape(event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    if (focusIsInsideTextEntry()) return;
+    const target = event.target instanceof Element ? event.target : null;
+    const reingestPanel = target?.closest('.inspector-reingest-panel');
+    if (reingestPanel?.querySelector('.inspector-reingest-cancel')) return;
+
+    if (surfaceMenuOpen) {
+      event.preventDefault();
+      surfaceMenuOpen = false;
+      void tick().then(() => surfaceMenuSummary?.focus());
+      return;
+    }
+
+    if (reprocessState === 'confirming') {
+      event.preventDefault();
+      cancelReprocess();
+      return;
+    }
+
+    if (steerFeedback.kind === 'submitting' || reprocessState === 'running') return;
+
+    if (currentSurface === 'inspector') {
+      event.preventDefault();
+      if (isNarrow) {
+        showSurface('feed');
+      } else {
+        focusFeedFromDesktopInspector();
+      }
+      return;
+    }
+
+    if (currentSurface === 'ledger' || currentSurface === 'doctor' || currentSurface === 'search') {
+      event.preventDefault();
+      showSurface('feed');
+    }
   }
 
   function rememberFeedScrollPosition(): void {
@@ -480,7 +587,8 @@
       processingLanguage = languageResponse;
       setDocumentLanguage(languageResponse.code);
       agentSteeringRules = await loadAgentSteeringRules(client);
-      selectedItemId = itemIdForPath(window.location.pathname) ?? feedResponse.items[0]?.id ?? null;
+      replaceSurfaceFromLocation();
+      reconcileSelectedFeedItem(feedResponse.items);
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
       if (import.meta.env.MODE === 'test' && window.navigator.userAgent.includes('jsdom') && (window.location.pathname === '/source-ledger' || window.location.pathname === '/doctor')) {
@@ -568,10 +676,8 @@
     feedOffset = feedResponse.items.length;
     feedHasMore = feedResponse.items.length === feedPageSize;
     agentSteeringRules = await loadAgentSteeringRules(client);
-    if (selectedItemId && !feedResponse.items.some((item) => item.id === selectedItemId)) {
-      selectedItemId = feedResponse.items[0]?.id ?? null;
-      selectedItemDetail = null;
-    }
+    reconcileSelectedFeedItem(feedResponse.items);
+    if (selectedItemId && selectedItemDetail?.id !== selectedItemId) await loadItemDetail(selectedItemId);
   }
 
   async function loadAgentSteeringRules(client: ResoFeedApiClient): Promise<SteerRule[]> {
@@ -584,16 +690,19 @@
   }
 
   async function loadItemDetail(itemId: string, token = ownerToken): Promise<void> {
+    const requestSequence = ++itemDetailRequestSequence;
     inspectorState = 'loading';
     inspectorError = null;
     try {
       const response = await apiClient(token).item(itemId);
+      if (requestSequence !== itemDetailRequestSequence || itemId !== selectedItemId) return;
       selectedItemDetail = response.item;
       inspectorState = 'ready';
       await tick();
       applySplitScrollContainment();
       if (detailPaneElement) detailPaneElement.scrollTop = 0;
     } catch (error) {
+      if (requestSequence !== itemDetailRequestSequence || itemId !== selectedItemId) return;
       inspectorState = 'error';
       inspectorError = error instanceof Error ? error.message : 'err: item unavailable';
     }
@@ -602,8 +711,8 @@
   async function selectItem(item: ItemSummary): Promise<void> {
     rememberFeedScrollPosition();
     selectedItemId = item.id;
+    setSelectedItemPreview(item);
     inspectorActivated = true;
-    selectedItemDetail = null;
     currentSurface = 'inspector';
     inspectorFocusRequestId += 1;
     if (detailPaneElement) detailPaneElement.scrollTop = 0;
@@ -632,7 +741,7 @@
     const searchRegion = document.querySelector<HTMLElement>('.contract-search');
     const preservedSearchScrollTop = searchRegion?.scrollTop ?? 0;
     selectedItemId = item.id;
-    selectedItemDetail = null;
+    setSelectedItemPreview(item);
     inspectorFocusRequestId += 1;
     if (detailPaneElement) detailPaneElement.scrollTop = 0;
     try {
@@ -666,18 +775,15 @@
 
   function showSurface(surface: Surface, updateUrl = true): void {
     if (surface === 'feed') suppressFeedScrollRecording = true;
+    const leavingSearch = currentSurface === 'search' && surface !== 'search';
     currentSurface = surface;
     if (updateUrl) {
       const canonicalPath = canonicalPathForSurface(surface);
-      if (canonicalPath && window.location.pathname !== canonicalPath) {
+      if (canonicalPath && (window.location.pathname !== canonicalPath || window.location.search)) {
         window.history.pushState({}, '', canonicalPath);
       }
     }
-    if (surface !== 'search' && steerFeedback.kind === 'receipt' && steerFeedback.text.startsWith('retrieval:')) {
-      steerFeedback = { kind: 'idle' };
-      searchSeedQuery = '';
-      steerCommand = '';
-    }
+    if (leavingSearch) resetSearchSurfaceState();
     void focusSurfaceAndRestoreFeed(surface);
   }
 
@@ -816,12 +922,14 @@
       if (/^(search|find)\s+/i.test(command)) {
         shouldRefocusSteer = false;
         searchSeedQuery = command.replace(/^(search|find)\s+/i, '');
+        clearSelectedInspectorContext();
         preservedSearchWindowScrollY = 0;
         showSurface('search', false);
         syncSearchHistory(0);
         steerCommand = '';
         steerFeedback = {
           kind: 'receipt',
+          route: 'search',
           text: processingLanguage.code === 'zh'
             ? '检索：词汇搜索'
             : command.toLowerCase().startsWith('find ')
@@ -955,6 +1063,13 @@
     return apiClient().search(params);
   }
 
+  async function handleSearchResults(items: ItemSummary[], state: 'ready' | 'error'): Promise<void> {
+    if (isNarrow || currentSurface !== 'search') return;
+    if (state === 'error' || items.length === 0) {
+      clearSelectedInspectorContext();
+    }
+  }
+
   async function updateProcessingLanguage(): Promise<void> {
     languageStatus = '';
     try {
@@ -1033,8 +1148,9 @@
     const media = window.matchMedia('(max-width: 1079px)');
     const updateMedia = () => {
       isNarrow = media.matches;
-      if (!media.matches && currentSurface === 'inspector') currentSurface = 'feed';
-    };
+        if (!media.matches && currentSurface === 'inspector') currentSurface = 'feed';
+        if (!media.matches && currentSurface === 'feed' && items.length > 0 && !selectedItemId) reconcileSelectedFeedItem(items);
+      };
     updateMedia();
     applySplitScrollContainment();
     media.addEventListener('change', updateMedia);
@@ -1045,6 +1161,7 @@
       if (target instanceof HTMLButtonElement) event.preventDefault();
     };
     document.addEventListener('mousedown', preserveKeyboardFocusModality);
+    document.addEventListener('keydown', handleGlobalEscape, true);
 
     const handlePopState = (event: PopStateEvent) => replaceSurfaceFromLocation(event.state);
     window.addEventListener('popstate', handlePopState);
@@ -1059,19 +1176,26 @@
     if (storedToken) {
       ownerToken = storedToken;
       promptState = 'accepted';
+      tokenHydrated = true;
       void loadShellData(storedToken, true, false);
+    } else {
+      tokenHydrated = true;
     }
 
     return () => {
       media.removeEventListener('change', updateMedia);
       document.removeEventListener('mousedown', preserveKeyboardFocusModality);
+      document.removeEventListener('keydown', handleGlobalEscape, true);
       window.removeEventListener('popstate', handlePopState);
     };
   });
 </script>
 
-<main bind:this={shellElement} class="contract-shell resofeed-shell" aria-label="RESOFEED">
-  {#if !hasOwnerToken}
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions: app shell owns the DESIGN.md global Escape contract while preserving child text-entry ownership. -->
+<main bind:this={shellElement} class="contract-shell resofeed-shell" data-surface={currentSurface} aria-label="RESOFEED" onkeydown={handleGlobalEscape}>
+  {#if !tokenHydrated}
+    <p class="visually-hidden" role="status" aria-live="polite">loading owner token</p>
+  {:else if !hasOwnerToken}
     <OwnerTokenPrompt state={promptState} language={processingLanguage.code} onAccepted={handleOwnerTokenAccepted} />
   {:else}
     <a class="skip-link" href="#today-feed" tabindex="-1">{shellChrome.skipFeed}</a>
@@ -1196,7 +1320,7 @@
         <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{undoStatus}</p>
       {/if}
 
-      {#if steerFeedback.kind === 'receipt' && (!steerFeedback.text.startsWith('retrieval:') || currentSurface === 'search')}
+      {#if steerFeedback.kind === 'receipt' && (steerFeedback.route !== 'search' || currentSurface === 'search')}
       <div class="contract-steering-receipt" role="status" aria-label={shellChrome.steerReceipt} aria-live="polite">
         <span>{steerFeedback.text}</span>
         {#if receiptUndoTarget}
@@ -1220,7 +1344,7 @@
         {#if !feedPaneInactive || currentSurface === 'inspector'}
           <p id="feed-heading" class="visually-hidden" tabindex="-1">TODAY feed</p>
           {#if currentSurface === 'search' && !isNarrow}
-            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} autoSelectFirstResult={true} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
           {:else if apiError && !ownerTokenRejected}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {:else if items.length === 0}
@@ -1232,16 +1356,17 @@
       </section>
 
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Inspector scroll region itself to be keyboard-focusable. -->
-      <aside bind:this={detailPaneElement} role="region" class="detail-pane" class:active-panel={currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} aria-label={inspectorScrollLabel} aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent">
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions: detail scroll region owns desktop Inspector Escape close per DESIGN.md. -->
+      <aside bind:this={detailPaneElement} role="region" class="detail-pane" class:active-panel={currentSurface === 'feed' || currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} class:detail-pane--closed={currentSurface === 'feed' && !inspectorItem} aria-label={inspectorScrollLabel} aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent" onkeydown={handleGlobalEscape}>
         {#if currentSurface === 'inspector'}
           <button class="back-command" type="button" aria-label={backTodayLabel} onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
         {/if}
         {#if inspectorItem}
           <section class="inspector-stable-landmark" role="complementary" aria-label="INSPECTOR">
-            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} showReingest={inspectorActivated} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
+            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} onEscape={() => { if (isNarrow) showSurface('feed'); else focusFeedFromDesktopInspector(); }} showReingest={inspectorActivated} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
           </section>
         {:else}
-          <p class="contract-label">INSPECTOR</p>
+          <p class="contract-label inspector-empty-placeholder">INSPECTOR</p>
         {/if}
       </aside>
     </div>
@@ -1278,7 +1403,7 @@
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
       {/if}
       {#if isNarrow}
-        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={true} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={true} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
       {/if}
     </section>
     {#if steerFeedback.kind === 'doctor'}

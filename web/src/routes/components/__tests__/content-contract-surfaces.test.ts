@@ -109,7 +109,7 @@ describe('content contract UI surfaces', () => {
     // DEVIATION RECORD: type=test_error; artifact=web/src/routes/components/__tests__/content-contract-surfaces.test.ts; what_changed=Feed provenance assertion now checks accessible source/title provenance without requiring the forbidden visual/readout-style `来源标题：` prefix; why=DESIGN.md:486-487,528-532,730,747 and 1033/1058 forbid repeated reader prefixes in Feed while preserving accessible provenance; impact=stronger positive a11y provenance plus visual-prefix regression guard.
     expect(within(row).getByLabelText(new RegExp(`来源：.*来源标题：${item.source_item_title}`, 'u'))).toBeVisible();
     expect(row).not.toHaveTextContent(`来源标题：${item.source_item_title}`);
-    expect(within(row).getByText(/这篇文章说明.*AI 初创公司的退出路径/u)).toBeVisible();
+    expect(within(row).getByText(/AI 初创公司的退出路径正在被技术、资本与监管共同重塑/u)).toBeVisible();
     for (const point of item.key_points) {
       expect(within(row).queryByText(point)).not.toBeInTheDocument();
     }

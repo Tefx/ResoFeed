@@ -55,7 +55,7 @@ const items: ItemSummary[] = Array.from({ length: 50 }, (_, index) => {
     source_title: source.title,
     url: `https://news.example.test/articles/browser-proof-${ordinal}?utm_source=exact-anchor`,
     title: `Browser proof item ${ordinal}`,
-    summary: `Rendered browser fixture summary ${ordinal}.`,
+    summary: ordinal === 12 ? 'Rendered browser fixture summary 12.\\n\\nContinuation after escaped newline.' : `Rendered browser fixture summary ${ordinal}.`,
     core_insight: `Rendered browser fixture insight ${ordinal}.`,
     value_tier: ordinal % 2 === 0 ? 'high' : null,
     published_at: `2026-05-16T${String(ordinal).padStart(2, '0')}:00:00Z`,
@@ -165,6 +165,7 @@ test('browser proves source identifiers are non-translatable and desktop panes s
 
   const feedPane = page.locator('[data-scroll-region="feed-independent"]');
   const inspectorPane = page.locator('[data-scroll-region="inspector-independent"]');
+  const inspectorSurface = page.locator('[data-scroll-region="inspector-reading-independent"]');
   await expect(feedPane).toHaveAttribute('tabindex', '0');
   await expect(feedPane).toHaveAttribute('aria-label', 'TODAY surface independent scroll');
   await expect(inspectorPane).toHaveAttribute('tabindex', '0');
@@ -176,24 +177,33 @@ test('browser proves source identifiers are non-translatable and desktop panes s
     const grid = document.querySelector('.shell-grid')?.getBoundingClientRect();
     const feed = document.querySelector('[data-scroll-region="feed-independent"]')?.getBoundingClientRect();
     const inspector = document.querySelector('[data-scroll-region="inspector-independent"]')?.getBoundingClientRect();
+    const inspectorSurface = document.querySelector('[data-scroll-region="inspector-reading-independent"]')?.getBoundingClientRect();
     return {
       viewport: window.innerHeight,
       shell: shell?.height ?? 0,
       grid: grid?.height ?? 0,
       feed: feed?.height ?? 0,
-      inspector: inspector?.height ?? 0
+      inspector: inspector?.height ?? 0,
+      inspectorSurface: inspectorSurface?.height ?? 0
     };
   });
   expect(paneHeights.shell).toBeGreaterThan(paneHeights.viewport - 80);
   expect(paneHeights.grid).toBeGreaterThan(paneHeights.viewport - 180);
   expect(paneHeights.feed).toBeGreaterThanOrEqual(paneHeights.grid - 4);
   expect(paneHeights.inspector).toBeGreaterThanOrEqual(paneHeights.grid - 4);
+  expect(paneHeights.inspectorSurface).toBeGreaterThanOrEqual(paneHeights.inspector - 4);
+  await expect(inspectorSurface).toHaveCSS('overflow-y', 'visible');
   await feedPane.focus();
   await expect(feedPane).toBeFocused();
   await inspectorPane.focus();
   await expect(inspectorPane).toBeFocused();
 
   await expect(page.locator('.feed-meta-source').first()).toHaveAttribute('translate', 'no');
+
+  await inspectorSurface.locator('details[aria-label="来源文本"], details[aria-label="Source text"]').evaluate((node) => {
+    if (node instanceof HTMLDetailsElement) node.open = true;
+  });
+  await expect.poll(async () => inspectorPane.evaluate((node) => node.scrollHeight > node.clientHeight)).toBe(true);
 
   const initialInspectorTop = await inspectorPane.evaluate((node) => node.scrollTop);
   await feedPane.evaluate((node) => {
@@ -250,10 +260,30 @@ test('browser keeps mobile full-screen Inspector route and restores feed scroll 
   await expect(page).toHaveURL(/\/items\/browser_proof_item_12$/u);
   await expect(page.getByRole('button', { name: 'back to TODAY' })).toBeVisible();
   await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).toContainText('Browser proof item 12');
+  await expect(page.locator('[aria-label="摘要"], [aria-label="Summary"]')).toContainText('Rendered browser fixture summary 12. Continuation after escaped newline.');
+  await expect(page.locator('[aria-label="摘要"], [aria-label="Summary"]')).not.toContainText('\\n');
   await expect(page.getByRole('button', { name: 'Resonate item: Browser proof item 12' })).toBeVisible();
   await expect(page.locator('.detail-pane')).toHaveClass(/active-panel/u);
   await expect(page.locator('.feed-pane')).toBeHidden();
   await expect(page.locator('.contract-feed-item[aria-current="true"] .contract-feed-title')).toHaveText('Browser proof item 12');
+  const mobileInspectorFill = await page.evaluate(() => {
+    const detail = document.querySelector('.detail-pane.active-panel')?.getBoundingClientRect();
+    const landmark = document.querySelector('.detail-pane.active-panel > .inspector-stable-landmark')?.getBoundingClientRect();
+    const inspector = document.querySelector('.detail-pane.active-panel > .inspector-stable-landmark > .contract-inspector')?.getBoundingClientRect();
+    return {
+      viewportHeight: window.innerHeight,
+      viewportWidth: window.innerWidth,
+      detail: detail ? { width: detail.width, height: detail.height, bottom: detail.bottom } : null,
+      landmark: landmark ? { width: landmark.width, height: landmark.height } : null,
+      inspector: inspector ? { width: inspector.width, height: inspector.height } : null
+    };
+  });
+  expect(mobileInspectorFill.detail?.width).toBeGreaterThanOrEqual(mobileInspectorFill.viewportWidth - 1);
+  expect(mobileInspectorFill.detail?.height).toBeGreaterThanOrEqual(mobileInspectorFill.viewportHeight - 79);
+  expect(mobileInspectorFill.detail?.bottom).toBeLessThanOrEqual(mobileInspectorFill.viewportHeight - 77);
+  expect(mobileInspectorFill.landmark?.width).toBeGreaterThanOrEqual((mobileInspectorFill.detail?.width ?? 0) - 1);
+  expect(mobileInspectorFill.inspector?.width).toBeGreaterThanOrEqual((mobileInspectorFill.landmark?.width ?? 0) - 1);
+  expect(mobileInspectorFill.inspector?.height).toBeGreaterThanOrEqual((mobileInspectorFill.landmark?.height ?? 0) - 1);
   await captureRenderedEvidence(page, testInfo, 'mobile-inspector-route');
 
   await page.getByRole('button', { name: 'back to TODAY' }).click();

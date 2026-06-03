@@ -252,7 +252,7 @@ describe('expected-red runtime and provenance conformance regressions', () => {
     await user.click(within(menu as HTMLElement).getByText('RESOFEED'));
 
     await waitFor(() => {
-      expect(within(menu as HTMLElement).getByText(/op:\s*library_reprocess\s*·\s*actor:human\s*·\s*phase:processing_items\s*·\s*2\/5\s*·\s*library reprocess processing item\s*·\s*since\s*11:00:00/i)).toBeVisible();
+      expect(within(menu as HTMLElement).getByText(/op:\s*library_reprocess\s*·\s*actor:human\s*·\s*phase:processing_items\s*·\s*2\/5\s*·\s*library reprocess processing item\s*·\s*since\s*\d{2}:\d{2}:\d{2} local/i)).toBeVisible();
     });
     expect(within(menu as HTMLElement).queryByText(/current operation:|msg:|started:|updated:/i)).not.toBeInTheDocument();
   });

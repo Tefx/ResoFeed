@@ -103,7 +103,7 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByRole('group', { name: '来源列表操作' })).toHaveTextContent('来源列表');
-    expect(within(ledger).getByRole('group', { name: '可携带状态操作' })).toHaveTextContent('可携带状态');
+    expect(within(ledger).getByRole('group', { name: '状态迁移操作' })).toHaveTextContent('状态迁移');
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
     expect(within(ledger).getByText('[FETCH]')).toBeVisible();
     expect(within(ledger).getByText('来源: Example')).toBeVisible();

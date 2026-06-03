@@ -26,13 +26,14 @@
     focusRequestId?: number;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
     onReingestItem?: (item: InspectableItem, request: { model: string | null; prompt: string | null }) => Promise<ItemReingestResponse>;
+    onEscape?: () => void;
     showReingest?: boolean;
     openRouterModels?: OpenRouterModelOption[];
     openRouterModelListState?: 'loading' | 'available' | 'unavailable';
     landmarkLabel?: string | null;
   }
 
-  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable', landmarkLabel = null }: Props = $props();
+  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, onEscape, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable', landmarkLabel = null }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let reingestModel = $state('default');
@@ -305,12 +306,16 @@
 
   function readableText(text: string | null): string | null {
     if (!text) return null;
-    const decodedOnce = removeEnclosureMetadata(decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text)))));
+    const decodedOnce = normalizeEscapedLineBreaks(removeEnclosureMetadata(decodeEntities(removeEnclosureMetadata(removeJsonLdObjects(stripExecutableAndTags(text))))));
     const normalized = removeRepeatedIntro(removeDiagnosticSentences(removeSourceBoilerplate(removeJsonLdObjects(stripExecutableAndTags(decodedOnce)))))
       .replace(/\s+/g, ' ')
       .trim();
     if (isNonArticleDiagnosticText(normalized)) return null;
     return normalized.length > 0 ? normalized : null;
+  }
+
+  function normalizeEscapedLineBreaks(text: string): string {
+    return text.replace(/\\r\\n|\\n|\\r/g, ' ');
   }
 
   function hasModelBackedText(value: InspectableItem): boolean {
@@ -450,6 +455,7 @@
     if (value.extraction_status === 'partial_extraction') return localizedChrome('source excerpt', '来源摘录');
     if (value.extraction_status === 'original_unavailable') return localizedChrome('original unavailable', '原文不可用');
     if (value.extraction_status === 'summary_unavailable') return localizedChrome('summary unavailable', '摘要不可用');
+    if (value.extraction_status === 'full' && !sourceEvidenceText(value)) return localizedChrome('source not stored', '原文未存');
     return localizedChrome('full', '全文');
   }
 
@@ -650,6 +656,25 @@
     reingestToggle?.focus();
   }
 
+  function focusIsInsideTextEntry(): boolean {
+    const active = document.activeElement;
+    if (!(active instanceof HTMLElement)) return false;
+    if (active.isContentEditable) return true;
+    return active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active instanceof HTMLSelectElement;
+  }
+
+  function handleInspectorEscape(event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    if (focusIsInsideTextEntry()) return;
+    if (reingestConfiguring && reingestState !== 'submitting') {
+      event.preventDefault();
+      void cancelReingestConfig();
+      return;
+    }
+    event.preventDefault();
+    onEscape?.();
+  }
+
   function modelListDiagnostic(): string {
     if (openRouterModelListState === 'loading') return localizedChrome('models: loading', '模型：加载中');
     if (openRouterModelListState === 'available') {
@@ -728,11 +753,12 @@
 </script>
 
 <!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions: Escape closes Inspector-local transient re-ingest chrome from the focusable scroll region before global route handling. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
-<aside class="contract-region contract-inspector" aria-label={item ? (landmarkLabel ?? localizedDisplayTitle(item)) : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent">
-  <p id="inspector-region-label" class="contract-label">{item ? inspectorChromeLabel(item) : localizedChrome('INSPECTOR', '检查器')}</p>
+<aside class="contract-region contract-inspector" aria-label={item ? (landmarkLabel ?? localizedDisplayTitle(item)) : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent" onkeydown={handleInspectorEscape}>
+  <p id="inspector-region-label" class="visually-hidden contract-label">{item ? inspectorChromeLabel(item) : localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
-    <p class="contract-muted" role="status">{localizedChrome('loading', '加载中')}</p>
+    <p class="contract-muted inspector-transition-status" role="status">{localizedChrome('loading', '加载中')}</p>
   {/if}
   {#if error}
     <p class="contract-feedback-error" role="alert">{error}</p>
@@ -741,13 +767,15 @@
       <p class="visually-hidden inspector-provenance" aria-label={`${localizedChrome('Provenance', '来源')}${language === 'zh' ? '：' : ': '}${provenanceDisclosure(item)}`}>
         <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>{item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}${language === 'zh' ? '：' : ': '}${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${qualityValueLabel(item)}` : ''}
       </p>
+    </div>
+    <div class="inspector-title-row">
+      <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{localizedDisplayTitle(item)}</h2>
       {#if mode === 'mobile-route' && onResonanceToggle}
         <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={browserLegacyEnglishA11y() ? (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`) : language === 'zh' ? (item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`) : (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`)} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
         </button>
       {/if}
     </div>
-    <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{localizedDisplayTitle(item)}</h2>
     {#if language === 'zh'}
       <p class="visually-hidden" aria-label={`本地化标题：${localizedDisplayTitle(item)}`}></p>
     {:else}
@@ -853,7 +881,7 @@
         <summary class="inspector-section-label">{sectionLabelText('source text', '来源文本')}</summary>
         <p class="inspector-reading inspector-reading--source-text">{detailText(item)}</p>
       </details>
-    {:else}
+    {:else if !hasModelBackedText(item)}
       <p class="contract-muted inspector-source-text-unavailable">{sourceTextUnavailableNote()}</p>
     {/if}
     <details class="contract-source-details" aria-label={localizedChrome('Source details', '来源详情')}>

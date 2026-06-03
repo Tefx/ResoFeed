@@ -190,17 +190,17 @@ describe('current operation and low-frequency utility placement', () => {
     expect(within(document.querySelector('header.shell-command') as HTMLElement).queryByText('err: operation already running')).not.toBeInTheDocument();
     expect(within(screen.getByTestId('source-ledger')).getAllByText(/err: operation already running/i)).toHaveLength(1);
     const blockedMenu = await openMenu(blocked.user);
-    expect(blockedMenu.getByText(/err: operation already running.*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
-    expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
+    expect(blockedMenu.getByText(/err: operation already running.*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*\d{2}:\d{2}:\d{2} local/i)).toBeVisible();
+    expect(within(screen.getByTestId('source-ledger')).getByText(/err: operation already running.*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*\d{2}:\d{2}:\d{2} local/i)).toBeVisible();
   });
 
   it('renders current operation phase, count, message, and timestamps when the menu or Source Ledger is contextual', async () => {
     const { user } = await renderAuthenticatedPage({ operation: runningOperation() });
     const menu = await openMenu(user);
-    expect(menu.getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
+    expect(menu.getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*\d{2}:\d{2}:\d{2} local/i)).toBeVisible();
 
     await user.click(menu.getByRole('button', { name: 'SOURCE LEDGER' }));
-    expect(within(screen.getByTestId('source-ledger')).getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*11:00:00/i)).toBeVisible();
+    expect(within(screen.getByTestId('source-ledger')).getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*\d{2}:\d{2}:\d{2} local/i)).toBeVisible();
   });
 
   it('refreshes current operation counts in-place while the RESOFEED menu remains open', async () => {

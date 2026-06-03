@@ -8,14 +8,16 @@
     query?: string;
     onSearch: (params: SearchRequestParams) => Promise<SearchResponse>;
     onSelect?: (item: ItemSummary) => Promise<void> | void;
+    onResultsSettled?: (items: ItemSummary[], state: 'ready' | 'error') => Promise<void> | void;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
     selectedItemId?: string | null;
+    autoSelectFirstResult?: boolean;
     suppressStatusRole?: boolean;
     compactFilters?: boolean;
     language?: ProcessingLanguage;
   }
 
-  let { items, query = '', onSearch, onSelect, onResonanceToggle, selectedItemId = null, suppressStatusRole = false, compactFilters = false, language = 'en' }: Props = $props();
+  let { items, query = '', onSearch, onSelect, onResultsSettled, onResonanceToggle, selectedItemId = null, autoSelectFirstResult = false, suppressStatusRole = false, compactFilters = false, language = 'en' }: Props = $props();
   let searchQuery = $state('');
   let source = $state('');
   let from = $state('');
@@ -26,6 +28,8 @@
   let statusText = $state('');
   let pendingResonanceId = $state<string | null>(null);
   let lastHandledSeedQuery = '';
+  let lastAutoSelectedResultKey = '';
+  let userSelectedResultKey = '';
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const chrome = $derived(itemAnatomyChrome(language));
   const searchChrome = $derived(language === 'zh'
@@ -104,6 +108,7 @@
 
   async function submitSearch(showLoading = true): Promise<void> {
     if (showLoading) statusText = chrome.search.searching;
+    const resultKey = JSON.stringify({ searchQuery, source, from, to, resonated, limit });
     try {
       const response = await onSearch({
         q: searchQuery || undefined,
@@ -115,14 +120,21 @@
       });
       results = response.items;
       statusText = chrome.search.resultCount(response.items.length);
+      await onResultsSettled?.(response.items, 'ready');
+      if (autoSelectFirstResult && response.items.length > 0 && resultKey !== lastAutoSelectedResultKey && resultKey !== userSelectedResultKey) {
+        lastAutoSelectedResultKey = resultKey;
+        await onSelect?.(response.items[0]);
+      }
     } catch (error) {
       results = [];
       const message = error instanceof Error ? error.message : 'err: search failed';
       statusText = /err:\s*internal/i.test(message) ? chrome.search.resultCount(0) : message;
+      await onResultsSettled?.([], 'error');
     }
   }
 
   async function openInspector(item: ItemSummary): Promise<void> {
+    userSelectedResultKey = JSON.stringify({ searchQuery, source, from, to, resonated, limit });
     await onSelect?.(item);
   }
 
