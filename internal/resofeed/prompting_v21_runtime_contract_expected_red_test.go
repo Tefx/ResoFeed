@@ -455,7 +455,9 @@ func promptingV21ExactDocumentedUserPayloadFixture() map[string]any {
 			"required_fields":    []any{"localized_title", "summary", "core_insight", "key_points", "value_tier", "model_status"},
 			"field_rules": []any{
 				"localized_title is generated display title; source title/provenance remain literal",
-				"summary is contextual factual explanation: what happened, background, and main source-backed facts",
+				"summary is coherent readable prose: preferably 1 to 2 source-backed paragraphs, or one concise prose block for short/source-limited items",
+				"summary must not include section labels or headings such as 【背景定位】, 【架构特征】, Context:, Key Details:, Markdown headings, bullets, numbered lists, or other label-like chunks",
+				"when content naturally splits into multiple facets, keep summary narrative and route separable facets/details to key_points",
 				"core_insight must be exactly one sentence answering why this matters / what judgment or priority changes",
 				"core_insight must not paraphrase, repeat, or restate the summary's first sentence",
 				"key_points carry multi-point details; do not use core_insight for lists or detail dumps",
@@ -491,9 +493,9 @@ func promptingV21ExactDocumentedUserPayloadFixture() map[string]any {
 		"quality_profile": map[string]any{
 			"profile_id": "rss-agent.v2.7-alignment",
 			"summary_density_guidance": map[string]any{
-				"high": "Aim for 4+ paragraphs and 8+ concrete source-backed fact units when source text supports it. Use Context / Key Details / Impact structure when natural.",
-				"mid":  "Aim for 3+ paragraphs and 4+ concrete source-backed fact units when source text supports it.",
-				"low":  "Use one concise but complete block with at least 2 concrete source-backed fact units when available. Do not produce a stub.",
+				"high": "Use 1 to 2 coherent readable paragraphs with concrete source-backed facts when source text supports it; route separable facets and details to key_points.",
+				"mid":  "Use 1 to 2 coherent readable paragraphs with concrete source-backed facts when source text supports it; route separable facets and details to key_points.",
+				"low":  "Use one concise but complete prose block with concrete source-backed facts when available. Do not produce a stub.",
 			},
 			"value_tier_density_mapping": map[string]any{
 				"high":         "Use high-density guidance.",
@@ -521,6 +523,7 @@ func promptingV21ExactDocumentedUserPayloadFixture() map[string]any {
 				"No 'this article discusses', 'the author notes', 'interesting', 'worth reading', or similar filler.",
 				"Do not collapse high-value items into generic one-paragraph summaries.",
 				"Do not abbreviate merely to save tokens.",
+				"Do not use bracketed or labelled subheadings inside generated readable strings, including 【背景定位】, 【架构特征】, Context:, Key Details:, bullets, numbered lists, or Markdown headings.",
 				"Keep summary and core_insight distinct: summary gives context and facts; core_insight gives the one-sentence why-it-matters judgment, not a paraphrase.",
 			},
 			"fallback_guidance": map[string]any{

@@ -194,7 +194,10 @@ Schema support enforces shape, field presence, enums, extra-field rejection, max
 ### `summary`
 
 - Chinese context summary when `item.target_language="zh"`.
+- Coherent readable prose, preferably 1-2 source-backed paragraphs; for short or source-limited items, use one concise prose block.
 - Dense, source-backed, non-generic, and suitable for the main reading surface.
+- Do not include section labels, inline headings, bullets, or numbered-list structures inside `summary`; forbidden examples include `【背景定位】`, `【架构特征】`, `【训练与优化】`, `Context:`, `Key Details:`, Markdown headings, and label-like chunks.
+- If content naturally splits into multiple facets, route separable facets/details to `key_points`; `summary` remains narrative context.
 - May reflect one-time prompt or Steer emphasis only when source-backed.
 
 ### `core_insight`
@@ -372,12 +375,11 @@ Validation failure must become a non-destructive attempt failure, not a destruct
 
 Advisory/non-blocking Go checks may record diagnostics but must not fail the run by themselves:
 
-- RSS-agent paragraph count, fact-unit density, or Context / Key Details / Impact structure;
 - subjective summary style strength;
 - weak but schema-valid one-time-prompt satisfaction;
 - target-language smoke checks that are inconclusive rather than deterministic failures.
 
-Go must not use a default LLM-as-validator pass. RSS-agent density guidance is prompt guidance only unless a later architecture decision explicitly upgrades it.
+Go must not use a default LLM-as-validator pass. RSS-agent density and readability guidance is prompt guidance only unless a later architecture decision explicitly upgrades it.
 
 ## Retry and Reprocess Policy
 

@@ -63,7 +63,7 @@ func TestSummaryPromptContractIncludesAntiFluffDensityAndProvenanceRules(t *test
 			t.Errorf("summary prompt missing anti-fluff/anti-blogger rule %q; prompt=%s", want, promptJSON)
 		}
 	}
-	for _, want := range []string{"fact_unit", "numbers", "specific", "concrete source-backed fact units"} {
+	for _, want := range []string{"fact_unit", "numbers", "specific", "concrete source-backed facts"} {
 		if !strings.Contains(promptText, want) {
 			t.Errorf("summary prompt missing factual-density guidance %q; prompt=%s", want, promptJSON)
 		}
@@ -84,9 +84,10 @@ func TestSummaryPromptContractDistinguishesSummaryFromCoreInsight(t *testing.T) 
 	}
 	promptText := strings.ToLower(string(payload))
 	for _, want := range []string{
-		"summary is contextual factual explanation",
-		"what happened",
-		"background",
+		"summary is coherent readable prose",
+		"source-backed paragraphs",
+		"summary narrative",
+		"route separable facets/details to key_points",
 		"core_insight must be exactly one sentence answering why this matters",
 		"what judgment or priority changes",
 		"must not paraphrase",
@@ -96,6 +97,45 @@ func TestSummaryPromptContractDistinguishesSummaryFromCoreInsight(t *testing.T) 
 		if !strings.Contains(promptText, want) {
 			t.Fatalf("prompt contract missing summary/core_insight distinction %q in %s", want, payload)
 		}
+	}
+}
+
+func TestSummaryPromptContractForbidsInlineSectionLabels(t *testing.T) {
+	compiled, err := compilePromptingV21SummaryPrompt(OpenRouterSummaryInput{
+		ItemID:         "item_summary_readability",
+		Title:          "Summary readability",
+		SourceTitle:    "Example Source",
+		URL:            "https://example.test/readability",
+		AvailableText:  "The source covers architecture, optimization, and deployment details.",
+		TargetLanguage: ProcessingLanguageChinese,
+	})
+	if err != nil {
+		t.Fatalf("compile summary prompt: %v", err)
+	}
+	payload, err := json.Marshal(compiled.UserPayload)
+	if err != nil {
+		t.Fatalf("marshal prompt payload: %v", err)
+	}
+	promptText := string(payload)
+	lowerPromptText := strings.ToLower(promptText)
+
+	for _, want := range []string{
+		"summary is coherent readable prose",
+		"summary must not include section labels or headings",
+		"【背景定位】",
+		"【架构特征】",
+		"Context:",
+		"Key Details:",
+		"route separable facets and details to key_points",
+		"bracketed or labelled subheadings",
+	} {
+		if !strings.Contains(promptText, want) {
+			t.Fatalf("compiled prompt missing summary readability/no-section-label rule %q in %s", want, payload)
+		}
+	}
+	removedGuidance := "Context / " + "Key Details / " + "Impact"
+	if strings.Contains(lowerPromptText, strings.ToLower(removedGuidance)) {
+		t.Fatalf("compiled prompt still includes removed section-structure guidance: %s", payload)
 	}
 }
 
