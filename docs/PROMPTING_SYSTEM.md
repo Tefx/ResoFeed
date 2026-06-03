@@ -53,6 +53,7 @@ Keep URLs, source identifiers, source titles, original item titles, enum values,
 core_insight must be exactly one concise Chinese sentence when the target language is Chinese.
 If a one-time prompt asks for bullets, lists, multiple insights, or split points, keep core_insight as one sentence and place the list-shaped content in key_points.
 key_points must be a structured JSON array of 3 to 5 source-grounded Chinese items for successful generated content.
+Do not emit literal escaped line break sequences such as `\\n` or `\\r` inside generated user-facing strings; use normal JSON string text and real paragraph breaks where needed.
 
 One-time prompts and steering rules are field-scoped guidance only. They may affect emphasis, angle, fact selection, key_points focus/order, and value_tier judgment when source-backed. They must not change schema, required fields, enum/status values, target language, provenance rules, or core_insight shape.
 
@@ -76,6 +77,7 @@ The prompt compiler emits one JSON user payload using schema version `resofeed.s
     "target_language_rule": "Write localized_title, summary, core_insight, and key_points in item.target_language. Keep source_item_title, source_title, URLs, source identifiers, enum values, and provenance literal.",
     "core_insight_rule": "Exactly one concise sentence. List requests route to key_points, not core_insight.",
     "key_points_rule": "For model_status=ok, emit 3 to 5 structured array items, all source-grounded and non-generic.",
+    "literal_line_break_rule": "Do not emit literal escaped line break sequences such as \\n or \\r inside generated user-facing strings; use normal JSON string text and real paragraph breaks where needed.",
     "guidance_policy": {
       "steer_rules_priority": "below system/schema contract",
       "one_time_prompt_priority": "below system/schema contract and field invariants",
@@ -164,14 +166,14 @@ Strict structured-output JSON Schema contract:
     "model_status"
   ],
   "properties": {
-    "localized_title": { "type": "string", "maxLength": 180 },
-    "summary": { "type": "string", "maxLength": 1800 },
-    "core_insight": { "type": "string", "maxLength": 350 },
+    "localized_title": { "type": "string", "maxLength": 180, "description": "Do not include literal escaped line break sequences such as \\n or \\r." },
+    "summary": { "type": "string", "maxLength": 1800, "description": "Use real paragraph breaks if needed; do not include literal escaped line break sequences such as \\n or \\r." },
+    "core_insight": { "type": "string", "maxLength": 350, "description": "Do not include literal escaped line break sequences such as \\n or \\r." },
     "key_points": {
       "type": "array",
       "minItems": 3,
       "maxItems": 5,
-      "items": { "type": "string", "maxLength": 500 }
+      "items": { "type": "string", "maxLength": 500, "description": "Do not include literal escaped line break sequences such as \\n or \\r." }
     },
     "value_tier": { "type": "string", "enum": ["high", "brief", "source-claim"] },
     "model_status": { "type": "string", "enum": ["ok", "summary_unavailable"] }

@@ -253,6 +253,37 @@ func TestReprocessFallsBackToFeedExcerptWhenFetchedOrStoredTextIsXPlaceholder(t 
 	}
 }
 
+func TestChineseReprocessPreservesStoredSourceEvidenceWhenModelOmitsEchoFields(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-reprocess-preserve-evidence"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.NotFound(w, r)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_zh_reprocess_evidence", server.URL+"/feed.xml", "ZH Reprocess")
+	now := time.Now().UTC().Format(time.RFC3339)
+	if _, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, source_item_title, localized_title, summary, core_insight, key_points, value_tier, content_status, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text) values ('item_zh_reprocess_evidence', 'src_zh_reprocess_evidence', ?, ?, 'prior title', 'Source title', 'prior localized', 'prior summary', 'prior insight', '[]', 'brief', 'ok', ?, 'full', 'ok', 'Stored RSS source excerpt remains.', 'Stored extracted source article remains.')`, server.URL+"/feed.xml", server.URL+"/missing", now); err != nil {
+		t.Fatalf("seed item: %v", err)
+	}
+	assertReprocessIndexReady(t, ctx, db)
+
+	resp, err := reprocessLibraryFresh(ctx, db, emptySourceEvidenceZHLLM{})
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompleted || resp.Reprocess.ItemsUpdated != 1 {
+		t.Fatalf("reprocess result = %+v, want completed with one updated item", resp.Reprocess)
+	}
+	text := readStoredText(t, ctx, db, "item_zh_reprocess_evidence")
+	if text.summary != "中文摘要说明来源事实" || text.feedExcerpt != "Stored RSS source excerpt remains." || text.extractedText != "Stored extracted source article remains." {
+		t.Fatalf("stored text = %+v, want generated fields plus preserved source evidence", text)
+	}
+}
+
 func TestReprocessFailedValidationStoresSafeDiagnosticSubcode(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
@@ -405,7 +436,7 @@ func TestReprocessLibraryUsesStoredTitleAndPreservesItForURLLikeModelTitle(t *te
 	}
 }
 
-func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsReadableBody(t *testing.T) {
+func TestChineseReprocessPreservesFetchedSourceEvidenceWhenModelOmitsReadableBody(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-blank-body-reprocess"}}); err != nil {
@@ -420,7 +451,7 @@ func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsR
 	seedReprocessItem(t, ctx, db, "item_zh_blank_reprocess", "src_zh_blank_reprocess", server.URL+"/article", "")
 	assertReprocessIndexReady(t, ctx, db)
 
-	resp, err := reprocessLibraryFresh(ctx, db, blankReadableBodyLLM{})
+	resp, err := reprocessLibraryFresh(ctx, db, emptySourceEvidenceZHLLM{})
 	if err != nil {
 		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
 	}
@@ -428,14 +459,14 @@ func TestChineseReprocessDoesNotFallbackToRawEnglishExtractedTextWhenModelOmitsR
 		t.Fatalf("result = %+v, want one updated item", resp.Reprocess)
 	}
 	text := readStoredText(t, ctx, db, "item_zh_blank_reprocess")
-	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || strings.Contains(text.feedExcerpt, "Original English") || strings.Contains(text.extractedText, "Original English") {
-		t.Fatalf("stored text = %+v, want Chinese model fields and no raw English body/excerpt", text)
+	if text.summary != "中文摘要说明来源事实" || text.coreInsight != "中文洞察说明来源事实。" || text.feedExcerpt != "PRIOR excerpt item_zh_blank_reprocess" || !strings.Contains(text.extractedText, "Original English TLDR article body") {
+		t.Fatalf("stored text = %+v, want Chinese model fields plus preserved/fetched source evidence", text)
 	}
-	if count := reprocessFTSCount(t, ctx, db, "item_zh_blank_reprocess", `"Original English"`); count != 0 {
-		t.Fatalf("FTS retained raw English source text with count %d", count)
+	if count := reprocessFTSCount(t, ctx, db, "item_zh_blank_reprocess", `"Original English"`); count != 1 {
+		t.Fatalf("FTS source evidence phrase count = %d, want 1", count)
 	}
 	if count := reprocessFTSCount(t, ctx, db, "item_zh_blank_reprocess", `"PRIOR extracted"`); count != 0 {
-		t.Fatalf("FTS retained stale prior body/excerpt text with count %d", count)
+		t.Fatalf("FTS retained stale prior extracted text with count %d", count)
 	}
 }
 

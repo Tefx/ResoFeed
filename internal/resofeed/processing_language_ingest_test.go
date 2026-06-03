@@ -188,7 +188,7 @@ func TestIngestUsesHTTPGUIDAsURLWhenRSSLinkIsEmpty(t *testing.T) {
 	}
 }
 
-func TestChineseModelBackedIngestDoesNotStoreRawEnglishExcerptWhenModelOmitsReadableBody(t *testing.T) {
+func TestChineseModelBackedIngestPreservesSourceEvidenceWhenModelOmitsReadableBody(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-blank-body-ingest"}}); err != nil {
@@ -209,27 +209,78 @@ func TestChineseModelBackedIngestDoesNotStoreRawEnglishExcerptWhenModelOmitsRead
 	t.Cleanup(feed.Close)
 
 	seedSource(t, ctx, db, "src_zh_blank_ingest", feed.URL+"/feed.xml", "TLDR AI")
-	if err := IngestOnce(ctx, db, IngestConfig{LLM: blankReadableBodyLLM{}}); err != nil {
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: emptySourceEvidenceZHLLM{}}); err != nil {
 		t.Fatalf("IngestOnce: %v", err)
 	}
 
 	itemID := itemIDByURL(t, ctx, db, feed.URL+"/one")
 	text := readStoredText(t, ctx, db, itemID)
-	if text.summary != "中文摘要" || text.coreInsight != "中文洞察" || strings.Contains(text.feedExcerpt, "original English") || strings.Contains(text.extractedText, "original English") {
-		t.Fatalf("stored text = %+v, want Chinese model fields and no raw English body/excerpt", text)
+	if text.summary != "中文摘要说明来源事实" || text.coreInsight != "中文洞察说明来源事实。" || !strings.Contains(text.feedExcerpt, "original English RSS excerpt") || !strings.Contains(text.extractedText, "original English article body") {
+		t.Fatalf("stored text = %+v, want Chinese model fields plus preserved source evidence", text)
 	}
 	detail, err := ReadItemDetail(ctx, db, itemID)
 	if err != nil {
 		t.Fatalf("ReadItemDetail: %v", err)
 	}
-	if (detail.FeedExcerpt != nil && strings.Contains(*detail.FeedExcerpt, "original English")) || (detail.ExtractedText != nil && strings.Contains(*detail.ExtractedText, "original English")) {
-		t.Fatalf("detail exposed raw source text: feed_excerpt=%v extracted_text=%v", detail.FeedExcerpt, detail.ExtractedText)
+	if detail.FeedExcerpt == nil || !strings.Contains(*detail.FeedExcerpt, "original English RSS excerpt") || detail.ExtractedText == nil || !strings.Contains(*detail.ExtractedText, "original English article body") {
+		t.Fatalf("detail source evidence not preserved: feed_excerpt=%v extracted_text=%v", detail.FeedExcerpt, detail.ExtractedText)
 	}
 	if detail.SourceTitle != "TLDR AI" || detail.URL != feed.URL+"/one" || detail.Provenance.SourceURL != feed.URL+"/feed.xml" {
 		t.Fatalf("source identifiers changed: detail=%+v provenance=%+v", detail, detail.Provenance)
 	}
-	if count := reprocessFTSCount(t, ctx, db, itemID, `"original English"`); count != 0 {
-		t.Fatalf("FTS retained raw English excerpt/body with count %d", count)
+	if count := reprocessFTSCount(t, ctx, db, itemID, `"original English"`); count != 1 {
+		t.Fatalf("FTS source evidence phrase count = %d, want 1", count)
+	}
+}
+
+func TestChineseModelBackedIngestPreservesOnlyRSSExcerptWhenArticleUnavailable(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-rss-only-ingest"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+
+	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/feed.xml":
+			w.Header().Set("Content-Type", "application/rss+xml")
+			_, _ = io.WriteString(w, `<?xml version="1.0"?><rss><channel><title>RSS Only</title><item><guid>rss-only</guid><title>RSS Only Item</title><link>http://`+r.Host+`/missing</link><description>RSS-only source-backed excerpt remains available.</description></item></channel></rss>`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(feed.Close)
+
+	seedSource(t, ctx, db, "src_zh_rss_only", feed.URL+"/feed.xml", "RSS Only")
+	if err := IngestOnce(ctx, db, IngestConfig{LLM: emptySourceEvidenceZHLLM{}}); err != nil {
+		t.Fatalf("IngestOnce: %v", err)
+	}
+
+	itemID := itemIDByURL(t, ctx, db, feed.URL+"/missing")
+	text := readStoredText(t, ctx, db, itemID)
+	if text.feedExcerpt != "RSS-only source-backed excerpt remains available." || text.extractedText != "" {
+		t.Fatalf("stored evidence = feed:%q extracted:%q, want RSS excerpt only", text.feedExcerpt, text.extractedText)
+	}
+	var status string
+	if err := db.QueryRowContext(ctx, `select extraction_status from items where id = ?`, itemID).Scan(&status); err != nil {
+		t.Fatalf("read extraction status: %v", err)
+	}
+	if status != extractionStatusPartial {
+		t.Fatalf("extraction_status = %q, want %q", status, extractionStatusPartial)
+	}
+}
+
+func TestChineseIngestNoSourceDoesNotFabricateSourceEvidence(t *testing.T) {
+	ctx := context.Background()
+	item, err := buildItemWithActiveSteering(ctx, Source{ID: "src_no_source", URL: "https://nosource.example/feed.xml", Title: "No Source"}, feedEntry{ID: "no-source", Title: "No Source Item", URL: "not a url"}, emptySourceEvidenceZHLLM{}, ProcessingLanguageChinese, nil)
+	if err != nil {
+		t.Fatalf("buildItemWithActiveSteering: %v", err)
+	}
+	if item.FeedExcerpt != nil || item.ExtractedText != nil {
+		t.Fatalf("source evidence was fabricated: feed_excerpt=%v extracted_text=%v", item.FeedExcerpt, item.ExtractedText)
+	}
+	if item.Summary != nil || item.CoreInsight != nil || item.ModelStatus != modelStatusSummaryNA || item.ExtractionStatus != extractionStatusOriginalNA {
+		t.Fatalf("no-source item = %+v, want unavailable without model-generated source evidence", item)
 	}
 }
 
@@ -332,13 +383,13 @@ func (l *countingSummaryLLM) TranslateSteering(context.Context, OpenRouterSteeri
 	return OpenRouterSteeringOutput{}, nil
 }
 
-type blankReadableBodyLLM struct{}
+type emptySourceEvidenceZHLLM struct{}
 
-func (blankReadableBodyLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
-	return OpenRouterSummaryOutput{LocalizedTitle: "中文标题", Title: "中文标题", FeedExcerpt: "中文摘录", ExtractedText: "中文正文", Summary: "中文摘要", CoreInsight: "中文洞察", KeyPoints: []string{"中文要点一说明来源事实。", "中文要点二说明来源事实。", "中文要点三说明来源事实。"}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
+func (emptySourceEvidenceZHLLM) SummarizeItem(context.Context, OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	return OpenRouterSummaryOutput{LocalizedTitle: "中文标题", Title: "中文标题", Summary: "中文摘要说明来源事实", CoreInsight: "中文洞察说明来源事实。", KeyPoints: []string{"中文要点一说明来源事实。", "中文要点二说明来源事实。", "中文要点三说明来源事实。"}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 }
 
-func (blankReadableBodyLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+func (emptySourceEvidenceZHLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
 	return OpenRouterSteeringOutput{}, nil
 }
 

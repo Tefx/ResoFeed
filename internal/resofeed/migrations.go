@@ -3,6 +3,7 @@ package resofeed
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 )
 
@@ -44,7 +45,126 @@ func RunMigrations(ctx context.Context, db *sql.DB) error {
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("commit migrations: %w", err)
 	}
+	if err := repairPersistedReadableText(ctx, db); err != nil {
+		return fmt.Errorf("repair persisted readable text: %w", err)
+	}
 	return nil
+}
+
+func repairPersistedReadableText(ctx context.Context, db *sql.DB) error {
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("readable text repair: %w", err)
+	}
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin readable text repair: %w", err)
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	rows, err := tx.QueryContext(ctx, `
+select id, feed_excerpt, extracted_text, summary, core_insight, key_points
+from items
+where instr(coalesce(feed_excerpt, '') || coalesce(extracted_text, '') || coalesce(summary, '') || coalesce(core_insight, ''), '\n') > 0
+   or instr(coalesce(feed_excerpt, '') || coalesce(extracted_text, '') || coalesce(summary, '') || coalesce(core_insight, ''), '\r') > 0
+   or instr(coalesce(key_points, ''), '\\n') > 0
+   or instr(coalesce(key_points, ''), '\\r') > 0`)
+	if err != nil {
+		return fmt.Errorf("query readable text repair rows: %w", err)
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	type readableRepairRow struct {
+		id            string
+		feedExcerpt   sql.NullString
+		extractedText sql.NullString
+		summary       sql.NullString
+		coreInsight   sql.NullString
+		keyPoints     sql.NullString
+	}
+	var pending []readableRepairRow
+	for rows.Next() {
+		var row readableRepairRow
+		if err := rows.Scan(&row.id, &row.feedExcerpt, &row.extractedText, &row.summary, &row.coreInsight, &row.keyPoints); err != nil {
+			return fmt.Errorf("scan readable text repair row: %w", err)
+		}
+		pending = append(pending, row)
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate readable text repair rows: %w", err)
+	}
+	if err := rows.Close(); err != nil {
+		return fmt.Errorf("close readable text repair rows: %w", err)
+	}
+
+	anyChanged := false
+	for _, row := range pending {
+		feedExcerpt, feedChanged := sanitizeReadableSQLString(row.feedExcerpt, sanitizeReadablePayloadPointer)
+		extractedText, extractedChanged := sanitizeReadableSQLString(row.extractedText, sanitizeReadablePayloadPointer)
+		summary, summaryChanged := sanitizeReadableSQLString(row.summary, sanitizeReadablePayloadPointer)
+		coreInsight, coreChanged := sanitizeReadableSQLString(row.coreInsight, sanitizeReadableInsightPointer)
+		keyPoints, keyPointsChanged := sanitizeReadableKeyPointsJSONString(row.keyPoints)
+		if !feedChanged && !extractedChanged && !summaryChanged && !coreChanged && !keyPointsChanged {
+			continue
+		}
+		if _, err := tx.ExecContext(ctx, `update items set feed_excerpt = ?, extracted_text = ?, summary = ?, core_insight = ?, key_points = ? where id = ?`, feedExcerpt, extractedText, summary, coreInsight, keyPoints, row.id); err != nil {
+			return fmt.Errorf("update readable text repair row %s: %w", row.id, err)
+		}
+		anyChanged = true
+	}
+	if anyChanged {
+		if err := rebuildSearchIndexTx(ctx, tx); err != nil {
+			return fmt.Errorf("rebuild readable text repair search index: %w", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit readable text repair: %w", err)
+	}
+	return nil
+}
+
+func sanitizeReadableSQLString(value sql.NullString, sanitize func(*string) (*string, bool)) (any, bool) {
+	if !value.Valid {
+		return nil, false
+	}
+	cleaned, changed := sanitize(&value.String)
+	if cleaned == nil {
+		return nil, changed
+	}
+	return *cleaned, changed
+}
+
+func sanitizeReadableKeyPointsJSONString(value sql.NullString) (any, bool) {
+	if !value.Valid {
+		return nil, false
+	}
+	var points []string
+	if err := json.Unmarshal([]byte(value.String), &points); err != nil {
+		return value.String, false
+	}
+	changed := false
+	cleaned := make([]string, 0, len(points))
+	for _, point := range points {
+		point := point
+		cleanedPoint, pointChanged := sanitizeReadablePayloadPointer(&point)
+		changed = changed || pointChanged
+		if cleanedPoint == nil {
+			continue
+		}
+		cleaned = append(cleaned, *cleanedPoint)
+	}
+	if !changed {
+		return value.String, false
+	}
+	encoded, err := json.Marshal(cleaned)
+	if err != nil {
+		return value.String, false
+	}
+	return string(encoded), true
 }
 
 // Migration identifies one SQLite migration contract artifact.

@@ -113,9 +113,11 @@ func looksLikeBinaryReadablePayload(body []byte) bool {
 }
 
 func sanitizeReadablePayloadText(value string) (string, bool) {
+	original := value
+	value = normalizeLiteralReadableLineBreaks(value)
 	value = strings.TrimSpace(value)
 	if value == "" {
-		return "", false
+		return "", strings.TrimSpace(original) != ""
 	}
 	if pdfPayloadLeadRE.MatchString(value) || strings.ContainsRune(value, '\uFFFD') {
 		return "", true
@@ -142,7 +144,14 @@ func sanitizeReadablePayloadText(value string) (string, bool) {
 		kept = append(kept, paragraph)
 	}
 	cleaned := strings.TrimSpace(strings.Join(kept, "\n\n"))
-	return cleaned, contaminated || cleaned != value
+	return cleaned, contaminated || cleaned != original
+}
+
+func normalizeLiteralReadableLineBreaks(value string) string {
+	value = strings.ReplaceAll(value, `\r\n`, "\n")
+	value = strings.ReplaceAll(value, `\n`, "\n")
+	value = strings.ReplaceAll(value, `\r`, "\n")
+	return value
 }
 
 func cleanInlineReadableBoilerplate(value string) string {

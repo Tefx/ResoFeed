@@ -134,6 +134,47 @@ func TestPromptingV21PriorityAndInjectionBoundariesAreCompiledDeterministically(
 	}
 }
 
+func TestPromptingV21ReadableFieldsForbidLiteralEscapedLineBreaks(t *testing.T) {
+	compiled, err := compilePromptingV21SummaryPrompt(OpenRouterSummaryInput{
+		ItemID:         "literal-newline-guard",
+		Title:          "Literal newline guard",
+		SourceTitle:    "Guard Source",
+		URL:            "https://example.test/literal-newline-guard",
+		AvailableText:  "Source text supports generated readable fields.",
+		TargetLanguage: ProcessingLanguageEnglish,
+	})
+	if err != nil {
+		t.Fatalf("compile prompt: %v", err)
+	}
+	encoded, err := json.Marshal(compiled.UserPayload.Contract)
+	if err != nil {
+		t.Fatalf("marshal contract: %v", err)
+	}
+	contract := string(encoded)
+	for _, want := range []string{"literal escaped line break", `\n`, `\r`, "generated readable strings"} {
+		if !strings.Contains(contract, want) {
+			t.Fatalf("compiled prompt contract missing literal newline guard %q: %s", want, contract)
+		}
+	}
+
+	responseFormat := openRouterJSONSchemaResponseFormat()
+	encodedSchema, err := json.Marshal(responseFormat)
+	if err != nil {
+		t.Fatalf("marshal response format: %v", err)
+	}
+	schema := string(encodedSchema)
+	for _, field := range []string{"localized_title", "summary", "core_insight", "key_points"} {
+		if !strings.Contains(schema, field) {
+			t.Fatalf("json schema missing readable field %q: %s", field, schema)
+		}
+	}
+	for _, want := range []string{"literal escaped line break", `\n`, `\r`} {
+		if !strings.Contains(schema, want) {
+			t.Fatalf("json schema missing literal newline guard %q: %s", want, schema)
+		}
+	}
+}
+
 func TestPromptingV21SelectedItemReingestInputUsesSamePromptCompiler(t *testing.T) {
 	ctx := context.Background()
 	var captured promptingV21ChatRequest

@@ -337,10 +337,7 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 	if isUnusableReprocessOutputTitle(title) {
 		title = reprocessInputTitle(item)
 	}
-	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: nullableString(out.FeedExcerpt), extractedText: nullableString(out.ExtractedText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
-	if result.extractedText == nil && language != ProcessingLanguageChinese {
-		result.extractedText = nullableString(sourceText)
-	}
+	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: sourceEvidenceString(out.FeedExcerpt, item.feedExcerpt, availableTextSource == "rss_excerpt", sourceText), extractedText: sourceEvidenceString(out.ExtractedText, item.extractedText, availableTextSource == "fresh_full_text" || availableTextSource == "stored_extracted_text", sourceText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
 	itemForSanitize := Item{Title: result.title, Summary: result.summary, CoreInsight: result.coreInsight, FeedExcerpt: result.feedExcerpt, ExtractedText: result.extractedText, ValueTier: result.valueTier, ExtractionStatus: result.extractStatus, ModelStatus: result.modelStatus}
 	sanitizeReadableItem(&itemForSanitize)
 	result.title = itemForSanitize.Title
@@ -543,6 +540,19 @@ func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bo
 		}
 	}
 	return "", "", "", false
+}
+
+func sourceEvidenceString(modelValue string, stored sql.NullString, sourceTextApplies bool, sourceText string) *string {
+	if strings.TrimSpace(modelValue) != "" {
+		return nullableString(modelValue)
+	}
+	if sourceTextApplies && strings.TrimSpace(sourceText) != "" {
+		return nullableString(sourceText)
+	}
+	if stored.Valid && strings.TrimSpace(stored.String) != "" {
+		return nullableString(stored.String)
+	}
+	return nil
 }
 
 func safePromptValidationDiagnostic(err error) string {

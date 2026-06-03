@@ -741,13 +741,9 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		item.KeyPoints = append([]string(nil), out.KeyPoints...)
 		if strings.TrimSpace(out.FeedExcerpt) != "" {
 			item.FeedExcerpt = nullableString(out.FeedExcerpt)
-		} else if targetLanguage == ProcessingLanguageChinese {
-			item.FeedExcerpt = nil
 		}
 		if strings.TrimSpace(out.ExtractedText) != "" {
 			item.ExtractedText = nullableString(out.ExtractedText)
-		} else if targetLanguage == ProcessingLanguageChinese {
-			item.ExtractedText = nil
 		}
 		item.Summary = nullableString(out.Summary)
 		item.CoreInsight = nullableString(out.CoreInsight)
