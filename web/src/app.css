@@ -120,7 +120,7 @@ a:focus,
 .contract-shell {
   box-sizing: border-box;
   width: calc(100vw - 32px);
-  max-width: 1536px;
+  max-width: 1520px;
   min-height: 100vh;
   margin: var(--rf-space-sm) auto;
   border: 1px solid var(--rf-color-rule);
@@ -1052,7 +1052,7 @@ details.surface-nav button:focus-visible {
 .contract-search-form {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--rf-space-sm) var(--rf-space-row);
+  gap: var(--rf-space-xs) var(--rf-space-row);
   align-items: center;
   flex: 0 0 auto;
 }
@@ -1075,9 +1075,9 @@ details.surface-nav button:focus-visible {
 .search-secondary-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--rf-space-sm) var(--rf-space-row);
+  gap: var(--rf-space-xs) var(--rf-space-row);
   align-items: flex-end;
-  margin-block-start: var(--rf-space-sm);
+  margin-block-start: var(--rf-space-xs);
 }
 
 .search-filter-field {
@@ -1130,7 +1130,11 @@ details.surface-nav button:focus-visible {
 }
 
 .search-secondary-filters summary {
+  display: inline-flex;
   min-height: 44px;
+  width: fit-content;
+  align-items: center;
+  padding-inline: 0 var(--rf-space-sm);
   color: var(--rf-color-muted);
   cursor: pointer;
   font: var(--rf-typography-metadata);
@@ -1552,7 +1556,7 @@ details.surface-nav button:focus-visible {
   }
 
   .contract-shell {
-    width: min(calc(100vw - 32px), 1536px);
+    width: min(calc(100vw - 32px), 1520px);
     height: calc(100dvh - (var(--rf-space-sm) * 2));
     min-height: 0;
     overflow: hidden;
@@ -1564,7 +1568,7 @@ details.surface-nav button:focus-visible {
 
   .shell-grid {
     grid-template-columns: minmax(0, 760px) minmax(420px, 1fr);
-    column-gap: clamp(var(--rf-space-xl), 4vw, var(--rf-space-column));
+    column-gap: 0;
     justify-content: start;
     min-height: 0;
     flex: 1;
@@ -1681,6 +1685,24 @@ details.surface-nav button:focus-visible {
 
   .resofeed-shell {
     min-height: 100dvh;
+  }
+
+  .resofeed-shell[data-surface='search'],
+  .resofeed-shell[data-surface='ledger'],
+  .resofeed-shell[data-surface='doctor'],
+  .resofeed-shell[data-surface='search'] .shell-command,
+  .resofeed-shell[data-surface='ledger'] .shell-command,
+  .resofeed-shell[data-surface='doctor'] .shell-command,
+  .resofeed-shell[data-surface='search'] .shell-command > .surface-nav,
+  .resofeed-shell[data-surface='ledger'] .shell-command > .surface-nav,
+  .resofeed-shell[data-surface='doctor'] .shell-command > .surface-nav,
+  .resofeed-shell[data-surface='search'] .contract-brand,
+  .resofeed-shell[data-surface='ledger'] .contract-brand,
+  .resofeed-shell[data-surface='doctor'] .contract-brand,
+  .resofeed-shell[data-surface='search'] .steer-route-preview,
+  .resofeed-shell[data-surface='ledger'] .steer-route-preview,
+  .resofeed-shell[data-surface='doctor'] .steer-route-preview {
+    background: var(--rf-color-current-surface);
   }
 
   .shell-command {
@@ -1845,7 +1867,7 @@ details.surface-nav button:focus-visible {
   .utility-surface.active-panel > .contract-search,
   .utility-surface.active-panel > .contract-region,
   .utility-surface.active-panel > .back-command {
-    margin-inline: var(--rf-space-lg);
+    margin-inline: 0;
   }
 
   .utility-surface.search-surface.active-panel {
@@ -1853,6 +1875,12 @@ details.surface-nav button:focus-visible {
     inset: auto;
     overflow: visible;
     min-height: calc(100dvh + 240px);
+    background: var(--rf-color-current-surface);
+  }
+
+  .resofeed-shell[data-surface='ledger'] .utility-surface.active-panel:not(.feed-pane),
+  .resofeed-shell[data-surface='doctor'] .utility-surface.active-panel:not(.feed-pane) {
+    background: var(--rf-color-current-surface);
   }
 
   .back-command {
@@ -1935,7 +1963,7 @@ details.surface-nav button:focus-visible {
   }
 
   .search-secondary-grid {
-    gap: var(--rf-space-sm);
+    gap: var(--rf-space-xs) var(--rf-space-sm);
   }
 
   .search-filter-field,

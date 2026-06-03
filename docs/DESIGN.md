@@ -520,14 +520,20 @@ Feed lifecycle:
 - No completion badge, no queue-clear affordance, no mark-all-read action.
 
 ### Desktop Split Proximity and Gutter Contract
-Desktop split view must preserve visual proximity between Feed and Inspector. The middle gutter between the Feed column and Inspector column is structural breathing room, not expandable empty content. It SHOULD stay around `32–64px` and MUST NOT grow as an unbounded `1fr` field on wide screens.
+Desktop split view must preserve proximity by avoiding a separate phantom middle slab. Feed and Inspector are adjacent workbench panes: the Feed column owns Feed content, the Inspector pane owns the visible separator line and its internal reading padding. A separate grid `column-gap` between the panes SHOULD be `0`; if a browser/layout constraint forces one, it MUST stay at or below one spacing row (`12px`).
 
-The visible split line must not make the Inspector read as if it has extra left padding. If the separator line is drawn at the Feed edge, any middle gutter after that line is perceived as part of the Inspector's left whitespace and MUST be counted together with Inspector padding when checking balance. Prefer placing the visible separator at the actual Inspector pane boundary, or reducing the gutter so the perceived distance from split line to Inspector reading content does not exceed the trailing right-side breathing room by more than one spacing row (`12px`).
+The visible split line belongs to the Inspector pane boundary. Any whitespace from that line to the Inspector reading group is Inspector internal breathing room and MUST be balanced against the trailing right-side breathing room. The two sides SHOULD differ by no more than one spacing row (`12px`) at common desktop widths.
 
-The Feed column must anchor to the shell's left content edge. Do not center the Feed+Inspector grid inside a wider shell in a way that creates a large blank leading gutter before the Feed rows. Desktop Feed row text should start within roughly `32–48px` of the shell's inner left edge, including normal surface padding and any invisible rhythm gutter. A leading internal blank band wider than one spacing column (`64px`) is a layout bug, even if it uses the correct background color.
+The Feed column must anchor to the shell's left content edge. Do not center the Feed+Inspector grid inside a wider shell in a way that creates a large blank leading gutter before the Feed rows. Desktop Feed row text should start within roughly `32–48px` of the shell's inner left edge, including normal surface padding and any invisible rhythm gutter. A leading internal blank band wider than one spacing column (`64px`) is a layout bug.
 
-On ultra-wide displays, constrain the shell, cap the middle gutter, or put extra width outside the shell. Extra width may increase outer page gutter or remain outside the workbench, but it must not create a large dead zone before the Feed, between the visible split line and Inspector content, or between the Inspector reading group and the pane's right edge.
+On ultra-wide displays, constrain the shell or put extra width outside the shell. Extra width must not create a dead zone before the Feed, between Feed and Inspector, or between the Inspector reading group and the pane's right edge.
 
+### Narrow Surface Canvas and Fixed Chrome Contract
+On narrow layouts, fixed top navigation and bottom Steer chrome are allowed only when they are the active route chrome for that surface. They must read as light rules on the same canvas as the adjacent surface, not as opaque top or bottom color slabs.
+
+Feed, Search, Source Ledger, and Doctor may keep global top/bottom chrome visible on narrow screens, but the chrome background must match the active surface canvas closely enough that screenshots do not show a distinct full-width block above or below the content. Inspector remains the exception: it is a full-screen takeover and MUST cover both global top navigation and bottom Steer chrome.
+
+The active narrow utility/search surface owns its own scroll flow. Avoid fixed overlays with reserved `top`/`bottom` insets unless the visible chrome is intentionally still usable. If chrome remains usable, the content start/end spacing must be explained by the chrome height, not by an extra background slab or hidden margin.
 ### Desktop Split Scroll and Processing Language Layout
 Desktop shell must keep Feed and Inspector as independent vertical scroll regions. Global page scroll must not couple the two panes. Scrolling the Feed must not move the Inspector, and scrolling the Inspector must not move the Feed. Selecting a Feed item must keep Feed scroll position stable and reset the Inspector pane scroll to the top for the newly selected item.
 
@@ -1090,8 +1096,9 @@ Keyboard and accessibility: search results follow normal feed item focus behavio
 Forbidden search-detail patterns: no modal detail views, accordions-as-detail, recommendation rails, generated answer panels, immersive reader mode, complex tabs, folders/tags/unread concepts, settings sliders, onboarding/account prompts, flashy highlight effects, animated selection, accent-color selection, short fixed-height desktop widgets, or selected-result cards that visually overpower the list.
 
 #### Search filter disclosure and controls
-
 Search filters are [SHARP] progressive disclosure. The filter details control is collapsed by default in every processing language, including Chinese. The default Search surface is query-first: one plain query field, one bracket submit action, then a compact `筛选` / `filters` disclosure. Filters must not render as a settings dashboard or a permanently expanded form block.
+
+The disclosure summary is [SHARP] text-sized chrome with a touch-safe hit target. It must not occupy the full row width or make blank space to its right clickable. Its visible and clickable width should be only the marker/text plus compact padding, while preserving at least `44px` height for touch and keyboard access.
 
 Filter component types are [SHARP]:
 
@@ -1100,7 +1107,7 @@ Filter component types are [SHARP]:
 - `Resonated` / `已标星` is one flex-aligned checkbox label. The checkbox and label text must share a visual baseline/center and remain a single 44px-minimum hit target.
 - `Result limit` remains a low-chrome select. It belongs after the semantic filters, not between date endpoints.
 
-Filter layout is [SHARP]: keep a compact, wrapping control grid with stable minimum widths for date fields so placeholders do not clip. Labels and controls should read as pairs, not as a six-column spreadsheet. The expanded filter block must preserve feed-row density below it and must not push the first result into a visually unrelated region.
+Filter layout is [SHARP]: keep a compact, wrapping control grid with stable minimum widths for date fields so placeholders do not clip. Labels and controls should read as pairs, not as a six-column spreadsheet. The summary, expanded grid, status line, and first result must keep clear proximity: inner gaps within the Search form should be smaller than the outer gap before the first result, and no collapsed or expanded filter row may create a visually unrelated blank band.
 
 Submission remains deliberate: changing a filter does not automatically run a new search. The user submits with the single `[SEARCH]` / `[搜索]` bracket action.
 
