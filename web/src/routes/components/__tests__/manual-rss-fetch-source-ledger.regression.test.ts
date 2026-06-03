@@ -91,10 +91,11 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     }
     expect(within(ledger).getByRole('group', { name: 'Source list actions' })).toHaveTextContent('SOURCE LIST');
     expect(within(ledger).getByRole('group', { name: 'Portable state actions' })).toHaveTextContent('PORTABLE STATE');
-    expect(ledger).toHaveTextContent('OPML = source list; State = sources + rules + stars, import replaces.');
+    expect(ledger).toHaveTextContent('OPML = source list; State = sources + rules + stars.');
     expect(within(ledger).getByRole('button', { name: '[IMPORT STATE]' })).toHaveAccessibleDescription('Import State replaces active sources, rules, and stars.');
     expect(within(ledger).getByText('Import State replaces active sources, rules, and stars.')).not.toBeVisible();
     expect(within(ledger).getByRole('group', { name: 'Source list actions' })).not.toHaveTextContent('Import State replaces');
+    expect(ledger.querySelector('.source-ledger__tools-helper')).not.toHaveTextContent('import replaces');
     expect(ledger).not.toHaveTextContent(/\[run ingest\]|\[fetch\]|\[details\]|\[delete\]|\[import opml\]|\[export opml\]|\[export state\]|\[import state\]/);
   });
 
@@ -135,6 +136,17 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     const runIngest = within(ledger).getByRole('button', { name: '[INGESTING...]' });
     expect(runIngest).toBeDisabled();
     expect(within(ledger).getByText(/op: library_reprocess/)).toBeVisible();
+  });
+
+  it('announces Source Ledger conflict and row diagnostics assertively', () => {
+    renderLedger({
+      sources: [sourceWithLongDiagnostic],
+      currentOperationStatusText: 'err: operation already running — op: source_fetch · actor:human · phase:fetching'
+    });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    expect(within(ledger).getByText(/err: operation already running/)).toHaveAttribute('aria-live', 'assertive');
+    expect(ledger.querySelector('.source-ledger__row .source-ledger__status')).toHaveAttribute('aria-live', 'assertive');
   });
 
   it('keeps manual fetch progress free of spinner or progress animation affordance at rest', () => {
@@ -259,6 +271,7 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(within(ledger).getByText('[RUN INGEST]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[FETCH]')).toHaveClass('bracket-action');
     expect(appCss).toMatch(/\.bracket-action\s*\{[\s\S]*cursor:\s*pointer;/);
+    expect(appCss).toMatch(/\.bracket-action:hover:not\(:disabled\):not\(\[aria-disabled='true'\]\),\s*\.bracket-action:focus-visible:not\(:disabled\):not\(\[aria-disabled='true'\]\)\s*\{[\s\S]*background:\s*var\(--rf-color-current-text\)/);
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action--delete');
     // DEVIATION RECORD: type=test_error; artifact=manual-rss-fetch-source-ledger.regression.test.ts; what_changed=negative OPML receipt assertion uses `OPML outlines flattened`; why=folder terminology is stale and forbidden; impact=manual fetch still proves no unrelated OPML import receipt appears.

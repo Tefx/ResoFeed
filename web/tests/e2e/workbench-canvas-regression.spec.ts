@@ -57,7 +57,7 @@ const fixtureItems = [
     is_resonated: false,
     human_inspected_at: null,
     external_surfaced_at: null,
-    story_key: null,
+    story_key: 'workbench-canvas-story',
     duplicate_of_item_id: null
   }
 ] as const;
@@ -135,9 +135,48 @@ async function installFixtureApi(page: Page, ownerToken: string): Promise<void> 
               source_url: source.url,
               canonical_url: item.url,
               original_url: item.url,
-              story_key: null,
-              duplicate_of_item_id: null,
-              grouped_source_items: []
+              story_key: item.story_key,
+              duplicate_of_item_id: item.duplicate_of_item_id,
+              grouped_source_items: item.id === 'item_workbench_canvas'
+                ? [
+                    {
+                      item_id: 'item_workbench_canvas',
+                      source_id: fixtureSource.id,
+                      source_title: fixtureSource.title,
+                      source_url: fixtureSource.url,
+                      url: item.url,
+                      canonical_url: item.url,
+                      title: item.title,
+                      localized_title: item.localized_title,
+                      source_item_title: item.source_item_title,
+                      published_at: item.published_at,
+                      first_seen_at: item.first_seen_at,
+                      extraction_status: item.extraction_status,
+                      model_status: item.model_status,
+                      story_key: item.story_key,
+                      duplicate_of_item_id: item.duplicate_of_item_id,
+                      is_selected_item: true
+                    },
+                    {
+                      item_id: 'item_workbench_canvas_related',
+                      source_id: fixtureSecondSource.id,
+                      source_title: fixtureSecondSource.title,
+                      source_url: fixtureSecondSource.url,
+                      url: 'https://workbench-notes.example.test/related',
+                      canonical_url: 'https://workbench-notes.example.test/related',
+                      title: 'Related grouped source stays within the Inspector measure',
+                      localized_title: null,
+                      source_item_title: 'Related grouped source stays within the Inspector measure',
+                      published_at: timestamp,
+                      first_seen_at: timestamp,
+                      extraction_status: 'partial_extraction',
+                      model_status: 'ok',
+                      story_key: item.story_key,
+                      duplicate_of_item_id: null,
+                      is_selected_item: false
+                    }
+                  ]
+                : []
             }
           }
         }
@@ -147,7 +186,7 @@ async function installFixtureApi(page: Page, ownerToken: string): Promise<void> 
   });
 }
 
-test('wide desktop shell expands as a full-height workbench while Feed and Inspector stay bounded', async ({ page, ownerToken }) => {
+test('wide desktop shell expands as a full-height workbench while Feed and Inspector stay bounded', async ({ page, ownerToken }, testInfo) => {
   await page.setViewportSize({ width: 1600, height: 900 });
   await installFixtureApi(page, ownerToken);
 
@@ -157,6 +196,7 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
   await expect(page.locator('.detail-pane')).toBeVisible();
   await expect(page.locator('.contract-feed-item').first()).toHaveAttribute('aria-current', 'true');
   await expect(page.getByRole('heading', { name: 'Workbench split view item stays readable' })).toBeVisible();
+  await expect(page.locator('.contract-grouped-sources')).toBeVisible();
 
   const layout = await page.evaluate(() => {
     const shell = document.querySelector('.contract-shell');
@@ -164,11 +204,7 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
     const feedPane = document.querySelector('.feed-pane');
     const inspectorPane = document.querySelector('.detail-pane');
     const feedTitle = document.querySelector('.contract-feed-item .contract-feed-title');
-    const readingGroupParts = Array.from(
-      document.querySelectorAll(
-        '.contract-inspector .inspector-title-row, .contract-inspector .inspector-frontmatter, .contract-inspector .inspector-text-section, .contract-inspector .inspector-points-section, .contract-inspector .inspector-reingest-panel, .contract-inspector .contract-source-details'
-      )
-    );
+    const readingGroupParts = Array.from(document.querySelectorAll('.contract-inspector .inspector-title-row, .contract-inspector .inspector-frontmatter, .contract-inspector .inspector-status-line, .contract-inspector .inspector-text-section, .contract-inspector .inspector-points-section, .contract-inspector .inspector-reingest-panel, .contract-inspector .inspector-reading-section, .contract-inspector .contract-source-details, .contract-inspector .contract-grouped-sources, .contract-inspector > .contract-muted:not(.inspector-transition-status)'));
     if (!shell || !grid || !feedPane || !inspectorPane || !feedTitle || readingGroupParts.length === 0) throw new Error('wide workbench layout target missing');
 
     const shellRect = shell.getBoundingClientRect();
@@ -178,6 +214,7 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
     const readingGroupRects = readingGroupParts.map((element) => element.getBoundingClientRect());
     const readingGroupLeft = Math.min(...readingGroupRects.map((rect) => rect.left));
     const readingGroupRight = Math.max(...readingGroupRects.map((rect) => rect.right));
+    const edgeDeltas = readingGroupRects.map((rect) => ({ left: Math.abs(rect.left - readingGroupLeft), right: Math.abs(rect.right - readingGroupRight), width: rect.width }));
     const gridColumns = window.getComputedStyle(grid).gridTemplateColumns;
     const inspectorStyle = window.getComputedStyle(inspectorPane);
 
@@ -194,6 +231,9 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
       splitLineToReadingGroup: readingGroupLeft - inspectorRect.left,
       readingGroupToPaneRight: inspectorRect.right - readingGroupRight,
       readingGroupWidth: readingGroupRight - readingGroupLeft,
+      maxLeftDelta: Math.max(...edgeDeltas.map((delta) => delta.left)),
+      maxRightDelta: Math.max(...edgeDeltas.map((delta) => delta.right)),
+      minPartWidth: Math.min(...edgeDeltas.map((delta) => delta.width)),
       shellInnerToFeedTextLeft: feedTitleRect.left - shellRect.left - parseFloat(window.getComputedStyle(shell).borderLeftWidth),
       gridColumns
     };
@@ -213,9 +253,14 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
   expect(layout.inspectorBorderLeftWidth, 'Visible split line sits on the Inspector pane boundary, not the Feed edge before the gutter').toBeGreaterThanOrEqual(1);
   expect(Math.abs(layout.splitLineToReadingGroup - layout.readingGroupToPaneRight), 'Wide desktop Inspector reading group balances split-line-to-content and content-to-pane-edge whitespace').toBeLessThanOrEqual(12);
   expect(layout.readingGroupWidth, 'Inspector reading group keeps a measured line length instead of stretching across the full pane').toBeLessThan(layout.inspectorWidth - 32);
+  expect(layout.maxLeftDelta, 'Inspector title/frontmatter/status/summary/reingest/source/grouped/story blocks share one left edge').toBeLessThanOrEqual(1);
+  expect(layout.maxRightDelta, 'Inspector divider-bearing blocks share one right edge').toBeLessThanOrEqual(1);
+  expect(layout.minPartWidth, 'No visible Inspector block keeps a narrower legacy 68ch/600px/unconstrained measure inside the shared group').toBeGreaterThanOrEqual(layout.readingGroupWidth - 1);
   expect(layout.shellInnerToFeedTextLeft, 'Feed text anchors near shell inner left edge without a leading blank band').toBeGreaterThanOrEqual(32);
   expect(layout.shellInnerToFeedTextLeft, 'Feed text anchors near shell inner left edge without a leading blank band').toBeLessThanOrEqual(48);
   expect(layout.gridColumns.split(' ').length, 'Desktop split uses column-gap breathing room, not an explicit phantom middle slab track').toBe(2);
+
+  await page.screenshot({ path: testInfo.outputPath('inspector-divider-wide.png'), fullPage: true });
 });
 
 test('Search filters are collapsed, typed system controls, and Escape restores TODAY Inspector', async ({ page, ownerToken }) => {
@@ -229,6 +274,19 @@ test('Search filters are collapsed, typed system controls, and Escape restores T
 
   const search = page.locator('.contract-search');
   await expect(search).toBeVisible();
+  const searchCommand = search.getByRole('button', { name: 'submit search' });
+  const searchCommandRest = await searchCommand.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return { color: style.color, background: style.backgroundColor };
+  });
+  await searchCommand.hover();
+  const searchCommandHover = await searchCommand.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return { color: style.color, background: style.backgroundColor };
+  });
+  expect(searchCommandRest.background, 'Search command rests on transparent/inherited chrome').toBe('rgba(0, 0, 0, 0)');
+  expect(searchCommandHover.background, 'Search [SEARCH] uses the shared terminal reverse hover state').not.toBe(searchCommandRest.background);
+  expect(searchCommandHover.color, 'Search [SEARCH] hover inverts text color with other bracket commands').not.toBe(searchCommandRest.color);
   const filters = search.locator('.search-secondary-filters');
   await expect(filters).not.toHaveAttribute('open', /.+/);
   const summary = filters.locator('summary');
@@ -390,7 +448,7 @@ test('desktop split Inspector aligns to feed rows and Escape preserves the selec
   expect(focusStyle.markerColor, 'Selected Feed row must not render a visible left pseudo-element marker/color block').toBe('rgba(0, 0, 0, 0)');
 });
 
-test('narrow dark canvas has no light gutters and keeps top chrome plus bottom Steer visible', async ({ page, ownerToken }) => {
+test('narrow dark canvas has no light gutters or top/bottom TODAY chrome slabs', async ({ page, ownerToken }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ colorScheme: 'dark' });
   await installFixtureApi(page, ownerToken);
@@ -405,16 +463,38 @@ test('narrow dark canvas has no light gutters and keeps top chrome plus bottom S
     const command = document.querySelector('.shell-command');
     const nav = document.querySelector('.shell-command > .surface-nav');
     const brand = document.querySelector('.contract-brand');
+    const routePreview = document.querySelector('.steer-route-preview');
     const feed = document.querySelector('.feed-pane');
+    const feedRow = document.querySelector('.contract-feed-item');
     const input = document.querySelector('#steer-input');
-    if (!appRoot || !shell || !command || !nav || !brand || !feed || !input) throw new Error('narrow dark canvas target missing');
+    if (!appRoot || !shell || !command || !nav || !brand || !routePreview || !feed || !feedRow || !input) throw new Error('narrow dark canvas target missing');
 
     const inputRect = input.getBoundingClientRect();
     const shellRect = shell.getBoundingClientRect();
-    const styles = [document.documentElement, document.body, appRoot, shell, command, nav, brand, feed].map((element) => window.getComputedStyle(element).backgroundColor);
+    const navRect = nav.getBoundingClientRect();
+    const routePreviewRect = routePreview.getBoundingClientRect();
+    const feedRect = feed.getBoundingClientRect();
+    const feedRowRect = feedRow.getBoundingClientRect();
+    const commandRect = command.getBoundingClientRect();
+    const shellStyle = window.getComputedStyle(shell);
+    const styles = [document.documentElement, document.body, appRoot, shell, command, nav, brand, routePreview, feed, feedRow].map((element) => window.getComputedStyle(element).backgroundColor);
 
     return {
       styles,
+      shellBackground: window.getComputedStyle(shell).backgroundColor,
+      commandBackground: window.getComputedStyle(command).backgroundColor,
+      navBackground: window.getComputedStyle(nav).backgroundColor,
+      brandBackground: window.getComputedStyle(brand).backgroundColor,
+      routePreviewBackground: window.getComputedStyle(routePreview).backgroundColor,
+      feedBackground: window.getComputedStyle(feed).backgroundColor,
+      feedRowBackground: window.getComputedStyle(feedRow).backgroundColor,
+      shellPaddingTop: parseFloat(shellStyle.paddingTop),
+      shellPaddingBottom: parseFloat(shellStyle.paddingBottom),
+      navHeight: navRect.height,
+      routePreviewHeight: routePreviewRect.height,
+      rowTopGap: feedRowRect.top - navRect.bottom,
+      commandHeight: commandRect.height,
+      commandTopGap: window.innerHeight - commandRect.top,
       inputTop: inputRect.top,
       inputBottom: inputRect.bottom,
       shellLeft: shellRect.left,
@@ -425,11 +505,24 @@ test('narrow dark canvas has no light gutters and keeps top chrome plus bottom S
 
   const disallowedLightCanvas = new Set(['rgb(243, 240, 231)', 'rgb(251, 248, 239)', 'rgb(236, 230, 216)']);
   for (const color of canvas.styles) expect(disallowedLightCanvas.has(color), `unexpected light canvas band: ${color}`).toBe(false);
+  expect(canvas.commandBackground, 'bottom Steer chrome uses the TODAY feed canvas color instead of a full-width slab').toBe(canvas.feedBackground);
+  expect(canvas.navBackground, 'top RESOFEED nav uses the TODAY feed canvas color instead of a full-width slab').toBe(canvas.feedBackground);
+  expect(canvas.brandBackground, 'RESOFEED label does not paint a separate top band').toBe(canvas.feedBackground);
+  expect(canvas.routePreviewBackground, 'idle route-preview strip stays on the feed canvas').toBe(canvas.feedBackground);
+  expect(canvas.feedRowBackground, 'feed rows do not introduce a contrasting slab against the feed pane').toBe(canvas.feedBackground);
+  expect(canvas.shellBackground, 'shell canvas matches narrow TODAY feed canvas').toBe(canvas.feedBackground);
+  expect(canvas.shellPaddingTop, 'top reserved gap is only fixed nav height, not an extra banner').toBeLessThanOrEqual(canvas.navHeight + 1);
+  expect(canvas.routePreviewHeight, 'idle route-preview is a compact continuity strip').toBeLessThanOrEqual(1);
+  expect(canvas.rowTopGap, 'first feed row begins after usable top chrome plus only normal feed content padding').toBeLessThanOrEqual(28);
+  expect(canvas.shellPaddingBottom, 'bottom reserved gap is compact and accountable to fixed Steer').toBeLessThanOrEqual(64);
+  expect(canvas.commandTopGap, 'bottom fixed Steer occupies the reserved bottom area without a broad masked band above it').toBeLessThanOrEqual(canvas.shellPaddingBottom + 4);
+  expect(canvas.commandHeight, 'bottom Steer remains usable but compact').toBeLessThanOrEqual(70);
   expect(canvas.inputTop).toBeGreaterThanOrEqual(0);
   expect(canvas.inputBottom).toBeLessThanOrEqual(844);
   expect(canvas.shellLeft).toBe(0);
   expect(canvas.shellRight).toBe(0);
   expect(canvas.shellHeight).toBeGreaterThanOrEqual(844);
+  await page.screenshot({ path: testInfo.outputPath('narrow-dark-today-feed.png'), fullPage: true });
 });
 
 test('narrow dark Search chrome shares the active utility canvas', async ({ page, ownerToken }) => {
@@ -463,7 +556,7 @@ test('narrow dark Search chrome shares the active utility canvas', async ({ page
   expect(canvas.utilityBackground, 'active Search surface does not expose an outer color band').toBe(canvas.searchBackground);
 });
 
-test('narrow Inspector route uses one back header row and Escape returns to TODAY', async ({ page, ownerToken }) => {
+test('narrow Inspector route uses one back header row, compact bottom whitespace, and Escape returns to TODAY', async ({ page, ownerToken }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await installFixtureApi(page, ownerToken);
 
@@ -472,6 +565,7 @@ test('narrow Inspector route uses one back header row and Escape returns to TODA
   await expect(page).toHaveURL(/\/items\/item_workbench_canvas$/);
   await expect(page.getByRole('button', { name: 'back to TODAY' })).toBeVisible();
   await expect(page.locator('.shell-command > .surface-nav')).toBeHidden();
+  await expect(page.locator('.contract-grouped-sources')).toBeVisible();
 
   const chrome = await page.evaluate(() => {
     const back = document.querySelector('.detail-pane.active-panel > .back-command');
@@ -498,6 +592,34 @@ test('narrow Inspector route uses one back header row and Escape returns to TODA
   expect(scrolledBackTop, 'narrow Inspector back row stays sticky while reading').toBeGreaterThanOrEqual(0);
   expect(scrolledBackTop, 'narrow Inspector back row stays sticky while reading').toBeLessThanOrEqual(1);
 
+  const bottomWhitespace = await page.locator('.detail-pane.active-panel').evaluate((detail) => {
+    detail.scrollTop = detail.scrollHeight;
+    const detailRect = detail.getBoundingClientRect();
+    const back = detail.querySelector<HTMLElement>(':scope > .back-command');
+    const candidates = Array.from(detail.querySelectorAll<HTMLElement>('.contract-inspector .inspector-title-row, .contract-inspector .inspector-frontmatter, .contract-inspector .inspector-status-line, .contract-inspector .inspector-text-section, .contract-inspector .inspector-points-section, .contract-inspector .inspector-reingest-panel, .contract-inspector .inspector-reading-section, .contract-inspector .contract-source-details, .contract-inspector .contract-grouped-sources, .contract-inspector > .contract-muted:not(.inspector-transition-status)'))
+      .map((element) => ({ element, rect: element.getBoundingClientRect() }))
+      .filter(({ rect }) => rect.width > 0 && rect.height > 0);
+    if (!back || candidates.length === 0) throw new Error('narrow Inspector bottom whitespace target missing');
+    const last = candidates.reduce((latest, candidate) => candidate.rect.bottom > latest.rect.bottom ? candidate : latest);
+    return {
+      canScroll: detail.scrollHeight > detail.clientHeight,
+      scrollTop: detail.scrollTop,
+      scrollMax: detail.scrollHeight - detail.clientHeight,
+      viewportCoverage: Math.abs(detailRect.top) + Math.abs(window.innerHeight - detailRect.bottom),
+      bottomEmptyArea: detailRect.bottom - last.rect.bottom,
+      lastClassName: last.element.className,
+      backTop: back.getBoundingClientRect().top
+    };
+  });
+
+  expect(bottomWhitespace.canScroll, 'fixture makes narrow Inspector a real scrollport').toBe(true);
+  expect(Math.abs(bottomWhitespace.scrollTop - bottomWhitespace.scrollMax), 'Inspector is scrolled to its bottom edge for whitespace measurement').toBeLessThanOrEqual(1);
+  expect(bottomWhitespace.viewportCoverage, 'narrow Inspector detail route still covers the full viewport').toBeLessThanOrEqual(1);
+  expect(bottomWhitespace.bottomEmptyArea, `narrow Inspector leaves only compact breathing room after ${bottomWhitespace.lastClassName}`).toBeLessThanOrEqual(96);
+  expect(bottomWhitespace.backTop, 'back row remains sticky at the top after bottom scroll').toBeGreaterThanOrEqual(0);
+  expect(bottomWhitespace.backTop, 'back row remains sticky at the top after bottom scroll').toBeLessThanOrEqual(1);
+  await page.screenshot({ path: testInfo.outputPath('narrow-inspector-bottom.png'), fullPage: true });
+
   await page.keyboard.press('Escape');
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'feed');
@@ -509,6 +631,47 @@ test('Source Ledger and RESOFEED utility menu stay compact and top-clustered', a
 
   await page.goto('/');
   await page.getByText('RESOFEED').click();
+  const menu = page.locator('.surface-nav-menu');
+  const todayNav = menu.getByRole('button', { name: 'TODAY' });
+  const languageAction = menu.getByRole('button', { name: /Processing language English; set Chinese/ });
+  const reprocessAction = menu.getByRole('button', { name: 'Reprocess existing library and rebuild search index' });
+  const warning = menu.locator('.runtime-reprocess-warning');
+  await expect(todayNav).toHaveAttribute('aria-pressed', 'true');
+  await expect(menu.locator('.utility-label--operations')).toHaveText('SYSTEM');
+  await expect(reprocessAction).toHaveAttribute('aria-describedby', 'runtime-reprocess-warning');
+  await expect(reprocessAction).toHaveAccessibleDescription(/Existing readable item content will be rewritten/);
+  const interactionStates = await todayNav.evaluate((today) => {
+    const language = document.querySelector<HTMLElement>('.bracket-action--language');
+    const reprocess = document.querySelector<HTMLElement>('.bracket-action--reprocess');
+    const warning = document.querySelector<HTMLElement>('.runtime-reprocess-warning');
+    if (!language || !reprocess || !warning) throw new Error('utility menu state targets missing');
+    const todayStyle = window.getComputedStyle(today);
+    const languageStyle = window.getComputedStyle(language);
+    return {
+      todayBackground: todayStyle.backgroundColor,
+      todayBorder: todayStyle.borderWidth,
+      languageText: language.textContent?.trim() ?? '',
+      languageBackground: languageStyle.backgroundColor,
+      warningPreviousClass: warning.previousElementSibling?.className ?? '',
+      warningText: warning.textContent?.trim() ?? '',
+      reprocessText: reprocess.textContent?.trim() ?? ''
+    };
+  });
+  expect(interactionStates.todayBackground, 'Current nav is text-only, not a filled/reversed pill').toBe('rgba(0, 0, 0, 0)');
+  expect(interactionStates.todayBorder, 'Current nav does not add selected border chrome').toBe('0px');
+  expect(interactionStates.languageText, 'Language current state is expressed by state copy').toBe('LANG: EN');
+  expect(interactionStates.languageBackground, 'Language state has no persistent selected background').toBe('rgba(0, 0, 0, 0)');
+  expect(interactionStates.warningPreviousClass, 'Reprocess warning is adjacent to the reprocess command, not the language action').toContain('bracket-action--reprocess');
+  expect(interactionStates.warningText).toContain('Existing readable item content will be rewritten.');
+  expect(interactionStates.reprocessText).toBe('[REPROCESS LIBRARY]');
+  await languageAction.hover();
+  const languageHover = await languageAction.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return { color: style.color, background: style.backgroundColor };
+  });
+  expect(languageHover.background, 'Language text action only inverts while interacted with').not.toBe(interactionStates.languageBackground);
+  await reprocessAction.hover();
+  await expect(warning).toBeVisible();
   const menuMetrics = await page.locator('.surface-nav-menu').evaluate((element) => {
     const rect = element.getBoundingClientRect();
     const firstButton = element.querySelector('button');
@@ -561,4 +724,15 @@ test('Source Ledger and RESOFEED utility menu stay compact and top-clustered', a
   expect(ledgerMetrics.toolsGap).toBeLessThanOrEqual(8);
   expect(ledgerMetrics.rowGap).toBeLessThanOrEqual(8);
   expect(ledgerMetrics.rowTop, 'ledger rows cluster near top').toBeLessThan(220);
+  await expect(page.locator('.source-ledger__tools-helper'), 'Import risk copy must not float as detached Source Ledger helper prose').not.toContainText(/import replaces|导入会替换/);
+  await page.locator('#state-export').focus();
+  await page.keyboard.press('Tab');
+  const importState = page.locator('#state-import');
+  await expect(importState).toBeFocused();
+  const importStateFocus = await importState.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return { color: style.color, background: style.backgroundColor };
+  });
+  expect(importStateFocus.background, '[IMPORT STATE] focus-visible uses shared terminal reverse state').not.toBe('rgba(0, 0, 0, 0)');
+  await expect(page.locator('#state-import-warning'), 'State import warning sits with the specific dangerous import action').toBeVisible();
 });

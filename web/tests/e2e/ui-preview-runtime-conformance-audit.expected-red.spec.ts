@@ -247,7 +247,7 @@ test.describe('expected-red runtime conformance audit browser regressions', () =
 
     const menu = menuRoot.locator('.surface-nav-menu');
     await expect.soft(menu.getByText('NAV', { exact: true }), 'F02: NAV micro-heading is visible in the opened utility menu').toBeVisible();
-    await expect.soft(menu.getByText('OPERATIONS', { exact: true }), 'F02: OPERATIONS micro-heading is visible in the opened utility menu').toBeVisible();
+    await expect.soft(menu.getByText('SYSTEM', { exact: true }), 'F02: SYSTEM micro-heading is visible in the opened utility menu').toBeVisible();
     await expect.soft(menu.getByText('Existing readable item content will be rewritten.'), 'F03: reprocess warning is visible to sighted users').toBeVisible();
     await expect.soft(menu.getByText('Source identifiers remain unchanged.'), 'F03: source identifier warning is visible to sighted users').toBeVisible();
 

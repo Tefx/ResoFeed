@@ -315,7 +315,7 @@ architecture_basis:
     - surface: "Desktop shell"
       scope: "independent feed/Inspector scroll, no coupled global page scroll"
     - surface: "Language control"
-      scope: "terse LANG control inside opened RESOFEED OPERATIONS menu, optional /doctor raw echo, no persistent chrome or settings dashboard"
+      scope: "terse LANG control inside opened RESOFEED SYSTEM menu, optional /doctor raw echo, no persistent chrome or settings dashboard"
     - surface: "Reprocess action"
       scope: "bracket-style explicit operation with warning, no progress dashboard"
     - surface: "MCP item/search/detail outputs"

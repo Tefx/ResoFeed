@@ -54,6 +54,7 @@
   const visibleSources = $derived(sources.filter((source) => !deletedSourceIds.has(source.id)));
   const headerIngestStatusText = $derived(globalIngestStatusText || latestIngestStatusText(visibleSources));
   const headerOperationStatusText = $derived(currentOperationStatusText || headerIngestStatusText);
+  const headerOperationIsError = $derived(headerOperationStatusText.toLowerCase().startsWith('err:'));
   const ingestActionRunning = $derived(isRunningIngest || isOperationBlockingManualIngest(currentOperation));
   const sharedIngestProbeKey = $derived(
     !isRunningIngest && currentOperation?.running && (currentOperation.kind === 'manual_ingest' || currentOperation.kind === 'background_ingest')
@@ -69,7 +70,7 @@
       portableStateActions: '状态迁移操作',
       sourceList: '来源列表',
       portableState: '状态迁移',
-      helper: 'OPML = 来源列表；State = 来源 + 规则 + 星标，导入会替换。',
+      helper: 'OPML = 来源列表；State = 来源 + 规则 + 星标。',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
       exportOpml: '[EXPORT OPML]',
@@ -111,7 +112,7 @@
       portableStateActions: 'Portable state actions',
       sourceList: 'SOURCE LIST',
       portableState: 'PORTABLE STATE',
-      helper: 'OPML = source list; State = sources + rules + stars, import replaces.',
+      helper: 'OPML = source list; State = sources + rules + stars.',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
       exportOpml: '[EXPORT OPML]',
@@ -380,7 +381,7 @@
 <section class="contract-region contract-source-ledger source-ledger" data-testid="source-ledger" aria-labelledby="source-ledger-title">
   <header class="source-ledger-head source-ledger__header source-ledger__header-actions">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
-    <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class:source-ledger__status--error={headerOperationStatusText.toLowerCase().startsWith('err:')} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
+    <span role={suppressStatusRole ? undefined : 'status'} aria-live={headerOperationIsError ? 'assertive' : 'polite'} class:source-ledger__status--error={headerOperationIsError} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
     <button type="button" class="bracket-action bracket-action--run-ingest" disabled={ingestActionRunning} onclick={() => void runIngest()}>{ingestActionRunning ? chrome.ingesting : chrome.runIngest}</button>
   </header>
   <div class="source-ledger__tools" aria-label={chrome.ledgerActions}>
@@ -392,7 +393,7 @@
     <StatePortability onExportState={onExportState} onImportState={onImportState} groupLabel={chrome.portableState} groupAriaLabel={chrome.portableStateActions} language={language} />
     <span class="contract-muted source-ledger__tools-helper">{chrome.helper}</span>
     {#if statusText}
-      <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
+      <span role={suppressStatusRole ? undefined : 'status'} aria-live={statusText.toLowerCase().startsWith('err:') ? 'assertive' : 'polite'} class="ledger-status imported-status">{statusText}</span>
     {/if}
   </div>
   {#if visibleSources.length === 0}
@@ -408,7 +409,7 @@
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id}>
           <div class="source-ledger-copy source-ledger__name" title={rowGrammarForSource(source, sourceLabel, lastFetch)} translate={sourceTitleTranslate}>{sourceRowNameText(sourceLabel)}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>{sourceRowUrlText(source.url)}</div>
-          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live="polite" aria-label={rowGrammarForSource(source, sourceLabel, lastFetch)} title={rowStatusText}>{rowVisibleStatus}</div>
+          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live={rowHasError ? 'assertive' : 'polite'} aria-label={rowGrammarForSource(source, sourceLabel, lastFetch)} title={rowStatusText}>{rowVisibleStatus}</div>
           <span class="source-ledger__actions">
             <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? chrome.fetchingAria(sourceA11yLabel(sourceLabel)) : chrome.fetchAria(sourceA11yLabel(sourceLabel))} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? chrome.fetching : chrome.fetch}</button>
             {#if confirmingSourceId === source.id}

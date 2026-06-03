@@ -529,11 +529,16 @@ The Feed column must anchor to the shell's left content edge. Do not center the 
 On ultra-wide displays, constrain the shell or put extra width outside the shell. Extra width must not create a dead zone before the Feed, between Feed and Inspector, or between the Inspector reading group and the pane's right edge.
 
 ### Narrow Surface Canvas and Fixed Chrome Contract
-On narrow layouts, fixed top navigation and bottom Steer chrome are allowed only when they are the active route chrome for that surface. They must read as light rules on the same canvas as the adjacent surface, not as opaque top or bottom color slabs.
+On narrow layouts, fixed top navigation and bottom Steer chrome are allowed only when they are active, usable route chrome for the current surface. They must read as light rules on the same canvas as the adjacent surface, not as opaque top or bottom color slabs.
 
-Feed, Search, Source Ledger, and Doctor may keep global top/bottom chrome visible on narrow screens, but the chrome background must match the active surface canvas closely enough that screenshots do not show a distinct full-width block above or below the content. Inspector remains the exception: it is a full-screen takeover and MUST cover both global top navigation and bottom Steer chrome.
+Feed/TODAY, Search, Source Ledger, and Doctor may keep global top/bottom chrome visible on narrow screens, but the chrome background, route-preview strip, shell padding area, and active surface canvas must visually match. Screenshots must not show a distinct full-width block below `RESOFEED`, above the Steer input, or between fixed chrome and feed rows.
 
-The active narrow utility/search surface owns its own scroll flow. Avoid fixed overlays with reserved `top`/`bottom` insets unless the visible chrome is intentionally still usable. If chrome remains usable, the content start/end spacing must be explained by the chrome height, not by an extra background slab or hidden margin.
+Reserved space for fixed chrome must be minimal and accountable. The first feed row should begin after the top chrome plus normal content padding only; there must not be an extra blank banner. The bottom Steer region may reserve safe-area/input space, but it must not cover feed text with a separate color slab or leave a broad masked band above the input.
+
+Inspector remains the exception: it is a full-screen takeover and MUST cover both global top navigation and bottom Steer chrome. Mobile Inspector must keep one sticky back row and should end with compact reading breathing room, not a viewport-sized empty block after collapsed source/details disclosures.
+
+The active narrow utility/search surface owns its own scroll flow. Avoid fixed overlays with reserved `top`/`bottom` insets unless the visible chrome is intentionally still usable. If chrome remains usable, the content start/end spacing must be explained by the chrome height and safe-area needs, not by an extra background slab or hidden margin.
+
 ### Desktop Split Scroll and Processing Language Layout
 Desktop shell must keep Feed and Inspector as independent vertical scroll regions. Global page scroll must not couple the two panes. Scrolling the Feed must not move the Inspector, and scrolling the Inspector must not move the Feed. Selecting a Feed item must keep Feed scroll position stable and reset the Inspector pane scroll to the top for the newly selected item.
 
@@ -543,7 +548,7 @@ Both desktop scroll regions MUST be focusable (e.g., `tabindex="0"`) with proper
 
 Mobile keeps the existing single-column behavior: Feed is the main surface and Inspector opens as a full-screen route with preserved Feed scroll.
 
-Processing language is a global operational state, not a per-item display toggle. The language control lives in the `RESOFEED` utility menu under an `OPERATIONS` micro-heading, with an optional duplicate in `/doctor` raw utility output. It must not be persistent top chrome and must not become a settings dashboard, preference center, or onboarding wizard (see **Language Control** in the Components section for exact anatomy and ARIA rules).
+Processing language is a global operational state, not a per-item display toggle. The language control lives in the `RESOFEED` utility menu under a `SYSTEM` / `系统` micro-heading, with an optional duplicate in `/doctor` raw utility output. It must not be persistent top chrome and must not become a settings dashboard, preference center, or onboarding wizard (see **Language Control** in the Components section for exact anatomy and ARIA rules).
 
 ### High-Density Acceptance and Mechanical Gates
 
@@ -639,15 +644,32 @@ Purpose: hold Steer, feed, and optional Inspector with no settings-sidebar bloat
 
 Anatomy: top command row, feed viewport, detail pane, and utility surfaces reachable through the `RESOFEED` surface menu. The menu may contain `TODAY` and `SOURCE LEDGER`; those labels do not need to be persistent visible links when the menu is closed. States: default, menu open, narrow, wide split, dark mode. Accessibility: landmarks for command, feed, detail; `RESOFEED` menu summary must be keyboard reachable; menu items must be real buttons/links with accessible names; skip-to-feed link may exist but should be visually quiet.
 
-### RESOFEED Utility Menu (`utility-menu`)
-- **Intent**: [SHARP] Keep low-frequency global navigation and operations discoverable without occupying persistent top chrome.
-- **useFor**: `TODAY`, `SOURCE LEDGER`, processing language control, guarded `[REPROCESS LIBRARY]`, and terse current operation context when it affects utility actions.
-- **avoidFor**: Settings dashboard, preference center, task/job dashboard, activity history, command ledger, onboarding wizard, decorative brand menu, or any unrelated product feature.
+### Interaction State Taxonomy
+- **Intent**: [SHARP] Make every interactive element communicate the same thing with the same visual state across Shell, Search, Inspector, Source Ledger, State Portability, and Owner Token flows.
+- **useFor**: Navigation items, bracket commands, text/state toggles, disclosures, destructive/rewrite warnings, receipts, disabled/running controls, and focus-visible affordances.
+- **avoidFor**: Component-local hover exceptions, background-filled navigation tabs, warning copy detached from the risky action, selected-command states, color-only semantics, SaaS primary buttons, animated loading indicators, or per-surface interaction styles.
 
-Anatomy: the closed top chrome shows only the `RESOFEED` label/button and the Steer field. Opening `RESOFEED` reveals a flat menu/panel with two compact groups: `NAV` for `TODAY` and `SOURCE LEDGER`, and `OPERATIONS` for `LANG: EN`/`LANG: ZH` plus guarded `[REPROCESS LIBRARY]`. The panel uses `{components.utility-menu}`, stark 1px rules, no shadow, no blur, no icons, and no preference prose beyond the required reprocess warning. It may appear as a popover on desktop and as a flat full-width utility sheet on narrow screens.
+State families are [SHARP]:
+
+- **Navigation items** say where the user is. Examples: `TODAY`, `SOURCE LEDGER`. Rest uses muted text. Hover uses primary text only. Current uses primary text plus semantic `aria-current` or `aria-pressed`; it MUST NOT use terminal inversion, filled backgrounds, accent fill, pill tabs, or bracket-action styling. Focus-visible adds the shared focus outline without changing geometry.
+- **Bracket commands** execute work. Examples: `[SEARCH]`, `[FETCH]`, `[IMPORT STATE]`, `[REPROCESS LIBRARY]`, `[RE-INGEST ITEM]`, `[CANCEL]`. Rest uses muted monospace bracket text on transparent/inherited surface. Hover and focus-visible use immediate terminal-style inversion; focus-visible also keeps the shared outline. Running uses text replacement only and preserves the hitbox. Disabled keeps geometry, muted text, and no hover inversion.
+- **State toggles/text actions** change a global state. Example: processing language. The current state is expressed by the label text (`LANG: EN`, `语言：中文`), not by a persistent selected background. Hover/focus may use the bracket-command interaction only if the control is styled as a command; persistent inversion is forbidden.
+- **Disclosures** reveal secondary controls or evidence. Examples: `filters`, source text/details, source diagnostic details. Rest uses low-chrome summary text. Hover may brighten text or underline. Open may use primary text. Disclosures MUST NOT become filled accordion cards or selected tabs.
+- **Warnings/status lines** explain risk or outcome. Warning copy MUST sit adjacent to the action that causes the risk. Errors/conflicts use terse visible text and live regions. Receipts stay concise. Warnings MUST NOT float as unrelated menu prose or attach to a different control.
+
+Accent/fill rule: active Resonate is the only common control that may use filled accent treatment. Navigation current state and command hover/focus must not spend the accent token.
+### RESOFEED Utility Menu (`utility-menu`)
+- **Intent**: [SHARP] Keep low-frequency global navigation and system operations discoverable without occupying persistent top chrome.
+- **useFor**: `TODAY`, `SOURCE LEDGER`, processing language control, guarded `[REPROCESS LIBRARY]`, and terse current-operation context when it affects utility actions.
+- **avoidFor**: Settings dashboard, preference center, task/job dashboard, activity history, command ledger, onboarding wizard, decorative brand menu, unrelated feature links, or mixed navigation/command selected states.
+
+Anatomy: the closed top chrome shows only the `RESOFEED` label/button and the Steer field. Opening `RESOFEED` reveals a flat menu/panel with two compact groups: `NAV` / `导航` for surface routes (`TODAY`, `SOURCE LEDGER`) and `SYSTEM` / `系统` for low-frequency global operations (`LANG: EN`/`LANG: ZH`, `语言：中文`, and guarded `[REPROCESS LIBRARY]` / `[重处理资料库]`). The panel uses `{components.utility-menu}`, stark 1px rules, no shadow, no blur, no icons, and no preference prose beyond action-scoped warnings. It may appear as a popover on desktop and as a flat full-width utility sheet on narrow screens.
+
+State contract: `NAV` items are navigation items, not bracket commands. Current route uses primary text plus semantic `aria-current` or `aria-pressed`; it MUST NOT use background inversion, filled borders, accent fill, or bracket styling. `SYSTEM` actions follow the global interaction taxonomy: language is a state text action whose state is in the label, while library reprocess is a bracket command.
+
+Warning placement: rewrite warning copy such as `Existing readable item content will be rewritten. Source identifiers remain unchanged.` / `已有可读内容将被重写。来源标识保持不变。` belongs to `[REPROCESS LIBRARY]` / `[重处理资料库]` only. It MUST NOT visually attach to the language control. The warning may be visible directly under the reprocess action or shown on focus/confirming, but it must remain adjacent to the reprocess action and smaller/lower-priority than the command.
 
 Keyboard and accessibility: the `RESOFEED` trigger is a real button with `aria-haspopup="menu"` or equivalent disclosure semantics and `aria-expanded`. Opening the menu moves focus to the first item; `Escape` closes it and returns focus to `RESOFEED`; tab order remains linear. Menu status/error text uses visible inline text and `aria-live` as specified by each contained operation. Do not hide language/reprocess exclusively behind hover.
-
 ### Current Operation Status (`current-operation-status`)
 - **Intent**: [SHARP] Explain one in-memory heavy operation currently occupying the ingest/process/reprocess guard.
 - **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, `[FETCH]`, `[REPROCESS LIBRARY]`, `[RE-INGEST ITEM]`, or language mutation; best-effort phase/count text from the shared `GET /api/runtime/operation` HTTP snapshot or matching MCP/UI current-operation data.
@@ -668,34 +690,32 @@ Conflict copy examples:
 Keyboard and accessibility: status lines are visible text. Running updates use `aria-live="polite"` and should update no more frequently than useful phase/count changes. Conflict/errors use `aria-live="assertive"`. When a user triggers a blocked action, keep focus on the trigger if it remains actionable, or move focus to the adjacent conflict line with `tabindex="-1"` and then restore predictable tab order. Do not use spinner-only or color-only status.
 
 ### Language Control
-
 - **Intent**: [SHARP] Expose the persisted processing language as a terse global pipeline state.
 - **useFor**: Switching future processing language from the `RESOFEED` utility menu when no guarded ingest/fetch/reprocess operation is running; optional `/doctor` raw utility echo; announcing language update success/failure/conflict.
-- **avoidFor**: Persistent top-chrome badge, per-item translation toggle, settings panel, preference center, language wizard, automatic existing-library rewrite, or mixed-language batch creation.
+- **avoidFor**: Persistent top-chrome badge, selected tab, filled toggle, per-item translation toggle, settings panel, preference center, language wizard, automatic existing-library rewrite, or mixed-language batch creation.
 
-Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言: 英文` / `语言: 中文`. It lives in the opened `RESOFEED` utility menu under `OPERATIONS`, with an optional raw `/doctor` utility echo. It must reuse the `bracket-action` token set or equivalent low-chrome text-action styles. It must not open a settings dashboard, preference panel, onboarding wizard, or per-item translation selector. Language switching is guarded: if ingest/fetch/library reprocess/item re-ingest is running, it uses the shared current-operation conflict pattern and does not create a mixed-language batch.
+Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言：英文` / `语言：中文`. It lives in the opened `RESOFEED` utility menu under `SYSTEM` / `系统`, with an optional raw `/doctor` utility echo. The current language is expressed by the label text itself. It must not use persistent background inversion or warning copy to communicate state. Hover/focus may use the same terminal-style interaction as bracket commands only while the control is being interacted with.
+
+Behavior boundary: language switching changes future processing language only. It MUST NOT imply that existing readable content will be rewritten. The library rewrite warning belongs to `[REPROCESS LIBRARY]` / `[重处理资料库]`, not to the language control.
 
 States: English, Chinese, updating, conflict, failed. Updating keeps dimensions stable and uses terse text only. Conflict uses the Current Operation Status pattern, e.g. `err: language blocked — op: item_reingest · actor:human · phase:processing`. Failure uses raw `err: <diagnostic>` copy and the existing feedback-line style.
 
 Keyboard and accessibility: language control is a real button/control with an accessible name that announces the current processing language and the target action. The document `<html lang>` must reflect the active UI language (`en` or `zh-CN` unless a narrower Chinese locale is chosen later). Successful, blocked, or failed language updates MUST be announced via an `aria-live="polite"` terse status line for success and `aria-live="assertive"` for conflict/failure.
-
 ### Reprocess Library Action
-
 - **Intent**: [SHARP] Explicitly rewrite existing stored user-readable item content into the current processing language and rebuild search indexing.
-- **useFor**: Low-frequency guarded library reprocess from the `RESOFEED` utility menu; conflict feedback that references the shared current operation snapshot.
-- **avoidFor**: Persistent top chrome, automatic language-change side effect, progress dashboard, durable job, task history, queue, or background sync flow.
+- **useFor**: Low-frequency guarded library reprocess from the `RESOFEED` utility menu; conflict feedback that references the shared current-operation snapshot.
+- **avoidFor**: Persistent top chrome, language-control warning copy, automatic language-change side effect, progress dashboard, durable job, task history, queue, or background sync flow.
 
-Anatomy: a terse operational bracket action, preferably `[REPROCESS LIBRARY]` / `[重处理资料库]`, inside the `RESOFEED` utility menu under `OPERATIONS`, with warning copy such as `Existing readable item content will be rewritten.` / `已存可读内容将被重写。` and `Source identifiers remain unchanged.` / `来源标识保持不变。`
+Anatomy: a terse operational bracket command, preferably `[REPROCESS LIBRARY]` / `[重处理资料库]`, inside the `RESOFEED` utility menu under `SYSTEM` / `系统`. Rewrite warning copy belongs directly with this action: `Existing readable item content will be rewritten. Source identifiers remain unchanged.` / `已有可读内容将被重写。来源标识保持不变。` It may appear directly below the idle reprocess action, on focus, or in confirming state, but it MUST NOT appear between the language control and the reprocess command as if language switching caused the rewrite.
 
-States: default, confirming, running, complete, conflict, failed. Running state uses text replacement only, e.g. `[REPROCESSING...]`, plus the Current Operation Status line when available; no spinner, progress bar, wizard, dashboard, queue view, or activity log is allowed. Confirming state replaces the default action with two bracket actions: `[CONFIRM REPROCESS]` and `[CANCEL]`. Conflict state uses terse copy with current operation detail, e.g. `err: reprocess blocked — op: background_ingest · actor:background · phase:fetch · 17/128 sources`.
+States: default, confirming, running, complete, conflict, failed. Running state uses text replacement only, e.g. `[REPROCESSING...]`, plus the Current Operation Status line when available; no spinner, progress bar, wizard, dashboard, queue view, or activity log is allowed. Confirming state replaces the default action with two bracket commands: `[CONFIRM REPROCESS]` and `[CANCEL]`, and keeps the rewrite warning adjacent to those commands. Conflict state uses terse copy with current operation detail, e.g. `err: reprocess blocked — op: background_ingest · actor:background · phase:fetch · 17/128 sources`.
 
-Keyboard and accessibility: the action must expose its destructive/operational meaning, e.g. `Reprocess existing library and rebuild search index`.
+Keyboard and accessibility: the action must expose its destructive/operational meaning, e.g. `Reprocess existing library and rebuild search index`. The warning must be in the action's accessible description when visible or relevant.
 Focus management across states:
 - `confirming`: keep/place focus on the `[CONFIRM REPROCESS]` action;
 - `running`: use `aria-disabled="true"` instead of the native `disabled` attribute to disable the action without losing keyboard focus;
 - `conflict`, `complete` or `failed`: return focus predictably to the trigger or adjacent text, and announce result via an `aria-live` region.
 Completion/failure messages use live regions and remain terse.
-
 ### Source Identifiers
 
 Purpose: preserve trust anchors when item-readable content is processed in another language.
@@ -870,6 +890,13 @@ Readable measure is [FLEXIBLE] but scroll ownership is [SHARP]. Inspector text s
 
 Extra horizontal width is absorbed in this order: outside the capped workbench shell, then a capped middle gutter that does not distort Inspector left/right balance, then balanced breathing room around the Inspector reading group. A vertical scrollbar between the reading group and a trailing empty gutter is a layout bug because it makes the reading group, not the pane, read as the scroll surface.
 
+#### Inspector divider and content measure
+Inspector divider lines are [SHARP] content-measure artifacts, not independent decorative rules. Title row, Frontmatter borders, processing/status lines, Summary/Core/Key Points sections, item re-ingest panel, Source Text disclosure, Source Details disclosure, grouped-source disclosure, and story/provenance footnotes MUST share the same horizontal measure and left/right edges inside the Inspector reading group.
+
+Do not mix `68ch`, `76ch`, `600px`, and unconstrained detail blocks in the same Inspector route unless they are wrapped by one shared reading group that makes their visible borders align. A divider line that starts or ends at a different x-coordinate from adjacent Inspector dividers is a layout bug.
+
+This applies to desktop split and narrow Inspector routes. Mobile may use a pixel cap for the whole reading group, but every visible divider inside that group must still align to that mobile measure.
+
 ### Inspector Summary (`摘要`)
 - **Intent**: [SHARP] Chinese contextual explanation of the selected item.
 - **useFor**: Model-backed `summary` text, localized to Chinese when processing language is Chinese, placed before `核心洞察` and `要点` in Inspector.
@@ -929,7 +956,7 @@ Visual hierarchy: [SHARP] source text body must not use the same visual treatmen
 
 Necessity: Source Text remains useful as an audit/evidence affordance, especially when the model output looks suspicious, the article was only partially extracted, the original is unavailable, or the user wants to verify grounding without leaving the app. The primary path for reading the original article is still the compact original link. Source Text is not primary reading content and should never be open by default for normal model-backed items.
 
-Grouped-source disclosure contract: Inspector may show a source-list disclosure only for authoritative backend grouping: non-null `story_key`, non-null `duplicate_of_item_id`, or non-empty backend `provenance.grouped_source_items` on the selected item/detail. It must list backend-provided source items/provenance without merging client-side identities. It must not compute groups by stripping URL fragments, by treating URLs that differ only by a synthetic feed-entry fragment as identical, or by host/path fallback. If authoritative grouping fields are absent, show the selected item as a standalone item even if URL normalization would make unrelated items look similar. This protects feeds whose entry URLs intentionally use fragments to identify distinct source items.
+Grouped-source disclosure contract: Inspector may show a source-list disclosure only for authoritative backend grouping: non-null `story_key`, non-null `duplicate_of_item_id`, or non-empty backend `provenance.grouped_source_items` on the selected item/detail. It must list backend-provided source items/provenance without merging client-side identities. It must not compute groups by stripping URL fragments, by treating URLs that differ only by a synthetic feed-entry fragment as identical, or by host/path fallback. If authoritative grouping fields are absent, show the selected item as a standalone item even if URL normalization would make unrelated items look similar. This protects feeds whose entry URLs intentionally use fragments to identify distinct source items. When authoritative grouping exists, `.contract-grouped-sources` is intentionally open by default so the source roster is immediately auditable; this exception does not change the [SHARP] default-collapsed rule for ordinary Source Text/source evidence details.
 
 Fallback/source-evidence contract: If target-language/model processing has not produced model-backed summary or core insight, Inspector must not render ghost Summary or Core sections. It shows exactly one low-chrome processing state line below title/original-link/provenance metadata, then one collapsed source evidence disclosure only if a source excerpt exists. Recommended copy is `target-language processing incomplete · summary/core unavailable · showing source excerpt` / `中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录`, followed by a disclosure summary such as `Source evidence (collapsed): RSS excerpt` / `出处记录（已折叠）：RSS 摘录` and the raw RSS excerpt inside the controlled region. Model latency/error states use the same one-line pattern with `failed`/`失败`. Fallback source excerpt is provenance evidence, not completed synthesized target-language reading content. Source identifiers, original link, and source title remain literal.
 
@@ -1098,7 +1125,7 @@ Forbidden search-detail patterns: no modal detail views, accordions-as-detail, r
 #### Search filter disclosure and controls
 Search filters are [SHARP] progressive disclosure. The filter details control is collapsed by default in every processing language, including Chinese. The default Search surface is query-first: one plain query field, one bracket submit action, then a compact `筛选` / `filters` disclosure. Filters must not render as a settings dashboard or a permanently expanded form block.
 
-The disclosure summary is [SHARP] text-sized chrome with a touch-safe hit target. It must not occupy the full row width or make blank space to its right clickable. Its visible and clickable width should be only the marker/text plus compact padding, while preserving at least `44px` height for touch and keyboard access.
+The disclosure summary is [SHARP] text-sized chrome with a touch-safe hit target. It must not occupy the full row width or make blank space to its right clickable. Its visible and clickable width should be only the marker/text plus compact padding, while preserving at least `44px` height for touch and keyboard access. Hover/open/focus treatment follows the global disclosure state contract: low-chrome text change or underline only, no filled accordion header.
 
 Filter component types are [SHARP]:
 
@@ -1109,8 +1136,7 @@ Filter component types are [SHARP]:
 
 Filter layout is [SHARP]: keep a compact, wrapping control grid with stable minimum widths for date fields so placeholders do not clip. Labels and controls should read as pairs, not as a six-column spreadsheet. The summary, expanded grid, status line, and first result must keep clear proximity: inner gaps within the Search form should be smaller than the outer gap before the first result, and no collapsed or expanded filter row may create a visually unrelated blank band.
 
-Submission remains deliberate: changing a filter does not automatically run a new search. The user submits with the single `[SEARCH]` / `[搜索]` bracket action.
-
+Submission remains deliberate: changing a filter does not automatically run a new search. The user submits with the single `[SEARCH]` / `[搜索]` bracket command. `[SEARCH]` follows the same bracket-command rest/hover/focus/disabled treatment as Source Ledger, State Portability, and Inspector re-ingest; Search MUST NOT define a local hover/focus exception that makes the button behave unlike other bracket commands.
 #### Search auto-selection and stale Inspector prevention
 
 Executing a desktop Search invalidates any previous TODAY/feed selection as the visible Inspector context. When a search returns one or more results, the first result MUST be selected automatically and the desktop Inspector MUST update to that result. This keeps the left Search results and right Inspector in the same information context without requiring an extra click.
@@ -1283,7 +1309,7 @@ Latest Stitch source project: `projects/16485408683705488556` (`ResoFeed Design 
 | --- | --- | --- |
 | `0363936b97974a199e9a559c939d46fc` — `ResoFeed Workbench - Main Workspace (Refined)` | Desktop feed + Inspector split-pane visual exploration. | Accept split-pane rhythm, warm archival palette, JetBrains Mono chrome, and 44px star target. Reject persistent top navigation/counts, Material-symbol structural icons, shadowed sticky header, and `[INGEST FEED]` global shortcut as canonical UI. |
 | `2e38d6a81f764f2f911477eab184daac` — `ResoFeed State Matrix — Auth, Empty, Menu, Operation States` | Owner token, first-use empty state, utility menu, and current-operation state exploration. | Accept terse state coverage. Reject overlay/menu shadow, warning icon dependency, and `[AUTHENTICATE]` copy; canonical token action remains `[SUBMIT]` and raw `err:` lines. |
-| `38c91458d5f942f0a885e1e46f4747fd` — `SOURCE LEDGER — State Matrix` | Source Ledger roster and operational state exploration. | Accept flat table/list density and operation cluster. Reject `[RETRY]`, `syncing...`, `animate-pulse`, persistent `OPERATIONS` nav, and second-order job/retry semantics. Canonical actions remain `[RUN INGEST]`, `[FETCH]`, `[IMPORT OPML]`, `[EXPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[DETAILS]`. |
+| `38c91458d5f942f0a885e1e46f4747fd` — `SOURCE LEDGER — State Matrix` | Source Ledger roster and operational state exploration. | Accept flat table/list density and operation cluster. Reject `[RETRY]`, `syncing...`, `animate-pulse`, persistent operations nav, and second-order job/retry semantics. Canonical actions remain `[RUN INGEST]`, `[FETCH]`, `[IMPORT OPML]`, `[EXPORT OPML]`, `[EXPORT STATE]`, `[IMPORT STATE]`, `[DELETE]`, `[DETAILS]`. |
 | `7e4d3cf967da4a34b476c4f656e57045` — `ResoFeed - Bilingual + Responsive Matrix` | Responsive/bilingual state coverage. | Accept as visual coverage input only when it preserves Feed/Inspector separation, Chinese generated content, literal source identifiers, and touch-safe mobile behavior. |
 | `0945e90ac2ce4b408576a0d3b063228f` — `ResoFeed Workbench - Editorial Atlas` | Broad editorial atlas board. | Reference for overall mood only; local component, navigation, and runtime constraints remain stricter than this atlas. |
 | `116c49ba79224f2fb04f1c0dbde52c09` — `ResoFeed Atlas Specification` | Stitch-generated inventory of page families. | Accept page-family inventory as non-authoritative summary: TODAY + INSPECTOR, SOURCE LEDGER, SEARCH RETRIEVAL, FULL INSPECTOR, OWNER TOKEN, FIRST USE EMPTY, RESOFEED MENU, CURRENT OPERATION. |

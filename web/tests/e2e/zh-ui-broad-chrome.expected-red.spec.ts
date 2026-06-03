@@ -254,7 +254,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(page.getByPlaceholder('导向或粘贴 RSS URL...')).toBeVisible();
     await redExpect(page.locator('#steer-route-preview-status')).toHaveAttribute('aria-label', '导向路由预览');
     await redExpect(page.locator('.utility-label').first()).toHaveText('导航');
-    await redExpect(page.locator('.utility-label--operations')).toHaveText('操作');
+    await redExpect(page.locator('.utility-label--operations')).toHaveText('系统');
     await redExpect(page.getByText('RESOFEED').first()).toBeVisible();
     await redExpect(page.getByRole('button', { name: 'TODAY' })).toHaveCount(0);
     await redExpect(page.getByText('/doctor')).toHaveCount(0);

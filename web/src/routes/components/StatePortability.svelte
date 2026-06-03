@@ -54,6 +54,7 @@
 
   const visibleGroupLabel = $derived(groupLabel ?? chrome.defaultGroupLabel);
   const accessibleGroupLabel = $derived(groupAriaLabel ?? chrome.group);
+  const statusIsError = $derived(statusText.toLowerCase().startsWith('err:'));
 
   function restoreImportIdleFocus(): void {
     if (!importPickerOpening) return;
@@ -126,6 +127,6 @@
   <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" aria-label={browserStateInputLabel} onchange={() => void importSelectedFile()} />
   <span id="state-import-warning" class="contract-warning state-portability-warning" hidden={!importRiskFocused && portabilityState !== 'importing' && portabilityState !== 'import-failed'}>{chrome.warning}</span>
   {#if statusText}
-    <span role="status" aria-live="polite" class="contract-muted state-portability-status">{statusText}</span>
+    <span role="status" aria-live={statusIsError ? 'assertive' : 'polite'} class="contract-muted state-portability-status">{statusText}</span>
   {/if}
 </div>

@@ -353,8 +353,8 @@ a:focus,
   transition: none;
 }
 
-.bracket-action:hover:not(:disabled),
-.bracket-action:focus-visible:not(:disabled) {
+.bracket-action:hover:not(:disabled):not([aria-disabled='true']),
+.bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']) {
   color: var(--rf-color-background);
   background: var(--rf-color-current-text);
   outline: 2px solid var(--rf-component-focus-ring-color);
@@ -862,7 +862,6 @@ details.surface-nav button:focus-visible {
   grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
   gap: var(--rf-space-xs) var(--rf-space-md);
   align-items: baseline;
-  max-width: 76ch;
   margin: 0 0 var(--rf-space-md);
   border-block: 1px solid var(--rf-color-current-border);
   padding-block: var(--rf-space-sm) var(--rf-space-row);
@@ -915,7 +914,6 @@ details.surface-nav button:focus-visible {
 
 .contract-provenance-anchors {
   display: grid;
-  max-width: 76ch;
   gap: var(--rf-space-xs);
   margin-block: 0 var(--rf-space-md);
   font: var(--rf-typography-metadata);
@@ -1041,12 +1039,6 @@ details.surface-nav button:focus-visible {
   margin-block-start: var(--rf-space-sm);
   color: var(--rf-color-current-muted);
   text-transform: none;
-}
-
-.contract-search .bracket-action:hover:not(:disabled),
-.contract-search .bracket-action:focus:not(:disabled) {
-  color: var(--rf-color-current-muted);
-  background: transparent;
 }
 
 .contract-search-form {
@@ -1197,9 +1189,29 @@ details.surface-nav button:focus-visible {
 
 .contract-inspector {
   position: relative;
+  --rf-inspector-measure: 600px;
   background: var(--rf-component-inspector-pane-background-color);
   color: var(--rf-component-inspector-pane-text-color);
   padding: var(--rf-space-xl);
+}
+
+.contract-inspector .inspector-title-row,
+.contract-inspector .inspector-frontmatter,
+.contract-inspector .contract-provenance-anchors,
+.contract-inspector .inspector-evidence-line,
+.contract-inspector .inspector-status-line,
+.contract-inspector .inspector-text-section,
+.contract-inspector .inspector-points-section,
+.contract-inspector .inspector-attempt-failure,
+.contract-inspector .inspector-reingest-panel,
+.contract-inspector .contract-source-details,
+.contract-inspector .contract-grouped-sources,
+.contract-inspector > .contract-muted:not(.inspector-transition-status),
+.contract-inspector > .contract-warning,
+.contract-inspector > .contract-feedback-error {
+  width: min(100%, var(--rf-inspector-measure));
+  max-width: var(--rf-inspector-measure);
+  margin-inline: auto;
 }
 
 .inspector-transition-status {
@@ -1290,7 +1302,6 @@ details.surface-nav button:focus-visible {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--rf-space-row);
   align-items: start;
-  max-width: 68ch;
   margin-block-end: var(--rf-space-xs);
 }
 
@@ -1303,7 +1314,6 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-inspector p:not(.contract-muted):not(.contract-warning):not(.inspector-evidence-line):not(.inspector-section-label):not(.inspector-section-copy):not(.inspector-reading):not(.inspector-source-evidence):not(.inspector-provenance):not(.inspector-model-list-diagnostic) {
-  max-width: 68ch;
   overflow-wrap: anywhere;
   font: var(--rf-typography-payload);
 }
@@ -1318,7 +1328,6 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-inspector .inspector-evidence-line {
-  max-width: 68ch;
   overflow-wrap: anywhere;
 }
 
@@ -1333,7 +1342,6 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-inspector .inspector-text-section {
-  max-width: 68ch;
   margin-block: 0;
 }
 
@@ -1374,7 +1382,6 @@ details.surface-nav button:focus-visible {
 }
 
 .inspector-points-section {
-  max-width: 68ch;
   margin-block-start: var(--rf-space-md);
 }
 
@@ -1384,7 +1391,6 @@ details.surface-nav button:focus-visible {
 }
 
 .inspector-attempt-failure {
-  max-width: 68ch;
   margin-block: var(--rf-space-md);
   border-block: 1px solid var(--rf-color-border);
   padding-block: var(--rf-space-sm);
@@ -1400,7 +1406,6 @@ details.surface-nav button:focus-visible {
 
 .inspector-reingest-panel {
   display: grid;
-  max-width: 68ch;
   gap: var(--rf-space-sm);
   margin-block: var(--rf-space-md);
   border-block-start: 1px solid var(--rf-color-border);
@@ -1484,7 +1489,7 @@ details.surface-nav button:focus-visible {
 }
 
 .contract-grouped-sources__item {
-  max-width: 76ch;
+  max-width: 100%;
   overflow-wrap: anywhere;
 }
 
@@ -1543,8 +1548,8 @@ details.surface-nav button:focus-visible {
     border-color: var(--rf-color-current-rule);
   }
 
-  .bracket-action:hover:not(:disabled),
-  .bracket-action:focus-visible:not(:disabled) {
+  .bracket-action:hover:not(:disabled):not([aria-disabled='true']),
+  .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']) {
     color: var(--rf-color-background-dark);
     background: var(--rf-color-text-dark);
   }
@@ -1633,8 +1638,8 @@ details.surface-nav button:focus-visible {
   .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-reingest-panel,
   .detail-pane > .inspector-stable-landmark > .contract-inspector .contract-source-details,
   .detail-pane > .inspector-stable-landmark > .contract-inspector .contract-grouped-sources {
-    width: min(100%, 68ch);
-    max-width: 68ch;
+    width: min(100%, var(--rf-inspector-measure));
+    max-width: var(--rf-inspector-measure);
     margin-inline: auto;
   }
 
@@ -1716,8 +1721,8 @@ details.surface-nav button:focus-visible {
   }
 
   .resofeed-shell {
-    padding-block-start: 45px;
-    padding-block-end: 78px;
+    padding-block-start: 44px;
+    padding-block-end: 62px;
   }
 
   .resofeed-shell[data-surface='inspector'] {
@@ -1740,8 +1745,19 @@ details.surface-nav button:focus-visible {
     z-index: 5;
     inset-block-start: 0;
     inset-inline: 0;
+    min-height: 44px;
     justify-content: flex-end;
     border-block-end: 1px solid var(--rf-color-rule);
+    background: var(--rf-color-current-background);
+  }
+
+  .resofeed-shell[data-surface='feed'],
+  .resofeed-shell[data-surface='feed'] .shell-command,
+  .resofeed-shell[data-surface='feed'] .shell-command > .surface-nav,
+  .resofeed-shell[data-surface='feed'] .contract-brand,
+  .resofeed-shell[data-surface='feed'] .steer-route-preview,
+  .resofeed-shell[data-surface='feed'] .feed-pane,
+  .resofeed-shell[data-surface='feed'] .contract-feed-item {
     background: var(--rf-color-current-background);
   }
 
@@ -1835,6 +1851,7 @@ details.surface-nav button:focus-visible {
   }
 
   .detail-pane.active-panel > .inspector-stable-landmark > .contract-inspector {
+    --rf-inspector-measure: 600px;
     flex: 1 0 auto;
     width: 100%;
     max-width: calc(600px + (var(--rf-space-lg) * 2));
@@ -1845,17 +1862,25 @@ details.surface-nav button:focus-visible {
   }
 
   .detail-pane.active-panel .contract-inspector {
-    padding: var(--rf-space-lg) var(--rf-space-lg) calc(var(--rf-space-column) + var(--rf-space-xl));
+    padding: var(--rf-space-lg) var(--rf-space-lg) var(--rf-space-lg);
   }
 
   .detail-pane.active-panel .inspector-title-row,
   .detail-pane.active-panel .contract-inspector .inspector-frontmatter,
   .detail-pane.active-panel .contract-inspector .inspector-evidence-line,
+  .detail-pane.active-panel .contract-inspector .inspector-status-line,
   .detail-pane.active-panel .contract-inspector .inspector-text-section,
   .detail-pane.active-panel .inspector-points-section,
   .detail-pane.active-panel .inspector-attempt-failure,
-  .detail-pane.active-panel .inspector-reingest-panel {
-    max-width: 600px;
+  .detail-pane.active-panel .inspector-reingest-panel,
+  .detail-pane.active-panel .contract-inspector .contract-source-details,
+  .detail-pane.active-panel .contract-inspector .contract-grouped-sources,
+  .detail-pane.active-panel .contract-inspector > .contract-muted:not(.inspector-transition-status),
+  .detail-pane.active-panel .contract-inspector > .contract-warning,
+  .detail-pane.active-panel .contract-inspector > .contract-feedback-error {
+    width: min(100%, var(--rf-inspector-measure));
+    max-width: var(--rf-inspector-measure);
+    margin-inline: auto;
   }
 
   .detail-pane.active-panel .contract-inspector h2 {

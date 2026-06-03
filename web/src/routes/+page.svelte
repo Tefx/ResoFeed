@@ -138,12 +138,13 @@
   const languageStatusIsError = $derived(languageStatus.toLowerCase().startsWith('err:'));
   const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
   const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running' || contextualOperation.kind === 'running'));
+  const reprocessWarningVisible = $derived(import.meta.env.MODE === 'test' || surfaceMenuOpen);
   const shellChrome = $derived(processingLanguage.code === 'zh'
     ? {
-      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL / Steer or paste RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '操作', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向记录', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
+      skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL / Steer or paste RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '系统', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向记录', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
     }
     : {
-      skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'OPERATIONS', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering' + ' receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
+      skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'SYSTEM', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering' + ' receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
     });
   const browserLegacyEnglishA11y = $derived(true);
   const browserRuntimeA11y = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom'));
@@ -1264,7 +1265,7 @@
             <p class="utility-label utility-label--operations">{shellChrome.operations}</p>
             <div class="runtime-language-controls" aria-label={shellChrome.languageControls}>
               {#if contextualOperationStatusText}
-                <span class="surface-operation-status" role="status" aria-live="polite">{contextualOperationStatusText}</span>
+                <span class="surface-operation-status" role="status" aria-live={contextualOperationStatusText.toLowerCase().startsWith('err:') ? 'assertive' : 'polite'}>{contextualOperationStatusText}</span>
               {/if}
               <button
                 type="button"
@@ -1274,19 +1275,19 @@
                 aria-hidden={surfaceMenuOpen ? undefined : 'true'}
                 onclick={() => void updateProcessingLanguage()}
               >{processingLanguageButtonText}</button>
-              {#if import.meta.env.MODE === 'test' || surfaceMenuOpen}
-                <span class="contract-muted runtime-language-warning"><span>{processingLanguage.code === 'zh' ? '已存可读内容将被重写。' : 'Existing readable item content will be rewritten.'}</span> <span translate="no">{processingLanguage.code === 'zh' ? '来源标识保持不变。' : 'Source identifiers remain unchanged.'}</span></span>
-              {/if}
               {#if reprocessState === 'confirming'}
-                <button bind:this={reprocessConfirm} type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.confirmReprocessAria} tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void confirmReprocess()}>{reprocessConfirmLabel}</button>
+                <button bind:this={reprocessConfirm} type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.confirmReprocessAria} aria-describedby={reprocessWarningVisible ? 'runtime-reprocess-warning' : undefined} tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void confirmReprocess()}>{reprocessConfirmLabel}</button>
                 <button type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.cancelReprocessAria} tabindex={surfaceMenuOpen ? 0 : -1} onclick={cancelReprocess}>{reprocessCancelLabel}</button>
               {:else if reprocessState === 'running'}
-                <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.reprocessAria} aria-disabled="true" tabindex={surfaceMenuOpen ? 0 : -1} onclick={(event) => event.preventDefault()}>{reprocessRunningLabel}</button>
+                <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.reprocessAria} aria-describedby={reprocessWarningVisible ? 'runtime-reprocess-warning' : undefined} aria-disabled="true" tabindex={surfaceMenuOpen ? 0 : -1} onclick={(event) => event.preventDefault()}>{reprocessRunningLabel}</button>
               {:else}
-                <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.reprocessAria} tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
+                <button bind:this={reprocessTrigger} type="button" class="bracket-action bracket-action--reprocess" aria-label={shellChrome.reprocessAria} aria-describedby={reprocessWarningVisible ? 'runtime-reprocess-warning' : undefined} tabindex={surfaceMenuOpen ? 0 : -1} onclick={() => void beginReprocessConfirmation()}>{reprocessDefaultLabel}</button>
+              {/if}
+              {#if reprocessWarningVisible}
+                <span id="runtime-reprocess-warning" class="contract-muted runtime-language-warning runtime-reprocess-warning"><span>{processingLanguage.code === 'zh' ? '已存可读内容将被重写。' : 'Existing readable item content will be rewritten.'}</span> <span translate="no">{processingLanguage.code === 'zh' ? '来源标识保持不变。' : 'Source identifiers remain unchanged.'}</span></span>
               {/if}
               {#if reprocessStatus}
-                <span class="runtime-reprocess-status" role="status" aria-label={shellChrome.reprocessStatusAria} aria-live="polite">{reprocessStatus}</span>
+                <span class="runtime-reprocess-status" role="status" aria-label={shellChrome.reprocessStatusAria} aria-live={reprocessStatus.toLowerCase().startsWith('err:') ? 'assertive' : 'polite'}>{reprocessStatus}</span>
               {/if}
             </div>
           </div>
@@ -1323,7 +1324,7 @@
       <span id="steer-route-preview-detail" class="visually-hidden">{shellChrome.routeRequired}</span>
 
       {#if languageStatus}
-        <p class:visually-hidden={!languageStatusIsError} class:contract-feedback-error={languageStatusIsError} role="status" aria-label={shellChrome.processingLanguageStatus} aria-live="polite">{languageStatus}</p>
+        <p class:visually-hidden={!languageStatusIsError} class:contract-feedback-error={languageStatusIsError} role="status" aria-label={shellChrome.processingLanguageStatus} aria-live={languageStatusIsError ? 'assertive' : 'polite'}>{languageStatus}</p>
       {/if}
       {#if undoStatus}
         <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{undoStatus}</p>
