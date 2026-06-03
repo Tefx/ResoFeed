@@ -31,7 +31,7 @@
   const searchChrome = $derived(language === 'zh'
     ? {
       region: '搜索与检索',
-      heading: '搜索',
+      heading: '词汇搜索',
       filters: '搜索筛选',
       query: '纯文本查询',
       submit: '[搜索]',
@@ -193,8 +193,8 @@
     {/if}
   </form>
   <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || chrome.search.resultCount(results.length)}</p>
-  <div role="region" aria-label={searchChrome.resultsRegion}>
-    <div role="list" aria-label={searchChrome.resultsList}>
+  <div class="contract-search-results-region" role="region" aria-label={searchChrome.resultsRegion}>
+    <div class="contract-search-results-list" role="list" aria-label={searchChrome.resultsList}>
       {#each results as item, index (item.id)}
         <article class="contract-feed-item contract-search-result" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined}>
           <button

@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"encoding/xml"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -223,6 +224,7 @@ func TestHTTPNoQueryEndpointsRejectUnknownAfterAuthBeforeBackend(t *testing.T) {
 		path   string
 	}{
 		{name: "sources", method: http.MethodGet, path: "/api/sources?trace=1"},
+		{name: "source opml export", method: http.MethodGet, path: "/api/sources/export-opml?trace=1"},
 		{name: "state export", method: http.MethodGet, path: "/api/state/export?trace=1"},
 		{name: "doctor", method: http.MethodGet, path: "/api/doctor?trace=1"},
 		{name: "active steering", method: http.MethodGet, path: "/api/steer/active?trace=1"},
@@ -243,6 +245,88 @@ func TestHTTPNoQueryEndpointsRejectUnknownAfterAuthBeforeBackend(t *testing.T) {
 			assertErrorField(t, recorder.Body.Bytes(), "trace")
 		})
 	}
+}
+
+func TestHTTPSourceOPMLExportActiveSourcesOnly(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	insertSource(t, ctx, db, "src_export_alpha", "https://alpha.example.test/feed.xml", "Alpha & Friends")
+	insertSource(t, ctx, db, "src_export_beta", "https://beta.example.test/rss.xml", "Beta Source")
+	insertSource(t, ctx, db, "src_export_inactive", "https://inactive.example.test/feed.xml", "Inactive Source")
+	if _, err := db.ExecContext(ctx, `update sources set is_active = 0 where id = 'src_export_inactive'`); err != nil {
+		t.Fatalf("mark inactive source: %v", err)
+	}
+	if _, err := db.ExecContext(ctx, `insert into steer_rules (id, rule_text, is_active, created_at, revision) values ('rule_export_forbidden', 'Do not export me', 1, ?, 1)`, time.Now().UTC().Format(time.RFC3339)); err != nil {
+		t.Fatalf("insert steer rule: %v", err)
+	}
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/sources/export-opml", nil))
+
+	assertStatus(t, recorder, http.StatusOK)
+	assertContentType(t, recorder, "application/xml; charset=utf-8")
+	if got := recorder.Header().Get("Content-Disposition"); got != `attachment; filename="sources.opml"` {
+		t.Fatalf("Content-Disposition = %q, want sources.opml attachment", got)
+	}
+	body := recorder.Body.String()
+	for _, forbidden := range []string{"inactive.example.test", "Do not export me", "steer_rules", "resonated_items", "item_state", "agent_receipts", "folders", "tags"} {
+		if strings.Contains(body, forbidden) {
+			t.Fatalf("OPML export leaked forbidden content %q: %s", forbidden, body)
+		}
+	}
+
+	var parsed struct {
+		XMLName xml.Name `xml:"opml"`
+		Version string   `xml:"version,attr"`
+		Head    struct {
+			Title string `xml:"title"`
+		} `xml:"head"`
+		Body struct {
+			Outlines []struct {
+				Type   string `xml:"type,attr"`
+				Text   string `xml:"text,attr"`
+				Title  string `xml:"title,attr"`
+				XMLURL string `xml:"xmlUrl,attr"`
+			} `xml:"outline"`
+		} `xml:"body"`
+	}
+	if err := xml.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal OPML export: %v; body=%s", err, body)
+	}
+	if parsed.XMLName.Local != "opml" || parsed.Version != "2.0" || parsed.Head.Title != "ResoFeed Sources" {
+		t.Fatalf("OPML metadata = root:%s version:%s title:%s", parsed.XMLName.Local, parsed.Version, parsed.Head.Title)
+	}
+	if len(parsed.Body.Outlines) != 2 {
+		t.Fatalf("OPML outlines = %+v, want two active sources", parsed.Body.Outlines)
+	}
+	want := map[string]string{
+		"https://alpha.example.test/feed.xml": "Alpha & Friends",
+		"https://beta.example.test/rss.xml":   "Beta Source",
+	}
+	for _, outline := range parsed.Body.Outlines {
+		wantTitle, ok := want[outline.XMLURL]
+		if !ok {
+			t.Fatalf("unexpected OPML outline: %+v", outline)
+		}
+		if outline.Type != "rss" || outline.Text != wantTitle || outline.Title != wantTitle {
+			t.Fatalf("OPML outline = %+v, want rss text/title %q", outline, wantTitle)
+		}
+		delete(want, outline.XMLURL)
+	}
+	if len(want) != 0 {
+		t.Fatalf("missing OPML source URLs: %+v", want)
+	}
+}
+
+func TestHTTPSourceOPMLExportRejectsRequestBody(t *testing.T) {
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+	recorder := httptest.NewRecorder()
+
+	router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/sources/export-opml", bytes.NewReader([]byte("<opml/>"))))
+
+	assertStatus(t, recorder, http.StatusBadRequest)
+	assertErrorField(t, recorder.Body.Bytes(), "body")
 }
 
 func TestHTTPAuthRunsBeforeQueryValidationDetails(t *testing.T) {

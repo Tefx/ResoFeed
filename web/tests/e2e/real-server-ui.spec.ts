@@ -368,7 +368,7 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   await expect(inspector).toContainText('summary unavailable');
-  await expect(inspector).toContainText('why: fresh from configured source');
+  await expect(inspector).not.toContainText('why: fresh from configured source');
 
   await page.getByRole('button', { name: 'Resonate item' }).click();
   await expect(page.getByRole('button', { name: 'Remove resonance' })).toBeVisible();
@@ -460,7 +460,7 @@ test('ci-safe real server live audit proof produces complete browser artifacts w
 
     await liveAuditItem.click();
     await expect(page.getByRole('heading', { name: 'Live audit item one' })).toBeFocused();
-    await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).toContainText('why: fresh from configured source');
+    await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).not.toContainText('why: fresh from configured source');
     await captureAuditState(page, testInfo, 'inspector', metrics);
 
     const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
@@ -573,7 +573,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
 
   await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
   await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
-  await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).toContainText('why: fresh from configured source');
+  await expect(page.getByRole('complementary', { name: 'INSPECTOR' })).not.toContainText('why: fresh from configured source');
   await expect.poll(async () => {
     const detail = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
     return detail.item.human_inspected_at;

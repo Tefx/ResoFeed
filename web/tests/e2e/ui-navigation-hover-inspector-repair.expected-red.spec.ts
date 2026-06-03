@@ -249,7 +249,7 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
     await expect(inspector).toContainText(itemSummary.core_insight);
     await expect(inspector.getByRole('link', { name: 'original link' })).toHaveAttribute('href', itemSummary.url);
     await expect(inspector).toContainText(itemSummary.core_insight);
-    await expect(inspector).toContainText('why: fresh from configured source');
+    await expect(inspector).not.toContainText('why: fresh from configured source');
     await expect(inspector).toContainText('provenance: story story-json-ld · duplicate none');
 
     const rawPrimaryPayloads = inspector.locator('h2, p:not(.contract-muted)').filter({ hasText: /"@context"|"@type"|schema\.org|<script|<style/ });

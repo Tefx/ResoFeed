@@ -246,7 +246,8 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (/<!doctype|<html|function\(|JSON|raw body|undefined|null/i.test(inspectorText)) note(violations, 'F19', 'Inspector primary reading body includes raw extraction/technical boilerplate');
   if (await inspector.getByRole('link', { name: /original/i }).count() === 0) note(violations, 'F21', 'Inspector original navigation is not exposed as a normal link');
   if (/searchable text:|priority:|raw diagnostics/i.test(inspectorText)) note(violations, 'F20', 'Inspector primary hierarchy includes internal ranking/search/debug labels');
-  if (!/why:|source claim|interpretation|fresh from configured source/i.test(inspectorText)) note(violations, 'F23', `Inspector lacks calm provenance disclosure: ${inspectorText}`);
+  if (/why:\s*fresh from configured source/i.test(inspectorText)) note(violations, 'F23', `Inspector shows forbidden generic configured-source why line: ${inspectorText}`);
+  if (!/source claim|interpretation|provenance|source details|AI STATUS|original link|feed link/i.test(inspectorText)) note(violations, 'F23', `Inspector lacks calm provenance disclosure: ${inspectorText}`);
   const headingMetric = await metric(page, '[aria-label="INSPECTOR"] h1, [aria-label="INSPECTOR"] h2, [role="complementary"] h1, [role="complementary"] h2');
   if (headingMetric.outlineStyle !== 'none' && headingMetric.outlineStyle !== '') note(violations, 'F17', `Inspector heading focus is visually noisy: outline=${headingMetric.outlineStyle}`);
 

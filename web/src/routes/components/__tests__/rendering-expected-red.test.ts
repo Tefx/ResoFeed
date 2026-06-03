@@ -11,7 +11,7 @@ import SearchRetrieval from '../SearchRetrieval.svelte';
 import SourceLedger from '../SourceLedger.svelte';
 import StatePortability from '../StatePortability.svelte';
 import Page from '../../+page.svelte';
-import { formatLocalClockTime } from '$lib/display-time';
+import { formatLocalClockTimeWithHint } from '$lib/display-time';
 import {
   expectedRedFallbackItem,
   expectedRedItem,
@@ -133,6 +133,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const feed = screen.getByRole('list', { name: 'Today feed items' });
     expect(within(feed).getByText('SQLite FTS changes ranking contract')).toBeVisible();
+    expect(within(feed).getAllByText('Why this matters for retrieval.')[0]).toBeVisible();
+    expect(within(feed).queryByText('Dense factual summary for a rendered feed row.')).not.toBeInTheDocument();
     expect(within(feed).getAllByLabelText('Source: Example Source')[0]).toBeVisible();
     expect(within(feed).getAllByLabelText('Extraction: partial_extraction')[0]).toBeVisible();
     expect(within(feed).getByLabelText('Externally surfaced by agent')).toBeVisible();
@@ -174,10 +176,14 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     });
 
     const feed = screen.getByRole('list', { name: 'Today feed items' });
+    expect(feed).toHaveAccessibleDescription('Grouped by time; ranked within each group.');
     expect(screen.queryByRole('heading', { name: 'TODAY' })).not.toBeInTheDocument();
-    expect(within(feed).getByText('TODAY')).toBeVisible();
+    const todayLabel = within(feed).getByText('TODAY');
+    expect(todayLabel).toBeVisible();
+    expect(todayLabel).toHaveAttribute('title', 'Time group: TODAY; following items belong to this group until the next group marker');
     expect(within(feed).getByText('YESTERDAY')).toBeVisible();
     expect(within(feed).getByText('EARLIER')).toBeVisible();
+    expect(within(feed).getByText('1m')).toHaveAttribute('title', 'Age: 1 minute ago');
     expect(within(feed).getByText('Source-backed feed excerpt for list/search fallback.')).toBeVisible();
     expect(within(feed).queryByText('summary unavailable')).not.toBeInTheDocument();
   });
@@ -191,8 +197,9 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       'href',
       expectedRedItem.url
     );
-    expect(within(inspector).getByText('source text: RSS excerpt only')).toBeVisible();
-    expect(within(inspector).getByText('why: fresh from configured source')).toBeVisible();
+    expect(within(inspector).getByText('feed excerpt fallback · source excerpt · quality: high')).toBeVisible();
+    expect(within(inspector).queryByText('source text: RSS excerpt only')).not.toBeInTheDocument();
+    expect(within(inspector).queryByText('why: fresh from configured source')).not.toBeInTheDocument();
     expect(within(inspector).queryByRole('button', { name: `Resonate item: ${expectedRedItem.title}` })).not.toBeInTheDocument();
     await waitFor(() => expect(within(inspector).getByRole('heading', { name: expectedRedItem.title })).toHaveFocus());
   });
@@ -329,7 +336,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(sections[0].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[1].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[2]).toHaveClass('inspector-reading-section');
-    expect(sections[2].querySelector('.inspector-reading')).not.toBeNull();
+    expect(sections[2]).toHaveClass('inspector-source-text-section');
+    expect(sections[2].querySelector('.inspector-reading--source-text')).not.toBeNull();
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Dense factual summary for a rendered Inspector section.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Why this matters for retrieval remains model-backed.');
   });
@@ -348,6 +356,17 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(originalLinkHoverFocusRule).toContain('outline: 0;');
     expect(originalLinkHoverFocusRule).toContain('box-shadow: none;');
     expect(originalLinkHoverFocusRule).toContain('text-decoration-line: underline;');
+  });
+
+  it('keeps Inspector model-list diagnostics out of payload paragraph typography', () => {
+    const css = fs.readFileSync(`${process.cwd()}/src/app.css`, 'utf8');
+    const payloadParagraphRule = css.match(/\.contract-inspector p[^{]+\{[^}]+font: var\(--rf-typography-payload\);[^}]+\}/)?.[0] ?? '';
+    const modelListDiagnosticRule = css.match(/\.contract-inspector \.inspector-model-list-diagnostic\s*\{[^}]+\}/)?.[0] ?? '';
+
+    expect(payloadParagraphRule).toContain(':not(.inspector-model-list-diagnostic)');
+    expect(modelListDiagnosticRule).toContain('color: var(--rf-color-muted);');
+    expect(modelListDiagnosticRule).toContain('font: var(--rf-typography-metadata);');
+    expect(modelListDiagnosticRule).not.toContain('font: var(--rf-typography-payload);');
   });
 
   it('removes follow/newsletter prompts and adjacent repeated lead-like filler without blanking article prose', () => {
@@ -562,9 +581,10 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
-    expect(within(ledger).getByText(/src: Example Source · status: ok · last_fetch:/)).toBeVisible();
+    expect(within(ledger).getByText('src: Example Source')).toBeVisible();
+    expect(ledger).not.toHaveTextContent('status: ok');
     expect(within(ledger).getByText('url: https://example.com/feed.xml')).toBeVisible();
-    expect(within(ledger).getByText(`last_fetch: ${formatLocalClockTime(expectedRedSource.last_fetch_at)}`)).toBeVisible();
+    expect(within(ledger).getByText(formatLocalClockTimeWithHint(expectedRedSource.last_fetch_at) ?? '')).toBeVisible();
     expect(within(ledger).getByText('[EXPORT STATE]')).toBeVisible();
     expect(within(ledger).getByText('[IMPORT STATE]')).toBeVisible();
     // DEVIATION RECORD: type=test_error; artifact=rendering-expected-red.test.ts; what_changed=negative OPML receipt assertion uses `OPML outlines flattened`; why=folder terminology is stale and forbidden; impact=rendering proof still rejects unrelated import receipt presence.
@@ -579,9 +599,9 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     render(StatePortability, { props: { onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-09T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }), onImportState: async () => {} } });
 
     const portability = screen.getByRole('group', { name: 'State portability' });
-    expect(
-      within(portability).getByText('import replaces active sources, rules, and stars')
-    ).toBeVisible();
+    expect(within(portability).getByRole('button', { name: '[IMPORT STATE]' })).toHaveAccessibleDescription('Import State replaces active sources, rules, and stars.');
+    expect(within(portability).getByText('Import State replaces active sources, rules, and stars.')).not.toBeVisible();
+    expect(within(portability).getByText('Import State replaces active sources, rules, and stars.')).toHaveAttribute('hidden');
 
     await user.click(within(portability).getByRole('button', { name: '[IMPORT STATE]' }));
     expect(within(portability).getByLabelText('Choose state JSON')).toHaveClass('visually-hidden');

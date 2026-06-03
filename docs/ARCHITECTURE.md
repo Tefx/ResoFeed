@@ -1607,6 +1607,36 @@ Idempotency rules:
 - retrying with the same live `idempotency_key` but a different request fingerprint returns `400 bad_request`;
 - new idempotency keys represent new intended operations.
 
+### OPML Export HTTP Addendum
+
+`GET /api/sources/export-opml` exports the active Source Ledger source list as OPML XML. It is the symmetric source-list counterpart to `POST /api/sources/import-opml`; it is not state export.
+
+Contract:
+
+- requires owner-token authorization like every `/api/*` route;
+- accepts no request body and no query parameters;
+- returns `200 OK` with `application/xml; charset=utf-8`;
+- may include `Content-Disposition: attachment; filename="sources.opml"`;
+- includes active sources only, using source title and feed URL;
+- omits inactive/deleted sources, steering rules, resonated items, item state, reading history, command history, receipts, runtime operation state, and sync metadata;
+- does not recreate OPML folders/tags because imported OPML is flattened by design;
+- uses the standard JSON error body for auth/internal failures.
+
+Minimal response shape:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head><title>ResoFeed Sources</title></head>
+  <body>
+    <outline type="rss" text="Example" title="Example" xmlUrl="https://example.com/feed.xml" />
+  </body>
+</opml>
+```
+
+Failure condition: this endpoint is wrong if it exports portable State JSON fields, embeds steering/resonance data, restores OPML folder hierarchy, or requires a settings/backup-management surface.
+
+
 ### Processing Language and Reprocess HTTP Addendum
 
 `ProcessingLanguageInfo`:
@@ -1893,6 +1923,9 @@ Endpoint additions:
 | `POST /api/items/{id}/reingest` | `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if a guarded operation is already running |
 
 ## 7. MCP Surface
+
+Read-item audit envelope: `read_item` may include optional top-level `fallback_reason` when the returned `ItemDetail.extraction_status` is `full` but no raw `extracted_text` is persisted. This reason is transport/audit metadata only; it MUST NOT downgrade `extraction_status`, create durable state, or imply that model-backed content is unavailable. Rationale: `full` records successful source acquisition/model grounding, while raw source text persistence is optional under the ingestion contract.
+
 
 MCP is required over Remote Streamable HTTP at `/mcp`. MCP tools/resources expose the same product concepts as the UI: inspect, resonate, steer, retrieve, and report delivery.
 

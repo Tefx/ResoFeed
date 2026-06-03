@@ -250,6 +250,65 @@ func ImportOPML(ctx context.Context, db *sql.DB, opml []byte) (OPMLImportResult,
 	return result, nil
 }
 
+// ExportOPML writes active Source Ledger sources as flat OPML 2.0. It is a
+// source-list exchange format only and intentionally omits portable state,
+// steering rules, item state, resonance, receipts, folders, and tags.
+func ExportOPML(ctx context.Context, db *sql.DB, w io.Writer) error {
+	if db == nil {
+		return errors.New("export opml: db required")
+	}
+	if w == nil {
+		return errors.New("export opml: writer required")
+	}
+	sources, err := listSources(ctx, db)
+	if err != nil {
+		return fmt.Errorf("export opml: list sources: %w", err)
+	}
+	outlines := make([]opmlExportOutline, 0, len(sources))
+	for _, source := range sources {
+		outlines = append(outlines, opmlExportOutline{Type: "rss", Text: source.Title, Title: source.Title, XMLURL: source.URL})
+	}
+	doc := opmlExportDocument{
+		Version: "2.0",
+		Head:    opmlExportHead{Title: "ResoFeed Sources"},
+		Body:    opmlExportBody{Outlines: outlines},
+	}
+	if _, err := io.WriteString(w, xml.Header); err != nil {
+		return fmt.Errorf("export opml: write header: %w", err)
+	}
+	encoder := xml.NewEncoder(w)
+	encoder.Indent("", "  ")
+	if err := encoder.Encode(doc); err != nil {
+		return fmt.Errorf("export opml: encode: %w", err)
+	}
+	if err := encoder.Flush(); err != nil {
+		return fmt.Errorf("export opml: flush: %w", err)
+	}
+	return nil
+}
+
+type opmlExportDocument struct {
+	XMLName xml.Name       `xml:"opml"`
+	Version string         `xml:"version,attr"`
+	Head    opmlExportHead `xml:"head"`
+	Body    opmlExportBody `xml:"body"`
+}
+
+type opmlExportHead struct {
+	Title string `xml:"title"`
+}
+
+type opmlExportBody struct {
+	Outlines []opmlExportOutline `xml:"outline"`
+}
+
+type opmlExportOutline struct {
+	Type   string `xml:"type,attr"`
+	Text   string `xml:"text,attr"`
+	Title  string `xml:"title,attr"`
+	XMLURL string `xml:"xmlUrl,attr"`
+}
+
 // DeleteSource marks a source inactive/deleted so it no longer appears in the
 // Source Ledger or contributes new items.
 func DeleteSource(ctx context.Context, db *sql.DB, sourceID string) (DeleteSourceResult, error) {

@@ -75,6 +75,30 @@ func TestSummaryPromptContractIncludesAntiFluffDensityAndProvenanceRules(t *test
 	}
 }
 
+func TestSummaryPromptContractDistinguishesSummaryFromCoreInsight(t *testing.T) {
+	contract := promptingV21DocumentedContract()
+	quality := promptingV21DocumentedQualityProfile()
+	payload, err := json.Marshal(map[string]any{"field_rules": contract.FieldRules, "anti_fluff": quality.AntiFluffGuidance})
+	if err != nil {
+		t.Fatalf("marshal prompt contract guidance: %v", err)
+	}
+	promptText := strings.ToLower(string(payload))
+	for _, want := range []string{
+		"summary is contextual factual explanation",
+		"what happened",
+		"background",
+		"core_insight must be exactly one sentence answering why this matters",
+		"what judgment or priority changes",
+		"must not paraphrase",
+		"summary's first sentence",
+		"key_points carry multi-point details",
+	} {
+		if !strings.Contains(promptText, want) {
+			t.Fatalf("prompt contract missing summary/core_insight distinction %q in %s", want, payload)
+		}
+	}
+}
+
 func TestOpenRouterSummaryRejectsMultipleSentenceCoreInsight(t *testing.T) {
 	ctx := context.Background()
 	model := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {

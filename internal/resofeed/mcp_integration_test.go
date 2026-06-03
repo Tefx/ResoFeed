@@ -202,10 +202,12 @@ func TestMCPReadItemFullExtractionStatusRequiresDetailTextOrFallbackReason(t *te
 		t.Fatalf("REG-04 read_item id = %q, want fixture item; text=%s", body.Item.ID, rawToolText)
 	}
 
-	hasDetailText := body.Item.ExtractedText != nil && strings.TrimSpace(*body.Item.ExtractedText) != ""
 	hasFallbackReason := body.FallbackReason != nil && strings.TrimSpace(*body.FallbackReason) != ""
-	if body.Item.ExtractionStatus == "full" && !hasDetailText && !hasFallbackReason {
-		t.Fatalf("REG-2026-05-12-04 exposed: MCP read_item returned extraction_status=full without non-empty extracted/detail text or fallback reason; response=%s", rawToolText)
+	if body.Item.ExtractionStatus != extractionStatusFull {
+		t.Fatalf("REG-04 read_item extraction_status = %q, want %q; response=%s", body.Item.ExtractionStatus, extractionStatusFull, rawToolText)
+	}
+	if !hasFallbackReason {
+		t.Fatalf("REG-2026-05-12-04 exposed: MCP read_item returned extraction_status=full without fallback reason; response=%s", rawToolText)
 	}
 }
 

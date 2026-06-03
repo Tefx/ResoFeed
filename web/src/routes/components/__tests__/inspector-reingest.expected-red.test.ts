@@ -321,7 +321,10 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     expect(within(panel).getByLabelText('一次性提示')).toBeVisible();
     expect(within(panel).getByRole('button', { name: '[确认重处理]' })).toBeVisible();
     expect(within(panel).getByRole('button', { name: '[取消]' })).toBeVisible();
-    expect(within(panel).getByText(/模型列表：2 个 OpenRouter 模型可用/u)).toBeVisible();
+    expect(within(panel).getByText('2 个 OpenRouter 模型可选')).toBeVisible();
+    expect(within(panel).getByText('仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。')).toBeVisible();
+    const sourceBackedHelp = within(panel).getByText(/只能在有来源支持的事实中改变重点/u);
+    expect(sourceBackedHelp).toHaveClass('visually-hidden');
   });
 
   it('renders model-list loading and unavailable states with live status text while preserving default re-ingest', async () => {
@@ -394,7 +397,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     await user.click(within(panel).getByRole('button', { name: '[CONFIRM RE-INGEST]' }));
 
     const conflict = await within(inspector).findByRole('alert', { name: /item re-ingest/i });
-    expect(conflict).toHaveTextContent('err: reingest blocked — op: library_reprocess · actor:human · phase:processing_items · 2/5 · library reprocess processing item · since 11:00:00');
+    expect(conflict).toHaveTextContent(/err: reingest blocked — op: library_reprocess · actor:human · phase:processing_items · 2\/5 · library reprocess processing item · since \d{2}:\d{2}:\d{2} local/);
   });
 
   it('clears transient item re-ingest form and status state when the Inspector item changes', async () => {

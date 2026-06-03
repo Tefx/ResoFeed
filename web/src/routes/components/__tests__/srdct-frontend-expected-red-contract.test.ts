@@ -186,6 +186,7 @@ describe('srdct expected-red frontend UI contracts', () => {
     expect(opmlFileInput).toHaveAttribute('type', 'file');
     expect(opmlFileInput).toHaveAttribute('aria-hidden', 'true');
     expect(opmlFileInput).toHaveAttribute('tabindex', '-1');
+    expect(within(ledger).getByRole('button', { name: '[EXPORT OPML]' })).toBeVisible();
     expect(within(ledger).getByRole('button', { name: '[EXPORT STATE]' })).toBeVisible();
     expect(within(ledger).getByRole('button', { name: '[IMPORT STATE]' })).toBeVisible();
     expect(ledger.querySelectorAll('input[type="url"], input[name*="url" i], textarea[name*="url" i]')).toHaveLength(0);
@@ -199,11 +200,12 @@ describe('srdct expected-red frontend UI contracts', () => {
     await user.click(within(ledger).getByRole('button', { name: '[RUN INGEST]' }));
     const header = ledger.querySelector('.source-ledger__header');
     expect(header).not.toBeNull();
-    expect(within(header as HTMLElement).getByText('last_ingest: 14:00:02')).toHaveClass('source-ledger__status');
+    expect(within(header as HTMLElement).getByText(/last_ingest: \d{2}:\d{2}:\d{2} local/)).toHaveClass('source-ledger__status');
     expect(ledger.querySelector('.source-ledger-footer')).not.toHaveTextContent(/last_ingest:/);
     const sourceRow = ledger.querySelector('.source-ledger__row');
     expect(sourceRow).not.toBeNull();
-    expect(within(sourceRow as HTMLElement).getByText('last_fetch: 14:02:05')).toHaveClass('source-ledger__status');
+    expect((sourceRow as HTMLElement).querySelector('.source-ledger__status')).toHaveTextContent(/\d{2}:\d{2}:\d{2} local/);
+    expect((sourceRow as HTMLElement).querySelector('.source-ledger__status')).not.toHaveTextContent('last_fetch:');
     expect(within(sourceRow as HTMLElement).getByRole('button', { name: /\[FETCH\].*Fetch source Example Source/ })).toHaveTextContent('[FETCH]');
     expect(ledger).not.toHaveTextContent(/job|queue|dashboard|settings|activity log|folder|tag|semantic answer|chat|RAG/i);
   });

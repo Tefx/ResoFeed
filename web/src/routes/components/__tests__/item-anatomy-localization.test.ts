@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ItemSummary } from '$lib/api-contract';
-import { itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemPriorityLabel, itemSourceBackedProvenanceLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup } from '../item-anatomy';
+import { itemAgeAccessibleDescription, itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemPriorityLabel, itemReaderRowPreviewText, itemSourceBackedProvenanceLabel, itemSummaryProvenanceLabel, itemSummaryText, itemTimeGroup } from '../item-anatomy';
 
 const item: ItemSummary = {
   id: 'item_literal_identifier',
@@ -65,5 +65,32 @@ describe('item anatomy chrome localization', () => {
   it('preserves operational time-group tokens while localizing time fallback chrome', () => {
     expect(itemTimeGroup(item, new Date('2026-05-23T10:00:00Z'))).toBe('TODAY');
     expect(itemAgeLabel({ ...item, published_at: null, first_seen_at: null }, new Date('2026-05-23T10:00:00Z'), 'zh')).toBe('时间不可用');
+  });
+
+  it('expands compact age tokens for accessible labels and hover titles', () => {
+    expect(itemAgeAccessibleDescription('1m', 'zh')).toBe('1 分钟前');
+    expect(itemAgeAccessibleDescription('4d', 'zh')).toBe('4 天前');
+    expect(itemAgeAccessibleDescription('1m')).toBe('1 minute ago');
+    expect(itemAgeAccessibleDescription('4d')).toBe('4 days ago');
+    expect(itemAgeAccessibleDescription('may 23')).toBe('may 23');
+  });
+
+  it('prioritizes readable core insight over summary for feed row preview', () => {
+    const preview = itemReaderRowPreviewText({
+      ...item,
+      summary: 'Summary text must stay out of the compact feed row.',
+      core_insight: 'Core insight explains why this item matters.'
+    });
+
+    expect(preview).toBe('Core insight explains why this item matters.');
+    expect(preview).not.toContain('Summary text must stay out of the compact feed row.');
+  });
+
+  it('falls back to summary when core insight is missing', () => {
+    expect(itemReaderRowPreviewText({ ...item, summary: 'Summary fallback remains compact.', core_insight: null })).toBe('Summary fallback remains compact.');
+  });
+
+  it('keeps source-backed fallback when generated preview fields are missing', () => {
+    expect(itemReaderRowPreviewText({ ...item, summary: null, core_insight: null, display_excerpt: 'Source-backed display excerpt remains available.' })).toBe('Source-backed display excerpt remains available.');
   });
 });

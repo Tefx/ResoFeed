@@ -86,6 +86,9 @@ describe('UIUX token and base-state integration proof', () => {
   it('wires dark mode and base interaction states without forbidden loading/animation patterns', () => {
     expect(app).toMatch(/@media\s*\(prefers-color-scheme:\s*dark\)/u);
     expect(app).toMatch(/:focus-visible[\s\S]*--rf-component-focus-ring-color/u);
+    expect(app).toMatch(/details\.surface-nav \.surface-nav-menu[\s\S]*border:\s*1px solid var\(--rf-color-current-rule\)[\s\S]*background:\s*var\(--rf-color-current-surface\)[\s\S]*color:\s*var\(--rf-color-current-text\)/u);
+    expect(app).toMatch(/details\.surface-nav button \{[\s\S]*color:\s*var\(--rf-color-current-muted\)/u);
+    expect(app).toMatch(/details\.surface-nav button:focus-visible \{[\s\S]*outline:\s*2px solid var\(--rf-color-current-focus\)/u);
     expect(app).toMatch(/\.bracket-action[\s\S]*transition:\s*none/u);
     expect(app).toMatch(/\.bracket-action:disabled|\.bracket-action\[aria-disabled='true'\]/u);
     expect(app).toMatch(/\.contract-feedback-error[\s\S]*--rf-component-status-error-text-color/u);

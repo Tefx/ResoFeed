@@ -530,7 +530,7 @@
       line-height: 20px;
     }
 
-    .why {
+    .ledger-note {
       margin-top: 24px;
       padding-top: 16px;
       border-top: 1px solid var(--border);
@@ -690,11 +690,12 @@
     }
 
     .source-disclosure__body {
-      padding: 8px 0 0;
-      color: var(--text);
-      font-family: var(--payload);
-      font-size: 18px;
-      line-height: 28px;
+      padding: 8px 0 0 12px;
+      border-left: 2px solid var(--border);
+      color: var(--muted);
+      font-family: var(--chrome);
+      font-size: 14px;
+      line-height: 20px;
     }
 
     .secondary-grid {
@@ -759,9 +760,24 @@
     .source-ledger__tools {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 8px 24px;
+      align-items: baseline;
       padding: 8px 0;
       border-bottom: 1px solid var(--border);
+    }
+
+    .source-ledger__action-group {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .source-ledger__group-label {
+      color: var(--muted);
+      font: var(--metadata);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .source-ledger__list {
@@ -1106,11 +1122,11 @@
                   <span class="pill">1m</span>
                   <span class="pill">全文</span>
                   <span class="pill">模型支持</span>
-                  <span class="pill">high</span>
+                  <span class="pill">高价值</span>
                   <span class="group-badge">今日</span>
                 </span>
                 <h2 class="item-title" id="desktop-feed-item-1-title">Agent Judge：针对生产级 AI 代理的长上下文评估方案</h2>
-                <p class="summary" id="desktop-feed-item-1-summary">随着长周期自主 AI 代理的应用日益普及，传统单一 LLM 作为评估判断者已显现局限。</p>
+                <p class="summary" id="desktop-feed-item-1-summary">生产级代理评估需要可验证的长上下文证据链，而不是一次性模型判断。</p>
               </div>
               <button class="item-activate" type="button" aria-labelledby="desktop-feed-item-1-title" aria-describedby="desktop-feed-item-1-meta desktop-feed-item-1-summary" aria-controls="preview-inspector"></button>
               <button type="button" class="star" aria-label="标记共鸣">☆</button>
@@ -1126,7 +1142,7 @@
                   <span class="pill agent">agent: delivery-bot</span>
                 </span>
                 <h2 class="item-title" id="desktop-feed-item-2-title">不依赖平台的边缘 SQLite 部署</h2>
-                <p class="summary" id="desktop-feed-item-2-summary">项目笔记说明如何靠近用户放置 SQLite 副本，同时避免绑定特定托管平台。</p>
+                <p class="summary" id="desktop-feed-item-2-summary">边缘 SQLite 的价值在于保留本地可控性，同时减少对托管平台的结构性依赖。</p>
               </div>
               <button class="item-activate" type="button" aria-labelledby="desktop-feed-item-2-title" aria-describedby="desktop-feed-item-2-meta desktop-feed-item-2-summary" aria-controls="preview-inspector"></button>
               <button type="button" class="star active" aria-label="移除共鸣">★</button>
@@ -1143,7 +1159,7 @@
                   <span class="group-badge">昨日</span>
                 </span>
                 <h2 class="item-title" id="desktop-feed-item-3-title">关于本地优先软件的笔记</h2>
-                <p class="summary" id="desktop-feed-item-3-summary">短文权衡本地优先同步取舍，主张简单可导出的状态优先于账号绑定数据。</p>
+                <p class="summary" id="desktop-feed-item-3-summary">本地优先软件的关键判断是：可导出状态比账号绑定同步更能保护长期自主权。</p>
               </div>
               <button class="item-activate" type="button" aria-labelledby="desktop-feed-item-3-title" aria-describedby="desktop-feed-item-3-meta desktop-feed-item-3-summary" aria-controls="preview-inspector"></button>
               <button type="button" class="star" aria-label="标记共鸣">☆</button>
@@ -1157,11 +1173,11 @@
             <dt>ORIGINAL</dt>
             <dd translate="no">Agent Judge: Solving Long-Context Evals for Production Agents</dd>
             <dt>LINKS</dt>
-            <dd><a href="https://example.com/articles/agent-judge-long-context-evals" aria-label="原文链接：https://example.com/articles/agent-judge-long-context-evals，来源：TLDR AI Feed">原文 ↗</a> · <a href="https://example.com/feeds/tldr-ai.xml" aria-label="来源链接：https://example.com/feeds/tldr-ai.xml，来源：TLDR AI Feed">来源 ↗</a></dd>
+            <dd><a href="https://example.com/articles/agent-judge-long-context-evals" aria-label="原文链接：https://example.com/articles/agent-judge-long-context-evals，来源：TLDR AI Feed">原文链接</a> · <a href="https://example.com/feeds/tldr-ai.xml" aria-label="来源链接：https://example.com/feeds/tldr-ai.xml，来源：TLDR AI Feed">来源链接</a></dd>
             <dt>AI STATUS</dt>
-            <dd>模型支持 · 全文 · quality: high</dd>
+            <dd>模型支持 · 全文 · 质量：高价值</dd>
             <dt>ATTEMPT</dt>
-            <dd>失败 · 已保留现有摘要和要点</dd>
+            <dd>失败 · 解码错误 · 已保留现有摘要和要点</dd>
           </dl>
           <section class="reading-section" aria-label="摘要">
             <p class="reading-label">摘要</p>
@@ -1189,24 +1205,22 @@
                 <option>anthropic/claude-sonnet-4.5</option>
                 <option>openai/gpt-5.1</option>
               </select>
+              <p class="reingest-panel__helper">342 个 OpenRouter 模型可选</p>
             </div>
             <div class="reingest-panel__row">
               <label class="reingest-panel__label" for="extra-prompt">额外提示<br>（仅本次，不保存）</label>
               <textarea id="extra-prompt" aria-describedby="extra-prompt-helper" placeholder="示例 · 可选 · 不保存"></textarea>
-              <p class="reingest-panel__helper" id="extra-prompt-helper">仅作本条目一次性指导；只能调整重点、角度或有来源支撑的事实选择，不能覆盖结构、处理语言、来源标识、安全/出处、运行时/供应商状态或持久化边界。</p>
+              <p class="reingest-panel__helper" id="extra-prompt-helper">仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。</p>
             </div>
             <div class="reingest-panel__actions">
-              <button class="bracket-action" type="button">[确认重新处理]</button>
+              <button class="bracket-action" type="button">[确认重处理]</button>
               <button class="bracket-action" type="button">[取消]</button>
-              <span class="source-ledger__status" aria-live="polite">模型：已从 OpenRouter 加载</span>
             </div>
           </div>
           <details class="source-disclosure">
             <summary>来源文本（已折叠）：全文</summary>
             <div class="source-disclosure__body">原始来源证据保留在折叠区域内；URL、来源名和引用术语保持原样。</div>
           </details>
-          <div class="rule"></div>
-          <p class="why">why: fresh from configured source · interpretation: model-backed structured content</p>
         </aside>
       </div>
     </section>
@@ -1215,21 +1229,29 @@
       <section class="panel ledger source-ledger" aria-labelledby="source-ledger-title">
         <header class="source-ledger__header">
           <h1 class="source-ledger__title" id="source-ledger-title">SOURCE LEDGER</h1>
-          <span class="source-ledger__status" aria-live="polite" title="last_ingest: 14:00:00 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 14:00:00">last_ingest: 14:00:00 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 14:00:00</span>
+          <span class="source-ledger__status" aria-live="polite" title="last_ingest: 22:00:00 本地 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源 · since 22:00:00 本地">last_ingest: 22:00:00 本地 · op: manual_ingest · actor:human · phase:fetching_sources · 1/3 · 正在抓取来源</span>
           <button class="bracket-action bracket-action--run-ingest" type="button" disabled>[RUN INGEST]</button>
         </header>
 
         <div class="source-ledger__tools" aria-label="账本操作">
-          <button class="bracket-action" type="button" aria-label="导入 OPML">[IMPORT OPML]</button>
-          <button class="bracket-action" type="button" aria-label="导出状态">[EXPORT STATE]</button>
-          <button class="bracket-action" type="button" aria-label="导入状态">[IMPORT STATE]</button>
+          <div class="source-ledger__action-group" role="group" aria-label="来源列表操作">
+            <span class="source-ledger__group-label">SOURCE LIST</span>
+            <button class="bracket-action" type="button" aria-label="导入 OPML 来源列表">[IMPORT OPML]</button>
+            <button class="bracket-action" type="button" aria-label="导出 OPML 来源列表">[EXPORT OPML]</button>
+          </div>
+          <div class="source-ledger__action-group" role="group" aria-label="可携带状态操作">
+            <span class="source-ledger__group-label">PORTABLE STATE</span>
+            <button class="bracket-action" type="button" aria-label="导出状态">[EXPORT STATE]</button>
+            <button class="bracket-action" type="button" aria-label="导入状态，会替换活动来源、规则和星标" aria-describedby="preview-state-import-risk">[IMPORT STATE]</button>
+            <span id="preview-state-import-risk" class="visually-hidden">导入 State 会替换活动来源、规则和星标。</span>
+          </div>
         </div>
 
         <ul class="source-ledger__list">
           <li class="source-ledger__row">
             <span class="source-ledger__name" translate="no">src: simonwillison</span>
             <span class="source-ledger__url" translate="no" title="https://simonwillison.net/feed.xml">https://simonwillison.net/feed.xml</span>
-            <span class="source-ledger__status" aria-live="polite" title="last_fetch: 14:02:05">last_fetch: 14:02:05</span>
+            <span class="source-ledger__status" aria-live="polite" title="last_fetch: 22:02:05 本地">22:02:05 本地</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Simon Willison">[FETCH]</button>
               <button class="bracket-action bracket-action--details" type="button" aria-label="查看来源详情 Simon Willison">[DETAILS]</button>
@@ -1239,7 +1261,7 @@
           <li class="source-ledger__row">
             <span class="source-ledger__name" translate="no">src: hn</span>
             <span class="source-ledger__url" translate="no" title="https://hn.algolia.com/rss">https://hn.algolia.com/rss</span>
-            <span class="source-ledger__status" aria-live="polite" title="last_fetch: 12:00:11">last_fetch: 12:00:11</span>
+            <span class="source-ledger__status" aria-live="polite" title="last_fetch: 20:00:11 本地">20:00:11 本地</span>
             <span class="source-ledger__actions">
               <button class="bracket-action bracket-action--fetch" type="button" aria-label="抓取来源 Hacker News">[FETCH]</button>
               <button class="bracket-action bracket-action--details" type="button" aria-label="查看来源详情 Hacker News">[DETAILS]</button>
@@ -1257,7 +1279,7 @@
             </span>
           </li>
         </ul>
-        <p class="why">来源添加仍通过 Steer；手动摄取控件只更新时间戳或原始诊断。</p>
+        <p class="ledger-note">OPML = 来源列表；State = 来源 + 规则 + 星标，导入会替换。</p>
       </section>
 
       <div class="panel doctor" aria-labelledby="doctor-heading">
@@ -1291,9 +1313,9 @@ extraction_failures: see source rows</pre>
           <article class="item">
             <div class="item-head">
               <div class="item-copy">
-                <span class="meta-row" id="mobile-feed-item-1-meta"><span class="pill" translate="no">TLDR AI FEED</span><span class="pill">1m</span><span class="pill">全文</span><span class="pill">high</span><span class="group-badge">今日</span></span>
+                <span class="meta-row" id="mobile-feed-item-1-meta"><span class="pill" translate="no">TLDR AI FEED</span><span class="pill">1m</span><span class="pill">全文</span><span class="pill">高价值</span><span class="group-badge">今日</span></span>
                 <h2 class="item-title" id="mobile-feed-item-1-title">Agent Judge：长上下文评估方案</h2>
-                <p class="summary" id="mobile-feed-item-1-summary">密集摘要文本保持可扫读；要点不出现在馈送列表。</p>
+                <p class="summary" id="mobile-feed-item-1-summary">长上下文评估的重点是可复审证据，而不是一次性模型判断。</p>
               </div>
               <button class="item-activate" type="button" aria-labelledby="mobile-feed-item-1-title" aria-describedby="mobile-feed-item-1-meta mobile-feed-item-1-summary" aria-controls="mobile-preview-inspector"></button>
               <button type="button" class="star" aria-label="标记共鸣">☆</button>
@@ -1304,7 +1326,7 @@ extraction_failures: see source rows</pre>
               <div class="item-copy">
                 <span class="meta-row" id="mobile-feed-item-2-meta"><span class="pill" translate="no">BLOG EXAMPLE</span><span class="pill">4h</span><span class="pill warning">摘录</span></span>
                 <h2 class="item-title" id="mobile-feed-item-2-title">另一条目</h2>
-                <p class="summary" id="mobile-feed-item-2-summary">单列馈送保持紧凑；检查器作为详情视图打开。</p>
+                <p class="summary" id="mobile-feed-item-2-summary">单列馈送应先给判断价值，完整上下文留到检查器。</p>
               </div>
               <button class="item-activate" type="button" aria-labelledby="mobile-feed-item-2-title" aria-describedby="mobile-feed-item-2-meta mobile-feed-item-2-summary" aria-controls="mobile-preview-inspector"></button>
               <button type="button" class="star active" aria-label="移除共鸣">★</button>
@@ -1345,11 +1367,11 @@ extraction_failures: see source rows</pre>
             <dt>ORIGINAL</dt>
             <dd translate="no">Agent Judge: Solving Long-Context Evals for Production Agents</dd>
             <dt>LINKS</dt>
-            <dd><a href="https://example.com/articles/agent-judge-long-context-evals" aria-label="原文链接：https://example.com/articles/agent-judge-long-context-evals，来源：TLDR AI Feed">原文 ↗</a> · <a href="https://example.com/feeds/tldr-ai.xml" aria-label="来源链接：https://example.com/feeds/tldr-ai.xml，来源：TLDR AI Feed">来源 ↗</a></dd>
+            <dd><a href="https://example.com/articles/agent-judge-long-context-evals" aria-label="原文链接：https://example.com/articles/agent-judge-long-context-evals，来源：TLDR AI Feed">原文链接</a> · <a href="https://example.com/feeds/tldr-ai.xml" aria-label="来源链接：https://example.com/feeds/tldr-ai.xml，来源：TLDR AI Feed">来源链接</a></dd>
             <dt>AI STATUS</dt>
-            <dd>模型支持 · 来源摘录 · quality: high</dd>
+            <dd>模型支持 · 来源摘录 · 质量：高价值</dd>
             <dt>ATTEMPT</dt>
-            <dd>失败 · 已保留现有摘要和要点</dd>
+            <dd>失败 · 解码错误 · 已保留现有摘要和要点</dd>
           </dl>
           <section class="reading-section" aria-label="摘要">
             <p class="reading-label">摘要</p>
@@ -1376,14 +1398,15 @@ extraction_failures: see source rows</pre>
                 <option>默认：account_default（model:null）</option>
                 <option>anthropic/claude-sonnet-4.5</option>
               </select>
+              <p class="reingest-panel__helper">342 个 OpenRouter 模型可选</p>
             </div>
             <div class="reingest-panel__row">
               <label class="reingest-panel__label" for="mobile-extra-prompt">额外提示<br>（仅本次，不保存）</label>
               <textarea id="mobile-extra-prompt" aria-describedby="mobile-extra-prompt-helper" placeholder="示例 · 可选 · 不保存"></textarea>
-              <p class="reingest-panel__helper" id="mobile-extra-prompt-helper">仅作本条目一次性指导；只能调整重点、角度或有来源支撑的事实选择，不能覆盖结构、处理语言、来源标识、安全/出处、运行时/供应商状态或持久化边界。</p>
+              <p class="reingest-panel__helper" id="mobile-extra-prompt-helper">仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。</p>
             </div>
             <div class="reingest-panel__actions">
-              <button class="bracket-action" type="button">[确认重新处理]</button>
+              <button class="bracket-action" type="button">[确认重处理]</button>
               <button class="bracket-action" type="button">[取消]</button>
             </div>
           </div>
@@ -1391,8 +1414,6 @@ extraction_failures: see source rows</pre>
             <summary>来源文本（已折叠）：全文</summary>
             <div class="source-disclosure__body">移动详情在紧凑列表之后恢复阅读密度；原始来源证据保留在折叠区域内。</div>
           </details>
-          <div class="rule"></div>
-          <p class="why">why: fresh from configured source · interpretation: model-backed structured content</p>
         </article>
       </div>
     </section>

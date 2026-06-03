@@ -19,8 +19,10 @@ interface ItemAnatomyChrome {
   };
   readonly feed: {
     readonly listLabel: string;
+    readonly groupExplanation: string;
     readonly sourceAria: (sourceTitle: string) => string;
-    readonly ageAria: (age: string) => string;
+    readonly ageAria: (ageDescription: string) => string;
+    readonly timeGroupAria: (group: TimeGroup) => string;
     readonly extractionAria: (status: string) => string;
     readonly summaryProvenanceAria: (label: string) => string;
     readonly priorityAria: (label: string) => string;
@@ -68,8 +70,10 @@ const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
     },
     feed: {
       listLabel: 'Today feed items',
+      groupExplanation: 'Grouped by time; ranked within each group.',
       sourceAria: (sourceTitle) => `Source: ${sourceTitle}`,
-      ageAria: (age) => `Age: ${age}`,
+      ageAria: (ageDescription) => `Age: ${ageDescription}`,
+      timeGroupAria: (group) => `Time group: ${group}; following items belong to this group until the next group marker`,
       extractionAria: (status) => `Extraction: ${status}`,
       summaryProvenanceAria: (label) => `Summary provenance: ${label}`,
       priorityAria: (label) => `Priority signal: ${label}`,
@@ -119,8 +123,10 @@ const itemChromeByLanguage: Record<ProcessingLanguage, ItemAnatomyChrome> = {
     },
     feed: {
       listLabel: '今日订阅条目',
+      groupExplanation: '按时间组显示；组内按导向/相关性排序。',
       sourceAria: (sourceTitle) => `来源：${sourceTitle}`,
-      ageAria: (age) => `时间：${age}`,
+      ageAria: (ageDescription) => `时间：${ageDescription}`,
+      timeGroupAria: (group) => `时间分组：${group}；以下条目直到下一个分组同属该组`,
       extractionAria: (status) => `提取：${status}`,
       summaryProvenanceAria: (label) => `摘要来源：${label}`,
       priorityAria: (label) => `优先信号：${label}`,
@@ -219,10 +225,9 @@ export function itemSourceProvenanceTitle(item: ItemSummary): string {
 }
 
 export function itemCompactPreviewText(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
-  const summary = readableItemText(item.summary);
   const coreInsight = readableItemText(item.core_insight);
-  const preview = [summary, coreInsight].filter((part): part is string => Boolean(part)).join(' · ');
-  return preview || itemSummaryText(item, language);
+  const summary = readableItemText(item.summary);
+  return coreInsight ?? summary ?? itemSummaryText(item, language);
 }
 
 function stripReaderRowForbiddenText(text: string): string {
@@ -236,12 +241,12 @@ function stripReaderRowForbiddenText(text: string): string {
 
 export function itemReaderRowPreviewText(item: ItemSummary, language: ProcessingLanguage = 'en'): string {
   const chrome = itemAnatomyChrome(language);
-  const preview = itemCompactPreviewText(item, language);
-  const compactSegments = preview
-    .split(' · ')
-    .map((segment) => stripReaderRowForbiddenText(segment))
-    .filter((segment) => segment.length > 0);
-  return compactSegments.join(' · ') || chrome.summaryUnavailable;
+  const previewCandidates = [readableItemText(item.core_insight), readableItemText(item.summary), itemSummaryText(item, language)];
+  for (const candidate of previewCandidates) {
+    const preview = candidate ? stripReaderRowForbiddenText(candidate) : '';
+    if (preview.length > 0) return preview;
+  }
+  return chrome.summaryUnavailable;
 }
 
 export function itemTimestamp(item: ItemSummary): Rfc3339UtcString | null {
@@ -276,6 +281,19 @@ export function itemAgeLabel(item: ItemSummary, now = new Date(), language: Proc
   const days = Math.floor(hours / 24);
   if (days < 7) return chrome.age(`${days}d`);
   return date.toLocaleDateString(language === 'zh' ? 'zh-CN' : undefined, { month: 'short', day: 'numeric' }).toLowerCase();
+}
+
+export function itemAgeAccessibleDescription(ageLabel: string, language: ProcessingLanguage = 'en'): string {
+  const match = /^(\d+)([mhd])$/u.exec(ageLabel);
+  if (!match) return ageLabel;
+  const value = Number(match[1]);
+  const unit = match[2];
+  if (language === 'zh') {
+    const unitLabel = unit === 'm' ? '分钟' : unit === 'h' ? '小时' : '天';
+    return `${value} ${unitLabel}前`;
+  }
+  const unitLabel = unit === 'm' ? 'minute' : unit === 'h' ? 'hour' : 'day';
+  return `${value} ${unitLabel}${value === 1 ? '' : 's'} ago`;
 }
 
 export function compareItemsByTimeGroup(left: ItemSummary, right: ItemSummary, now = new Date()): number {

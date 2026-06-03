@@ -282,6 +282,11 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.handleSources(w, r)
+	case r.Method == http.MethodGet && r.URL.Path == "/api/sources/export-opml":
+		if !rejectUnexpectedQuery(w, r) || !rejectRequestBody(w, r) {
+			return
+		}
+		h.handleExportOPML(w, r)
 	case r.Method == http.MethodPost && r.URL.Path == "/api/sources/import-opml":
 		if !rejectUnexpectedQuery(w, r) {
 			return
@@ -923,6 +928,20 @@ func (h apiHandler) handleImportOPML(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, result)
 }
 
+func (h apiHandler) handleExportOPML(w http.ResponseWriter, r *http.Request) {
+	var buf bytes.Buffer
+	if err := ExportOPML(r.Context(), h.cfg.DB, &buf); err != nil {
+		writeInternal(w)
+		return
+	}
+	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	w.Header().Set("Content-Disposition", `attachment; filename="sources.opml"`)
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write(buf.Bytes()); err != nil {
+		return
+	}
+}
+
 func (h apiHandler) handleStateExport(w http.ResponseWriter, r *http.Request) {
 	var buf bytes.Buffer
 	if err := ExportState(r.Context(), h.cfg.DB, &buf); err != nil {
@@ -1030,6 +1049,14 @@ func parseSearchQuery(w http.ResponseWriter, r *http.Request) (SearchQuery, bool
 func rejectUnexpectedQuery(w http.ResponseWriter, r *http.Request) bool {
 	for key := range r.URL.Query() {
 		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": key})
+		return false
+	}
+	return true
+}
+
+func rejectRequestBody(w http.ResponseWriter, r *http.Request) bool {
+	if r.ContentLength > 0 {
+		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": "body"})
 		return false
 	}
 	return true
@@ -1366,7 +1393,8 @@ type TodayFeedResponse struct {
 
 // ItemResponse is GET /api/items/{id} and MCP read_item.
 type ItemResponse struct {
-	Item ItemDetail `json:"item"`
+	Item           ItemDetail `json:"item"`
+	FallbackReason string     `json:"fallback_reason,omitempty"`
 }
 
 // SourcesResponse is GET /api/sources and resofeed://sources. Empty result sets

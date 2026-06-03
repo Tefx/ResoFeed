@@ -313,45 +313,12 @@
     return normalized.length > 0 ? normalized : null;
   }
 
-  function hasCJKText(text: string | null): boolean {
-    return Boolean(text?.match(/[\u3400-\u9FFF]/u));
-  }
-
-  function isLikelyUntranslatedEnglish(text: string | null): boolean {
-    if (!text || hasCJKText(text)) return false;
-    const latinWords = text.match(/\b[A-Za-z][A-Za-z'-]{2,}\b/g) ?? [];
-    const allWords = text.match(/\b[\p{L}\p{N}'-]+\b/gu) ?? [];
-    return latinWords.length >= 8 && allWords.length > 0 && latinWords.length / allWords.length > 0.75;
-  }
-
   function hasModelBackedText(value: InspectableItem): boolean {
     return value.model_status === 'ok' && Boolean(readableText(value.summary) || readableText(value.core_insight));
   }
 
-  function modelBackedZhText(value: InspectableItem): string | null {
-    if (language !== 'zh' || !hasModelBackedText(value)) return null;
-    const summary = readableText(value.summary);
-    const coreInsight = readableText(value.core_insight);
-    if (!hasCJKText(summary) && !hasCJKText(coreInsight)) return null;
-    const body = 'extracted_text' in value ? readableText(value.extracted_text) : null;
-    const excerpt = 'feed_excerpt' in value ? readableText(value.feed_excerpt) : null;
-    if (body && !isLikelyUntranslatedEnglish(body)) return body;
-    if (excerpt && !isLikelyUntranslatedEnglish(excerpt)) return excerpt;
-    return [summary, coreInsight].filter((part): part is string => Boolean(part)).join(' ');
-  }
-
-  function detailText(value: InspectableItem): string {
-    const zhModelText = modelBackedZhText(value);
-    if (zhModelText) return zhModelText;
-    if ('extracted_text' in value) {
-      const extractedText = readableText(value.extracted_text);
-      if (extractedText) return extractedText;
-      const feedExcerpt = readableText(value.feed_excerpt);
-      if (feedExcerpt) return feedExcerpt;
-      const displayExcerpt = readableText(value.display_excerpt ?? null);
-      if (displayExcerpt) return displayExcerpt;
-    }
-    return readableText(value.summary) ?? readableText(value.core_insight) ?? 'summary unavailable';
+  function detailText(value: InspectableItem): string | null {
+    return sourceEvidenceText(value);
   }
 
   function generatedSummaryText(value: InspectableItem): string | null {
@@ -496,6 +463,10 @@
     return readableText(value.display_excerpt ?? null);
   }
 
+  function sourceTextUnavailableNote(): string {
+    return localizedChrome('Source text unavailable; use original link.', '来源文本不可用；请使用原文链接。');
+  }
+
   function isFallbackEvidenceState(value: InspectableItem): boolean {
     if (hasModelBackedText(value)) return false;
     if (!sourceEvidenceText(value)) return false;
@@ -527,6 +498,13 @@
       return `${extractionDisclosure(value)} · ${generatedContentAvailabilityDisclosure(value)}`;
     }
     return `${extractionDisclosure(value)} · ${summaryProvenanceDisclosure(value)}`;
+  }
+
+  function shouldShowProcessingStateLine(value: InspectableItem): boolean {
+    if (isModelFailureStatus(value.model_status)) return true;
+    if (value.model_status === 'summary_unavailable' && !readableText(value.summary) && !readableText(value.core_insight)) return true;
+    if (language === 'zh' && !hasModelBackedText(value)) return true;
+    return false;
   }
 
   function generatedContentAvailabilityDisclosure(value: InspectableItem): string {
@@ -561,6 +539,16 @@
   function aiStatusFrontmatter(value: InspectableItem): string {
     const quality = localizedChrome(`quality: ${qualityValueLabel(value)}`, `质量：${qualityValueLabel(value)}`);
     return `${summaryProvenanceFrontmatterToken(value)} · ${extractionFrontmatterToken(value)} · ${quality}`;
+  }
+
+  function aiStatusA11yLabel(value: InspectableItem): string {
+    const provenance = summaryProvenanceFrontmatterToken(value);
+    const extraction = extractionFrontmatterToken(value);
+    const quality = qualityValueLabel(value);
+    return localizedChrome(
+      `AI status: ${provenance}; source depth ${extraction}; quality ${quality}`,
+      `AI 状态：${provenance}，来源深度 ${extraction}，质量 ${quality}`
+    );
   }
 
   function qualityValueLabel(value: InspectableItem): string {
@@ -666,7 +654,7 @@
     if (openRouterModelListState === 'loading') return localizedChrome('models: loading', '模型：加载中');
     if (openRouterModelListState === 'available') {
       return language === 'zh'
-        ? `模型列表：${openRouterModels.length} 个 OpenRouter 模型可用`
+        ? `${openRouterModels.length} 个 OpenRouter 模型可选`
         : `model list: ${openRouterModels.length} OpenRouter ${openRouterModels.length === 1 ? 'model' : 'models'} available`;
     }
     return localizedChrome('err: models unavailable', 'err: 模型不可用');
@@ -778,18 +766,16 @@
         </p>
       </dd>
       <dt>AI STATUS</dt>
-      <dd>{aiStatusFrontmatter(item)}</dd>
+      <dd aria-label={aiStatusA11yLabel(item)}>{aiStatusFrontmatter(item)}</dd>
       {#if attemptFrontmatterText(item)}
         <dt>ATTEMPT</dt>
         <dd class={attemptFrontmatterClass(item)}>{attemptFrontmatterText(item)}</dd>
       {/if}
     </dl>
-    <p class="inspector-status-line inspector-evidence-line">
-      {processingStateLine(item)}
-    </p>
-    <p class="visually-hidden">{summaryProvenanceDisclosure(item)} · {localizedChrome(`quality: ${qualityValueLabel(item)}`, `质量：${qualityValueLabel(item)}`)}</p>
-    {#if item.extraction_status === 'partial_extraction'}
-      <p class="visually-hidden">{extractionDisclosure(item)}</p>
+    {#if shouldShowProcessingStateLine(item)}
+      <p class="inspector-status-line inspector-evidence-line">
+        {processingStateLine(item)}
+      </p>
     {/if}
     {@const generatedSummary = generatedSummaryText(item)}
     {@const generatedCoreInsight = generatedCoreInsightText(item)}
@@ -842,7 +828,8 @@
             <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label={localizedChrome('One-time prompt', '一次性提示')} aria-describedby="inspector-reingest-prompt-authority" rows="2" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
           </label>
           <p id="inspector-reingest-prompt-authority" class="inspector-model-list-diagnostic">
-            {localizedChrome('guidance only; cannot override schema, language, source identifiers, safety, status, or persistence. May change emphasis, angle, or fact selection only among source-backed facts.', '仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。只能在有来源支持的事实中改变重点、角度或事实选择。')}
+            {localizedChrome('guidance only; cannot override schema, language, source identifiers, safety, status, or persistence.', '仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。')}
+            <span class="visually-hidden">{localizedChrome(' May change emphasis, angle, or fact selection only among source-backed facts.', '只能在有来源支持的事实中改变重点、角度或事实选择。')}</span>
           </p>
           <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem} aria-disabled={reingestState === 'submitting' ? 'true' : undefined} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? localizedChrome('[RE-INGESTING ITEM...]', '[正在重新处理本文...]') : localizedChrome('[CONFIRM RE-INGEST]', '[确认重处理]')}</button>
           <button class="bracket-action inspector-reingest-cancel" type="button" disabled={reingestState === 'submitting'} onclick={() => void cancelReingestConfig()}>{localizedChrome('[CANCEL]', '[取消]')}</button>
@@ -861,11 +848,13 @@
         <summary class="inspector-section-label">{localizedChrome('Source evidence (collapsed)', '出处记录（已折叠）')} · {readingSectionLabel(item)}</summary>
         <p class="inspector-source-evidence">{evidenceText}</p>
       </details>
-    {:else}
-      <details class="inspector-text-section inspector-reading-section" aria-label={localizedChrome('Source text', '来源文本')}>
+    {:else if evidenceText}
+      <details class="inspector-text-section inspector-reading-section inspector-source-text-section" aria-label={localizedChrome('Source text', '来源文本')}>
         <summary class="inspector-section-label">{sectionLabelText('source text', '来源文本')}</summary>
-        <p class="inspector-reading">{detailText(item)}</p>
+        <p class="inspector-reading inspector-reading--source-text">{detailText(item)}</p>
       </details>
+    {:else}
+      <p class="contract-muted inspector-source-text-unavailable">{sourceTextUnavailableNote()}</p>
     {/if}
     <details class="contract-source-details" aria-label={localizedChrome('Source details', '来源详情')}>
       <summary>{localizedChrome('source details', '来源详情')}</summary>
@@ -874,7 +863,6 @@
         <p><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源详情链接：${item.source_title}` : `source detail feed link: ${item.source_title}`} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('feed link', '来源链接')}</a></p>
       {/if}
     </details>
-    <p class="contract-muted">{localizedChrome('why: fresh from configured source', '为什么：来自已配置来源的新条目')}</p>
     {@const groupedItems = groupedSourceItems(item)}
     {#if groupedItems.length > 0}
       <details class="contract-grouped-sources" open>

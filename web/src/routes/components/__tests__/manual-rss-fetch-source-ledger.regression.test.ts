@@ -1,21 +1,23 @@
-import { render, screen, within } from '@testing-library/svelte';
+import { render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 
 import type { CurrentOperationInfo, Source, StateBundleV1 } from '$lib/api-contract';
-import { formatLocalClockTime } from '$lib/display-time';
+import { formatLocalClockTimeWithHint } from '$lib/display-time';
 import SourceLedger from '../SourceLedger.svelte';
 
 type ManualFetchSourceLedgerProps = {
   sources: Source[];
   onDeleteSource: (source: Source) => Promise<void> | void;
   onImportOpml: (opml: string) => Promise<void> | void;
+  onExportOpml?: () => Promise<string | Blob> | string | Blob;
   onExportState: () => Promise<StateBundleV1>;
   onImportState: (bundle: StateBundleV1) => Promise<void> | void;
   currentOperation?: CurrentOperationInfo | null;
   currentOperationStatusText?: string;
+  language?: 'en' | 'zh';
 };
 
 const ManualSourceLedger = SourceLedger as Component<ManualFetchSourceLedgerProps>;
@@ -84,10 +86,34 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     renderLedger();
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    for (const label of ['[RUN INGEST]', '[FETCH]', '[DETAILS]', '[DELETE]', '[IMPORT OPML]', '[EXPORT STATE]', '[IMPORT STATE]']) {
+    for (const label of ['[RUN INGEST]', '[FETCH]', '[DETAILS]', '[DELETE]', '[IMPORT OPML]', '[EXPORT OPML]', '[EXPORT STATE]', '[IMPORT STATE]']) {
       expect(within(ledger).getByText(label)).toHaveTextContent(label);
     }
-    expect(ledger).not.toHaveTextContent(/\[run ingest\]|\[fetch\]|\[details\]|\[delete\]|\[import opml\]|\[export state\]|\[import state\]/);
+    expect(within(ledger).getByRole('group', { name: 'Source list actions' })).toHaveTextContent('SOURCE LIST');
+    expect(within(ledger).getByRole('group', { name: 'Portable state actions' })).toHaveTextContent('PORTABLE STATE');
+    expect(ledger).toHaveTextContent('OPML = source list; State = sources + rules + stars, import replaces.');
+    expect(within(ledger).getByRole('button', { name: '[IMPORT STATE]' })).toHaveAccessibleDescription('Import State replaces active sources, rules, and stars.');
+    expect(within(ledger).getByText('Import State replaces active sources, rules, and stars.')).not.toBeVisible();
+    expect(within(ledger).getByRole('group', { name: 'Source list actions' })).not.toHaveTextContent('Import State replaces');
+    expect(ledger).not.toHaveTextContent(/\[run ingest\]|\[fetch\]|\[details\]|\[delete\]|\[import opml\]|\[export opml\]|\[export state\]|\[import state\]/);
+  });
+
+  it('localizes ordinary Source Ledger labels in Chinese while preserving bracket actions and literals', () => {
+    renderLedger({ sources: [sourceWithFetchTime], language: 'zh' });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    expect(within(ledger).getByRole('group', { name: '来源列表操作' })).toHaveTextContent('来源列表');
+    expect(within(ledger).getByRole('group', { name: '可携带状态操作' })).toHaveTextContent('可携带状态');
+    expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
+    expect(within(ledger).getByText('[FETCH]')).toBeVisible();
+    expect(within(ledger).getByText('来源: Example')).toBeVisible();
+    expect(within(ledger).getByText('URL: https://example.com/feed.xml')).toBeVisible();
+    const row = ledger.querySelector('.source-ledger__row');
+    expect(row).toBeInstanceOf(HTMLLIElement);
+    expect(ledger).not.toHaveTextContent('SOURCE LIST');
+    expect(ledger).not.toHaveTextContent('PORTABLE STATE');
+    expect(row?.querySelector('.source-ledger__name')).not.toHaveTextContent('src: Example');
+    expect(row?.querySelector('.source-ledger__url')).not.toHaveTextContent('url: https://example.com/feed.xml');
   });
 
   it('disables global ingest from typed current-operation state including library_reprocess without parsing status text', () => {
@@ -127,13 +153,51 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     const header = ledger.querySelector('.source-ledger__header');
-    const expectedFetchTime = formatLocalClockTime(sourceWithFetchTime.last_fetch_at);
+    const expectedFetchTime = formatLocalClockTimeWithHint(sourceWithFetchTime.last_fetch_at) ?? '';
     expect(header).toBeInstanceOf(HTMLElement);
     expect(within(header as HTMLElement).getByText(`last_ingest: ${expectedFetchTime}`)).toHaveClass('source-ledger__status');
     expect(within(header as HTMLElement).getByRole('button', { name: '[RUN INGEST]' })).toHaveClass('bracket-action--run-ingest');
-    expect(ledger.querySelector('.source-ledger__row .source-ledger__status')).toHaveTextContent(`last_fetch: ${expectedFetchTime}`);
+    expect(ledger.querySelector('.source-ledger__row .source-ledger__status')).toHaveTextContent(expectedFetchTime);
+    expect(ledger.querySelector('.source-ledger__row .source-ledger__status')).not.toHaveTextContent('last_fetch:');
     expect(ledger).not.toHaveTextContent('2026-05-09T10:25:31Z');
+    expect(ledger).toHaveTextContent(/\d{2}:\d{2}:\d{2} local/);
     expect(ledger).not.toHaveTextContent(/UTC|Z/);
+  });
+
+  it('exports OPML as sources.opml with active and completion feedback', async () => {
+    const user = userEvent.setup();
+    const createObjectURL = vi.fn(() => 'blob:sources-opml');
+    const revokeObjectURL = vi.fn();
+    Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true });
+    Object.defineProperty(URL, 'revokeObjectURL', { value: revokeObjectURL, configurable: true });
+    const onExportOpml = vi.fn(async () => '<opml version="2.0"></opml>');
+    renderLedger({ onExportOpml });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    await user.click(within(ledger).getByRole('button', { name: '[EXPORT OPML]' }));
+
+    await waitFor(() => expect(onExportOpml).toHaveBeenCalledTimes(1));
+    expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:sources-opml');
+    expect(within(ledger).getByText('exported sources.opml')).toBeVisible();
+    expect(within(ledger).getByRole('button', { name: '[EXPORT OPML]' })).toBeEnabled();
+  });
+
+  it('restores Import State idle label, geometry state, and focus when the file picker is cancelled', async () => {
+    const user = userEvent.setup();
+    const onImportState = vi.fn(async () => {});
+    renderLedger({ onImportState });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    const importState = within(ledger).getByRole('button', { name: '[IMPORT STATE]' });
+    await user.click(importState);
+
+    await waitFor(() => expect(importState).toHaveFocus());
+    expect(importState).toHaveTextContent('[IMPORT STATE]');
+    expect(importState).toBeEnabled();
+    expect(importState.closest('[data-state]')).toHaveAttribute('data-state', 'idle');
+    expect(ledger).not.toHaveTextContent('[IMPORTING STATE...]');
+    expect(onImportState).not.toHaveBeenCalled();
   });
 
   it('renders source diagnostics through a visible details disclosure without friendly SaaS copy', async () => {
@@ -205,12 +269,14 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
   it('matches the Source Ledger preview row copy with one primary source string and direct action columns', () => {
     const ledger = renderCanonicalLedger();
     const row = ledger.querySelector('.source-ledger-row');
-    const expectedFetchTime = formatLocalClockTime(sourceWithFetchTime.last_fetch_at);
+    const expectedFetchTime = formatLocalClockTimeWithHint(sourceWithFetchTime.last_fetch_at) ?? '';
 
     expect(row).toBeInstanceOf(HTMLLIElement);
-    expect(row).toHaveTextContent(`src: simonwillison.net/feed.xml · status: ok · last_fetch: ${expectedFetchTime}`);
+    expect(row).toHaveTextContent('src: simonwillison.net/feed.xml');
+    expect(row).not.toHaveTextContent('status: ok');
     expect(row).toHaveTextContent('url: https://simonwillison.net/atom/everything');
-    expect(row).toHaveTextContent(`last_fetch: ${expectedFetchTime}`);
+    expect(row).toHaveTextContent(expectedFetchTime);
+    expect(row?.querySelector('.source-ledger__status')).toHaveAttribute('title', `last_fetch: ${expectedFetchTime}`);
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();
     expect(row?.children).toHaveLength(4);
     expect(row?.children[0]).toHaveClass('source-ledger-copy');

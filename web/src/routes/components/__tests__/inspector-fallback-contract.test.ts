@@ -62,7 +62,33 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Model-backed digest explains durable feed retrieval behavior.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Model-backed core insight remains visible.');
     expect(within(inspector).getByLabelText('Source text')).toHaveTextContent('Full article text for normal source text rendering.');
+    expect(within(inspector).getByLabelText('Source text')).toHaveClass('inspector-source-text-section');
+    expect(within(inspector).getByText('Full article text for normal source text rendering.')).toHaveClass('inspector-reading--source-text');
     expect(within(inspector).queryByLabelText('Source evidence')).not.toBeInTheDocument();
+  });
+
+  it('never falls back to generated summary or core insight in Source Text when source evidence is absent', () => {
+    const generatedOnlyDetail: ItemDetail = {
+      ...baseDetail,
+      id: 'generated-only-source-text-contract',
+      title: 'Generated only source text contract item',
+      summary: 'Generated summary must remain only in Summary.',
+      core_insight: 'Generated core insight must remain only in Core insight.',
+      extraction_status: 'original_unavailable',
+      model_status: 'ok',
+      extracted_text: null,
+      feed_excerpt: null,
+      display_excerpt: null
+    };
+
+    render(Inspector, { props: { item: generatedOnlyDetail, mode: 'desktop-split' } });
+
+    const inspector = screen.getByRole('complementary', { name: generatedOnlyDetail.title });
+    expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Generated summary must remain only in Summary.');
+    expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Generated core insight must remain only in Core insight.');
+    expect(within(inspector).queryByLabelText('Source text')).not.toBeInTheDocument();
+    expect(within(inspector).getByText('Source text unavailable; use original link.')).toHaveClass('contract-muted');
+    expect(within(inspector).getByRole('link', { name: 'original link' })).toBeVisible();
   });
 
   it('does not mark generated content unavailable when only the original article is unavailable', () => {
@@ -82,11 +108,33 @@ describe('Inspector fallback/source evidence contract', () => {
     render(Inspector, { props: { item: originalUnavailableWithGeneratedContent, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = screen.getByRole('complementary', { name: originalUnavailableWithGeneratedContent.title });
-    expect(within(inspector).getByText('原文不可用 · 摘要/核心洞察可用')).toBeVisible();
+    expect(within(inspector).getByText('模型支持 · 原文不可用 · 质量：高价值')).toBeVisible();
+    expect(within(inspector).queryByText('原文不可用 · 摘要/核心洞察可用')).not.toBeInTheDocument();
     expect(inspector).not.toHaveTextContent('原文不可用 · 摘要/核心洞察不可用');
     expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('模型摘要仍然可用。');
     expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('核心洞察仍然可用。');
     expect(within(inspector).getByLabelText('要点')).toHaveTextContent('第三条要点仍然可见。');
+  });
+
+  it('keeps AI status as the only model-backed provenance line when content is available', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'deduped-ai-status-provenance-contract',
+      title: 'Deduped AI status provenance contract item',
+      summary: '模型摘要可见。',
+      core_insight: '模型核心洞察可见。',
+      extraction_status: 'partial_extraction',
+      model_status: 'ok',
+      value_tier: 'high'
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
+    expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 来源摘录，质量 高价值"]')).toBeVisible();
+    expect(inspector).not.toHaveTextContent('来源文本：仅 RSS 摘录 · 摘要来源：模型支持');
+    expect(inspector).not.toHaveTextContent('摘要来源：模型支持');
   });
 
   it('localizes Chinese AI status quality tier in visible and accessibility text', () => {

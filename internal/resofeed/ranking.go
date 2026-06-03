@@ -506,10 +506,7 @@ func rankCandidatesWithRules(candidates []rankedCandidate, limit int, now time.T
 		eligible = append(eligible, candidate)
 	}
 	sort.SliceStable(eligible, func(i, j int) bool {
-		if eligible[i].score != eligible[j].score {
-			return eligible[i].score > eligible[j].score
-		}
-		return itemTime(eligible[i]).After(itemTime(eligible[j]))
+		return rankCandidateBefore(eligible[i], eligible[j], now)
 	})
 
 	selected := make([]rankedCandidate, 0, minInt(limit, len(eligible)))
@@ -565,7 +562,9 @@ func rankCandidatesWithRules(candidates []rankedCandidate, limit int, now time.T
 		selected = append(selected, candidate)
 		selectedIDs[candidate.item.ID] = true
 	}
-	sort.SliceStable(selected, func(i, j int) bool { return selected[i].score > selected[j].score })
+	sort.SliceStable(selected, func(i, j int) bool {
+		return rankCandidateBefore(selected[i], selected[j], now)
+	})
 
 	result := make([]ItemSummary, 0, len(selected))
 	for _, candidate := range selected {
@@ -595,6 +594,43 @@ func scoreCandidate(candidate rankedCandidate, now time.Time, rules []SteerRule)
 	score -= int(age / time.Hour)
 	score -= candidate.ordinal
 	return score
+}
+
+func rankCandidateBefore(a, b rankedCandidate, now time.Time) bool {
+	if groupA, groupB := timeGroupOrder(a, now), timeGroupOrder(b, now); groupA != groupB {
+		return groupA < groupB
+	}
+	if a.score != b.score {
+		return a.score > b.score
+	}
+	timeA, timeB := itemTime(a), itemTime(b)
+	if !timeA.Equal(timeB) {
+		return timeA.After(timeB)
+	}
+	return a.ordinal < b.ordinal
+}
+
+func timeGroupOrder(candidate rankedCandidate, now time.Time) int {
+	candidateTime := itemTime(candidate)
+	if candidateTime.IsZero() {
+		return 2
+	}
+	if now.IsZero() {
+		now = time.Now().UTC()
+	}
+	loc := now.Location()
+	candidateTime = candidateTime.In(loc)
+	now = now.In(loc)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
+	candidateDay := time.Date(candidateTime.Year(), candidateTime.Month(), candidateTime.Day(), 0, 0, 0, 0, loc)
+	switch {
+	case candidateDay.Equal(today):
+		return 0
+	case candidateDay.Equal(today.AddDate(0, 0, -1)):
+		return 1
+	default:
+		return 2
+	}
 }
 
 func candidateTouchTime(candidate rankedCandidate) (time.Time, bool) {

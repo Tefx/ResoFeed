@@ -171,6 +171,23 @@ test('browser proves source identifiers are non-translatable and desktop panes s
   await expect(inspectorPane).toHaveAttribute('aria-label', 'INSPECTOR independent scroll');
   await expect(feedPane).toHaveCSS('overflow-y', 'auto');
   await expect(inspectorPane).toHaveCSS('overflow-y', 'auto');
+  const paneHeights = await page.evaluate(() => {
+    const shell = document.querySelector('.contract-shell')?.getBoundingClientRect();
+    const grid = document.querySelector('.shell-grid')?.getBoundingClientRect();
+    const feed = document.querySelector('[data-scroll-region="feed-independent"]')?.getBoundingClientRect();
+    const inspector = document.querySelector('[data-scroll-region="inspector-independent"]')?.getBoundingClientRect();
+    return {
+      viewport: window.innerHeight,
+      shell: shell?.height ?? 0,
+      grid: grid?.height ?? 0,
+      feed: feed?.height ?? 0,
+      inspector: inspector?.height ?? 0
+    };
+  });
+  expect(paneHeights.shell).toBeGreaterThan(paneHeights.viewport - 80);
+  expect(paneHeights.grid).toBeGreaterThan(paneHeights.viewport - 180);
+  expect(paneHeights.feed).toBeGreaterThanOrEqual(paneHeights.grid - 4);
+  expect(paneHeights.inspector).toBeGreaterThanOrEqual(paneHeights.grid - 4);
   await feedPane.focus();
   await expect(feedPane).toBeFocused();
   await inspectorPane.focus();

@@ -164,7 +164,11 @@ func ReadItemForMCP(ctx context.Context, db *sql.DB, input MCPReadItemInput) (It
 	if err != nil {
 		return ItemResponse{}, err
 	}
-	return ItemResponse{Item: item}, nil
+	resp := ItemResponse{Item: item}
+	if item.ExtractionStatus == extractionStatusFull && strings.TrimSpace(derefString(item.ExtractedText)) == "" {
+		resp.FallbackReason = "raw source text not persisted; extraction_status reflects source acquisition"
+	}
+	return resp, nil
 }
 
 // MarkInspectedForMCP forwards a human inspection from an external context.

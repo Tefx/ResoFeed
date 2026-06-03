@@ -374,22 +374,18 @@ The UI should continue showing the existing content and show a non-destructive s
 ## UI Contract
 
 ### Feed Row
-
 Feed rows must not show Key Points.
 
 Feed row display:
 
 ```text
-src: TLDR AI Feed · 1m · 全文
+TLDR AI FEED · 1m · 全文 · 模型支持 · 高价值
 中文本地化标题
-中文摘要预览……
-· 模型支持 · 价值: high
+一句话核心洞察预览……
 ```
 
-Rationale: Feed is the scanning surface. Adding Key Points to Feed rows would increase row height and reduce scan speed.
-
+Rationale: Feed is the scanning surface. The title says what the item is about; the preview should prioritize the validated `core_insight` so the row answers why the item may deserve inspection or resonance. Fall back to `summary` only when `core_insight` is missing, and to source-backed excerpt only when generated preview is unavailable. Adding Key Points, duplicate Summary + Core Insight blocks, or repeated visual prefixes to Feed rows would increase row height and reduce scan speed.
 ### Inspector
-
 Inspector is the structured reading surface.
 
 Inspector display:
@@ -397,9 +393,12 @@ Inspector display:
 ```text
 INSPECTOR
 
-src: TLDR AI Feed · 摘要
-
 中文本地化标题
+
+ORIGINAL  TLDR AI Feed
+LINKS     原文链接 · 来源链接
+AI STATUS 模型支持 · 全文 · 质量：高价值
+ATTEMPT   失败 · 解码错误 · 已保留现有摘要和要点
 
 摘要：
 中文上下文摘要。

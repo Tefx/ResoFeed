@@ -83,7 +83,7 @@ describe('ResoFeed API client and rendered sinks', () => {
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(ledger).toHaveTextContent('src: Example Source');
     expect(ledger).toHaveTextContent('url: https://example.com/feed.xml');
-    expect(ledger).toHaveTextContent('last_fetch: 00:00:00');
+    expect(ledger).toHaveTextContent(/last_fetch: \d{2}:\d{2}:\d{2} local/);
 
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
     const list = screen.getByRole('list', { name: 'Today feed items' });
@@ -123,7 +123,7 @@ describe('ResoFeed API client and rendered sinks', () => {
 
     render(StatePortability, { props: { onExportState: async () => state, onImportState: async () => {} } });
     expect(screen.getByRole('group', { name: 'State portability' })).toHaveTextContent(
-      'import replaces active sources, rules, and stars'
+      'Import State replaces active sources, rules, and stars.'
     );
   });
 
@@ -137,6 +137,19 @@ describe('ResoFeed API client and rendered sinks', () => {
     const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
     await client.today({ limit: 50, offset: 50 });
 
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it('downloads OPML source-list text from the canonical frontend endpoint', async () => {
+    const opml = '<?xml version="1.0"?><opml version="2.0"></opml>';
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });
+      expect(String(input)).toBe('/api/sources/export-opml');
+      return new Response(opml, { status: 200, headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
+    });
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+
+    await expect(client.exportOpml()).resolves.toBe(opml);
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
 

@@ -253,6 +253,38 @@ func contractValidSummaryOutputForTest(label string) OpenRouterSummaryOutput {
 	}
 }
 
+func TestPromptValidationRejectsSummaryCoreInsightDuplicate(t *testing.T) {
+	out := validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
+		out.Summary = "SQLite FTS5 migration preserves lexical search and provenance boundaries."
+		out.CoreInsight = "SQLite FTS5 migration preserves lexical search and provenance boundaries."
+	})
+
+	_, err := validateSummaryOutputForPersistenceWithPrompt(out, promptingV21Item{
+		AvailableTextSource: "fresh_full_text",
+		AvailableText:       "SQLite FTS5 migration preserves lexical search and provenance boundaries with source-backed facts.",
+		TargetLanguage:      ProcessingLanguageEnglish,
+	})
+	var validationErr PromptValidationError
+	if !errors.As(err, &validationErr) || validationErr.Code != PromptValidationSummaryInsightDuplicate || validationErr.Field != "core_insight" {
+		t.Fatalf("validation error = %T %[1]v, want duplicate core_insight rejection", err)
+	}
+}
+
+func TestPromptValidationAllowsDistinctSummaryAndCoreInsight(t *testing.T) {
+	out := validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
+		out.Summary = "SQLite FTS5 migration keeps search lexical, preserves provenance, and avoids vector databases."
+		out.CoreInsight = "ResoFeed should prioritize source-backed retrieval guarantees over broader semantic ranking ambitions."
+	})
+
+	if _, err := validateSummaryOutputForPersistenceWithPrompt(out, promptingV21Item{
+		AvailableTextSource: "fresh_full_text",
+		AvailableText:       "ResoFeed SQLite FTS5 migration keeps search lexical, preserves provenance, avoids vector databases, and prioritizes source-backed retrieval guarantees over semantic ranking ambitions.",
+		TargetLanguage:      ProcessingLanguageEnglish,
+	}); err != nil {
+		t.Fatalf("validate distinct summary/core_insight returned error: %v", err)
+	}
+}
+
 func TestPromptValidationFieldCeilingsForAllGeneratedFields(t *testing.T) {
 	cases := []struct {
 		field  string

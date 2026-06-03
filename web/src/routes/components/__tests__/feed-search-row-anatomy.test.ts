@@ -122,5 +122,41 @@ describe('Feed/Search compact row anatomy', () => {
     expect(css).toMatch(/\.contract-resonate\s*\{[\s\S]*width:\s*44px;[\s\S]*height:\s*44px;[\s\S]*min-width:\s*44px;[\s\S]*min-height:\s*44px;/u);
   });
 
+  it('keeps desktop Search as a full-height workflow slice instead of a 260px widget', () => {
+    const css = readFileSync(resolve(__dirname, '../../../app.css'), 'utf8');
+    expect(css).toMatch(/\.feed-pane\s*>\s*\.contract-search\s*\{[\s\S]*height:\s*calc\(100vh - 178px\);/u);
+    expect(css).toMatch(/\.feed-pane\s*>\s*\.contract-search\s*>\s*\.contract-search-results-region\s*,[\s\S]*flex:\s*1 1 auto;[\s\S]*overflow-y:\s*auto;/u);
+    expect(css).not.toContain('min(260px, calc(100vh - 178px))');
+  });
+
+  it('localizes visible Search chrome in Chinese while preserving literal source data', async () => {
+    const results = [item({ id: 'zh_search_localized' })];
+    const onSearch = vi.fn(async (): Promise<SearchResponse> => ({
+      items: results,
+      query: { q: 'row', source: null, from: null, to: null, resonated: null, limit: 50 }
+    }));
+
+    render(SearchRetrieval, {
+      props: {
+        items: results,
+        query: 'row',
+        onSearch,
+        onSelect: vi.fn(),
+        onResonanceToggle: vi.fn(),
+        language: 'zh'
+      }
+    });
+
+    await waitFor(() => expect(onSearch).toHaveBeenCalled());
+    const search = screen.getByRole('region', { name: '搜索与检索' });
+    expect(within(search).getByRole('heading', { name: '词汇搜索' })).toBeVisible();
+    expect(within(search).getByText('匹配：词汇索引')).toBeVisible();
+    expect(within(search).getByText('来源支持')).toBeVisible();
+    expect(within(search).getByText('TLDR AI Feed')).toBeVisible();
+    expect(search).not.toHaveTextContent('match: lexical index');
+    expect(search).not.toHaveTextContent('provenance: source-backed');
+    expect(search).not.toHaveTextContent('filters');
+  });
+
   afterEach(() => cleanup());
 });

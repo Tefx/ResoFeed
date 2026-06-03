@@ -62,6 +62,33 @@ func TestRankCandidatesGuardrailsWithoutSQLiteOwnership(t *testing.T) {
 	}
 }
 
+func TestRankCandidatesPreservesTimeGroupBeforeScore(t *testing.T) {
+	t.Parallel()
+
+	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
+	today := now.Add(-2 * time.Hour)
+	yesterday := now.Add(-26 * time.Hour)
+	earlier := now.Add(-72 * time.Hour)
+	candidates := []rankedCandidate{
+		{item: ItemSummary{ID: "earlier_resonated_steered", SourceID: "src_old", PublishedAt: &earlier, IsResonated: true, Summary: ptr("sqlite database internals")}, memory: true, text: "sqlite database internals", ordinal: 0},
+		{item: ItemSummary{ID: "today_plain", SourceID: "src_today", PublishedAt: &today, Summary: ptr("ordinary fresh update")}, fresh: true, text: "ordinary fresh update", ordinal: 1},
+		{item: ItemSummary{ID: "yesterday_plain", SourceID: "src_yesterday", PublishedAt: &yesterday, Summary: ptr("ordinary yesterday update")}, fresh: true, text: "ordinary yesterday update", ordinal: 2},
+	}
+	rules := []SteerRule{{RuleText: "Prioritize sqlite database internals.", IsActive: true}}
+
+	items := rankCandidatesWithRules(candidates, 3, now, rules)
+	if len(items) != 3 {
+		t.Fatalf("len(items) = %d, want 3", len(items))
+	}
+	got := []string{items[0].ID, items[1].ID, items[2].ID}
+	want := []string{"today_plain", "yesterday_plain", "earlier_resonated_steered"}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("ranked ids = %v, want time-group order %v", got, want)
+		}
+	}
+}
+
 func TestSearchSQLPlanCoversLexicalAndMetadataFilters(t *testing.T) {
 	t.Parallel()
 

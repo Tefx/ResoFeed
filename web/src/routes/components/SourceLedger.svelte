@@ -3,13 +3,14 @@
   import { processingLanguageRuntimeContract, type CurrentOperationInfo, type FetchSourceSuccessResponse, type ImportOpmlResponse, type RunIngestSuccessResponse, type Source } from '$lib/api-contract';
   import type { StateBundleV1 } from '$lib/api-contract';
   import { isOperationBlockingManualIngest } from '$lib/current-operation';
-  import { formatLocalClockTime } from '$lib/display-time';
+  import { formatLocalClockTimeWithHint } from '$lib/display-time';
   import StatePortability from './StatePortability.svelte';
 
   interface Props {
     sources: Source[];
     onDeleteSource: (source: Source) => Promise<void> | void;
     onImportOpml: (opml: string) => Promise<ImportOpmlResponse | void> | ImportOpmlResponse | void;
+    onExportOpml?: () => Promise<string | Blob> | string | Blob;
     onRunIngest?: () => Promise<RunIngestSuccessResponse>;
     onFetchSource?: (source: Source) => Promise<FetchSourceSuccessResponse>;
     onExportState: () => Promise<StateBundleV1>;
@@ -24,6 +25,7 @@
     sources,
     onDeleteSource,
     onImportOpml,
+    onExportOpml = () => Promise.resolve(''),
     onRunIngest = () => Promise.resolve({ operation: 'ingest', source_id: null, completed: true, sources_total: 0, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [] }),
     onFetchSource = (source: Source) => Promise.resolve({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: source.last_fetch_at ?? undefined }),
     onExportState,
@@ -37,6 +39,7 @@
   let statusText = $state('');
   let globalIngestStatusText = $state('');
   let isImportingOpml = $state(false);
+  let isExportingOpml = $state(false);
   let isRunningIngest = $state(false);
   let fetchingSourceId = $state<string | null>(null);
   let sourceFeedbackById = $state<Record<string, string>>({});
@@ -62,8 +65,15 @@
       runIngest: '[RUN INGEST]',
       ingesting: '[INGESTING...]',
       ledgerActions: '账本操作',
+      sourceListActions: '来源列表操作',
+      portableStateActions: '可携带状态操作',
+      sourceList: '来源列表',
+      portableState: '可携带状态',
+      helper: 'OPML = 来源列表；State = 来源 + 规则 + 星标，导入会替换。',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
+      exportOpml: '[EXPORT OPML]',
+      exportingOpml: '[EXPORTING OPML...]',
       empty: '暂无来源。在导向栏粘贴 RSS URL。',
       lastIngest: '上次抓取',
       lastFetch: '上次抓取',
@@ -74,6 +84,8 @@
       importComplete: (count: number) => `已导入 ${count} 个来源；OPML 大纲已扁平化`,
       importCompleteFallback: '已导入来源；OPML 大纲已扁平化',
       importFailed: 'err: 导入失败',
+      exportComplete: '已导出 sources.opml',
+      exportFailed: 'err: 导出失败',
       deleting: (title: string) => `正在删除 ${title}`,
       deleted: (title: string) => `已删除 ${title}`,
       deleteFailed: 'err: 删除失败',
@@ -95,8 +107,15 @@
       runIngest: '[RUN INGEST]',
       ingesting: '[INGESTING...]',
       ledgerActions: 'Ledger actions',
+      sourceListActions: 'Source list actions',
+      portableStateActions: 'Portable state actions',
+      sourceList: 'SOURCE LIST',
+      portableState: 'PORTABLE STATE',
+      helper: 'OPML = source list; State = sources + rules + stars, import replaces.',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
+      exportOpml: '[EXPORT OPML]',
+      exportingOpml: '[EXPORTING OPML...]',
       empty: 'No sources. Paste RSS URL in Steer.',
       lastIngest: 'last_ingest',
       lastFetch: 'last_fetch',
@@ -107,6 +126,8 @@
       importComplete: (count: number) => `imported ${count} sources; OPML outlines flattened`,
       importCompleteFallback: 'imported sources; OPML outlines flattened',
       importFailed: 'err: import failed',
+      exportComplete: 'exported sources.opml',
+      exportFailed: 'err: export failed',
       deleting: (title: string) => `deleting ${title}`,
       deleted: (title: string) => `deleted ${title}`,
       deleteFailed: 'err: delete failed',
@@ -130,7 +151,7 @@
       .map((source) => source.last_fetch_at)
       .filter((timestamp): timestamp is string => Boolean(timestamp))
       .sort((left, right) => new Date(right).getTime() - new Date(left).getTime())[0];
-    const formatted = formatLocalClockTime(latest);
+    const formatted = formatLocalClockTimeWithHint(latest, language);
     return `${chrome.lastIngest}: ${formatted ?? chrome.notRun}`;
   }
 
@@ -177,8 +198,24 @@
     return `${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`;
   }
 
+  function sourceRowNameText(sourceLabel: string): string {
+    return language === 'zh' ? `来源: ${sourceLabel}` : `src: ${sourceLabel}`;
+  }
+
+  function sourceRowUrlText(url: string): string {
+    return language === 'zh' ? `URL: ${url}` : `url: ${url}`;
+  }
+
   function rowGrammarForSource(source: Source, sourceLabel: string, lastFetch: string | null): string {
-    return `src: ${sourceLabel} · status: ${source.last_fetch_status} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`;
+    return language === 'zh'
+      ? `来源: ${sourceLabel} · status: ${source.last_fetch_status} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`
+      : `src: ${sourceLabel} · status: ${source.last_fetch_status} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`;
+  }
+
+  function rowVisibleStatusText(source: Source, lastFetch: string | null, diagnosticStatus: string, hasError: boolean): string {
+    if (hasError) return diagnosticStatus;
+    if (sourceFeedbackById[source.id]) return diagnosticStatus.replace(new RegExp(`^${chrome.lastFetch}:\\s*`), '');
+    return lastFetch ?? '—';
   }
 
   function rawErrorText(message: string): string {
@@ -223,7 +260,7 @@
       globalIngestStatusText = chrome.submittingIngest;
       return onRunIngest();
     }).then((result) => {
-      const completedAt = formatLocalClockTime(result.completed_at);
+      const completedAt = formatLocalClockTimeWithHint(result.completed_at, language);
       globalIngestStatusText = result.completed
           ? `${chrome.lastIngest}: ${completedAt ?? chrome.complete}`
           : rawErrorText(result.errors[0]?.message ?? chrome.ingestFailed);
@@ -240,7 +277,7 @@
     if (ownsActivePendingState) fetchingSourceId = source.id;
     setSourceFeedback(source.id, null);
     return tick().then(() => onFetchSource(source)).then((result) => pendingFrame().then(() => result)).then((result) => {
-      const completedAt = formatLocalClockTime(result.completed_at ?? source.last_fetch_at);
+      const completedAt = formatLocalClockTimeWithHint(result.completed_at ?? source.last_fetch_at, language);
       const errorMessage = result.errors.find((candidate) => candidate.source_id === source.id || candidate.source_id === null)?.message;
       setSourceFeedback(
         source.id,
@@ -272,6 +309,26 @@
         : error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.importFailed);
     }).finally(() => {
       isImportingOpml = false;
+    });
+  }
+
+  function exportOpml(): Promise<void> {
+    if (isExportingOpml) return Promise.resolve();
+    isExportingOpml = true;
+    statusText = '';
+    return Promise.resolve(onExportOpml()).then((opml) => {
+      const blob = opml instanceof Blob ? opml : new Blob([opml], { type: 'application/xml' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'sources.opml';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      statusText = chrome.exportComplete;
+    }).catch((error: unknown) => {
+      statusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.exportFailed);
+    }).finally(() => {
+      isExportingOpml = false;
     });
   }
 
@@ -327,8 +384,13 @@
     <button type="button" class="bracket-action bracket-action--run-ingest" disabled={ingestActionRunning} onclick={() => void runIngest()}>{ingestActionRunning ? chrome.ingesting : chrome.runIngest}</button>
   </header>
   <div class="source-ledger__tools" aria-label={chrome.ledgerActions}>
-    <button type="button" class="bracket-action bracket-action--import-opml" aria-label={chrome.importOpml} disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? chrome.importingOpml : chrome.importOpml}</button>
-    <StatePortability onExportState={onExportState} onImportState={onImportState} language={language} />
+    <div class="source-ledger__action-group source-ledger__action-group--source-list" role="group" aria-label={chrome.sourceListActions}>
+      <span class="source-ledger__group-label">{chrome.sourceList}</span>
+      <button type="button" class="bracket-action bracket-action--import-opml" aria-label={chrome.importOpml} disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? chrome.importingOpml : chrome.importOpml}</button>
+      <button type="button" class="bracket-action bracket-action--export-opml" aria-label={chrome.exportOpml} disabled={isExportingOpml} onclick={() => void exportOpml()}>{isExportingOpml ? chrome.exportingOpml : chrome.exportOpml}</button>
+    </div>
+    <StatePortability onExportState={onExportState} onImportState={onImportState} groupLabel={chrome.portableState} groupAriaLabel={chrome.portableStateActions} language={language} />
+    <span class="contract-muted source-ledger__tools-helper">{chrome.helper}</span>
     {#if statusText}
       <span role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="ledger-status imported-status">{statusText}</span>
     {/if}
@@ -338,14 +400,15 @@
   {:else}
     <ul class="contract-list source-ledger__list">
       {#each visibleSources as source (source.id)}
-        {@const lastFetch = formatLocalClockTime(source.last_fetch_at)}
+        {@const lastFetch = formatLocalClockTimeWithHint(source.last_fetch_at, language)}
         {@const sourceLabel = sourceLedgerLabel(source)}
         {@const rowStatusText = statusTextForSource(source, lastFetch)}
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
+        {@const rowVisibleStatus = rowVisibleStatusText(source, lastFetch, rowStatusText, rowHasError)}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id}>
-          <div class="source-ledger-copy source-ledger__name" title={rowGrammarForSource(source, sourceLabel, lastFetch)} translate={sourceTitleTranslate}>{rowGrammarForSource(source, sourceLabel, lastFetch)}</div>
-          <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>url: {source.url}</div>
-          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live="polite" title={rowStatusText}>{rowStatusText}</div>
+          <div class="source-ledger-copy source-ledger__name" title={rowGrammarForSource(source, sourceLabel, lastFetch)} translate={sourceTitleTranslate}>{sourceRowNameText(sourceLabel)}</div>
+          <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>{sourceRowUrlText(source.url)}</div>
+          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live="polite" aria-label={rowGrammarForSource(source, sourceLabel, lastFetch)} title={rowStatusText}>{rowVisibleStatus}</div>
           <span class="source-ledger__actions">
             <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? chrome.fetchingAria(sourceA11yLabel(sourceLabel)) : chrome.fetchAria(sourceA11yLabel(sourceLabel))} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? chrome.fetching : chrome.fetch}</button>
             {#if confirmingSourceId === source.id}

@@ -332,6 +332,18 @@ export class ResoFeedApiClient {
     });
   }
 
+  async exportOpml(): Promise<string> {
+    const response = await this.fetcher(`${this.baseUrl}/api/sources/export-opml`, {
+      headers: { Authorization: `Bearer ${this.ownerToken}` }
+    });
+
+    if (!response.ok) {
+      await this.throwCanonicalError(response);
+    }
+
+    return response.text();
+  }
+
   async runIngest(): Promise<ManualRssFetchApiResult<RunIngestSuccessResponse>> {
     const result = await this.manualRssFetchRequest<ManualFetchSuccessBody>('/api/ingest');
     return result.ok ? { ...result, body: normalizeIngestEnvelope(result.body, 'ingest') } : result;

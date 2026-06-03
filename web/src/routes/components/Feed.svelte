@@ -1,6 +1,6 @@
 <script lang="ts">
   import { itemDisplayTimestamp, processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage } from '$lib/api-contract';
-  import { compareItemsByTimeGroup, itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemHasAuthoritativeGrouping, itemLocalizedDisplayTitle, itemReaderRowPreviewText, itemReaderRowPriorityToken, itemSourceProvenanceTitle, itemSummaryProvenanceLabel, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
+  import { compareItemsByTimeGroup, itemAgeAccessibleDescription, itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemHasAuthoritativeGrouping, itemLocalizedDisplayTitle, itemReaderRowPreviewText, itemReaderRowPriorityToken, itemSourceProvenanceTitle, itemSummaryProvenanceLabel, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
   interface Props {
     items: ItemSummary[];
@@ -90,11 +90,24 @@
     if (item.title === 'Model error keeps raw terse status') return chrome.summaryUnavailable;
     return itemReaderRowPreviewText(item, language);
   }
+
+  function ageLabel(item: ItemSummary): string {
+    return itemAgeLabel(item, feedTimeGroupReference, language);
+  }
+
+  function ageAccessibleLabel(item: ItemSummary): string {
+    return chrome.feed.ageAria(itemAgeAccessibleDescription(ageLabel(item), language));
+  }
+
+  function timeGroupAccessibleLabel(item: ItemSummary): string {
+    return chrome.feed.timeGroupAria(itemTimeGroup(item, feedTimeGroupReference));
+  }
 </script>
 
 <section class="contract-region" aria-labelledby="feed-list-heading">
   <span id="feed-list-heading" class="visually-hidden">{feedListLabel}</span>
-  <div role="list" aria-label={feedListLabel}>
+  <span id="feed-list-description" class="visually-hidden">{chrome.feed.groupExplanation}</span>
+  <div role="list" aria-label={feedListLabel} aria-describedby="feed-list-description">
     {#each groupedItems as item, index (item.id)}
       <article class="contract-feed-item" role="listitem" aria-current={selectedItemId === item.id ? 'true' : undefined} data-item-id={item.id} data-source-id={item.source_id}>
         <button
@@ -105,7 +118,7 @@
         >
           <p class="contract-label contract-feed-meta">
             <span class="feed-meta-source" aria-label={sourceProvenanceLabel(item)} translate={sourceTitleTranslate}>{item.source_title}</span>
-            <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={chrome.feed.ageAria(itemAgeLabel(item, feedTimeGroupReference, language))}>{itemAgeLabel(item, feedTimeGroupReference, language)}</span>
+            <span class="feed-meta-separator feed-meta-age-separator" aria-hidden="true">·</span> <span class="feed-meta-age" aria-label={ageAccessibleLabel(item)} title={ageAccessibleLabel(item)}>{ageLabel(item)}</span>
             <span class="feed-meta-separator feed-meta-extraction-separator" aria-hidden="true">·</span> <span class="feed-meta-extraction" aria-label={chrome.feed.extractionAria(item.extraction_status)}>{itemExtractionLabel(item.extraction_status, language)}</span>
             <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.summaryProvenanceAria(itemSummaryProvenanceLabel(item, language))}>{itemSummaryProvenanceLabel(item, language)}</span>
             <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-secondary" aria-label={chrome.feed.priorityAria(itemReaderRowPriorityToken(item, language))}>{itemReaderRowPriorityToken(item, language)}</span>
@@ -116,7 +129,7 @@
               <span class="feed-meta-separator" aria-hidden="true">·</span> <span class="feed-meta-agent" aria-label={chrome.feed.externallySurfacedByAgent}>agent:external</span>
             {/if}
             {#if shouldShowTimeGroup(groupedItems, index, feedTimeGroupReference)}
-              <span class="contract-time-label">{itemTimeGroup(item, feedTimeGroupReference)}</span>
+              <span class="contract-time-label" aria-label={timeGroupAccessibleLabel(item)} title={timeGroupAccessibleLabel(item)}>{itemTimeGroup(item, feedTimeGroupReference)}</span>
             {/if}
           </p>
           <p class="contract-feed-title" aria-label={language === 'zh' ? `本地化标题：${itemLocalizedDisplayTitle(item, language)}` : `Localized title: ${itemLocalizedDisplayTitle(item, language)}`}>{itemLocalizedDisplayTitle(item, language)}</p>

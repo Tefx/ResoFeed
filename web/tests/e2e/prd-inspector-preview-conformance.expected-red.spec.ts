@@ -289,11 +289,13 @@ test('expected-red PRD Inspector fields and ui-preview desktop parity are visibl
     await expectVisibleField(inspector, /优先级|value tier|priority category|priority:/i, '优先级/value tier', violations);
     await expectVisibleField(inspector, /核心见解|concise core insight|core insight/i, '核心见解/concise core insight', violations);
     await expectVisibleField(inspector, /密集事实摘要|dense factual summary|dense summary|summary:/i, '密集事实摘要/dense factual summary', violations);
-    await expectVisibleField(inspector, /来源与提取溯源|source and extraction provenance|provenance:|src:|extraction:/i, '来源与提取溯源/source and extraction provenance', violations);
-    await expectVisibleField(inspector, /为什么展示给你|why this appeared|why:/i, '为什么展示给你/why this appeared', violations);
+    await expectVisibleField(inspector, /来源与提取溯源|source and extraction provenance|provenance:|src:|extraction:|source details|AI STATUS|original link|feed link/i, '来源与提取溯源/source and extraction provenance', violations);
     await expectVisibleField(inspector, /可检索文本|searchable text|retrieval text|indexed text|blue-green-cassowary/i, '可检索文本/searchable text', violations);
 
     const inspectorText = await visibleText(inspector);
+    if (/为什么：来自已配置来源的新条目|why:\s*fresh from configured source/i.test(inspectorText)) {
+      violations.push('ordinary configured-source Inspector item shows forbidden generic why-this-appeared copy');
+    }
     if (!/rss-intelligence|provenance-audit|inspector-preview|topic/i.test(inspectorText)) {
       violations.push('missing topical metadata proof in Inspector visible text');
     }

@@ -323,6 +323,28 @@ func TestReadItemDetailKeepsDuplicateOriginalRetrievable(t *testing.T) {
 	}
 }
 
+func TestReadItemDetailPreservesFullStatusWithoutRawSourceText(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	now := time.Date(2026, 5, 12, 9, 0, 0, 0, time.UTC)
+	insertSource(t, ctx, db, "src_full_no_raw", "https://full-no-raw.example/feed.xml", "Full No Raw")
+	_, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, canonical_url, title, feed_excerpt, extracted_text, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status) values (?, ?, ?, ?, ?, ?, '', '', ?, ?, ?, ?, ?, 'full', 'ok')`, "item_full_no_raw", "src_full_no_raw", "https://full-no-raw.example/feed.xml", "https://full-no-raw.example/item", "https://full-no-raw.example/item", "Model-backed detail without raw source text", "model-backed summary from acquired article evidence", "model-backed insight from acquired article evidence", "high", now.Format(time.RFC3339), now.Format(time.RFC3339))
+	if err != nil {
+		t.Fatalf("insert full no raw item: %v", err)
+	}
+
+	detail, err := ReadItemDetail(ctx, db, "item_full_no_raw")
+	if err != nil {
+		t.Fatalf("ReadItemDetail returned error: %v", err)
+	}
+	if detail.ExtractionStatus != extractionStatusFull {
+		t.Fatalf("detail extraction_status = %q, want %q", detail.ExtractionStatus, extractionStatusFull)
+	}
+	if strings.TrimSpace(derefString(detail.FeedExcerpt)) != "" || strings.TrimSpace(derefString(detail.ExtractedText)) != "" {
+		t.Fatalf("detail raw source fields = feed_excerpt:%q extracted_text:%q, want empty", derefString(detail.FeedExcerpt), derefString(detail.ExtractedText))
+	}
+}
+
 type staticGemini struct {
 	summary     string
 	coreInsight string

@@ -324,7 +324,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(inspector.locator('.inspector-provenance')).toHaveAttribute('aria-label', /来源：/u);
     await redExpect(inspector.locator('.inspector-provenance [translate="no"]')).toContainText(sourceWithoutTranslatedConvenienceName.title);
     await redExpect(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
-    await redExpect(inspector.getByText('为什么：来自已配置来源的新条目')).toBeVisible();
+    await redExpect(inspector.getByText('为什么：来自已配置来源的新条目')).toHaveCount(0);
     await redExpect(inspector.getByLabel('本文重处理')).toBeVisible();
     await redExpect(inspector.getByRole('button', { name: '[重新处理本文]' })).toBeVisible();
     await inspector.getByRole('button', { name: '[重新处理本文]' }).click();

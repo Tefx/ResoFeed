@@ -176,7 +176,6 @@ where i.id = ?`, itemID)
 	}
 	detail.Provenance = Provenance{SourceURL: sourceURL.String, CanonicalURL: stringPtrFromNull(canonicalURL), OriginalURL: detail.URL, StoryKey: detail.StoryKey, DuplicateOfItemID: detail.DuplicateOfItemID, GroupedSourceItems: groupedSources}
 	sanitizeReadableDetail(&detail)
-	normalizeDetailExtractionStatus(&detail)
 	return detail, nil
 }
 
@@ -218,17 +217,6 @@ order by case when i.id = ? then 0 when i.duplicate_of_item_id = ? then 1 else 2
 		return nil, fmt.Errorf("iterate grouped source items: %w", err)
 	}
 	return items, nil
-}
-
-func normalizeDetailExtractionStatus(detail *ItemDetail) {
-	if detail == nil || detail.ExtractionStatus != extractionStatusFull || strings.TrimSpace(derefString(detail.ExtractedText)) != "" {
-		return
-	}
-	if strings.TrimSpace(derefString(detail.FeedExcerpt)) != "" {
-		detail.ExtractionStatus = extractionStatusPartial
-		return
-	}
-	detail.ExtractionStatus = extractionStatusOriginalNA
 }
 
 func rebuildSearchIndexTx(ctx context.Context, tx *sql.Tx) error {
