@@ -265,8 +265,10 @@
         const inspectorSurface = stableLandmark.querySelector<HTMLElement>('.contract-inspector');
         if (inspectorSurface) {
           inspectorSurface.style.flex = '1 0 auto';
+          inspectorSurface.style.width = '100%';
           inspectorSurface.style.minHeight = '100%';
           inspectorSurface.style.maxHeight = 'none';
+          inspectorSurface.style.overflow = 'visible';
         }
       }
     }
@@ -776,6 +778,10 @@
   function showSurface(surface: Surface, updateUrl = true): void {
     if (surface === 'feed') suppressFeedScrollRecording = true;
     const leavingSearch = currentSurface === 'search' && surface !== 'search';
+    if (leavingSearch) {
+      resetSearchSurfaceState();
+      clearSelectedInspectorContext();
+    }
     currentSurface = surface;
     if (updateUrl) {
       const canonicalPath = canonicalPathForSurface(surface);
@@ -783,7 +789,10 @@
         window.history.pushState({}, '', canonicalPath);
       }
     }
-    if (leavingSearch) resetSearchSurfaceState();
+    if (leavingSearch && surface === 'feed') {
+      reconcileSelectedFeedItem(items);
+      if (selectedItemId) void loadItemDetail(selectedItemId);
+    }
     void focusSurfaceAndRestoreFeed(surface);
   }
 
@@ -1344,7 +1353,7 @@
         {#if !feedPaneInactive || currentSurface === 'inspector'}
           <p id="feed-heading" class="visually-hidden" tabindex="-1">TODAY feed</p>
           {#if currentSurface === 'search' && !isNarrow}
-            <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} autoSelectFirstResult={true} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+            <SearchRetrieval items={items} query={searchSeedQuery} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} autoSelectFirstResult={true} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
           {:else if apiError && !ownerTokenRejected}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {:else if items.length === 0}
@@ -1403,7 +1412,7 @@
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
       {/if}
       {#if isNarrow}
-        <SearchRetrieval items={items} query={searchSeedQuery} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={true} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+        <SearchRetrieval items={items} query={searchSeedQuery} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={true} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
       {/if}
     </section>
     {#if steerFeedback.kind === 'doctor'}

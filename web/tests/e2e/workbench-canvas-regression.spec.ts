@@ -16,17 +16,40 @@ const fixtureSource = {
   revision: 1
 } as const;
 
+const fixtureSecondSource = {
+  id: 'src_workbench_notes',
+  url: 'https://workbench-notes.example.test/feed.xml',
+  title: 'Workbench Notes Source',
+  last_fetch_at: timestamp,
+  last_fetch_status: 'ok',
+  last_fetch_error: null,
+  is_active: true,
+  revision: 1
+} as const;
+
 const fixtureItems = [
   {
     id: 'item_workbench_canvas',
     source_id: fixtureSource.id,
     source_title: fixtureSource.title,
+    source_item_title: 'Workbench split view item stays readable',
+    localized_title: null,
     url: 'https://workbench-canvas.example.test/item',
     title: 'Workbench split view item stays readable',
-    summary: 'A compact summary proves feed text measure stays bounded while the shell grows.',
+    summary: Array.from({ length: 18 }, (_, index) => `Inspector paragraph ${index + 1} proves line measure can stay readable while the outer right pane owns scrolling.`).join(' '),
     core_insight: 'The wide workbench can grow without turning feed rows into long text banners.',
+    key_points: [
+      'The Inspector pane is the scrollport, not the reading measure wrapper.',
+      'The readable text column remains left-aligned with dense pane padding.',
+      'The pane absorbs available desktop width without creating an inner scroll island.'
+    ],
     display_excerpt: 'A compact summary proves feed text measure stays bounded while the shell grows.',
     value_tier: 'high',
+    content_status: 'ok',
+    last_reprocess_status: null,
+    last_reprocess_error_code: null,
+    last_reprocess_error_message: null,
+    last_reprocess_at: null,
     published_at: timestamp,
     first_seen_at: timestamp,
     extraction_status: 'full',
@@ -38,6 +61,22 @@ const fixtureItems = [
     duplicate_of_item_id: null
   }
 ] as const;
+
+const fixtureSearchItems = [
+  {
+    ...fixtureItems[0],
+    id: 'item_search_canvas',
+    source_id: fixtureSecondSource.id,
+    source_title: fixtureSecondSource.title,
+    source_item_title: 'Search-only result must not leak after Escape',
+    title: 'Search-only result must not leak after Escape',
+    url: 'https://workbench-notes.example.test/search-result',
+    summary: 'Search result summary belongs to the Search surface only.',
+    core_insight: 'Escape must restore TODAY Inspector context instead of preserving this Search result.'
+  }
+] as const;
+
+const fixtureAllItems = [...fixtureItems, ...fixtureSearchItems] as const;
 
 async function installFixtureApi(page: Page, ownerToken: string): Promise<void> {
   await page.addInitScript(
@@ -64,20 +103,38 @@ async function installFixtureApi(page: Page, ownerToken: string): Promise<void> 
         }
       });
     }
-    if (url.pathname === '/api/sources') return route.fulfill({ json: { sources: [fixtureSource] } });
+    if (url.pathname === '/api/sources') return route.fulfill({ json: { sources: [fixtureSource, fixtureSecondSource] } });
     if (url.pathname === '/api/feed/today') return route.fulfill({ json: { items: fixtureItems } });
+    if (url.pathname === '/api/search') {
+      return route.fulfill({
+        json: {
+          items: fixtureSearchItems,
+          query: {
+            q: url.searchParams.get('q') ?? '',
+            source: url.searchParams.get('source'),
+            from: url.searchParams.get('from'),
+            to: url.searchParams.get('to'),
+            resonated: null,
+            limit: Number(url.searchParams.get('limit') ?? 50)
+          }
+        }
+      });
+    }
     if (url.pathname === '/api/steer/active') return route.fulfill({ json: { rules: [] } });
     if (url.pathname.startsWith('/api/items/')) {
+      const itemId = decodeURIComponent(url.pathname.slice('/api/items/'.length));
+      const item = fixtureAllItems.find((candidate) => candidate.id === itemId) ?? fixtureItems[0];
+      const source = item.source_id === fixtureSecondSource.id ? fixtureSecondSource : fixtureSource;
       return route.fulfill({
         json: {
           item: {
-            ...fixtureItems[0],
+            ...item,
             feed_excerpt: 'Source-backed excerpt remains secondary to the readable Inspector payload.',
-            extracted_text: 'Readable source text is available without changing the Inspector measure.',
+            extracted_text: Array.from({ length: 40 }, (_, index) => `Source evidence line ${index + 1} remains inside the outer Inspector scrollport.`).join('\n'),
             provenance: {
-              source_url: fixtureSource.url,
-              canonical_url: fixtureItems[0].url,
-              original_url: fixtureItems[0].url,
+              source_url: source.url,
+              canonical_url: item.url,
+              original_url: item.url,
               story_key: null,
               duplicate_of_item_id: null,
               grouped_source_items: []
@@ -107,13 +164,22 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
     const feedPane = document.querySelector('.feed-pane');
     const inspectorPane = document.querySelector('.detail-pane');
     const feedTitle = document.querySelector('.contract-feed-item .contract-feed-title');
-    if (!shell || !grid || !feedPane || !inspectorPane || !feedTitle) throw new Error('wide workbench layout target missing');
+    const readingGroupParts = Array.from(
+      document.querySelectorAll(
+        '.contract-inspector .inspector-title-row, .contract-inspector .inspector-frontmatter, .contract-inspector .inspector-text-section, .contract-inspector .inspector-points-section, .contract-inspector .inspector-reingest-panel, .contract-inspector .contract-source-details'
+      )
+    );
+    if (!shell || !grid || !feedPane || !inspectorPane || !feedTitle || readingGroupParts.length === 0) throw new Error('wide workbench layout target missing');
 
     const shellRect = shell.getBoundingClientRect();
     const feedRect = feedPane.getBoundingClientRect();
     const inspectorRect = inspectorPane.getBoundingClientRect();
     const feedTitleRect = feedTitle.getBoundingClientRect();
+    const readingGroupRects = readingGroupParts.map((element) => element.getBoundingClientRect());
+    const readingGroupLeft = Math.min(...readingGroupRects.map((rect) => rect.left));
+    const readingGroupRight = Math.max(...readingGroupRects.map((rect) => rect.right));
     const gridColumns = window.getComputedStyle(grid).gridTemplateColumns;
+    const inspectorStyle = window.getComputedStyle(inspectorPane);
 
     return {
       shellWidth: shellRect.width,
@@ -122,7 +188,12 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
       shellRight: window.innerWidth - shellRect.right,
       feedWidth: feedRect.width,
       inspectorWidth: inspectorRect.width,
+      shellInnerToInspectorRight: shellRect.right - inspectorRect.right - parseFloat(window.getComputedStyle(shell).borderRightWidth),
       gutterWidth: inspectorRect.left - feedRect.right,
+      inspectorBorderLeftWidth: parseFloat(inspectorStyle.borderLeftWidth),
+      splitLineToReadingGroup: readingGroupLeft - inspectorRect.left,
+      readingGroupToPaneRight: inspectorRect.right - readingGroupRight,
+      readingGroupWidth: readingGroupRight - readingGroupLeft,
       shellInnerToFeedTextLeft: feedTitleRect.left - shellRect.left - parseFloat(window.getComputedStyle(shell).borderLeftWidth),
       gridColumns
     };
@@ -134,13 +205,74 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
   expect(layout.shellLeft).toBeGreaterThanOrEqual(16);
   expect(layout.shellRight).toBeGreaterThanOrEqual(16);
   expect(layout.feedWidth).toBeLessThanOrEqual(760);
-  expect(layout.inspectorWidth).toBeGreaterThanOrEqual(420);
-  expect(layout.inspectorWidth).toBeLessThanOrEqual(560);
+  expect(layout.inspectorWidth).toBeGreaterThanOrEqual(560);
+  expect(layout.inspectorWidth).toBeLessThanOrEqual(760);
+  expect(layout.shellInnerToInspectorRight, 'Inspector pane absorbs trailing desktop width so its scrollbar belongs at the pane edge, not an inner column').toBeLessThanOrEqual(1);
   expect(layout.gutterWidth).toBeGreaterThanOrEqual(32);
   expect(layout.gutterWidth).toBeLessThanOrEqual(64);
+  expect(layout.inspectorBorderLeftWidth, 'Visible split line sits on the Inspector pane boundary, not the Feed edge before the gutter').toBeGreaterThanOrEqual(1);
+  expect(Math.abs(layout.splitLineToReadingGroup - layout.readingGroupToPaneRight), 'Wide desktop Inspector reading group balances split-line-to-content and content-to-pane-edge whitespace').toBeLessThanOrEqual(12);
+  expect(layout.readingGroupWidth, 'Inspector reading group keeps a measured line length instead of stretching across the full pane').toBeLessThan(layout.inspectorWidth - 32);
   expect(layout.shellInnerToFeedTextLeft, 'Feed text anchors near shell inner left edge without a leading blank band').toBeGreaterThanOrEqual(32);
   expect(layout.shellInnerToFeedTextLeft, 'Feed text anchors near shell inner left edge without a leading blank band').toBeLessThanOrEqual(48);
-  expect(layout.gridColumns.split(' ').length).toBeGreaterThanOrEqual(3);
+  expect(layout.gridColumns.split(' ').length, 'Desktop split uses column-gap breathing room, not an explicit phantom middle slab track').toBe(2);
+});
+
+test('Search filters are collapsed, typed system controls, and Escape restores TODAY Inspector', async ({ page, ownerToken }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await installFixtureApi(page, ownerToken);
+
+  await page.goto('/');
+  const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+  await steer.fill('search canvas');
+  await page.getByRole('button', { name: 'apply' }).click();
+
+  const search = page.locator('.contract-search');
+  await expect(search).toBeVisible();
+  const filters = search.locator('.search-secondary-filters');
+  await expect(filters).not.toHaveAttribute('open', /.+/);
+  await filters.locator('summary').click();
+
+  const source = search.locator('#search-source');
+  const from = search.locator('#search-from');
+  const to = search.locator('#search-to');
+  const checkboxLabel = search.locator('.search-filter-checkbox');
+  await expect.poll(async () => source.evaluate((element) => element.tagName)).toBe('SELECT');
+  await expect(source.locator('option')).toHaveText(['All sources', 'Workbench Canvas Source', 'Workbench Notes Source']);
+  await expect(from).toHaveAttribute('type', 'text');
+  await expect(from).toHaveAttribute('placeholder', 'YYYY-MM-DD');
+  await expect(to).toHaveAttribute('type', 'text');
+  await expect(to).toHaveAttribute('placeholder', 'YYYY-MM-DD');
+
+  const filterMetrics = await search.evaluate(() => {
+    const label = document.querySelector<HTMLElement>('.search-filter-checkbox');
+    const input = document.querySelector<HTMLInputElement>('#search-resonated');
+    const toInput = document.querySelector<HTMLInputElement>('#search-to');
+    if (!label || !input || !toInput) throw new Error('search filter controls missing');
+    const labelRect = label.getBoundingClientRect();
+    const inputRect = input.getBoundingClientRect();
+    const toRect = toInput.getBoundingClientRect();
+    const labelStyle = window.getComputedStyle(label);
+    return {
+      checkboxDisplay: labelStyle.display,
+      checkboxAlignItems: labelStyle.alignItems,
+      hitTargetHeight: labelRect.height,
+      centerDelta: Math.abs((labelRect.top + labelRect.height / 2) - (inputRect.top + inputRect.height / 2)),
+      endDateWidth: toRect.width
+    };
+  });
+  expect(filterMetrics.checkboxDisplay).toBe('flex');
+  expect(filterMetrics.checkboxAlignItems).toBe('center');
+  expect(filterMetrics.hitTargetHeight).toBeGreaterThanOrEqual(44);
+  expect(filterMetrics.centerDelta).toBeLessThanOrEqual(1);
+  expect(filterMetrics.endDateWidth, 'End date text input is wide enough for YYYY-MM-DD').toBeGreaterThanOrEqual(144);
+
+  await expect(page.getByRole('heading', { name: 'Search-only result must not leak after Escape' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'feed');
+  await expect(page.getByRole('heading', { name: 'Workbench split view item stays readable' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Search-only result must not leak after Escape' })).toHaveCount(0);
 });
 
 test('desktop split Inspector aligns to feed rows and Escape preserves the selected pane', async ({ page, ownerToken }) => {
@@ -155,19 +287,32 @@ test('desktop split Inspector aligns to feed rows and Escape preserves the selec
   const layout = await page.evaluate(() => {
     const feedRow = document.querySelector('.contract-feed-item');
     const detailPane = document.querySelector('.detail-pane');
+    const inspectorSurface = document.querySelector('.contract-inspector');
     const inspectorTitle = document.querySelector('.contract-inspector h2');
-    if (!feedRow || !detailPane || !inspectorTitle) throw new Error('desktop Inspector alignment target missing');
+    if (!feedRow || !detailPane || !inspectorSurface || !inspectorTitle) throw new Error('desktop Inspector alignment target missing');
 
     const feedRect = feedRow.getBoundingClientRect();
     const detailRect = detailPane.getBoundingClientRect();
+    const surfaceRect = inspectorSurface.getBoundingClientRect();
     const titleRect = inspectorTitle.getBoundingClientRect();
+    const detailStyle = window.getComputedStyle(detailPane);
+    const surfaceStyle = window.getComputedStyle(inspectorSurface);
 
     return {
       feedTop: feedRect.top,
       titleTop: titleRect.top,
       titleInset: titleRect.left - detailRect.left,
       detailWidth: detailRect.width,
-      titleLeft: titleRect.left
+      titleLeft: titleRect.left,
+      detailLeft: detailRect.left,
+      detailRight: detailRect.right,
+      surfaceRight: surfaceRect.right,
+      surfaceLeft: surfaceRect.left,
+      detailOverflowY: detailStyle.overflowY,
+      surfaceOverflowY: surfaceStyle.overflowY,
+      surfaceTabIndex: inspectorSurface.getAttribute('tabindex'),
+      detailCanScroll: detailPane.scrollHeight > detailPane.clientHeight,
+      surfaceCanScroll: inspectorSurface.scrollHeight > inspectorSurface.clientHeight
     };
   });
 
@@ -175,10 +320,17 @@ test('desktop split Inspector aligns to feed rows and Escape preserves the selec
   expect(layout.titleInset, 'Inspector content is left-aligned inside its pane, not centered').toBeGreaterThanOrEqual(20);
   expect(layout.titleInset, 'Inspector side inset remains dense').toBeLessThanOrEqual(28);
   expect(layout.detailWidth).toBeGreaterThan(layout.titleInset * 2);
+  expect(Math.abs(layout.surfaceLeft - layout.detailLeft), 'Inspector surface spans from the detail pane left edge').toBeLessThanOrEqual(1);
+  expect(Math.abs(layout.surfaceRight - layout.detailRight), 'Inspector surface spans to the detail pane right edge').toBeLessThanOrEqual(1);
+  expect(layout.detailOverflowY, 'Desktop .detail-pane owns Inspector vertical scrolling').toBe('auto');
+  expect(layout.surfaceOverflowY, 'Desktop .contract-inspector must not become an inner vertical scroll island').toBe('visible');
+  expect(layout.surfaceTabIndex, 'Desktop .contract-inspector does not compete with .detail-pane as scroll focus owner').toBeNull();
+  expect(layout.detailCanScroll, 'Fixture makes the right pane a real scrollport').toBe(true);
+  expect(layout.surfaceCanScroll, 'The inner Inspector surface is not clipped into its own scrollport').toBe(false);
 
-  await page.locator('.contract-inspector').focus();
-  await expect(page.locator('.contract-inspector')).toBeFocused();
-  await page.locator('.contract-inspector').dispatchEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+  await page.locator('.detail-pane').focus();
+  await expect(page.locator('.detail-pane')).toBeFocused();
+  await page.locator('.detail-pane').dispatchEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'inspector');
   await expect(page.locator('.detail-pane')).toBeVisible();
@@ -268,11 +420,13 @@ test('narrow Inspector route uses one back header row and Escape returns to TODA
     return {
       backTop: backRect.top,
       detailTop: detailRect.top,
+      detailBottomGap: window.innerHeight - detailRect.bottom,
       backText: back.textContent?.trim() ?? ''
     };
   });
 
   expect(chrome.detailTop).toBe(0);
+  expect(chrome.detailBottomGap, 'narrow Inspector covers the bottom Steer chrome instead of leaving a color slab').toBe(0);
   expect(chrome.backTop).toBeGreaterThanOrEqual(0);
   expect(chrome.backTop).toBeLessThanOrEqual(1);
   expect(chrome.backText).toMatch(/TODAY/);

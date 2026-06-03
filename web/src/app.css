@@ -35,7 +35,8 @@ body > div {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -1064,8 +1065,7 @@ details.surface-nav button:focus-visible {
   min-height: 0;
 }
 
-.search-primary-row,
-.search-secondary-grid {
+.search-primary-row {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
   gap: var(--rf-space-sm) var(--rf-space-row);
@@ -1073,12 +1073,60 @@ details.surface-nav button:focus-visible {
 }
 
 .search-secondary-grid {
-  grid-template-columns: max-content minmax(14ch, 1fr) max-content minmax(14ch, 1fr) max-content minmax(10ch, 0.5fr);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rf-space-sm) var(--rf-space-row);
+  align-items: flex-end;
   margin-block-start: var(--rf-space-sm);
 }
 
-.search-secondary-grid .contract-checkbox {
-  grid-column: span 2;
+.search-filter-field {
+  display: grid;
+  flex: 1 1 18ch;
+  min-width: min(100%, 18ch);
+  gap: var(--rf-space-xs);
+  color: var(--rf-color-current-muted);
+  font: var(--rf-typography-metadata);
+}
+
+.search-filter-field--source {
+  flex-basis: 22ch;
+}
+
+.search-filter-field--date {
+  flex: 0 1 20ch;
+  min-width: min(100%, 20ch);
+}
+
+.search-filter-field--limit {
+  flex: 0 1 12ch;
+  min-width: min(100%, 12ch);
+}
+
+.search-filter-field input,
+.search-filter-field select {
+  width: 100%;
+  min-width: 0;
+}
+
+.search-filter-checkbox {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--rf-space-sm);
+  padding-inline: var(--rf-space-xs);
+  color: var(--rf-color-current-muted);
+  font: var(--rf-typography-metadata);
+}
+
+.search-filter-checkbox input[type='checkbox'] {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  accent-color: var(--rf-color-current-text);
 }
 
 .search-secondary-filters summary {
@@ -1515,7 +1563,8 @@ details.surface-nav button:focus-visible {
   }
 
   .shell-grid {
-    grid-template-columns: minmax(0, 760px) clamp(var(--rf-space-xl), 4vw, var(--rf-space-column)) minmax(420px, 560px);
+    grid-template-columns: minmax(0, 760px) minmax(420px, 1fr);
+    column-gap: clamp(var(--rf-space-xl), 4vw, var(--rf-space-column));
     justify-content: start;
     min-height: 0;
     flex: 1;
@@ -1525,10 +1574,12 @@ details.surface-nav button:focus-visible {
 
   .feed-pane {
     grid-column: 1;
+    border-inline-end: 0;
   }
 
   .detail-pane {
-    grid-column: 3;
+    grid-column: 2;
+    border-inline-start: 1px solid var(--rf-color-current-rule);
   }
 
   .shell-grid[data-surface='feed'] .detail-pane.detail-pane--closed {
@@ -1560,11 +1611,27 @@ details.surface-nav button:focus-visible {
 
   .detail-pane > .inspector-stable-landmark > .contract-inspector {
     flex: 1 0 auto;
+    width: 100%;
     min-height: 100%;
     max-height: none;
     overflow: visible;
     /* [DEVIATION]: Use lg instead of the flexible inspector-pane xl padding on desktop split so Inspector title aligns with feed row content while preserving readable measure. */
     padding: var(--rf-space-lg);
+  }
+
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-title-row,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-frontmatter,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-evidence-line,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-status-line,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-text-section,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-points-section,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-attempt-failure,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .inspector-reingest-panel,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .contract-source-details,
+  .detail-pane > .inspector-stable-landmark > .contract-inspector .contract-grouped-sources {
+    width: min(100%, 68ch);
+    max-width: 68ch;
+    margin-inline: auto;
   }
 
   .feed-pane > .contract-search {
@@ -1713,8 +1780,10 @@ details.surface-nav button:focus-visible {
   }
 
   .shell-grid[data-surface='inspector'] .detail-pane.active-panel {
-    inset-block-start: 0;
+    z-index: 6;
+    inset-block: 0;
     top: 0;
+    bottom: 0;
   }
 
   .detail-pane.active-panel {
@@ -1866,13 +1935,19 @@ details.surface-nav button:focus-visible {
   }
 
   .search-secondary-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--rf-space-xs) var(--rf-space-sm);
+    gap: var(--rf-space-sm);
   }
 
-  .search-secondary-grid label,
-  .search-secondary-grid .contract-checkbox {
-    font: var(--rf-typography-metadata);
+  .search-filter-field,
+  .search-filter-field--source,
+  .search-filter-field--date,
+  .search-filter-field--limit {
+    flex: 1 1 calc(50% - var(--rf-space-sm));
+    min-width: min(100%, 16ch);
+  }
+
+  .search-filter-checkbox {
+    flex: 1 1 calc(50% - var(--rf-space-sm));
   }
 
   .search-secondary-grid input,

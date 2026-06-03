@@ -493,9 +493,9 @@ Desktop layout:
 - Desktop shell height should be full or near-full viewport height: prefer `100dvh` with `0–8px` vertical margin, not `32px` top/bottom margins. The goal is to maximize visible feed rows while preserving a thin archival frame.
 - Top row contains the Steer input and minimal product label. Persistent top chrome must not permanently show `LANG: EN`, `LANG: ZH`, `[REPROCESS LIBRARY]`, or their localized equivalents.
 - The product label may act as a discreet `RESOFEED` surface menu; `TODAY`, `SOURCE LEDGER`, processing language, and guarded `[REPROCESS LIBRARY]` are allowed to appear only after that menu opens. This is intentional low-chrome navigation/utility placement, not a missing-link regression.
-- Feed text remains clamped for scan comfort even when the shell expands. Feed content should stay around `640–760px`; extra desktop width may become interior whitespace or structural gutter, but must not stretch Feed line length past comfortable scanning.
-- Inspector opens to the right at `420–560px`; it may approach `640px` only when the content remains readable and frontmatter/reading sections stay visually controlled. If width is below `1080px`, Inspector becomes a route/full-screen detail view.
-- Desktop Inspector content is left-aligned within its right pane with only standard reading padding (`16–24px`). It must not float as a centered island, and a flexible gutter must not create a large empty right-side field inside the Inspector pane.
+- Feed text remains clamped for scan comfort even when the shell expands. Feed content should stay around `640–760px`; extra desktop width may become exterior shell gutter or controlled split structure, but must not stretch Feed line length past comfortable scanning.
+- Inspector opens to the right at `420–760px` depending on available desktop width. Its outer pane owns scrolling and may grow, while the reading group keeps a measured line length and balanced left/right breathing room.
+- Desktop Inspector reading groups may be horizontally balanced inside the pane, but they must not become floating scroll islands. The `.detail-pane` remains the pane, scrollport, and scrollbar owner.
 - Selected item state must not alter feed item dimensions.
 
 Mobile layout:
@@ -508,6 +508,7 @@ Mobile layout:
 - Mobile feed title uses `{typography.feed-title}` (18px/24px) identical to desktop. Feed summaries clamp to one line in the feed.
 - Feed row padding should stay around 12px top, 11px bottom, and 10–12px left marker offset to preserve the exact 24px rhythm increment. Do not shrink independent controls to gain density.
 - Inspector uses full-screen navigation with back behavior and preserved feed scroll. Mobile Inspector/detail view has one sticky top back row (`返回 TODAY` / `back to TODAY`) that remains visible while reading; it replaces the global `RESOFEED` banner on that route. The title uses `{typography.inspector-title}`, body uses `{typography.payload}`, with 20–24px horizontal padding.
+- Mobile Inspector/detail routes are [SHARP] full-screen takeovers. They must cover global top chrome and the bottom Steer command area instead of leaving top or bottom color slabs visible behind the route. The back row is the route chrome; the global shell chrome must not show through as a second banner.
 - Source Ledger opens as a flat full-screen utility surface on narrow layouts, reachable from the `RESOFEED` menu and optionally by Steer command text such as `source ledger`.
 - Touch targets must be at least 44 CSS px on web/mobile web. Native shells may map this to platform points.
 - Gestures: Support native OS edge-swipe to dismiss the Inspector (crucial for one-handed use). Feed rows are full-width tap targets (excluding the independent Resonate hit area). Double-tap in the Inspector reading body to toggle Resonate is encouraged as a power-user enhancement, provided the explicit star button remains visible.
@@ -521,12 +522,18 @@ Feed lifecycle:
 ### Desktop Split Proximity and Gutter Contract
 Desktop split view must preserve visual proximity between Feed and Inspector. The middle gutter between the Feed column and Inspector column is structural breathing room, not expandable empty content. It SHOULD stay around `32–64px` and MUST NOT grow as an unbounded `1fr` field on wide screens.
 
+The visible split line must not make the Inspector read as if it has extra left padding. If the separator line is drawn at the Feed edge, any middle gutter after that line is perceived as part of the Inspector's left whitespace and MUST be counted together with Inspector padding when checking balance. Prefer placing the visible separator at the actual Inspector pane boundary, or reducing the gutter so the perceived distance from split line to Inspector reading content does not exceed the trailing right-side breathing room by more than one spacing row (`12px`).
+
 The Feed column must anchor to the shell's left content edge. Do not center the Feed+Inspector grid inside a wider shell in a way that creates a large blank leading gutter before the Feed rows. Desktop Feed row text should start within roughly `32–48px` of the shell's inner left edge, including normal surface padding and any invisible rhythm gutter. A leading internal blank band wider than one spacing column (`64px`) is a layout bug, even if it uses the correct background color.
 
-On ultra-wide displays, constrain the shell, cap the middle gutter, or put extra width outside the shell. Extra width may increase outer page gutter or remain outside the workbench, but it must not create a large dead zone before the Feed or between the selected feed row and its Inspector detail.
-### Desktop Split Scroll and Processing Language Layout
+On ultra-wide displays, constrain the shell, cap the middle gutter, or put extra width outside the shell. Extra width may increase outer page gutter or remain outside the workbench, but it must not create a large dead zone before the Feed, between the visible split line and Inspector content, or between the Inspector reading group and the pane's right edge.
 
-Desktop shell must keep Feed and Inspector as independent vertical scroll regions. Global page scroll must not couple the two panes. Scrolling the Feed must not move the Inspector, and scrolling the Inspector must not move the Feed. Selecting a Feed item must keep Feed scroll position stable and reset the Inspector reading container to the top for the newly selected item. Both scroll regions MUST be focusable (e.g., `tabindex="0"`) with proper accessible names so keyboard users can scroll them independently.
+### Desktop Split Scroll and Processing Language Layout
+Desktop shell must keep Feed and Inspector as independent vertical scroll regions. Global page scroll must not couple the two panes. Scrolling the Feed must not move the Inspector, and scrolling the Inspector must not move the Feed. Selecting a Feed item must keep Feed scroll position stable and reset the Inspector pane scroll to the top for the newly selected item.
+
+The desktop Inspector scrollport contract is [SHARP]: the right `.detail-pane` owns Inspector vertical scrolling. The Inspector article/content column may constrain line length, but it MUST NOT become a nested vertical scroll container, MUST NOT place the scrollbar at the reading-column edge, and MUST NOT use a centered scroll island. The scrollbar belongs at the outer right edge of the Inspector pane.
+
+Both desktop scroll regions MUST be focusable (e.g., `tabindex="0"`) with proper accessible names so keyboard users can scroll them independently. In desktop split view, prefer exactly one keyboard-scroll focus owner per pane: the Feed pane for feed rows and the `.detail-pane` for Inspector reading. Inner Inspector reading blocks may contain focusable controls and headings, but they must not compete as page-level scroll owners.
 
 Mobile keeps the existing single-column behavior: Feed is the main surface and Inspector opens as a full-screen route with preserved Feed scroll.
 
@@ -849,8 +856,13 @@ On desktop TODAY, if feed items exist and no explicit item route is active, the 
 Switching from one selected item to another MUST NOT collapse, blank, or visibly tear down the Inspector layout. Keep the previous Inspector structure mounted until the new item detail is ready, then replace content in place. A terse low-chrome loading line is acceptable, but it must not shift the title/frontmatter/body geometry or flash a blank pane.
 
 #### Desktop split alignment
+On desktop split view, the Inspector reading group (title, Frontmatter, reading sections, points, and item-scoped controls) belongs to the right pane, not to a floating inner scroll surface. These elements MUST share one coherent horizontal measure and a consistent left edge inside that measure.
 
-On desktop split view, the Inspector reading content belongs to the right pane's left edge. The title, Frontmatter, and reading sections MUST share a consistent left edge with only standard reading padding (`16–24px`). Do not center the Inspector content inside its pane, do not add a floating padded island, and do not leave a large unused right-side field inside the Inspector pane. When TODAY has a selected item, the selected item and Inspector content remain visible unless the user selects a different item or navigates to a utility/detail route.
+Inspector whitespace balance is [SHARP]. The perceived blank space from the visible split line to the reading group and from the reading group to the right pane edge should look balanced; the two sides SHOULD differ by no more than one spacing row (`12px`) at common desktop widths. Do not allow the middle gutter plus Inspector padding to stack into a visibly heavier left-side void.
+
+Readable measure is [FLEXIBLE] but scroll ownership is [SHARP]. Inspector text sections may keep a max-width for legibility, and the measured reading group may be horizontally balanced inside the pane. That max-width only controls line length and horizontal rhythm. It does not define pane width, scrollbar position, or scroll ownership. The outer Inspector surface still spans the pane, and the `.detail-pane` remains the scrollport.
+
+Extra horizontal width is absorbed in this order: outside the capped workbench shell, then a capped middle gutter that does not distort Inspector left/right balance, then balanced breathing room around the Inspector reading group. A vertical scrollbar between the reading group and a trailing empty gutter is a layout bug because it makes the reading group, not the pane, read as the scroll surface.
 
 ### Inspector Summary (`摘要`)
 - **Intent**: [SHARP] Chinese contextual explanation of the selected item.
@@ -1077,6 +1089,21 @@ Keyboard and accessibility: search results follow normal feed item focus behavio
 
 Forbidden search-detail patterns: no modal detail views, accordions-as-detail, recommendation rails, generated answer panels, immersive reader mode, complex tabs, folders/tags/unread concepts, settings sliders, onboarding/account prompts, flashy highlight effects, animated selection, accent-color selection, short fixed-height desktop widgets, or selected-result cards that visually overpower the list.
 
+#### Search filter disclosure and controls
+
+Search filters are [SHARP] progressive disclosure. The filter details control is collapsed by default in every processing language, including Chinese. The default Search surface is query-first: one plain query field, one bracket submit action, then a compact `筛选` / `filters` disclosure. Filters must not render as a settings dashboard or a permanently expanded form block.
+
+Filter component types are [SHARP]:
+
+- `Source` uses a low-chrome native select populated from active sources, with an all-sources empty option. Do not use a free-text source field when the active source list is available; source identity is selected, not typed.
+- `Start date` and `End date` use plain text inputs with `YYYY-MM-DD` placeholders. Do not use native `type="date"` controls because the browser/OS calendar popup is visually uncontrolled and clashes with the dark archival workbench.
+- `Resonated` / `已标星` is one flex-aligned checkbox label. The checkbox and label text must share a visual baseline/center and remain a single 44px-minimum hit target.
+- `Result limit` remains a low-chrome select. It belongs after the semantic filters, not between date endpoints.
+
+Filter layout is [SHARP]: keep a compact, wrapping control grid with stable minimum widths for date fields so placeholders do not clip. Labels and controls should read as pairs, not as a six-column spreadsheet. The expanded filter block must preserve feed-row density below it and must not push the first result into a visually unrelated region.
+
+Submission remains deliberate: changing a filter does not automatically run a new search. The user submits with the single `[SEARCH]` / `[搜索]` bracket action.
+
 #### Search auto-selection and stale Inspector prevention
 
 Executing a desktop Search invalidates any previous TODAY/feed selection as the visible Inspector context. When a search returns one or more results, the first result MUST be selected automatically and the desktop Inspector MUST update to that result. This keeps the left Search results and right Inspector in the same information context without requiring an extra click.
@@ -1189,7 +1216,6 @@ Motion is functional, brief, and optional.
 - Bracket actions use immediate terminal feedback: transparent enlarged hitbox at rest, stark color inversion or equivalent hard highlight on hover/focus, strict monospace text, and zero transform/shadow/fade behavior.
 
 ### Escape Navigation Contract
-
 Purpose: `Escape` is a keyboard escape hatch back to ResoFeed's neutral state, not a command system or configurable shortcut layer.
 
 Rules are [SHARP]:
@@ -1201,6 +1227,8 @@ Rules are [SHARP]:
 - On mobile/narrow Inspector route, `Escape` returns to `TODAY` and preserves the feed scroll position, matching the visible back behavior.
 - On Source Ledger, `/doctor`, Search, or any other non-`TODAY` utility surface, `Escape` returns to `TODAY` only when no focused input, transient panel, confirmation, or in-flight submit owns the key.
 - Returning from Search to `TODAY` MUST clear the Search surface state, Search receipt, and Search route/query by semantic state, not by matching localized visible copy such as `retrieval:` or `检索：词汇搜索`.
+- Returning from Search to `TODAY` MUST also clear the Search-selected item context before feed reconciliation. The desktop Inspector must re-sync to the first visible TODAY item when feed items exist, or show the normal empty Inspector only when TODAY has no items. It must never keep displaying an orphaned Search result after Search is exited.
+- Search filters are ephemeral Search surface state. `Escape` from Search clears the query and filters; it does not create saved searches, durable filter profiles, reading history, or command history.
 - On desktop `TODAY` with a selected item visible in the split Inspector, `Escape` MUST NOT clear the selected item, blank the right pane, or close the Inspector solely because the page is in the selected-item state. This is option C: `TODAY` is already the neutral workbench surface; `Escape` only handles nested/transient UI there.
 - If focus is inside the desktop split Inspector and no transient Inspector control owns `Escape`, the key may move focus back to the Feed list, but the selected item and right pane remain visible.
 - Moving focus back to the Feed list MUST use a low-chrome focus treatment. Keyboard focus must remain perceivable, but it must not render as a bright full-height cyan strip, a selected-item marker, or any accent-heavy bar that can be mistaken for selection.

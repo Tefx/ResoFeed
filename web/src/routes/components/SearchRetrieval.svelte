@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage, type SearchResponse } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type ItemSummary, type ProcessingLanguage, type SearchResponse, type Source } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { itemAgeLabel, itemAnatomyChrome, itemExtractionLabel, itemHasAuthoritativeGrouping, itemLocalizedDisplayTitle, itemReaderRowPreviewText, itemReaderRowPriorityToken, itemSourceBackedProvenanceLabel, itemSourceProvenanceTitle, itemTimeGroup, shouldShowTimeGroup } from './item-anatomy';
 
@@ -15,9 +15,10 @@
     suppressStatusRole?: boolean;
     compactFilters?: boolean;
     language?: ProcessingLanguage;
+    sources?: Source[];
   }
 
-  let { items, query = '', onSearch, onSelect, onResultsSettled, onResonanceToggle, selectedItemId = null, autoSelectFirstResult = false, suppressStatusRole = false, compactFilters = false, language = 'en' }: Props = $props();
+  let { items, query = '', onSearch, onSelect, onResultsSettled, onResonanceToggle, selectedItemId = null, autoSelectFirstResult = false, suppressStatusRole = false, compactFilters = false, language = 'en', sources = [] }: Props = $props();
   let searchQuery = $state('');
   let source = $state('');
   let from = $state('');
@@ -43,6 +44,7 @@
       filtersSummary: '筛选',
       source: '来源',
       sourceInput: '来源筛选',
+      allSources: '全部来源',
       from: '开始日期',
       to: '结束日期',
       resonated: '已标星',
@@ -65,6 +67,7 @@
       filtersSummary: 'filters',
       source: 'Source',
       sourceInput: 'Source filter',
+      allSources: 'All sources',
       from: 'From date',
       to: 'To date',
       resonated: 'Resonated',
@@ -77,6 +80,7 @@
       extractionPrefix: '',
       resonate: (item: ItemSummary) => item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`
     });
+  const activeSources = $derived(sources.filter((candidate) => candidate.is_active));
 
   function sourceProvenanceLabel(item: ItemSummary): string {
     const source = chrome.search.sourceAria(item.source_title);
@@ -156,53 +160,45 @@
       <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
       <button type="submit" class="bracket-action" aria-label={searchChrome.submitAria}>{searchChrome.submit}</button>
     </div>
-    {#if compactFilters}
-      <details class="search-secondary-filters" data-compact-filters="true">
-        <summary>{searchChrome.filtersSummary}</summary>
-        <div class="search-secondary-grid">
-          <label for="search-source">{searchChrome.source}</label>
-          <input id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput} />
-          <label for="search-from">{searchChrome.from}</label>
-          <input id="search-from" name="from" type="date" bind:value={from} />
-          <label for="search-to">{searchChrome.to}</label>
-          <input id="search-to" name="to" type="date" bind:value={to} />
-          <label class="contract-checkbox" for="search-resonated">
-            <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} aria-label={searchChrome.resonatedInput} />
-            {searchChrome.resonated}
-          </label>
-          <label for="search-limit">{searchChrome.limit}</label>
+    <details class="search-secondary-filters" data-compact-filters={compactFilters ? 'true' : 'false'}>
+      <summary>{searchChrome.filtersSummary}</summary>
+      <div class="search-secondary-grid">
+        <label class="search-filter-field search-filter-field--source" for="search-source">
+          <span>{searchChrome.source}</span>
+          {#if activeSources.length > 0}
+            <select id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput}>
+              <option value="">{searchChrome.allSources}</option>
+              {#each activeSources as activeSource (activeSource.id)}
+                <option value={activeSource.id}>{activeSource.title}</option>
+              {/each}
+            </select>
+          {:else}
+            <input id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput} />
+          {/if}
+        </label>
+        <label class="search-filter-field search-filter-field--date" for="search-from">
+          <span>{searchChrome.from}</span>
+          <input id="search-from" name="from" type="text" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" placeholder="YYYY-MM-DD" bind:value={from} />
+        </label>
+        <label class="search-filter-field search-filter-field--date" for="search-to">
+          <span>{searchChrome.to}</span>
+          <input id="search-to" name="to" type="text" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" placeholder="YYYY-MM-DD" bind:value={to} />
+        </label>
+        <label class="contract-checkbox search-filter-checkbox" for="search-resonated">
+          <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} aria-label={searchChrome.resonatedInput} />
+          <span>{searchChrome.resonated}</span>
+        </label>
+        <label class="search-filter-field search-filter-field--limit" for="search-limit">
+          <span>{searchChrome.limit}</span>
           <select id="search-limit" name="limit" bind:value={limit}>
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
           </select>
-        </div>
-      </details>
-    {:else}
-      <details class="search-secondary-filters" data-compact-filters="false" open={language === 'zh'}>
-        <summary>{searchChrome.filtersSummary}</summary>
-        <div class="search-secondary-grid">
-          <label for="search-source">{searchChrome.source}</label>
-          <input id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput} />
-          <label for="search-from">{searchChrome.from}</label>
-          <input id="search-from" name="from" type="date" bind:value={from} />
-          <label for="search-to">{searchChrome.to}</label>
-          <input id="search-to" name="to" type="date" bind:value={to} />
-          <label class="contract-checkbox" for="search-resonated">
-            <input id="search-resonated" name="resonated" type="checkbox" bind:checked={resonated} aria-label={searchChrome.resonatedInput} />
-            {searchChrome.resonated}
-          </label>
-          <label for="search-limit">{searchChrome.limit}</label>
-          <select id="search-limit" name="limit" bind:value={limit}>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
-        </div>
-      </details>
-    {/if}
+        </label>
+      </div>
+    </details>
   </form>
   <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || chrome.search.resultCount(results.length)}</p>
   <div class="contract-search-results-region" role="region" aria-label={searchChrome.resultsRegion}>

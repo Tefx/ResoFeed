@@ -752,10 +752,10 @@
   }
 </script>
 
-<!-- DESIGN.md desktop split-scroll requires the Inspector reading region itself to be keyboard focusable and labelled. -->
+<!-- DESIGN.md desktop split-scroll requires the outer .detail-pane to own keyboard scrolling; this inner surface stays focusable only on the mobile single-column route. -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions: Escape closes Inspector-local transient re-ingest chrome from the focusable scroll region before global route handling. -->
-<!-- svelte-ignore a11y_no_noninteractive_tabindex: the region is an explicitly focusable scroll container. -->
-<aside class="contract-region contract-inspector" aria-label={item ? (landmarkLabel ?? localizedDisplayTitle(item)) : 'INSPECTOR'} tabindex="0" data-scroll-region="inspector-reading-independent" onkeydown={handleInspectorEscape}>
+<!-- svelte-ignore a11y_no_noninteractive_tabindex: on mobile route the Inspector surface remains a focusable route-level reading region. -->
+<aside class="contract-region contract-inspector" aria-label={item ? (landmarkLabel ?? localizedDisplayTitle(item)) : 'INSPECTOR'} tabindex={mode === 'mobile-route' ? 0 : undefined} data-scroll-region={mode === 'mobile-route' ? 'inspector-reading-independent' : undefined} onkeydown={handleInspectorEscape}>
   <p id="inspector-region-label" class="visually-hidden contract-label">{item ? inspectorChromeLabel(item) : localizedChrome('INSPECTOR', '检查器')}</p>
   {#if loading}
     <p class="contract-muted inspector-transition-status" role="status">{localizedChrome('loading', '加载中')}</p>
