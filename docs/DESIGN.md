@@ -436,7 +436,6 @@ Content contract target is **dense comprehension, not paragraph-only compression
 Product copy rule: internal design metaphors and principles are not user-visible slogans. Do not render “Analyst’s Workbench,” “Archival Index,” “low-fatigue,” “single-tenant,” or “no SaaS chrome” in the app UI. The product chrome should use only operational labels such as `RESOFEED`, `TODAY`, `YESTERDAY`, `SOURCE LEDGER`, `INSPECTOR`, `/doctor`, and raw status strings.
 
 ## Colors
-
 The color system is nearly monochrome, but not literal terminal black-and-white. Low-fatigue neutrals carry almost every pixel. `primary`, `text`, `surface`, `background`, `muted`, and `border` form the base utility palette. `accent` is scarce and reserved for Resonate state. Implementation should normally show no more than two accent moments per screen.
 
 - `background` / `surface`: stone-paper and zinc-paper neutrals for an analyst workbench feel, avoiding both pastel SaaS softness and eye-straining pure canvas colors.
@@ -449,6 +448,8 @@ The color system is nearly monochrome, but not literal terminal black-and-white.
 Use perceptually even ramps when extending tokens: think in OKLCH/HSL for contrast and step consistency, then serialize to sRGB hex in implementation. Avoid pure `#000000` / `#FFFFFF` as primary reading surfaces; diagnostic blocks may use stronger contrast because they are short operational output, not reading canvas.
 
 Dark mode mirrors the same hierarchy: dark slate canvas, zinc surface, warm ash text, blue-steel focus, amber Resonate. No gradients, decorative blobs, or purple AI trust palettes.
+
+Theme-root rule: [SHARP] light/dark mode must apply at the page canvas level (`html`, `body`, and app root), not only inside `.contract-shell` or component islands. Page gutters, safe-area bands, fixed command bars, top chrome, feed surfaces, and Inspector surfaces must all use the active theme's background/surface tokens. Dark mode must never expose light stone-paper gaps around a dark feed or command bar; separate surfaces with 1px muted rules rather than mismatched background bands.
 
 If a future non-web shell is created, it should inherit semantic labels (`src:`, `agent:`, `source text: RSS excerpt only`, `source excerpt`, `error:`) and star shape changes (`☆` to `★`). These labels preserve source-text provenance separately from generated-summary provenance. `partial:` is an internal extraction condition, not a user-facing semantic label. This document does not define a separate terminal product surface.
 
@@ -478,31 +479,35 @@ All-caps labels must use 0.08em tracking and remain short. Body copy line length
 Font loading must use swap behavior and stable fallbacks to avoid layout shift. If custom fonts are unavailable, Georgia + system monospace is acceptable.
 
 ## Layout & Spacing
-
 Spacing uses a strict 4px/8px mathematical scale: `0, 2, 4, 8, 12, 16, 24, 32, 48, 64`.
 
 - **Proximity (Gestalt):** Elements that belong together must have inner margins smaller than outer margins. E.g., Title and Summary (`4px` gap) vs Metadata and Title (`8px` gap).
-- **Data-Ink Ratio:** Horizontal lines divide content. Full-width colored blocks or pill backgrounds are omitted wherever spacing + alignment can convey structure alone.
+- **Data-Ink Ratio:** Horizontal lines divide content. Full-width colored blocks or pill backgrounds are omitted wherever spacing + alignment can convey structure alone. Fixed chrome may use thin rules and low-contrast canvas continuity, but it must not create heavy horizontal color bands that compete with feed or reading content.
 - **Metadata Compression:** Known fields in the Feed and Inspector are communicated by position, order, typography, and accessible names. Do not spend visual space on repeated `src:`, `来源标题:`, `条目 URL`, `来源 URL`, or `价值:` prefixes in the main reading flow.
 - **Rhythm:** Feed rows use `12px` top padding, `11px` bottom padding, and a `1px` separator to cleanly add up to an exact `24px` vertical shift per item boundary, preserving the 8-point grid rhythm exactly.
 
 Desktop layout:
 
 - Shell has no persistent left navigation.
+- Desktop shell is a responsive full-height workbench, not a narrow centered webpage. It should use the viewport with small controlled gutters: target `calc(100vw - 32px)` to `calc(100vw - 64px)` with an upper bound around `1440–1600px`. A hard `1216px` desktop cap is too small for split Feed + Inspector work.
+- Desktop shell height should be full or near-full viewport height: prefer `100dvh` with `0–8px` vertical margin, not `32px` top/bottom margins. The goal is to maximize visible feed rows while preserving a thin archival frame.
 - Top row contains the Steer input and minimal product label. Persistent top chrome must not permanently show `LANG: EN`, `LANG: ZH`, `[REPROCESS LIBRARY]`, or their localized equivalents.
 - The product label may act as a discreet `RESOFEED` surface menu; `TODAY`, `SOURCE LEDGER`, processing language, and guarded `[REPROCESS LIBRARY]` are allowed to appear only after that menu opens. This is intentional low-chrome navigation/utility placement, not a missing-link regression.
-- Feed column occupies the left/center and should remain scannable at 640–760px; compact density is the default rather than a settings preference.
-- Inspector opens to the right at 420–560px. If width is below 1080px, Inspector becomes a route/full-screen detail view.
+- Feed text remains clamped for scan comfort even when the shell expands. Feed content should stay around `640–760px`; extra desktop width may become interior whitespace or structural gutter, but must not stretch Feed line length past comfortable scanning.
+- Inspector opens to the right at `420–560px`; it may approach `640px` only when the content remains readable and frontmatter/reading sections stay visually controlled. If width is below `1080px`, Inspector becomes a route/full-screen detail view.
+- Desktop Inspector content is left-aligned within its right pane with only standard reading padding (`16–24px`). It must not float as a centered island, and a flexible gutter must not create a large empty right-side field inside the Inspector pane.
 - Selected item state must not alter feed item dimensions.
 
 Mobile layout:
 
 - Single-column feed uses **touch-safe compact** density: preserve the archival index scan pattern, but do not compress below comfortable thumb interaction or serif legibility.
-- Steer input is sticky near the bottom or accessible via a fixed command affordance, respecting safe-area insets and the virtual keyboard.
+- Mobile/narrow shell is full-bleed and full-height. It must not expose desktop-style outer margins or light page gutters around a dark surface.
+- Steer input is sticky near the bottom or accessible via a fixed command affordance, respecting safe-area insets and the virtual keyboard. The fixed command affordance must be visually light: use the same canvas, a thin rule, and compact padding rather than a large opaque color block.
+- Top operational chrome remains visible on TODAY even when the Steer input is moved to the bottom; `RESOFEED` menu access must not be visually clipped to a 1px hidden label. This top chrome must also stay visually light and must not form a heavy full-width banner.
 - Feed metadata remains a flat inline monospace line; do not reintroduce bordered metadata pills on mobile feed rows.
 - Mobile feed title uses `{typography.feed-title}` (18px/24px) identical to desktop. Feed summaries clamp to one line in the feed.
 - Feed row padding should stay around 12px top, 11px bottom, and 10–12px left marker offset to preserve the exact 24px rhythm increment. Do not shrink independent controls to gain density.
-- Inspector uses full-screen navigation with back behavior and preserved feed scroll. Mobile Inspector/detail view returns to reading density: title uses `{typography.inspector-title}`, body uses `{typography.payload}`, with 20–24px horizontal padding.
+- Inspector uses full-screen navigation with back behavior and preserved feed scroll. Mobile Inspector/detail view has one sticky top back row (`返回 TODAY` / `back to TODAY`) that remains visible while reading; it replaces the global `RESOFEED` banner on that route. The title uses `{typography.inspector-title}`, body uses `{typography.payload}`, with 20–24px horizontal padding.
 - Source Ledger opens as a flat full-screen utility surface on narrow layouts, reachable from the `RESOFEED` menu and optionally by Steer command text such as `source ledger`.
 - Touch targets must be at least 44 CSS px on web/mobile web. Native shells may map this to platform points.
 - Gestures: Support native OS edge-swipe to dismiss the Inspector (crucial for one-handed use). Feed rows are full-width tap targets (excluding the independent Resonate hit area). Double-tap in the Inspector reading body to toggle Resonate is encouraged as a power-user enhancement, provided the explicit star button remains visible.
@@ -512,6 +517,10 @@ Feed lifecycle:
 - Group by soft inline time labels: Today, Yesterday, Earlier. Time dividers must not break the vertical grid rhythm of the feed. Place the time group string (e.g., `TODAY`) right-aligned inside the inline metadata row of the *first item* in that time group, rather than injecting a full-width divider row that disrupts the distance between item rules.
 - Older items remain reachable via pagination or progressive loading.
 - No completion badge, no queue-clear affordance, no mark-all-read action.
+
+### Desktop Split Proximity and Gutter Contract
+
+Desktop split view must preserve visual proximity between Feed and Inspector. The middle gutter between the Feed column and Inspector column is structural breathing room, not expandable empty content. It SHOULD stay around `32–64px` and MUST NOT grow as an unbounded `1fr` field on wide screens. On ultra-wide displays, constrain the shell or cap the gutter so the Feed, divider, and Inspector still read as one workbench. Extra width may increase outer page gutter or remain outside the shell, but it must not create a large dead zone between the selected feed row and its Inspector detail.
 
 ### Desktop Split Scroll and Processing Language Layout
 
@@ -831,6 +840,16 @@ The structured reading order is [SHARP]: `摘要` section, `核心洞察` sectio
 
 States: empty/no-selection (minimal placeholder indicating no item is selected), loading raw detail, OK model-backed Chinese content, latest re-ingest attempt failed while preserved content remains visible, RSS-excerpt source evidence, unavailable original, grouped-story sources, externally surfaced receipt, and item re-ingest states listed below. OK/model-backed states do not need a second visible availability line; fallback/model-failure states keep exactly one useful processing line.
 
+#### Initial selection and stable transitions
+
+On desktop TODAY, if feed items exist and no explicit item route is active, the first feed item MUST be selected automatically after owner-token hydration and feed load complete. The right Inspector pane should only be empty when there are no feed items, the owner token is not accepted, or the app is still loading.
+
+Switching from one selected item to another MUST NOT collapse, blank, or visibly tear down the Inspector layout. Keep the previous Inspector structure mounted until the new item detail is ready, then replace content in place. A terse low-chrome loading line is acceptable, but it must not shift the title/frontmatter/body geometry or flash a blank pane.
+
+#### Desktop split alignment
+
+On desktop split view, the Inspector reading content belongs to the right pane's left edge. The title, Frontmatter, and reading sections MUST share a consistent left edge with only standard reading padding (`16–24px`). Do not center the Inspector content inside its pane, do not add a floating padded island, and do not leave a large unused right-side field inside the Inspector pane. When TODAY has a selected item, the selected item and Inspector content remain visible unless the user selects a different item or navigates to a utility/detail route.
+
 ### Inspector Summary (`摘要`)
 - **Intent**: [SHARP] Chinese contextual explanation of the selected item.
 - **useFor**: Model-backed `summary` text, localized to Chinese when processing language is Chinese, placed before `核心洞察` and `要点` in Inspector.
@@ -918,7 +937,7 @@ Action grouping is [SHARP]:
 - `SOURCE LIST`: `[IMPORT OPML]` and `[EXPORT OPML]`. OPML is source-list exchange only: feed URLs and feed/source titles for interop with other RSS readers. OPML import/export must not imply steering rules, stars/resonance, reading history, or full app restore.
 - `PORTABLE STATE`: `[EXPORT STATE]` and `[IMPORT STATE]`. State is ResoFeed JSON backup/restore for active sources, active steering rules, and currently resonated/starred items. State import is the destructive replace operation.
 
-In Chinese mode, ordinary group labels should localize to `来源列表` and `可携带状态`; the exact bracket action tokens remain English. Source Ledger row labels may use localized `来源:` / `URL:` or omit prefixes through column rhythm. Literal source titles and URLs remain untranslated.
+In Chinese mode, ordinary group labels should localize to `来源列表` and `状态迁移`; the exact bracket action tokens remain English. Source Ledger row labels may use localized `来源:` / `URL:` or omit prefixes through column rhythm. Literal source titles and URLs remain untranslated.
 
 The toolbar shows at most one visible helper line: `OPML = 来源列表；State = 来源 + 规则 + 星标，导入会替换。` / `OPML = source list; State = sources + rules + stars, import replaces.` Do not also render a second always-visible State warning line. `[IMPORT STATE]` must still expose the destructive replacement warning through its accessible description and may show an inline warning only when the import control is focused, opening, confirming, or failed.
 
@@ -999,6 +1018,10 @@ CSS usage contract: `.source-ledger` uses `{components.source-ledger}`. `.source
 
 `.bracket-action` uses `{components.bracket-action}` and must render as a text-only `<button>` or keyboard-reachable file-control trigger with strict monospace typography, transparent background, no border, no radius, no shadow, no icon, no pill fill, no transform, and no transition. `.bracket-action:focus-visible` uses `{components.bracket-action-focus}` and must include a visible `{colors.focus}` outline independent of inversion. `.bracket-action[disabled]` uses `{components.bracket-action-disabled}`, keeps the same hitbox dimensions, suppresses hover/focus inversion, preserves opacity at `1`, and shows raw active text such as `[FETCHING...]`, `[INGESTING...]`, `[IMPORTING OPML...]`, `[EXPORTING OPML...]`, `[EXPORTING STATE...]`, or `[IMPORTING STATE...]`. Invisible hitbox enlargement is mandatory: use generous transparent padding (`0.5rem` / `{spacing.sm}` minimum) plus equal negative margin when needed so the click target grows without increasing Source Ledger row height or disrupting baseline alignment. Hover/focus must feel terminal-like: either invert colors immediately (`background: current text color`, `text: paired background color`) or apply an equally stark instantaneous highlight. Do not use soft fades, drop shadows, scale/translate lifts, opacity fades, or animated underlines for bracket actions.
 
+#### Source Ledger density and empty-state geometry
+
+Source Ledger is an operational ledger, not a landing page. Header, action groups, helper text, empty-state copy, and source rows should cluster near the top using the normal 4px/8px spacing scale. Empty state MUST remain compact (`No sources. Paste RSS URL in Steer.` / `暂无来源。在导向栏粘贴 RSS URL。`) and must not center large labels across the viewport or create large empty vertical bands. The `RESOFEED` utility menu may expose `TODAY` and `SOURCE LEDGER`, but it must remain compact menu chrome rather than a sparse full-screen dashboard.
+
 ### State Portability
 Purpose: satisfy active state export/import without adding a settings dashboard.
 
@@ -1051,6 +1074,12 @@ Localization: [SHARP] ordinary Search UI chrome localizes with the active proces
 Keyboard and accessibility: search results follow normal feed item focus behavior; each result activation target is a real button or link and supports `Enter` and `Space`. The selected result MUST expose `aria-selected="true"` on an option/listbox pattern or `aria-current="true"` on a list/listitem pattern, with the attribute absent/false on unselected rows. Focus rings remain distinct from selected state. Result count, if present, is plain text inside the results region, not a badge or queue indicator.
 
 Forbidden search-detail patterns: no modal detail views, accordions-as-detail, recommendation rails, generated answer panels, immersive reader mode, complex tabs, folders/tags/unread concepts, settings sliders, onboarding/account prompts, flashy highlight effects, animated selection, accent-color selection, short fixed-height desktop widgets, or selected-result cards that visually overpower the list.
+
+#### Search auto-selection and stale Inspector prevention
+
+Executing a desktop Search invalidates any previous TODAY/feed selection as the visible Inspector context. When a search returns one or more results, the first result MUST be selected automatically and the desktop Inspector MUST update to that result. This keeps the left Search results and right Inspector in the same information context without requiring an extra click.
+
+If a search returns zero results or fails, the desktop Inspector MUST NOT continue showing a stale item from a previous TODAY/feed context as if it belonged to the Search results. Show the explicit no-results/error Search state and either hide the Inspector pane or show the normal minimal no-selection Inspector placeholder.
 
 ### Feedback Lines
 
@@ -1156,6 +1185,26 @@ Motion is functional, brief, and optional.
 - No layout shift: hover, focus, selected, loading, error, and receipt states must keep component bounds stable.
 - No CSS animations or transitions are permitted on `.bracket-action`, `.source-ledger__status`, or manual ingest controls.
 - Bracket actions use immediate terminal feedback: transparent enlarged hitbox at rest, stark color inversion or equivalent hard highlight on hover/focus, strict monospace text, and zero transform/shadow/fade behavior.
+
+### Escape Navigation Contract
+
+Purpose: `Escape` is a keyboard escape hatch back to ResoFeed's neutral state, not a command system or configurable shortcut layer.
+
+Rules are [SHARP]:
+
+- Resolve `Escape` from the innermost active state outward.
+- If focus is inside an input, textarea, editable field, select, or the Steer input with unsent text, `Escape` MUST NOT navigate. It may blur the field, close browser/IME affordances, or clear unsent Steer text according to the Steer Input contract.
+- If a transient surface is open, `Escape` closes only that surface first: utility menu, Source Ledger panel affordances, re-ingest configuration, popover, confirmation, or similar local UI.
+- If the `RESOFEED` utility menu is open, `Escape` closes the menu and restores focus to the invoking control.
+- On mobile/narrow Inspector route, `Escape` returns to `TODAY` and preserves the feed scroll position, matching the visible back behavior.
+- On Source Ledger, `/doctor`, Search, or any other non-`TODAY` utility surface, `Escape` returns to `TODAY` only when no focused input, transient panel, confirmation, or in-flight submit owns the key.
+- Returning from Search to `TODAY` MUST clear the Search surface state, Search receipt, and Search route/query by semantic state, not by matching localized visible copy such as `retrieval:` or `检索：词汇搜索`.
+- On desktop `TODAY` with a selected item visible in the split Inspector, `Escape` MUST NOT clear the selected item, blank the right pane, or close the Inspector solely because the page is in the selected-item state. This is option C: `TODAY` is already the neutral workbench surface; `Escape` only handles nested/transient UI there.
+- If focus is inside the desktop split Inspector and no transient Inspector control owns `Escape`, the key may move focus back to the Feed list, but the selected item and right pane remain visible.
+- Moving focus back to the Feed list MUST use a low-chrome focus treatment. Keyboard focus must remain perceivable, but it must not render as a bright full-height cyan strip, a selected-item marker, or any accent-heavy bar that can be mistaken for selection.
+- If a submit/fetch/re-ingest operation is in flight, `Escape` MUST NOT force route navigation or cancel durable work unless an explicit cancellable operation exists. Prefer ignoring the key or closing only non-destructive local chrome.
+
+Visual rule: visible back/close controls remain mandatory on touch surfaces. On narrow Inspector routes, the back row stays sticky at the top while reading; `Escape` is a power-user accelerator, never the only way out.
 
 ## Low-Fidelity Wireframe
 ```text
