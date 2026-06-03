@@ -31,7 +31,7 @@ RUN set -eux; \
 FROM gcr.io/distroless/static-debian12:nonroot AS runtime
 
 LABEL org.opencontainers.image.title="ResoFeed" \
-      org.opencontainers.image.version="v0.1" \
+      org.opencontainers.image.version="v0.2" \
       org.opencontainers.image.source="https://github.com/tefx/ResoFeed"
 
 WORKDIR /app
