@@ -519,9 +519,11 @@ Feed lifecycle:
 - No completion badge, no queue-clear affordance, no mark-all-read action.
 
 ### Desktop Split Proximity and Gutter Contract
+Desktop split view must preserve visual proximity between Feed and Inspector. The middle gutter between the Feed column and Inspector column is structural breathing room, not expandable empty content. It SHOULD stay around `32–64px` and MUST NOT grow as an unbounded `1fr` field on wide screens.
 
-Desktop split view must preserve visual proximity between Feed and Inspector. The middle gutter between the Feed column and Inspector column is structural breathing room, not expandable empty content. It SHOULD stay around `32–64px` and MUST NOT grow as an unbounded `1fr` field on wide screens. On ultra-wide displays, constrain the shell or cap the gutter so the Feed, divider, and Inspector still read as one workbench. Extra width may increase outer page gutter or remain outside the shell, but it must not create a large dead zone between the selected feed row and its Inspector detail.
+The Feed column must anchor to the shell's left content edge. Do not center the Feed+Inspector grid inside a wider shell in a way that creates a large blank leading gutter before the Feed rows. Desktop Feed row text should start within roughly `32–48px` of the shell's inner left edge, including normal surface padding and any invisible rhythm gutter. A leading internal blank band wider than one spacing column (`64px`) is a layout bug, even if it uses the correct background color.
 
+On ultra-wide displays, constrain the shell, cap the middle gutter, or put extra width outside the shell. Extra width may increase outer page gutter or remain outside the workbench, but it must not create a large dead zone before the Feed or between the selected feed row and its Inspector detail.
 ### Desktop Split Scroll and Processing Language Layout
 
 Desktop shell must keep Feed and Inspector as independent vertical scroll regions. Global page scroll must not couple the two panes. Scrolling the Feed must not move the Inspector, and scrolling the Inspector must not move the Feed. Selecting a Feed item must keep Feed scroll position stable and reset the Inspector reading container to the top for the newly selected item. Both scroll regions MUST be focusable (e.g., `tabindex="0"`) with proper accessible names so keyboard users can scroll them independently.
@@ -747,8 +749,8 @@ Rules: Metadata tokens are text atoms; use spacing, order, and separators to com
 
 ### Feed Item
 - **Intent**: [SHARP] Compact scan row for triage, not the full structured reading payload.
-- **useFor**: Source/time/provenance metadata, localized display title when available, 1–2 line core-insight-first Chinese preview, value/source marker when space allows, selected state, and Resonate action.
-- **avoidFor**: `src:`/`来源标题:`/`价值:` visual prefixes, raw URLs, original source title duplication, Key Points, multi-bullet lists, full article body, source text disclosure, re-ingest controls, duplicate Summary + Core Insight blocks, or miniature article-card treatment.
+- **useFor**: Source/time/provenance metadata, localized display title when available, 1–2 line core-insight-first Chinese preview, value/source text token when space allows, selected state, and Resonate action.
+- **avoidFor**: `src:`/`来源标题:`/`价值:` visual prefixes, raw URLs, original source title duplication, Key Points, multi-bullet lists, full article body, source text disclosure, re-ingest controls, duplicate Summary + Core Insight blocks, standalone left-edge color markers, or miniature article-card treatment.
 
 Purpose: scan one RSS-derived item with maximum data-ink efficiency.
 
@@ -763,8 +765,8 @@ Key Points exclusion: [SHARP] Feed rows MUST NOT show `key_points`, bullets, num
 States:
 
 - default;
-- hover/focus: tonal shift or outline only, no translation;
-- selected: non-layout-shifting 3px left marker only by default; optional `surface-active` tonal background is reserved for compact/narrow layouts where it does not create large empty color blocks. Selected state means "currently open in Inspector," not keyboard focus, importance, recommendation, unread, or priority. Use focus rings only for true keyboard focus;
+- hover/focus: tonal shift or outline only, no translation, no gutter strip;
+- selected: no standalone colored left marker, vertical strip, gutter chip, pseudo-element block, or other isolated color block. Selected state may use a non-layout-shifting whole-row tonal treatment only when it stays as quiet as surrounding rules, or it may rely on `aria-current` plus the visible Inspector context. Selected state means "currently open in Inspector," not keyboard focus, importance, recommendation, unread, or priority. Use focus rings only for true keyboard focus;
 - externally surfaced: add compact `agent:<name>` marker only when the item was actually delivered by an external agent;
 - RSS-excerpt source text: text marker `来源摘录` / `source excerpt` with warning color and explanation in Inspector;
 - raw fallback: show feed excerpt when core-insight-first generated preview is unavailable;

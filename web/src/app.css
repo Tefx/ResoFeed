@@ -965,10 +965,6 @@ details.surface-nav button:focus-visible {
   background: transparent;
 }
 
-.contract-feed-item[aria-current='true']::before {
-  background: var(--rf-component-feed-item-selected-marker-color);
-}
-
 .contract-feed-item[aria-current='true'] {
   background: transparent;
 }
@@ -1520,7 +1516,7 @@ details.surface-nav button:focus-visible {
 
   .shell-grid {
     grid-template-columns: minmax(0, 760px) clamp(var(--rf-space-xl), 4vw, var(--rf-space-column)) minmax(420px, 560px);
-    justify-content: center;
+    justify-content: start;
     min-height: 0;
     flex: 1;
     overflow: hidden;

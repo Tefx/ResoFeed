@@ -106,11 +106,13 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
     const grid = document.querySelector('.shell-grid');
     const feedPane = document.querySelector('.feed-pane');
     const inspectorPane = document.querySelector('.detail-pane');
-    if (!shell || !grid || !feedPane || !inspectorPane) throw new Error('wide workbench layout target missing');
+    const feedTitle = document.querySelector('.contract-feed-item .contract-feed-title');
+    if (!shell || !grid || !feedPane || !inspectorPane || !feedTitle) throw new Error('wide workbench layout target missing');
 
     const shellRect = shell.getBoundingClientRect();
     const feedRect = feedPane.getBoundingClientRect();
     const inspectorRect = inspectorPane.getBoundingClientRect();
+    const feedTitleRect = feedTitle.getBoundingClientRect();
     const gridColumns = window.getComputedStyle(grid).gridTemplateColumns;
 
     return {
@@ -121,6 +123,7 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
       feedWidth: feedRect.width,
       inspectorWidth: inspectorRect.width,
       gutterWidth: inspectorRect.left - feedRect.right,
+      shellInnerToFeedTextLeft: feedTitleRect.left - shellRect.left - parseFloat(window.getComputedStyle(shell).borderLeftWidth),
       gridColumns
     };
   });
@@ -135,11 +138,14 @@ test('wide desktop shell expands as a full-height workbench while Feed and Inspe
   expect(layout.inspectorWidth).toBeLessThanOrEqual(560);
   expect(layout.gutterWidth).toBeGreaterThanOrEqual(32);
   expect(layout.gutterWidth).toBeLessThanOrEqual(64);
+  expect(layout.shellInnerToFeedTextLeft, 'Feed text anchors near shell inner left edge without a leading blank band').toBeGreaterThanOrEqual(32);
+  expect(layout.shellInnerToFeedTextLeft, 'Feed text anchors near shell inner left edge without a leading blank band').toBeLessThanOrEqual(48);
   expect(layout.gridColumns.split(' ').length).toBeGreaterThanOrEqual(3);
 });
 
 test('desktop split Inspector aligns to feed rows and Escape preserves the selected pane', async ({ page, ownerToken }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ colorScheme: 'dark' });
   await installFixtureApi(page, ownerToken);
 
   await page.goto('/');
@@ -181,18 +187,24 @@ test('desktop split Inspector aligns to feed rows and Escape preserves the selec
   await expect(page.locator('.feed-pane')).toBeFocused();
   const focusStyle = await page.locator('.feed-pane').evaluate((element) => {
     const style = window.getComputedStyle(element);
-    const rowMarker = window.getComputedStyle(document.querySelector('.contract-feed-item')!, '::before');
+    const row = document.querySelector('.contract-feed-item')!;
+    const rowStyle = window.getComputedStyle(row);
+    const rowMarker = window.getComputedStyle(row, '::before');
     return {
       outlineColor: style.outlineColor,
       outlineWidth: style.outlineWidth,
       boxShadow: style.boxShadow,
-      markerColor: rowMarker.backgroundColor
+      rowBackground: rowStyle.backgroundColor,
+      markerColor: rowMarker.backgroundColor,
+      markerWidth: rowMarker.width
     };
   });
   expect(focusStyle.outlineWidth, 'Feed focus is visible but quiet').toBe('1px');
   expect(focusStyle.outlineColor, 'Feed focus does not use bright cyan focus ink as a full pane strip').not.toBe('rgb(47, 111, 126)');
   expect(focusStyle.boxShadow, 'Feed focus remains an inset low-chrome line').toContain('inset');
-  expect(focusStyle.markerColor, 'Selected marker remains muted, not cyan focus ink').not.toBe('rgb(47, 111, 126)');
+  expect(focusStyle.rowBackground, 'Selected row relies on aria-current + Inspector context, not a large selected flood').toBe('rgba(0, 0, 0, 0)');
+  expect(focusStyle.markerWidth, 'Feed layout keeps the scan rhythm gutter without widening the row').toBe('3px');
+  expect(focusStyle.markerColor, 'Selected Feed row must not render a visible left pseudo-element marker/color block').toBe('rgba(0, 0, 0, 0)');
 });
 
 test('narrow dark canvas has no light gutters and keeps top chrome plus bottom Steer visible', async ({ page, ownerToken }) => {

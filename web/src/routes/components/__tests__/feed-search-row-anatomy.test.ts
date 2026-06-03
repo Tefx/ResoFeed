@@ -114,10 +114,11 @@ describe('Feed/Search compact row anatomy', () => {
     expectReaderRowsPreserveNegativeContract(visibleText());
   });
 
-  it('keeps selected state geometry independent from row padding and 44px controls', () => {
+  it('keeps selected state geometry independent from row padding and visible left markers', () => {
     const css = readFileSync(resolve(__dirname, '../../../app.css'), 'utf8');
     expect(css).toMatch(/\.contract-feed-item\s*\{[\s\S]*grid-template-columns:\s*3px minmax\(0, 1fr\) 44px[\s\S]*padding:\s*var\(--rf-space-row\) var\(--rf-space-row\) 11px 0;/u);
-    expect(css).toMatch(/\.contract-feed-item\[aria-current='true'\]::before\s*\{[\s\S]*background:/u);
+    expect(css).toMatch(/\.contract-feed-item::before\s*\{[\s\S]*background:\s*transparent;/u);
+    expect(css).not.toMatch(/\.contract-feed-item\[aria-current='true'\]::before/u);
     expect(css).not.toMatch(/\.contract-feed-item\[aria-current='true'\]\s*\{[^}]*?(?:padding|grid-template-columns|gap|border-block-end):/u);
     expect(css).toMatch(/\.contract-resonate\s*\{[\s\S]*width:\s*44px;[\s\S]*height:\s*44px;[\s\S]*min-width:\s*44px;[\s\S]*min-height:\s*44px;/u);
   });
