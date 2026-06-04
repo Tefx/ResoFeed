@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">ResoFeed icon</title>
+  <desc id="desc">A compact paper-toned RSS signal mark with a restrained resonate accent.</desc>
+  <rect width="512" height="512" fill="#F3F0E7" />
+  <rect x="38" y="38" width="436" height="436" fill="#FBF8EF" stroke="#D7D0C0" stroke-width="20" />
+  <path d="M142 137c151 0 233 82 233 233h-48c0-124-61-185-185-185z" fill="#24231E" />
+  <path d="M142 237c86 0 133 47 133 133h-48c0-60-25-85-85-85z" fill="#24231E" />
+  <rect x="125" y="337" width="75" height="75" fill="#24231E" />
+  <path d="M394 119l14 40 40 14-40 14-14 40-14-40-40-14 40-14 14-40z" fill="#7A4600" />
+</svg>
