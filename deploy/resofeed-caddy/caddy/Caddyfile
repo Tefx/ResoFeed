@@ -1,0 +1,14 @@
+{
+	# This deployment only publishes HTTPS on the host Tailscale IP.
+	# DNS-01 handles certificate issuance, so no public inbound HTTP challenge is required.
+	auto_https disable_redirects
+}
+
+{$RESOFEED_DOMAIN} {
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+
+	encode zstd gzip
+	reverse_proxy resofeed:8080
+}

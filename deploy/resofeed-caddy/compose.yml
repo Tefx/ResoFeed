@@ -1,0 +1,50 @@
+services:
+  caddy:
+    build:
+      context: ./caddy
+    image: resofeed-caddy-cloudflare:local
+    container_name: resofeed-caddy
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${CADDY_LOCAL_HTTPS_PORT:-8443}:443"
+    environment:
+      CF_API_TOKEN: ${CF_API_TOKEN:?set CF_API_TOKEN in .env}
+      RESOFEED_DOMAIN: ${RESOFEED_DOMAIN:?set RESOFEED_DOMAIN in .env}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - resofeed
+    networks:
+      - resofeed-private
+
+  resofeed:
+    image: tefx/resofeed:latest
+    container_name: resofeed
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      OPENROUTER_KEY: ${OPENROUTER_KEY:-}
+    command:
+      - serve
+      - --addr
+      - 0.0.0.0:8080
+      - --public-url
+      - https://${RESOFEED_DOMAIN:?set RESOFEED_DOMAIN in .env}
+      - --db
+      - /data/resofeed.sqlite3
+    volumes:
+      - resofeed-data:/data
+    networks:
+      - resofeed-private
+
+networks:
+  resofeed-private:
+    name: resofeed-private
+
+volumes:
+  caddy-data:
+  caddy-config:
+  resofeed-data:

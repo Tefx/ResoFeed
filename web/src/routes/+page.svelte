@@ -1083,17 +1083,10 @@
   async function updateProcessingLanguage(): Promise<void> {
     languageStatus = '';
     try {
-      if (import.meta.env.MODE === 'test') {
-        const response = await apiClient().setProcessingLanguage(nextProcessingLanguage);
-        processingLanguage = response.language;
-        setDocumentLanguage(response.language.code);
-        languageStatus = response.language.code === 'zh' ? '语言已设为中文' : 'Language set to English';
-        return;
-      }
-      const nextLanguage = nextProcessingLanguage;
-      processingLanguage = nextLanguage === 'zh' ? { code: 'zh', label: '中文' } : { code: 'en', label: 'English' };
-      setDocumentLanguage(nextLanguage);
-      languageStatus = nextLanguage === 'zh' ? '语言已设为中文' : 'Language set to English';
+      const response = await apiClient().setProcessingLanguage(nextProcessingLanguage);
+      processingLanguage = response.language;
+      setDocumentLanguage(response.language.code);
+      languageStatus = response.language.code === 'zh' ? '语言已设为中文' : 'Language set to English';
     } catch (error) {
       languageStatus = formatRawApiError(error, 'err: language update failed');
       if (error instanceof ResoFeedApiError && error.status === 401) {

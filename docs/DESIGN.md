@@ -671,20 +671,22 @@ Warning placement: rewrite warning copy such as `Existing readable item content 
 
 Keyboard and accessibility: the `RESOFEED` trigger is a real button with `aria-haspopup="menu"` or equivalent disclosure semantics and `aria-expanded`. Opening the menu moves focus to the first item; `Escape` closes it and returns focus to `RESOFEED`; tab order remains linear. Menu status/error text uses visible inline text and `aria-live` as specified by each contained operation. Do not hide language/reprocess exclusively behind hover.
 ### Current Operation Status (`current-operation-status`)
-- **Intent**: [SHARP] Explain one in-memory heavy operation currently occupying the ingest/process/reprocess guard.
-- **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, `[FETCH]`, `[REPROCESS LIBRARY]`, `[RE-INGEST ITEM]`, or language mutation; best-effort phase/count text from the shared `GET /api/runtime/operation` HTTP snapshot or matching MCP/UI current-operation data.
+- **Intent**: [SHARP] Explain in-memory heavy work that blocks a requested operation, without turning fetch/ingest into durable jobs.
+- **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, duplicate same-source `[FETCH]`, `[REPROCESS LIBRARY]`, `[RE-INGEST ITEM]`, or language mutation; best-effort phase/count text from `GET /api/runtime/operation`, row-local fetch state, or matching MCP/UI current-operation data.
 - **avoidFor**: Durable jobs, queues, task dashboards, activity/history ledgers, retry panels, progress timelines, command history, sync status, or persisted audit records.
 
-Anatomy: a single terse line or two-line block, hidden while idle unless it explains a disabled/blocked operation. Canonical text shape is `op: <kind> · actor:<actor> · phase:<phase> · <counts/message> · since <time>`. Allowed operation kinds are `background_ingest`, `manual_ingest`, `source_fetch`, `library_reprocess`, and `item_reingest`. Allowed actors are `background`, `human`, and `agent`. Scope may appear as `scope: all sources`, `scope: source:<name>`, `scope: library`, or `scope: item:<title-or-id>`. Counts are best-effort (`17/128 fetched`, `42 items processed`) and must not imply durable completion guarantees.
+Anatomy: a single terse line or two-line block, hidden while idle unless it explains a disabled/blocked operation. Canonical text shape is `op: <kind> · actor:<actor> · phase:<phase> · <counts/message> · since <time>`. Allowed operation kinds are `background_ingest`, `manual_ingest`, `source_fetch`, `library_reprocess`, and `item_reingest`. Allowed actors are `background`, `human`, and `agent`. Scope may appear as `scope: all sources`, `scope: source:<name>`, `scope: N source fetches`, `scope: library`, or `scope: item:<title-or-id>`. Counts are best-effort and must not imply durable completion guarantees.
 
-Placement: [SHARP] show running current-operation status in the Source Ledger header/status area, in the opened `RESOFEED` utility menu, or adjacent to the Inspector re-ingest action only when relevant. The status must not appear as a persistent global top strip when idle. If a feed-level background ingest is running but no action is blocked, Source Ledger may show the line; the feed itself should remain calm.
+Placement: [SHARP] show running current-operation status in the Source Ledger header/status area, in the opened `RESOFEED` utility menu, or adjacent to the Inspector re-ingest action only when relevant. Row-level source fetches may show state directly on the affected rows instead of forcing every active source fetch into one global status line. The status must not appear as a persistent global top strip when idle. If a feed-level background ingest is running but no action is blocked, Source Ledger may show the line; the feed itself should remain calm.
 
 States: idle hidden, running, blocked conflict, completed transient receipt, failed raw error. Running state uses `{components.current-operation-status}` and text replacement only. Conflict state uses `{components.current-operation-conflict}` and includes the current operation detail; it must not show only `err: operation already running`.
 
 Conflict copy examples:
 
 - `err: operation already running — op: background_ingest · actor:background · phase:fetch · 17/128 sources · since 14:05:11`
-- `err: reprocess blocked — op: source_fetch · actor:human · scope: simonwillison · phase:fetching · since 14:06:02`
+- `err: fetch already running — op: source_fetch · actor:human · scope: source:simonwillison · phase:fetching · since 14:06:02`
+- `err: ingest blocked — op: source_fetch · actor:human · scope: 3 source fetches · phase:fetching · since 14:06:02`
+- `err: reprocess blocked — op: source_fetch · actor:human · scope: source:simonwillison · phase:fetching · since 14:06:02`
 - `err: re-ingest blocked — op: item_reingest · actor:human · scope: item:item_01 · phase:processing · since 14:07:33`
 
 Keyboard and accessibility: status lines are visible text. Running updates use `aria-live="polite"` and should update no more frequently than useful phase/count changes. Conflict/errors use `aria-live="assertive"`. When a user triggers a blocked action, keep focus on the trigger if it remains actionable, or move focus to the adjacent conflict line with `tabindex="-1"` and then restore predictable tab order. Do not use spinner-only or color-only status.
@@ -977,7 +979,7 @@ On desktop, the Inspector is its own scroll container. Opening a different item 
 - **useFor**: Source rows, OPML source-list import/export, state export/import, manual `[RUN INGEST]`, per-source `[FETCH]`, and visible current operation status when work is running or blocks an action.
 - **avoidFor**: Settings dashboard, durable job list, operation history, task queue, retry dashboard, command ledger, sync/merge controls, source hierarchy, tags, or a second URL-add field.
 
-Anatomy: title, global ingest/current-operation status, global `[RUN INGEST]` action, a visually grouped Source List action cluster, a visually grouped Portable State action cluster, one terse muted helper line, flat source rows, source-level `[FETCH]` actions, `[DELETE]` action, and diagnostic `[DETAILS]`. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields are [SHARP]: source name, source URL, adjacent local-time last fetch timestamp or raw error diagnostic, and a right-aligned action block. Normal `status: ok` / `status: not_fetched` text is diagnostic detail, not primary row copy; show it in `[DETAILS]`, `title`, or accessible text. Only error states such as `err: rss_fetch_error` should replace the timestamp/status slot visibly.
+Anatomy: title, global ingest/current-operation status, global `[RUN INGEST]` action, a visually grouped Source List action cluster, a visually grouped Portable State action cluster, one terse muted helper line, flat source rows, source-level `[FETCH]` actions, `[DELETE]` action, and diagnostic `[DETAILS]`. URL subscription must route users back to Steer; the Ledger does not provide a second manual URL paste field. Row fields are [SHARP]: source name, source URL, adjacent local-time last fetch timestamp or raw error diagnostic, and a right-aligned action block. The source name is backend `source.title`: after successful RSS/Atom fetch this should be the parsed feed title when available; before first successful fetch, URL-derived or OPML-imported fallback text is acceptable. Normal `status: ok` / `status: not_fetched` text is diagnostic detail, not primary row copy; show it in `[DETAILS]`, `title`, or accessible text. Only error states such as `err: rss_fetch_error` should replace the timestamp/status slot visibly.
 
 Action grouping is [SHARP]:
 
@@ -990,7 +992,9 @@ The toolbar shows at most one visible helper line: `OPML = 来源列表；State 
 
 Source Ledger bracket action labels are [SHARP] exact English tokens across locales: `[RUN INGEST]`, `[INGESTING...]`, `[FETCH]`, `[FETCHING...]`, `[IMPORT OPML]`, `[IMPORTING OPML...]`, `[EXPORT OPML]`, `[EXPORTING OPML...]`, `[EXPORT STATE]`, `[EXPORTING STATE...]`, `[IMPORT STATE]`, `[IMPORTING STATE...]`, `[DELETE]`, and `[DETAILS]`. Localize surrounding prose and accessible names, not these visible Source Ledger bracket tokens. UI text must not render lowercase variants such as `import opml`, `export opml`, `export state`, or `import state`, and must not render localized Source Ledger bracket labels such as `[导入 OPML]`, `[导出 OPML]`, `[导出状态]`, or `[导入状态]` unless this contract is explicitly revised.
 
-Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]` are immediate operational commands, not durable jobs. They must not create a queue, job table, activity ledger, command history, sync primitive, or settings dashboard. They reuse the in-process current-operation guard described in `docs/ARCHITECTURE.md`; conflict feedback is raw, terse, and includes current operation detail rather than only `err: operation already running`.
+Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]` are immediate operational commands, not durable jobs. They must not create a queue, job table, activity ledger, command history, sync primitive, or settings dashboard. They reuse the in-process current-operation/concurrency coordinator described in `docs/ARCHITECTURE.md`; conflict feedback is raw, terse, and includes current operation detail rather than only `err: operation already running`.
+
+Parallel source fetch boundary: per-source `[FETCH]` is row-scoped. Different source rows may show `[FETCHING...]` at the same time when their fetch requests are running concurrently. A row already fetching keeps only that row's `[FETCHING...]` disabled state; unrelated rows may remain actionable. `[RUN INGEST]` remains disabled while any row-level fetch is active, because global ingest is mutually exclusive with manual source fetch. Do not add progress bars, spinners, job lists, queue labels, retry panels, or operation history to explain parallel fetches.
 
 States:
 
@@ -1008,7 +1012,7 @@ States:
 - global ingest conflict: revert to `[RUN INGEST]` and show raw `err: operation already running — op: <kind> · actor:<actor> · phase:<phase> · <counts/message>` conflict text;
 - global ingest complete: revert to `[RUN INGEST]` and update `last_ingest: HH:MM:SS <timezone>`;
 - source fetch default: `[FETCH]` on the same row as the source;
-- source fetch active: `[FETCHING...]`, disabled, no spinner, no progress animation; show `op: source_fetch · actor:human · scope: source:<name> · phase:<phase> · since HH:MM:SS <timezone>` in the source row or Ledger status line;
+- source fetch active: `[FETCHING...]`, disabled only for the affected row, no spinner, no progress animation; multiple different rows may show `[FETCHING...]` at the same time;
 - source fetch conflict: revert to `[FETCH]` and show raw current-operation conflict text adjacent to the source;
 - source fetch complete: revert to `[FETCH]` and update `HH:MM:SS <timezone>` in the row timestamp slot;
 - source fetch failed: revert to `[FETCH]` and show raw `err: <diagnostic>` text in the row timestamp/status slot;
@@ -1048,7 +1052,7 @@ Required DOM contract for manual ingest and portability controls:
   </div>
   <ul class="source-ledger__list">
     <li class="source-ledger__row">
-      <span class="source-ledger__name">nyt</span>
+      <span class="source-ledger__name">NYT</span>
       <span class="source-ledger__url">https://nyt.com/rss</span>
       <span class="source-ledger__status" aria-live="polite">14:02:05 local</span>
       <span class="source-ledger__actions">

@@ -211,10 +211,11 @@ Coordination rules:
 - use SQLite transactions for state changes;
 - keep state export/import as direct backup/restore transactions inside `internal/resofeed`; do not introduce a state merger, conflict resolver, sync coordinator, or receipt-portability module;
 - isolate source-level ingestion failures;
-- coordinate background ingest, global manual ingest, and per-source manual fetch through one in-process ingest concurrency guard owned by `ingest.go`;
-- permit at most one ingest/fetch operation to run at a time across the process: background ingest, `POST /api/ingest`, and `POST /api/sources/{id}/fetch` must never overlap;
-- reject HTTP manual triggers with `409 conflict` when the guard is already held; background ticks may be ignored/skipped while an ingest is already running;
-- expose the current guard holder as an in-memory `CurrentOperationInfo` snapshot for contextual UI/MCP conflict explanation only; it is not persisted and is cleared when the guarded operation finishes or releases;
+- coordinate background ingest, global manual ingest, and per-source manual fetch through one in-process concurrency coordinator owned by `ingest.go`;
+- keep global ingest mutually exclusive with any manual source fetch: background ingest and `POST /api/ingest` must not overlap each other or overlap `POST /api/sources/{id}/fetch`;
+- permit concurrent manual source fetches only when their source ids differ; the same source id must not be fetched twice at the same time;
+- reject HTTP manual triggers with `409 conflict` when their requested scope conflicts with an already-running operation; background ticks may be ignored/skipped while any conflicting ingest/fetch is already running;
+- expose current operation state as in-memory `CurrentOperationInfo`/source-fetch status for contextual UI/MCP conflict explanation only; it is not persisted and is cleared when the relevant operation scope finishes or releases;
 - do not persist ingest work as a queue, job table, command ledger, activity log, or portable receipt;
 - use no event bus, plugin registry, DI container, service discovery, or repository interface layer.
 
@@ -522,11 +523,19 @@ Required fields:
 - active/deleted flag for source removal;
 - integer `revision` for local mutation responses.
 
+Title semantics:
+
+- `sources.title` is the canonical Source Ledger display name;
+- before a source has been successfully fetched, `title` may be an OPML/import title or URL-derived fallback;
+- after a successful RSS/Atom fetch, if the feed exposes a non-empty feed title, `sources.title` must be updated to that feed title and `revision` must be incremented;
+- no separate `feed_title` column is required unless a future feature needs to preserve both a user-edited title and the fetched feed title.
+
 Invariants:
 
 - OPML folders are discarded on import;
 - deleted sources do not appear in the Source Ledger;
-- one source failure does not block other sources.
+- one source failure does not block other sources;
+- source display title changes are local source-row mutations, not portable reading history or activity records.
 
 ### 4.2 `items`
 
@@ -708,7 +717,8 @@ FTS contract:
 Responsibilities:
 
 - fetch active sources independently;
-- parse RSS/Atom entries;
+- parse RSS/Atom feed metadata and entries;
+- update `sources.title` from the parsed feed title after successful fetch when the feed title is non-empty;
 - upsert item cache rows;
 - extract article content when possible;
 - request OpenRouter summary/metadata only after source text or fallback text exists;
@@ -730,15 +740,18 @@ Runtime limits:
 - source fetch timeout: 20 seconds per source, including per-source manual fetches;
 - OpenRouter request timeout: 45 seconds;
 - OpenRouter retry policy: at most one retry for network/429/5xx failures;
-- failed OpenRouter responses must not block item visibility.
+- failed OpenRouter responses must not block item visibility;
+- source-level parallelism must be bounded inside the process; implementations must not spawn unbounded goroutines or create external workers.
 
 Concurrency semantics:
 
-- exactly one ingest/fetch operation may run at a time in the Go process;
-- the same non-overlap rule applies to the background ingest loop, `POST /api/ingest`, and `POST /api/sources/{id}/fetch`;
-- if an HTTP manual trigger arrives while ingestion is already running, it must return `409 conflict` and must not enqueue, persist, or retry the requested work;
+- global ingest remains a single guarded operation: background ingest and `POST /api/ingest` must never overlap each other;
+- global ingest must not overlap any manual per-source fetch;
+- manual per-source fetches may overlap only when their source ids differ;
+- a second `POST /api/sources/{id}/fetch` for the same source while that source is already fetching must return `409 conflict` and must not enqueue, persist, or retry the duplicate request;
+- `POST /api/ingest` while any manual source fetch is running must return `409 conflict` and must not enqueue, persist, or retry the request;
 - if a background ingest tick fires while another ingest/fetch is running, it may be ignored/skipped rather than queued;
-- persistent queues, job tables, command-history rows, ingest ledgers, and cross-process schedulers are forbidden.
+- persistent queues, job tables, command-history rows, ingest ledgers, durable progress records, and cross-process schedulers are forbidden.
 
 Failure contract:
 
@@ -2134,6 +2147,9 @@ Responsibilities:
 - expose `TODAY` and `SOURCE LEDGER` through a discreet `RESOFEED` surface menu when the design chooses low-chrome navigation; persistent visible top-level links are not required;
 - expose flat Source Ledger without folders/tags/settings-dashboard behavior;
 - expose lightweight Source Ledger manual controls for `POST /api/ingest` and `POST /api/sources/{id}/fetch` as immediate bracket actions only; these controls must not create durable jobs, queues, command histories, activity ledgers, retry dashboards, sync/merge concepts, or additional source-management surfaces;
+- render Source Ledger source rows with `sources.title` as the primary source label and the feed URL as secondary provenance text;
+- allow multiple row-level `[FETCH]` actions to show independent `[FETCHING...]` state when different sources are fetching concurrently; do not block all row fetch actions merely because one unrelated source is fetching;
+- keep `[RUN INGEST]` disabled while any manual source fetch is running, because global ingest and per-source manual fetch remain mutually exclusive;
 - render current-operation status only as contextual inline feedback while an operation is running or a conflict is being explained; do not add a persistent idle top-chrome operation strip, job-management dashboard, or historical operation surface;
 - expose state export/import as terse actions, not backup-management UI;
 - show fallback/status labels plainly.
@@ -2356,6 +2372,38 @@ curl -i -X POST http://127.0.0.1:8080/api/runtime/reprocess-library \
 # expect 200 JSON body: {"reprocess":{"language":"zh","fts_rebuilt":true,...},"already_applied":false}
 ```
 
+
+### Source title and bounded source-fetch parallelism verification additions
+
+- successful manual source fetch updates `sources.title` from the RSS/Atom feed title when the parsed title is non-empty and increments the source `revision`;
+- Source Ledger HTTP/MCP source listings expose the updated `title` without adding a separate `feed_title` field;
+- two `POST /api/sources/{id}/fetch` requests for different active source ids may run concurrently and both return source-scoped results;
+- a duplicate `POST /api/sources/{id}/fetch` for the same source id while that source is already fetching returns `409 conflict` and does not enqueue work;
+- `POST /api/ingest` while any manual source fetch is running returns `409 conflict` and does not enqueue work;
+- background ingest ticks are skipped/ignored while any conflicting global/manual fetch scope is running;
+- no implementation creates a durable queue, job table, activity ledger, worker process, event bus, or settings/dashboard surface for the parallel fetch behavior;
+- Source Ledger row UI can show `[FETCHING...]` independently for multiple source rows while keeping `[RUN INGEST]` disabled during active row fetches.
+
+Suggested smoke check shape:
+
+```bash
+curl -i -X POST http://127.0.0.1:8080/api/sources/src_a/fetch \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+
+curl -i -X POST http://127.0.0.1:8080/api/sources/src_b/fetch \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# if both upstream feeds are slow and different source ids, both requests may be in flight together.
+
+curl -i -X POST http://127.0.0.1:8080/api/sources/src_a/fetch \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# while src_a is already fetching, expect 409 conflict with current-operation detail.
+```
 
 ### Inspector item re-ingest verification additions
 

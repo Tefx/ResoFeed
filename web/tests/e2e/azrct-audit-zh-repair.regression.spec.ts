@@ -285,11 +285,18 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
     await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
 
     await page.getByRole('button', { name: /Processing language English; set Chinese/u }).click();
+    expect(calls.filter((call) => call === 'PUT /api/runtime/language'), 'production-built language toggle must persist through the backend runtime metadata route').toHaveLength(1);
     await expect.soft(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
     await expect.soft(page.getByRole('button', { name: /处理语言 中文/u })).toHaveText('语言: 中文');
     await expect.soft(page.getByRole('status', { name: 'processing language' })).toContainText('语言已设为中文');
     await expect.soft(page.getByRole('button', { name: 'Reprocess existing library and rebuild search index' })).toHaveText('[重处理资料库]');
     await expect.soft(page.getByText('已存可读内容将被重写。 来源标识保持不变。')).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByRole('textbox', { name: '导向或粘贴 RSS URL / Steer or paste RSS URL' })).toBeVisible();
+    await expect.soft(page.locator('html'), 'reload must hydrate from backend runtime_metadata processing_language instead of falling back to English').toHaveAttribute('lang', 'zh-CN');
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+    await expect.soft(page.getByRole('button', { name: /处理语言 中文/u })).toHaveText('语言: 中文');
 
     await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('search 中文');
     await expect.soft(page.locator('.steer-route-preview')).toContainText('[搜索]');
