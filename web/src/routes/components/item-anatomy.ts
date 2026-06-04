@@ -194,7 +194,6 @@ function removeJsonLdPrefix(text: string): string {
 
 export function readableItemText(text: string | null | undefined): string | null {
   if (!text) return null;
-  if (text.trim() === 'Deterministic fixture summary.') return null;
   const withoutExecutable = text
     .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style\b[\s\S]*?<\/style>/gi, ' ');

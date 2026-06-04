@@ -40,7 +40,6 @@
   }
 
   const tokenStorageKey = 'resofeed.ownerToken';
-  const preAuthLanguageFixtureKey = 'resofeed.e2e.preAuthLanguage';
   const feedPageSize = 50;
   const activeOperationPollMs = 800;
   const idleOperationPollMs = 5000;
@@ -138,7 +137,7 @@
   const languageStatusIsError = $derived(languageStatus.toLowerCase().startsWith('err:'));
   const currentOperation = $derived(contextualOperation.kind === 'running' ? contextualOperation.operation : contextualOperation.kind === 'blocked' ? contextualOperation.operation : null);
   const operationSurfaceRelevant = $derived(hasOwnerToken && loadState === 'ready' && (currentSurface === 'ledger' || surfaceMenuOpen || reprocessState === 'running' || contextualOperation.kind === 'running'));
-  const reprocessWarningVisible = $derived(import.meta.env.MODE === 'test' || surfaceMenuOpen);
+  const reprocessWarningVisible = $derived(surfaceMenuOpen);
   const shellChrome = $derived(processingLanguage.code === 'zh'
     ? {
       skipFeed: '跳到订阅流', steerForm: '导向', steerLabel: '导向或粘贴 RSS URL / Steer or paste RSS URL', steerPlaceholder: '导向或粘贴 RSS URL...', apply: '[应用]', applying: '[应用中...]', nav: '导航', operations: '系统', languageControls: '处理语言控制', routePreview: '导向路由预览', routeRequired: '需要 URL', backToday: '返回 TODAY', loading: '加载中', applyingStatus: '应用中', undo: '[撤销]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: '代理导向记录', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} 导向生效：${rule} · 在导向中修正`, searchScroll: '搜索表面独立滚动', todayScroll: 'TODAY 表面独立滚动', independentScroll: '独立滚动区域', inspectorScroll: 'INSPECTOR 独立滚动', detailScroll: '详情独立滚动', ledgerSurface: 'SOURCE LEDGER 表面', searchSurface: '搜索表面'
@@ -147,7 +146,6 @@
       skipFeed: 'skip to feed', steerForm: 'Steer', steerLabel: 'Steer or paste RSS URL', steerPlaceholder: 'Steer or paste RSS URL...', apply: '[APPLY]', applying: '[APPLYING...]', nav: 'NAV', operations: 'SYSTEM', languageControls: 'Processing language controls', routePreview: 'Steer route preview', routeRequired: 'URL required', backToday: 'back to TODAY', loading: 'loading', applyingStatus: 'applying', undo: '[UNDO]', steerReceipt: 'Steer receipt', processingLanguageStatus: 'processing language', reprocessStatusAria: 'reprocess', confirmReprocessAria: 'Confirm reprocess existing library', cancelReprocessAria: 'Cancel reprocess', reprocessAria: 'Reprocess existing library and rebuild search index', agentSteeringReceipt: 'Agent steering' + ' receipt', agentSteeringActive: (actor: string, rule: string) => `agent:${actor} steering active: ${rule} · correct in Steer`, searchScroll: 'Search surface independent scroll', todayScroll: 'TODAY surface independent scroll', independentScroll: 'Independent scroll region', inspectorScroll: 'INSPECTOR independent scroll', detailScroll: 'Detail independent scroll', ledgerSurface: 'SOURCE LEDGER surface', searchSurface: 'Search surface'
     });
   const browserLegacyEnglishA11y = $derived(true);
-  const browserRuntimeA11y = $derived(typeof navigator !== 'undefined' && !navigator.userAgent.includes('jsdom'));
   const todayScrollLabel = $derived(browserLegacyEnglishA11y ? 'TODAY surface independent scroll' : shellChrome.todayScroll);
   const inspectorScrollLabel = $derived(browserLegacyEnglishA11y ? 'INSPECTOR independent scroll' : shellChrome.inspectorScroll);
   const backTodayLabel = $derived(browserLegacyEnglishA11y ? 'back to TODAY' : shellChrome.backToday);
@@ -236,18 +234,6 @@
   function inspectorInnerLandmarkLabel(item: ItemSummary | ItemDetail): string {
     const label = item.localized_title && processingLanguage.code === 'zh' ? item.localized_title : item.title;
     return label.replace(/item re-ingest/giu, 'item reprocess');
-  }
-
-  function loadPreAuthLanguageFixture(): ProcessingLanguageInfo | null {
-    try {
-      const raw = window.localStorage.getItem(preAuthLanguageFixtureKey);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw) as { code?: unknown; label?: unknown };
-      if (parsed.code === 'zh') return { code: 'zh', label: '中文' };
-    } catch {
-      return null;
-    }
-    return null;
   }
 
   function applySplitScrollContainment(): void {
@@ -394,11 +380,6 @@
 
   $effect(() => {
     if (feedPaneElement || detailPaneElement) applySplitScrollContainment();
-  });
-
-  $effect(() => {
-    if (import.meta.env.MODE !== 'test' || !routePreviewElement || !window.navigator.userAgent.includes('jsdom')) return;
-    routePreviewElement.getBoundingClientRect = () => DOMRect.fromRect({ x: 0, y: 0, width: 320, height: 20 });
   });
 
   let steerPreviewRequestSequence = 0;
@@ -594,9 +575,6 @@
       reconcileSelectedFeedItem(feedResponse.items);
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
-      if (import.meta.env.MODE === 'test' && window.navigator.userAgent.includes('jsdom') && (window.location.pathname === '/source-ledger' || window.location.pathname === '/doctor')) {
-        window.history.replaceState({}, '', '/');
-      }
       if (syncRoute) replaceSurfaceFromLocation();
       if (currentSurface === 'doctor') {
         steerFeedback = { kind: 'doctor', text: await loadDoctorDiagnostics(client) };
@@ -631,9 +609,8 @@
       const response = await client.processingLanguage();
       return response.language;
     } catch (error) {
-      // docs/ARCHITECTURE.md defines missing processing_language as effective `en`; keep the served feed usable when older/focused fixtures omit the runtime-language route.
-      if (error instanceof ResoFeedApiError) {
-        if (error.status === 401) throw error;
+      if (error instanceof ResoFeedApiError && error.status === 404) {
+        // Product compatibility: runtimes without the language endpoint use the documented effective English default; real auth/server failures remain visible.
         return { code: 'en', label: 'English' };
       }
       throw error;
@@ -645,8 +622,8 @@
       const response = await client.openRouterModels();
       return { models: response.models, available: true };
     } catch (error) {
-      // docs/ARCHITECTURE.md treats model-listing support as live/transient UI help; older fixtures/backends may omit it without blocking Inspector re-ingest's Default model path.
-      if (error instanceof ResoFeedApiError) {
+      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 503)) {
+        // Product compatibility: model listing is optional UI assistance; default-model Inspector re-ingest remains available when listing is absent or provider-unavailable.
         return { models: [], available: false };
       }
       throw error;
@@ -725,7 +702,7 @@
     try {
       await apiClient().inspect(item.id);
     } catch {
-      // Inspection marking is provenance-only; keep Inspector navigation usable if a test/runtime stub omits the mutation route.
+      // Inspection marking is provenance-only; selecting an item must keep navigation usable even if the marker write is unavailable.
     }
     await loadItemDetail(item.id);
     if (isNarrow && window.location.pathname !== `/items/${encodeURIComponent(item.id)}`) return;
@@ -750,7 +727,7 @@
     try {
       await apiClient().inspect(item.id);
     } catch {
-      // Inspection marking is provenance-only; keep desktop search selection usable if a focused fixture omits the mutation route.
+      // Inspection marking is provenance-only; search selection must keep navigation usable even if the marker write is unavailable.
     }
     await loadItemDetail(item.id);
     currentSurface = 'search';
@@ -1142,12 +1119,6 @@
   }
 
   onMount(() => {
-    if (import.meta.env.MODE === 'test') {
-      for (const shell of Array.from(document.querySelectorAll('.resofeed-shell'))) {
-        if (shell !== shellElement) shell.remove();
-      }
-    }
-
     const media = window.matchMedia('(max-width: 1079px)');
     const updateMedia = () => {
       isNarrow = media.matches;
@@ -1168,12 +1139,6 @@
 
     const handlePopState = (event: PopStateEvent) => replaceSurfaceFromLocation(event.state);
     window.addEventListener('popstate', handlePopState);
-
-    const preAuthLanguage = loadPreAuthLanguageFixture();
-    if (preAuthLanguage) {
-      processingLanguage = preAuthLanguage;
-      setDocumentLanguage(preAuthLanguage.code);
-    }
 
     const storedToken = window.localStorage.getItem(tokenStorageKey);
     if (storedToken) {

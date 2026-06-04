@@ -448,13 +448,6 @@ func safeSQLiteStartupLabel(dbPath string) string {
 	return "configured local file"
 }
 
-func deterministicOpenRouterEndpointForE2E() string {
-	if os.Getenv("RESOFEED_E2E") != "1" {
-		return ""
-	}
-	return strings.TrimSpace(os.Getenv("RESOFEED_E2E_OPENROUTER_ENDPOINT"))
-}
-
 func activePlaintextToken(cfg ServeConfig, resolution OwnerTokenResolution) string {
 	if cfg.OwnerToken != "" {
 		return cfg.OwnerToken

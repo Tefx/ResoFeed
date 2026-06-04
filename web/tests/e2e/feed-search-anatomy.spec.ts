@@ -181,11 +181,10 @@ test('Escape from Search returns to TODAY and clears search state in English and
     await page.unroute('**/api/**').catch(() => undefined);
     await installMockApi(page, language);
     await page.addInitScript(
-      ({ token, lang }) => {
+      ({ token }) => {
         window.localStorage.setItem('resofeed.ownerToken', token);
-        if (lang === 'zh') window.localStorage.setItem('resofeed.e2e.preAuthLanguage', JSON.stringify({ code: 'zh', label: '中文' }));
       },
-      { token: ownerToken, lang: language }
+      { token: ownerToken }
     );
 
     await page.setViewportSize({ width: 390, height: 844 });

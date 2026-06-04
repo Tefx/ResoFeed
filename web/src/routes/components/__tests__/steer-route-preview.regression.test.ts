@@ -117,7 +117,7 @@ describe('Steer route preview and receipt regression contracts', () => {
     expect(preview).toHaveAttribute('aria-live', 'polite');
     expect(preview).toHaveClass('steer-route-preview');
     expect(preview).toHaveTextContent(/^\s*$/);
-    expect(preview.getBoundingClientRect().height).toBeGreaterThan(0);
+    expect(preview).toHaveAttribute('data-route-kind', 'idle');
     expect(preview).not.toHaveTextContent('[IDLE]');
     expect(document.body).not.toHaveTextContent(/Steer is optional correction\.\s+Steer is optional correction\./);
     expect(steer).toHaveAccessibleDescription(/Steer route preview/i);

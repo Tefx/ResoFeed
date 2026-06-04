@@ -68,10 +68,7 @@ func TestPostClosureModelListProviderFailureRedactionExpectedRed(t *testing.T) {
 	}))
 	t.Cleanup(provider.Close)
 
-	t.Setenv("RESOFEED_E2E", "1")
-	t.Setenv("RESOFEED_E2E_OPENROUTER_ENDPOINT", provider.URL)
-	t.Setenv("OPENROUTER_KEY", "sk-or-local-secret-from-env")
-	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken, OpenRouter: OpenRouterConfig{APIKey: "sk-or-local-secret-from-env", Endpoint: provider.URL}})
 
 	recorder := httptest.NewRecorder()
 	router.ServeHTTP(recorder, authorizedRequest(http.MethodGet, "/api/runtime/openrouter-models", nil))
@@ -109,11 +106,7 @@ func TestPostClosureModelListCanonicalAndCompatRouteSemanticsExpectedRed(t *test
 		_, _ = io.WriteString(w, `{"data":[{"id":"openrouter/test-model","name":"Test Model"}]}`)
 	}))
 	t.Cleanup(provider.Close)
-	t.Setenv("RESOFEED_E2E", "1")
-	t.Setenv("RESOFEED_E2E_OPENROUTER_ENDPOINT", provider.URL)
-	t.Setenv("OPENROUTER_KEY", "sk-or-route-equivalence-secret")
-
-	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
+	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken, OpenRouter: OpenRouterConfig{APIKey: "sk-or-route-equivalence-secret", Endpoint: provider.URL}})
 	canonical := "/api/runtime/openrouter-models"
 	compat := "/api/runtime/openrouter/models"
 
@@ -149,9 +142,9 @@ func TestPostClosureModelListCanonicalAndCompatRouteSemanticsExpectedRed(t *test
 		http.Error(w, `{"error":{"message":"OpenRouter raw provider leak sk-or-route-equivalence-secret /tmp/.env owner-token-route"}}`, http.StatusBadGateway)
 	}))
 	t.Cleanup(failingProvider.Close)
-	t.Setenv("RESOFEED_E2E_OPENROUTER_ENDPOINT", failingProvider.URL)
-	left := exerciseModelListRoute(router, canonical, true, contractOwnerToken)
-	right := exerciseModelListRoute(router, compat, true, contractOwnerToken)
+	failingRouter := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken, OpenRouter: OpenRouterConfig{APIKey: "sk-or-route-equivalence-secret", Endpoint: failingProvider.URL}})
+	left := exerciseModelListRoute(failingRouter, canonical, true, contractOwnerToken)
+	right := exerciseModelListRoute(failingRouter, compat, true, contractOwnerToken)
 	assertModelListRouteEquivalent(t, canonical, left, compat, right)
 	if left.status != http.StatusServiceUnavailable {
 		t.Fatalf("provider failure status = %d, want %d; body=%s", left.status, http.StatusServiceUnavailable, left.body)

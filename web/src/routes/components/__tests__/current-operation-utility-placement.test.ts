@@ -1,7 +1,7 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { readFileSync } from 'node:fs';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
 import Page from '../../+page.svelte';
@@ -97,6 +97,7 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
 async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown); readonly pagedFeed?: boolean } = {}) {
   cleanup();
   window.localStorage.clear();
+  window.history.replaceState({}, '', '/');
   installFetch(options);
   render(Page);
   const user = userEvent.setup();
@@ -115,6 +116,17 @@ async function openMenu(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('current operation and low-frequency utility placement', () => {
+  beforeEach(() => {
+    cleanup();
+    window.localStorage.clear();
+    window.history.replaceState({}, '', '/');
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
   it('accepts documented count objects and rejects invalid count shapes', async () => {
     installFetch({ operation: runningOperation() });
     await expect(new ResoFeedApiClient({ ownerToken }).currentOperation()).resolves.toMatchObject({

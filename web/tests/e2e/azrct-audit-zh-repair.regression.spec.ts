@@ -274,8 +274,9 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
 
     await page.getByRole('button', { name: `Open Inspector for: ${zhItem.title}` }).click();
     const inspector = page.locator('.contract-inspector');
-    await expect(inspector).toContainText('source text: RSS excerpt only');
-    await expect(inspector).toContainText('summary provenance: model-backed');
+    await expect(inspector.locator('.inspector-frontmatter')).toContainText('AI STATUS');
+    await expect(inspector.locator('.inspector-frontmatter')).toContainText('model-backed · source excerpt · quality: high');
+    await expect(inspector.locator('.inspector-status-line'), 'OK/model-backed Inspector must not duplicate AI STATUS provenance as a second visible line').toHaveCount(0);
     await expect(inspector.locator('.inspector-provenance')).not.toContainText('model: ok');
   });
 
@@ -316,8 +317,11 @@ test.describe('AZRCT audit and zh repair regression coverage', () => {
     await page.getByRole('button', { name: `打开检查器：${zhItem.title}` }).click();
     const inspector = page.locator('.contract-inspector');
     await expect.soft(inspector).toContainText('检查器');
-    await expect.soft(inspector).toContainText('来源文本：仅 RSS 摘录');
-    await expect.soft(inspector).toContainText('摘要来源：模型支持');
+    await expect.soft(inspector.locator('.inspector-frontmatter')).toContainText('AI STATUS');
+    await expect.soft(inspector.locator('.inspector-frontmatter')).toContainText('模型支持 · 来源摘录 · 质量：高价值');
+    await expect.soft(inspector.locator('.inspector-status-line'), 'OK/model-backed Inspector must not duplicate AI STATUS provenance as a second visible line').toHaveCount(0);
+    await inspector.locator('.inspector-source-text-section summary').click();
+    await expect.soft(inspector.locator('.inspector-reading--source-text')).toContainText('中文摘录文本。');
     await expect.soft(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('href', zhItem.url);
     await expect.soft(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
     await expect.soft(inspector.getByRole('link', { name: '来源链接' }).first()).toHaveAttribute('href', source.url);

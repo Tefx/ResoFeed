@@ -148,6 +148,7 @@ function installFetch(options: FetchFixtureOptions = {}) {
 async function renderAuthenticatedPage(options: FetchFixtureOptions = {}) {
   cleanup();
   window.localStorage.clear();
+  window.history.replaceState({}, '', '/');
   installFetch(options);
   render(Page);
   const user = userEvent.setup();
@@ -159,6 +160,8 @@ async function renderAuthenticatedPage(options: FetchFixtureOptions = {}) {
 
 afterEach(() => {
   cleanup();
+  window.localStorage.clear();
+  window.history.replaceState({}, '', '/');
   vi.unstubAllGlobals();
 });
 

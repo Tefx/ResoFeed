@@ -1269,20 +1269,22 @@ details.surface-nav button:focus-visible {
 
 .contract-inspector .inspector-original-link:hover,
 .contract-inspector .inspector-original-link:focus-visible {
+  color: var(--rf-color-current-text);
   background: transparent;
   outline: 0;
   box-shadow: none;
   text-decoration-line: underline;
+  text-decoration-color: currentColor;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
 .contract-inspector .inspector-original-link:focus,
 .contract-inspector .inspector-original-link:focus-visible {
-  color: var(--rf-color-focus);
-  outline: 2px solid var(--rf-color-focus);
+  color: var(--rf-color-current-focus);
+  outline: 2px solid var(--rf-color-current-focus);
   outline-offset: 2px;
-  text-decoration-color: var(--rf-color-focus);
+  text-decoration-color: var(--rf-color-current-focus);
 }
 
 .contract-inspector .inspector-original-link:focus-visible {

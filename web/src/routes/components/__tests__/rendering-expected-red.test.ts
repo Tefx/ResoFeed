@@ -1,7 +1,7 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import fs from 'node:fs';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Feed from '../Feed.svelte';
 import FirstUseEmptyState from '../FirstUseEmptyState.svelte';
@@ -49,6 +49,17 @@ function textResponse(body: string, init: ResponseInit = {}): Response {
 }
 
 describe('expected-red rendering contracts from docs/DESIGN.md', () => {
+  beforeEach(() => {
+    cleanup();
+    window.localStorage.clear();
+    window.history.replaceState({}, '', '/');
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
   it('renders the owner-token prompt as the local access gate without pre-acceptance persistence', async () => {
     const user = userEvent.setup();
     const onAccepted = vi.fn();
@@ -353,16 +364,24 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const css = fs.readFileSync(`${process.cwd()}/src/app.css`, 'utf8');
     const originalLinkRule = css.match(/\.contract-inspector \.inspector-original-link\s*\{[^}]+\}/)?.[0] ?? '';
     const originalLinkHoverFocusRule = css.match(/\.contract-inspector \.inspector-original-link:hover,\n\.contract-inspector \.inspector-original-link:focus-visible\s*\{[^}]+\}/)?.[0] ?? '';
+    const originalLinkFocusRule = css.match(/\.contract-inspector \.inspector-original-link:focus,\n\.contract-inspector \.inspector-original-link:focus-visible\s*\{[^}]+\}/)?.[0] ?? '';
 
     expect(originalLinkRule).toContain('display: inline;');
     expect(originalLinkRule).toContain('min-height: auto;');
     expect(originalLinkRule).toContain('padding: 0;');
     expect(originalLinkRule).toContain('border: 0;');
     expect(originalLinkRule).not.toMatch(/border-block-end|box-shadow|background:/);
+    expect(originalLinkHoverFocusRule).toContain('color: var(--rf-color-current-text);');
     expect(originalLinkHoverFocusRule).toContain('background: transparent;');
     expect(originalLinkHoverFocusRule).toContain('outline: 0;');
     expect(originalLinkHoverFocusRule).toContain('box-shadow: none;');
     expect(originalLinkHoverFocusRule).toContain('text-decoration-line: underline;');
+    expect(originalLinkHoverFocusRule).toContain('text-decoration-color: currentColor;');
+    expect(originalLinkFocusRule).toContain('color: var(--rf-color-current-focus);');
+    expect(originalLinkFocusRule).toContain('outline: 2px solid var(--rf-color-current-focus);');
+    expect(originalLinkFocusRule).toContain('text-decoration-color: var(--rf-color-current-focus);');
+    expect(originalLinkHoverFocusRule).not.toContain('var(--rf-color-text)');
+    expect(originalLinkFocusRule).not.toContain('var(--rf-color-focus)');
   });
 
   it('keeps Inspector model-list diagnostics out of payload paragraph typography', () => {
