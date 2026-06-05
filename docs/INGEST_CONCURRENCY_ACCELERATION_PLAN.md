@@ -158,7 +158,7 @@ architecture_basis:
 
 Use a process-local source lease map keyed by source id. Manual source fetch, manual ingest source attempts, and background ingest source attempts all acquire the same source lease before fetching a source.
 
-Rationale: the current global ingest guard makes unrelated feeds block each other. Source identity is the smallest safe unit because source title updates, first-fetch limits, and feed fetch status are source-local. This preserves same-source safety while allowing unrelated sources to progress.
+Rationale: the previous global ingest guard made unrelated feeds block each other. Source identity is the smallest safe unit because source title updates, first-fetch limits, and feed fetch status are source-local. This preserves same-source safety while allowing unrelated sources to progress.
 
 Trade-off: result aggregation and current-operation reporting become slightly more complex. The accepted cost is small compared with the large-library throughput gain.
 
