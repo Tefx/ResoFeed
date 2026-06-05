@@ -9,7 +9,7 @@ Status: acceptance-only contract artifact. This document defines browser/a11y/sc
 - `docs/DESIGN.md` defines Inspector, Source Ledger, State Portability hierarchy, lightweight Source Ledger manual `[RUN INGEST]` / `[FETCH]` controls, and keyboard/a11y behavior.
 - `docs/DESIGN.md` defines motion/state rules: color/border-only transitions, no bounce, no skeleton loaders, reduced motion support, and no layout shift. Manual ingest/fetch uses bracket text replacement only, not spinners or dashboards.
 - `docs/DESIGN_VISION.md` anchors split-pane desktop, single-column mobile, the `RESOFEED` menu, flat Source Ledger, and anti-slop/no-layout-shift interaction behavior.
-- `docs/ARCHITECTURE.md` anchors the manual ingest/fetch HTTP boundary, global in-process ingest guard, `409 conflict` behavior, and the ban on persistent jobs, queues, command histories, activity ledgers, sync/merge, or dashboards.
+- `docs/ARCHITECTURE.md` anchors the manual ingest/fetch HTTP boundary, source-scoped bounded leases for ingest, global-exclusive guards for state/language mutations, `409 conflict` behavior, and the ban on persistent jobs, queues, command histories, activity ledgers, sync/merge, or dashboards.
 - `web/src/routes/+page.svelte`, `web/src/routes/components/Feed.svelte`, `web/src/routes/components/Inspector.svelte`, and `web/src/routes/components/SourceLedger.svelte` define implementation selectors and state observables to target in tests.
 
 ## Real hit-target contract
