@@ -7,11 +7,15 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+	"unicode"
 )
 
 const (
@@ -142,6 +146,24 @@ func TestSTCExpectedRedSameSourceDuplicateConflictsWithoutPendingWork(t *testing
 	assertManualFetchDurableArtifactsAbsent(t, ctx, db)
 	close(sameRelease)
 	assertStatus(t, <-firstSameDone, http.StatusOK)
+}
+
+func TestSTCExpectedRedFoundationNoFeedTitleStorageOrBackendAliases(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+
+	assertSQLiteTableColumnPresent(t, ctx, db, "sources", "title")
+	assertSQLiteTableColumnAbsent(t, ctx, db, "sources", "feed_title")
+	assertSQLiteSchemaTokenAbsent(t, ctx, db, "feed_title")
+	assertProductionBackendTokenAbsent(t, "feed_title")
+}
+
+func TestSTCExpectedRedFoundationNoDurableQueueJobActivityWorkerOrSchedulerDrift(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+
+	assertSQLiteTableNameFragmentsAbsent(t, ctx, db, []string{"queue", "job", "activity", "ledger", "history", "pending_work", "progress"})
+	assertProductionBackendIdentifiersAbsent(t, []string{"worker", "eventbus", "event_bus", "scheduler"})
 }
 
 func TestSTCExpectedRedGlobalManualAndBackgroundIngestSkipWhileSourceFetchActive(t *testing.T) {
@@ -282,4 +304,328 @@ func assertSTCSourceListTitleOnly(t *testing.T, body []byte, sourceID string, wa
 		return
 	}
 	t.Fatalf("%s response missing source %s; body=%s", surface, sourceID, body)
+}
+
+func assertSQLiteTableColumnPresent(t *testing.T, ctx context.Context, db *sql.DB, tableName string, columnName string) {
+	t.Helper()
+	columns := sqliteTableColumns(t, ctx, db, tableName)
+	if !columns[columnName] {
+		t.Fatalf("SQLite table %s missing required canonical column %s; columns=%v", tableName, columnName, stcMapKeys(columns))
+	}
+}
+
+func assertSQLiteTableColumnAbsent(t *testing.T, ctx context.Context, db *sql.DB, tableName string, columnName string) {
+	t.Helper()
+	columns := sqliteTableColumns(t, ctx, db, tableName)
+	if columns[columnName] {
+		t.Fatalf("SQLite table %s contains forbidden source-title delta storage column %s", tableName, columnName)
+	}
+}
+
+func sqliteTableColumns(t *testing.T, ctx context.Context, db *sql.DB, tableName string) map[string]bool {
+	t.Helper()
+	rows, err := db.QueryContext(ctx, `pragma table_info(`+tableName+`)`)
+	if err != nil {
+		t.Fatalf("read SQLite table metadata for %s: %v", tableName, err)
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			t.Errorf("close table metadata rows for %s: %v", tableName, err)
+		}
+	}()
+	columns := map[string]bool{}
+	for rows.Next() {
+		var cid int
+		var name, columnType string
+		var notNull int
+		var defaultValue any
+		var pk int
+		if err := rows.Scan(&cid, &name, &columnType, &notNull, &defaultValue, &pk); err != nil {
+			t.Fatalf("scan table metadata for %s: %v", tableName, err)
+		}
+		columns[name] = true
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatalf("iterate table metadata for %s: %v", tableName, err)
+	}
+	return columns
+}
+
+func assertSQLiteSchemaTokenAbsent(t *testing.T, ctx context.Context, db *sql.DB, token string) {
+	t.Helper()
+	rows, err := db.QueryContext(ctx, `select name, coalesce(sql, '') from sqlite_master where type in ('table', 'view', 'trigger', 'index') and name not like 'sqlite_%'`)
+	if err != nil {
+		t.Fatalf("read SQLite schema for forbidden token %q: %v", token, err)
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			t.Errorf("close SQLite schema rows: %v", err)
+		}
+	}()
+	needle := strings.ToLower(token)
+	for rows.Next() {
+		var name, sqlText string
+		if err := rows.Scan(&name, &sqlText); err != nil {
+			t.Fatalf("scan SQLite schema row: %v", err)
+		}
+		if strings.Contains(strings.ToLower(name), needle) || strings.Contains(strings.ToLower(sqlText), needle) {
+			t.Fatalf("SQLite schema contains forbidden token %q in object %s: %s", token, name, sqlText)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatalf("iterate SQLite schema rows: %v", err)
+	}
+}
+
+func assertSQLiteTableNameFragmentsAbsent(t *testing.T, ctx context.Context, db *sql.DB, forbiddenFragments []string) {
+	t.Helper()
+	rows, err := db.QueryContext(ctx, `select name from sqlite_master where type = 'table' and name not like 'sqlite_%'`)
+	if err != nil {
+		t.Fatalf("read SQLite table names: %v", err)
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			t.Errorf("close SQLite table rows: %v", err)
+		}
+	}()
+	for rows.Next() {
+		var tableName string
+		if err := rows.Scan(&tableName); err != nil {
+			t.Fatalf("scan SQLite table name: %v", err)
+		}
+		lowerName := strings.ToLower(tableName)
+		for _, fragment := range forbiddenFragments {
+			if strings.Contains(lowerName, fragment) {
+				t.Fatalf("SQLite table %s contains forbidden durable-work fragment %q", tableName, fragment)
+			}
+		}
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatalf("iterate SQLite table names: %v", err)
+	}
+}
+
+func assertProductionBackendTokenAbsent(t *testing.T, token string) {
+	t.Helper()
+	needle := strings.ToLower(token)
+	for _, file := range stcProductionBackendGoFiles(t) {
+		content, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatalf("read production backend file %s: %v", file, err)
+		}
+		withoutComments := strings.ToLower(stcStripGoComments(string(content)))
+		if strings.Contains(withoutComments, needle) {
+			t.Fatalf("production backend file %s contains forbidden source-title token %q outside comments", stcRepoRelativePath(t, file), token)
+		}
+	}
+}
+
+func assertProductionBackendIdentifiersAbsent(t *testing.T, forbiddenFragments []string) {
+	t.Helper()
+	for _, file := range stcProductionBackendGoFiles(t) {
+		content, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatalf("read production backend file %s: %v", file, err)
+		}
+		codeOnly := stcMaskGoStringLiterals(stcStripGoComments(string(content)))
+		for _, token := range stcIdentifierTokens(codeOnly) {
+			lowerToken := strings.ToLower(token)
+			for _, fragment := range forbiddenFragments {
+				if strings.Contains(lowerToken, fragment) {
+					t.Fatalf("production backend file %s contains forbidden durable-work abstraction identifier %q matching %q", stcRepoRelativePath(t, file), token, fragment)
+				}
+			}
+		}
+	}
+}
+
+func stcProductionBackendGoFiles(t *testing.T) []string {
+	t.Helper()
+	backendDir := filepath.Join(stcRepositoryRoot(t), "internal", "resofeed")
+	entries, err := os.ReadDir(backendDir)
+	if err != nil {
+		t.Fatalf("read backend directory %s: %v", backendDir, err)
+	}
+	var files []string
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") || strings.HasSuffix(entry.Name(), "_test.go") {
+			continue
+		}
+		files = append(files, filepath.Join(backendDir, entry.Name()))
+	}
+	return files
+}
+
+func stcRepositoryRoot(t *testing.T) string {
+	t.Helper()
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("resolve repository root: runtime caller unavailable")
+	}
+	return filepath.Clean(filepath.Join(filepath.Dir(filename), "..", ".."))
+}
+
+func stcRepoRelativePath(t *testing.T, path string) string {
+	t.Helper()
+	rel, err := filepath.Rel(stcRepositoryRoot(t), path)
+	if err != nil {
+		return path
+	}
+	return rel
+}
+
+func stcStripGoComments(src string) string {
+	var out strings.Builder
+	state := "code"
+	escaped := false
+	for i := 0; i < len(src); i++ {
+		ch := src[i]
+		next := byte(0)
+		if i+1 < len(src) {
+			next = src[i+1]
+		}
+		switch state {
+		case "code":
+			if ch == '/' && next == '/' {
+				out.WriteByte(' ')
+				i++
+				state = "line_comment"
+				continue
+			}
+			if ch == '/' && next == '*' {
+				out.WriteByte(' ')
+				i++
+				state = "block_comment"
+				continue
+			}
+			out.WriteByte(ch)
+			if ch == '`' {
+				state = "raw_string"
+			} else if ch == '"' {
+				state = "string"
+				escaped = false
+			} else if ch == '\'' {
+				state = "rune"
+				escaped = false
+			}
+		case "line_comment":
+			if ch == '\n' {
+				out.WriteByte('\n')
+				state = "code"
+			}
+		case "block_comment":
+			if ch == '\n' {
+				out.WriteByte('\n')
+			}
+			if ch == '*' && next == '/' {
+				out.WriteByte(' ')
+				i++
+				state = "code"
+			}
+		case "raw_string":
+			out.WriteByte(ch)
+			if ch == '`' {
+				state = "code"
+			}
+		case "string":
+			out.WriteByte(ch)
+			if escaped {
+				escaped = false
+			} else if ch == '\\' {
+				escaped = true
+			} else if ch == '"' {
+				state = "code"
+			}
+		case "rune":
+			out.WriteByte(ch)
+			if escaped {
+				escaped = false
+			} else if ch == '\\' {
+				escaped = true
+			} else if ch == '\'' {
+				state = "code"
+			}
+		}
+	}
+	return out.String()
+}
+
+func stcMaskGoStringLiterals(src string) string {
+	var out strings.Builder
+	state := "code"
+	escaped := false
+	for i := 0; i < len(src); i++ {
+		ch := src[i]
+		switch state {
+		case "code":
+			if ch == '`' {
+				out.WriteByte(' ')
+				state = "raw_string"
+			} else if ch == '"' {
+				out.WriteByte(' ')
+				state = "string"
+				escaped = false
+			} else if ch == '\'' {
+				out.WriteByte(' ')
+				state = "rune"
+				escaped = false
+			} else {
+				out.WriteByte(ch)
+			}
+		case "raw_string":
+			if ch == '\n' {
+				out.WriteByte('\n')
+			} else {
+				out.WriteByte(' ')
+			}
+			if ch == '`' {
+				state = "code"
+			}
+		case "string":
+			if ch == '\n' {
+				out.WriteByte('\n')
+			} else {
+				out.WriteByte(' ')
+			}
+			if escaped {
+				escaped = false
+			} else if ch == '\\' {
+				escaped = true
+			} else if ch == '"' {
+				state = "code"
+			}
+		case "rune":
+			out.WriteByte(' ')
+			if escaped {
+				escaped = false
+			} else if ch == '\\' {
+				escaped = true
+			} else if ch == '\'' {
+				state = "code"
+			}
+		}
+	}
+	return out.String()
+}
+
+func stcIdentifierTokens(src string) []string {
+	fields := strings.FieldsFunc(src, func(r rune) bool {
+		return r != '_' && !unicode.IsLetter(r) && !unicode.IsDigit(r)
+	})
+	tokens := make([]string, 0, len(fields))
+	for _, field := range fields {
+		if field == "" {
+			continue
+		}
+		tokens = append(tokens, field)
+	}
+	return tokens
+}
+
+func stcMapKeys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+	return keys
 }

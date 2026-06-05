@@ -1,3 +1,6 @@
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import path from 'node:path';
+
 import { render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -64,6 +67,25 @@ function expectForbiddenOperationalSurfacesAbsent(ledger: HTMLElement): void {
   expect(ledger).not.toHaveTextContent(/job list|jobs?|queue|queued|retry dashboard|operation history|activity ledger|command history/i);
 }
 
+function routeProductionFiles(): string[] {
+  const routeRoot = path.resolve(process.cwd(), 'src', 'routes');
+  const files: string[] = [];
+  const visit = (candidate: string): void => {
+    const stat = statSync(candidate);
+    if (stat.isDirectory()) {
+      for (const entry of readdirSync(candidate)) visit(path.join(candidate, entry));
+      return;
+    }
+    if (/\.(svelte|ts)$/.test(candidate) && !candidate.includes(`${path.sep}__tests__${path.sep}`)) files.push(candidate);
+  };
+  visit(routeRoot);
+  return files;
+}
+
+function readRouteProductionText(relativePath: string): string {
+  return readFileSync(path.resolve(process.cwd(), 'src', 'routes', relativePath), 'utf8');
+}
+
 describe('Source Ledger source-title/concurrency expected-red contract', () => {
   it('renders the row primary name from backend source.title and never from a feed_title field', () => {
     const sourceWithForbiddenAlias = {
@@ -103,6 +125,27 @@ describe('Source Ledger source-title/concurrency expected-red contract', () => {
     for (const [sourceId, resolve] of pendingBySource) {
       resolve({ operation: 'source_fetch', source_id: sourceId, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [] });
     }
+  });
+
+  it('keeps Source Ledger route integration free of settings/dashboard/progress/queue/history drift', () => {
+    const routeFiles = routeProductionFiles();
+    const routeNames = routeFiles.map((file) => path.relative(path.resolve(process.cwd(), 'src', 'routes'), file));
+    const forbiddenRouteNamePattern = /(^|[\\/])(settings|dashboard|progress|queue|queues|job|jobs|history|activity|activities)([\\/.]|$)/i;
+    const forbiddenRoutePathPattern = /['"`]\/(?:settings|dashboard|progress|queue|queues|jobs?|history|activity|activities)(?:[/?#'"`]|$)/i;
+
+    expect(routeNames.filter((name) => forbiddenRouteNamePattern.test(name))).toEqual([]);
+    for (const file of routeFiles) {
+      const content = readFileSync(file, 'utf8');
+      expect(content.match(forbiddenRoutePathPattern)).toBeNull();
+    }
+
+    const pageShell = readRouteProductionText('+page.svelte');
+    expect(pageShell).toContain("if (pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources') return 'ledger';");
+    expect(pageShell).toContain("if (surface === 'ledger') return '/source-ledger';");
+
+    const sourceLedger = readRouteProductionText(path.join('components', 'SourceLedger.svelte'));
+    expect(sourceLedger).not.toMatch(/role=["']progressbar["']|data-(?:spinner|progress)|class=["'][^"']*(?:spinner|progress|dashboard|queue|history)[^"']*["']/i);
+    expect(sourceLedger).not.toMatch(/job list|queue label|retry dashboard|operation history|activity ledger|command history|settings dashboard/i);
   });
 
   it('shows raw duplicate same-source current-operation conflict adjacent to the affected row without queue/progress/dashboard UI', async () => {
