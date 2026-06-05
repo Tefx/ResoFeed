@@ -920,7 +920,7 @@
       <summary>{localizedChrome('Source info', '来源信息')}</summary>
       <p translate="no">{sourceTitleProvenanceText(sourceProvenanceTitle(item))}</p>
       {#if sourceFeedUrl(item)}
-        <p><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源详情链接：${item.source_title}` : `source detail feed link: ${item.source_title}`} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('feed link', '来源链接')}</a></p>
+        <p><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源信息链接：${item.source_title}` : `Source info feed link: ${item.source_title}`} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('feed link', '来源链接')}</a></p>
       {/if}
     </details>
     {@const groupedItems = groupedSourceItems(item)}
