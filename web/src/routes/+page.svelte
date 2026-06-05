@@ -479,8 +479,12 @@
   }
 
   function reprocessCompleteMessage(result: ReprocessLibraryResult): string {
-    const prefix = result.language === 'zh' ? '重处理完成' : 'reprocess complete';
-    return `${prefix}: updated ${result.items_updated}; unavailable ${result.items_unavailable}; failed ${result.items_failed}; indexed ${result.items_indexed}`;
+    const incomplete = result.status === 'failed' || result.fts_stale === true;
+    const prefix = result.language === 'zh'
+      ? (incomplete ? '重处理未完成' : '重处理完成')
+      : (incomplete ? 'reprocess incomplete' : 'reprocess complete');
+    const stale = result.fts_stale === true ? (result.language === 'zh' ? '; 搜索索引待重建' : '; search index stale') : '';
+    return `${prefix}: attempted ${result.items_attempted}; updated ${result.items_updated}; unavailable ${result.items_unavailable}; failed ${result.items_failed}; indexed ${result.items_indexed}${stale}`;
   }
 
   function detailsCurrentOperation(error: ResoFeedApiError): CurrentOperationInfo | null {

@@ -228,7 +228,9 @@ export interface ReprocessLibraryResult {
   items_indexed: number;
   items_unavailable: number;
   items_failed: number;
+  items_preserved_failures?: number;
   fts_rebuilt: boolean;
+  fts_stale?: boolean;
   errors: ReprocessErrorDetail[];
 }
 

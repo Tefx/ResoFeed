@@ -32,7 +32,7 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
-function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number } = {}) {
+function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number; reprocessResultStatus?: 'completed' | 'completed_with_errors' | 'failed'; ftsStale?: boolean } = {}) {
   const language = options.language ?? 'en';
   const languageStatus = options.languageStatus ?? 200;
   const languagePutStatus = options.languagePutStatus ?? languageStatus;
@@ -82,7 +82,7 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
       }
       return jsonResponse({
         reprocess: {
-          status: 'completed',
+          status: options.reprocessResultStatus ?? 'completed',
           language: 'zh',
           started_at: '2026-05-15T00:00:00Z',
           completed_at: '2026-05-15T00:00:01Z',
@@ -91,7 +91,8 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
           items_indexed: 4,
           items_unavailable: 2,
           items_failed: 3,
-          fts_rebuilt: true,
+          fts_rebuilt: options.ftsStale === true ? false : true,
+          fts_stale: options.ftsStale === true,
           errors: []
         },
         already_applied: false
@@ -103,7 +104,7 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number } = {}) {
+async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number; reprocessResultStatus?: 'completed' | 'completed_with_errors' | 'failed'; ftsStale?: boolean } = {}) {
   cleanup();
   window.localStorage.clear();
   installAuthenticatedRuntimeFetch(options);
@@ -212,8 +213,16 @@ describe('expected-red processing language and reprocess rendering contracts', (
     expect(running).not.toHaveAttribute('disabled');
 
     await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/reprocess complete|重处理完成/));
-    expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/updated 1; unavailable 2; failed 3; indexed 4/);
+    expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/attempted 6; updated 1; unavailable 2; failed 3; indexed 4/);
     expect(screen.getByRole('status', { name: /reprocess/i })).toHaveAttribute('aria-live', 'polite');
+
+    installAuthenticatedRuntimeFetch({ language: 'zh', reprocessResultStatus: 'failed', ftsStale: true });
+    await openResofeedSurfaceMenu(user);
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Reprocess existing library/i }));
+    await user.click(within(surfaceMenu).getByRole('button', { name: /Confirm reprocess/i }));
+    await waitFor(() => expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/重处理未完成|reprocess incomplete/));
+    expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/attempted 6; updated 1; unavailable 2; failed 3; indexed 4/);
+    expect(screen.getByRole('status', { name: /reprocess/i })).toHaveTextContent(/搜索索引待重建|search index stale/);
 
     installAuthenticatedRuntimeFetch({ language: 'zh', reprocessStatus: 409 });
     await openResofeedSurfaceMenu(user);

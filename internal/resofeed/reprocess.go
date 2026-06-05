@@ -11,10 +11,9 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
-
-const reprocessLibraryTimeout = 10 * time.Minute
 
 const ItemReingestHTTPPathPrefix = "/api/items/"
 
@@ -380,78 +379,23 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 		return ReprocessLibraryResponse{}, fmt.Errorf("reprocess library: set stale FTS marker: %w", err)
 	}
 
-	runCtx, cancel := context.WithTimeout(ctx, reprocessLibraryTimeout)
-	defer cancel()
-
-	items, err := loadReprocessItems(runCtx, db)
+	items, err := loadReprocessItems(ctx, db)
 	if err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
 	updateCurrentOperation("processing_items", &CurrentOperationCount{Current: 0, Total: len(items)}, "library reprocess processing items")
-	for index, item := range items {
-		if err := runCtx.Err(); err != nil {
-			result.Status = ReprocessStatusFailed
-			appendReprocessError(&result, nil, ReprocessErrorTimeout, "operation timed out")
-			result.CompletedAt = time.Now().UTC()
-			result.FTSStale = true
-			return ReprocessLibraryResponse{Reprocess: result}, nil
-		}
-		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(items)}, "library reprocess processing item")
-		result.ItemsAttempted++
-		outcome, err := processReprocessItem(runCtx, item, llm, language, activeSteeringRules)
-		if err != nil {
-			if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-				outcome = failedReprocessOutcome(fallbackReprocessSourceURL(item), ReprocessErrorTimeout, "item processing timed out")
-				result.ItemsFailed++
-				appendReprocessError(&result, &item.id, ReprocessErrorTimeout, "item processing timed out")
-				continue
-			}
-			result.ItemsFailed++
-			appendReprocessError(&result, &item.id, ReprocessErrorRSSFetchError, err.Error())
-			continue
-		}
-		if outcome.failed {
-			result.ItemsFailed++
-			appendReprocessError(&result, &item.id, outcome.errorCode, outcome.errorMessage)
-			if outcome.storableFailure() {
-				result.ItemsPreservedFailures++
-				if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
-					return ReprocessLibraryResponse{}, err
-				}
-			}
-			continue
-		}
-		if outcome.unavailable {
-			result.ItemsUnavailable++
-			appendReprocessError(&result, &item.id, outcome.errorCode, outcome.errorMessage)
-			if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
-				return ReprocessLibraryResponse{}, err
-			}
-			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item unavailable")
-			continue
-		}
-		if !outcome.writable() {
-			result.ItemsUnavailable++
-			appendReprocessError(&result, &item.id, ReprocessErrorSummaryUnavailable, "summary unavailable")
-			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item unavailable")
-			continue
-		}
-		if err := storeReprocessItem(runCtx, db, item.id, outcome); err != nil {
-			return ReprocessLibraryResponse{}, err
-		}
-		result.ItemsUpdated++
-		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(items)}, "library reprocess item processed")
+	if err := processReprocessLibraryItems(ctx, db, llm, language, activeSteeringRules, items, &result); err != nil {
+		return ReprocessLibraryResponse{}, err
 	}
-
-	if err := runCtx.Err(); err != nil {
+	if err := ctx.Err(); err != nil {
 		result.Status = ReprocessStatusFailed
-		appendReprocessError(&result, nil, ReprocessErrorTimeout, "operation timed out")
+		appendReprocessError(&result, nil, ReprocessErrorTimeout, reprocessContextFailureMessage(err))
 		result.CompletedAt = time.Now().UTC()
 		result.FTSStale = true
 		return ReprocessLibraryResponse{Reprocess: result}, nil
 	}
 	updateCurrentOperation("rebuilding_search", &CurrentOperationCount{Current: len(items), Total: len(items)}, "library reprocess rebuilding search index")
-	indexed, err := rebuildSearchIndexAndClearStale(runCtx, db)
+	indexed, err := rebuildSearchIndexAndClearStale(ctx, db)
 	if err != nil {
 		return ReprocessLibraryResponse{}, err
 	}
@@ -464,6 +408,120 @@ func reprocessLibraryUnlocked(ctx context.Context, db *sql.DB, llm LLMClient) (R
 	}
 	updateCurrentOperation("complete", &CurrentOperationCount{Current: len(items), Total: len(items)}, "library reprocess complete")
 	return ReprocessLibraryResponse{Reprocess: result}, nil
+}
+
+type reprocessLibraryTask struct {
+	index int
+	item  reprocessItem
+}
+
+type reprocessLibraryProcessedItem struct {
+	index   int
+	item    reprocessItem
+	outcome reprocessItemOutcome
+	err     error
+}
+
+func processReprocessLibraryItems(ctx context.Context, db *sql.DB, llm LLMClient, language ProcessingLanguage, activeSteeringRules []string, items []reprocessItem, result *ReprocessLibraryResult) error {
+	if len(items) == 0 {
+		return nil
+	}
+	slotCount := minInt(DefaultIngestItemConcurrencyPerSource, len(items))
+	if slotCount < 1 {
+		slotCount = 1
+	}
+	tasks := make(chan reprocessLibraryTask)
+	processedItems := make(chan reprocessLibraryProcessedItem, len(items))
+	var wg sync.WaitGroup
+	for slot := 0; slot < slotCount; slot++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for task := range tasks {
+				if err := ctx.Err(); err != nil {
+					processedItems <- reprocessLibraryProcessedItem{index: task.index, item: task.item, err: err}
+					continue
+				}
+				outcome, err := processReprocessItem(ctx, task.item, llm, language, activeSteeringRules)
+				processedItems <- reprocessLibraryProcessedItem{index: task.index, item: task.item, outcome: outcome, err: err}
+			}
+		}()
+	}
+	go func() {
+		defer close(tasks)
+		for index, item := range items {
+			select {
+			case <-ctx.Done():
+				return
+			case tasks <- reprocessLibraryTask{index: index, item: item}:
+			}
+		}
+	}()
+	go func() {
+		wg.Wait()
+		close(processedItems)
+	}()
+
+	completed := 0
+	for processed := range processedItems {
+		result.ItemsAttempted++
+		if processed.err != nil {
+			if errors.Is(processed.err, context.DeadlineExceeded) || errors.Is(processed.err, context.Canceled) {
+				result.ItemsFailed++
+				appendReprocessError(result, &processed.item.id, ReprocessErrorTimeout, reprocessContextFailureMessage(processed.err))
+			} else {
+				result.ItemsFailed++
+				appendReprocessError(result, &processed.item.id, ReprocessErrorRSSFetchError, processed.err.Error())
+			}
+			completed++
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: completed, Total: len(items)}, "library reprocess item failed")
+			continue
+		}
+		if processed.outcome.failed {
+			result.ItemsFailed++
+			appendReprocessError(result, &processed.item.id, processed.outcome.errorCode, processed.outcome.errorMessage)
+			if processed.outcome.storableFailure() {
+				result.ItemsPreservedFailures++
+				if err := storeReprocessItem(ctx, db, processed.item.id, processed.outcome); err != nil {
+					return err
+				}
+			}
+			completed++
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: completed, Total: len(items)}, "library reprocess item failed")
+			continue
+		}
+		if processed.outcome.unavailable {
+			result.ItemsUnavailable++
+			appendReprocessError(result, &processed.item.id, processed.outcome.errorCode, processed.outcome.errorMessage)
+			if err := storeReprocessItem(ctx, db, processed.item.id, processed.outcome); err != nil {
+				return err
+			}
+			completed++
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: completed, Total: len(items)}, "library reprocess item unavailable")
+			continue
+		}
+		if !processed.outcome.writable() {
+			result.ItemsUnavailable++
+			appendReprocessError(result, &processed.item.id, ReprocessErrorSummaryUnavailable, "summary unavailable")
+			completed++
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: completed, Total: len(items)}, "library reprocess item unavailable")
+			continue
+		}
+		if err := storeReprocessItem(ctx, db, processed.item.id, processed.outcome); err != nil {
+			return err
+		}
+		result.ItemsUpdated++
+		completed++
+		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: completed, Total: len(items)}, "library reprocess item processed")
+	}
+	return nil
+}
+
+func reprocessContextFailureMessage(err error) string {
+	if errors.Is(err, context.Canceled) {
+		return "operation canceled"
+	}
+	return "operation timed out"
 }
 
 type reprocessItem struct {
@@ -503,7 +561,7 @@ func (o reprocessItemOutcome) storableFailure() bool {
 }
 
 func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error) {
-	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), coalesce(i.source_item_title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text from items i join sources s on s.id = i.source_id where s.is_active = 1 order by i.id`)
+	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), coalesce(i.source_item_title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text from items i join sources s on s.id = i.source_id where s.is_active = 1 order by case when i.last_reprocess_at is null then 0 else 1 end, i.last_reprocess_at, i.id`)
 	if err != nil {
 		return nil, fmt.Errorf("reprocess library: query items: %w", err)
 	}

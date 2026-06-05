@@ -177,7 +177,9 @@ function isReprocessLibraryResponse(value: unknown): value is ReprocessLibraryRe
     typeof result.items_indexed === 'number' &&
     typeof result.items_unavailable === 'number' &&
     typeof result.items_failed === 'number' &&
+    (result.items_preserved_failures === undefined || typeof result.items_preserved_failures === 'number') &&
     typeof result.fts_rebuilt === 'boolean' &&
+    (result.fts_stale === undefined || typeof result.fts_stale === 'boolean') &&
     Array.isArray(result.errors) &&
     result.errors.every((error) => isRecord(error) && (typeof error.item_id === 'string' || error.item_id === null) && typeof error.code === 'string' && typeof error.message === 'string')
   );

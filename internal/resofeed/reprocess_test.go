@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -102,6 +103,66 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 	if ftsCount != 1 {
 		t.Fatalf("FTS core_insight match count = %d, want 1", ftsCount)
+	}
+}
+
+func TestReprocessLibraryConcurrentProcessingBeatsSerialRuntime(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>parallel reprocess source body</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_reprocess_parallel", server.URL+"/feed.xml", "Parallel Reprocess Source")
+	for index := 0; index < 4; index++ {
+		seedReprocessItem(t, ctx, db, fmt.Sprintf("item_parallel_%d", index), "src_reprocess_parallel", fmt.Sprintf("%s/article-%d", server.URL, index), "")
+	}
+	assertReprocessIndexReady(t, ctx, db)
+
+	llm := &slowConcurrentReprocessLLM{delay: 150 * time.Millisecond}
+	started := time.Now()
+	resp, err := reprocessLibraryFresh(ctx, db, llm)
+	elapsed := time.Since(started)
+	if err != nil {
+		t.Fatalf("reprocessLibraryFresh returned error: %v", err)
+	}
+	if resp.Reprocess.Status != ReprocessStatusCompleted || resp.Reprocess.ItemsUpdated != 4 || !resp.Reprocess.FTSRebuilt {
+		t.Fatalf("parallel reprocess result = %+v, want 4 updated and FTS rebuilt", resp.Reprocess)
+	}
+	if llm.maxConcurrent < 2 {
+		t.Fatalf("max concurrent LLM calls = %d, want at least 2", llm.maxConcurrent)
+	}
+	if elapsed >= 450*time.Millisecond {
+		t.Fatalf("parallel reprocess elapsed %s, expected materially below serial 600ms", elapsed)
+	}
+}
+
+func TestLoadReprocessItemsPrioritizesNeverAndOldestAttempts(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	seedSource(t, ctx, db, "src_reprocess_priority", "https://priority.example/feed.xml", "Priority Source")
+	seedReprocessItem(t, ctx, db, "item_recent", "src_reprocess_priority", "https://priority.example/recent", "")
+	seedReprocessItem(t, ctx, db, "item_never", "src_reprocess_priority", "https://priority.example/never", "")
+	seedReprocessItem(t, ctx, db, "item_old", "src_reprocess_priority", "https://priority.example/old", "")
+	if _, err := db.ExecContext(ctx, `update items set last_reprocess_at = ? where id = 'item_recent'`, "2026-05-15T12:00:00Z"); err != nil {
+		t.Fatalf("mark recent item: %v", err)
+	}
+	if _, err := db.ExecContext(ctx, `update items set last_reprocess_at = ? where id = 'item_old'`, "2026-05-01T12:00:00Z"); err != nil {
+		t.Fatalf("mark old item: %v", err)
+	}
+
+	items, err := loadReprocessItems(ctx, db)
+	if err != nil {
+		t.Fatalf("loadReprocessItems: %v", err)
+	}
+	got := []string{}
+	for _, item := range items {
+		got = append(got, item.id)
+	}
+	want := []string{"item_never", "item_old", "item_recent"}
+	if strings.Join(got, ",") != strings.Join(want, ",") {
+		t.Fatalf("reprocess order = %v, want %v", got, want)
 	}
 }
 
@@ -570,12 +631,21 @@ func TestFetchArticleReadableTextRejectsSniffedBinaryPayload(t *testing.T) {
 	}
 }
 
+type slowConcurrentReprocessLLM struct {
+	mu            sync.Mutex
+	delay         time.Duration
+	inFlight      int
+	maxConcurrent int
+}
+
 type reprocessMatrixLLM struct {
+	mu               sync.Mutex
 	failURLSubstring string
 	availableTexts   []string
 }
 
 type reprocessTitleLLM struct {
+	mu          sync.Mutex
 	inputTitles map[string]string
 }
 
@@ -584,6 +654,7 @@ type reprocessStatusLLM struct {
 }
 
 type reprocessCaptureLLM struct {
+	mu     sync.Mutex
 	inputs map[string]OpenRouterSummaryInput
 }
 
@@ -592,14 +663,49 @@ type actualContextInvalidReingestLLM struct{}
 type wrappedPromptValidationErrorLLM struct{}
 
 type literalTitleCaptureLLM struct {
+	mu     sync.Mutex
 	titles map[string]string
 }
 
+func (l *slowConcurrentReprocessLLM) SummarizeItem(ctx context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	l.mu.Lock()
+	l.inFlight++
+	if l.inFlight > l.maxConcurrent {
+		l.maxConcurrent = l.inFlight
+	}
+	l.mu.Unlock()
+	defer func() {
+		l.mu.Lock()
+		l.inFlight--
+		l.mu.Unlock()
+	}()
+	select {
+	case <-ctx.Done():
+		return OpenRouterSummaryOutput{}, ctx.Err()
+	case <-time.After(l.delay):
+	}
+	out := ccrTestSummaryOutput("processed "+input.ItemID, "summary parallel reprocess source body.", "parallel reprocess insight.", "high")
+	out.KeyPoints = []string{
+		"Parallel reprocess source point one.",
+		"Parallel reprocess source point two.",
+		"Parallel reprocess source point three.",
+	}
+	out.FeedExcerpt = input.AvailableText
+	out.ExtractedText = input.AvailableText
+	return out, nil
+}
+
+func (l *slowConcurrentReprocessLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
+
 func (l *literalTitleCaptureLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	l.mu.Lock()
 	if l.titles == nil {
 		l.titles = map[string]string{}
 	}
 	l.titles[input.ItemID] = input.Title
+	l.mu.Unlock()
 	out := ccrTestSummaryOutput("localized rewritten title", "summary literal provenance article body.", "insight literal provenance article body.", "high")
 	out.KeyPoints = []string{
 		"source-backed point one from article body.",
@@ -641,10 +747,12 @@ func (l reprocessStatusLLM) TranslateSteering(context.Context, OpenRouterSteerin
 }
 
 func (l *reprocessCaptureLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	l.mu.Lock()
 	if l.inputs == nil {
 		l.inputs = map[string]OpenRouterSummaryInput{}
 	}
 	l.inputs[input.ItemID] = input
+	l.mu.Unlock()
 	out := ccrTestSummaryOutput("processed "+input.ItemID, "RSS fallback excerpt with MiniMax M3 facts.", "MiniMax M3 facts remain source-grounded.", "high")
 	out.KeyPoints = []string{
 		"RSS fallback excerpt with MiniMax M3 facts point one.",
@@ -664,7 +772,9 @@ func (l *reprocessMatrixLLM) SummarizeItem(_ context.Context, input OpenRouterSu
 	if l.failURLSubstring != "" && strings.Contains(input.URL, l.failURLSubstring) {
 		return OpenRouterSummaryOutput{}, errors.New("synthetic model failure")
 	}
+	l.mu.Lock()
 	l.availableTexts = append(l.availableTexts, input.AvailableText)
+	l.mu.Unlock()
 	out := ccrTestSummaryOutput("processed "+input.URL, "summary "+input.AvailableText, "core insight "+input.AvailableText, "high")
 	out.FeedExcerpt = "excerpt " + input.AvailableText
 	out.ExtractedText = "extracted " + input.AvailableText
@@ -672,10 +782,12 @@ func (l *reprocessMatrixLLM) SummarizeItem(_ context.Context, input OpenRouterSu
 }
 
 func (l *reprocessTitleLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	l.mu.Lock()
 	if l.inputTitles == nil {
 		l.inputTitles = map[string]string{}
 	}
 	l.inputTitles[input.ItemID] = input.Title
+	l.mu.Unlock()
 	if input.ItemID == "item_url_title" {
 		return OpenRouterSummaryOutput{LocalizedTitle: "PRIOR title item_url_title", Title: "https://github.com/raindrop-ai/workshop?utm_source=tldrai", Summary: "中文摘要：保留标题", CoreInsight: "中文洞察：保留标题", FeedExcerpt: "中文摘录：保留标题", ExtractedText: "中文全文：保留标题", KeyPoints: []string{"中文要点一说明保留标题。", "中文要点二说明保留标题。", "中文要点三说明保留标题。"}, ValueTier: "high", ModelStatus: modelStatusOK}, nil
 	}
