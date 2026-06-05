@@ -209,7 +209,7 @@ describe('Inspector fallback/source evidence contract', () => {
     const sourceInfo = within(inspector).getByLabelText('Source info');
     expect(sourceInfo.querySelector('summary')).toBeVisible();
     expect(sourceInfo.querySelector('summary')).toHaveTextContent(/^Source info$/u);
-    expect(within(sourceInfo).getByRole('link', { name: 'source detail feed link: Example Source' })).toHaveAttribute('href', expectedRedSource.url);
+    expect(within(sourceInfo).getByRole('link', { name: 'Source info feed link: Example Source' })).toHaveAttribute('href', expectedRedSource.url);
     expect(inspector).not.toHaveTextContent(expectedRedItem.url);
     expect(sourceInfo).not.toHaveTextContent(expectedRedSource.url);
   });
