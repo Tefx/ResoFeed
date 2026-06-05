@@ -108,6 +108,37 @@ func TestICAExpectedRedBackgroundTickExternalCapacityDrainsOwnedSlotsAndSkipsBlo
 	})
 }
 
+func TestICAExpectedRedBackgroundTickSourceConcurrencyLimitDrainsOwnBacklogWithoutCapacitySkips(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	db := newContractDB(t, ctx)
+
+	const sourceCount = 5
+	const sourceLimit = 2
+	requests := make([]*icaObservedFeedRequests, 0, sourceCount)
+	for i := 0; i < sourceCount; i++ {
+		feed, observed := icaObservedDelayedFeedServer(t, fmt.Sprintf("ICA Background Backlog %d", i), fmt.Sprintf("background-backlog-%d", i), 75*time.Millisecond)
+		seedSTCSource(t, ctx, db, fmt.Sprintf("src_ica_background_backlog_%d", i), feed.URL+"/feed.xml", fmt.Sprintf("ICA Background Backlog %d", i), 1)
+		requests = append(requests, observed)
+	}
+
+	if err := IngestOnce(ctx, db, IngestConfig{SourceConcurrency: sourceLimit, SourceFetchTimeout: 3 * time.Second}); err != nil {
+		t.Fatalf("background tick with source_concurrency=%d returned error: %v", sourceLimit, err)
+	}
+	for i, observed := range requests {
+		if got := observed.requests.Load(); got != 1 {
+			t.Fatalf("background tick own-backlog source %d requests = %d, want eventually drained once instead of skipped as source_capacity_exhausted", i, got)
+		}
+		if got := observed.maxConcurrent.Load(); got > sourceLimit {
+			t.Fatalf("background tick own-backlog source %d max concurrency = %d, want bounded by source_concurrency=%d", i, got, sourceLimit)
+		}
+	}
+	assertManualFetchDurableArtifactsAbsent(t, ctx, db)
+	for i, observed := range requests {
+		icaAssertNoAdditionalRequests(t, &observed.requests, 1, fmt.Sprintf("own-backlog background source %d after tick", i))
+	}
+}
+
 func TestICAExpectedRedThroughputMultipleSlowSourcesBeatSerialTime(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 	defer cancel()
@@ -253,6 +284,51 @@ func icaDelayedFeedServer(t *testing.T, sourceTitle string, itemSlug string, del
 	}))
 	t.Cleanup(server.Close)
 	return server, &requests
+}
+
+type icaObservedFeedRequests struct {
+	requests      atomic.Int64
+	current       atomic.Int64
+	maxConcurrent atomic.Int64
+}
+
+func icaObservedDelayedFeedServer(t *testing.T, sourceTitle string, itemSlug string, delay time.Duration) (*httptest.Server, *icaObservedFeedRequests) {
+	t.Helper()
+	observed := &icaObservedFeedRequests{}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/feed.xml":
+			observed.requests.Add(1)
+			current := observed.current.Add(1)
+			for {
+				maxSeen := observed.maxConcurrent.Load()
+				if current <= maxSeen || observed.maxConcurrent.CompareAndSwap(maxSeen, current) {
+					break
+				}
+			}
+			defer observed.current.Add(-1)
+			timer := time.NewTimer(delay)
+			select {
+			case <-timer.C:
+			case <-r.Context().Done():
+				if !timer.Stop() {
+					select {
+					case <-timer.C:
+					default:
+					}
+				}
+				return
+			}
+			w.Header().Set("Content-Type", "application/rss+xml")
+			_, _ = io.WriteString(w, icaRSSFixture(r.Host, sourceTitle, []string{itemSlug}))
+		case "/" + itemSlug + "-article":
+			_, _ = io.WriteString(w, `<html><body><article>Article body for `+itemSlug+`.</article></body></html>`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	t.Cleanup(server.Close)
+	return server, observed
 }
 
 func icaMultiItemFeedServer(t *testing.T, sourceTitle string, itemPrefix string, itemCount int) *httptest.Server {
