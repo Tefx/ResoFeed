@@ -991,7 +991,7 @@ func updateSourceFetch(ctx context.Context, db *sql.DB, sourceID string, status 
 		}
 		return nil
 	}
-	_, err := execSourceMutation(ctx, db, `update sources set title = ?, last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + case when title <> ? then 2 else 1 end where id = ?`, fetchedTitle, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), fetchedTitle, sourceID)
+	_, err := execSourceMutation(ctx, db, `update sources set title = ?, last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + 1 where id = ?`, fetchedTitle, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), sourceID)
 	if err != nil {
 		return fmt.Errorf("update source fetch %q: %w", sourceID, err)
 	}

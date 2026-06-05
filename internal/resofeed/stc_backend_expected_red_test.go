@@ -42,24 +42,25 @@ func TestSTCExpectedRedSourceTitleRevisionAndTransportContracts(t *testing.T) {
 	if rssResult.Source == nil || rssResult.Source.Title != "Example Newsroom Dispatch" {
 		t.Fatalf("RSS manual fetch source title = %+v, want canonical sources.title updated from documented RSS feed title", rssResult.Source)
 	}
+	assertSTCSourceTitleRevision(t, ctx, db, "src_stc_rss", "Example Newsroom Dispatch", 10, "RSS")
+	if rssResult.Source.Revision != 11 {
+		t.Fatalf("RSS manual fetch response revision = %d, want seed 10 -> 11 exact-once bump", rssResult.Source.Revision)
+	}
 
 	atomResult := manualFetchJSON[IngestResponse](t, router, "/api/sources/src_stc_atom/fetch", ManualFetchRequestBody, http.StatusOK)
 	if atomResult.Source == nil || atomResult.Source.Title != "Open Standards Weekly" {
 		t.Fatalf("Atom manual fetch source title = %+v, want canonical sources.title updated from documented Atom feed title", atomResult.Source)
+	}
+	assertSTCSourceTitleRevision(t, ctx, db, "src_stc_atom", "Open Standards Weekly", 20, "Atom")
+	if atomResult.Source.Revision != 21 {
+		t.Fatalf("Atom manual fetch response revision = %d, want seed 20 -> 21 exact-once bump", atomResult.Source.Revision)
 	}
 
 	blankResult := manualFetchJSON[IngestResponse](t, router, "/api/sources/src_stc_blank/fetch", ManualFetchRequestBody, http.StatusOK)
 	if blankResult.Source == nil || blankResult.Source.Title != "Existing Blank Fallback" {
 		t.Fatalf("blank-title manual fetch source title = %+v, want existing fallback preserved", blankResult.Source)
 	}
-
-	t.Run("non-empty feed-title revision bump is distinct from blank-title fetch bookkeeping", func(t *testing.T) {
-		rssRevision := stcSourceRevision(t, ctx, db, "src_stc_rss")
-		blankRevision := stcSourceRevision(t, ctx, db, "src_stc_blank")
-		if rssRevision <= blankRevision {
-			t.Fatalf("RSS title-update revision = %d, blank-title revision = %d; want non-empty feed-title mutation to create a distinct revision bump beyond status-only blank-title fetch", rssRevision, blankRevision)
-		}
-	})
+	assertSTCSourceTitleRevision(t, ctx, db, "src_stc_blank", "Existing Blank Fallback", 10, "blank-title")
 
 	t.Run("HTTP source listing exposes title only", func(t *testing.T) {
 		assertSTCSourcesHTTPTitleOnly(t, router, "src_stc_atom", "Open Standards Weekly")
@@ -246,6 +247,21 @@ func stcSourceRevision(t *testing.T, ctx context.Context, db *sql.DB, sourceID s
 		t.Fatalf("read source revision %s: %v", sourceID, err)
 	}
 	return revision
+}
+
+func assertSTCSourceTitleRevision(t *testing.T, ctx context.Context, db *sql.DB, sourceID string, wantTitle string, seedRevision int64, fixtureKind string) {
+	t.Helper()
+	var gotTitle string
+	var gotRevision int64
+	if err := db.QueryRowContext(ctx, `select title, revision from sources where id = ?`, sourceID).Scan(&gotTitle, &gotRevision); err != nil {
+		t.Fatalf("read %s source title/revision %s: %v", fixtureKind, sourceID, err)
+	}
+	if gotTitle != wantTitle {
+		t.Fatalf("%s source title = %q, want %q", fixtureKind, gotTitle, wantTitle)
+	}
+	if gotRevision != seedRevision+1 {
+		t.Fatalf("%s source revision = %d, want seed %d -> %d exact-once bump", fixtureKind, gotRevision, seedRevision, seedRevision+1)
+	}
 }
 
 func stcPostManualFetch(router http.Handler, path string) *httptest.ResponseRecorder {

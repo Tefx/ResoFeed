@@ -422,9 +422,9 @@ func (c *ingestFakeConn) ExecContext(_ context.Context, query string, args []dri
 	defer c.state.mu.Unlock()
 	switch {
 	case strings.HasPrefix(query, "update sources set title"):
-		if len(args) >= 6 {
+		if len(args) >= 5 {
 			status, _ := args[2].Value.(string)
-			sourceID, _ := args[5].Value.(string)
+			sourceID, _ := args[len(args)-1].Value.(string)
 			c.state.sourceStatuses[sourceID] = status
 		}
 		return driver.RowsAffected(1), nil
