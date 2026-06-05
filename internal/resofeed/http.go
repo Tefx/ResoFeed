@@ -963,6 +963,10 @@ func (h apiHandler) handleStateImport(w http.ResponseWriter, r *http.Request) {
 	}
 	result, err := ImportState(r.Context(), h.cfg.DB, bytes.NewReader(body))
 	if err != nil {
+		if details, ok := guardConflictDetails(err); ok {
+			writeGuardConflict(w, details)
+			return
+		}
 		writeAPIError(w, http.StatusBadRequest, "bad_request", "bad request", map[string]any{"field": stateErrorField(err)})
 		return
 	}

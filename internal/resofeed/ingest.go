@@ -129,7 +129,7 @@ func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error
 }
 
 // ManualIngest triggers one user-requested ingestion pass. It shares the same
-// in-process guard as background ingestion and never creates durable queue/job
+// in-process guard as background ingestion and never creates durable deferred-work
 // state when another operation is already running.
 func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret ManualFetchResult, retErr error) {
 	release, err := tryAcquireIngestGuardWithActor(ctx, "ingest", "all", string(ActorKindHuman))
@@ -387,7 +387,9 @@ func tryAcquireIngestGuardWithConfig(ctx context.Context, cfg ingestCoordinatorC
 			ingestGuardState.holder.Store(operationGuardDetails{})
 		}
 		ingestGuardState.mu.Unlock()
-		if !hasRemaining {
+		if hasRemaining {
+			ingestGuardState.current.start(remaining.Operation, remaining.Scope, remaining.ActorKind)
+		} else {
 			ingestGuardState.current.clear()
 		}
 	}, nil
@@ -490,27 +492,30 @@ func guardConflictDetails(err error) (operationGuardDetails, bool) {
 }
 
 func guardConflictDetailMap(details operationGuardDetails) map[string]any {
-	currentOperation := currentOperationFromGuardDetails(details)
-	operation := "operation"
-	actorKind := string(ActorKindHuman)
-	if currentOperation.Kind != nil {
-		operation = *currentOperation.Kind
-	}
-	if currentOperation.ActorKind != nil {
-		actorKind = *currentOperation.ActorKind
+	currentOperation, represented := currentOperationFromGuardDetails(details)
+	var operation any
+	var actorKind any
+	var currentOperationValue any
+	if represented {
+		if currentOperation.Kind != nil {
+			operation = *currentOperation.Kind
+		}
+		if currentOperation.ActorKind != nil {
+			actorKind = *currentOperation.ActorKind
+		}
+		currentOperationValue = currentOperation
 	}
 	reason := details.Reason
 	if reason == "" {
-		reason = ingestConflictReasonGlobalOperationRunning
+		reason = conflictReasonForGuardDetails(details)
 	}
 	return map[string]any{
 		"operation_running": true,
 		"operation":         operation,
 		"actor_kind":        actorKind,
 		"retry_allowed":     true,
-		"reason":            conflictReasonForGuardDetails(details),
-		"current_operation": currentOperation,
 		"reason":            reason,
+		"current_operation": currentOperationValue,
 	}
 }
 
@@ -518,26 +523,36 @@ func guardConflictHTTPDetailMap(details operationGuardDetails) map[string]any {
 	return guardConflictDetailMap(details)
 }
 
-func currentOperationFromGuardDetails(details operationGuardDetails) CurrentOperationInfo {
+func currentOperationFromGuardDetails(details operationGuardDetails) (CurrentOperationInfo, bool) {
 	if current := currentOperationInfo(); current.Running {
-		return current
+		if current.Kind == nil {
+			return CurrentOperationInfo{}, false
+		}
+		if _, ok := representedOperationKind(*current.Kind, nil); !ok {
+			return CurrentOperationInfo{}, false
+		}
+		return current, true
+	}
+	kind, ok := representedOperationKind(details.Operation, details.Scope)
+	if !ok {
+		return CurrentOperationInfo{}, false
 	}
 	now := time.Now().UTC()
 	phase := "starting"
-	message := currentOperationStartMessage(canonicalOperationKind(details.Operation, details.Scope))
+	message := currentOperationStartMessage(kind)
 	actorKind := details.ActorKind
 	if actorKind == "" {
 		actorKind = string(ActorKindHuman)
 	}
 	return CurrentOperationInfo{
 		Running:   true,
-		Kind:      stringPtr(canonicalOperationKind(details.Operation, details.Scope)),
+		Kind:      stringPtr(kind),
 		ActorKind: stringPtr(canonicalOperationActorKind(actorKind)),
 		Phase:     stringPtr(phase),
 		Message:   stringPtr(message),
 		StartedAt: timePtr(now),
 		UpdatedAt: timePtr(now),
-	}
+	}, true
 }
 
 func releaseGuardRecover(release func(), retErr *error, label string) {

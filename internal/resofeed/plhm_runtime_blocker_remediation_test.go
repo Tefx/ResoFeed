@@ -51,18 +51,19 @@ func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 
 	t.Run("runtime language", func(t *testing.T) {
 		recorder := httptest.NewRecorder()
-		req := authorizedRequest(http.MethodPut, RuntimeLanguageHTTPPath, bytes.NewReader([]byte(`{"language":"zh","actor_kind":"human","actor_id":"owner","idempotency_key":"plhm-language-allowed"}`)))
+		req := authorizedRequest(http.MethodPut, RuntimeLanguageHTTPPath, bytes.NewReader([]byte(`{"language":"zh","actor_kind":"human","actor_id":"owner","idempotency_key":"plhm-language-blocked"}`)))
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(recorder, req)
-		assertStatus(t, recorder, http.StatusOK)
+		assertStatus(t, recorder, http.StatusConflict)
 
-		var parsed ProcessingLanguageResponse
+		var parsed ErrorBody
 		if err := json.Unmarshal(recorder.Body.Bytes(), &parsed); err != nil {
-			t.Fatalf("unmarshal language body: %v; body=%s", err, recorder.Body.String())
+			t.Fatalf("unmarshal language conflict body: %v; body=%s", err, recorder.Body.String())
 		}
-		if parsed.Language.Code != ProcessingLanguageChinese || parsed.Language.Label != "中文" || parsed.AlreadyApplied {
-			t.Fatalf("language response = %+v, want fresh zh response", parsed)
+		if parsed.Error.Code != "conflict" || parsed.Error.Details["reason"] != ConflictReasonGlobalOperationRunning {
+			t.Fatalf("language conflict = %+v, want global operation conflict", parsed.Error)
 		}
+		assertGuardDetails(t, parsed.Error.Details, "source_fetch", "human")
 	})
 }
 
@@ -116,8 +117,11 @@ func TestPLHMMCPRuntimeFieldErrorsUseNestedOnlyData(t *testing.T) {
 
 func assertGuardDetails(t *testing.T, details map[string]any, operation string, actorKind string) {
 	t.Helper()
-	if len(details) != 5 {
-		t.Fatalf("guard details = %#v, want canonical fields and current_operation", details)
+	if len(details) != 6 {
+		t.Fatalf("guard details = %#v, want canonical fields, reason, and current_operation", details)
+	}
+	if details["reason"] == nil || details["reason"] == "" {
+		t.Fatalf("guard details = %#v, want non-empty reason", details)
 	}
 	if details["operation_running"] != true || details["operation"] != operation || details["actor_kind"] != actorKind || details["retry_allowed"] != true {
 		t.Fatalf("guard details = %#v, want operation=%s actor_kind=%s", details, operation, actorKind)

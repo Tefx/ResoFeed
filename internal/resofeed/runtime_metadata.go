@@ -24,7 +24,7 @@ func GetProcessingLanguage(ctx context.Context, db *sql.DB) (ProcessingLanguageI
 // The idempotency receipt is live-only runtime metadata and is not portable
 // state; same-key/same-fingerprint replays the stored snapshot, while same-key
 // fingerprint mismatch is rejected by the receipt helper.
-func SetProcessingLanguage(ctx context.Context, db *sql.DB, req SetProcessingLanguageRequest) (ProcessingLanguageResponse, error) {
+func SetProcessingLanguage(ctx context.Context, db *sql.DB, req SetProcessingLanguageRequest) (ret ProcessingLanguageResponse, retErr error) {
 	if err := validateProcessingLanguage(req.Language); err != nil {
 		return ProcessingLanguageResponse{}, err
 	}
@@ -37,6 +37,11 @@ func SetProcessingLanguage(ctx context.Context, db *sql.DB, req SetProcessingLan
 	if req.IdempotencyKey == "" || len([]byte(req.IdempotencyKey)) > 200 {
 		return ProcessingLanguageResponse{}, fieldError("idempotency_key")
 	}
+	release, err := tryAcquireIngestGuardWithActor(ctx, "language_write", "runtime_language", string(req.ActorKind))
+	if err != nil {
+		return ProcessingLanguageResponse{}, err
+	}
+	defer releaseGuardRecover(release, &retErr, "set processing language")
 	var response ProcessingLanguageResponse
 	applied, err := withIdempotencyReceipt(ctx, db, req.IdempotencyKey, req.ActorID, "set_processing_language", "", setProcessingLanguageFingerprintPayload(req), &response, func() (ProcessingLanguageResponse, error) {
 		if err := storeRuntimeMetadata(ctx, db, RuntimeMetadataKeyProcessingLanguage, string(req.Language)); err != nil {

@@ -46,7 +46,7 @@ type ResonatedItemState struct {
 
 // ExportState writes the validated current-state bundle as JSON. It must not
 // include runtime_metadata, agent_receipts, deleted tombstones, inactive rules,
-// search indexes, command history, reading history, or sync metadata.
+// search indexes, command logs, reading logs, or sync metadata.
 func ExportState(ctx context.Context, db *sql.DB, w io.Writer) error {
 	if db == nil {
 		return fmt.Errorf("export state: db required")
@@ -132,9 +132,11 @@ order by i.id`)
 }
 
 // ImportState validates the JSON state bundle before writing and then replaces
-// local portable active state in one transaction. It must not merge, preserve
-// absent portable rows, or return conflict results.
-func ImportState(ctx context.Context, db *sql.DB, r io.Reader) (RestoreResult, error) {
+// local portable active state in one transaction. It must not merge or preserve
+// absent portable rows. The import write is a short unrepresented global
+// operation: it uses the in-memory guard for coordination, but it does not
+// publish a durable work record or a current-operation kind.
+func ImportState(ctx context.Context, db *sql.DB, r io.Reader) (ret RestoreResult, retErr error) {
 	if db == nil {
 		return RestoreResult{}, fmt.Errorf("import state: db required")
 	}
@@ -142,6 +144,11 @@ func ImportState(ctx context.Context, db *sql.DB, r io.Reader) (RestoreResult, e
 	if err != nil {
 		return RestoreResult{}, err
 	}
+	release, err := tryAcquireIngestGuardWithActor(ctx, "state_import", "restore", "")
+	if err != nil {
+		return RestoreResult{}, err
+	}
+	defer releaseGuardRecover(release, &retErr, "import state")
 
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {

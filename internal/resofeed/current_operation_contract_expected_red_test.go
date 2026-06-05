@@ -16,8 +16,8 @@ const currentOperationHTTPPath = "/api/runtime/operation"
 //
 // Exposed gaps are intentional in this step: the implementation owner must add
 // an in-memory CurrentOperationInfo snapshot endpoint and enrich guarded
-// operation conflicts without adding durable jobs, queues, histories, schema, or
-// service/repository layers.
+// operation conflicts without adding durable worker records, delayed backlogs,
+// past-run logs, schema, or service/repository layers.
 func TestCOSBackendCurrentOperationIdleContract(t *testing.T) {
 	router := NewRouter(HTTPServerConfig{OwnerToken: contractOwnerToken})
 
@@ -163,8 +163,11 @@ func assertCurrentOperationShape(t *testing.T, operation map[string]any) {
 
 func assertConflictDetailsWithCurrentOperation(t *testing.T, details map[string]any, kind string, actorKind string) {
 	t.Helper()
-	if len(details) != 5 {
-		t.Fatalf("conflict details = %#v, want operation_running, operation, actor_kind, retry_allowed, and current_operation", details)
+	if len(details) != 6 {
+		t.Fatalf("conflict details = %#v, want operation_running, operation, actor_kind, retry_allowed, reason, and current_operation", details)
+	}
+	if details["reason"] != ConflictReasonGlobalOperationRunning {
+		t.Fatalf("conflict reason = %#v, want %s", details["reason"], ConflictReasonGlobalOperationRunning)
 	}
 	if details["operation_running"] != true || details["operation"] != kind || details["actor_kind"] != actorKind || details["retry_allowed"] != true {
 		t.Fatalf("conflict details = %#v, want canonical operation=%s actor_kind=%s retry_allowed true", details, kind, actorKind)

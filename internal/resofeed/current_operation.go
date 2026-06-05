@@ -11,7 +11,7 @@ const RuntimeOperationMCPResourceURI = "resofeed://system/operation"
 
 // CurrentOperationInfo is a process-local, best-effort view of the guarded
 // runtime operation. It is intentionally in-memory only and is cleared when the
-// guard is released; it is not a job, queue, ledger, or durable history.
+// guard is released; it is not persisted or kept as a ledger.
 type CurrentOperationInfo struct {
 	Running   bool                   `json:"running"`
 	Kind      *string                `json:"kind"`
@@ -38,8 +38,12 @@ type currentOperationSnapshot struct {
 }
 
 func (s *currentOperationSnapshot) start(kind string, scope any, actorKind string) {
+	canonicalKind, ok := representedOperationKind(kind, scope)
+	if !ok {
+		s.clear()
+		return
+	}
 	now := time.Now().UTC()
-	canonicalKind := canonicalOperationKind(kind, scope)
 	canonicalActorKind := canonicalOperationActorKind(actorKind)
 	phase := "starting"
 	message := currentOperationStartMessage(canonicalKind)
@@ -123,22 +127,32 @@ func updateCurrentOperation(phase string, count *CurrentOperationCount, message 
 	ingestGuardState.current.update(phase, count, message)
 }
 
-func canonicalOperationKind(kind string, scope any) string {
+func representedOperationKind(kind string, scope any) (string, bool) {
 	switch kind {
 	case "ingest":
 		if scope == "background" {
-			return "background_ingest"
+			return "background_ingest", true
 		}
-		return "manual_ingest"
+		return "manual_ingest", true
 	case "fetch":
-		return "source_fetch"
+		return "source_fetch", true
 	case "reprocess":
-		return "library_reprocess"
+		return "library_reprocess", true
 	case "item_reingest":
-		return "item_reingest"
+		return "item_reingest", true
+	case "background_ingest", "manual_ingest", "source_fetch", "library_reprocess":
+		return kind, true
 	default:
-		return kind
+		return "", false
 	}
+}
+
+func canonicalOperationKind(kind string, scope any) string {
+	canonical, ok := representedOperationKind(kind, scope)
+	if !ok {
+		return ""
+	}
+	return canonical
 }
 
 func canonicalOperationActorKind(actorKind string) string {
