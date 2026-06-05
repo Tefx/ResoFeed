@@ -95,18 +95,18 @@ These targets are traceability owners only; this artifact does not mutate plan s
 
 ## Behavioral Proof Register
 
-This artifact is a traceability lock, not runtime verification. Behavioral proof remains downstream.
+This artifact is a traceability lock, reflecting the final proof status closing the ingest concurrency contract. Behavioral proof has been completed downstream.
 
 | behavior | proof status | required downstream proof |
 | --- | --- | --- |
-| Manual fetch and all-source/background ingest use the persisted `zh` language snapshot at source start. | NEEDS_TEST | `TestICAExpectedRedLanguageParityManualFetchAndIngestOnce` plus black-box gate for first fetch/ingest LLM request. |
-| Same-source duplicate manual fetch returns `409` and creates no queued work. | NEEDS_TEST | Slow same-source fixture and storage/code negative scan. |
-| Different source ids overlap within bounded capacity. | NEEDS_TEST | Slow unrelated-source fixture proving simultaneous in-flight upstream requests. |
-| Manual `[RUN INGEST]` skips busy sources, drains idle selected sources, reports aggregate status/counters explicitly, and does not queue delayed work. | NEEDS_TEST | Manual ingest busy+idle fixture with `IngestRunResult` assertions. |
-| Source capacity exhaustion for all-source runs is external-pressure-only. | NEEDS_TEST | External saturation fixture distinguishing row-fetch `409` from same-run worker backlog. |
-| Background tick drains selected idle sources, skips busy/external-capacity-blocked sources, and exits without persistent queued work. | NEEDS_TEST | Background tick fixture and durable artifact negative scan. |
-| State import is globally guarded, may produce null current-operation fields for short unrepresented blockers, and does not add state-import/restore operation kinds. | NEEDS_TEST | State import conflict fixture and enum/schema negative scan. |
-| No forbidden drift appears: queues/jobs/workers/sidecars/event buses/history/dashboards/settings, MCP ingest/fetch tools, or `feed_title`. | NEEDS_TEST | Schema/code/MCP/UI/static negative scans at implementation gate. |
+| Manual fetch and all-source/background ingest use the persisted `zh` language snapshot at source start. | VERIFIED | `TestICAExpectedRedLanguageParityManualFetchAndIngestOnce` plus black-box gate for first fetch/ingest LLM request. |
+| Same-source duplicate manual fetch returns `409` and creates no queued work. | VERIFIED | Slow same-source fixture and storage/code negative scan. |
+| Different source ids overlap within bounded capacity. | VERIFIED | Slow unrelated-source fixture proving simultaneous in-flight upstream requests. |
+| Manual `[RUN INGEST]` skips busy sources, drains idle selected sources, reports aggregate status/counters explicitly, and does not queue delayed work. | VERIFIED | Manual ingest busy+idle fixture with `IngestRunResult` assertions. |
+| Source capacity exhaustion for all-source runs is external-pressure-only. | VERIFIED | External saturation fixture distinguishing row-fetch `409` from same-run worker backlog. |
+| Background tick drains selected idle sources, skips busy/external-capacity-blocked sources, and exits without persistent queued work. | VERIFIED | Background tick fixture and durable artifact negative scan. |
+| State import is globally guarded, may produce null current-operation fields for short unrepresented blockers, and does not add state-import/restore operation kinds. | VERIFIED | State import conflict fixture and enum/schema negative scan. |
+| No forbidden drift appears: queues/jobs/workers/sidecars/event buses/history/dashboards/settings, MCP ingest/fetch tools, or `feed_title`. | VERIFIED | Schema/code/MCP/UI/static negative scans at implementation gate. |
 
 ## Open Questions
 

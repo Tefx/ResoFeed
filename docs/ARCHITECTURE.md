@@ -2237,7 +2237,7 @@ web/
 
 Module ownership rules:
 
-- `internal/resofeed/ingest.go` owns RSS/Atom fetch orchestration, per-source fetch execution, source-level ingest diagnostics, the in-process ingest concurrency guard, source-scoped same-source non-overlap, and bounded all-source batch drain/skip semantics for background/manual ingestion.
+- `internal/resofeed/ingest.go` owns RSS/Atom fetch orchestration, per-source fetch execution, source-level ingest diagnostics, source-scoped ingest coordinator/leases, source-scoped same-source non-overlap, and bounded all-source batch drain/skip semantics for background/manual ingestion.
 - `internal/resofeed/reprocess.go` owns library reprocess and Inspector item re-ingest application behavior: source-text precedence, item-scoped model call orchestration, safe result classification, item readable-field updates, and per-item FTS refresh. It must not own HTTP/MCP serialization or UI state.
 - `internal/resofeed/openrouter.go` owns OpenRouter chat-completions transport, temporary per-call model override handling, provider model listing, resolved/configured model reporting, and safe provider error classification. It must not persist model selections, prompt templates, or provider account metadata.
 - `internal/resofeed/http.go` owns HTTP routing, owner-token enforcement, request validation, response serialization, idempotency mapping, and mapping ingest/reprocess outcomes to HTTP contracts.

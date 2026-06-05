@@ -1,19 +1,19 @@
 # Ingest Concurrency Acceleration Implementation Plan
 
-Status: Proposed target architecture for the next ResoFeed ingest acceleration change.
+Status: Implemented target architecture for the ResoFeed ingest acceleration change.
 Scope: runtime processing-language correctness, source-scoped ingest/fetch coordination, and large-library ingest throughput.
 Non-scope: durable queues, worker processes, sidecars, job dashboards, settings dashboards, vector/semantic retrieval, provider abstraction layers, or multi-user operation management.
 
 ## Original Problems
 
 1. The owner observed that the first automatic ingest after fetch may appear to produce English output, while explicit reprocessing later follows the selected language.
-2. Manual row `[FETCH]`, `[RUN INGEST]`, and background ingest use inconsistent concurrency semantics: row fetch can be source-scoped, but global ingest/background ingest can still block unrelated source work.
+2. Historically, manual row `[FETCH]`, `[RUN INGEST]`, and background ingest used inconsistent concurrency semantics: row fetch could be source-scoped, but global ingest/background ingest could still block unrelated source work.
 3. Large libraries ingest too slowly because active sources are processed serially, and each source processes new items serially.
 
 ## Evidence From Current Code
 
 - `internal/resofeed/ingest.go` reads the persisted runtime processing language inside `ingestSource` before item processing and passes it as `TargetLanguage` to the LLM summary input. This supports the backend language contract for both manual source fetch and ingest passes.
-- `ingestOnceUnlocked` currently loops active sources one by one and calls `ingestSource` serially.
+- Prior to this change, `ingestOnceUnlocked` looped active sources one by one and called `ingestSource` serially.
 - `ingestSource` currently loops feed entries one by one, builds one item at a time, and performs one `SummarizeItem` call per item.
 - Existing source-title/concurrency work already permits concurrent manual source fetches when source ids differ and forbids same-source duplicate fetches.
 
