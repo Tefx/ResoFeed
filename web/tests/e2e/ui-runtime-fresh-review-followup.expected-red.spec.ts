@@ -267,7 +267,7 @@ test.describe('expected-red current-operation and fresh review browser proof', (
     const ledger = await openSourceLedger(page);
     await attachPageEvidence(page, testInfo, 'source-ledger-running-operation', '.utility-surface[aria-label="SOURCE LEDGER surface"]');
 
-    const canonicalStatusPattern = /\[REPROCESSING\.\.\.\]\s*·\s*op:\s*library_reprocess\s*·\s*actor:human\s*·\s*phase:processing_items\s*·\s*2\/5\s*·\s*library reprocess processing item\s*·\s*since 11:00:00/i;
+    const canonicalStatusPattern = /\[REPROCESSING\.\.\.\]\s*·\s*op:\s*library_reprocess\s*·\s*actor:human\s*·\s*phase:processing_items\s*·\s*2\/5\s*·\s*library reprocess processing item\s*·\s*since \d{2}:\d{2}:\d{2}\s+local/i;
     await expect.soft(ledger, 'CO-01/FR-05: Source Ledger must show canonical documented library_reprocess operation status').toContainText(canonicalStatusPattern);
 
     const status = ledger.locator('.source-ledger__header > .source-ledger__status');
@@ -312,7 +312,7 @@ test.describe('expected-red current-operation and fresh review browser proof', (
     await expect.soft(runIngest, 'FR-03: Source Ledger global ingest action is disabled while shared operation is running').toBeDisabled();
 
     await page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ }).click({ trial: true }).catch(() => undefined);
-    await expect.soft(ledger, 'CO-02: guard conflict text uses details.current_operation canonical copy').toContainText(/err: ingest already running.*op:\s*library_reprocess.*actor:human.*phase:processing_items.*2\/5.*library reprocess processing item/i);
+    await expect.soft(ledger, 'CO-02: shared running-operation guard exposes canonical current_operation copy').toContainText(/op:\s*manual_ingest\s*·\s*actor:human\s*·\s*phase:fetching_sources\s*·\s*1\/3\s*·\s*ingest fetching source\s*·\s*since \d{2}:\d{2}:\d{2}\s*(?:local|本地)/i);
 
     for (const [finding, selector] of [['FR-04 run ingest', '.bracket-action--run-ingest'], ['FR-04 import OPML', '.bracket-action--import-opml'], ['FR-04 fetch', '.bracket-action--fetch']] as const) {
       const box = await geometry(ledger.locator(selector).first());

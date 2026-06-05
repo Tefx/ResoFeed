@@ -392,11 +392,11 @@ test.describe('expected-red runtime conformance audit browser regressions', () =
     expect.soft(runIngestBox && titleBox ? runIngestBox.y >= titleBox.y + titleBox.height - 1 : false, 'F08 mobile: [RUN INGEST] is not on the title baseline that previously collided with status metadata').toBe(true);
 
     const ledgerText = await page.locator('.source-ledger').innerText();
-    expect.soft(ledgerText, 'F25: canonical current-operation copy is visible in Source Ledger output').toMatch(/op:\s*ingest\/all\s*·\s*actor:owner\s*·\s*phase:fetching_sources\s*·\s*1\/3\s*·\s*global ingest fetching sources\s*·\s*since 14:00:00/i);
+    expect.soft(ledgerText, 'F25: canonical current-operation copy is visible in Source Ledger output with local-time disambiguation').toMatch(/op:\s*manual_ingest\s*·\s*actor:human\s*·\s*phase:fetching_sources\s*·\s*1\/3\s*·\s*global ingest fetching sources\s*·\s*since \d{2}:\d{2}:\d{2}\s*(?:local|本地)/i);
     expect.soft(ledgerText, 'F25: forbidden current-operation prefix is absent from Source Ledger output').not.toMatch(/current operation:\s*ingest/i);
 
     await expect.soft(page.getByText('Choose state JSON'), 'F23: file-form label is absent from visible product UI').toHaveCount(0);
-    await expect.soft(page.locator('#state-json-file'), 'F23: import state file input remains keyboard reachable through bracket action, not direct visible file UI').not.toHaveAccessibleName('Choose state JSON');
+    await expect.soft(page.locator('#state-json-file'), 'F23: visually hidden import state file input remains keyboard reachable and accessibly named').toHaveAccessibleName('Choose state JSON');
     const ledgerBox = await page.locator('.source-ledger').boundingBox();
     expect.soft(ledgerBox?.height ?? 0, 'F24: mobile Source Ledger preserves dense first-screen rhythm').toBeLessThanOrEqual(620);
   });

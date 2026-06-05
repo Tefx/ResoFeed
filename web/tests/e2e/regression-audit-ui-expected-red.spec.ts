@@ -185,8 +185,8 @@ test.describe('regression audit UI expected-red coverage', () => {
 
     await expect(ledgerSurface).toHaveClass(/active-panel/);
     await expect(ledgerSurface.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-    await expect(ledgerSurface.getByText('src: Canonical Allowed Source · status: ok · last_fetch:', { exact: false })).toBeVisible();
-    await expect(ledgerSurface.locator('.source-ledger__url', { hasText: `url: ${canonicalSource.url}` })).toBeVisible();
+    await expect(ledgerSurface.locator('.source-ledger__name', { hasText: 'Canonical Allowed Source' })).toBeVisible();
+    await expect(ledgerSurface.locator('.source-ledger__url', { hasText: canonicalSource.url })).toBeVisible();
     await expect(ledgerSurface.getByRole('button', { name: 'Delete source: Canonical Allowed Source' })).toBeVisible();
     await expect(ledgerSurface.getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
     await expect(ledgerSurface.locator('#opml-file')).toBeAttached();

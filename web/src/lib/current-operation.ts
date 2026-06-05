@@ -90,11 +90,9 @@ export function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']
 }
 
 export function operationDetails(operation: CurrentOperationInfo): string {
-  const compatibilityKind = operation.kind === 'manual_ingest' && operation.message === 'global ingest fetching sources' ? 'ingest/all' : operation.kind;
-  const compatibilityActor = operation.kind === 'manual_ingest' && operation.message === 'global ingest fetching sources' ? 'owner' : operation.actor_kind;
   return [
-    compatibilityKind ? `op: ${compatibilityKind}` : null,
-    compatibilityActor ? `actor:${compatibilityActor}` : null,
+    operation.kind ? `op: ${operation.kind}` : null,
+    operation.actor_kind ? `actor:${operation.actor_kind}` : null,
     operation.phase ? `phase:${operation.phase}` : null,
     operation.count ? `${operation.count.current}/${operation.count.total}` : null,
     operation.message,

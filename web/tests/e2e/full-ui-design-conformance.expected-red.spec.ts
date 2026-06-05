@@ -179,7 +179,7 @@ async function importFixtureFeed(page: Page, runInfo: { readonly artifactRoot: s
   await expect(page.getByRole('button', { name: /\[RUN INGEST\]|\[INGESTING\.\.\.\]/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /\[FETCH\]|\[FETCHING\.\.\.\]/ }).first()).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/(?:last_fetch|fetched_at):?\s*\d{2}:\d{2}:\d{2}(?:\s+local)?|\b\d{2}:\d{2}:\d{2}\s+local\b/, { timeout: 20_000 });
   await openToday(page);
 }
 
@@ -234,9 +234,11 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   const star = page.getByRole('button', { name: /Resonate item/ }).first();
   const starMetric = await metric(page, '.contract-resonate');
   if (Math.abs(starMetric.width - 44) > 2 || Math.abs(starMetric.height - 44) > 2) note(violations, 'F16', `Resonate target is not 44x44: ${starMetric.width}x${starMetric.height}`);
-  await star.focus();
-  const focusedStar = await metric(page, '.contract-resonate:focus');
-  if (!focusedStar.found || focusedStar.outlineStyle === 'none') note(violations, 'F46', 'focused Resonate action lacks an independent visible focus outline');
+  await star.evaluate((element) => {
+    (element as HTMLElement).focus({ focusVisible: true } as FocusOptions & { focusVisible: boolean });
+  });
+  const focusedStar = await metric(page, '.contract-resonate:focus-visible');
+  if (!focusedStar.found || focusedStar.outlineStyle === 'none') note(violations, 'F46', 'keyboard-focused Resonate action lacks an independent visible focus outline');
 
   await feedItem.click();
   await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeVisible();
@@ -265,8 +267,10 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   if (/imported \d+ sources; OPML outlines flattened/.test(ledgerText) && !/\[IMPORT OPML\]/.test(ledgerText)) note(violations, 'F28', 'import-complete status is shown as a default/import action substitute');
   if (!/\[EXPORT STATE\]/.test(ledgerText) || !/\[IMPORT STATE\]/.test(ledgerText)) note(violations, 'F35', `state actions are not canonical bracket labels: ${ledgerText}`);
   if (!/https?:\/\//.test(ledgerText)) note(violations, 'F29', `source URL column/value is not visible in ledger rows: ${ledgerText}`);
-  if (!/src:\s*ResoFeed E2E Local Source/.test(ledgerText) || !/last_fetch:\s*\d{2}:\d{2}:\d{2}/.test(ledgerText)) note(violations, 'F24', `source row grammar lacks src/last_fetch fields: ${ledgerText}`);
-  if (!/last_fetch/.test(ledgerText)) note(violations, 'F30', `timestamp label is not canonical last_fetch: ${ledgerText}`);
+  const sourcePrimaryCells = await page.locator('.source-ledger__row .source-ledger__name, .source-ledger__row .source-ledger__url, .source-ledger__row > .source-ledger__status').allTextContents();
+  if (/src:\s*ResoFeed E2E Local Source|url:\s*https?:\/\/|status: ok|fetch_state: ok/.test(sourcePrimaryCells.join(' '))) note(violations, 'F24', `source row primary grammar reintroduced diagnostic/English prefixes: ${sourcePrimaryCells.join(' ')}`);
+  if (!/ResoFeed E2E Local Source/.test(ledgerText) || !/(?:last_fetch|fetched_at):?\s*\d{2}:\d{2}:\d{2}(?:\s+local)?|\b\d{2}:\d{2}:\d{2}\s+local\b/.test(ledgerText)) note(violations, 'F24', `source row grammar lacks source/time fields: ${ledgerText}`);
+  if (!/(?:last_fetch|fetched_at|\b\d{2}:\d{2}:\d{2}\s+local\b)/.test(ledgerText)) note(violations, 'F30', `timestamp label/value is missing from Source Ledger: ${ledgerText}`);
   const fileInputMetric = await metric(page, 'input[type="file"]');
   if (fileInputMetric.found && fileInputMetric.display !== 'none' && fileInputMetric.width > 1 && fileInputMetric.height > 1) note(violations, 'F31', `file input leaves visible browser artifact: ${fileInputMetric.width}x${fileInputMetric.height}`);
   const disabledButtonMetric = await metric(page, 'button:disabled');
@@ -274,7 +278,12 @@ test('expected-red UI/design conformance matrix covers findings F1-F47 on the re
   const actionButtons = await page.locator('button').evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().y));
   if (new Set(actionButtons.map((y) => Math.round(y))).size > Math.max(4, actionButtons.length - 2)) note(violations, 'F33', 'ledger actions do not share stable row baselines');
   if (await page.getByRole('heading', { name: /state portability/i }).count() > 0) note(violations, 'F34', 'standalone State Portability/settings-like section is visible');
-  if (!/import replaces active sources, rules, and stars/.test(ledgerText)) note(violations, 'F36', 'state import warning copy is missing from ledger footer/actions');
+  if (!/OPML = source list; State = sources \+ rules \+ stars, import replaces\./.test(ledgerText)) note(violations, 'F36', 'single Source Ledger helper line is missing or stale');
+  const stateImportDescription = await page.getByRole('button', { name: '[IMPORT STATE]' }).evaluate((button) => {
+    const ids = button.getAttribute('aria-describedby')?.split(/\s+/).filter(Boolean) ?? [];
+    return ids.map((id) => document.getElementById(id)?.textContent?.trim() ?? '').join(' ');
+  });
+  if (!/Import State replaces active sources, rules, and stars\./i.test(stateImportDescription)) note(violations, 'F36', 'state import accessible destructive warning is missing');
 
   await page.getByRole('textbox', { name: 'Steer or paste RSS URL' }).fill('/doctor');
   await page.getByRole('button', { name: 'apply' }).click();
@@ -346,8 +355,9 @@ test('expected-red docs/ui-preview.html drift contract covers findings F48-F52',
   if (/#fffdf5/i.test(preview)) note(violations, 'F48', 'preview contains non-token hard-coded #fffdf5 surface color');
   if (!/\.mobile-detail h2\s*\{[\s\S]*font-size:\s*28px[\s\S]*line-height:\s*32px/.test(preview)) note(violations, 'F49', 'preview mobile Inspector title does not use 28px/32px inspector-title typography');
   if (/mobile feed|mobile inspector/i.test(preview)) note(violations, 'F50', 'preview product chrome includes explanatory mobile feed/mobile inspector labels');
-  if (!/\.item\s*\{[\s\S]*padding:\s*12px 12px 11px 0/.test(preview)) note(violations, 'F51', 'preview feed row padding does not match 12px 12px 11px 0');
-  if (!/\.item\.selected\s*\{[\s\S]*outline:\s*none/.test(preview) || !/\.item\.selected::before\s*\{[\s\S]*background:\s*var\(--border-dark\)/.test(preview)) note(violations, 'F51', 'preview selected marker does not use non-layout-shifting pseudo-element model');
+  if (!/\.item\s*\{[\s\S]*padding:\s*12px 12px 11px 12px/.test(preview)) note(violations, 'F51', 'preview feed row padding does not preserve row rhythm without a marker gutter');
+  if (/\.mobile-feed \.item\s*\{[\s\S]*padding:\s*12px 12px 11px 0[\s\S]*\}/.test(preview)) note(violations, 'F51', 'preview mobile feed row reintroduces stale marker-gutter padding override');
+  if (!/\.item\.selected\s*\{[\s\S]*background:\s*var\(--surface-active\)[\s\S]*outline:\s*none/.test(preview) || /\.item\.selected::before/.test(preview)) note(violations, 'F51', 'preview current selected-state implementation is not stable quiet tone without a standalone marker');
   // [DEVIATION]: docs/ui-preview has an older protected h1 contract in ui-runtime-fresh-review-followup; either h1 or h2 preserves the same visible SOURCE LEDGER heading semantics until the contract owners reconcile the conflict.
   if (!/<h[12] class="source-ledger__title" id="source-ledger-title">SOURCE LEDGER<\/h[12]>/.test(preview)) note(violations, 'F52', 'preview Source Ledger heading does not match #source-ledger-title SOURCE LEDGER contract');
 

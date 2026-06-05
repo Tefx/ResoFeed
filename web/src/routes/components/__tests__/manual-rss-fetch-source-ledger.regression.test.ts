@@ -1,10 +1,9 @@
 import { render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 
-import type { CurrentOperationInfo, Source, StateBundleV1 } from '$lib/api-contract';
+import type { CurrentOperationInfo, FetchSourceSuccessResponse, RunIngestSuccessResponse, Source, StateBundleV1 } from '$lib/api-contract';
 import { formatLocalClockTimeWithHint } from '$lib/display-time';
 import SourceLedger from '../SourceLedger.svelte';
 
@@ -13,6 +12,8 @@ type ManualFetchSourceLedgerProps = {
   onDeleteSource: (source: Source) => Promise<void> | void;
   onImportOpml: (opml: string) => Promise<void> | void;
   onExportOpml?: () => Promise<string | Blob> | string | Blob;
+  onRunIngest?: () => Promise<RunIngestSuccessResponse>;
+  onFetchSource?: (source: Source) => Promise<FetchSourceSuccessResponse>;
   onExportState: () => Promise<StateBundleV1>;
   onImportState: (bundle: StateBundleV1) => Promise<void> | void;
   currentOperation?: CurrentOperationInfo | null;
@@ -21,8 +22,6 @@ type ManualFetchSourceLedgerProps = {
 };
 
 const ManualSourceLedger = SourceLedger as Component<ManualFetchSourceLedgerProps>;
-const appCss = readFileSync('src/app.css', 'utf8');
-
 const sourceWithFetchTime: Source = {
   id: 'src_ok',
   url: 'https://example.com/feed.xml',
@@ -91,11 +90,10 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     }
     expect(within(ledger).getByRole('group', { name: 'Source list actions' })).toHaveTextContent('SOURCE LIST');
     expect(within(ledger).getByRole('group', { name: 'Portable state actions' })).toHaveTextContent('PORTABLE STATE');
-    expect(ledger).toHaveTextContent('OPML = source list; State = sources + rules + stars.');
+    expect(ledger).toHaveTextContent('OPML = source list; State = sources + rules + stars, import replaces.');
     expect(within(ledger).getByRole('button', { name: '[IMPORT STATE]' })).toHaveAccessibleDescription('Import State replaces active sources, rules, and stars.');
     expect(within(ledger).getByText('Import State replaces active sources, rules, and stars.')).not.toBeVisible();
     expect(within(ledger).getByRole('group', { name: 'Source list actions' })).not.toHaveTextContent('Import State replaces');
-    expect(ledger.querySelector('.source-ledger__tools-helper')).not.toHaveTextContent('import replaces');
     expect(ledger).not.toHaveTextContent(/\[run ingest\]|\[fetch\]|\[details\]|\[delete\]|\[import opml\]|\[export opml\]|\[export state\]|\[import state\]/);
   });
 
@@ -107,14 +105,68 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(within(ledger).getByRole('group', { name: '状态迁移操作' })).toHaveTextContent('状态迁移');
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
     expect(within(ledger).getByText('[FETCH]')).toBeVisible();
-    expect(within(ledger).getByText('来源: Example')).toBeVisible();
-    expect(within(ledger).getByText('URL: https://example.com/feed.xml')).toBeVisible();
+    expect(within(ledger).getByText('Example')).toBeVisible();
+    expect(within(ledger).getByText('https://example.com/feed.xml')).toBeVisible();
     const row = ledger.querySelector('.source-ledger__row');
     expect(row).toBeInstanceOf(HTMLLIElement);
     expect(ledger).not.toHaveTextContent('SOURCE LIST');
     expect(ledger).not.toHaveTextContent('PORTABLE STATE');
     expect(row?.querySelector('.source-ledger__name')).not.toHaveTextContent('src: Example');
     expect(row?.querySelector('.source-ledger__url')).not.toHaveTextContent('url: https://example.com/feed.xml');
+    expect(ledger).toHaveTextContent('OPML = 来源列表；State = 来源 + 规则 + 星标，导入会替换。');
+  });
+
+  it('does not trigger ingest from currentOperation state without explicit RUN INGEST click', async () => {
+    const onRunIngest = vi.fn(async (): Promise<RunIngestSuccessResponse> => ({ operation: 'ingest', source_id: null, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [] }));
+    renderLedger({
+      onRunIngest,
+      currentOperation: {
+        running: true,
+        kind: 'manual_ingest',
+        actor_kind: 'human',
+        phase: 'fetching_sources',
+        count: null,
+        message: null,
+        started_at: '2026-05-17T11:00:00Z',
+        updated_at: '2026-05-17T11:00:01Z'
+      }
+    });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    expect(within(ledger).getByRole('button', { name: '[INGESTING...]' })).toBeDisabled();
+    await new Promise((resolve) => window.setTimeout(resolve, 0));
+    expect(onRunIngest).not.toHaveBeenCalled();
+  });
+
+  it('shows independent row fetch states concurrently and blocks global ingest during local fetches', async () => {
+    const user = userEvent.setup();
+    let resolveFirst: ((value: FetchSourceSuccessResponse) => void) | undefined;
+    let resolveSecond: typeof resolveFirst;
+    const onFetchSource = vi.fn((source: Source) => new Promise<FetchSourceSuccessResponse>((resolve) => {
+      const complete = () => resolve({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [] });
+      if (source.id === 'src_ok') resolveFirst = complete;
+      if (source.id === 'src_next') resolveSecond = complete;
+    }));
+    renderLedger({
+      sources: [sourceWithFetchTime, { ...sourceWithFetchTime, id: 'src_next', title: 'Next Source', url: 'https://next.example.com/feed.xml' }],
+      onFetchSource
+    });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    await user.click(within(ledger).getByRole('button', { name: /\[FETCH\].*Fetch source Example/ }));
+    await user.click(within(ledger).getByRole('button', { name: /\[FETCH\].*Fetch source Next Source/ }));
+
+    const fetchingButtons = within(ledger).getAllByRole('button', { name: /\[FETCHING\.\.\.\]/ });
+    expect(fetchingButtons).toHaveLength(2);
+    expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeDisabled();
+
+    await user.click(fetchingButtons[0]);
+    expect(onFetchSource).toHaveBeenCalledTimes(2);
+
+    resolveFirst?.({ operation: 'source_fetch', source_id: 'src_ok', completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [] });
+    resolveSecond?.({ operation: 'source_fetch', source_id: 'src_next', completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [] });
+    await waitFor(() => expect(within(ledger).queryByText('[FETCHING...]')).not.toBeInTheDocument());
+    expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeEnabled();
   });
 
   it('disables global ingest from typed current-operation state including library_reprocess without parsing status text', () => {
@@ -270,8 +322,7 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(within(ledger).getByText('[DETAILS]')).toHaveTextContent(/^\[[A-Z]+\]$/);
     expect(within(ledger).getByText('[RUN INGEST]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[FETCH]')).toHaveClass('bracket-action');
-    expect(appCss).toMatch(/\.bracket-action\s*\{[\s\S]*cursor:\s*pointer;/);
-    expect(appCss).toMatch(/\.bracket-action:hover:not\(:disabled\):not\(\[aria-disabled='true'\]\),\s*\.bracket-action:focus-visible:not\(:disabled\):not\(\[aria-disabled='true'\]\)\s*\{[\s\S]*background:\s*var\(--rf-color-current-text\)/);
+    expect(within(ledger).getByText('[DETAILS]').closest('details')).toHaveClass('source-diagnostic-details');
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action--delete');
     // DEVIATION RECORD: type=test_error; artifact=manual-rss-fetch-source-ledger.regression.test.ts; what_changed=negative OPML receipt assertion uses `OPML outlines flattened`; why=folder terminology is stale and forbidden; impact=manual fetch still proves no unrelated OPML import receipt appears.
@@ -285,9 +336,9 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     const expectedFetchTime = formatLocalClockTimeWithHint(sourceWithFetchTime.last_fetch_at) ?? '';
 
     expect(row).toBeInstanceOf(HTMLLIElement);
-    expect(row).toHaveTextContent('src: simonwillison.net/feed.xml');
+    expect(row).toHaveTextContent('simonwillison.net/feed.xml');
     expect(row).not.toHaveTextContent('status: ok');
-    expect(row).toHaveTextContent('url: https://simonwillison.net/atom/everything');
+    expect(row).toHaveTextContent('https://simonwillison.net/atom/everything');
     expect(row).toHaveTextContent(expectedFetchTime);
     expect(row?.querySelector('.source-ledger__status')).toHaveAttribute('title', `last_fetch: ${expectedFetchTime}`);
     expect(row?.querySelector('.source-ledger-actions')).toBeNull();

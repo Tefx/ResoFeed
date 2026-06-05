@@ -46,7 +46,27 @@ const itemDetail = {
     canonical_url: 'https://example.test/raw-json-ld-item',
     original_url: 'https://example.test/raw-json-ld-item',
     story_key: 'story-json-ld',
-    duplicate_of_item_id: null
+    duplicate_of_item_id: null,
+    grouped_source_items: [
+      {
+        item_id: fixtureItemId,
+        source_title: 'Fixture Source',
+        source_url: 'https://example.test/feed.xml',
+        title: 'Clean fixture item with JSON-LD metadata',
+        source_item_title: 'Fixture source-side title',
+        published_at: '2026-05-09T10:00:00Z',
+        is_selected_item: true
+      },
+      {
+        item_id: 'json-ld-sibling-item',
+        source_title: 'Sibling Fixture Source',
+        source_url: 'https://example.test/sibling-feed.xml',
+        title: 'Sibling grouped fixture item',
+        source_item_title: 'Sibling source-side title',
+        published_at: '2026-05-09T09:30:00Z',
+        is_selected_item: false
+      }
+    ]
   }
 } as const;
 
@@ -76,6 +96,9 @@ async function installFixtureApi(page: Page): Promise<void> {
   });
   await page.route('**/api/feed/today', async (route) => {
     await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: [itemSummary] }) });
+  });
+  await page.route('**/api/search**', async (route) => {
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: [itemSummary], query: { q: 'Fixture', source: null, from: null, to: null, resonated: null, limit: 50 } }) });
   });
   await page.route('**/api/steer/active', async (route) => {
     await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ rules: [] }) });
@@ -165,6 +188,54 @@ async function expectVisiblePrimaryCopyClean(locator: Locator, label: string): P
   expect(text, `${label} visible primary copy must avoid forbidden product-language drift`).not.toMatch(forbiddenPrimaryCopy);
 }
 
+type InteractiveStyle = {
+  readonly backgroundColor: string;
+  readonly color: string;
+  readonly outlineColor: string;
+  readonly outlineStyle: string;
+  readonly outlineWidth: string;
+  readonly boxShadow: string;
+  readonly textDecorationLine: string;
+};
+
+async function interactiveStyle(locator: Locator): Promise<InteractiveStyle> {
+  return locator.evaluate<InteractiveStyle>((element) => {
+    const style = window.getComputedStyle(element);
+    return {
+      backgroundColor: style.backgroundColor,
+      color: style.color,
+      outlineColor: style.outlineColor,
+      outlineStyle: style.outlineStyle,
+      outlineWidth: style.outlineWidth,
+      boxShadow: style.boxShadow,
+      textDecorationLine: style.textDecorationLine
+    };
+  });
+}
+
+function hasVisibleFocusRing(style: InteractiveStyle): boolean {
+  return (Number.parseFloat(style.outlineWidth || '0') >= 2 && style.outlineStyle !== 'none') || style.boxShadow !== 'none';
+}
+
+async function expectReadableChrome(locator: Locator, label: string): Promise<void> {
+  await expect(locator, `${label} must be visible before style proof`).toBeVisible();
+  const style = await locator.evaluate((element) => {
+    const computed = window.getComputedStyle(element);
+    const parent = element.parentElement ? window.getComputedStyle(element.parentElement) : computed;
+    return {
+      color: computed.color,
+      backgroundColor: computed.backgroundColor,
+      inheritedBackgroundColor: parent.backgroundColor,
+      visibility: computed.visibility,
+      opacity: computed.opacity
+    };
+  });
+  const effectiveBackground = style.backgroundColor === 'rgba(0, 0, 0, 0)' ? style.inheritedBackgroundColor : style.backgroundColor;
+  expect(style.visibility, `${label} visibility`).toBe('visible');
+  expect(Number.parseFloat(style.opacity), `${label} opacity`).toBeGreaterThan(0.95);
+  expect(style.color, `${label} foreground must not collapse into background`).not.toBe(effectiveBackground);
+}
+
 test.describe('ui-navigation-hover-inspector-repair expected-red browser contract', () => {
   test('ui-navigation-hover-inspector-repair: SOURCE LEDGER real click opens ledger with active-state proof and obstruction diagnostics', async ({ page }) => {
     await openFixtureShell(page);
@@ -179,7 +250,15 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
     await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).toHaveClass(/active-panel/);
     await expect(page.locator('.feed-pane')).not.toHaveClass(/active-panel/);
     await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-    await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]').getByText('src: Fixture Source · status: ok · last_fetch: 10:00:00')).toBeVisible();
+    const ledgerRow = page.locator('.source-ledger__row', { hasText: 'Fixture Source' });
+    await expect(ledgerRow).toContainText('Fixture Source');
+    await expect(ledgerRow).toContainText('https://example.test/feed.xml');
+    expect((await ledgerRow.locator('.source-ledger__name, .source-ledger__url, .source-ledger__status').allTextContents()).join(' ')).not.toMatch(/\bsrc:|\burl:|status: ok|fetch_state: ok/);
+    await expect(ledgerRow).toContainText(/(?:last_fetch|fetched_at):?\s*\d{2}:\d{2}:\d{2}(?:\s+local)?|\b\d{2}:\d{2}:\d{2}\s+local\b/);
+    const diagnostic = ledgerRow.locator('.source-diagnostic-details');
+    await expect(diagnostic.locator('summary')).toBeVisible();
+    await diagnostic.locator('summary').click();
+    await expect(diagnostic.locator('pre')).toContainText('fetch_state: ok');
   });
 
   test('ui-navigation-hover-inspector-repair: TODAY click after another panel restores Today as the only active primary surface', async ({ page }) => {
@@ -199,7 +278,7 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
     await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'feed');
     await expect(page.locator('.feed-pane')).toHaveClass(/active-panel/);
     await expect(page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"]')).not.toHaveClass(/active-panel/);
-    await expect(page.locator('.detail-pane')).not.toHaveClass(/active-panel/);
+    await expect(page.locator('.detail-pane'), 'desktop Today may keep the Inspector split scroll pane mounted/active while Source Ledger is inactive').not.toHaveAttribute('aria-hidden', 'true');
   });
 
   test('ui-navigation-hover-inspector-repair: selected feed row hover remains restrained instead of stacking ambiguous active hover blocks', async ({ page }) => {
@@ -232,9 +311,117 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
 
     expect(after.width, 'selected+hover must not shift row width').toBeCloseTo(before.width, 0);
     expect(after.height, 'selected+hover must not shift row height').toBeCloseTo(before.height, 0);
-    expect(after.rowBackground, 'desktop selected+hover should preserve a restrained marker-led selected state, not flood the whole row').toMatch(/rgba?\(0, 0, 0, 0\)|transparent/);
-    expect(after.rowBackground, 'selected row marker/background must persist while hovered').toBe(before.rowBackground);
+    expect(after.rowBackground, 'desktop selected+hover must preserve the current selected row background when present').toBe(before.rowBackground);
     expect(after.openBackground, 'selected row hover must not add a second contrasting background block over the selected state').toBe(before.openBackground);
+  });
+
+  test('ui-navigation-hover-inspector-repair: bracket actions and Inspector links expose hover/focus-visible states at runtime in light and dark', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+
+    for (const colorScheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme });
+      await openFixtureShell(page);
+
+      await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+      await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+      const bracketAction = page.locator('.utility-surface[aria-label="SOURCE LEDGER surface"] .bracket-action--fetch').first();
+      await expect(bracketAction).toBeVisible();
+
+      await page.locator('body').click({ position: { x: 4, y: 4 } });
+      const bracketRest = await interactiveStyle(bracketAction);
+      await bracketAction.hover();
+      const bracketHover = await interactiveStyle(bracketAction);
+      expect(hasVisibleFocusRing(bracketHover), `${colorScheme} bracket action hover must not show a focus ring`).toBe(false);
+      expect(bracketHover.backgroundColor, `${colorScheme} bracket action hover must invert from rest background`).not.toBe(bracketRest.backgroundColor);
+      expect(bracketHover.color, `${colorScheme} bracket action hover must invert from rest text color`).not.toBe(bracketRest.color);
+
+      await bracketAction.evaluate((element) => {
+        (element as HTMLElement).focus({ focusVisible: true } as FocusOptions & { focusVisible: boolean });
+      });
+      const bracketFocus = await interactiveStyle(bracketAction);
+      expect(hasVisibleFocusRing(bracketFocus), `${colorScheme} bracket action focus-visible must show a visible ring`).toBe(true);
+      expect(bracketFocus.backgroundColor, `${colorScheme} bracket action focus-visible must keep terminal inversion`).toBe(bracketHover.backgroundColor);
+
+      await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+      await page.getByRole('button', { name: 'TODAY' }).click();
+      await page.getByRole('button', { name: 'Open Inspector for: Clean fixture item with JSON-LD metadata' }).click();
+      const originalLink = page.locator('.contract-inspector .inspector-original-link').first();
+      await expect(originalLink).toBeVisible();
+
+      await page.locator('.contract-inspector').click({ position: { x: 8, y: 8 } });
+      await originalLink.hover();
+      const linkHover = await interactiveStyle(originalLink);
+      expect(hasVisibleFocusRing(linkHover), `${colorScheme} Inspector link hover must not show a focus ring`).toBe(false);
+      expect(linkHover.textDecorationLine, `${colorScheme} Inspector link hover keeps low-chrome underline affordance`).toContain('underline');
+
+      await originalLink.evaluate((element) => {
+        (element as HTMLElement).focus({ focusVisible: true } as FocusOptions & { focusVisible: boolean });
+      });
+      const linkFocus = await interactiveStyle(originalLink);
+      expect(hasVisibleFocusRing(linkFocus), `${colorScheme} Inspector link focus-visible must show a visible ring`).toBe(true);
+      expect(linkFocus.color, `${colorScheme} Inspector link focus-visible must use a distinct focus color`).not.toBe(linkHover.color);
+    }
+  });
+
+  test('ui-navigation-hover-inspector-repair: disclosure, route preview, skip, re-ingest, and status chrome have runtime style proof', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await openFixtureShell(page);
+
+    const skipLink = page.locator('.skip-link');
+    await skipLink.evaluate((element) => (element as HTMLElement).focus());
+    await expect(skipLink).toBeVisible();
+    expect(hasVisibleFocusRing(await interactiveStyle(skipLink)), 'skip link focus must remain perceivable').toBe(true);
+
+    const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
+    await steer.fill('search Fixture');
+    const routePreview = page.locator('.steer-route-preview');
+    await expect(routePreview).toHaveAttribute('data-route-kind', 'search');
+    await expectReadableChrome(routePreview, 'route preview current-token rendering');
+
+    await steer.press('Enter');
+    const searchDetails = page.locator('.search-secondary-filters');
+    await expect(searchDetails.locator('summary')).toBeVisible();
+    await searchDetails.locator('summary').click();
+    await expect(searchDetails).toHaveAttribute('open', '');
+    await page.locator('#search-query').focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(searchDetails.locator('summary')).toBeFocused();
+    expect(hasVisibleFocusRing(await interactiveStyle(searchDetails.locator('summary'))), 'search filter disclosure focus must be visible').toBe(true);
+
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+    await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+    const ledgerStatus = page.locator('.source-ledger__row .source-ledger__status').first();
+    await expectReadableChrome(ledgerStatus, 'source row timestamp/status label');
+    const sourceDiagnosticSummary = page.locator('.source-ledger__row .source-diagnostic-details summary').first();
+    await sourceDiagnosticSummary.click();
+    await expect(page.locator('.source-ledger__row .source-diagnostic-details').first()).toHaveAttribute('open', '');
+    await page.locator('.source-ledger__row .bracket-action--fetch').first().focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(sourceDiagnosticSummary).toBeFocused();
+    expect(hasVisibleFocusRing(await interactiveStyle(sourceDiagnosticSummary)), 'source diagnostic disclosure focus must be visible').toBe(true);
+
+    for (const colorScheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme });
+      await expectReadableChrome(ledgerStatus, `${colorScheme} source row status label`);
+      await expectReadableChrome(page.locator('.source-ledger__header .source-ledger__status'), `${colorScheme} source header status label`);
+    }
+    await page.emulateMedia({ colorScheme: 'light' });
+
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+    await page.getByRole('button', { name: 'TODAY' }).click();
+    await page.getByRole('button', { name: 'Open Inspector for: Clean fixture item with JSON-LD metadata' }).click();
+    const groupedSummary = page.locator('.contract-grouped-sources summary');
+    await expect(groupedSummary).toBeVisible();
+    await groupedSummary.click();
+    await expect(page.locator('.contract-grouped-sources')).not.toHaveAttribute('open', '');
+    await expectReadableChrome(groupedSummary, 'grouped source disclosure collapsed summary');
+
+    await page.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+    const prompt = page.getByRole('textbox', { name: 'One-time prompt' });
+    await prompt.focus();
+    expect(hasVisibleFocusRing(await interactiveStyle(prompt)), 're-ingest textarea focus must be visible').toBe(true);
   });
 
   test('ui-navigation-hover-inspector-repair: default Inspector primary area is structured reading content, not raw JSON-LD/extracted metadata', async ({ page }) => {

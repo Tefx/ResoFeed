@@ -106,6 +106,9 @@
     --rf-component-diagnostic-output-text-color: var(--rf-color-text-dark);
     --rf-component-bracket-action-rest-background-color: var(--rf-color-surface-dark);
     --rf-component-bracket-action-rest-text-color: var(--rf-color-muted-dark);
+    --rf-component-status-error-text-color: #ffb4a8;
+    --rf-component-status-warning-text-color: #f1c66d;
+    --rf-component-status-success-text-color: #8bd8a8;
     --rf-component-focus-ring-color: var(--rf-color-focus-dark);
   }
 }

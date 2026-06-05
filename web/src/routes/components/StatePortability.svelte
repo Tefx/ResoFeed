@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { StateBundleV1 } from '$lib/api-contract';
 
-  type PortabilityState = 'idle' | 'exporting' | 'export-complete' | 'importing' | 'import-complete' | 'import-failed';
+  type PortabilityState = 'idle' | 'exporting' | 'export-complete' | 'export-failed' | 'importing' | 'import-complete' | 'import-failed';
 
   interface Props {
     onExportState: () => Promise<StateBundleV1>;
@@ -105,7 +105,7 @@
       portabilityState = 'export-complete';
       statusText = chrome.exported;
     }).catch((error: unknown) => {
-      portabilityState = 'import-failed';
+      portabilityState = 'export-failed';
       statusText = error instanceof Error ? rawErrorText(error.message) : chrome.exportFailed;
     });
   }
@@ -120,7 +120,6 @@
   <span class="source-ledger__group-label">{visibleGroupLabel}</span>
   <button id="state-export" class="bracket-action bracket-action--export-state" type="button" disabled={portabilityState === 'exporting'} onclick={() => void exportState()}>{portabilityState === 'exporting' ? chrome.exporting : chrome.exportState}</button>
   <button id="state-import" bind:this={importStateButton} class="bracket-action bracket-action--import-state" type="button" aria-describedby="state-import-warning" disabled={portabilityState === 'importing'} onfocus={() => (importRiskFocused = true)} onblur={() => (importRiskFocused = false)} onclick={startImport}>{portabilityState === 'importing' ? chrome.importing : chrome.importState}</button>
-  <label class="visually-hidden" for="state-json-file">{chrome.input}</label>
   <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" aria-label={chrome.input} onchange={() => void importSelectedFile()} />
   <span id="state-import-warning" class="contract-warning state-portability-warning" hidden={!importRiskFocused && portabilityState !== 'importing' && portabilityState !== 'import-failed'}>{chrome.warning}</span>
   {#if statusText}

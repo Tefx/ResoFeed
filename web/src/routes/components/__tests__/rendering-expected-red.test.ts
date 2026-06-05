@@ -360,28 +360,15 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Why this matters for retrieval remains model-backed.');
   });
 
-  it('contracts original-link CSS away from boxed/button-like styling', () => {
-    const css = fs.readFileSync(`${process.cwd()}/src/app.css`, 'utf8');
-    const originalLinkRule = css.match(/\.contract-inspector \.inspector-original-link\s*\{[^}]+\}/)?.[0] ?? '';
-    const originalLinkHoverFocusRule = css.match(/\.contract-inspector \.inspector-original-link:hover,\n\.contract-inspector \.inspector-original-link:focus-visible\s*\{[^}]+\}/)?.[0] ?? '';
-    const originalLinkFocusRule = css.match(/\.contract-inspector \.inspector-original-link:focus,\n\.contract-inspector \.inspector-original-link:focus-visible\s*\{[^}]+\}/)?.[0] ?? '';
+  it('keeps Inspector link, disclosure, star, and re-ingest controls as rendered UI contracts', () => {
+    render(Inspector, { props: { item: expectedRedDetail, mode: 'desktop-split', showReingest: true } });
 
-    expect(originalLinkRule).toContain('display: inline;');
-    expect(originalLinkRule).toContain('min-height: auto;');
-    expect(originalLinkRule).toContain('padding: 0;');
-    expect(originalLinkRule).toContain('border: 0;');
-    expect(originalLinkRule).not.toMatch(/border-block-end|box-shadow|background:/);
-    expect(originalLinkHoverFocusRule).toContain('color: var(--rf-color-current-text);');
-    expect(originalLinkHoverFocusRule).toContain('background: transparent;');
-    expect(originalLinkHoverFocusRule).toContain('outline: 0;');
-    expect(originalLinkHoverFocusRule).toContain('box-shadow: none;');
-    expect(originalLinkHoverFocusRule).toContain('text-decoration-line: underline;');
-    expect(originalLinkHoverFocusRule).toContain('text-decoration-color: currentColor;');
-    expect(originalLinkFocusRule).toContain('color: var(--rf-color-current-focus);');
-    expect(originalLinkFocusRule).toContain('outline: 2px solid var(--rf-color-current-focus);');
-    expect(originalLinkFocusRule).toContain('text-decoration-color: var(--rf-color-current-focus);');
-    expect(originalLinkHoverFocusRule).not.toContain('var(--rf-color-text)');
-    expect(originalLinkFocusRule).not.toContain('var(--rf-color-focus)');
+    const inspector = screen.getByRole('complementary', { name: expectedRedDetail.title });
+    expect(within(inspector).getByRole('link', { name: 'original link' })).toHaveClass('inspector-original-link');
+    expect(inspector.querySelector('.contract-source-details')).toBeInstanceOf(HTMLDetailsElement);
+    expect(inspector.querySelector('.contract-grouped-sources')).toBeNull();
+    expect(within(inspector).getByRole('button', { name: '[RE-INGEST ITEM]' })).toHaveClass('inspector-reingest-toggle');
+    expect(inspector.querySelector('.inspector-section-label')).not.toBeNull();
   });
 
   it('keeps Inspector model-list diagnostics out of payload paragraph typography', () => {
@@ -390,7 +377,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const modelListDiagnosticRule = css.match(/\.contract-inspector \.inspector-model-list-diagnostic\s*\{[^}]+\}/)?.[0] ?? '';
 
     expect(payloadParagraphRule).toContain(':not(.inspector-model-list-diagnostic)');
-    expect(modelListDiagnosticRule).toContain('color: var(--rf-color-muted);');
+    expect(modelListDiagnosticRule).toContain('color: var(--rf-color-current-muted);');
     expect(modelListDiagnosticRule).toContain('font: var(--rf-typography-metadata);');
     expect(modelListDiagnosticRule).not.toContain('font: var(--rf-typography-payload);');
   });
@@ -608,9 +595,9 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
-    expect(within(ledger).getByText('src: Example Source')).toBeVisible();
+    expect(within(ledger).getByText('Example Source')).toBeVisible();
     expect(ledger).not.toHaveTextContent('status: ok');
-    expect(within(ledger).getByText('url: https://example.com/feed.xml')).toBeVisible();
+    expect(within(ledger).getByText('https://example.com/feed.xml')).toBeVisible();
     expect(within(ledger).getByText(formatLocalClockTimeWithHint(expectedRedSource.last_fetch_at) ?? '')).toBeVisible();
     expect(within(ledger).getByText('[EXPORT STATE]')).toBeVisible();
     expect(within(ledger).getByText('[IMPORT STATE]')).toBeVisible();
@@ -631,10 +618,27 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(portability).getByText('Import State replaces active sources, rules, and stars.')).toHaveAttribute('hidden');
 
     await user.click(within(portability).getByRole('button', { name: '[IMPORT STATE]' }));
-    expect(within(portability).getByLabelText('Choose state JSON')).toHaveClass('visually-hidden');
+    expect(within(portability).getByLabelText('Choose state JSON')).toBeInTheDocument();
+    const stateFileInput = portability.querySelector<HTMLInputElement>('#state-json-file');
+    expect(stateFileInput).toHaveClass('visually-hidden');
+    expect(stateFileInput).toHaveAccessibleName('Choose state JSON');
+    expect(stateFileInput).not.toHaveAttribute('aria-hidden');
+    expect(stateFileInput).not.toHaveAttribute('tabindex', '-1');
 
     await user.click(within(portability).getByRole('button', { name: '[EXPORT STATE]' }));
     expect(within(portability).getByRole('status')).toHaveTextContent('exported state.json');
+  });
+
+  it('keeps Import State replacement warning hidden for export failures while showing raw error status', async () => {
+    const user = userEvent.setup();
+    render(StatePortability, { props: { onExportState: async () => { throw new Error('disk denied'); }, onImportState: async () => {} } });
+
+    const portability = screen.getByRole('group', { name: 'State portability' });
+    await user.click(within(portability).getByRole('button', { name: '[EXPORT STATE]' }));
+
+    expect(within(portability).getByRole('status')).toHaveTextContent('err: disk denied');
+    expect(within(portability).getByText('Import State replaces active sources, rules, and stars.')).not.toBeVisible();
+    expect(within(portability).getByText('Import State replaces active sources, rules, and stars.')).toHaveAttribute('hidden');
   });
 
   it('renders search/retrieval with filters collapsed by default and still openable', async () => {

@@ -1,8 +1,9 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import { ResoFeedApiError } from '$lib/api-client';
   import { processingLanguageRuntimeContract, type CurrentOperationInfo, type FetchSourceSuccessResponse, type ImportOpmlResponse, type RunIngestSuccessResponse, type Source } from '$lib/api-contract';
   import type { StateBundleV1 } from '$lib/api-contract';
-  import { isOperationBlockingManualIngest } from '$lib/current-operation';
+  import { formatOperationConflictStatus, isOperationBlockingManualIngest, normalizeCurrentOperationInfo } from '$lib/current-operation';
   import { formatLocalClockTimeWithHint } from '$lib/display-time';
   import StatePortability from './StatePortability.svelte';
 
@@ -41,13 +42,12 @@
   let isImportingOpml = $state(false);
   let isExportingOpml = $state(false);
   let isRunningIngest = $state(false);
-  let fetchingSourceId = $state<string | null>(null);
+  let fetchingSourceIds = $state<ReadonlySet<string>>(new Set());
   let sourceFeedbackById = $state<Record<string, string>>({});
   let importedTitleByUrl = $state<Record<string, string>>({});
   let deletedSourceIds = $state<ReadonlySet<string>>(new Set());
   let importInput = $state<HTMLInputElement | undefined>();
   let ledgerHeading = $state<HTMLHeadingElement | undefined>();
-  let sharedIngestConflictProbeKey: string | null = null;
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
   const hasGlobalIngestFeedback = $derived(globalIngestStatusText.startsWith('last_ingest:') || globalIngestStatusText.startsWith('上次抓取:') || globalIngestStatusText === 'ingest complete' || globalIngestStatusText === '抓取完成');
@@ -56,11 +56,6 @@
   const headerOperationStatusText = $derived(currentOperationStatusText || headerIngestStatusText);
   const headerOperationIsError = $derived(headerOperationStatusText.toLowerCase().startsWith('err:'));
   const ingestActionRunning = $derived(isRunningIngest || isOperationBlockingManualIngest(currentOperation));
-  const sharedIngestProbeKey = $derived(
-    !isRunningIngest && currentOperation?.running && (currentOperation.kind === 'manual_ingest' || currentOperation.kind === 'background_ingest')
-      ? `${currentOperation.kind}:${currentOperation.started_at ?? currentOperation.updated_at ?? 'unknown'}`
-      : null
-  );
   const chrome = $derived(language === 'zh'
     ? {
       runIngest: '[RUN INGEST]',
@@ -70,7 +65,7 @@
       portableStateActions: '状态迁移操作',
       sourceList: '来源列表',
       portableState: '状态迁移',
-      helper: 'OPML = 来源列表；State = 来源 + 规则 + 星标。',
+      helper: 'OPML = 来源列表；State = 来源 + 规则 + 星标，导入会替换。',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
       exportOpml: '[EXPORT OPML]',
@@ -112,7 +107,7 @@
       portableStateActions: 'Portable state actions',
       sourceList: 'SOURCE LIST',
       portableState: 'PORTABLE STATE',
-      helper: 'OPML = source list; State = sources + rules + stars.',
+      helper: 'OPML = source list; State = sources + rules + stars, import replaces.',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
       exportOpml: '[EXPORT OPML]',
@@ -200,17 +195,17 @@
   }
 
   function sourceRowNameText(sourceLabel: string): string {
-    return language === 'zh' ? `来源: ${sourceLabel}` : `src: ${sourceLabel}`;
+    return sourceLabel;
   }
 
   function sourceRowUrlText(url: string): string {
-    return language === 'zh' ? `URL: ${url}` : `url: ${url}`;
+    return url;
   }
 
   function rowGrammarForSource(source: Source, sourceLabel: string, lastFetch: string | null): string {
     return language === 'zh'
-      ? `来源: ${sourceLabel} · status: ${source.last_fetch_status} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`
-      : `src: ${sourceLabel} · status: ${source.last_fetch_status} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched}`;
+      ? `${sourceLabel} · ${source.url} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched} · fetch_state: ${source.last_fetch_status}`
+      : `${sourceLabel} · ${source.url} · ${chrome.lastFetch}: ${lastFetch ?? chrome.notFetched} · fetch_state: ${source.last_fetch_status}`;
   }
 
   function rowVisibleStatusText(source: Source, lastFetch: string | null, diagnosticStatus: string, hasError: boolean): string {
@@ -222,6 +217,16 @@
   function rawErrorText(message: string): string {
     const trimmed = message.trim();
     return trimmed.toLowerCase().startsWith('err:') ? trimmed : `err: ${trimmed}`;
+  }
+
+  function ingestErrorText(error: unknown): string {
+    if (error instanceof ResoFeedApiError) {
+      const text = rawErrorText(error.body.error.message);
+      if (error.status !== 409) return text;
+      const operation = normalizeCurrentOperationInfo(error.body.error.details.current_operation);
+      return formatOperationConflictStatus(text, operation);
+    }
+    return error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.ingestFailed);
   }
 
   function setSourceFeedback(sourceId: string, text: string | null): void {
@@ -237,24 +242,15 @@
     return new Promise((resolve) => window.setTimeout(resolve, 120));
   }
 
-  $effect(() => {
-    if (!sharedIngestProbeKey) {
-      sharedIngestConflictProbeKey = null;
-      return;
-    }
-    if (sharedIngestConflictProbeKey === sharedIngestProbeKey) return;
-    sharedIngestConflictProbeKey = sharedIngestProbeKey;
-    void onRunIngest().catch(() => {
-      // Source Ledger remains disabled from typed currentOperation; parent promotes backend details.current_operation into contextual conflict display.
-    });
-  });
+  const hasActiveRowFetch = $derived(fetchingSourceIds.size > 0);
+  const runIngestDisabled = $derived(ingestActionRunning || hasActiveRowFetch);
 
   function openImportPicker(): void {
     importInput?.click();
   }
 
   function runIngest(): Promise<void> {
-    if (isRunningIngest) return Promise.resolve();
+    if (isRunningIngest || hasActiveRowFetch) return Promise.resolve();
     isRunningIngest = true;
     globalIngestStatusText = '';
     return tick().then(() => {
@@ -266,16 +262,15 @@
           ? `${chrome.lastIngest}: ${completedAt ?? chrome.complete}`
           : rawErrorText(result.errors[0]?.message ?? chrome.ingestFailed);
     }).catch((error: unknown) => {
-      globalIngestStatusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.ingestFailed);
+      globalIngestStatusText = ingestErrorText(error);
     }).finally(() => {
       isRunningIngest = false;
     });
   }
 
   function fetchSource(source: Source): Promise<void> {
-    if (fetchingSourceId === source.id) return Promise.resolve();
-    const ownsActivePendingState = fetchingSourceId === null;
-    if (ownsActivePendingState) fetchingSourceId = source.id;
+    if (fetchingSourceIds.has(source.id)) return Promise.resolve();
+    fetchingSourceIds = new Set([...fetchingSourceIds, source.id]);
     setSourceFeedback(source.id, null);
     return tick().then(() => onFetchSource(source)).then((result) => pendingFrame().then(() => result)).then((result) => {
       const completedAt = formatLocalClockTimeWithHint(result.completed_at ?? source.last_fetch_at, language);
@@ -289,7 +284,7 @@
     }).catch((error: unknown) => {
       setSourceFeedback(source.id, error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.fetchFailed));
     }).finally(() => {
-      if (ownsActivePendingState) fetchingSourceId = null;
+      fetchingSourceIds = new Set([...fetchingSourceIds].filter((sourceId) => sourceId !== source.id));
     });
   }
 
@@ -305,9 +300,7 @@
         : chrome.importCompleteFallback;
       if (importInput) importInput.value = '';
     }).catch((error: unknown) => {
-      statusText = sources.length > 0 && error instanceof Error && /bad_request/i.test(error.message)
-        ? `imported ${sources.length} sources; OPML outlines flattened`
-        : error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.importFailed);
+      statusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.importFailed);
     }).finally(() => {
       isImportingOpml = false;
     });
@@ -382,7 +375,7 @@
   <header class="source-ledger-head source-ledger__header source-ledger__header-actions">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <span role={suppressStatusRole ? undefined : 'status'} aria-live={headerOperationIsError ? 'assertive' : 'polite'} class:source-ledger__status--error={headerOperationIsError} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
-    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={ingestActionRunning} onclick={() => void runIngest()}>{ingestActionRunning ? chrome.ingesting : chrome.runIngest}</button>
+    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={runIngestDisabled} onclick={() => void runIngest()}>{ingestActionRunning ? chrome.ingesting : chrome.runIngest}</button>
   </header>
   <div class="source-ledger__tools" aria-label={chrome.ledgerActions}>
     <div class="source-ledger__action-group source-ledger__action-group--source-list" role="group" aria-label={chrome.sourceListActions}>
@@ -406,12 +399,13 @@
         {@const rowStatusText = statusTextForSource(source, lastFetch)}
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
         {@const rowVisibleStatus = rowVisibleStatusText(source, lastFetch, rowStatusText, rowHasError)}
+        {@const rowFetching = fetchingSourceIds.has(source.id)}
         <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id}>
           <div class="source-ledger-copy source-ledger__name" title={rowGrammarForSource(source, sourceLabel, lastFetch)} translate={sourceTitleTranslate}>{sourceRowNameText(sourceLabel)}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>{sourceRowUrlText(source.url)}</div>
-          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live={rowHasError ? 'assertive' : 'polite'} aria-label={rowGrammarForSource(source, sourceLabel, lastFetch)} title={rowStatusText}>{rowVisibleStatus}</div>
+          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live={rowHasError ? 'assertive' : 'polite'} aria-label={rowStatusText} title={rowStatusText}>{rowVisibleStatus}</div>
           <span class="source-ledger__actions">
-            <button type="button" class="bracket-action bracket-action--fetch" aria-label={fetchingSourceId === source.id ? chrome.fetchingAria(sourceA11yLabel(sourceLabel)) : chrome.fetchAria(sourceA11yLabel(sourceLabel))} disabled={fetchingSourceId === source.id} onclick={() => void fetchSource(source)}>{fetchingSourceId === source.id ? chrome.fetching : chrome.fetch}</button>
+            <button type="button" class="bracket-action bracket-action--fetch" aria-label={rowFetching ? chrome.fetchingAria(sourceA11yLabel(sourceLabel)) : chrome.fetchAria(sourceA11yLabel(sourceLabel))} disabled={rowFetching} onclick={() => void fetchSource(source)}>{rowFetching ? chrome.fetching : chrome.fetch}</button>
             {#if confirmingSourceId === source.id}
               <button type="button" class="bracket-action bracket-action--confirm" aria-label={chrome.confirmAria(sourceLabel)} onclick={() => void confirmDelete(source)}>{chrome.confirm}</button>
             {:else}

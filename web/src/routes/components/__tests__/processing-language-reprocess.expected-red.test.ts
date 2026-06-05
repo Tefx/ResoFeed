@@ -264,7 +264,7 @@ describe('expected-red processing language and reprocess rendering contracts', (
         onImportState: async () => {}
       }
     });
-    expect(screen.getByText(`url: ${expectedRedSource.url}`)).toHaveAttribute('translate', 'no');
+    expect(screen.getByText(expectedRedSource.url)).toHaveAttribute('translate', 'no');
   });
 
   it('keeps desktop feed and Inspector as independent focusable scroll regions while mobile Inspector remains a route', async () => {

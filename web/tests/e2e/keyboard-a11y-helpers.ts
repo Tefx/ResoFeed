@@ -56,11 +56,21 @@ export async function importFixtureAndIngest(page: Page, runInfo: E2ERunInfo): P
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 }
 
-export async function focusAndAudit(locator: Locator, label: string): Promise<FocusAudit> {
+export async function focusAndAuditKeyboardVisible(page: Page, locator: Locator, label: string): Promise<FocusAudit> {
   await expect(locator).toBeVisible();
   const before = await locator.boundingBox();
   expect(before, `${label} has a layout box before focus`).not.toBeNull();
-  await locator.focus();
+
+  if (!(await locator.evaluate((element) => element.matches(':focus-visible')).catch(() => false))) {
+    if (await locator.evaluate((element) => element === document.activeElement).catch(() => false)) {
+      await page.keyboard.press('Shift+Tab');
+    }
+    const reachedWithForwardTab = await tabUntilFocused(page, locator, 'Tab');
+    if (!reachedWithForwardTab) {
+      await tabUntilFocused(page, locator, 'Shift+Tab');
+    }
+  }
+
   await expect(locator).toBeFocused();
   const audit = await locator.evaluate<FocusAudit, { label: string; before: BoundingBox }>((element, payload) => {
     const active = document.activeElement;
@@ -68,7 +78,7 @@ export async function focusAndAudit(locator: Locator, label: string): Promise<Fo
     const rect = element.getBoundingClientRect();
     const after = { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
     const outlineWidth = Number.parseFloat(style.outlineWidth || '0');
-    const focusVisible = (outlineWidth > 0 && style.outlineStyle !== 'none') || style.boxShadow !== 'none';
+    const focusVisible = element.matches(':focus-visible') && ((outlineWidth > 0 && style.outlineStyle !== 'none') || style.boxShadow !== 'none');
     const layoutStable = Math.abs(after.width - payload.before.width) < 0.5 && Math.abs(after.height - payload.before.height) < 0.5;
     return {
       label: payload.label,
@@ -87,6 +97,16 @@ export async function focusAndAudit(locator: Locator, label: string): Promise<Fo
   expect.soft(audit.focusVisible, `${label} focus indicator is visible independent of active/accent state`).toBe(true);
   expect.soft(audit.layoutStable, `${label} focus must not shift layout bounds`).toBe(true);
   return audit;
+}
+
+async function tabUntilFocused(page: Page, locator: Locator, key: 'Tab' | 'Shift+Tab'): Promise<boolean> {
+  for (let index = 0; index < 80; index += 1) {
+    if (await locator.evaluate((element) => element === document.activeElement).catch(() => false)) {
+      return true;
+    }
+    await page.keyboard.press(key);
+  }
+  return await locator.evaluate((element) => element === document.activeElement).catch(() => false);
 }
 
 export async function expectActiveState(locator: Locator, label: string): Promise<void> {

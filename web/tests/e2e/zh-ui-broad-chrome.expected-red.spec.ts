@@ -189,9 +189,9 @@ async function fulfillJson(route: Route, payload: unknown, status = 200): Promis
   await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(payload) });
 }
 
-async function installPreAuthZhLanguageFixture(page: Page): Promise<void> {
-  // B-ZH-TOKEN-06: make the expected-red pre-auth zh authority explicit instead of
-  // relying on the authenticated /api/runtime/language ordering from docs/ARCHITECTURE.md.
+async function installIgnoredPreAuthZhLanguageFixture(page: Page): Promise<void> {
+  // Authenticated runtime language is the product authority; this ignored e2e key
+  // proves unauthenticated owner-token chrome is not controlled by fixture state.
   await page.addInitScript(
     ({ key, value }) => window.localStorage.setItem(key, JSON.stringify(value)),
     { key: preAuthLanguageFixtureKey, value: preAuthZhLanguageFixture }
@@ -231,15 +231,17 @@ async function installBroadZhFixtures(page: Page, ownerToken: string, mode: 'pop
 }
 
 test.describe('expected-red zh UI chrome localization matrix', () => {
-  test('owner token prompt exposes zh auth chrome gap from explicit pre-auth language fixture', async ({ page }) => {
-    await installPreAuthZhLanguageFixture(page);
+  test('owner token prompt ignores pre-auth e2e language fixture and avoids account concepts', async ({ page }) => {
+    await installIgnoredPreAuthZhLanguageFixture(page);
     await page.goto('/');
 
     await expect(page.evaluate((key) => window.localStorage.getItem(key), preAuthLanguageFixtureKey)).resolves.toContain('"authority":"e2e-fixture:zh-ui-preauth-language-test-contract-fix"');
 
-    await redExpect(page.getByRole('heading', { name: '输入所有者令牌' })).toBeVisible();
-    await redExpect(page.getByLabel('所有者令牌')).toBeVisible();
-    await redExpect(page.getByRole('button', { name: '[提交]' })).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.getByRole('heading', { name: 'Enter owner token' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Owner token' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '[SUBMIT]' })).toBeVisible();
+    await redExpect(page.getByRole('heading', { name: '输入所有者令牌' })).toHaveCount(0);
     await redExpect(page.getByText('RESOFEED')).toBeVisible();
     await redExpect(page.getByText(/login|account|password reset|profile/iu)).toHaveCount(0);
   });
@@ -282,6 +284,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(search.getByLabel('纯文本查询')).toBeVisible();
     await redExpect(search.getByRole('button', { name: '[搜索]' })).toBeVisible();
     await redExpect(search.getByText('筛选')).toBeVisible();
+    await search.getByText('筛选').click();
     await redExpect(search.getByLabel('来源筛选')).toBeVisible();
     await redExpect(search.getByLabel('仅已标星')).toBeVisible();
     await redExpect(search.getByRole('status')).toContainText('2 条结果');
@@ -301,20 +304,20 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(ledger.locator('.source-ledger__status').first()).toContainText('上次抓取');
     await redExpect(ledger.locator('[aria-label="账本操作"]')).toBeVisible();
     await redExpect(ledger.getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
-    await redExpect(ledger.locator('.source-ledger__name').first()).toContainText(`src: ${sourceWithoutTranslatedConvenienceName.title}`);
+    await redExpect(ledger.locator('.source-ledger__name').first()).toHaveText(sourceWithoutTranslatedConvenienceName.title);
     await redExpect(ledger.locator('.source-ledger__name').first()).toHaveAttribute('translate', 'no');
-    await redExpect(ledger.locator('.source-ledger__url').first()).toHaveText(`url: ${sourceWithoutTranslatedConvenienceName.url}`);
+    await redExpect(ledger.locator('.source-ledger__url').first()).toHaveText(sourceWithoutTranslatedConvenienceName.url);
     await redExpect(ledger.locator('.source-ledger__url').first()).toHaveAttribute('translate', 'no');
     await redExpect(ledger.getByRole('button', { name: `[FETCH] 抓取来源 ${sourceWithoutTranslatedConvenienceName.title}` })).toBeVisible();
     await redExpect(ledger.getByRole('button', { name: `删除来源：${sourceWithoutTranslatedConvenienceName.title}` })).toBeVisible();
     await redExpect(ledger.getByLabel(`诊断详情：${sourceWithoutTranslatedConvenienceName.title}`)).toBeVisible();
 
     const portability = ledger.locator('.contract-portability');
-    await redExpect(portability).toHaveAttribute('aria-label', '状态可携带性');
+    await redExpect(portability).toHaveAttribute('aria-label', '状态迁移操作');
     await redExpect(portability.getByRole('button', { name: '[EXPORT STATE]' })).toBeVisible();
     await redExpect(portability.getByRole('button', { name: '[IMPORT STATE]' })).toBeVisible();
     await redExpect(portability.getByLabel('状态 JSON 导入输入')).toHaveCount(1);
-    await redExpect(portability.locator('.state-portability-warning')).toHaveText('导入会替换活动来源、规则和星标');
+    await redExpect(portability.locator('.state-portability-warning')).toHaveText('导入 State 会替换活动来源、规则和星标。');
 
     await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: 'TODAY' }).click();

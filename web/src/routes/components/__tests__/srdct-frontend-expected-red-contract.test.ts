@@ -210,6 +210,28 @@ describe('srdct expected-red frontend UI contracts', () => {
     expect(ledger).not.toHaveTextContent(/job|queue|dashboard|settings|activity log|folder|tag|semantic answer|chat|RAG/i);
   });
 
+  it('shows raw OPML import diagnostics on bad_request even when sources already exist', async () => {
+    const user = userEvent.setup();
+    render(SourceLedger, {
+      props: {
+        sources: [sourceWithDiagnostic],
+        onDeleteSource: async () => {},
+        onImportOpml: async () => { throw new Error('bad_request: invalid OPML outline'); },
+        onExportState: async () => stateBundle(),
+        onImportState: async () => {}
+      }
+    });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    const opmlFileInput = ledger.querySelector('#opml-file');
+    if (!(opmlFileInput instanceof HTMLInputElement)) throw new Error('missing OPML file input');
+
+    await user.upload(opmlFileInput, new File(['<opml><body></body></opml>'], 'bad.opml', { type: 'text/xml' }));
+
+    expect(await within(ledger).findByText('err: bad_request: invalid OPML outline')).toBeVisible();
+    expect(ledger).not.toHaveTextContent(/imported \d+ sources; OPML outlines flattened/);
+  });
+
   it('disables only the active Source Ledger fetch row while another row remains reachable for backend conflict proof', async () => {
     const user = userEvent.setup();
     let releaseFetch: (() => void) | undefined;

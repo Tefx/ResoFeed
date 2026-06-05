@@ -6,7 +6,7 @@ import {
   attachRoleAriaSnapshot,
   enterOwnerToken,
   expectActiveState,
-  focusAndAudit,
+  focusAndAuditKeyboardVisible,
   importFixtureAndIngest
 } from './keyboard-a11y-helpers';
 
@@ -18,13 +18,13 @@ test('expected-red keyboard a11y primary nav tab order and active surface semant
 
   const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
   await expect(steer).toBeFocused();
-  await focusAndAudit(steer, 'Steer input');
+  await focusAndAuditKeyboardVisible(page, steer, 'Steer input');
 
   await page.keyboard.press('Tab');
   const menu = page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]');
   const summary = menu.locator('summary');
   await expect(summary).toBeFocused();
-  await focusAndAudit(summary, 'RESOFEED menu trigger');
+  await focusAndAuditKeyboardVisible(page, summary, 'RESOFEED menu trigger');
   await page.keyboard.press('Enter');
   await expect(menu).toHaveAttribute('open', '');
   await expect(menu.getByRole('button', { name: 'TODAY' })).toHaveAttribute('tabindex', '0');
@@ -32,13 +32,13 @@ test('expected-red keyboard a11y primary nav tab order and active surface semant
   await page.keyboard.press('Tab');
   const today = menu.getByRole('button', { name: 'TODAY' });
   await expect(today).toBeFocused();
-  await focusAndAudit(today, 'TODAY menu entry');
+  await focusAndAuditKeyboardVisible(page, today, 'TODAY menu entry');
   await expectActiveState(today, 'TODAY menu entry initial selected surface');
 
   await page.keyboard.press('Tab');
   const sourceLedger = menu.getByRole('button', { name: 'SOURCE LEDGER' });
   await expect(sourceLedger).toBeFocused();
-  await focusAndAudit(sourceLedger, 'SOURCE LEDGER menu entry');
+  await focusAndAuditKeyboardVisible(page, sourceLedger, 'SOURCE LEDGER menu entry');
   await page.keyboard.press('Space');
 
   await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'ledger');
@@ -58,7 +58,7 @@ test('expected-red keyboard a11y feed row star inspector activation and selected
   await importFixtureAndIngest(page, runInfo);
 
   const rowOpen = page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' });
-  await focusAndAudit(rowOpen, 'Feed row Open Inspector button');
+  await focusAndAuditKeyboardVisible(page, rowOpen, 'Feed row Open Inspector button');
   await page.keyboard.press('Space');
 
   await expect(page.getByRole('heading', { name: 'Local fixture item one' })).toBeFocused();
@@ -68,7 +68,7 @@ test('expected-red keyboard a11y feed row star inspector activation and selected
   await expect(page.locator('.contract-feed-item', { has: rowOpen })).toHaveAttribute('aria-current', 'true');
 
   const star = page.getByRole('button', { name: /^Resonate item/ }).first();
-  await focusAndAudit(star, 'Feed Resonate star');
+  await focusAndAuditKeyboardVisible(page, star, 'Feed Resonate star');
   const starBox = await star.boundingBox();
   expect.soft(starBox?.width ?? 0, 'Resonate target width is at least 44 CSS px').toBeGreaterThanOrEqual(44);
   expect.soft(starBox?.height ?? 0, 'Resonate target height is at least 44 CSS px').toBeGreaterThanOrEqual(44);
@@ -91,7 +91,7 @@ test('expected-red keyboard a11y Steer submit doctor log and Inspector original 
   await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
   const originalLink = page.getByRole('link', { name: 'original link' });
   await expect(originalLink).toHaveAttribute('href', /https?:\/\//);
-  await focusAndAudit(originalLink, 'Inspector original link');
+  await focusAndAuditKeyboardVisible(page, originalLink, 'Inspector original link');
 
   const steer = page.getByRole('textbox', { name: 'Steer or paste RSS URL' });
   await steer.focus();
@@ -120,7 +120,7 @@ test('expected-red keyboard a11y Source Ledger OPML state with manual fetch cont
   await expectActiveState(page.locator('details.surface-nav[aria-label="RESOFEED surface menu"]').getByRole('button', { name: 'SOURCE LEDGER' }), 'SOURCE LEDGER nav active state before ledger controls');
 
   const opmlButton = page.getByRole('button', { name: '[IMPORT OPML]' });
-  await focusAndAudit(opmlButton, 'OPML import visible button');
+  await focusAndAuditKeyboardVisible(page, opmlButton, 'OPML import visible button');
   const opmlBox = await opmlButton.boundingBox();
   expect.soft(opmlBox?.width ?? 0, 'OPML import control has detectable keyboard hit width').toBeGreaterThanOrEqual(44);
   expect.soft(opmlBox?.height ?? 0, 'OPML import control has detectable keyboard hit height').toBeGreaterThanOrEqual(44);
@@ -128,14 +128,19 @@ test('expected-red keyboard a11y Source Ledger OPML state with manual fetch cont
     // DEVIATION RECORD: type=test_error; artifact=keyboard-a11y.expected-red.spec.ts; what_changed=OPML import receipt expects `OPML outlines flattened`; why=folder terminology is forbidden while source-subscription outline flattening remains; impact=keyboard OPML proof still waits for import completion.
     await expect(page.getByText(/imported \d+ sources; OPML outlines flattened/)).toBeVisible();
 
-  await focusAndAudit(page.getByRole('button', { name: '[RUN INGEST]' }), 'Source Ledger run ingest action');
-  await focusAndAudit(page.getByRole('button', { name: '[FETCH]' }).first(), 'Source Ledger fetch source action');
+  await focusAndAuditKeyboardVisible(page, page.getByRole('button', { name: '[RUN INGEST]' }), 'Source Ledger run ingest action');
+  await focusAndAuditKeyboardVisible(page, page.getByRole('button', { name: '[FETCH]' }).first(), 'Source Ledger fetch source action');
 
-  await focusAndAudit(page.getByRole('button', { name: 'Delete source: ResoFeed E2E Local Source' }), 'Source Ledger delete source');
-  await focusAndAudit(page.getByRole('button', { name: 'export state' }), 'State export action');
-  await page.getByRole('button', { name: 'import state' }).focus();
+  await focusAndAuditKeyboardVisible(page, page.getByRole('button', { name: 'Delete source: ResoFeed E2E Local Source' }), 'Source Ledger delete source');
+  await focusAndAuditKeyboardVisible(page, page.getByRole('button', { name: '[EXPORT STATE]' }), 'State export action');
+  const importStateButton = page.getByRole('button', { name: '[IMPORT STATE]' });
+  await focusAndAuditKeyboardVisible(page, importStateButton, 'State import action');
   await page.keyboard.press('Space');
-  await expect(page.getByLabel('Choose state JSON')).toBeFocused();
+  await expect(page.getByText('Choose state JSON')).toHaveCount(0);
+  await expect(page.locator('#state-json-file')).toHaveAccessibleName('Choose state JSON');
+  await expect(page.locator('#state-json-file')).not.toHaveAttribute('aria-hidden', 'true');
+  await expect(page.locator('#state-json-file')).not.toHaveAttribute('tabindex', '-1');
+  await expect(importStateButton).toBeFocused();
 
   await attachRoleAriaSnapshot(page, testInfo, 'source-ledger-opml-role-aria-output.json');
   await testInfo.attach('source-ledger-opml-keyboard-a11y.png', {

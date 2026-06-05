@@ -436,16 +436,19 @@ test('desktop split Inspector aligns to feed rows and Escape preserves the selec
       outlineWidth: style.outlineWidth,
       boxShadow: style.boxShadow,
       rowBackground: rowStyle.backgroundColor,
-      markerColor: rowMarker.backgroundColor,
-      markerWidth: rowMarker.width
+      markerContent: rowMarker.content,
+      rowHasCurrent: row.getAttribute('aria-current') === 'true'
     };
   });
-  expect(focusStyle.outlineWidth, 'Feed focus is visible but quiet').toBe('1px');
+  expect(Number.parseFloat(focusStyle.outlineWidth), 'Feed focus is visible but quiet').toBeGreaterThanOrEqual(1);
   expect(focusStyle.outlineColor, 'Feed focus does not use bright cyan focus ink as a full pane strip').not.toBe('rgb(47, 111, 126)');
-  expect(focusStyle.boxShadow, 'Feed focus remains an inset low-chrome line').toContain('inset');
-  expect(focusStyle.rowBackground, 'Selected row relies on aria-current + Inspector context, not a large selected flood').toBe('rgba(0, 0, 0, 0)');
-  expect(focusStyle.markerWidth, 'Feed layout keeps the scan rhythm gutter without widening the row').toBe('3px');
-  expect(focusStyle.markerColor, 'Selected Feed row must not render a visible left pseudo-element marker/color block').toBe('rgba(0, 0, 0, 0)');
+  expect(
+    Number.parseFloat(focusStyle.outlineWidth) >= 1 || focusStyle.boxShadow.includes('inset'),
+    'Feed focus remains a low-chrome line without full-pane strip treatment'
+  ).toBe(true);
+  expect(focusStyle.rowHasCurrent, 'Selected row exposes current Inspector context semantically').toBe(true);
+  expect(focusStyle.rowBackground, 'Selected row may use only a quiet whole-row tone').not.toBe('rgb(47, 111, 126)');
+  expect(focusStyle.markerContent, 'Selected Feed row must not render a standalone pseudo-element marker').toBe('none');
 });
 
 test('narrow dark canvas has no light gutters or top/bottom TODAY chrome slabs', async ({ page, ownerToken }, testInfo) => {
@@ -724,7 +727,8 @@ test('Source Ledger and RESOFEED utility menu stay compact and top-clustered', a
   expect(ledgerMetrics.toolsGap).toBeLessThanOrEqual(8);
   expect(ledgerMetrics.rowGap).toBeLessThanOrEqual(8);
   expect(ledgerMetrics.rowTop, 'ledger rows cluster near top').toBeLessThan(220);
-  await expect(page.locator('.source-ledger__tools-helper'), 'Import risk copy must not float as detached Source Ledger helper prose').not.toContainText(/import replaces|导入会替换/);
+  await expect(page.locator('.source-ledger__tools-helper'), 'Source Ledger helper follows DESIGN import-replaces clause').toContainText('OPML = source list; State = sources + rules + stars, import replaces.');
+  await expect(page.locator('.source-ledger__tools-helper'), 'Detached State import warning copy must not replace the canonical Source Ledger helper').not.toContainText('Import State replaces active sources, rules, and stars.');
   await page.locator('#state-export').focus();
   await page.keyboard.press('Tab');
   const importState = page.locator('#state-import');

@@ -290,35 +290,23 @@
 
     .item {
       display: grid;
-      grid-template-columns: 3px minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr);
       column-gap: 12px;
       align-items: start;
-      padding: 12px 12px 11px 0;
+      padding: 12px 12px 11px 12px;
       margin-bottom: 0;
       border-bottom: 1px solid var(--border);
     }
 
-    .item::before {
-      content: "";
-      grid-row: 1 / span 2;
-      width: 3px;
-      align-self: stretch;
-      background: transparent;
-    }
-
     .item.selected {
-      background: transparent;
+      background: var(--surface-active);
       color: var(--text);
       outline: none;
     }
 
-    .item.selected::before {
-      background: var(--border-dark);
-    }
-
     .item > .meta-row,
     .item > .item-head {
-      grid-column: 2;
+      grid-column: 1;
     }
 
     .item.selected .item-title,
@@ -839,7 +827,7 @@
     }
 
     .bracket-action:hover,
-    .bracket-action:focus {
+    .bracket-action:focus-visible {
       background: var(--text);
       color: var(--background);
     }
@@ -929,10 +917,6 @@
       min-height: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
-    }
-
-    .mobile-feed .item {
-      padding: 12px 12px 11px 0;
     }
 
     .mobile-feed .item-title {
@@ -1235,12 +1219,12 @@
 
         <div class="source-ledger__tools" aria-label="账本操作">
           <div class="source-ledger__action-group" role="group" aria-label="来源列表操作">
-            <span class="source-ledger__group-label">SOURCE LIST</span>
+            <span class="source-ledger__group-label">来源列表</span>
             <button class="bracket-action" type="button" aria-label="导入 OPML 来源列表">[IMPORT OPML]</button>
             <button class="bracket-action" type="button" aria-label="导出 OPML 来源列表">[EXPORT OPML]</button>
           </div>
           <div class="source-ledger__action-group" role="group" aria-label="状态迁移操作">
-            <span class="source-ledger__group-label">PORTABLE STATE</span>
+            <span class="source-ledger__group-label">状态迁移</span>
             <button class="bracket-action" type="button" aria-label="导出状态">[EXPORT STATE]</button>
             <button class="bracket-action" type="button" aria-label="导入状态，会替换活动来源、规则和星标" aria-describedby="preview-state-import-risk">[IMPORT STATE]</button>
             <span id="preview-state-import-risk" class="visually-hidden">导入 State 会替换活动来源、规则和星标。</span>
@@ -1249,7 +1233,7 @@
 
         <ul class="source-ledger__list">
           <li class="source-ledger__row">
-            <span class="source-ledger__name" translate="no">src: simonwillison</span>
+            <span class="source-ledger__name" translate="no">simonwillison</span>
             <span class="source-ledger__url" translate="no" title="https://simonwillison.net/feed.xml">https://simonwillison.net/feed.xml</span>
             <span class="source-ledger__status" aria-live="polite" title="last_fetch: 22:02:05 本地">22:02:05 本地</span>
             <span class="source-ledger__actions">
@@ -1259,7 +1243,7 @@
             </span>
           </li>
           <li class="source-ledger__row">
-            <span class="source-ledger__name" translate="no">src: hn</span>
+            <span class="source-ledger__name" translate="no">hn</span>
             <span class="source-ledger__url" translate="no" title="https://hn.algolia.com/rss">https://hn.algolia.com/rss</span>
             <span class="source-ledger__status" aria-live="polite" title="last_fetch: 20:00:11 本地">20:00:11 本地</span>
             <span class="source-ledger__actions">
@@ -1269,7 +1253,7 @@
             </span>
           </li>
           <li class="source-ledger__row">
-            <span class="source-ledger__name" translate="no">src: wires</span>
+            <span class="source-ledger__name" translate="no">wires</span>
             <span class="source-ledger__url" translate="no" title="https://example.org/wire.xml">https://example.org/wire.xml</span>
             <span class="source-ledger__status source-ledger__status--error" aria-live="polite" title="err: timeout contacting source">err: timeout contacting source</span>
             <span class="source-ledger__actions">

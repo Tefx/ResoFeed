@@ -152,7 +152,7 @@ test.describe('expected-red Source Ledger manual controls, diagnostics, and geom
     for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }] as const) {
       await page.setViewportSize(viewport);
       const row = page.locator('.source-ledger__row', { hasText: 'Long Diagnostic Source' }).first();
-      await expect(row.locator('.source-ledger__name'), `name column must be stable at ${viewport.width}px`).toHaveText(/src: Long Diagnostic Source/);
+      await expect(row.locator('.source-ledger__name'), `name column must be stable at ${viewport.width}px`).toHaveText('Long Diagnostic Source');
       await expect(row.locator('.source-ledger__url'), `URL column must be stable at ${viewport.width}px`).toHaveText(/https:\/\/very-long-source\.example\.com/);
       const status = row.locator('.source-ledger__status.source-ledger__status--error');
       await expect(status, `raw err diagnostic must be inline beside the affected row at ${viewport.width}px`).toContainText(longDiagnostic);

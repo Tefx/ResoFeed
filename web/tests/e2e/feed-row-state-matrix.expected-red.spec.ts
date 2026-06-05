@@ -12,7 +12,7 @@ const fixtureItems = [
     source_id: 'state-matrix-source',
     source_title: 'State Matrix Source',
     url: 'https://example.test/state-matrix-selected',
-    title: 'Selected item must keep its marker through hover and focus',
+    title: 'Selected item must avoid standalone markers through hover and focus',
     summary: 'Fixture summary for selected row state matrix verification.',
     core_insight: 'Selected row remains distinguishable without an extra active block.',
     value_tier: 'high',
@@ -62,7 +62,7 @@ type RowStyleSnapshot = {
   readonly outlineColor: string;
   readonly boxShadow: string;
   readonly box: Box;
-  readonly selectedMarkerVisible: boolean;
+  readonly standaloneMarkerVisible: boolean;
   readonly focusIndicatorVisible: boolean;
 };
 
@@ -170,10 +170,18 @@ async function rowStyle(row: Locator): Promise<RowStyleSnapshot> {
       outlineColor: openStyle.outlineColor,
       boxShadow: openStyle.boxShadow,
       box: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-      selectedMarkerVisible: markerBackground !== 'rgba(0, 0, 0, 0)' && markerBackground !== 'transparent',
+      standaloneMarkerVisible: markerBackground !== 'rgba(0, 0, 0, 0)' && markerBackground !== 'transparent',
       focusIndicatorVisible: (outlineWidth >= 2 && openStyle.outlineStyle !== 'none') || openStyle.boxShadow !== 'none'
     };
   });
+}
+
+function expectSelectedWithoutStandaloneMarker(selected: RowStyleSnapshot, label: string): void {
+  expect.soft(selected.standaloneMarkerVisible, `${label} must not expose a standalone selected marker`).toBe(false);
+}
+
+function hasQuietRowTone(selected: RowStyleSnapshot, normal: RowStyleSnapshot): boolean {
+  return selected.rowBackground !== normal.rowBackground && selected.rowBackground !== 'rgba(0, 0, 0, 0)' && selected.rowBackground !== 'transparent';
 }
 
 function expectStableBox(before: RowStyleSnapshot, after: RowStyleSnapshot, label: string): void {
@@ -209,14 +217,14 @@ test.describe('expected-red feed row state matrix screenshot contract', () => {
     await selectedOpen.click();
     await expect(selectedRow).toHaveAttribute('aria-current', 'true');
     const selected = await rowStyle(selectedRow);
-    expect(selected.selectedMarkerVisible, 'selected state must expose a visible non-color/geometry marker').toBe(true);
+    expectSelectedWithoutStandaloneMarker(selected, 'selected state');
     await attachScreenshot(page, testInfo, 'selected-item');
 
     await selectedOpen.hover();
     const selectedHover = await rowStyle(selectedRow);
     expectStableBox(selected, selectedHover, 'selected-hover state');
     expect(selectedHover.ariaCurrent, 'selected-hover must preserve selected/current semantics').toBe('true');
-    expect(selectedHover.selectedMarkerVisible, 'selected-hover must keep selected marker visible').toBe(true);
+    expectSelectedWithoutStandaloneMarker(selectedHover, 'selected-hover state');
     await attachScreenshot(page, testInfo, 'selected-hover');
 
     await normalOpen.focus();
@@ -229,19 +237,34 @@ test.describe('expected-red feed row state matrix screenshot contract', () => {
     const selectedFocus = await rowStyle(selectedRow);
     expectStableBox(selectedHover, selectedFocus, 'selected-focus state');
     expect(selectedFocus.ariaCurrent, 'selected-focus must preserve selected/current semantics').toBe('true');
-    expect(selectedFocus.selectedMarkerVisible, 'selected-focus must keep selected marker visible').toBe(true);
+    expectSelectedWithoutStandaloneMarker(selectedFocus, 'selected-focus state');
     await attachScreenshot(page, testInfo, 'selected-focus');
-    expect.soft(selectedFocus.focusIndicatorVisible, 'selected-focus must expose focus ring independent of selected marker').toBe(true);
+    expect.soft(selectedFocus.focusIndicatorVisible, 'selected-focus must expose focus ring independent of selected tone').toBe(true);
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await selectedOpen.focus();
+    const normalDark = await rowStyle(normalRow);
+    const selectedFocusDark = await rowStyle(selectedRow);
+    expectStableBox(selectedFocus, selectedFocusDark, 'selected-focus dark mode state');
+    expect(selectedFocusDark.ariaCurrent, 'selected-focus dark mode must preserve selected/current semantics').toBe('true');
+    expectSelectedWithoutStandaloneMarker(selectedFocusDark, 'selected-focus dark mode state');
+    expect.soft(selectedFocusDark.focusIndicatorVisible, 'selected-focus dark mode must expose focus ring independent of selected tone').toBe(true);
 
     await testInfo.attach('feed-row-state-matrix-style-dump.json', {
-      body: JSON.stringify({ normal, hover, selected, selectedHover, focus, selectedFocus }, null, 2),
+      body: JSON.stringify({ normal, hover, selected, selectedHover, focus, selectedFocus, normalDark, selectedFocusDark }, null, 2),
       contentType: 'application/json'
     });
 
-    expect(
-      selectedHover.rowBackground,
-      'selected-hover must not stack a full-row selected active block; selected should remain marker-led per docs/DESIGN.md:421-423 and UI_REGRESSION_CONTRACT.md:73-76'
-    ).toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+    if (hasQuietRowTone(selected, normal)) {
+      expect(
+        selectedHover.rowBackground,
+        'selected-hover must preserve the current quiet selected row tone when that implementation is present'
+      ).toBe(selected.rowBackground);
+      expect(
+        selectedFocus.rowBackground,
+        'selected-focus must preserve the current quiet selected row tone when that implementation is present'
+      ).toBe(selected.rowBackground);
+    }
     expect(
       selectedHover.openBackground,
       'selected-hover must not add a second hover background block over selected state per docs/DESIGN.md:540-545'

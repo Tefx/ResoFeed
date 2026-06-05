@@ -81,8 +81,9 @@ describe('ResoFeed API client and rendered sinks', () => {
 
     render(SourceLedger, { props: { sources: sources.sources, onDeleteSource: async () => {}, onImportOpml: async () => {}, onExportState: async () => ({ schema_version: 'resofeed.state.v1', exported_at: '2026-05-09T00:00:00Z', sources: [], steer_rules: [], resonated_items: [] }), onImportState: async () => {} } });
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    expect(ledger).toHaveTextContent('src: Example Source');
-    expect(ledger).toHaveTextContent('url: https://example.com/feed.xml');
+    expect(ledger).toHaveTextContent('Example Source');
+    expect(ledger).not.toHaveTextContent('src: Example Source');
+    expect(ledger).toHaveTextContent('https://example.com/feed.xml');
     expect(ledger).toHaveTextContent(/\d{2}:\d{2}:\d{2} local/);
 
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });

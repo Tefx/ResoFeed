@@ -64,7 +64,7 @@ describe('UIUX expected-red design contract coverage', () => {
       expectPresent(tokens, new RegExp(`${token}:\\s*#`, 'u'), 'DESIGN.COLOR.DARK_MODE_SHELL');
     }
 
-    expectPresent(css, /@media\s*\(prefers-color-scheme:\s*dark\)|\[data-theme=['"]dark['"]|\.dark\b/u, 'DESIGN.COLOR.DARK_MODE_SHELL');
+    expectPresent(tokens, /@media\s*\(prefers-color-scheme:\s*dark\)|\[data-theme=['"]dark['"]|\.dark\b/u, 'DESIGN.COLOR.DARK_MODE_SHELL');
     expectAbsent(css, /gradient|blob|purple|#8b5cf6|#a855f7/iu, 'DESIGN.COLOR.DARK_MODE_SHELL');
   });
 

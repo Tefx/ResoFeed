@@ -100,7 +100,12 @@ async function importDirtyCorpus(page: Page, ownerToken: string, opmlPath: strin
   await page.reload();
   await expect(page.getByRole('textbox', { name: 'Steer or paste RSS URL' })).toBeVisible();
   await runSteerCommand(page, 'source ledger', 'source ledger');
-  await expect(page.locator('.source-ledger__row', { hasText: feedUrl }).getByText(/src: Dirty Inspector Corpus · status: ok · last_fetch:/)).toBeVisible({ timeout: 20_000 });
+  const fetchedRow = page.locator('.source-ledger__row', { hasText: feedUrl }).first();
+  await expect(fetchedRow.locator('.source-ledger__name')).toHaveText('Dirty Inspector Corpus', { timeout: 20_000 });
+  await expect(fetchedRow.locator('.source-ledger__url')).toHaveText(feedUrl);
+  await expect(fetchedRow.locator('.source-ledger__status')).toHaveText(/\d{2}:\d{2}:\d{2}\s+local/);
+  await fetchedRow.locator('.source-diagnostic-details summary').click();
+  await expect(fetchedRow.locator('.source-diagnostic-details pre')).toContainText('fetch_state: ok');
   await runSteerCommand(page, 'today', 'today');
   await expect(page.getByRole('list', { name: 'Today feed items' })).toBeVisible();
   return sourceId;
@@ -221,7 +226,12 @@ test('R1-R8 Inspector browser retest preserves R1 prose while keeping dirty payl
     let menu = await openSurfaceMenu(page);
     await menu.getByRole('button', { name: 'SOURCE LEDGER' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'retrieval: lexical search' })).toHaveCount(0);
-    await expect(page.locator('.source-ledger__row', { hasText: dirtyServer.feedUrl }).getByText(/src: Dirty Inspector Corpus · status: ok · last_fetch:/)).toBeVisible();
+    const ledgerRow = page.locator('.source-ledger__row', { hasText: dirtyServer.feedUrl }).first();
+    await expect(ledgerRow.locator('.source-ledger__name')).toHaveText('Dirty Inspector Corpus');
+    await expect(ledgerRow.locator('.source-ledger__url')).toHaveText(dirtyServer.feedUrl);
+    await expect(ledgerRow.locator('.source-ledger__status')).toHaveText(/\d{2}:\d{2}:\d{2}\s+local/);
+    await ledgerRow.locator('.source-diagnostic-details summary').click();
+    await expect(ledgerRow.locator('.source-diagnostic-details pre')).toContainText('fetch_state: ok');
     await assertManualLedgerFetchControls(page);
 
     await page.setViewportSize({ width: 390, height: 844 });
