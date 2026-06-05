@@ -145,7 +145,7 @@ function inspectorContractSnapshot(root: HTMLElement): string {
   const panel = root.querySelector('[data-contract="inspector-reingest"]');
   const model = root.querySelector('[name="reingest-model"]');
   const prompt = root.querySelector('[name="reingest-prompt"]');
-  const sourceEvidence = root.querySelector('[aria-label="Source evidence"], details[aria-label="Source evidence"]');
+  const sourceEvidence = root.querySelector('[aria-label="Text evidence"], details[aria-label="Text evidence"]');
   const originalLink = root.querySelector('.inspector-original-link');
   return JSON.stringify({
     reingestPanelText: panel?.textContent?.replace(/\s+/g, ' ').trim() ?? null,
@@ -174,7 +174,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
 
     expect(inspectorContractSnapshot(inspector)).toMatchInlineSnapshot(`
 "{
-  \"reingestPanelText\": \"REGENERATE [REGENERATE]\",
+  \"reingestPanelText\": \"[REGENERATE] Options\",
   \"modelControl\": null,
   \"promptControl\": null,
   \"sourceEvidenceCollapsed\": true,
@@ -182,48 +182,51 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
 }"
 `);
     expect(within(inspector).getByLabelText('Item re-ingest')).toBeVisible();
-    expect(nodeOrder(inspector, '[data-contract="inspector-reingest"]')).toBeLessThan(nodeOrder(inspector, '[aria-label="Source evidence"]'));
+    expect(nodeOrder(inspector, '[data-contract="inspector-reingest"]')).toBeLessThan(nodeOrder(inspector, '[aria-label="Text evidence"]'));
     expect(screen.queryByRole('button', { name: /re-ingest library/i })).not.toBeInTheDocument();
   });
 
-  it('expands low-chrome configuring state, cancels back to the idle affordance, and restores focus', async () => {
+  it('expands low-chrome Options disclosure while keeping direct regenerate as the only execution command', async () => {
     const user = userEvent.setup();
-    render(Inspector, { props: { item: failedDetail, mode: 'desktop-split', showReingest: true, onReingestItem: vi.fn(), openRouterModels: [...openRouterModelListing.models], openRouterModelListState: 'available' } });
+    const onReingestItem = vi.fn(async (): Promise<ItemReingestResponse> => ({
+      reingest: {
+        status: 'completed',
+        item_id: failedDetail.id,
+        language: 'en',
+        item_updated: false,
+        fts_updated: true,
+        error: null,
+        item: null
+      },
+      already_applied: false
+    }));
+    render(Inspector, { props: { item: failedDetail, mode: 'desktop-split', showReingest: true, onReingestItem, openRouterModels: [...openRouterModelListing.models], openRouterModelListState: 'available' } });
     const inspector = screen.getByRole('complementary', { name: failedDetail.title });
     const panel = within(inspector).getByLabelText('Item re-ingest');
-    const idleButton = within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' });
+    const regenerate = within(panel).getByRole('button', { name: '[REGENERATE]' });
 
+    expect(within(panel).queryByRole('button', { name: '[CONFIRM RE-INGEST]' })).not.toBeInTheDocument();
+    expect(within(panel).queryByRole('button', { name: '[CANCEL]' })).not.toBeInTheDocument();
     expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
     expect(within(panel).queryByLabelText('One-time prompt')).not.toBeInTheDocument();
-    await user.click(idleButton);
 
-    const confirm = within(panel).getByRole('button', { name: '[CONFIRM RE-INGEST]' });
-    expect(confirm).toHaveFocus();
-    expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
-    expect(within(panel).queryByLabelText('One-time prompt')).not.toBeInTheDocument();
-    const advanced = within(panel).getByRole('button', { name: '[ADVANCED OPTIONS ↓]' });
-    expect(advanced).toHaveAttribute('aria-expanded', 'false');
-    await user.click(advanced);
+    const options = within(panel).getByText('Options');
+    expect(options).not.toHaveClass('bracket-action');
+    expect(options.closest('details')).toBeInstanceOf(HTMLDetailsElement);
+    await user.click(options);
 
     expect(within(panel).getByText('model:')).toBeVisible();
     expect(within(panel).getByText('extra prompt (one-time, not saved)')).toBeVisible();
     expect(within(panel).getByText(/guidance only; cannot override schema, language, source identifiers, safety, status, or persistence/i)).toBeVisible();
-    expect(within(panel).getByText(/may change emphasis, angle, or fact selection only among source-backed facts/i)).toBeVisible();
+    expect(within(panel).getByText(/may change emphasis, angle, or fact selection only among source-backed facts/i)).toHaveClass('visually-hidden');
     expect(within(panel).getByLabelText('Model')).toHaveValue('default');
     await user.selectOptions(within(panel).getByLabelText('Model'), 'openai/gpt-4.1-mini');
     await user.type(within(panel).getByLabelText('One-time prompt'), 'Temporary prompt');
-    await user.click(within(panel).getByRole('button', { name: '[CANCEL]' }));
+    await user.click(regenerate);
 
-    const restoredIdleButton = within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' });
-    expect(restoredIdleButton).toHaveFocus();
-    expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
-    expect(within(panel).queryByLabelText('One-time prompt')).not.toBeInTheDocument();
-    await user.click(restoredIdleButton);
-    expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
-    expect(within(panel).queryByLabelText('One-time prompt')).not.toBeInTheDocument();
-    await user.click(within(panel).getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }));
-    expect(within(panel).getByLabelText('Model')).toHaveValue('default');
-    expect(within(panel).getByLabelText('One-time prompt')).toHaveValue('');
+    await waitFor(() => expect(onReingestItem).toHaveBeenCalledWith(failedDetail, { model: 'openai/gpt-4.1-mini', prompt: 'Temporary prompt' }));
+    await waitFor(() => expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument());
+    expect(within(panel).getByRole('button', { name: '[REGENERATE]' })).toHaveFocus();
   });
 
   it('keeps source evidence collapsed by default and source identifiers literal translate=no', () => {
@@ -232,7 +235,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
 
     expect(within(inspector).getByRole('link', { name: 'original link' })).toHaveAttribute('translate', 'no');
     expect(within(inspector).getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
-    const sourceEvidence = within(inspector).getByLabelText('Source evidence');
+    const sourceEvidence = within(inspector).getByLabelText('Text evidence');
     expect(sourceEvidence.tagName, 'product gap: source evidence should be a disclosure details element').toBe('DETAILS');
     expect(sourceEvidence).not.toHaveAttribute('open');
   });
@@ -245,7 +248,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     expect(within(inspector).getByText('A complete model-backed paragraph explains the source material clearly.')).toBeVisible();
     expect(within(inspector).getByText('The source disclosure remains the verification path for model-backed reading.')).toBeVisible();
 
-    const sourceText = within(inspector).getByLabelText('Source text');
+    const sourceText = within(inspector).getByLabelText('Text evidence');
     expect(sourceText.tagName, 'product gap: model-backed Source text should be an accessible disclosure').toBe('DETAILS');
     expect(sourceText, 'product gap: Source text disclosure should be collapsed by default').not.toHaveAttribute('open');
     expect(within(sourceText).getByText('Full source article text remains available for verification behind a collapsed disclosure.')).toBeInTheDocument();
@@ -256,9 +259,8 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     await user.click(screen.getByRole('button', { name: `Open Inspector for: ${failedItem.title}` }));
     const inspector = screen.getByRole('complementary', { name: failedItem.title });
     const panel = within(inspector).getByLabelText('Item re-ingest');
-    await user.click(within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
     expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
-    await user.click(within(panel).getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }));
+    await user.click(within(panel).getByText('Options'));
     const modelControl = within(panel).getByLabelText('Model');
 
     expect(within(panel).getByText(/model list: 2 OpenRouter models available/i), 'product gap: model-list diagnostics should be visible next to the selector').toBeVisible();
@@ -273,11 +275,10 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     const inspector = screen.getByRole('complementary', { name: failedItem.title });
     const panel = within(inspector).getByLabelText('Item re-ingest');
 
-    await user.click(within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
-    await user.click(within(panel).getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }));
+    await user.click(within(panel).getByText('Options'));
     await user.selectOptions(within(panel).getByLabelText('Model'), 'default');
     await user.type(within(panel).getByLabelText('One-time prompt'), 'Retry with article-only extraction.');
-    await user.click(within(panel).getByRole('button', { name: '[CONFIRM RE-INGEST]' }));
+    await user.click(within(panel).getByRole('button', { name: '[REGENERATE]' }));
 
     const request = vi.mocked(fetch).mock.calls.find(([url]) => String(url).endsWith(`/api/items/${failedItem.id}/reingest`));
     const body = JSON.parse(String(request?.[1]?.body ?? '{}')) as Record<string, unknown>;
@@ -293,8 +294,8 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     expect(window.localStorage.getItem('resofeed.itemReingestPrompt')).toBeNull();
     expect(window.localStorage.getItem(`resofeed.itemReingestPrompt.${failedItem.id}`)).toBeNull();
     expect(
-      within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }),
-      'R1 expected-red: successful re-ingest must collapse back to the single idle affordance'
+      within(panel).getByRole('button', { name: '[REGENERATE]' }),
+      'R1 expected-red: successful re-ingest must collapse back to the single direct affordance'
     ).toBeVisible();
     expect(within(panel).getByRole('status', { name: /item re-ingest status/i })).toHaveTextContent('re-ingest complete · search refreshed');
     expect(within(panel).queryByRole('button', { name: '[CONFIRM RE-INGEST]' })).not.toBeInTheDocument();
@@ -329,13 +330,13 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     expect(within(inspector).getByLabelText('Source: Example Source')).toHaveAttribute('translate', 'no');
     const panel = within(inspector).getByLabelText('本文重处理');
 
-    expect(within(panel).getByText('重新生成')).toBeVisible();
-    await user.click(within(panel).getByRole('button', { name: '[重新处理本文]' }));
+    expect(within(panel).getByRole('button', { name: '[重新生成]' })).toBeVisible();
+    expect(within(panel).queryByText(/^重新生成$/u), 'section label must not duplicate the command').not.toBeInTheDocument();
     expect(within(panel).queryByLabelText('模型')).not.toBeInTheDocument();
     expect(within(panel).queryByLabelText('一次性提示')).not.toBeInTheDocument();
-    expect(within(panel).getByRole('button', { name: '[确认重处理]' })).toHaveFocus();
-    expect(within(panel).getByRole('button', { name: '[取消]' })).toBeVisible();
-    await user.click(within(panel).getByRole('button', { name: '[高级选项 ↓]' }));
+    expect(within(panel).queryByRole('button', { name: '[确认重处理]' })).not.toBeInTheDocument();
+    expect(within(panel).queryByRole('button', { name: '[取消]' })).not.toBeInTheDocument();
+    await user.click(within(panel).getByText('选项'));
     expect(within(panel).getByLabelText('模型')).toBeVisible();
     expect(within(panel).getByLabelText('一次性提示')).toBeVisible();
     expect(within(panel).getByText('2 个 OpenRouter 模型可选')).toBeVisible();
@@ -358,9 +359,8 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     const inspector = screen.getByRole('complementary', { name: failedDetail.title });
     const panel = within(inspector).getByLabelText('Item re-ingest');
 
-    await user.click(within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
     expect(within(panel).queryByText('models: loading')).not.toBeInTheDocument();
-    await user.click(within(panel).getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }));
+    await user.click(within(panel).getByText('Options'));
     expect(within(panel).getByText('models: loading')).toHaveAttribute('aria-live', 'polite');
     expect(within(panel).getByLabelText('Model')).toHaveValue('default');
 
@@ -384,8 +384,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     render(Inspector, { props: { item: failedDetail, mode: 'desktop-split', showReingest: true, onReingestItem } });
     const panel = within(screen.getByRole('complementary', { name: failedDetail.title })).getByLabelText('Item re-ingest');
 
-    await user.click(within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
-    await user.click(within(panel).getByRole('button', { name: '[CONFIRM RE-INGEST]' }));
+    await user.click(within(panel).getByRole('button', { name: '[REGENERATE]' }));
 
     const running = within(panel).getByRole('button', { name: '[RE-INGESTING ITEM...]' });
     expect(running).toHaveAttribute('aria-disabled', 'true');
@@ -412,8 +411,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     const inspector = screen.getByRole('complementary', { name: failedItem.title });
     const panel = within(inspector).getByLabelText('Item re-ingest');
 
-    await user.click(within(panel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
-    await user.click(within(panel).getByRole('button', { name: '[CONFIRM RE-INGEST]' }));
+    await user.click(within(panel).getByRole('button', { name: '[REGENERATE]' }));
 
     const conflict = await within(inspector).findByRole('alert', { name: /item re-ingest/i });
     expect(conflict).toHaveTextContent(/err: reingest blocked — op: library_reprocess · actor:human · phase:processing_items · 2\/5 · library reprocess processing item · since \d{2}:\d{2}:\d{2} local/);
@@ -446,10 +444,9 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
 
     const firstInspector = screen.getByRole('complementary', { name: failedDetail.title });
     const firstPanel = within(firstInspector).getByLabelText('Item re-ingest');
-    await user.click(within(firstPanel).getByRole('button', { name: '[RE-INGEST ITEM]' }));
-    await user.click(within(firstPanel).getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }));
+    await user.click(within(firstPanel).getByText('Options'));
     await user.type(within(firstPanel).getByLabelText('One-time prompt'), 'Item 1 prompt');
-    await user.click(within(firstPanel).getByRole('button', { name: '[CONFIRM RE-INGEST]' }));
+    await user.click(within(firstPanel).getByRole('button', { name: '[REGENERATE]' }));
 
     await within(firstPanel).findByRole('alert', { name: /item re-ingest/i });
     expect(within(firstPanel).getByLabelText('One-time prompt')).toHaveValue('Item 1 prompt');
@@ -464,7 +461,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
 
     const secondInspector = screen.getByRole('complementary', { name: secondDetail.title });
     const secondPanel = within(secondInspector).getByLabelText('Item re-ingest');
-    expect(within(secondPanel).getByRole('button', { name: '[RE-INGEST ITEM]' })).toBeVisible();
+    expect(within(secondPanel).getByRole('button', { name: '[REGENERATE]' })).toBeVisible();
     expect(within(secondPanel).queryByLabelText('One-time prompt')).not.toBeInTheDocument();
     expect(within(secondPanel).queryByLabelText('Model')).not.toBeInTheDocument();
     expect(within(secondPanel).queryByLabelText('Item re-ingest status')).not.toBeInTheDocument();

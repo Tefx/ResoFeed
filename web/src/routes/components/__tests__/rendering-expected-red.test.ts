@@ -247,7 +247,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(inspector).queryByLabelText(/Model status:/)).not.toBeInTheDocument();
     expect(within(inspector).getByText('Readable core insight remains in the primary path.')).toBeVisible();
     expect(within(inspector).getByText('Readable core insight remains in the primary path.')).toBeVisible();
-    expect(within(inspector).getByLabelText('Source text')).toHaveTextContent('Readable fallback excerpt for the primary Inspector reading path.');
+    expect(within(inspector).getByLabelText('Text evidence')).toHaveTextContent('Readable fallback excerpt for the primary Inspector reading path.');
 
     const primaryText = Array.from(inspector.querySelectorAll('.inspector-section-copy, .inspector-evidence-line'))
       .map((node) => node.textContent ?? '')
@@ -287,8 +287,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect((inspector.textContent?.match(/中文处理未完成/g) ?? [])).toHaveLength(1);
     expect(within(inspector).queryByLabelText('摘要')).not.toBeInTheDocument();
     expect(within(inspector).queryByLabelText('核心洞察')).not.toBeInTheDocument();
-    expect(within(inspector).getByLabelText('出处记录')).toHaveTextContent('出处记录：');
-    expect(within(inspector).getByLabelText('出处记录')).toHaveTextContent('This raw English RSS excerpt should remain provenance, not the main Chinese body.');
+    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('出处记录：');
+    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('This raw English RSS excerpt should remain provenance, not the main Chinese body.');
     expect(inspector).not.toHaveTextContent('This raw English body should not appear as completed Chinese reading content.');
   });
 
@@ -349,8 +349,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const inspector = screen.getByRole('complementary', { name: okDetail.title });
     const sections = Array.from(inspector.querySelectorAll('.inspector-text-section'));
     expect(sections).toHaveLength(3);
-    expect(sections.map((section) => section.getAttribute('aria-label'))).toEqual(['Summary', 'Core insight', 'Source text']);
-    expect(sections.map((section) => section.querySelector('.inspector-section-label')?.textContent)).toEqual(['summary:', 'core insight:', 'source text:']);
+    expect(sections.map((section) => section.getAttribute('aria-label'))).toEqual(['Summary', 'Core insight', 'Text evidence']);
+    expect(sections.map((section) => section.querySelector('.inspector-section-label')?.textContent)).toEqual(['summary:', 'core insight:', 'Text evidence']);
     expect(sections[0].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[1].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[2]).toHaveClass('inspector-reading-section');
@@ -367,8 +367,9 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(within(inspector).getByRole('link', { name: 'original link' })).toHaveClass('inspector-original-link');
     expect(inspector.querySelector('.contract-source-details')).toBeInstanceOf(HTMLDetailsElement);
     expect(inspector.querySelector('.contract-grouped-sources')).toBeNull();
-    expect(within(inspector).getByRole('button', { name: '[RE-INGEST ITEM]' })).toHaveClass('inspector-reingest-toggle');
-    expect(inspector.querySelector('.inspector-section-label')).not.toBeNull();
+    expect(within(inspector).getByRole('button', { name: '[REGENERATE]' })).toHaveClass('inspector-reingest-submit');
+    expect(within(inspector).getByText('Options').closest('details')).toBeInstanceOf(HTMLDetailsElement);
+    expect(within(inspector).queryByText(/^REGENERATE$/u)).not.toBeInTheDocument();
   });
 
   it('keeps Inspector model-list diagnostics out of payload paragraph typography', () => {
@@ -408,7 +409,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     const inspector = screen.getByRole('complementary', { name: dirtyDetail.title });
     expect(within(inspector).getByText('Readable core insight remains outside social boilerplate.')).toBeVisible();
-    expect(within(inspector).getByLabelText('Source text')).toHaveTextContent('Readable fallback excerpt remains available.');
+    expect(within(inspector).getByLabelText('Text evidence')).toHaveTextContent('Readable fallback excerpt remains available.');
     const primaryText = Array.from(inspector.querySelectorAll('h2, p:not(.contract-label):not(.contract-muted):not(.contract-warning)'))
       .map((node) => node.textContent ?? '')
       .join(' ')

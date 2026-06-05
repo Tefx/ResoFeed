@@ -115,15 +115,15 @@ describe('UIUX expected-red design contract coverage', () => {
   it('DESIGN.INSPECTOR.REINGEST.* requires Inspector-only item scope, authority copy, clearing, focus/live-region states, failed preservation, and source disclosure', () => {
     const src = inspector();
     const nonInspector = `${feed()}\n${ledger()}\n${search()}\n${page()}`;
-    expectPresent(src, /\[RE-INGEST ITEM\]|\[重新处理本文\]/u, 'DESIGN.INSPECTOR.REINGEST.ITEM_SCOPED');
-    expectAbsent(nonInspector, /\[RE-INGEST ITEM\]|\[重新处理本文\]|reingest-model|reingest-prompt/u, 'DESIGN.INSPECTOR.REINGEST.ITEM_SCOPED');
+    expectPresent(src, /\[REGENERATE\]|\[重新生成\]/u, 'DESIGN.INSPECTOR.REINGEST.ITEM_SCOPED');
+    expectAbsent(nonInspector, /\[REGENERATE\]|\[重新生成\]|reingest-model|reingest-prompt/u, 'DESIGN.INSPECTOR.REINGEST.ITEM_SCOPED');
     expectPresent(src, /guidance only; cannot override schema, language, source identifiers, safety, status, or persistence/u, 'DESIGN.INSPECTOR.REINGEST.AUTHORITY_PROMPT');
     expectAbsent(`${src}\n${page()}\n${portability()}`, /localStorage\.setItem\([^)]*(?:reingest|prompt|model)|state\.json[\s\S]*(?:reingest|prompt|model)|steering receipt[\s\S]*(?:prompt|model)/iu, 'DESIGN.INSPECTOR.REINGEST.PERSISTENCE_CLEARING');
     expectPresent(src, /resetReingestTransientState[\s\S]*reingestModel\s*=\s*'default'[\s\S]*reingestPrompt\s*=\s*''/u, 'DESIGN.INSPECTOR.REINGEST.PERSISTENCE_CLEARING');
     expectPresent(src, /last re-ingest failed|上次重处理失败/u, 'DESIGN.INSPECTOR.REINGEST.FAILED_PRESERVATION');
-    expectPresent(src, /aria-live=\{reingestState === 'conflict' \|\| reingestState === 'failed' \? 'assertive' : 'polite'\}|aria-disabled=\{reingestState === 'submitting'/u, 'DESIGN.INSPECTOR.REINGEST.ACCESSIBILITY_STATES');
-    expectPresent(src, /'confirming'|\[CONFIRM RE-INGEST\][\s\S]*\[CANCEL\]/u, 'DESIGN.INSPECTOR.REINGEST.ACCESSIBILITY_STATES');
-    expectPresent(src, /<details[^>]+aria-label=\{localizedChrome\('Source text', '来源文本'\)\}/u, 'DESIGN.INSPECTOR.SOURCE_DISCLOSURE.DEFAULT_COLLAPSED');
+    expectPresent(src, /reingestStatusLive\(\)|aria-disabled=\{reingestState === 'submitting'/u, 'DESIGN.INSPECTOR.REINGEST.ACCESSIBILITY_STATES');
+    expectAbsent(src, /'confirming'|\[CONFIRM RE-INGEST\]|\[确认重处理\]|\[CANCEL\]|\[取消\]/u, 'DESIGN.INSPECTOR.REINGEST.ACCESSIBILITY_STATES');
+    expectPresent(src, /<details[^>]+aria-label=\{localizedChrome\('Text evidence', '文本证据'\)\}/u, 'DESIGN.INSPECTOR.SOURCE_DISCLOSURE.DEFAULT_COLLAPSED');
     expectAbsent(`${src}\n${page()}`, /localStorage\.setItem\([^)]*(?:disclosure|details|sourceText)|sessionStorage\.setItem\([^)]*(?:disclosure|details|sourceText)/iu, 'DESIGN.INSPECTOR.SOURCE_DISCLOSURE.DEFAULT_COLLAPSED');
   });
 
