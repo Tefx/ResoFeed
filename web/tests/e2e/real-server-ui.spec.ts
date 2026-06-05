@@ -145,6 +145,9 @@ async function roundTripStateThroughLedgerFooter(page: Page, testInfo: TestInfo)
   await download.saveAs(exportedStatePath);
   expect(fs.existsSync(exportedStatePath), 'state export download was saved').toBe(true);
   await page.locator('#state-json-file').setInputFiles(exportedStatePath);
+  await expect(page.getByRole('button', { name: '[CONFIRM IMPORT]' })).toBeVisible();
+  await expect(page.getByText('Import State replaces active sources, rules, and stars.')).toBeVisible();
+  await page.getByRole('button', { name: '[CONFIRM IMPORT]' }).click();
   await expect(page.getByText('import complete')).toBeVisible();
 }
 

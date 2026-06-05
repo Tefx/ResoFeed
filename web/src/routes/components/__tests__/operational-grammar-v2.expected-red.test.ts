@@ -255,6 +255,13 @@ describe('expected-red Operational Grammar v2 render contract lock', () => {
     expect(input.files).toHaveLength(0);
 
     await user.upload(input, file);
+    expect(await within(portability).findByRole('button', { name: '[CONFIRM IMPORT]' })).toHaveFocus();
+    await user.keyboard('{Escape}');
+    expect(within(portability).getByRole('button', { name: '[IMPORT STATE]' })).toHaveFocus();
+    expect(within(portability).queryByRole('button', { name: '[CONFIRM IMPORT]' })).not.toBeInTheDocument();
+    expect(onImportState).not.toHaveBeenCalled();
+
+    await user.upload(input, file);
     await user.click(await within(portability).findByRole('button', { name: '[CONFIRM IMPORT]' }));
     await waitFor(() => expect(onImportState).toHaveBeenCalledTimes(1));
   });

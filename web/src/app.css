@@ -409,7 +409,8 @@ a:focus-visible,
 }
 
 .bracket-action--delete,
-.bracket-action--confirm {
+.bracket-action--confirm,
+.bracket-action--cancel {
   width: auto;
   justify-content: center;
 }
@@ -511,6 +512,7 @@ a:focus-visible,
 }
 
 #state-import:focus-visible ~ .state-portability-warning:not([hidden]),
+.state-portability-actions[data-state='import-confirming'] .state-portability-warning,
 .state-portability-actions[data-state='importing'] .state-portability-warning,
 .state-portability-actions[data-state='import-failed'] .state-portability-warning {
   position: static;
