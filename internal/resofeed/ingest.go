@@ -244,6 +244,7 @@ func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source
 	result.SourcesFetched = 1
 	result.ItemsDiscovered = sourceResult.itemsDiscovered
 	result.ItemsUpserted = sourceResult.itemsUpserted
+	result.Errors = appendItemProcessingErrors(result.Errors, source.ID, sourceResult.itemFailures)
 	updateCurrentOperation("source_complete", &CurrentOperationCount{Current: 1, Total: 1}, "manual source fetch complete")
 	return result, nil
 }
@@ -274,6 +275,7 @@ func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (resu
 		result.SourcesFetched++
 		result.ItemsDiscovered += sourceResult.itemsDiscovered
 		result.ItemsUpserted += sourceResult.itemsUpserted
+		result.Errors = appendItemProcessingErrors(result.Errors, source.ID, sourceResult.itemFailures)
 		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: index + 1, Total: len(sources)}, "ingest source complete")
 	}
 	updateCurrentOperation("complete", &CurrentOperationCount{Current: len(sources), Total: len(sources)}, "ingest complete")
@@ -398,11 +400,12 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 		resultMu.Unlock()
 		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.skipMessage)
 	}
-	recordSourceSuccess := func(sourceResult ingestSourceResult) {
+	recordSourceSuccess := func(source Source, sourceResult ingestSourceResult) {
 		resultMu.Lock()
 		result.SourcesFetched++
 		result.ItemsDiscovered += sourceResult.itemsDiscovered
 		result.ItemsUpserted += sourceResult.itemsUpserted
+		result.Errors = appendItemProcessingErrors(result.Errors, source.ID, sourceResult.itemFailures)
 		completed++
 		current := completed
 		resultMu.Unlock()
@@ -445,7 +448,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 					recordFatal(err)
 					continue
 				}
-				recordSourceSuccess(sourceResult)
+				recordSourceSuccess(source, sourceResult)
 			}
 		}()
 	}
@@ -902,6 +905,12 @@ type ingestSourceResult struct {
 	itemsDiscovered int
 	itemsUpserted   int
 	sourceTitle     string
+	itemFailures    []ingestItemFailure
+}
+
+type ingestItemFailure struct {
+	itemID  string
+	message string
 }
 
 func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source) (ingestSourceResult, error) {
@@ -967,16 +976,28 @@ func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, sourc
 	taskCh := make(chan ingestItemTask)
 	var wg sync.WaitGroup
 	var resultMu sync.Mutex
-	var firstErr error
+	var fatalErr error
 
-	recordErr := func(err error) {
+	recordFatal := func(err error) {
 		if err == nil {
 			return
 		}
 		resultMu.Lock()
-		if firstErr == nil {
-			firstErr = err
+		if fatalErr == nil {
+			fatalErr = err
 		}
+		resultMu.Unlock()
+	}
+	recordItemFailure := func(task ingestItemTask, err error) {
+		if err == nil {
+			return
+		}
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			recordFatal(err)
+			return
+		}
+		resultMu.Lock()
+		result.itemFailures = append(result.itemFailures, ingestItemFailure{itemID: ingestedItemID(source, task.entry), message: err.Error()})
 		resultMu.Unlock()
 	}
 	recordDone := func(inserted bool) {
@@ -997,13 +1018,13 @@ func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, sourc
 			for task := range taskCh {
 				item, err := buildItemWithActiveSteeringAndSemaphore(ctx, source, task.entry, cfg.LLM, language, activeSteeringRules, cfg.llmSemaphore)
 				if err != nil {
-					recordErr(err)
+					recordItemFailure(task, err)
 					recordDone(false)
 					continue
 				}
 				inserted, err := upsertIngestedItem(ctx, db, item)
 				if err != nil {
-					recordErr(err)
+					recordItemFailure(task, err)
 					recordDone(false)
 					continue
 				}
@@ -1016,7 +1037,7 @@ sendLoop:
 	for _, task := range pending {
 		select {
 		case <-ctx.Done():
-			recordErr(ctx.Err())
+			recordFatal(ctx.Err())
 			break sendLoop
 		case taskCh <- task:
 		}
@@ -1026,7 +1047,37 @@ sendLoop:
 
 	resultMu.Lock()
 	defer resultMu.Unlock()
-	return result, firstErr
+	return result, fatalErr
+}
+
+func appendItemProcessingErrors(errors []ManualFetchSourceError, sourceID string, failures []ingestItemFailure) []ManualFetchSourceError {
+	if len(failures) == 0 {
+		return errors
+	}
+	return append(errors, ManualFetchSourceError{SourceID: sourceID, Code: IngestErrorCodeItemProcessingError, Message: formatItemProcessingFailureMessage(failures)})
+}
+
+func formatItemProcessingFailureMessage(failures []ingestItemFailure) string {
+	if len(failures) == 0 {
+		return ""
+	}
+	const maxDetails = 3
+	details := make([]string, 0, minInt(len(failures), maxDetails))
+	for i, failure := range failures {
+		if i >= maxDetails {
+			break
+		}
+		message := strings.TrimSpace(failure.message)
+		if message == "" {
+			message = "item processing failed"
+		}
+		details = append(details, fmt.Sprintf("%s: %s", failure.itemID, message))
+	}
+	suffix := ""
+	if remaining := len(failures) - len(details); remaining > 0 {
+		suffix = fmt.Sprintf("; +%d more", remaining)
+	}
+	return fmt.Sprintf("%d item(s) failed during processing: %s%s", len(failures), strings.Join(details, "; "), suffix)
 }
 
 func applyFirstFetchLimit(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string, items []feedEntry) ([]feedEntry, error) {

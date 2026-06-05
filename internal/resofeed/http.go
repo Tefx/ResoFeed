@@ -1278,6 +1278,7 @@ func newIngestRunResult(result ManualFetchResult, scope string, sourceID *string
 	ingestErrors := make([]IngestErrorDetail, 0, len(result.Errors))
 	sourcesFailed := 0
 	sourcesSkipped := 0
+	itemFailures := 0
 	for _, sourceErr := range result.Errors {
 		id := sourceErr.SourceID
 		ingestErrors = append(ingestErrors, IngestErrorDetail{SourceID: &id, Code: sourceErr.Code, Message: sourceErr.Message})
@@ -1285,9 +1286,16 @@ func newIngestRunResult(result ManualFetchResult, scope string, sourceID *string
 			sourcesSkipped++
 			continue
 		}
+		if isItemLevelIngestErrorCode(sourceErr.Code) {
+			itemFailures++
+			continue
+		}
 		sourcesFailed++
 	}
 	status := deriveIngestRunStatus(scope, sourcesFailed, sourcesSkipped)
+	if itemFailures > 0 && status == IngestRunStatusCompleted {
+		status = IngestRunStatusCompletedWithErrors
+	}
 	duration := completed.Sub(started).Milliseconds()
 	if duration < 0 {
 		duration = 0

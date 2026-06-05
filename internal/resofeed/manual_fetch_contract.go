@@ -33,6 +33,7 @@ const (
 	IngestErrorCodeTimeout                 = "timeout"
 	IngestErrorCodeSourceBusy              = "source_busy"
 	IngestErrorCodeSourceCapacityExhausted = "source_capacity_exhausted"
+	IngestErrorCodeItemProcessingError     = "item_processing_error"
 	IngestErrorCodeInternal                = "internal"
 
 	ConflictReasonSourceBusy              = "source_busy"
@@ -66,6 +67,10 @@ type ManualFetchRequest struct{}
 
 func isSkippedIngestErrorCode(code string) bool {
 	return code == IngestErrorCodeSourceBusy || code == IngestErrorCodeSourceCapacityExhausted
+}
+
+func isItemLevelIngestErrorCode(code string) bool {
+	return code == IngestErrorCodeItemProcessingError
 }
 
 func deriveIngestRunStatus(scope string, sourcesFailed int, sourcesSkipped int) string {

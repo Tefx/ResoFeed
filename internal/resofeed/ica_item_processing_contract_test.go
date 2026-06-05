@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -53,6 +54,73 @@ func TestICAItemProcessingContractOneLLMRequestPerNewItemNoBatching(t *testing.T
 		if matchedSlug == "" {
 			t.Fatalf("LLM request %d did not carry exactly one expected item slug: title=%q available_text=%q", i, input.Title, input.AvailableText)
 		}
+	}
+}
+
+func TestICAItemProcessingContractLLMFailurePersistsFallbackItemAndContinues(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	db := newContractDB(t, ctx)
+
+	const itemCount = 3
+	feed := icaMultiItemFeedServer(t, "ICA LLM Failure Isolation Source", "llm-isolation-item", itemCount)
+	seedSTCSource(t, ctx, db, "src_ica_llm_failure_isolation", feed.URL+"/feed.xml", "ICA LLM Failure Fallback", 1)
+	llm := &icaSelectiveFailureLLM{failTitleContains: "llm-isolation-item-1"}
+
+	result, err := ManualFetchSource(ctx, db, IngestConfig{LLM: llm, SourceFetchTimeout: 3 * time.Second, ItemConcurrencyPerSource: 2}, "src_ica_llm_failure_isolation")
+	if err != nil {
+		t.Fatalf("ManualFetchSource LLM failure isolation fixture returned error: %v", err)
+	}
+	if result.ItemsDiscovered != itemCount || result.ItemsUpserted != itemCount || result.SourcesFetched != 1 || len(result.Errors) != 0 {
+		t.Fatalf("ManualFetchSource LLM failure isolation result = %+v, want source success with all fallback items persisted and no source errors", result)
+	}
+	if got := llm.calls.Load(); got != itemCount {
+		t.Fatalf("LLM calls after item failure = %d, want one request per item (%d)", got, itemCount)
+	}
+	if got := countItemsForSource(t, ctx, db, "src_ica_llm_failure_isolation"); got != itemCount {
+		t.Fatalf("persisted items after LLM failure = %d, want %d", got, itemCount)
+	}
+	var failedModelStatus string
+	if err := db.QueryRowContext(ctx, `select model_status from items where source_id = ? and source_item_title like ?`, "src_ica_llm_failure_isolation", "%llm-isolation-item-1%").Scan(&failedModelStatus); err != nil {
+		t.Fatalf("read failed LLM item status: %v", err)
+	}
+	if failedModelStatus == modelStatusOK {
+		t.Fatalf("failed LLM item model_status = %q, want degraded non-ok status", failedModelStatus)
+	}
+}
+
+func TestICAItemProcessingContractItemPersistenceFailureIsAggregatedWithoutAbortingSource(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	db := newContractDB(t, ctx)
+	if _, err := db.ExecContext(ctx, `create trigger ica_fail_bad_item before insert on items when new.source_item_title like '%item-persistence-failure-1%' begin select raise(abort, 'ica item persistence failure fixture'); end`); err != nil {
+		t.Fatalf("create item failure trigger: %v", err)
+	}
+
+	const itemCount = 3
+	feed := icaMultiItemFeedServer(t, "ICA Item Failure Aggregation Source", "item-persistence-failure", itemCount)
+	seedSTCSource(t, ctx, db, "src_ica_item_failure_aggregation", feed.URL+"/feed.xml", "ICA Item Failure Fallback", 1)
+	llm := &icaSummaryInputRecordingLLM{}
+
+	result, err := ManualFetchSource(ctx, db, IngestConfig{LLM: llm, SourceFetchTimeout: 3 * time.Second, ItemConcurrencyPerSource: 2}, "src_ica_item_failure_aggregation")
+	if err != nil {
+		t.Fatalf("ManualFetchSource item failure aggregation fixture returned error: %v", err)
+	}
+	if result.SourcesFetched != 1 || result.ItemsDiscovered != itemCount || result.ItemsUpserted != itemCount-1 {
+		t.Fatalf("ManualFetchSource item failure aggregation result = %+v, want source success with two persisted items and one item failure", result)
+	}
+	if len(result.Errors) != 1 || result.Errors[0].Code != IngestErrorCodeItemProcessingError || !strings.Contains(result.Errors[0].Message, "1 item(s) failed during processing") || !strings.Contains(result.Errors[0].Message, "ica item persistence failure fixture") {
+		t.Fatalf("ManualFetchSource item failure errors = %+v, want one item_processing_error with failure count/message", result.Errors)
+	}
+	if got := countItemsForSource(t, ctx, db, "src_ica_item_failure_aggregation"); got != itemCount-1 {
+		t.Fatalf("persisted items after one item failure = %d, want %d", got, itemCount-1)
+	}
+	var sourceStatus string
+	if err := db.QueryRowContext(ctx, `select last_fetch_status from sources where id = ?`, "src_ica_item_failure_aggregation").Scan(&sourceStatus); err != nil {
+		t.Fatalf("read source status after item failure: %v", err)
+	}
+	if sourceStatus != sourceStatusOK {
+		t.Fatalf("source status after isolated item failure = %q, want %q", sourceStatus, sourceStatusOK)
 	}
 }
 
@@ -156,6 +224,23 @@ func TestICAExpectedRedGlobalLLMSemaphoreBoundsConcurrentSources(t *testing.T) {
 	}
 }
 
+type icaSelectiveFailureLLM struct {
+	failTitleContains string
+	calls             atomic.Int64
+}
+
+func (l *icaSelectiveFailureLLM) SummarizeItem(_ context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	l.calls.Add(1)
+	if strings.Contains(input.Title, l.failTitleContains) {
+		return OpenRouterSummaryOutput{ModelStatus: modelStatusProviderError}, fmt.Errorf("selective LLM failure for %s", input.ItemID)
+	}
+	return icaSummaryOutputForInput(input), nil
+}
+
+func (l *icaSelectiveFailureLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
+
 type icaSummaryInputRecordingLLM struct {
 	mu     sync.Mutex
 	inputs []OpenRouterSummaryInput
@@ -244,5 +329,6 @@ func icaSummaryOutputForInput(input OpenRouterSummaryInput) OpenRouterSummaryOut
 	}
 }
 
+var _ LLMClient = (*icaSelectiveFailureLLM)(nil)
 var _ LLMClient = (*icaSummaryInputRecordingLLM)(nil)
 var _ LLMClient = (*icaLanguageSnapshotLLM)(nil)

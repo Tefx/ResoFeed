@@ -44,6 +44,23 @@ func TestIngestRunResultStatusDerivationContract(t *testing.T) {
 			want: IngestRunResult{Status: IngestRunStatusCompleted, SourcesAttempted: 2, SourcesSucceeded: 2, SourcesFailed: 0, SourcesSkipped: 0, ItemsUpserted: 7},
 		},
 		{
+			name:  "item-level failures complete with source success and errors",
+			scope: IngestRunScopeAll,
+			result: ManualFetchResult{
+				Operation:      ManualFetchOperationIngest,
+				Completed:      true,
+				SourcesTotal:   1,
+				SourcesFetched: 1,
+				ItemsUpserted:  2,
+				Errors: []ManualFetchSourceError{{
+					SourceID: "src_partial_item_failure",
+					Code:     IngestErrorCodeItemProcessingError,
+					Message:  "1 item(s) failed during processing",
+				}},
+			},
+			want: IngestRunResult{Status: IngestRunStatusCompletedWithErrors, SourcesAttempted: 1, SourcesSucceeded: 1, SourcesFailed: 0, SourcesSkipped: 0, ItemsUpserted: 2},
+		},
+		{
 			name:  "all source run with failed attempt completes with errors",
 			scope: IngestRunScopeAll,
 			result: ManualFetchResult{
