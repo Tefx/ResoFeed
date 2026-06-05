@@ -508,6 +508,7 @@ export type ManualFetchStatus = 'idle' | 'fetching' | 'ok' | 'rss_fetch_error' |
 export interface ManualFetchSourceError {
   source_id: OpaqueId | null;
   code: string;
+  reason: string;
   message: string;
 }
 

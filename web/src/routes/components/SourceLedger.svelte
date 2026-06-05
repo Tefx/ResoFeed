@@ -223,17 +223,23 @@
     return error.code === 'source_busy' || error.code === 'source_capacity_exhausted';
   }
 
+  function ingestErrorReasonOrCode(error: RunIngestSuccessResponse['errors'][number]): string {
+    const reason = typeof error.reason === 'string' ? error.reason.trim() : '';
+    return reason || error.code;
+  }
+
   function runIngestErrorSummaries(errors: RunIngestSuccessResponse['errors']): string[] {
     const summaries = new Map<string, { count: number; messages: string[] }>();
     for (const error of errors) {
-      const existing = summaries.get(error.code) ?? { count: 0, messages: [] };
+      const summaryKey = isSkippedIngestError(error) ? ingestErrorReasonOrCode(error) : error.code;
+      const existing = summaries.get(summaryKey) ?? { count: 0, messages: [] };
       existing.count += 1;
       if (error.message.trim()) existing.messages.push(error.message.trim());
-      summaries.set(error.code, existing);
+      summaries.set(summaryKey, existing);
     }
-    return Array.from(summaries.entries()).map(([code, summary]) => {
+    return Array.from(summaries.entries()).map(([summaryKey, summary]) => {
       const firstMessage = summary.messages[0];
-      return firstMessage ? `${code}:${summary.count} ${firstMessage}` : `${code}:${summary.count}`;
+      return firstMessage ? `${summaryKey}:${summary.count} ${firstMessage}` : `${summaryKey}:${summary.count}`;
     });
   }
 

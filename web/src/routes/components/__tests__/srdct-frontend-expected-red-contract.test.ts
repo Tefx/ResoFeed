@@ -110,7 +110,7 @@ function renderSourceLedger(): void {
       onDeleteSource: async () => {},
       onImportOpml: async (): Promise<ImportOpmlResponse> => ({ imported: 1, skipped: 0, folders_flattened: true }),
       onRunIngest: async () => ({ operation: 'ingest', source_id: null, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 2, items_upserted: 2, errors: [], completed_at: '2026-05-09T14:00:02Z' }),
-      onFetchSource: async (source: Source): Promise<FetchSourceSuccessResponse> => ({ operation: 'source_fetch', source_id: source.id, completed: false, sources_total: 1, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [{ source_id: source.id, code: 'timeout', message: 'timeout while fetching upstream feed' }], completed_at: '2026-05-09T14:02:20Z' }),
+      onFetchSource: async (source: Source): Promise<FetchSourceSuccessResponse> => ({ operation: 'source_fetch', source_id: source.id, completed: false, sources_total: 1, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [{ source_id: source.id, code: 'timeout', reason: 'timeout', message: 'timeout while fetching upstream feed' }], completed_at: '2026-05-09T14:02:20Z' }),
       onExportState: async () => stateBundle(),
       onImportState: async () => {}
     }
@@ -247,7 +247,7 @@ describe('srdct expected-red frontend UI contracts', () => {
             await new Promise<void>((resolve) => { releaseFetch = resolve; });
             return { operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: '2026-05-09T14:02:20Z' };
           }
-          return { operation: 'source_fetch', source_id: source.id, completed: false, sources_total: 1, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [{ source_id: source.id, code: 'conflict', message: 'ingest already running' }] };
+          return { operation: 'source_fetch', source_id: source.id, completed: false, sources_total: 1, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [{ source_id: source.id, code: 'conflict', reason: 'global_operation_running', message: 'ingest already running' }] };
         },
         onExportState: async () => stateBundle(),
         onImportState: async () => {}

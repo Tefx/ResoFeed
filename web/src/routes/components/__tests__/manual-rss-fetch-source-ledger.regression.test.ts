@@ -147,7 +147,7 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
       if (source.id === 'src_ok') resolveFirst = complete;
       if (source.id === 'src_next') resolveSecond = complete;
     }));
-    const onRunIngest = vi.fn(async (): Promise<RunIngestSuccessResponse> => ({ operation: 'ingest', source_id: null, completed: true, sources_total: 2, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [{ source_id: 'src_ok', code: 'source_busy', message: 'Example already fetching' }], sources_skipped: 1, status: 'completed_with_errors' }));
+    const onRunIngest = vi.fn(async (): Promise<RunIngestSuccessResponse> => ({ operation: 'ingest', source_id: null, completed: true, sources_total: 2, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [{ source_id: 'src_ok', code: 'source_busy', reason: 'source_busy', message: 'Example already fetching' }], sources_skipped: 1, status: 'completed_with_errors' }));
     renderLedger({
       sources: [sourceWithFetchTime, { ...sourceWithFetchTime, id: 'src_next', title: 'Next Source', url: 'https://next.example.com/feed.xml' }],
       onFetchSource,
@@ -168,6 +168,8 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     await waitFor(() => expect(onRunIngest).toHaveBeenCalledTimes(1));
     expect(ledger).toHaveTextContent('sources_skipped:1');
     expect(ledger).toHaveTextContent('source_busy:1 Example already fetching');
+    const ingestResult = await onRunIngest.mock.results[0]?.value;
+    expect(ingestResult.errors[0]?.reason).toBe('source_busy');
 
     resolveFirst?.({ operation: 'source_fetch', source_id: 'src_ok', completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [] });
     resolveSecond?.({ operation: 'source_fetch', source_id: 'src_next', completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [] });

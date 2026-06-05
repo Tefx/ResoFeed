@@ -9,6 +9,7 @@ import {
   itemDisplayTimestamp,
   type ErrorBody,
   type FeedTodayResponse,
+  type IngestRunResult,
   type SearchResponse,
   type SourcesResponse,
   type StateBundleV1,
@@ -49,7 +50,7 @@ const stateFixture: StateBundleV1 = {
 };
 
 function jsonResponse(
-  body: FeedTodayResponse | SourcesResponse | SearchResponse | StateBundleV1 | CurrentOperationResponse | ErrorBody,
+  body: FeedTodayResponse | SourcesResponse | SearchResponse | StateBundleV1 | CurrentOperationResponse | ErrorBody | { ingest: IngestRunResult },
   status = 200
 ): Response {
   return new Response(JSON.stringify(body), {
@@ -233,6 +234,39 @@ describe('ResoFeed API client and rendered sinks', () => {
     expect(fetcher).toHaveBeenCalledWith('/api/runtime/operation', {
       headers: { Authorization: 'Bearer owner-token-123456789012345678901234' }
     });
+  });
+
+  it('preserves backend ingest error reason while normalizing manual ingest envelopes', async () => {
+    const ingest: IngestRunResult = {
+      scope: 'all',
+      source_id: null,
+      status: 'completed_with_errors',
+      started_at: '2026-06-05T14:07:00Z',
+      completed_at: '2026-06-05T14:07:08Z',
+      sources_attempted: 0,
+      sources_succeeded: 0,
+      sources_failed: 0,
+      sources_skipped: 1,
+      items_upserted: 0,
+      errors: [
+        {
+          source_id: 'src_busy',
+          code: 'source_busy',
+          reason: 'source_busy',
+          message: 'source already fetching'
+        }
+      ]
+    };
+    const fetcher = vi.fn<typeof fetch>(async () => jsonResponse({ ingest }));
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+
+    const result = await client.runIngest();
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.body.errors[0]).toMatchObject({ code: 'source_busy', reason: 'source_busy' });
+      expect(result.body.sources_skipped).toBe(1);
+    }
   });
 
   it('preserves canonical current_operation details on operation conflict responses', async () => {

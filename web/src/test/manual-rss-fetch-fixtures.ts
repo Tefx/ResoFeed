@@ -31,7 +31,7 @@ export const documentedRunIngestSourceError: RunIngestSuccessResponse = {
   sources_fetched: 0,
   items_discovered: 0,
   items_upserted: 0,
-  errors: [{ source_id: 'src_error', code: 'rss_fetch_error', message: 'err: fetch failed' }]
+  errors: [{ source_id: 'src_error', code: 'rss_fetch_error', reason: 'rss_fetch_error', message: 'err: fetch failed' }]
 };
 
 export const documentedFetchSourceOk: FetchSourceSuccessResponse = {

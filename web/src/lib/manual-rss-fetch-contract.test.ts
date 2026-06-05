@@ -35,7 +35,7 @@ describe('manual RSS fetch acceptance contract lock', () => {
         sources_fetched: 0,
         items_discovered: 0,
         items_upserted: 0,
-        errors: [{ source_id: 'src_error', code: 'rss_fetch_error', message: 'err: fetch failed' }]
+        errors: [{ source_id: 'src_error', code: 'rss_fetch_error', reason: 'rss_fetch_error', message: 'err: fetch failed' }]
       }
     };
     const sourceSuccess: ManualRssFetchApiResult<FetchSourceSuccessResponse> = {
@@ -64,6 +64,7 @@ describe('manual RSS fetch acceptance contract lock', () => {
     };
 
     expect(ingestWithSourceError.body.errors[0]?.code).toBe('rss_fetch_error');
+    expect(ingestWithSourceError.body.errors[0]?.reason).toBe('rss_fetch_error');
     expect(sourceSuccess.body.operation).toBe('source_fetch');
     expect(conflict.body.error.code).toBe('conflict');
     expect(notFound.body.error.code).toBe('not_found');

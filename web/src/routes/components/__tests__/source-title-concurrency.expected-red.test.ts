@@ -124,8 +124,8 @@ describe('Source Ledger source-title/concurrency expected-red contract', () => {
       items_upserted: 0,
       completed_at: '2026-06-05T14:07:08Z',
       errors: [
-        { source_id: 'src_alpha', code: 'source_busy', message: 'Alpha Journal already fetching' },
-        { source_id: 'src_beta', code: 'source_capacity_exhausted', message: 'external source capacity exhausted' }
+        { source_id: 'src_alpha', code: 'source_busy', reason: 'source_busy', message: 'Alpha Journal already fetching' },
+        { source_id: 'src_beta', code: 'source_capacity_exhausted', reason: 'source_capacity_exhausted', message: 'external source capacity exhausted' }
       ]
     }));
     const ledger = renderLedger({ onFetchSource, onRunIngest });
@@ -148,6 +148,13 @@ describe('Source Ledger source-title/concurrency expected-red contract', () => {
     expect(ledger).toHaveTextContent('sources_skipped:2');
     expect(ledger).toHaveTextContent('source_busy:1 Alpha Journal already fetching');
     expect(ledger).toHaveTextContent('source_capacity_exhausted:1 external source capacity exhausted');
+    const ingestResult = await onRunIngest.mock.results[0]?.value;
+    expect(ingestResult.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'source_busy', reason: 'source_busy' }),
+        expect.objectContaining({ code: 'source_capacity_exhausted', reason: 'source_capacity_exhausted' })
+      ])
+    );
     expectForbiddenOperationalSurfacesAbsent(ledger);
 
     for (const [sourceId, resolve] of pendingBySource) {
