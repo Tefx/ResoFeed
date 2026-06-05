@@ -173,9 +173,9 @@ func TestSTCExpectedRedGlobalManualAndBackgroundIngestSkipWhileSourceFetchActive
 	fetchEntered := make(chan struct{})
 	fetchRelease := make(chan struct{})
 	fetchFeed, _ := stcSlowFeedServer(t, stcRSSNonEmptyTitleFixture, fetchEntered, fetchRelease)
-	backgroundFeed, backgroundRequests := stcSlowFeedServer(t, stcAtomNonEmptyTitleFixture, make(chan struct{}), make(chan struct{}))
+	idleFeed, idleRequests := icaCountingFeedServer(t, "STC Idle", "stc-idle")
 	seedSTCSource(t, ctx, db, "src_stc_active_fetch", fetchFeed.URL+"/rss.xml", "Active Fetch Fallback", 1)
-	seedSTCSource(t, ctx, db, "src_stc_background_probe", backgroundFeed.URL+"/atom.xml", "Background Probe Fallback", 1)
+	seedSTCSource(t, ctx, db, "src_stc_background_probe", idleFeed.URL+"/feed.xml", "Background Probe Fallback", 1)
 	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
 
 	fetchDone := make(chan *httptest.ResponseRecorder, 1)
@@ -184,19 +184,26 @@ func TestSTCExpectedRedGlobalManualAndBackgroundIngestSkipWhileSourceFetchActive
 	}()
 	stcWaitForSignal(t, fetchEntered, "source fetch to enter upstream fixture")
 
-	manualIngestConflict := stcPostManualFetch(router, ManualIngestHTTPPath)
-	assertStatus(t, manualIngestConflict, http.StatusConflict)
-	assertErrorCode(t, manualIngestConflict.Body.Bytes(), ManualFetchErrorCodeConflict)
+	manualIngest := stcPostManualFetch(router, ManualIngestHTTPPath)
+	assertStatus(t, manualIngest, http.StatusOK)
+	icaAssertIngestCounter(t, manualIngest.Body.Bytes(), "sources_attempted", 1)
+	icaAssertIngestCounter(t, manualIngest.Body.Bytes(), "sources_skipped", 1)
+	icaAssertIngestError(t, manualIngest.Body.Bytes(), "src_stc_active_fetch", IngestErrorCodeSourceBusy)
+	if got := idleRequests.Load(); got != 1 {
+		close(fetchRelease)
+		assertStatus(t, <-fetchDone, http.StatusOK)
+		t.Fatalf("manual ingest contacted idle probe feeds %d times while another source was active; want exactly one bounded in-request attempt", got)
+	}
 
 	if err := IngestOnce(ctx, db, IngestConfig{}); err != nil {
 		close(fetchRelease)
 		assertStatus(t, <-fetchDone, http.StatusOK)
-		t.Fatalf("background ingest tick while source fetch active returned error = %v, want skip/ignore without queue", err)
+		t.Fatalf("background ingest tick while source fetch active returned error = %v, want skip busy and drain idle without delayed work", err)
 	}
-	if got := backgroundRequests.Load(); got != 0 {
+	if got := idleRequests.Load(); got != 2 {
 		close(fetchRelease)
 		assertStatus(t, <-fetchDone, http.StatusOK)
-		t.Fatalf("background tick contacted %d inactive-conflict probe feeds while a source fetch was active; want skipped/not queued", got)
+		t.Fatalf("background tick contacted idle probe feeds %d times while a source fetch was active; want one additional bounded in-request attempt", got)
 	}
 	assertManualFetchDurableArtifactsAbsent(t, ctx, db)
 	close(fetchRelease)

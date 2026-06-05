@@ -113,7 +113,7 @@ func TestSetProcessingLanguageUsesGlobalGuardWhileHeavyOperationsRemainGuarded(t
 		},
 	}
 	if _, err := ManualIngest(ctx, db, IngestConfig{}); !errors.Is(err, errManualFetchConflict) {
-		t.Fatalf("ManualIngest while guard held err=%v, want conflict", err)
+		t.Fatalf("ManualIngest while global guard held err=%v, want conflict", err)
 	}
 	if _, err := ManualFetchSource(ctx, db, IngestConfig{}, "src_missing"); !errors.Is(err, errManualFetchConflict) {
 		t.Fatalf("ManualFetchSource while guard held err=%v, want conflict", err)

@@ -37,7 +37,10 @@ const (
 	modelStatusTimeout         = "timeout"
 )
 
-var ingestGuardState guardedOperationState
+var (
+	ingestGuardState guardedOperationState
+	sqliteMutationMu sync.Mutex
+)
 
 var errManualFetchConflict = errors.New("operation already running")
 
@@ -117,8 +120,8 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 }
 
 // IngestOnce performs one background ingestion pass over active sources. The
-// pass skips already-busy sources, drains selected idle sources through bounded
-// in-request workers, and never leaves queued work after the tick returns.
+// pass skips already-busy sources, drains selected idle sources through a bounded
+// in-request goroutine batch, and never leaves delayed work after the tick returns.
 func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
 	ingestGuardState.current.start("ingest", "background", "background")
 	defer ingestGuardState.current.clear()
@@ -129,14 +132,17 @@ func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error
 // ManualIngest triggers one user-requested ingestion pass. It shares the same
 // in-process guard as background ingestion and never creates durable deferred-work
 // state when another operation is already running.
-func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret ManualFetchResult, retErr error) {
-	release, err := tryAcquireIngestGuardWithActor(ctx, "ingest", "all", string(ActorKindHuman))
-	if err != nil {
-		return ManualFetchResult{}, err
-	}
-	updateCurrentOperation("loading_sources", nil, "manual ingest loading active sources")
-	defer releaseGuardRecover(release, &retErr, "manual ingest")
-	return ingestOnceUnlocked(ctx, db, cfg)
+func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ManualFetchResult, error) {
+	return ingestOnceBounded(ctx, db, cfg, boundedIngestOptions{
+		actorKind:            string(ActorKindHuman),
+		aggregateCurrent:     true,
+		aggregateScope:       "all",
+		loadMessage:          "manual ingest loading active sources",
+		fetchMessage:         "manual ingest fetching active sources",
+		skipMessage:          "manual ingest source skipped",
+		completeMessage:      "manual ingest complete",
+		globalBusyAsConflict: true,
+	})
 }
 
 // ManualFetchSource triggers one user-requested source fetch for an active
@@ -206,54 +212,98 @@ func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (resu
 }
 
 func ingestOnceBackgroundBounded(ctx context.Context, db *sql.DB, cfg IngestConfig) (ManualFetchResult, error) {
+	return ingestOnceBounded(ctx, db, cfg, boundedIngestOptions{
+		actorKind:        "background",
+		aggregateCurrent: true,
+		aggregateScope:   "background",
+		loadMessage:      "background ingest loading active sources",
+		fetchMessage:     "background ingest fetching active sources",
+		skipMessage:      "background ingest source skipped",
+		completeMessage:  "background ingest complete",
+	})
+}
+
+type boundedIngestOptions struct {
+	actorKind            string
+	aggregateCurrent     bool
+	aggregateScope       any
+	loadMessage          string
+	fetchMessage         string
+	skipMessage          string
+	completeMessage      string
+	globalBusyAsConflict bool
+}
+
+func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts boundedIngestOptions) (ManualFetchResult, error) {
 	result := ManualFetchResult{Operation: ManualFetchOperationIngest, Completed: true, Errors: []ManualFetchSourceError{}}
+	if opts.actorKind == "" {
+		opts.actorKind = string(ActorKindHuman)
+	}
+	if opts.loadMessage == "" {
+		opts.loadMessage = "ingest loading active sources"
+	}
+	if opts.fetchMessage == "" {
+		opts.fetchMessage = "ingest fetching active sources"
+	}
+	if opts.skipMessage == "" {
+		opts.skipMessage = "ingest source skipped"
+	}
+	if opts.completeMessage == "" {
+		opts.completeMessage = "ingest complete"
+	}
+
+	updateCurrentOperation("loading_sources", nil, opts.loadMessage)
 	sources, err := loadActiveSources(ctx, db)
 	if err != nil {
 		return result, err
 	}
-	result.SourcesTotal = len(sources)
-	updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest fetching active sources")
-	if len(sources) == 0 {
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: 0}, "background ingest complete")
-		return result, nil
-	}
+	updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, opts.fetchMessage)
 
 	coordCfg := cfg.coordinatorConfig()
 	capacity := snapshotSourceRunCapacity(coordCfg)
 	if capacity.globalBusy {
+		if opts.globalBusyAsConflict {
+			return result, operationGuardConflictError{details: conflictDetailsWithReason(capacity.globalDetails, ingestConflictReasonGlobalOperationRunning)}
+		}
 		for _, source := range sources {
 			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceBusy, Message: "global operation running"})
 		}
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest skipped while global operation was running")
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, opts.completeMessage)
+		return result, nil
+	}
+	if len(sources) == 0 {
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: 0}, opts.completeMessage)
 		return result, nil
 	}
 
+	completed := 0
 	idleSources := make([]Source, 0, len(sources))
 	for _, source := range sources {
 		if capacity.isSourceBusy(source.ID) {
 			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceBusy, Message: "source already fetching"})
+			completed++
 			continue
 		}
 		idleSources = append(idleSources, source)
 	}
 	if len(idleSources) == 0 {
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest skipped busy sources")
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
 		return result, nil
 	}
 	if capacity.availableSlots <= 0 {
 		for _, source := range idleSources {
 			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceCapacityExhausted, Message: "source capacity exhausted"})
+			completed++
 		}
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest skipped capacity-unavailable sources")
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
 		return result, nil
 	}
 
-	workerCount := minInt(capacity.availableSlots, len(idleSources))
-	jobs := make(chan Source)
+	parallelSlots := minInt(capacity.availableSlots, len(idleSources))
+	sourceCh := make(chan Source)
 	var wg sync.WaitGroup
 	var resultMu sync.Mutex
 	var firstErr error
-	completed := 0
 
 	recordFatal := func(err error) {
 		if err == nil {
@@ -265,13 +315,18 @@ func ingestOnceBackgroundBounded(ctx context.Context, db *sql.DB, cfg IngestConf
 		}
 		resultMu.Unlock()
 	}
+	recordSourceAttemptStarted := func() {
+		resultMu.Lock()
+		result.SourcesTotal++
+		resultMu.Unlock()
+	}
 	recordSourceError := func(sourceID string, code string, message string) {
 		resultMu.Lock()
 		result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: sourceID, Code: code, Message: message})
 		completed++
 		current := completed
 		resultMu.Unlock()
-		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, "background ingest source skipped")
+		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.skipMessage)
 	}
 	recordSourceSuccess := func(sourceResult ingestSourceResult) {
 		resultMu.Lock()
@@ -281,15 +336,15 @@ func ingestOnceBackgroundBounded(ctx context.Context, db *sql.DB, cfg IngestConf
 		completed++
 		current := completed
 		resultMu.Unlock()
-		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, "background ingest source complete")
+		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.fetchMessage)
 	}
 
-	for i := 0; i < workerCount; i++ {
+	for i := 0; i < parallelSlots; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for source := range jobs {
-				release, err := tryAcquireIngestGuardWithConfig(ctx, coordCfg, "fetch", source.ID, "background")
+			for source := range sourceCh {
+				release, err := tryAcquireIngestGuardWithConfig(ctx, coordCfg, "fetch", source.ID, opts.actorKind)
 				if err != nil {
 					if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 						recordFatal(err)
@@ -298,6 +353,14 @@ func ingestOnceBackgroundBounded(ctx context.Context, db *sql.DB, cfg IngestConf
 					code, message := skippedSourceErrorFromGuard(err)
 					recordSourceError(source.ID, code, message)
 					continue
+				}
+				recordSourceAttemptStarted()
+				if opts.aggregateCurrent {
+					resultMu.Lock()
+					current := completed
+					resultMu.Unlock()
+					ingestGuardState.current.start("ingest", opts.aggregateScope, opts.actorKind)
+					updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.fetchMessage)
 				}
 				sourceResult, sourceErr := ingestSourceWithRelease(ctx, db, cfg, source, release)
 				if sourceErr != nil {
@@ -323,15 +386,15 @@ sendLoop:
 		case <-ctx.Done():
 			recordFatal(ctx.Err())
 			break sendLoop
-		case jobs <- source:
+		case sourceCh <- source:
 		}
 	}
-	close(jobs)
+	close(sourceCh)
 	wg.Wait()
 
 	resultMu.Lock()
 	defer resultMu.Unlock()
-	updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, "background ingest complete")
+	updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
 	return result, firstErr
 }
 
@@ -578,6 +641,7 @@ func conflictDetailsWithReason(details operationGuardDetails, reason string) ope
 
 type sourceRunCapacitySnapshot struct {
 	globalBusy     bool
+	globalDetails  operationGuardDetails
 	busySources    map[string]struct{}
 	availableSlots int
 }
@@ -597,6 +661,7 @@ func snapshotSourceRunCapacity(cfg ingestCoordinatorConfig) sourceRunCapacitySna
 	defer ingestGuardState.mu.Unlock()
 	if ingestGuardState.activeGlobal.Operation != "" {
 		snapshot.globalBusy = true
+		snapshot.globalDetails = ingestGuardState.activeGlobal
 		snapshot.availableSlots = 0
 		return snapshot
 	}
@@ -1179,7 +1244,7 @@ func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) (bool, error
 	if marshalErr != nil {
 		return false, fmt.Errorf("ingest item %q: marshal key points: %w", item.ID, marshalErr)
 	}
-	res, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, source_item_title, localized_title, summary, core_insight, key_points, value_tier, content_status, last_reprocess_status, last_reprocess_error_code, last_reprocess_error_message, last_reprocess_at, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.SourceItemTitle, item.LocalizedTitle, item.Summary, item.CoreInsight, string(keyPointsJSON), item.ValueTier, item.ContentStatus, item.LastReprocessStatus, item.LastReprocessErrorCode, item.LastReprocessErrorMessage, formatTimePtr(item.LastReprocessAt), formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
+	res, err := execSQLiteMutation(ctx, db, `insert into items (id, source_id, source_url, url, title, source_item_title, localized_title, summary, core_insight, key_points, value_tier, content_status, last_reprocess_status, last_reprocess_error_code, last_reprocess_error_message, last_reprocess_at, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.SourceItemTitle, item.LocalizedTitle, item.Summary, item.CoreInsight, string(keyPointsJSON), item.ValueTier, item.ContentStatus, item.LastReprocessStatus, item.LastReprocessErrorCode, item.LastReprocessErrorMessage, formatTimePtr(item.LastReprocessAt), formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
 	if err != nil {
 		return false, fmt.Errorf("ingest item %q: %w", item.ID, err)
 	}
@@ -1202,11 +1267,11 @@ func upsertSearchIndex(ctx context.Context, db *sql.DB, item Item) error {
 		return fmt.Errorf("refresh search index %q: marshal key points: %w", item.ID, marshalErr)
 	}
 	provenance := strings.Join([]string{item.Provenance.SourceURL, item.Provenance.OriginalURL, derefString(item.Provenance.CanonicalURL), derefString(item.StoryKey), derefString(item.DuplicateOfItemID)}, " ")
-	_, err := db.ExecContext(ctx, `delete from search_fts where item_id = ?`, item.ID)
+	_, err := execSQLiteMutation(ctx, db, `delete from search_fts where item_id = ?`, item.ID)
 	if err != nil {
 		return fmt.Errorf("refresh search index %q: delete old row: %w", item.ID, err)
 	}
-	_, err = db.ExecContext(ctx, `insert into search_fts (item_id, title, source_item_title, localized_title, source_title, feed_excerpt, summary, core_insight, key_points, extracted_text, provenance) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, item.ID, item.Title, item.SourceItemTitle, stringValue(item.LocalizedTitle), item.SourceTitle, stringValue(item.FeedExcerpt), stringValue(item.Summary)+" "+stringValue(item.ValueTier), stringValue(item.CoreInsight), string(keyPointsJSON), stringValue(item.ExtractedText), provenance+" "+stringValue(item.ValueTier))
+	_, err = execSQLiteMutation(ctx, db, `insert into search_fts (item_id, title, source_item_title, localized_title, source_title, feed_excerpt, summary, core_insight, key_points, extracted_text, provenance) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, item.ID, item.Title, item.SourceItemTitle, stringValue(item.LocalizedTitle), item.SourceTitle, stringValue(item.FeedExcerpt), stringValue(item.Summary)+" "+stringValue(item.ValueTier), stringValue(item.CoreInsight), string(keyPointsJSON), stringValue(item.ExtractedText), provenance+" "+stringValue(item.ValueTier))
 	if err != nil {
 		return fmt.Errorf("refresh search index %q: insert row: %w", item.ID, err)
 	}
@@ -1216,20 +1281,23 @@ func upsertSearchIndex(ctx context.Context, db *sql.DB, item Item) error {
 func updateSourceFetch(ctx context.Context, db *sql.DB, sourceID string, status string, rawErr string, parsedTitle string) error {
 	fetchedTitle := strings.TrimSpace(parsedTitle)
 	if fetchedTitle == "" {
-		_, err := execSourceMutation(ctx, db, `update sources set last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + 1 where id = ?`, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), sourceID)
+		_, err := execSQLiteMutation(ctx, db, `update sources set last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + 1 where id = ?`, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), sourceID)
 		if err != nil {
 			return fmt.Errorf("update source fetch %q: %w", sourceID, err)
 		}
 		return nil
 	}
-	_, err := execSourceMutation(ctx, db, `update sources set title = ?, last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + 1 where id = ?`, fetchedTitle, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), sourceID)
+	_, err := execSQLiteMutation(ctx, db, `update sources set title = ?, last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + 1 where id = ?`, fetchedTitle, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), sourceID)
 	if err != nil {
 		return fmt.Errorf("update source fetch %q: %w", sourceID, err)
 	}
 	return nil
 }
 
-func execSourceMutation(ctx context.Context, db *sql.DB, query string, args ...any) (sql.Result, error) {
+func execSQLiteMutation(ctx context.Context, db *sql.DB, query string, args ...any) (sql.Result, error) {
+	sqliteMutationMu.Lock()
+	defer sqliteMutationMu.Unlock()
+
 	var lastErr error
 	for attempt := 0; attempt < 6; attempt++ {
 		result, err := db.ExecContext(ctx, query, args...)

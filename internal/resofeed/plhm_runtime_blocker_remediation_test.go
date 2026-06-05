@@ -12,6 +12,7 @@ import (
 func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
+	seedSTCSource(t, ctx, db, "src_plhm_ingest_skip", "https://plhm.example/feed.xml", "PLHM Skip Probe", 1)
 	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
 
 	release, err := tryAcquireIngestGuard(ctx, "fetch", "source")
@@ -26,7 +27,6 @@ func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 		path   string
 		body   string
 	}{
-		{name: "manual ingest", method: http.MethodPost, path: ManualIngestHTTPPath, body: ManualFetchRequestBody},
 		{name: "manual fetch", method: http.MethodPost, path: "/api/sources/src_missing/fetch", body: ManualFetchRequestBody},
 		{name: "runtime reprocess", method: http.MethodPost, path: RuntimeReprocessLibraryHTTPPath, body: `{"actor_kind":"human","actor_id":"owner","idempotency_key":"plhm-reprocess-conflict"}`},
 	}
@@ -48,6 +48,17 @@ func TestPLHMHTTPGuardConflictsUseExactArchitectureShape(t *testing.T) {
 			assertGuardDetails(t, parsed.Error.Details, "source_fetch", "human")
 		})
 	}
+
+	t.Run("manual ingest skips source-scoped blocker inside result", func(t *testing.T) {
+		recorder := httptest.NewRecorder()
+		req := authorizedRequest(http.MethodPost, ManualIngestHTTPPath, bytes.NewReader([]byte(ManualFetchRequestBody)))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(recorder, req)
+		assertStatus(t, recorder, http.StatusOK)
+		icaAssertIngestCounter(t, recorder.Body.Bytes(), "sources_attempted", 0)
+		icaAssertIngestCounter(t, recorder.Body.Bytes(), "sources_skipped", 1)
+		icaAssertIngestError(t, recorder.Body.Bytes(), "src_plhm_ingest_skip", IngestErrorCodeSourceBusy)
+	})
 
 	t.Run("runtime language", func(t *testing.T) {
 		recorder := httptest.NewRecorder()
