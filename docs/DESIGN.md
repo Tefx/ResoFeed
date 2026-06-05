@@ -672,7 +672,7 @@ Warning placement: rewrite warning copy such as `Existing readable item content 
 Keyboard and accessibility: the `RESOFEED` trigger is a real button with `aria-haspopup="menu"` or equivalent disclosure semantics and `aria-expanded`. Opening the menu moves focus to the first item; `Escape` closes it and returns focus to `RESOFEED`; tab order remains linear. Menu status/error text uses visible inline text and `aria-live` as specified by each contained operation. Do not hide language/reprocess exclusively behind hover.
 ### Current Operation Status (`current-operation-status`)
 - **Intent**: [SHARP] Explain in-memory heavy work that blocks a requested operation, without turning fetch/ingest into durable jobs.
-- **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, duplicate same-source `[FETCH]`, `[REPROCESS LIBRARY]`, `[RE-INGEST ITEM]`, or language mutation; best-effort phase/count text from `GET /api/runtime/operation`, row-local fetch state, or matching MCP/UI current-operation data.
+- **useFor**: Visible running status near Source Ledger/operational utility surfaces; conflict details after blocked `[RUN INGEST]`, duplicate same-source `[FETCH]`, source-capacity-exhausted `[FETCH]`, `[REPROCESS LIBRARY]`, `[RE-INGEST ITEM]`, or language mutation; best-effort phase/count text from `GET /api/runtime/operation`, row-local fetch state, or matching MCP/UI current-operation data.
 - **avoidFor**: Durable jobs, queues, task dashboards, activity/history ledgers, retry panels, progress timelines, command history, sync status, or persisted audit records.
 
 Anatomy: a single terse line or two-line block, hidden while idle unless it explains a disabled/blocked operation. Canonical text shape is `op: <kind> · actor:<actor> · phase:<phase> · <counts/message> · since <time>`. Allowed operation kinds are `background_ingest`, `manual_ingest`, `source_fetch`, `library_reprocess`, and `item_reingest`. Allowed actors are `background`, `human`, and `agent`. Scope may appear as `scope: all sources`, `scope: source:<name>`, `scope: N source fetches`, `scope: library`, or `scope: item:<title-or-id>`. Counts are best-effort and must not imply durable completion guarantees.
@@ -685,7 +685,7 @@ Conflict copy examples:
 
 - `err: operation already running — op: background_ingest · actor:background · phase:fetch · 17/128 sources · since 14:05:11`
 - `err: fetch already running — op: source_fetch · actor:human · scope: source:simonwillison · phase:fetching · since 14:06:02`
-- `err: ingest blocked — op: source_fetch · actor:human · scope: 3 source fetches · phase:fetching · since 14:06:02`
+- `warn: ingest skipped 3 busy sources — op: manual_ingest · actor:human · scope: all sources · phase:complete · since 14:06:02`
 - `err: reprocess blocked — op: source_fetch · actor:human · scope: source:simonwillison · phase:fetching · since 14:06:02`
 - `err: re-ingest blocked — op: item_reingest · actor:human · scope: item:item_01 · phase:processing · since 14:07:33`
 
@@ -693,7 +693,7 @@ Keyboard and accessibility: status lines are visible text. Running updates use `
 
 ### Language Control
 - **Intent**: [SHARP] Expose the persisted processing language as a terse global pipeline state.
-- **useFor**: Switching future processing language from the `RESOFEED` utility menu when no guarded ingest/fetch/reprocess operation is running; optional `/doctor` raw utility echo; announcing language update success/failure/conflict.
+- **useFor**: Switching future processing language from the `RESOFEED` utility menu when no source-scoped ingest/fetch attempt or global-exclusive operation is running; optional `/doctor` raw utility echo; announcing language update success/failure/conflict.
 - **avoidFor**: Persistent top-chrome badge, selected tab, filled toggle, per-item translation toggle, settings panel, preference center, language wizard, automatic existing-library rewrite, or mixed-language batch creation.
 
 Anatomy: a compact text control using `{typography.chrome}` such as `LANG: EN` or `LANG: ZH`, or localized equivalents `语言：英文` / `语言：中文`. It lives in the opened `RESOFEED` utility menu under `SYSTEM` / `系统`, with an optional raw `/doctor` utility echo. The current language is expressed by the label text itself. It must not use persistent background inversion or warning copy to communicate state. Hover/focus may use the same terminal-style interaction as bracket commands only while the control is being interacted with.
@@ -994,7 +994,7 @@ Source Ledger bracket action labels are [SHARP] exact English tokens across loca
 
 Manual ingestion boundary: `[RUN INGEST]` and `[FETCH]` are immediate operational commands, not durable jobs. They must not create a queue, job table, activity ledger, command history, sync primitive, or settings dashboard. They reuse the in-process current-operation/concurrency coordinator described in `docs/ARCHITECTURE.md`; conflict feedback is raw, terse, and includes current operation detail rather than only `err: operation already running`.
 
-Parallel source fetch boundary: per-source `[FETCH]` is row-scoped. Different source rows may show `[FETCHING...]` at the same time when their fetch requests are running concurrently. A row already fetching keeps only that row's `[FETCHING...]` disabled state; unrelated rows may remain actionable. `[RUN INGEST]` remains disabled while any row-level fetch is active, because global ingest is mutually exclusive with manual source fetch. Do not add progress bars, spinners, job lists, queue labels, retry panels, or operation history to explain parallel fetches.
+Parallel source ingest boundary: per-source `[FETCH]` is row-scoped, and `[RUN INGEST]` is a bounded in-request batch of source-scoped attempts. Different source rows may show `[FETCHING...]` at the same time when their fetch requests are running concurrently. A row already fetching keeps only that row's `[FETCHING...]` disabled state; unrelated rows may remain actionable until source capacity is exhausted. `[RUN INGEST]` may run while unrelated rows are fetching; it drains selected idle sources through bounded workers, while busy or externally capacity-unavailable sources are skipped/reported tersely rather than queued after the response. Do not add progress bars, spinners, job lists, queue labels, retry panels, or operation history to explain parallel ingest/fetches.
 
 States:
 
@@ -1009,11 +1009,11 @@ States:
 - OPML export failed: revert to `[EXPORT OPML]` and show raw `err: <diagnostic>` text;
 - global ingest default: `[RUN INGEST]` in the Ledger header/action bar;
 - global ingest active: `[INGESTING...]`, disabled, no spinner, no progress animation; show `op: manual_ingest · actor:human · phase:<phase> · <counts/message> · since HH:MM:SS <timezone>` in the header status line when available;
-- global ingest conflict: revert to `[RUN INGEST]` and show raw `err: operation already running — op: <kind> · actor:<actor> · phase:<phase> · <counts/message>` conflict text;
+- global ingest conflict: revert to `[RUN INGEST]` and show raw `err: operation already running — op: <kind> · actor:<actor> · phase:<phase> · <counts/message>` conflict text only for true global-exclusive blockers; busy or capacity-unavailable source rows are summarized as skipped source-level conflicts;
 - global ingest complete: revert to `[RUN INGEST]` and update `last_ingest: HH:MM:SS <timezone>`;
 - source fetch default: `[FETCH]` on the same row as the source;
 - source fetch active: `[FETCHING...]`, disabled only for the affected row, no spinner, no progress animation; multiple different rows may show `[FETCHING...]` at the same time;
-- source fetch conflict: revert to `[FETCH]` and show raw current-operation conflict text adjacent to the source;
+- source fetch conflict: revert to `[FETCH]` and show raw current-operation conflict text adjacent to the source, including same-source duplicate or `source_capacity_exhausted` capacity cases;
 - source fetch complete: revert to `[FETCH]` and update `HH:MM:SS <timezone>` in the row timestamp slot;
 - source fetch failed: revert to `[FETCH]` and show raw `err: <diagnostic>` text in the row timestamp/status slot;
 - delete confirmation: terse confirmation for destructive removal;

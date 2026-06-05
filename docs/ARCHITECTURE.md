@@ -27,6 +27,7 @@ Contract baseline: these decisions are anchored in the current product/design do
 15. **Inspector item re-ingest is item-scoped, one-time, and non-durable.** The Inspector may expose a per-article re-ingest action that reprocesses exactly the selected item with an optional request-scoped OpenRouter model override and optional request-scoped extra prompt. The selected model and prompt must not be persisted, exported, reused as defaults, shown as history, or written to item metadata. Rationale: the owner needs a surgical retry/quality repair path without turning ResoFeed into a prompt-management, model-settings, or job-dashboard product. Fails if users require durable per-source/per-item model policies, reusable prompt templates, or multi-provider orchestration.
 16. **Generated content uses a structured content contract.** Model-backed item content separates literal provenance (`source_item_title`, source/source URLs, source identifiers) from localized generated display content (`localized_title`, `summary`, `core_insight`, `key_points`, `value_tier`, and model semantic status). `key_points` is a first-class 3-5 item generated field for Inspector rendering, not Markdown embedded in summaries. Rationale: explicit fields remove title-localization ambiguity and give list-shaped user intent a safe schema slot. Fails if a future schema collapses source and localized titles back into one overloaded `title` or renders model-generated lists as raw Markdown.
 17. **Re-ingest failures are attempt state, not destructive content state.** Successful re-ingest may atomically replace generated content fields and refresh selected FTS rows; failed provider/decode/schema/semantic attempts update only app-owned attempt diagnostics such as `last_reprocess_*` and must preserve existing valid generated content and `content_status`. Rationale: a failed repair attempt should not degrade a usable item. Trade-off: status modeling is more explicit because current content health and latest attempt outcome are separate. Fails if UI or transport hides current content solely because the latest attempt failed.
+18. **Ingest acceleration is source-scoped and bounded.** Manual row fetch, manual all-source ingest, and background ingest share source-scoped in-process leases so unrelated sources may run concurrently while same-source duplicates still fail fast. Large-library speed comes from bounded source concurrency, bounded per-source item processing, and a global LLM concurrency cap, not from durable queues or multi-article prompt batching. Rationale: source identity is the smallest safe coordination unit for feed status/title/item writes, and bounded in-memory concurrency preserves the one-binary architecture. Trade-off: current-operation reporting becomes approximate for multi-source work. Fails if source attempts start mutating unprotected global state.
 
 ## 2. System Boundary
 
@@ -211,11 +212,12 @@ Coordination rules:
 - use SQLite transactions for state changes;
 - keep state export/import as direct backup/restore transactions inside `internal/resofeed`; do not introduce a state merger, conflict resolver, sync coordinator, or receipt-portability module;
 - isolate source-level ingestion failures;
-- coordinate background ingest, global manual ingest, and per-source manual fetch through one in-process concurrency coordinator owned by `ingest.go`;
-- keep global ingest mutually exclusive with any manual source fetch: background ingest and `POST /api/ingest` must not overlap each other or overlap `POST /api/sources/{id}/fetch`;
-- permit concurrent manual source fetches only when their source ids differ; the same source id must not be fetched twice at the same time;
-- reject HTTP manual triggers with `409 conflict` when their requested scope conflicts with an already-running operation; background ticks may be ignored/skipped while any conflicting ingest/fetch is already running;
-- expose current operation state as in-memory `CurrentOperationInfo`/source-fetch status for contextual UI/MCP conflict explanation only; it is not persisted and is cleared when the relevant operation scope finishes or releases;
+- coordinate background ingest, all-source manual ingest, and per-source manual fetch through one in-process source-scoped concurrency coordinator owned by `ingest.go` or a small adjacent `ingest_coordinator.go` in `internal/resofeed`;
+- treat source id as the normal ingest/fetch lock scope: the same source id must not be fetched/ingested twice at the same time, while different source ids may run concurrently within bounded in-memory limits;
+- make `POST /api/ingest` and background ingest bounded in-request batches of source-scoped attempts rather than one global fetch lock; already-busy sources are skipped/reported, selected idle sources are drained through bounded workers, externally capacity-unavailable starts are skipped/reported, and no delayed work is persisted after the response/tick;
+- keep true global operations such as processing-language writes, library reprocess, short unrepresented state import/restore, and currently-global item re-ingest mutually exclusive with active source leases;
+- reject HTTP manual triggers with `409 conflict` when their requested source or global scope conflicts with an already-running operation; background ticks skip conflicting sources instead of waiting or queueing;
+- expose current operation state as in-memory `CurrentOperationInfo`/source-fetch status for contextual UI/MCP conflict explanation only; for multi-source work it may be aggregate/best-effort and is not persisted; it is cleared when the relevant operation scope finishes or releases;
 - do not persist ingest work as a queue, job table, command ledger, activity log, or portable receipt;
 - use no event bus, plugin registry, DI container, service discovery, or repository interface layer.
 
@@ -249,6 +251,7 @@ architecture_basis:
     searchable_text: "search_fts; rebuildable from current target-language item rows plus preserved provenance identifiers."
     ui_language: "frontend derives from authenticated runtime language API; html lang and chrome copy follow it."
     mcp_language: "MCP resources/tools read the same persisted processing language; no per-call language override in this contract."
+    mcp_source_listing: "MCP source resources/listings expose the same canonical source title as HTTP. Manual ingest/fetch triggers are not MCP tools in this plan."
   service_catalog:
     language_read: "Authenticated read of current processing language."
     language_set: "Authenticated update of processing_language; affects future processing only."
@@ -261,7 +264,7 @@ architecture_basis:
     future_ingest: "Newly processed items use the current processing language."
     reprocess: "Only explicit user/authorized-agent action rewrites existing user-readable item fields; completion rebuilds FTS."
     failure_semantics: "Existing model/extraction status values remain authoritative; no translation_failed status is introduced."
-    concurrency: "Reprocess must not run concurrently with ingest/fetch/reprocess operations and must not create durable jobs or queues."
+    concurrency: "Reprocess must not run concurrently with active source-scoped ingest/fetch attempts or another global-exclusive operation and must not create durable jobs or queues."
   state_strata:
     portable_state: "Only active sources, active steering rules, and currently resonated items. Processing language remains excluded."
     runtime_metadata: "owner token hash, processing_language, and optional search_fts_stale_since diagnostic marker."
@@ -280,9 +283,9 @@ architecture_basis:
     lifecycle_ordering:
       - "Startup runs migrations before reading processing_language."
       - "Frontend loads owner token, then reads processing_language before rendering localized chrome that depends on API state."
-      - "Reprocess acquires the same operation exclusivity class as ingest/fetch before item rewrites and FTS rebuild."
+      - "Reprocess acquires the global-exclusive guard before item rewrites and FTS rebuild; source-scoped ingest/fetch attempts use source leases instead of the global-exclusive path."
     coordination_mechanisms:
-      - "Single-process mutex/guard for ingest/fetch/reprocess exclusivity."
+      - "Source-scoped in-process leases for ingest/fetch attempts plus a separate global-exclusive guard for language writes, library reprocess, state import/restore, and intentionally-global item re-ingest."
       - "SQLite transactions for language metadata writes and FTS rebuild consistency."
     wiring_strategy: "Explicit function calls inside internal/resofeed; no DI container, event bus, sidecar worker, or scheduler service."
     governance_owner: "internal/resofeed owns runtime language and reprocess; web owns presentation/scroll containment."
@@ -431,14 +434,14 @@ architecture_basis:
   cross_cutting_governance:
     registries:
       - name: operation_guard
-        owner_module: internal/resofeed/ingest.go
-        write_policy: process-local, exclusive guard for background ingest/manual ingest/source fetch/library reprocess/item re-ingest.
+        owner_module: internal/resofeed/ingest.go or adjacent ingest_coordinator.go
+        write_policy: process-local source leases for background/manual ingest and source fetch; process-local global-exclusive guard only for language writes, library reprocess, state import/restore, and item re-ingest.
       - name: idempotency_receipts
         owner_module: internal/resofeed/idempotency path
         write_policy: live TTL mutation receipts only; not portable state.
     lifecycle_ordering:
-      - item re-ingest acquires the same guard before source fetch/model call/write.
-      - provider model listing is read-only and does not acquire the ingest/reprocess guard.
+      - item re-ingest acquires the global-exclusive guard before source fetch/model call/write.
+      - provider model listing is read-only and does not acquire source leases or the global-exclusive guard.
       - item update and per-item FTS refresh commit together; no final library-wide FTS rebuild is required.
     coordination_mechanisms:
       - explicit function calls inside internal/resofeed
@@ -528,7 +531,7 @@ Title semantics:
 - `sources.title` is the canonical Source Ledger display name;
 - before a source has been successfully fetched, `title` may be an OPML/import title or URL-derived fallback;
 - after a successful RSS/Atom fetch, if the feed exposes a non-empty feed title, `sources.title` must be updated to that feed title and `revision` must be incremented;
-- no separate `feed_title` column is required unless a future feature needs to preserve both a user-edited title and the fetched feed title.
+- no `feed_title` storage column, HTTP/MCP response field, UI label, compatibility alias, or client fallback is allowed in this scope; any future dual-title feature must create a new authoritative contract before introducing one.
 
 Invariants:
 
@@ -741,16 +744,18 @@ Runtime limits:
 - OpenRouter request timeout: 45 seconds;
 - OpenRouter retry policy: at most one retry for network/429/5xx failures;
 - failed OpenRouter responses must not block item visibility;
-- source-level parallelism must be bounded inside the process; implementations must not spawn unbounded goroutines or create external workers.
+- source-level parallelism must be bounded inside the process; implementations must not spawn unbounded goroutines or create external workers;
+- fast-mode default limits are source concurrency `8`, per-source item concurrency `4`, and global LLM concurrency `16` unless implementation evidence forces lower safe defaults;
+- source concurrency capacity is fail-fast for external contention, not a durable queue: a manual source fetch that cannot obtain a source-capacity slot returns `409 conflict` with reason `source_capacity_exhausted`; all-source manual/background ingest drains selected idle sources through bounded in-request workers, so `source_capacity_exhausted` applies only to sources blocked by external active source work, not to idle sources waiting behind the same run's own worker limit.
 
 Concurrency semantics:
 
-- global ingest remains a single guarded operation: background ingest and `POST /api/ingest` must never overlap each other;
-- global ingest must not overlap any manual per-source fetch;
+- normal ingest/fetch coordination is source-scoped: a source id may have only one active source attempt at a time;
 - manual per-source fetches may overlap only when their source ids differ;
-- a second `POST /api/sources/{id}/fetch` for the same source while that source is already fetching must return `409 conflict` and must not enqueue, persist, or retry the duplicate request;
-- `POST /api/ingest` while any manual source fetch is running must return `409 conflict` and must not enqueue, persist, or retry the request;
-- if a background ingest tick fires while another ingest/fetch is running, it may be ignored/skipped rather than queued;
+- a second `POST /api/sources/{id}/fetch` for the same source while that source is already fetching/ingesting must return `409 conflict` and must not enqueue, persist, or retry the duplicate request;
+- `POST /api/ingest` may overlap unrelated in-flight source fetches; it skips already-busy sources, drains every selected idle active source through bounded in-request workers, reports externally capacity-unavailable sources as skipped source-level conflicts, and never persists work after the response;
+- background ingest ticks skip already-busy sources, drain every selected idle active source through bounded in-request workers, report externally capacity-unavailable sources as skipped source-level conflicts, and never persist work after the tick returns;
+- true global operations such as processing-language writes, library reprocess, short unrepresented state import/restore, and currently-global item re-ingest remain mutually exclusive with active source work and with each other;
 - persistent queues, job tables, command-history rows, ingest ledgers, durable progress records, and cross-process schedulers are forbidden.
 
 Failure contract:
@@ -982,7 +987,7 @@ Language change behavior:
 
 - setting a new processing language persists the runtime setting and affects future ingestion/reprocess only;
 - existing item rows and FTS are not automatically rewritten when language changes;
-- language mutation uses the same process-local exclusion lock as a short atomic check/write so it cannot begin while background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is running;
+- language mutation uses the same process-local global-exclusive check/write so it cannot begin while any source-scoped ingest/fetch attempt or global-exclusive operation is running;
 - language mutation does not publish its own `CurrentOperationInfo.kind`, does not appear as `language_mutation`, and does not create a long-running current-operation snapshot; requests racing with the short language write serialize on the lock and then observe either the persisted language or a representable running operation;
 - UI chrome and MCP language metadata may reflect the new language immediately, but item text remains whatever is stored until future ingest or explicit reprocess updates it.
 
@@ -994,7 +999,7 @@ Existing library reprocess behavior:
 - it rebuilds or fully refreshes FTS after item text rewrites;
 - it returns terse counts for attempted, updated, failed/unavailable, and indexed items, where `items_updated` counts successful target-language rewrites only;
 - it must not create durable job rows, queues, sync state, command history, activity ledgers, retry dashboards, or settings panels;
-- it must not run concurrently with background ingest, manual ingest, source fetch, or another reprocess operation.
+- it must not run concurrently with any source-scoped ingest/fetch attempt or another global-exclusive operation.
 
 Failure contract:
 
@@ -1029,8 +1034,8 @@ Reprocess input source precedence:
 
 Concurrency and background ingest:
 
-- the single-process mutex/guard for ingest/fetch/reprocess exclusivity applies to reprocess;
-- if a background ingest tick fires while a reprocess operation holds the guard, the tick is ignored/skipped rather than queued, exactly mirroring the rule for manual ingest.
+- the global-exclusive guard applies to reprocess and conflicts with active source-scoped ingest/fetch attempts;
+- if a background ingest tick fires while a reprocess operation holds the global-exclusive guard, the tick is ignored/skipped rather than queued.
 
 
 ### 5.7 Inspector Item Re-ingest
@@ -1080,7 +1085,7 @@ Temporary extra prompt rules:
 
 Concurrency semantics:
 
-- item re-ingest uses the same process-local non-overlap guard as background ingest, manual ingest, source fetch, the short processing-language mutation check/write, and library reprocess;
+- item re-ingest remains a process-local global-exclusive operation for now and does not overlap active source-scoped ingest/fetch attempts, the short processing-language mutation check/write, library reprocess, or another item re-ingest;
 - the canonical current-operation kind for this operation is `item_reingest`;
 - if another guarded operation is running, item re-ingest returns the standard conflict shape with current-operation details when available;
 - if a background ingest tick fires while item re-ingest holds the guard, the tick is skipped rather than queued;
@@ -1260,11 +1265,11 @@ Revision contract: `revision` is response metadata only. HTTP and MCP clients do
 
 `CurrentOperationInfo`:
 
-This type is the authoritative HTTP/MCP shape for the process-local current-operation snapshot. It is a best-effort in-memory runtime fact, not durable state. When no long-running background ingest, manual ingest, source fetch, library reprocess, or item re-ingest operation is running, every nullable field is present as `null` and `running` is `false`. While one of those representable operations is running, `running` is `true`; `kind`, `actor_kind`, `phase`, `message`, `started_at`, and `updated_at` are present with non-null values when known; `count` is `null` until a measurable phase exists and then is an object with `current` and `total` integer members. Processing-language mutation is intentionally excluded from this enum: it uses the same lock only for a short atomic check/write and never publishes `language_mutation` as a current-operation kind. Clients must tolerate `count: null` during startup/transition phases and must not infer durable progress history from the values. `actor_id` remains provenance/idempotency metadata on mutating requests; it is not part of the current-operation snapshot and is never an authorization input.
+This type is the authoritative HTTP/MCP shape for the process-local current-operation snapshot. It is a best-effort in-memory runtime fact, not durable state. When no long-running source-scoped ingest/fetch attempt, library reprocess, or item re-ingest operation is running, every nullable field is present as `null` and `running` is `false`. While one or more representable operations are running, `running` is `true`; `kind`, `actor_kind`, `phase`, `message`, `started_at`, and `updated_at` are present with non-null values when known; `count` is `null` until a measurable phase exists and then is an object with `current` and `total` integer members. For multi-source ingest/fetch work, the snapshot may report aggregate/best-effort status rather than every active source lease. Processing-language mutation and state import/restore are intentionally excluded from this enum: they use the global-exclusive check/write only for short atomic mutations and never publish `language_mutation`, `state_import`, or `state_restore` as current-operation kinds. Clients must tolerate `count: null` during startup/transition phases and must not infer durable progress history from the values. `actor_id` remains provenance/idempotency metadata on mutating requests; it is not part of the current-operation snapshot and is never an authorization input.
 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
-| `running` | boolean | Yes | No | `true` only while the in-process guard is held by background ingest, manual ingest, source fetch, library reprocess, or item re-ingest. |
+| `running` | boolean | Yes | No | `true` only while a representable source-scoped ingest/fetch attempt or global-exclusive operation is active. |
 | `kind` | string enum | Yes | Yes | Canonical display/runtime values: `background_ingest`, `manual_ingest`, `source_fetch`, `library_reprocess`, or `item_reingest`; `null` when idle. |
 | `actor_kind` | string enum | Yes | Yes | `background`, `human`, or `agent`; `null` when idle. Owner-token auth remains separate from actor provenance. |
 | `phase` | string | Yes | Yes | Terse phase such as `starting`, `loading_sources`, `fetching_sources`, `fetching_feed`, `processing_items`, `source_complete`, or `complete`; `null` when idle or unknown. |
@@ -1342,8 +1347,10 @@ Manual ingest request rules:
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
 | `source_id` | string | Yes | Yes | source id when error is source-scoped; `null` for global trigger errors |
-| `code` | string enum | Yes | No | `rss_fetch_error`, `timeout`, `internal` |
-| `message` | string | Yes | No | terse diagnostic suitable for inline `err: <diagnostic>` display |
+| `code` | string enum | Yes | No | `rss_fetch_error`, `timeout`, `source_busy`, `source_capacity_exhausted`, `internal` |
+| `message` | string | Yes | No | terse diagnostic suitable for inline `err: <diagnostic>` or skipped-source summary display |
+
+`source_busy` is used only inside an all-source ingest result when a source-scoped lease is already active for that source. `source_capacity_exhausted` is used when a source attempt could not start because external active source work leaves no source-concurrency slot available. For all-source manual/background runs, `source_concurrency` limits simultaneous source attempts, not the total number of selected idle sources attempted by the run; idle sources waiting behind the run's own bounded worker batch are not reported as capacity-exhausted. Neither code is durable pending state, neither means RSS failure, and neither may create a retry job.
 
 `IngestRunResult`:
 
@@ -1355,17 +1362,30 @@ Manual ingest request rules:
 | `started_at` | RFC3339 string | Yes | No | request execution start time |
 | `completed_at` | RFC3339 string | Yes | No | request execution completion time |
 | `duration_ms` | integer | Yes | No | elapsed request duration in milliseconds |
-| `sources_attempted` | integer | Yes | No | number of sources attempted |
+| `sources_attempted` | integer | Yes | No | number of source fetch attempts actually started; busy/skipped sources are not counted here |
 | `sources_succeeded` | integer | Yes | No | number of sources fetched successfully |
-| `sources_failed` | integer | Yes | No | number of source fetch failures |
+| `sources_failed` | integer | Yes | No | number of source fetch failures after an attempt started; excludes busy/skipped sources |
+| `sources_skipped` | integer | Yes | No | number of sources skipped before fetch because their source-scoped lease was busy or source capacity was unavailable |
 | `items_upserted` | integer | Yes | No | number of item rows inserted or updated |
-| `errors` | array of `IngestErrorDetail` | Yes | No | empty array when no source-level errors occurred |
+| `errors` | array of `IngestErrorDetail` | Yes | No | empty array when no source-level errors or skipped-source entries occurred |
+
+`IngestRunResult.status` is derived deterministically:
+
+| Scope/case | Required status |
+|---|---|
+| zero active sources: `sources_attempted=0`, `sources_skipped=0`, `errors=[]` | `completed` |
+| all started source attempts succeeded and no sources were skipped | `completed` |
+| one or more started source attempts succeeded, and at least one source failed or was skipped | `completed_with_errors` |
+| all sources were skipped before fetch because they were busy or capacity-unavailable: `sources_attempted=0`, `sources_skipped>0` | `completed_with_errors` |
+| all started source attempts failed, with or without skipped sources, but the request could still serialize a normal result | `completed_with_errors` |
+| single-source `POST /api/sources/{id}/fetch` started but RSS/source fetch failed | `failed` |
+| fatal runtime, invariant, or SQLite failure prevents normal per-source aggregation/serialization | standard `5xx` `ErrorBody` rather than an `IngestRunResult`, unless a response has already safely committed to a normal result |
 
 Manual ingest success response schemas:
 
-Operational RSS fetch failures are successful HTTP requests whose ingest result records source-level failure. Network timeouts, RSS/Atom parse errors, upstream feed HTTP errors, and similar per-source fetch failures return HTTP `200 OK` with `status: "failed"` or `status: "completed_with_errors"` and a populated `errors` array. Only transport, authentication, request validation, missing/deleted/inactive source lookup, concurrency-guard, or unexpected runtime failures use the standard 4xx/5xx `ErrorBody` shape.
+Operational RSS fetch failures are successful HTTP requests whose ingest result records source-level failure. Network timeouts, RSS/Atom parse errors, upstream feed HTTP errors, and similar per-source fetch failures return HTTP `200 OK` with `status: "failed"` or `status: "completed_with_errors"` and a populated `errors` array. Busy or capacity-skipped sources in an all-source ingest return HTTP `200 OK` with `source_busy` or `source_capacity_exhausted` entries, increment `sources_skipped`, do not increment `sources_attempted` or `sources_failed`, and do not enqueue work. Only transport, authentication, request validation, missing/deleted/inactive source lookup, same-source manual source-fetch conflict, source-capacity conflict for a single manual source fetch, true global-exclusive conflict, or unexpected runtime failures use the standard 4xx/5xx `ErrorBody` shape.
 
-If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `200 OK` immediately with `status: "completed"`, `sources_attempted: 0`, `sources_succeeded: 0`, `sources_failed: 0`, `items_upserted: 0`, and `errors: []`.
+If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `200 OK` immediately with `status: "completed"`, `sources_attempted: 0`, `sources_succeeded: 0`, `sources_failed: 0`, `sources_skipped: 0`, `items_upserted: 0`, and `errors: []`.
 
 `POST /api/ingest` returns:
 
@@ -1378,15 +1398,21 @@ If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `
     "started_at": "2026-05-09T14:00:00Z",
     "completed_at": "2026-05-09T14:00:12Z",
     "duration_ms": 12000,
-    "sources_attempted": 12,
-    "sources_succeeded": 11,
+    "sources_attempted": 11,
+    "sources_succeeded": 10,
     "sources_failed": 1,
+    "sources_skipped": 1,
     "items_upserted": 37,
     "errors": [
       {
         "source_id": "src_02",
         "code": "rss_fetch_error",
         "message": "feed returned HTTP 502"
+      },
+      {
+        "source_id": "src_09",
+        "code": "source_busy",
+        "message": "source already fetching"
       }
     ]
   }
@@ -1407,6 +1433,7 @@ If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `
     "sources_attempted": 1,
     "sources_succeeded": 1,
     "sources_failed": 0,
+    "sources_skipped": 0,
     "items_upserted": 4,
     "errors": []
   },
@@ -1422,9 +1449,9 @@ If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `
 }
 ```
 
-Manual ingest conflict response schema:
+Manual ingest/fetch conflict response schema:
 
-The concurrency guard is global across background ingest, `POST /api/ingest`, `POST /api/sources/{id}/fetch`, the short `PUT /api/runtime/language` check/write, `POST /api/runtime/reprocess-library`, and `POST /api/items/{id}/reingest`. Conflict responses indicate the representable current operation holding the guard. When the in-memory snapshot reports `running: true`, `details.current_operation` is included and uses the exact `CurrentOperationInfo` shape above. This object is the same current-operation fact exposed by `GET /api/runtime/operation` and MCP `resofeed://system/operation`; it is not a durable job record. `PUT /api/runtime/language` can be blocked by a representable running operation, but it does not itself publish a `language_mutation` current-operation kind.
+The source-scoped coordinator returns request-level `409 conflict` only when the requested manual source fetch targets a source id that is already active, when no source-concurrency slot is available for that immediate manual fetch, or when a true global-exclusive operation blocks the request. `POST /api/ingest` does not fail merely because unrelated source fetches are active; it skips busy/capacity-unavailable sources inside the `IngestRunResult` as `source_busy` or `source_capacity_exhausted` entries. Conflict responses indicate the representable current operation holding the conflicting source/global/capacity scope. When the in-memory snapshot reports `running: true`, `details.current_operation` is included and uses the exact `CurrentOperationInfo` shape above. This object is the same current-operation fact exposed by `GET /api/runtime/operation` and MCP `resofeed://system/operation`; it is not a durable job record. `PUT /api/runtime/language` can be blocked by a representable running operation, but it does not itself publish a `language_mutation` current-operation kind.
 
 ```json
 {
@@ -1436,6 +1463,7 @@ The concurrency guard is global across background ingest, `POST /api/ingest`, `P
       "operation": "manual_ingest",
       "actor_kind": "human",
       "retry_allowed": true,
+      "reason": "source_busy",
       "current_operation": {
         "running": true,
         "kind": "manual_ingest",
@@ -1554,12 +1582,12 @@ Endpoint contracts:
 | `GET /api/sources` | none | `200` | `{ "sources": [Source] }` |
 | `DELETE /api/sources/{id}` | path `id` | `200` | `{ "source_id": "...", "deleted": true, "revision": 2 }` |
 | `POST /api/sources/import-opml` | `application/xml` OPML body, max `10 MiB` | `200` | `{ "imported": 12, "skipped": 0, "folders_flattened": true }` |
-| `POST /api/ingest` | JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult }`; returns `409 conflict` if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running |
-| `POST /api/sources/{id}/fetch` | path `id`, JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult, "source": Source }`; returns `404 not_found` if the requested source is missing, deleted, or explicitly inactive; returns `409 conflict` if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running |
+| `POST /api/ingest` | JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult }`; starts a bounded all-source source-attempt batch, skips/reports already-busy or externally capacity-unavailable sources, drains selected idle sources through bounded in-request workers, and returns `409 conflict` only when a true global-exclusive operation blocks the run |
+| `POST /api/sources/{id}/fetch` | path `id`, JSON `{}`; no query params | `200` | `{ "ingest": IngestRunResult, "source": Source }`; returns `404 not_found` if the requested source is missing, deleted, or explicitly inactive; returns `409 conflict` if the same source id, source capacity, or a true global-exclusive operation is already running |
 | `GET /api/search` | optional query params listed in the search query rules | `200` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` |
 | `GET /api/steer/active` | none | `200` | `{ "rules": [SteerRule] }`; intended for inline steering receipts only, not a rule-management UI |
 | `GET /api/state/export` | none | `200` | state bundle JSON (`schema_version: resofeed.state.v1`) |
-| `POST /api/state/import` | state bundle JSON, max `10 MiB` | `200` | restore result schema |
+| `POST /api/state/import` | state bundle JSON, max `10 MiB` | `200` | restore result schema; short unrepresented global-exclusive mutation that returns `409 conflict` with reason `global_operation_running` when active source/global work prevents a stable restore |
 | `GET /api/doctor` | none | `200` | `text/plain; charset=utf-8` raw diagnostic lines |
 | `GET /api/runtime/operation` | none; no query params | `200` | `{ "operation": CurrentOperationInfo }`; in-memory contextual snapshot only, not durable state |
 
@@ -1604,7 +1632,7 @@ HTTP error matrix:
 | invalid state bundle schema or field shape | `400` | `bad_request` | `{ "field": "<field_name>" }` |
 | invalid query parameter | `400` | `bad_request` | `{ "field": "<query_param>" }` |
 | missing item/source id | `404` | `not_found` | `{ "id": "..." }` |
-| manual ingest/fetch/reprocess/item re-ingest or language mutation requested while a representable long-running operation is already running | `409` | `conflict` | `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest", "actor_kind": "background"|"human"|"agent", "retry_allowed": true, "current_operation": CurrentOperationInfo }` when the in-memory snapshot is running |
+| manual source fetch requested for an already-active source id, manual source fetch requested when source capacity is exhausted, or any source/global operation requested while a true global-exclusive operation is running | `409` | `conflict` | `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest"|null, "actor_kind": "background"|"human"|"agent"|null, "retry_allowed": true, "current_operation": CurrentOperationInfo|null, "reason": "source_busy"|"source_capacity_exhausted"|"global_operation_running" }` when available. Short unrepresented operations such as language write or state import/restore may use `operation:null` and `current_operation:null`. |
 | OpenRouter model-list provider failure, provider timeout, provider auth/rate/decode failure, or unreadable provider response | `503` | `provider_unavailable` | `{}`; no raw provider details, account metadata, or secrets |
 | unexpected runtime failure | `500` | `internal` | `{}`; raw detail belongs in `/doctor` |
 
@@ -1690,7 +1718,7 @@ Rules:
 - no query parameters are accepted;
 - success persists the runtime default and returns the same response shape as `GET /api/runtime/language` with `already_applied: false`;
 - setting language does not rewrite existing item rows and does not rebuild FTS;
-- if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running, setting language returns `409 conflict` with that operation's canonical current-operation detail to avoid mixed-language batches;
+- if any source-scoped ingest/fetch attempt or global-exclusive operation is already running, setting language returns `409 conflict` to avoid mixed-language batches; representable blockers include canonical current-operation detail, while short unrepresented blockers such as state import/restore may return `operation: null`, `actor_kind: null`, `current_operation: null`, and `reason: "global_operation_running"`;
 - `PUT /api/runtime/language` itself is a short atomic write and never returns or exposes `language_mutation` as an `operation`/`kind` value;
 - retrying with the same idempotency key while a live receipt exists returns the same response with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours. After a crash or TTL expiration, idempotency state may be lost; if the same key is no longer recognized, the request is otherwise valid, and the operation guard is free, the server accepts it as a fresh operation with `already_applied: false` rather than rejecting it solely because the key was previously used.
 
@@ -1745,7 +1773,7 @@ Rules:
 - operation timeout returns HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and a global `errors[]` entry whose `code` is `timeout`, unless the server cannot serialize a response;
 - fatal SQLite or invariant failures before result construction return HTTP `500 internal`;
 - if committed item transactions exist but the final FTS rebuild does not complete, `runtime_metadata.search_fts_stale_since` remains set and `/api/doctor` reports stale FTS;
-- if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running, return `409 conflict` using the standard conflict shape with `details.operation_running: true`, `details.operation: "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest"`, `details.actor_kind: "background"|"human"|"agent"`, `details.retry_allowed: true`, and `details.current_operation: CurrentOperationInfo` whenever the in-memory snapshot is running. Conflict details must not expose the legacy internal `kind`/`scope` pair as canonical contract state;
+- if any source-scoped ingest/fetch attempt or global-exclusive operation is already running, return `409 conflict` using the standard conflict shape with `details.operation_running: true`, `details.reason: "global_operation_running"`, `details.operation: "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest"|null`, `details.actor_kind: "background"|"human"|"agent"|null`, `details.retry_allowed: true`, and `details.current_operation: CurrentOperationInfo|null` whenever available. Short unrepresented global-exclusive blockers may use null operation/current-operation fields. Conflict details must not expose the legacy internal `kind`/`scope` pair as canonical contract state;
 - the endpoint must not create durable jobs, queues, command histories, activity rows, or sync metadata;
 - retrying with the same idempotency key while the operation is still running returns `409 conflict`; retrying after completion while a live receipt exists returns the completed result with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns `400 bad_request` with `details: { "field": "idempotency_key", "reason": "request_fingerprint_mismatch" }`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the server accepts it as a fresh operation with `already_applied: false` rather than returning `400` solely because the key was previously used.
 
@@ -1772,7 +1800,7 @@ Endpoint additions:
 | `GET /api/runtime/openrouter-models` | none; no query params | `200` | `{ "models": [{ "id": "...", "name": "..." }] }` |
 | `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
 | `PUT /api/runtime/language` | JSON `{ "language": "en"|"zh", "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` |
-| `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running |
+| `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if any source-scoped ingest/fetch attempt or global-exclusive operation is already running |
 | `POST /api/items/{id}/reingest` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ..., "model": null|string, "prompt": null|string }`; no query params | `200` | `{ "already_applied": boolean, "reingest": ItemReingestResult }`; returns `409 conflict` if a guarded operation is already running |
 
 Canonical item response language rule:
@@ -1903,7 +1931,7 @@ Rules:
 - `language` and any other unknown fields are rejected; selected-item re-ingest uses the persisted runtime processing language and has no per-call language override;
 - no query parameters are accepted;
 - success returns `{ "already_applied": false, "reingest": ItemReingestResult }`, with `reingest.item` present and non-null whenever `item_updated: true`;
-- if background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is already running, return `409 conflict` with canonical current-operation details and no queued work;
+- if any source-scoped ingest/fetch attempt or global-exclusive operation is already running, return `409 conflict` with canonical current-operation details and no queued work;
 - same live idempotency key plus same fingerprint replays the stored response with `already_applied: true` after completion;
 - same live idempotency key plus different fingerprint returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`;
 - duplicate key during an active item re-ingest returns `409 conflict`;
@@ -1933,7 +1961,7 @@ Endpoint additions:
 |---|---|---:|---|
 | `GET /api/runtime/openrouter-models` | none; no query params | `200` | `OpenRouterModelsResponse` |
 | `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
-| `POST /api/items/{id}/reingest` | `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if a guarded operation is already running |
+| `POST /api/items/{id}/reingest` | `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if any source-scoped ingest/fetch attempt or global-exclusive operation is already running |
 
 ## 7. MCP Surface
 
@@ -2041,8 +2069,8 @@ Rules:
 - setting language through MCP affects future processing only and does not rewrite existing item rows;
 - `reprocess_library` is explicit, uses the current persisted language, and must not create durable jobs, queues, or activity feeds;
 - `list_candidate_items`, `search_items`, and `read_item` return stored historical item text as-is, which may differ from the current runtime processing language if the item was processed before a language change; source identifiers remain exact provenance anchors;
-- guarded-operation conflicts in MCP tool calls return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` whenever the same in-memory snapshot is running: `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest", "actor_kind": "background"|"human"|"agent", "retry_allowed": true, "current_operation": CurrentOperationInfo }`;
-- `set_processing_language` conflicts only when one of those representable operations is running; it does not publish or return `language_mutation` as a current-operation value;
+- guarded-operation conflicts in MCP tool calls return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` whenever the same in-memory snapshot is running: `{ "operation_running": true, "operation": "background_ingest"|"manual_ingest"|"source_fetch"|"library_reprocess"|"item_reingest"|null, "actor_kind": "background"|"human"|"agent"|null, "retry_allowed": true, "reason": "source_busy"|"source_capacity_exhausted"|"global_operation_running", "current_operation": CurrentOperationInfo|null }`;
+- `set_processing_language` conflicts when a representable source/global operation or short unrepresented global-exclusive mutation is running; it does not publish or return `language_mutation`, `state_import`, or `state_restore` as a current-operation value;
 - `set_processing_language` MCP idempotency behavior: while a live receipt exists, same key + same request fingerprint returns the stored language response with `already_applied: true`; same key + different request fingerprint returns an MCP schema/request error equivalent to HTTP `400 bad_request`; after crash-loss or TTL expiration, the same valid body/key is accepted as a fresh operation with `already_applied: false` if the operation guard is free;
 - `reprocess_library` MCP idempotency behavior: a duplicate key during an active run returns the JSON-RPC conflict error described above; a duplicate key after completion while a live receipt exists returns the same `ReprocessLibraryResult` payload with `already_applied: true` when the request fingerprint matches. Retrying with the same key but a different request fingerprint while the live receipt exists returns an MCP schema/request error equivalent to HTTP `400 bad_request`. Idempotency is maintained by storing the result snapshot and request fingerprint in `agent_receipts` for a TTL of up to 24 hours, which is permitted as transient runtime state. After a crash or TTL expiration, idempotency state may be lost; if the same request body and key are submitted again, the request is otherwise valid, and the operation guard is free, the tool accepts it as a fresh operation with `already_applied: false` rather than rejecting it solely because the key was previously used.
 
@@ -2064,6 +2092,7 @@ Guarded-operation conflict:
           "operation": "library_reprocess",
           "actor_kind": "agent",
           "retry_allowed": true,
+          "reason": "global_operation_running",
           "current_operation": {
             "running": true,
             "kind": "library_reprocess",
@@ -2149,7 +2178,7 @@ Responsibilities:
 - expose lightweight Source Ledger manual controls for `POST /api/ingest` and `POST /api/sources/{id}/fetch` as immediate bracket actions only; these controls must not create durable jobs, queues, command histories, activity ledgers, retry dashboards, sync/merge concepts, or additional source-management surfaces;
 - render Source Ledger source rows with `sources.title` as the primary source label and the feed URL as secondary provenance text;
 - allow multiple row-level `[FETCH]` actions to show independent `[FETCHING...]` state when different sources are fetching concurrently; do not block all row fetch actions merely because one unrelated source is fetching;
-- keep `[RUN INGEST]` disabled while any manual source fetch is running, because global ingest and per-source manual fetch remain mutually exclusive;
+- keep `[RUN INGEST]` available during unrelated row fetches unless a true global-exclusive operation blocks ingest; when run during active row fetches, show terse skipped-source feedback for busy rows rather than queueing delayed work;
 - render current-operation status only as contextual inline feedback while an operation is running or a conflict is being explained; do not add a persistent idle top-chrome operation strip, job-management dashboard, or historical operation surface;
 - expose state export/import as terse actions, not backup-management UI;
 - show fallback/status labels plainly.
@@ -2205,7 +2234,7 @@ web/
 
 Module ownership rules:
 
-- `internal/resofeed/ingest.go` owns RSS/Atom fetch orchestration, per-source fetch execution, source-level ingest diagnostics, the in-process ingest concurrency guard, and the non-overlap semantics for background/manual ingestion.
+- `internal/resofeed/ingest.go` owns RSS/Atom fetch orchestration, per-source fetch execution, source-level ingest diagnostics, the in-process ingest concurrency guard, source-scoped same-source non-overlap, and bounded all-source batch drain/skip semantics for background/manual ingestion.
 - `internal/resofeed/reprocess.go` owns library reprocess and Inspector item re-ingest application behavior: source-text precedence, item-scoped model call orchestration, safe result classification, item readable-field updates, and per-item FTS refresh. It must not own HTTP/MCP serialization or UI state.
 - `internal/resofeed/openrouter.go` owns OpenRouter chat-completions transport, temporary per-call model override handling, provider model listing, resolved/configured model reporting, and safe provider error classification. It must not persist model selections, prompt templates, or provider account metadata.
 - `internal/resofeed/http.go` owns HTTP routing, owner-token enforcement, request validation, response serialization, idempotency mapping, and mapping ingest/reprocess outcomes to HTTP contracts.
@@ -2292,12 +2321,12 @@ curl -i -X POST http://127.0.0.1:8080/api/sources/src_01/fetch \
 # expect 200 JSON body: {"ingest":{"scope":"source",...},"source":{...}}
 ```
 
-Manual ingest conflict check:
+Manual ingest/fetch conflict checks:
 
-Run the first command in a separate terminal or against a deliberately slow source to easily reproduce this.
+Use deliberately slow sources to make overlap observable.
 
 ```bash
-curl -i -X POST http://127.0.0.1:8080/api/ingest \
+curl -i -X POST http://127.0.0.1:8080/api/sources/src_01/fetch \
   -H "Authorization: Bearer <OWNER_TOKEN>" \
   -H "Content-Type: application/json" \
   --data '{}'
@@ -2306,8 +2335,21 @@ curl -i -X POST http://127.0.0.1:8080/api/sources/src_01/fetch \
   -H "Authorization: Bearer <OWNER_TOKEN>" \
   -H "Content-Type: application/json" \
   --data '{}'
-# when the first request is still running, expect 409 JSON error:
-# {"error":{"code":"conflict","message":"operation already running","details":{"operation_running":true,"operation":"manual_ingest","actor_kind":"human","retry_allowed":true,"current_operation":{"running":true,"kind":"manual_ingest","actor_kind":"human","phase":"fetching_sources","count":{"current":0,"total":12},"message":"ingest fetching active sources","started_at":"2026-05-09T14:00:00Z","updated_at":"2026-05-09T14:00:01Z"}}}}
+# while src_01 is already fetching, expect 409 JSON error with details.reason="source_busy".
+
+curl -i -X POST http://127.0.0.1:8080/api/sources/src_02/fetch \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# while src_01 is already fetching, an unrelated source fetch may return 200 if src_02 is idle and source capacity is available.
+# If all source-concurrency slots are occupied by external work, expect 409 JSON error with details.reason="source_capacity_exhausted".
+
+curl -i -X POST http://127.0.0.1:8080/api/ingest \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# while src_01 is already fetching, expect 200 JSON with ingest.sources_skipped incremented and an errors[] entry for src_01 with code="source_busy".
+# Other selected idle active sources are drained through bounded in-request workers; no delayed work is persisted after the response.
 ```
 
 State roundtrip check:
@@ -2343,7 +2385,7 @@ Processing-language and split-scroll verification additions:
 - source identifier DOM nodes/links use `translate="no"` or equivalent so browser/page translation does not localize provenance anchors;
 - `POST /api/runtime/reprocess-library` explicitly rewrites existing readable item text in the current language and rebuilds FTS without creating durable jobs, queues, or activity ledgers;
 - if a reprocess receipt expires or is lost after restart, resubmitting the same request body and `idempotency_key` while the concurrency guard is free is accepted as a fresh request with `already_applied: false`, not rejected as `400` solely because the key was previously used;
-- operation guard conflicts across manual ingest, source fetch, library reprocess, item re-ingest, and language changes blocked by those representable operations use `409 conflict` details with `operation_running`, canonical `operation`, `actor_kind`, `retry_allowed`, and `current_operation` when the in-memory snapshot is running; MCP returns the matching JSON-RPC error data shape;
+- operation guard conflicts across manual ingest, source fetch, library reprocess, item re-ingest, and language changes blocked by those representable operations use `409 conflict` details with `operation_running`, canonical `operation`, `actor_kind`, `retry_allowed`, `reason` (`source_busy`, `source_capacity_exhausted`, or `global_operation_running`), and `current_operation` when the in-memory snapshot is running; MCP returns the matching JSON-RPC error data shape;
 - timeout reprocess outcomes return `reprocess.status: "failed"`, `fts_rebuilt: false`, and error `code: "timeout"` when the server can serialize the response; fatal pre-result SQLite/invariant failures return `500 internal`;
 - `GET /api/search` searches the stored target-language FTS content after reprocess;
 - `GET /api/doctor` reports `search_fts: stale since <RFC3339_UTC>` when the stale marker is set, otherwise `search_fts: ok`, and never includes item text, source text, API keys, or raw model output;
@@ -2379,10 +2421,12 @@ curl -i -X POST http://127.0.0.1:8080/api/runtime/reprocess-library \
 - Source Ledger HTTP/MCP source listings expose the updated `title` without adding a separate `feed_title` field;
 - two `POST /api/sources/{id}/fetch` requests for different active source ids may run concurrently and both return source-scoped results;
 - a duplicate `POST /api/sources/{id}/fetch` for the same source id while that source is already fetching returns `409 conflict` and does not enqueue work;
-- `POST /api/ingest` while any manual source fetch is running returns `409 conflict` and does not enqueue work;
-- background ingest ticks are skipped/ignored while any conflicting global/manual fetch scope is running;
+- `POST /api/ingest` while an unrelated manual source fetch is running starts idle sources, reports the busy source as `source_busy`, increments `sources_skipped`, and does not enqueue work;
+- a manual `POST /api/sources/{id}/fetch` when all source-concurrency slots are occupied returns `409 conflict` with reason `source_capacity_exhausted` and does not enqueue work;
+- `POST /api/ingest` under external source-capacity pressure drains selected idle sources through any slot it owns, reports only externally capacity-unavailable starts as `source_capacity_exhausted`, increments `sources_skipped`, and does not persist work after the response;
+- background ingest ticks skip already-busy sources, drain selected idle sources through bounded workers, report only externally capacity-unavailable starts, and never persist work after the tick returns;
 - no implementation creates a durable queue, job table, activity ledger, worker process, event bus, or settings/dashboard surface for the parallel fetch behavior;
-- Source Ledger row UI can show `[FETCHING...]` independently for multiple source rows while keeping `[RUN INGEST]` disabled during active row fetches.
+- Source Ledger row UI can show `[FETCHING...]` independently for multiple source rows while allowing `[RUN INGEST]` during unrelated row fetches and summarizing busy sources tersely.
 
 Suggested smoke check shape:
 
@@ -2403,6 +2447,12 @@ curl -i -X POST http://127.0.0.1:8080/api/sources/src_a/fetch \
   -H "Content-Type: application/json" \
   --data '{}'
 # while src_a is already fetching, expect 409 conflict with current-operation detail.
+
+curl -i -X POST http://127.0.0.1:8080/api/ingest \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{}'
+# while src_a is busy and src_b is idle, expect 200 with src_a reported as source_busy/sources_skipped and src_b attempted; no queued work.
 ```
 
 ### Inspector item re-ingest verification additions
@@ -2415,7 +2465,7 @@ curl -i -X POST http://127.0.0.1:8080/api/sources/src_a/fetch \
 - extra prompt is subordinate to the fixed JSON/provenance/target-language contract and cannot cause source identifiers to be translated or rewritten;
 - item re-ingest uses the same source-text precedence as library reprocess and never fetches `sources.url`/`items.source_url` as article text;
 - selected-item readable fields and selected-item `search_fts` row are refreshed consistently after successful or storable failure outcomes;
-- conflicts across background ingest, manual ingest, source fetch, library reprocess, item re-ingest, and language changes blocked by those representable operations use canonical `409 conflict` current-operation details with item re-ingest reported as `item_reingest`; no work is queued;
+- conflicts across source-scoped ingest/fetch attempts, library reprocess, item re-ingest, and language changes blocked by active source/global-exclusive operations use canonical `409 conflict` current-operation details with item re-ingest reported as `item_reingest`; no work is queued;
 - MCP `list_openrouter_models` uses the same provider-backed model-list function as HTTP after runtime OpenRouter config resolution, and `reingest_item` exposes request-scoped `model`, canonical `prompt`, and compatibility `extra_prompt` fields through the runtime DTO/schema;
 - Inspector renders item re-ingest as inline bracket-action controls only, with no modal, toast, spinner, settings dashboard, queue, progress dashboard, or operation history;
 - Inspector Source Text/Source Evidence is collapsed by default for every newly opened item while preserving accessible disclosure semantics and fallback/source-evidence rules.

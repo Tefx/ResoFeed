@@ -157,9 +157,9 @@ OPML folders are ignored and flattened immediately. Source Ledger does not provi
 
 ### 7. Let ingestion run
 
-ResoFeed fetches sources, extracts content when possible, summarizes items with OpenRouter, indexes searchable text, and builds the Today surface. The default background ingest interval is 15 minutes.
+ResoFeed fetches sources, extracts content when possible, summarizes items with OpenRouter, indexes searchable text, and builds the Today surface. The default background ingest interval is 15 minutes. Ingest/fetch work is source-scoped and bounded inside the single process: unrelated sources may run concurrently, same-source duplicate fetches fail fast, and background ingest skips busy sources rather than queueing delayed work.
 
-If you want an immediate refresh, open `RESOFEED` → `SOURCE LEDGER` and use `[RUN INGEST]` for all active sources or `[FETCH]` on one source row. These are lightweight one-shot controls: they show terse pending/success/error text and do not create jobs, queues, or activity history.
+If you want an immediate refresh, open `RESOFEED` → `SOURCE LEDGER` and use `[RUN INGEST]` for all active sources or `[FETCH]` on one source row. These are lightweight one-shot controls: they show terse pending/success/error text, `[RUN INGEST]` drains selected idle sources through bounded in-request workers, and they do not create jobs, queues, or activity history.
 
 Use an always-on host if mobile access or external-agent workflows should continue while your laptop sleeps.
 
@@ -167,7 +167,7 @@ Use an always-on host if mobile access or external-agent workflows should contin
 
 ResoFeed has one runtime processing language for the local owner runtime. It supports `en` and `zh`, defaults to `en` when unset, and is persisted as `runtime_metadata.processing_language`. This runtime metadata is not included in state export/import.
 
-Changing language affects future ingestion and UI/MCP language metadata immediately, but it does not rewrite existing stored item text or rebuild FTS by itself. To rewrite existing stored readable item fields into the current language, use the explicit `[REPROCESS LIBRARY]` / `[重处理资料库]` action or the API/MCP operations documented below.
+Changing language affects future ingestion and UI/MCP language metadata immediately, but it does not rewrite existing stored item text or rebuild FTS by itself. Language changes are blocked while source ingest/fetch or a global operation is active, so a running batch cannot accidentally mix old and new processing languages. To rewrite existing stored readable item fields into the current language, use the explicit `[REPROCESS LIBRARY]` / `[重处理资料库]` action or the API/MCP operations documented below.
 
 Reprocess is an immediate owner-authorized operation. It preserves source identifiers, rewrites stored readable item fields where source text is available, rebuilds FTS when completion reaches the final indexing step, and reports counts in the response. It does not create a durable job, queue, dashboard, retry panel, activity log, sync record, or portable receipt. If reprocess fails before the final FTS rebuild, `/api/doctor` reports `search_fts: stale since <RFC3339_UTC>` until a later successful rebuild clears the marker.
 
@@ -570,7 +570,7 @@ Example response:
 }
 ```
 
-Accepted language values are `en` and `zh`. The endpoint accepts no query parameters and rejects unknown body fields. Setting the runtime language is metadata-only and affects future processing or explicit reprocess rather than rewriting existing rows. It is blocked while background ingest, manual ingest, source fetch, library reprocess, or item re-ingest is running; the server returns `409 conflict` with shared current-operation details for the operation holding the guard. The language write itself is a short atomic metadata update and is not exposed as a `language_mutation` current-operation kind. Live idempotency replay uses request fingerprints: same key and same body returns `already_applied: true`; same key with a different body returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
+Accepted language values are `en` and `zh`. The endpoint accepts no query parameters and rejects unknown body fields. Setting the runtime language is metadata-only and affects future processing or explicit reprocess rather than rewriting existing rows. It is blocked while any source-scoped ingest/fetch attempt or global-exclusive operation is running; the server returns `409 conflict` with shared current-operation details for the active operation. The language write itself is a short atomic metadata update and is not exposed as a `language_mutation` current-operation kind. Live idempotency replay uses request fingerprints: same key and same body returns `already_applied: true`; same key with a different body returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`.
 
 ### Reprocess existing library
 
@@ -600,7 +600,7 @@ Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
 }
 ```
 
-Reprocess accepts no query parameters, uses the current persisted processing language, and shares the same global operation guard as manual ingest/fetch. A conflicting ingest/fetch/reprocess returns `409 conflict`; a duplicate key during an active run also returns conflict. After completion, same-key/same-fingerprint replay returns the stored result with `already_applied: true`; same-key/different-fingerprint replay returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`. Timeout results that can be serialized return HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and an error code of `timeout`.
+Reprocess accepts no query parameters, uses the current persisted processing language, and remains a global-exclusive operation. Any active source-scoped ingest/fetch attempt or other global-exclusive operation returns `409 conflict`; a duplicate key during an active run also returns conflict. After completion, same-key/same-fingerprint replay returns the stored result with `already_applied: true`; same-key/different-fingerprint replay returns `400 bad_request` with `details.reason: "request_fingerprint_mismatch"`. Timeout results that can be serialized return HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and an error code of `timeout`.
 
 ### Export state
 
@@ -642,7 +642,7 @@ Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
 }
 ```
 
-Invalid state bundles fail before writing and return `400 bad_request` with the canonical JSON error body from `docs/ARCHITECTURE.md §6`.
+Invalid state bundles fail before writing and return `400 bad_request` with the canonical JSON error body from `docs/ARCHITECTURE.md §6`. State import is a short global-exclusive restore mutation: if active source/global work prevents a stable restore, it returns `409 conflict` with no queued retry and no operation-history entry.
 ### Diagnostics
 
 ```bash
@@ -829,16 +829,30 @@ Rules:
 - all feeds become one flat source list;
 - no tags, categories, pause/resume toggles, drag ordering, or source scoring sliders are created.
 
+### Export OPML
+
+Use the Source Ledger `[EXPORT OPML]` action or `GET /api/sources/export-opml` to export the active Source Ledger as OPML XML.
+
+```bash
+curl -sS "http://127.0.0.1:8080/api/sources/export-opml" \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -o sources.opml
+```
+
+OPML export is source-list exchange only. It is not complete state portability and does not include steering rules, resonated items, item cache rows, runtime metadata, receipts, operation state, or history.
+
 ### Refresh sources manually
 
 Use `[RUN INGEST]` in the Source Ledger header to fetch all active sources, or `[FETCH]` on a single source row.
 
 Rules:
 
-- only one ingest/fetch operation runs at a time;
-- conflicts return terse raw feedback such as `err: ingest already running`;
+- unrelated source fetches/ingest attempts may run at the same time within bounded in-process limits;
+- a duplicate fetch for the same source fails fast with terse raw conflict feedback;
+- if source capacity is exhausted, a row `[FETCH]` fails fast with `source_capacity_exhausted` conflict feedback rather than waiting in a queue;
+- `[RUN INGEST]` skips busy sources, drains selected idle active sources through bounded in-request workers even when unrelated row fetches are active, reports externally capacity-unavailable starts as skipped, and never persists delayed work;
 - pending states use text replacement (`[INGESTING...]`, `[FETCHING...]`), not spinners or progress dashboards;
-- source errors appear as raw `err: <diagnostic>` text and in `/doctor` diagnostics;
+- source errors, skipped busy sources, and skipped capacity-unavailable sources appear as raw terse diagnostics and in `/doctor` diagnostics where applicable;
 - no jobs, queues, retry dashboards, command histories, activity ledgers, or sync/merge state are created.
 
 ### Delete a source
@@ -888,7 +902,7 @@ Rules:
 
 - export/import is current-state based;
 - no event-sourced activity ledger is created;
-- source OPML import remains flat; OPML export is not part of the current HTTP/UI contract and is not complete state portability;
+- source OPML import/export remain flat source-list exchange only and are not complete state portability;
 - import should fail cleanly rather than partially corrupt state;
 - derived search indexes may be rebuilt after import.
 

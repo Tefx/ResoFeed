@@ -158,7 +158,7 @@ The product is a single-user tool, not a multi-tenant SaaS. There is no account 
 
 ### 4.8 Complete State Portability
 
-The user owns their data. Complete active-state portability is the JSON state bundle defined by `docs/ARCHITECTURE.md §5.5 State Portability`. Complete state includes the Source Ledger, current active steering policy rules, and currently resonated items. OPML remains source-ledger import-only and is not an export or complete state-restore format. Raw text may be used for human-readable feedback or diagnostics, but it is not a separate complete-state import contract.
+The user owns their data. Complete active-state portability is the JSON state bundle defined by `docs/ARCHITECTURE.md §5.5 State Portability`. Complete state includes the Source Ledger, current active steering policy rules, and currently resonated items. OPML import/export remains source-list exchange only and is not a complete state-restore format. Raw text may be used for human-readable feedback or diagnostics, but it is not a separate complete-state import contract.
 
 ## 5. Core Product Primitives
 
@@ -601,7 +601,7 @@ Given a new user imports or configures sources, when enough items are available,
 
 ### AC-16 State Portability
 
-Given the user requests a complete state export, when executed, the system must output the JSON state bundle defined by architecture, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via state import. OPML remains source-ledger import-only and is not an export or complete state restore format.
+Given the user requests a complete state export, when executed, the system must output the JSON state bundle defined by architecture, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via state import. OPML import/export remains source-list exchange only and is not complete state portability or complete state restore format.
 
 ### AC-17 Diagnostics Output
 
@@ -609,11 +609,13 @@ Given the user inputs `/doctor` in the Steer input, when processed, the system m
 
 ### AC-18 Manual fetch controls
 
-Given the Source Ledger exposes a global `[RUN INGEST]` control, when the user triggers it and no ingest is already running, then the system must attempt ingestion for active sources and return a success result that lets the UI update the global last-ingest status.
+Given the Source Ledger exposes a global `[RUN INGEST]` control, when the user triggers it, then the system must skip already-busy sources, drain selected idle active sources through bounded in-request concurrency, report externally capacity-unavailable sources tersely, and return a result that lets the UI update the global last-ingest status without persisting delayed work.
 
-Given the Source Ledger exposes a per-source `[FETCH]` control, when the user triggers it and no ingest is already running, then the system must attempt that source fetch and return a success result that lets the UI update that source's last-fetch status.
+Given the Source Ledger exposes a per-source `[FETCH]` control, when the user triggers it for a source that is not already active and source capacity is available, then the system must attempt that source fetch and return a success result that lets the UI update that source's last-fetch status.
 
-Given any ingest or fetch operation is already running, when the user triggers `[RUN INGEST]` or `[FETCH]`, then the system must reject the request with a terse conflict result and must not queue, persist, or retry the requested work.
+Given the user triggers `[FETCH]` for a source already fetching/ingesting, or when source capacity is exhausted, then the system must reject the request with a terse conflict result and must not queue, persist, or retry the requested work.
+
+Given the user triggers `[RUN INGEST]` while unrelated source fetches are active, then the system must skip/report busy sources, drain selected idle sources through any source slots it owns, report only externally capacity-unavailable starts, and must not queue, persist, or retry skipped work after the response.
 
 Given a manual fetch encounters an RSS/network/source error, when the request completes, then the system must return an error result with terse diagnostic details suitable for inline `err: <diagnostic>` display and `/doctor` diagnostics.
 
