@@ -219,6 +219,42 @@
     return trimmed.toLowerCase().startsWith('err:') ? trimmed : `err: ${trimmed}`;
   }
 
+  function isSkippedIngestError(error: RunIngestSuccessResponse['errors'][number]): boolean {
+    return error.code === 'source_busy' || error.code === 'source_capacity_exhausted';
+  }
+
+  function runIngestErrorSummaries(errors: RunIngestSuccessResponse['errors']): string[] {
+    const summaries = new Map<string, { count: number; messages: string[] }>();
+    for (const error of errors) {
+      const existing = summaries.get(error.code) ?? { count: 0, messages: [] };
+      existing.count += 1;
+      if (error.message.trim()) existing.messages.push(error.message.trim());
+      summaries.set(error.code, existing);
+    }
+    return Array.from(summaries.entries()).map(([code, summary]) => {
+      const firstMessage = summary.messages[0];
+      return firstMessage ? `${code}:${summary.count} ${firstMessage}` : `${code}:${summary.count}`;
+    });
+  }
+
+  function runIngestResultText(result: RunIngestSuccessResponse): string {
+    const completedAt = formatLocalClockTimeWithHint(result.completed_at, language);
+    const skippedErrors = result.errors.filter(isSkippedIngestError);
+    const sourcesSkipped = result.sources_skipped ?? skippedErrors.length;
+    const status = result.status ?? (result.completed && result.errors.length === 0 && sourcesSkipped === 0 ? 'completed' : result.completed ? 'completed_with_errors' : 'failed');
+    if (status === 'failed' && result.status === undefined) return rawErrorText(result.errors[0]?.message ?? chrome.ingestFailed);
+    const parts = [
+      `${chrome.lastIngest}: ${completedAt ?? chrome.complete}`,
+      status !== 'completed' || result.errors.length > 0 || sourcesSkipped > 0 ? `status:${status}` : null,
+      `sources_attempted:${result.sources_attempted ?? result.sources_total}`,
+      `sources_succeeded:${result.sources_succeeded ?? result.sources_fetched}`,
+      (result.sources_failed ?? 0) > 0 ? `sources_failed:${result.sources_failed}` : null,
+      sourcesSkipped > 0 ? `sources_skipped:${sourcesSkipped}` : null,
+      ...runIngestErrorSummaries(result.errors)
+    ];
+    return parts.filter(Boolean).join(' · ');
+  }
+
   function ingestErrorText(error: unknown): string {
     if (error instanceof ResoFeedApiError) {
       const text = rawErrorText(error.body.error.message);
@@ -252,25 +288,21 @@
     return new Promise((resolve) => window.setTimeout(resolve, 120));
   }
 
-  const hasActiveRowFetch = $derived(fetchingSourceIds.size > 0);
-  const runIngestDisabled = $derived(ingestActionRunning || hasActiveRowFetch);
+  const runIngestDisabled = $derived(ingestActionRunning);
 
   function openImportPicker(): void {
     importInput?.click();
   }
 
   function runIngest(): Promise<void> {
-    if (isRunningIngest || hasActiveRowFetch) return Promise.resolve();
+    if (ingestActionRunning) return Promise.resolve();
     isRunningIngest = true;
     globalIngestStatusText = '';
     return tick().then(() => {
       globalIngestStatusText = chrome.submittingIngest;
       return onRunIngest();
     }).then((result) => {
-      const completedAt = formatLocalClockTimeWithHint(result.completed_at, language);
-      globalIngestStatusText = result.completed
-          ? `${chrome.lastIngest}: ${completedAt ?? chrome.complete}`
-          : rawErrorText(result.errors[0]?.message ?? chrome.ingestFailed);
+      globalIngestStatusText = runIngestResultText(result);
     }).catch((error: unknown) => {
       globalIngestStatusText = ingestErrorText(error);
     }).finally(() => {

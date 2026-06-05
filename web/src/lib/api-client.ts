@@ -115,13 +115,21 @@ function normalizeIngestEnvelope(body: ManualFetchSuccessBody, operation: RunIng
   return {
     operation,
     source_id: ingest.source_id,
-    completed: ingest.status === 'completed',
-    sources_total: ingest.sources_attempted,
+    completed: ingest.status !== 'failed',
+    sources_total: ingest.sources_attempted + ingest.sources_skipped,
     sources_fetched: ingest.sources_succeeded,
     items_discovered: ingest.items_discovered ?? ingest.items_upserted,
     items_upserted: ingest.items_upserted,
     errors: ingest.errors,
-    completed_at: ingest.completed_at
+    completed_at: ingest.completed_at,
+    scope: ingest.scope,
+    status: ingest.status,
+    started_at: ingest.started_at,
+    duration_ms: ingest.duration_ms,
+    sources_attempted: ingest.sources_attempted,
+    sources_succeeded: ingest.sources_succeeded,
+    sources_failed: ingest.sources_failed,
+    sources_skipped: ingest.sources_skipped
   };
 }
 

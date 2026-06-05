@@ -81,7 +81,7 @@ export function operationActionLabel(operation: CurrentOperationInfo): Operation
 }
 
 export function isOperationBlockingManualIngest(operation: CurrentOperationInfo | null): boolean {
-  return Boolean(operation?.running && operation.kind !== null);
+  return Boolean(operation?.running && operation.kind !== null && operation.kind !== 'source_fetch');
 }
 
 export function operationTimestamp(timestamp: CurrentOperationInfo['updated_at']): string | null {

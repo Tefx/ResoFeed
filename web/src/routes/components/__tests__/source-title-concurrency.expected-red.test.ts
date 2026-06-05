@@ -7,13 +7,14 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 
 import { ResoFeedApiError } from '$lib/api-client';
-import type { CurrentOperationInfo, FetchSourceSuccessResponse, Source, StateBundleV1 } from '$lib/api-contract';
+import type { CurrentOperationInfo, FetchSourceSuccessResponse, RunIngestSuccessResponse, Source, StateBundleV1 } from '$lib/api-contract';
 import SourceLedger from '../SourceLedger.svelte';
 
 type SourceLedgerExpectedRedProps = {
   sources: Source[];
   onDeleteSource: (source: Source) => Promise<void> | void;
   onImportOpml: (opml: string) => Promise<void> | void;
+  onRunIngest?: () => Promise<RunIngestSuccessResponse>;
   onFetchSource?: (source: Source) => Promise<FetchSourceSuccessResponse>;
   onExportState: () => Promise<StateBundleV1>;
   onImportState: (bundle: StateBundleV1) => Promise<void> | void;
@@ -102,13 +103,32 @@ describe('Source Ledger source-title/concurrency expected-red contract', () => {
     expect(ledger).toHaveTextContent('[RUN INGEST]');
   });
 
-  it('allows multiple distinct source rows to show [FETCHING...] while unrelated row [FETCH] remains actionable and [RUN INGEST] is disabled', async () => {
+  it('allows multiple distinct source rows to show [FETCHING...] while unrelated row [FETCH] and [RUN INGEST] remain actionable', async () => {
     const user = userEvent.setup();
     const pendingBySource = new Map<string, (response: FetchSourceSuccessResponse) => void>();
     const onFetchSource = vi.fn((candidate: Source) => new Promise<FetchSourceSuccessResponse>((resolve) => {
       pendingBySource.set(candidate.id, resolve);
     }));
-    const ledger = renderLedger({ onFetchSource });
+    const onRunIngest = vi.fn(async (): Promise<RunIngestSuccessResponse> => ({
+      operation: 'ingest',
+      source_id: null,
+      completed: true,
+      status: 'completed_with_errors',
+      sources_total: 3,
+      sources_fetched: 1,
+      sources_attempted: 1,
+      sources_succeeded: 1,
+      sources_failed: 0,
+      sources_skipped: 2,
+      items_discovered: 0,
+      items_upserted: 0,
+      completed_at: '2026-06-05T14:07:08Z',
+      errors: [
+        { source_id: 'src_alpha', code: 'source_busy', message: 'Alpha Journal already fetching' },
+        { source_id: 'src_beta', code: 'source_capacity_exhausted', message: 'external source capacity exhausted' }
+      ]
+    }));
+    const ledger = renderLedger({ onFetchSource, onRunIngest });
 
     await user.click(within(rowBySourceId(ledger, 'src_alpha')).getByRole('button', { name: /\[FETCH\].*Alpha Journal/ }));
     await user.click(within(rowBySourceId(ledger, 'src_beta')).getByRole('button', { name: /\[FETCH\].*Beta Dispatch/ }));
@@ -118,8 +138,16 @@ describe('Source Ledger source-title/concurrency expected-red contract', () => {
     expect(fetchingButtons[0]).toBeDisabled();
     expect(fetchingButtons[1]).toBeDisabled();
     expect(within(rowBySourceId(ledger, 'src_gamma')).getByRole('button', { name: /\[FETCH\].*Gamma Notes/ })).toBeEnabled();
-    expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeDisabled();
+    expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeEnabled();
+
+    await user.click(within(ledger).getByRole('button', { name: '[RUN INGEST]' }));
+
     expect(onFetchSource).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(onRunIngest).toHaveBeenCalledTimes(1));
+    expect(within(ledger).getByText(/status:completed_with_errors/)).toBeVisible();
+    expect(ledger).toHaveTextContent('sources_skipped:2');
+    expect(ledger).toHaveTextContent('source_busy:1 Alpha Journal already fetching');
+    expect(ledger).toHaveTextContent('source_capacity_exhausted:1 external source capacity exhausted');
     expectForbiddenOperationalSurfacesAbsent(ledger);
 
     for (const [sourceId, resolve] of pendingBySource) {

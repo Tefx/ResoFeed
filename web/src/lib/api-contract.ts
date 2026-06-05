@@ -523,6 +523,7 @@ export interface IngestRunResult {
   sources_attempted: number;
   sources_succeeded: number;
   sources_failed: number;
+  sources_skipped: number;
   items_discovered?: number;
   items_upserted: number;
   errors: ManualFetchSourceError[];
@@ -538,6 +539,14 @@ export interface ManualFetchResult {
   items_upserted: number;
   errors: ManualFetchSourceError[];
   completed_at?: Rfc3339UtcString;
+  scope?: IngestRunResult['scope'];
+  status?: IngestRunStatus;
+  started_at?: Rfc3339UtcString;
+  duration_ms?: number;
+  sources_attempted?: number;
+  sources_succeeded?: number;
+  sources_failed?: number;
+  sources_skipped?: number;
 }
 
 export type RunIngestSuccessResponse = ManualFetchResult;
