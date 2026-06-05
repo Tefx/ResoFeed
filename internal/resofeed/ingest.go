@@ -87,11 +87,77 @@ type IngestConfig struct {
 	SourceConcurrency        int
 	ItemConcurrencyPerSource int
 	GlobalLLMConcurrency     int
+	llmSemaphore             *ingestLLMSemaphore
 	FirstFetchMaxItems       int
 	// FirstFetchMaxItemsSet distinguishes omitted IngestConfig{} (default 50)
 	// from an explicit zero unlimited cap. It is only needed for direct in-process
 	// callers because the CLI/env parser always materializes an explicit value.
 	FirstFetchMaxItemsSet bool
+}
+
+type ingestLLMSemaphore struct {
+	mu     sync.Mutex
+	tokens chan struct{}
+	limit  int
+	active int
+}
+
+var processLLMSemaphore ingestLLMSemaphore
+
+func newIngestLLMSemaphore(limit int) *ingestLLMSemaphore {
+	if limit <= 0 {
+		limit = DefaultIngestGlobalLLMConcurrency
+	}
+	processLLMSemaphore.configure(limit)
+	return &processLLMSemaphore
+}
+
+func (s *ingestLLMSemaphore) configure(limit int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.tokens == nil || (s.active == 0 && len(s.tokens) == 0) || s.limit <= 0 {
+		s.tokens = make(chan struct{}, limit)
+		s.limit = limit
+	}
+}
+
+func (s *ingestLLMSemaphore) acquire(ctx context.Context) (func(), error) {
+	if s == nil {
+		return func() {}, nil
+	}
+	s.mu.Lock()
+	if s.tokens == nil {
+		s.tokens = make(chan struct{}, DefaultIngestGlobalLLMConcurrency)
+		s.limit = DefaultIngestGlobalLLMConcurrency
+	}
+	tokens := s.tokens
+	s.mu.Unlock()
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case tokens <- struct{}{}:
+	}
+	s.mu.Lock()
+	s.active++
+	s.mu.Unlock()
+	released := false
+	return func() {
+		if released {
+			return
+		}
+		released = true
+		<-tokens
+		s.mu.Lock()
+		s.active--
+		s.mu.Unlock()
+	}, nil
+}
+
+func (cfg IngestConfig) withLLMSemaphore(coordCfg ingestCoordinatorConfig) IngestConfig {
+	if cfg.llmSemaphore == nil {
+		cfg.llmSemaphore = newIngestLLMSemaphore(coordCfg.withDefaults().GlobalLLMConcurrency)
+	}
+	return cfg
 }
 
 // RunIngestLoop fetches active sources independently until ctx is canceled. One
@@ -149,7 +215,9 @@ func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ManualFetc
 // source. Missing, deleted, and inactive sources are reported by the caller as
 // not_found; operational RSS failures are source-level result entries.
 func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string) (ret ManualFetchResult, retErr error) {
-	release, err := tryAcquireIngestGuardWithConfig(ctx, cfg.coordinatorConfig(), "fetch", sourceID, string(ActorKindHuman))
+	coordCfg := cfg.coordinatorConfig()
+	cfg = cfg.withLLMSemaphore(coordCfg)
+	release, err := tryAcquireIngestGuardWithConfig(ctx, coordCfg, "fetch", sourceID, string(ActorKindHuman))
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
@@ -181,6 +249,7 @@ func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source
 }
 
 func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (result ManualFetchResult, retErr error) {
+	cfg = cfg.withLLMSemaphore(cfg.coordinatorConfig())
 	result = ManualFetchResult{Operation: ManualFetchOperationIngest, Completed: true, Errors: []ManualFetchSourceError{}}
 	sources, err := loadActiveSources(ctx, db)
 	if err != nil {
@@ -260,6 +329,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 	updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, opts.fetchMessage)
 
 	coordCfg := cfg.coordinatorConfig()
+	cfg = cfg.withLLMSemaphore(coordCfg)
 	capacity := snapshotSourceRunCapacity(coordCfg)
 	if capacity.globalBusy {
 		if opts.globalBusyAsConflict {
@@ -864,31 +934,99 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 	if err != nil {
 		return result, err
 	}
-	for index, entry := range itemsToProcess {
-		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index, Total: len(feed.Items)}, "processing feed items")
-		itemID := ingestedItemID(effectiveSource, entry)
+	return processSourceItems(ctx, db, cfg, effectiveSource, itemsToProcess, len(feed.Items), language, activeSteeringRules, result)
+}
+
+type ingestItemTask struct {
+	entry feedEntry
+}
+
+func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, entries []feedEntry, totalItems int, language ProcessingLanguage, activeSteeringRules []string, result ingestSourceResult) (ingestSourceResult, error) {
+	cfg = cfg.withLLMSemaphore(cfg.coordinatorConfig())
+	processed := 0
+	pending := make([]ingestItemTask, 0, len(entries))
+	for _, entry := range entries {
+		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: processed, Total: totalItems}, "processing feed items")
+		itemID := ingestedItemID(source, entry)
 		exists, err := itemExists(ctx, db, itemID)
 		if err != nil {
 			return result, err
 		}
 		if exists {
-			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(feed.Items)}, "processed feed item")
+			processed++
+			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: processed, Total: totalItems}, "processed feed item")
 			continue
 		}
-		item, err := buildItemWithActiveSteering(ctx, effectiveSource, entry, cfg.LLM, language, activeSteeringRules)
-		if err != nil {
-			return result, err
+		pending = append(pending, ingestItemTask{entry: entry})
+	}
+	if len(pending) == 0 {
+		return result, nil
+	}
+
+	slotCount := minInt(cfg.coordinatorConfig().ItemConcurrencyPerSource, len(pending))
+	taskCh := make(chan ingestItemTask)
+	var wg sync.WaitGroup
+	var resultMu sync.Mutex
+	var firstErr error
+
+	recordErr := func(err error) {
+		if err == nil {
+			return
 		}
-		inserted, err := upsertIngestedItem(ctx, db, item)
-		if err != nil {
-			return result, err
+		resultMu.Lock()
+		if firstErr == nil {
+			firstErr = err
 		}
+		resultMu.Unlock()
+	}
+	recordDone := func(inserted bool) {
+		resultMu.Lock()
 		if inserted {
 			result.itemsUpserted++
 		}
-		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: index + 1, Total: len(feed.Items)}, "processed feed item")
+		processed++
+		current := processed
+		resultMu.Unlock()
+		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: current, Total: totalItems}, "processed feed item")
 	}
-	return result, nil
+
+	for i := 0; i < slotCount; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for task := range taskCh {
+				item, err := buildItemWithActiveSteeringAndSemaphore(ctx, source, task.entry, cfg.LLM, language, activeSteeringRules, cfg.llmSemaphore)
+				if err != nil {
+					recordErr(err)
+					recordDone(false)
+					continue
+				}
+				inserted, err := upsertIngestedItem(ctx, db, item)
+				if err != nil {
+					recordErr(err)
+					recordDone(false)
+					continue
+				}
+				recordDone(inserted)
+			}
+		}()
+	}
+
+sendLoop:
+	for _, task := range pending {
+		select {
+		case <-ctx.Done():
+			recordErr(ctx.Err())
+			break sendLoop
+		case taskCh <- task:
+		}
+	}
+	close(taskCh)
+	wg.Wait()
+
+	resultMu.Lock()
+	defer resultMu.Unlock()
+	return result, firstErr
 }
 
 func applyFirstFetchLimit(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string, items []feedEntry) ([]feedEntry, error) {
@@ -1040,6 +1178,10 @@ func buildItem(ctx context.Context, source Source, entry feedEntry, llm LLMClien
 }
 
 func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedEntry, llm LLMClient, targetLanguage ProcessingLanguage, activeSteeringRules []string) (Item, error) {
+	return buildItemWithActiveSteeringAndSemaphore(ctx, source, entry, llm, targetLanguage, activeSteeringRules, nil)
+}
+
+func buildItemWithActiveSteeringAndSemaphore(ctx context.Context, source Source, entry feedEntry, llm LLMClient, targetLanguage ProcessingLanguage, activeSteeringRules []string, llmSemaphore *ingestLLMSemaphore) (Item, error) {
 	if err := validateProcessingLanguage(targetLanguage); err != nil {
 		return Item{}, fmt.Errorf("build item: target language: %w", err)
 	}
@@ -1097,7 +1239,12 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
+	releaseLLM, err := llmSemaphore.acquire(ctx)
+	if err != nil {
+		return Item{}, fmt.Errorf("build item: acquire llm semaphore: %w", err)
+	}
 	out, err := llm.SummarizeItem(ctx, OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableTextSource: availableTextSource, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
+	releaseLLM()
 	if err != nil {
 		item.ModelStatus = classifyModelFailureStatus(err, out.ModelStatus)
 		sanitizeReadableItem(&item)
