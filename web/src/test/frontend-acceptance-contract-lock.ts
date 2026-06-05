@@ -83,7 +83,6 @@ export const frontendAcceptanceContractLock = {
     { label: '[INGESTING...]', role: 'button', accessibleName: '[INGESTING...]', hitTarget: canonicalHitTarget, liveRegion: 'polite' },
     { label: '[FETCH]', role: 'button', accessibleName: 'Fetch source: <name>', hitTarget: canonicalHitTarget, liveRegion: 'polite' },
     { label: '[FETCHING...]', role: 'button', accessibleName: 'Fetch source: <name>', hitTarget: canonicalHitTarget, liveRegion: 'polite' },
-    { label: '[DETAILS]', role: 'native-details-summary', accessibleName: 'Source diagnostics for: <name>', hitTarget: canonicalHitTarget, liveRegion: 'off' },
     { label: '[DELETE]', role: 'button', accessibleName: 'Delete source: <name>', hitTarget: canonicalHitTarget, liveRegion: 'assertive' },
     { label: '[IMPORT OPML]', role: 'keyboard-reachable-file-input', accessibleName: '[IMPORT OPML]', hitTarget: canonicalHitTarget, liveRegion: 'polite' },
     { label: '[IMPORTING OPML...]', role: 'button', accessibleName: '[IMPORTING OPML...]', hitTarget: canonicalHitTarget, liveRegion: 'polite' },
@@ -93,10 +92,11 @@ export const frontendAcceptanceContractLock = {
     { label: '[IMPORTING STATE...]', role: 'button', accessibleName: '[IMPORTING STATE...]', hitTarget: canonicalHitTarget, liveRegion: 'polite' }
   ],
   sourceLedgerDetailsDisclosure: {
-    triggerLabel: '[DETAILS]',
+    triggerLabels: ['source info', '来源信息'],
     semantics: 'native-details-summary-or-button-with-aria-expanded',
     collapsedByDefault: true,
     diagnosticPlacement: 'labelled-disclosure-not-primary-copy',
+    visualStyle: 'low-chrome-not-bracket-command',
     rawErrorPrefixPreserved: 'err:'
   },
   searchRetrieval: [

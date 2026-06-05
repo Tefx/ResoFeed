@@ -147,22 +147,25 @@ test.describe('expected-red Source Ledger hit targets, negative UX, and split sc
     await expectTopmostClickable(ledger.getByRole('button', { name: '[EXPORT STATE]' }), '[EXPORT STATE]');
     await expectTopmostClickable(ledger.getByRole('button', { name: '[IMPORT STATE]' }), '[IMPORT STATE]');
 
-    const details = ledger.getByText('[DETAILS]');
-    await expectTopmostClickable(details, '[DETAILS]');
-    const disclosureAudit = await details.evaluate((element) => {
+    await expect(ledger.getByText('[DETAILS]')).toHaveCount(0);
+    const sourceInfo = ledger.getByText('source info');
+    await expectTopmostClickable(sourceInfo, 'source info');
+    const disclosureAudit = await sourceInfo.evaluate((element) => {
       const disclosure = element.closest('details');
       return {
         nativeDetails: disclosure instanceof HTMLDetailsElement,
         ariaExpanded: element.getAttribute('aria-expanded'),
-        ariaControls: element.getAttribute('aria-controls')
+        ariaControls: element.getAttribute('aria-controls'),
+        bracketAction: element.classList.contains('bracket-action')
       };
     });
     expect(
       disclosureAudit.nativeDetails ||
         (disclosureAudit.ariaExpanded !== null && Boolean(disclosureAudit.ariaControls)),
-      '[DETAILS] must use native <details> or aria-expanded/aria-controls disclosure semantics'
+      'source info must use native <details> or aria-expanded/aria-controls disclosure semantics'
     ).toBe(true);
-    await details.click();
+    expect(disclosureAudit.bracketAction, 'source info is a low-chrome disclosure, not a bracket command').toBe(false);
+    await sourceInfo.click();
     await expect(ledger.locator('.source-ledger__status--error')).toContainText('err: timeout while fetching https://example.com/feed.xml after 20s');
     await expect(ledger).not.toContainText(/sorry|oops|try again later|friendly|dashboard/i);
   });

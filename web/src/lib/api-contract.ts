@@ -566,7 +566,8 @@ export interface SourceLedgerManualFetchRenderContract {
   readonly activeControlDisabled: false;
   readonly timestampFormat: 'HH:MM:SS';
   readonly timestampInputs: readonly ['last_fetch'];
-  readonly diagnosticDisclosure: '[DETAILS]';
+  readonly diagnosticDisclosure: 'source info / 来源信息';
+  readonly diagnosticDisclosureStyle: 'low-chrome-native-disclosure-not-bracket-command';
   readonly bracketActionStyle: 'bracket-padding-uppercase-terminal-hover-inversion-focus-visible';
   readonly accessibility: readonly [
     'native-details-summary',
@@ -601,7 +602,8 @@ export const sourceLedgerManualFetchRenderContract: SourceLedgerManualFetchRende
   activeControlDisabled: false,
   timestampFormat: 'HH:MM:SS',
   timestampInputs: ['last_fetch'],
-  diagnosticDisclosure: '[DETAILS]',
+  diagnosticDisclosure: 'source info / 来源信息',
+  diagnosticDisclosureStyle: 'low-chrome-native-disclosure-not-bracket-command',
   bracketActionStyle: 'bracket-padding-uppercase-terminal-hover-inversion-focus-visible',
   accessibility: [
     'native-details-summary',
@@ -663,7 +665,6 @@ export type SourceLedgerActionLabel =
   | '[INGESTING...]'
   | '[FETCH]'
   | '[FETCHING...]'
-  | '[DETAILS]'
   | '[DELETE]'
   | '[IMPORT OPML]'
   | '[IMPORTING OPML...]'
@@ -689,10 +690,11 @@ export interface SourceLedgerControlExpectation {
 }
 
 export interface SourceLedgerDetailsDisclosureExpectation {
-  readonly triggerLabel: '[DETAILS]';
+  readonly triggerLabels: readonly ['source info', '来源信息'];
   readonly semantics: 'native-details-summary-or-button-with-aria-expanded';
   readonly collapsedByDefault: true;
   readonly diagnosticPlacement: 'labelled-disclosure-not-primary-copy';
+  readonly visualStyle: 'low-chrome-not-bracket-command';
   readonly rawErrorPrefixPreserved: 'err:';
 }
 

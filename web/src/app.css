@@ -422,12 +422,13 @@ a:focus-visible,
 
 .source-diagnostic-details summary {
   display: inline-flex;
+  min-width: 44px;
   min-height: 44px;
   align-items: center;
+  justify-content: center;
+  padding-inline: var(--rf-space-sm);
   cursor: pointer;
   color: var(--rf-color-current-muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .source-diagnostic-details[open] summary,

@@ -85,9 +85,11 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     renderLedger();
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    for (const label of ['[RUN INGEST]', '[FETCH]', '[DETAILS]', '[DELETE]', '[IMPORT OPML]', '[EXPORT OPML]', '[EXPORT STATE]', '[IMPORT STATE]']) {
+    for (const label of ['[RUN INGEST]', '[FETCH]', '[DELETE]', '[IMPORT OPML]', '[EXPORT OPML]', '[EXPORT STATE]', '[IMPORT STATE]']) {
       expect(within(ledger).getByText(label)).toHaveTextContent(label);
     }
+    expect(within(ledger).queryByText('[DETAILS]')).not.toBeInTheDocument();
+    expect(within(ledger).getByText('source info')).toBeVisible();
     expect(within(ledger).getByRole('group', { name: 'Source list actions' })).toHaveTextContent('SOURCE LIST');
     expect(within(ledger).getByRole('group', { name: 'Portable state actions' })).toHaveTextContent('PORTABLE STATE');
     expect(ledger).toHaveTextContent('OPML = source list; State = sources + rules + stars, import replaces.');
@@ -105,6 +107,8 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(within(ledger).getByRole('group', { name: '状态迁移操作' })).toHaveTextContent('状态迁移');
     expect(within(ledger).getByText('[IMPORT OPML]')).toBeVisible();
     expect(within(ledger).getByText('[FETCH]')).toBeVisible();
+    expect(within(ledger).queryByText('[DETAILS]')).not.toBeInTheDocument();
+    expect(within(ledger).getByText('来源信息')).toBeVisible();
     expect(within(ledger).getByText('Example')).toBeVisible();
     expect(within(ledger).getByText('https://example.com/feed.xml')).toBeVisible();
     const row = ledger.querySelector('.source-ledger__row');
@@ -272,23 +276,25 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(onImportState).not.toHaveBeenCalled();
   });
 
-  it('renders source diagnostics through a visible details disclosure without friendly SaaS copy', async () => {
+  it('renders source diagnostics through a visible source info disclosure without friendly SaaS copy', async () => {
     const user = userEvent.setup();
     renderLedger();
 
     const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
-    const details = within(ledger).getByText('[DETAILS]');
-    expect(details).toBeVisible();
+    const sourceInfo = within(ledger).getByText('source info');
+    expect(sourceInfo).toBeVisible();
+    expect(sourceInfo).not.toHaveClass('bracket-action');
+    expect(within(ledger).queryByText('[DETAILS]')).not.toBeInTheDocument();
     expect(ledger.querySelector('.source-diagnostic-details')).not.toHaveAttribute('open');
-    await user.click(details);
+    await user.click(sourceInfo);
     expect(ledger.querySelector('.source-diagnostic-details')).toHaveAttribute('open');
     expect(within(ledger).getByText(/feed_url: https:\/\/example.com\/feed.xml/)).toBeVisible();
-    details.focus();
-    expect(details).toHaveFocus();
+    sourceInfo.focus();
+    expect(sourceInfo).toHaveFocus();
     await user.keyboard('{Enter}');
     expect(ledger.querySelector('.source-diagnostic-details')).not.toHaveAttribute('open');
     expect(ledger).not.toHaveTextContent(/sorry|oops|we couldn't|try again later|hang tight/i);
-    expect(details.closest('[role="alert"], [role="status"], .card, .toast')).toBeNull();
+    expect(sourceInfo.closest('[role="alert"], [role="status"], .card, .toast')).toBeNull();
   });
 
   it('preserves raw err diagnostics and exposes the full diagnostic through title and disclosure text', async () => {
@@ -300,7 +306,7 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(status).toHaveTextContent(/^err: timeout while fetching/);
     expect(status).toHaveAttribute('title', sourceWithLongDiagnostic.last_fetch_error);
 
-    await user.click(within(ledger).getByText('[DETAILS]'));
+    await user.click(within(ledger).getByText('source info'));
     expect(within(ledger).getByText(/fetch_error: err: timeout while fetching/)).toBeVisible();
   });
 
@@ -327,10 +333,14 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(ledger).toHaveClass('contract-source-ledger');
     expect(ledger.querySelector('ul')).toHaveClass('contract-list');
     expect(ledger.querySelector('.source-ledger-row')).toHaveClass('source-ledger-row');
-    expect(within(ledger).getByText('[DETAILS]')).toHaveTextContent(/^\[[A-Z]+\]$/);
+    const sourceInfo = within(ledger).getByText('source info');
+    expect(sourceInfo).toHaveTextContent(/^source info$/);
+    expect(sourceInfo).not.toHaveTextContent(/^\[[A-Z]+\]$/);
+    expect(sourceInfo).not.toHaveClass('bracket-action');
+    expect(within(ledger).queryByText('[DETAILS]')).not.toBeInTheDocument();
     expect(within(ledger).getByText('[RUN INGEST]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[FETCH]')).toHaveClass('bracket-action');
-    expect(within(ledger).getByText('[DETAILS]').closest('details')).toHaveClass('source-diagnostic-details');
+    expect(sourceInfo.closest('details')).toHaveClass('source-diagnostic-details');
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action');
     expect(within(ledger).getByText('[DELETE]')).toHaveClass('bracket-action--delete');
     // DEVIATION RECORD: type=test_error; artifact=manual-rss-fetch-source-ledger.regression.test.ts; what_changed=negative OPML receipt assertion uses `OPML outlines flattened`; why=folder terminology is stale and forbidden; impact=manual fetch still proves no unrelated OPML import receipt appears.

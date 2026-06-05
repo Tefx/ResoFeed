@@ -17,25 +17,26 @@ describe('frontend acceptance contract lock fixtures', () => {
     expect(idle?.forbiddenVisibleText).toEqual(expect.arrayContaining(['[IDLE]', 'duplicate hint']));
   });
 
-  it('pins Source Ledger bracket controls, details disclosure, OPML/state actions, and 44px targets', () => {
+  it('pins Source Ledger bracket controls, source-info disclosure, OPML/state actions, and 44px targets', () => {
     const labels = frontendAcceptanceContractLock.sourceLedgerControls.map((control) => control.label);
 
     expect(labels).toEqual(expect.arrayContaining([
       '[RUN INGEST]',
       '[FETCH]',
-      '[DETAILS]',
       '[DELETE]',
       '[IMPORT OPML]',
       '[EXPORT STATE]',
       '[IMPORT STATE]'
     ]));
+    expect(labels).not.toContain('[DETAILS]');
     for (const control of frontendAcceptanceContractLock.sourceLedgerControls) {
       expect(control.hitTarget).toMatchObject({ minWidthCssPx: 44, minHeightCssPx: 44, disabledKeepsBounds: true });
       expect(control.hitTarget.proof).toEqual(expect.arrayContaining(['elementFromPoint-topmost']));
     }
     expect(frontendAcceptanceContractLock.sourceLedgerDetailsDisclosure).toMatchObject({
-      triggerLabel: '[DETAILS]',
+      triggerLabels: ['source info', '来源信息'],
       collapsedByDefault: true,
+      visualStyle: 'low-chrome-not-bracket-command',
       rawErrorPrefixPreserved: 'err:'
     });
   });
