@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/svelte';
+import { fireEvent, render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
 import Inspector from '../Inspector.svelte';
@@ -44,7 +44,7 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(inspector).not.toHaveTextContent('Unprocessed source body must not masquerade');
   });
 
-  it('keeps OK model-backed items on the normal Summary/Core/Source Text path', () => {
+  it('keeps OK model-backed items on the normal Summary/Core/Text evidence path', () => {
     const okDetail: ItemDetail = {
       ...baseDetail,
       id: 'ok-model-backed-contract',
@@ -111,13 +111,14 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(summary).not.toHaveTextContent('\\n');
   });
 
-  it('never falls back to generated summary or core insight in Source Text when source evidence is absent', () => {
+  it('never falls back to generated summary, core insight, or key points in Text evidence when source evidence is absent', () => {
     const generatedOnlyDetail: ItemDetail = {
       ...baseDetail,
       id: 'generated-only-source-text-contract',
       title: 'Generated only source text contract item',
       summary: 'Generated summary must remain only in Summary.',
       core_insight: 'Generated core insight must remain only in Core insight.',
+      key_points: ['Generated key point one.', 'Generated key point two.', 'Generated key point three.'],
       extraction_status: 'original_unavailable',
       model_status: 'ok',
       extracted_text: null,
@@ -130,9 +131,78 @@ describe('Inspector fallback/source evidence contract', () => {
     const inspector = screen.getByRole('complementary', { name: generatedOnlyDetail.title });
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Generated summary must remain only in Summary.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Generated core insight must remain only in Core insight.');
+    expect(within(inspector).getByLabelText('Key points')).toHaveTextContent('Generated key point three.');
     expect(within(inspector).queryByLabelText('Text evidence')).not.toBeInTheDocument();
-    expect(within(inspector).queryByText('Source text unavailable; use original link.')).not.toBeInTheDocument();
+    expect(within(inspector).queryByText('Text evidence unavailable; use original link.')).not.toBeInTheDocument();
     expect(within(inspector).getByRole('link', { name: 'original link' })).toBeVisible();
+  });
+
+  it('resets Text evidence disclosure to collapsed when a newly opened item is rendered', async () => {
+    const firstDetail: ItemDetail = {
+      ...baseDetail,
+      id: 'first-text-evidence-reset-contract',
+      title: 'First text evidence reset contract item',
+      summary: 'First generated summary remains visible.',
+      core_insight: 'First generated core insight remains visible.',
+      extraction_status: 'full',
+      model_status: 'ok',
+      extracted_text: 'First item source-backed evidence.'
+    };
+    const secondDetail: ItemDetail = {
+      ...baseDetail,
+      id: 'second-text-evidence-reset-contract',
+      title: 'Second text evidence reset contract item',
+      summary: 'Second generated summary remains visible.',
+      core_insight: 'Second generated core insight remains visible.',
+      extraction_status: 'full',
+      model_status: 'ok',
+      extracted_text: 'Second item source-backed evidence.'
+    };
+
+    const view = render(Inspector, { props: { item: firstDetail, mode: 'desktop-split' } });
+    const firstInspector = screen.getByRole('complementary', { name: firstDetail.title });
+    const firstEvidence = within(firstInspector).getByLabelText('Text evidence');
+    expect(firstEvidence).not.toHaveAttribute('open');
+
+    await fireEvent.click(within(firstEvidence).getByText('Text evidence'));
+    expect(firstEvidence).toHaveAttribute('open');
+
+    await view.rerender({ item: secondDetail, mode: 'desktop-split' });
+    const secondInspector = screen.getByRole('complementary', { name: secondDetail.title });
+    const secondEvidence = within(secondInspector).getByLabelText('Text evidence');
+    expect(secondEvidence).toHaveTextContent('Second item source-backed evidence.');
+    expect(secondEvidence).not.toHaveAttribute('open');
+  });
+
+  it('labels source metadata/provenance disclosure as Source info without exposing raw URLs as visible text', () => {
+    const detail: ItemDetail = {
+      ...baseDetail,
+      id: 'source-info-terminology-contract',
+      title: 'Source info terminology contract item',
+      summary: 'Model-backed summary remains visible.',
+      core_insight: 'Model-backed core insight remains visible.',
+      extraction_status: 'full',
+      model_status: 'ok'
+    };
+
+    render(Inspector, { props: { item: detail, mode: 'desktop-split' } });
+
+    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const originalLink = within(inspector).getByRole('link', { name: 'original link' });
+    expect(originalLink).toHaveTextContent(/^original link$/u);
+    expect(originalLink).toHaveAttribute('href', expectedRedItem.url);
+    expect(originalLink).toHaveAttribute('translate', 'no');
+    const feedLink = within(inspector).getByRole('link', { name: 'feed link' });
+    expect(feedLink).toHaveTextContent(/^feed link$/u);
+    expect(feedLink).toHaveAttribute('href', expectedRedSource.url);
+    expect(feedLink).toHaveAttribute('translate', 'no');
+
+    const sourceInfo = within(inspector).getByLabelText('Source info');
+    expect(sourceInfo.querySelector('summary')).toBeVisible();
+    expect(sourceInfo.querySelector('summary')).toHaveTextContent(/^Source info$/u);
+    expect(within(sourceInfo).getByRole('link', { name: 'source detail feed link: Example Source' })).toHaveAttribute('href', expectedRedSource.url);
+    expect(inspector).not.toHaveTextContent(expectedRedItem.url);
+    expect(sourceInfo).not.toHaveTextContent(expectedRedSource.url);
   });
 
   it('does not render unavailable source text for full OK rows with generated content but no stored evidence', () => {
@@ -156,7 +226,7 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('Generated summary is present but not source evidence.');
     expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('Generated core insight is present but not source evidence.');
     expect(within(inspector).queryByLabelText('文本证据')).not.toBeInTheDocument();
-    expect(within(inspector).queryByText('来源文本不可用；请使用原文链接。')).not.toBeInTheDocument();
+    expect(within(inspector).queryByText('文本证据不可用；请使用原文链接。')).not.toBeInTheDocument();
     expect(within(inspector).getByText('模型支持 · 原文未存 · 质量：高价值')).toBeVisible();
     expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 原文未存，质量 高价值"]')).toBeVisible();
   });
@@ -201,7 +271,7 @@ describe('Inspector fallback/source evidence contract', () => {
     const inspector = screen.getByRole('complementary', { name: partialEvidenceDetail.title });
     expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('RSS excerpt source evidence remains auditable.');
     expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
-    expect(inspector).not.toHaveTextContent('来源文本不可用；请使用原文链接。');
+    expect(inspector).not.toHaveTextContent('文本证据不可用；请使用原文链接。');
   });
 
   it('does not mark generated content unavailable when only the original article is unavailable', () => {
@@ -246,7 +316,7 @@ describe('Inspector fallback/source evidence contract', () => {
     const inspector = screen.getByRole('complementary', { name: detail.title });
     expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
     expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 来源摘录，质量 高价值"]')).toBeVisible();
-    expect(inspector).not.toHaveTextContent('来源文本：仅 RSS 摘录 · 摘要来源：模型支持');
+    expect(inspector).not.toHaveTextContent('文本证据：仅 RSS 摘录 · 摘要来源：模型支持');
     expect(inspector).not.toHaveTextContent('摘要来源：模型支持');
   });
 
