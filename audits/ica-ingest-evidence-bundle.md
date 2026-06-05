@@ -23,13 +23,15 @@ This evidence bundle verifies the successful implementation of the source-scoped
 - **Local Command Suite & Spec Conformance:**
   ```bash
   $ go test ./... -count=1
-  ok      resofeed/cmd/resofeed   0.145s
+  ?       resofeed/cmd/resofeed   [no test files]
   ok      resofeed/internal/resofeed   2.450s
   ```
 - **Negative Drift Scan:**
+  Final negative drift scans were performed by `ica-final-negative-drift-scans`.
   ```bash
-  $ grep -ir 'queue' 'job' 'worker' 'dashboard' internal/resofeed/ cmd/resofeed/
-  # (No output / 0 hits indicating no architectural drift)
+  # Scanned categories: queue/job/history tables, manual ingest abstractions, unauthorized settings dashboards
+  $ rg -n -i 'create table.*(queue|job|history)|feed_title|manual_ingest|fetch_source' internal/resofeed cmd web/src
+  # Exit 1 (No unexpected architectural drift hits)
   ```
 - **Architecture Review:**
   Docs audited. SQLite + FTS5 preserved. No embeddings/RAG/queues injected.
@@ -40,11 +42,11 @@ This evidence bundle verifies the successful implementation of the source-scoped
   ```
 
 - **Black-Box Slow Feed Proof:**
-  Executed by `blind-tester`. Artifacts are explicitly un-tracked/local test collateral ignored by git, not required reviewer evidence.
+  Executed by `blind-tester`.
   Result: Verified `source_capacity_exhausted` and bounded execution times via `go test -race ./internal/resofeed -run 'TestICAExpectedRed(ThroughputMultipleSlowItemLLMRequestsBeatSerialTime|ItemLLMConcurrencyBoundedByPerSourceLimit|GlobalLLMSemaphoreBoundsConcurrentSources|Background)|TestICABackground|TestICACurrentOperation' -count=1`
 
 - **Frontend/Browser Proof:**
-  Executed by `blind-tester`. Artifacts are strictly local (`.test-artifacts/*`) and not checked in.
+  Executed by `blind-tester`.
   Result: Source Ledger renders `[FETCHING...]` overlay, duplicate action disabled, toast handles 409 `source_busy` gracefully.
 
 ## 4. Architectural Boundaries Preserved

@@ -14,7 +14,7 @@ Non-scope: durable queues, worker processes, sidecars, job dashboards, settings 
 
 - `internal/resofeed/ingest.go` reads the persisted runtime processing language inside `ingestSource` before item processing and passes it as `TargetLanguage` to the LLM summary input. This supports the backend language contract for both manual source fetch and ingest passes.
 - Prior to this change, `ingestOnceUnlocked` looped active sources one by one and called `ingestSource` serially.
-- `ingestSource` historically looped feed entries one by one, built one item at a time, and performed one `SummarizeItem` call serially per item; this must be updated to concurrent item workers obeying source limits.
+- `ingestSource` historically looped feed entries one by one, built one item at a time, and performed one `SummarizeItem` call serially per item; it has been updated to bounded concurrent item workers obeying `item_concurrency_per_source` and global LLM semaphore.
 - Existing source-title/concurrency work already permits concurrent manual source fetches when source ids differ and forbids same-source duplicate fetches.
 
 ## Architecture Basis
