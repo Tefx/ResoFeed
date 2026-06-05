@@ -1,7 +1,10 @@
+import fs from 'node:fs';
+
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Inspector from '../Inspector.svelte';
+import type { ItemReingestResponse } from '$lib/api-contract';
 import { expectedRedItem } from '../../../test/contract-fixtures';
 import Page from '../../+page.svelte';
 
@@ -79,6 +82,66 @@ describe('desktop split-pane Inspector re-ingest wiring', () => {
     const inspector = screen.getByRole('complementary', { name: 'SQLite FTS 改变排序契约' });
     expect(within(inspector).getByLabelText('本文重处理')).toBeVisible();
     expect(within(inspector).getByRole('button', { name: '[重新处理本文]' })).toBeVisible();
+  });
+
+  it('opens re-ingest on the confirm action while keeping model and prompt collapsed by default', async () => {
+    const onReingestItem = vi.fn(async (): Promise<ItemReingestResponse> => ({
+      reingest: {
+        status: 'completed',
+        item_id: expectedRedItem.id,
+        language: 'zh',
+        item_updated: true,
+        fts_updated: true,
+        error: null,
+        item: null
+      },
+      already_applied: false
+    }));
+
+    render(Inspector, {
+      props: {
+        item: expectedRedItem,
+        mode: 'desktop-split',
+        language: 'zh',
+        showReingest: true,
+        openRouterModels: [{ id: 'openrouter/test-model-with-very-long-name', name: 'OpenRouter Test Model With Very Long Name' }],
+        openRouterModelListState: 'available',
+        onReingestItem
+      }
+    });
+
+    const inspector = screen.getByRole('complementary', { name: 'SQLite FTS 改变排序契约' });
+    await fireEvent.click(within(inspector).getByRole('button', { name: '[重新处理本文]' }));
+
+    const confirm = within(inspector).getByRole('button', { name: '[确认重处理]' });
+    expect(confirm).toHaveFocus();
+    expect(within(inspector).queryByRole('combobox', { name: '模型' })).not.toBeInTheDocument();
+    expect(within(inspector).queryByRole('textbox', { name: '一次性提示' })).not.toBeInTheDocument();
+
+    const advanced = within(inspector).getByRole('button', { name: '[高级选项 ↓]' });
+    expect(advanced).toHaveAttribute('aria-expanded', 'false');
+    await fireEvent.click(advanced);
+
+    expect(within(inspector).getByRole('button', { name: '[高级选项 ↑]' })).toHaveAttribute('aria-expanded', 'true');
+    expect(within(inspector).getByRole('combobox', { name: '模型' })).toBeVisible();
+    expect(within(inspector).getByRole('textbox', { name: '一次性提示' })).toBeVisible();
+  });
+
+  it('keeps re-ingest advanced controls width-bound for narrow Inspector routes', () => {
+    render(Inspector, {
+      props: {
+        item: expectedRedItem,
+        mode: 'mobile-route',
+        language: 'zh',
+        showReingest: true,
+        onReingestItem: vi.fn()
+      }
+    });
+
+    const source = fs.readFileSync(`${process.cwd()}/src/app.css`, 'utf8');
+    expect(source).toMatch(/\.inspector-reingest-field select,\s*\.inspector-reingest-field textarea\s*\{[^}]*width: 100%;[^}]*min-width: 0;[^}]*max-width: 100%;/s);
+    expect(source).toMatch(/\.inspector-reingest-panel > \.bracket-action,\s*\.inspector-reingest-actions \.bracket-action\s*\{[^}]*margin: 0;[^}]*padding-inline: 0;[^}]*background: transparent;/s);
+    expect(source).not.toMatch(/\.inspector-reingest-actions \.bracket-action\s*\{[^}]*flex: 1 1 100%;/s);
   });
 
   it('wires page-selected Inspector re-ingest by rendered behavior on desktop and narrow routes', async () => {

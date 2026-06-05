@@ -1456,6 +1456,7 @@ details.surface-nav button:focus-visible {
 
 .inspector-reingest-panel {
   display: grid;
+  min-width: 0;
   gap: var(--rf-space-sm);
   margin-block: var(--rf-space-md);
   border-block-start: 1px solid var(--rf-color-current-border);
@@ -1463,22 +1464,80 @@ details.surface-nav button:focus-visible {
   font: var(--rf-typography-chrome);
 }
 
+.inspector-reingest-actions {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  column-gap: var(--rf-space-md);
+  row-gap: var(--rf-space-xs);
+  align-items: center;
+}
+
+/* [DEVIATION]: Re-ingest is an inline, low-frequency Inspector utility. The global bracket-action focus inversion is too heavy here and caused the narrow-screen overlap shown in user screenshots; keep the 44px target and visible focus ring, but render these as quiet text commands. */
+.inspector-reingest-panel > .bracket-action,
+.inspector-reingest-actions .bracket-action {
+  min-width: 0;
+  margin: 0;
+  padding-inline: 0;
+  overflow-wrap: anywhere;
+  color: var(--rf-color-current-muted);
+  background: transparent;
+}
+
+.inspector-reingest-panel > .bracket-action:hover:not(:disabled):not([aria-disabled='true']),
+.inspector-reingest-panel > .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']),
+.inspector-reingest-actions .bracket-action:hover:not(:disabled):not([aria-disabled='true']),
+.inspector-reingest-actions .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']) {
+  color: var(--rf-color-current-text);
+  background: transparent;
+}
+
+.inspector-reingest-panel > .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']),
+.inspector-reingest-actions .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']) {
+  outline: 2px solid var(--rf-component-focus-ring-color);
+  outline-offset: 2px;
+}
+
+.inspector-reingest-actions .inspector-reingest-submit {
+  color: var(--rf-color-current-text);
+}
+
+.inspector-reingest-advanced {
+  display: grid;
+  min-width: 0;
+  max-width: 100%;
+  gap: var(--rf-space-sm);
+}
+
 .inspector-reingest-field {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   gap: var(--rf-space-xs);
   color: var(--rf-color-current-muted);
   font: var(--rf-typography-metadata);
 }
 
+.inspector-reingest-field select,
 .inspector-reingest-field textarea {
-  min-height: 44px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.inspector-reingest-field textarea {
+  min-height: 88px;
+  max-height: 40vh;
   border: 1px solid var(--rf-color-current-border);
   border-radius: var(--rf-radius-sm);
   padding: var(--rf-space-sm) var(--rf-space-md);
+  overflow: auto;
   color: var(--rf-color-current-text);
   background: var(--rf-color-current-background);
   font: var(--rf-typography-chrome);
   resize: vertical;
+  overflow-wrap: anywhere;
 }
 
 .inspector-reingest-field textarea:focus-visible {
