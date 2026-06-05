@@ -229,6 +229,16 @@
     return error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.ingestFailed);
   }
 
+  function sourceFetchErrorText(error: unknown): string {
+    if (error instanceof ResoFeedApiError) {
+      const text = rawErrorText(error.body.error.message);
+      if (error.status !== 409) return text;
+      const operation = normalizeCurrentOperationInfo(error.body.error.details.current_operation);
+      return formatOperationConflictStatus(text, operation);
+    }
+    return error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.fetchFailed);
+  }
+
   function setSourceFeedback(sourceId: string, text: string | null): void {
     if (text) {
       sourceFeedbackById = { ...sourceFeedbackById, [sourceId]: text };
@@ -282,7 +292,7 @@
           : rawErrorText(errorMessage ?? source.last_fetch_error ?? chrome.fetchFailed)
       );
     }).catch((error: unknown) => {
-      setSourceFeedback(source.id, error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.fetchFailed));
+      setSourceFeedback(source.id, sourceFetchErrorText(error));
     }).finally(() => {
       fetchingSourceIds = new Set([...fetchingSourceIds].filter((sourceId) => sourceId !== source.id));
     });
