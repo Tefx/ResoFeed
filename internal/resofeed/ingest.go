@@ -42,14 +42,17 @@ var ingestGuardState guardedOperationState
 var errManualFetchConflict = errors.New("operation already running")
 
 type guardedOperationState struct {
-	mu      sync.Mutex
-	holder  atomic.Value
-	current currentOperationSnapshot
+	mu            sync.Mutex
+	holder        atomic.Value
+	current       currentOperationSnapshot
+	activeGlobal  operationGuardDetails
+	activeFetches map[string]operationGuardDetails
 }
 
 type operationGuardDetails struct {
 	Operation string
 	Scope     any
+	ActorKind string
 }
 
 type operationGuardConflictError struct {
@@ -134,7 +137,7 @@ func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret Manual
 // source. Missing, deleted, and inactive sources are reported by the caller as
 // not_found; operational RSS failures are source-level result entries.
 func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string) (ret ManualFetchResult, retErr error) {
-	release, err := tryAcquireIngestGuardWithActor(ctx, "fetch", "source", string(ActorKindHuman))
+	release, err := tryAcquireIngestGuardWithActor(ctx, "fetch", sourceID, string(ActorKindHuman))
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
@@ -149,13 +152,13 @@ func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source
 	result := ManualFetchResult{Operation: ManualFetchOperationSourceFetch, SourceID: &source.ID, Completed: true, SourcesTotal: 1, Errors: []ManualFetchSourceError{}}
 	sourceResult, err := ingestSource(ctx, db, cfg, source)
 	if err != nil {
-		if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error()); updateErr != nil {
+		if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error(), ""); updateErr != nil {
 			return ManualFetchResult{}, updateErr
 		}
 		result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: sourceStatusFetchError, Message: err.Error()})
 		return result, nil
 	}
-	if err := updateSourceFetch(ctx, db, source.ID, sourceStatusOK, ""); err != nil {
+	if err := updateSourceFetch(ctx, db, source.ID, sourceStatusOK, "", sourceResult.sourceTitle); err != nil {
 		return ManualFetchResult{}, err
 	}
 	result.SourcesFetched = 1
@@ -198,13 +201,13 @@ func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (resu
 		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: index, Total: len(sources)}, "ingest fetching source")
 		sourceResult, err := ingestSource(ctx, db, cfg, source)
 		if err != nil {
-			if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error()); updateErr != nil {
+			if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error(), ""); updateErr != nil {
 				return result, updateErr
 			}
 			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: sourceStatusFetchError, Message: err.Error()})
 			continue
 		}
-		if err := updateSourceFetch(ctx, db, source.ID, sourceStatusOK, ""); err != nil {
+		if err := updateSourceFetch(ctx, db, source.ID, sourceStatusOK, "", sourceResult.sourceTitle); err != nil {
 			return result, err
 		}
 		result.SourcesFetched++
@@ -346,11 +349,15 @@ func tryAcquireIngestGuardWithActor(ctx context.Context, operation string, scope
 		return nil, ctx.Err()
 	default:
 	}
-	if !ingestGuardState.mu.TryLock() {
-		details := ingestGuardState.snapshot()
-		return nil, operationGuardConflictError{details: details}
+	details := operationGuardDetails{Operation: operation, Scope: scope, ActorKind: actorKind}
+	ingestGuardState.mu.Lock()
+	if conflict, ok := ingestGuardState.conflictLocked(details); ok {
+		ingestGuardState.mu.Unlock()
+		return nil, operationGuardConflictError{details: conflict}
 	}
-	ingestGuardState.holder.Store(operationGuardDetails{Operation: operation, Scope: scope})
+	ingestGuardState.addLocked(details)
+	ingestGuardState.holder.Store(details)
+	ingestGuardState.mu.Unlock()
 	ingestGuardState.current.start(operation, scope, actorKind)
 	released := false
 	return func() {
@@ -358,17 +365,93 @@ func tryAcquireIngestGuardWithActor(ctx context.Context, operation string, scope
 			return
 		}
 		released = true
-		ingestGuardState.holder.Store(operationGuardDetails{})
-		ingestGuardState.current.clear()
+		ingestGuardState.mu.Lock()
+		ingestGuardState.removeLocked(details)
+		remaining, hasRemaining := ingestGuardState.anyLocked()
+		if hasRemaining {
+			ingestGuardState.holder.Store(remaining)
+		} else {
+			ingestGuardState.holder.Store(operationGuardDetails{})
+		}
 		ingestGuardState.mu.Unlock()
+		if !hasRemaining {
+			ingestGuardState.current.clear()
+		}
 	}, nil
 }
 
+func (s *guardedOperationState) conflictLocked(details operationGuardDetails) (operationGuardDetails, bool) {
+	if s.activeGlobal.Operation != "" {
+		return s.activeGlobal, true
+	}
+	if details.Operation != "fetch" {
+		if existing, ok := s.anyLocked(); ok {
+			return existing, true
+		}
+		return operationGuardDetails{}, false
+	}
+	key := sourceFetchGuardKey(details.Scope)
+	if key == "source" {
+		if existing, ok := s.anyLocked(); ok {
+			return existing, true
+		}
+		return operationGuardDetails{}, false
+	}
+	if existing, ok := s.activeFetches["source"]; ok {
+		return existing, true
+	}
+	if existing, ok := s.activeFetches[key]; ok {
+		return existing, true
+	}
+	return operationGuardDetails{}, false
+}
+
+func (s *guardedOperationState) addLocked(details operationGuardDetails) {
+	if details.Operation != "fetch" {
+		s.activeGlobal = details
+		return
+	}
+	if s.activeFetches == nil {
+		s.activeFetches = map[string]operationGuardDetails{}
+	}
+	s.activeFetches[sourceFetchGuardKey(details.Scope)] = details
+}
+
+func (s *guardedOperationState) removeLocked(details operationGuardDetails) {
+	if details.Operation != "fetch" {
+		s.activeGlobal = operationGuardDetails{}
+		return
+	}
+	delete(s.activeFetches, sourceFetchGuardKey(details.Scope))
+}
+
+func (s *guardedOperationState) anyLocked() (operationGuardDetails, bool) {
+	if s.activeGlobal.Operation != "" {
+		return s.activeGlobal, true
+	}
+	for _, details := range s.activeFetches {
+		return details, true
+	}
+	return operationGuardDetails{}, false
+}
+
+func sourceFetchGuardKey(scope any) string {
+	if value, ok := scope.(string); ok && strings.TrimSpace(value) != "" {
+		return value
+	}
+	return fmt.Sprint(scope)
+}
+
 func (s *guardedOperationState) snapshot() operationGuardDetails {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if details, ok := s.anyLocked(); ok {
+		return details
+	}
 	if holder, ok := s.holder.Load().(operationGuardDetails); ok && holder.Operation != "" {
 		return holder
 	}
-	return operationGuardDetails{Operation: "ingest", Scope: "all"}
+	return operationGuardDetails{Operation: "ingest", Scope: "all", ActorKind: string(ActorKindHuman)}
 }
 
 func guardConflictDetails(err error) (operationGuardDetails, bool) {
@@ -412,10 +495,14 @@ func currentOperationFromGuardDetails(details operationGuardDetails) CurrentOper
 	now := time.Now().UTC()
 	phase := "starting"
 	message := currentOperationStartMessage(canonicalOperationKind(details.Operation, details.Scope))
+	actorKind := details.ActorKind
+	if actorKind == "" {
+		actorKind = string(ActorKindHuman)
+	}
 	return CurrentOperationInfo{
 		Running:   true,
 		Kind:      stringPtr(canonicalOperationKind(details.Operation, details.Scope)),
-		ActorKind: stringPtr(string(ActorKindHuman)),
+		ActorKind: stringPtr(canonicalOperationActorKind(actorKind)),
 		Phase:     stringPtr(phase),
 		Message:   stringPtr(message),
 		StartedAt: timePtr(now),
@@ -448,6 +535,7 @@ func loadActiveSource(ctx context.Context, db *sql.DB, sourceID string) (Source,
 type ingestSourceResult struct {
 	itemsDiscovered int
 	itemsUpserted   int
+	sourceTitle     string
 }
 
 func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source) (ingestSourceResult, error) {
@@ -472,13 +560,10 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 		return ingestSourceResult{}, err
 	}
 	effectiveSource := source
-	if feed.Title != "" && feed.Title != source.Title {
-		if _, err := db.ExecContext(ctx, `update sources set title = ? where id = ?`, feed.Title, source.ID); err != nil {
-			return ingestSourceResult{}, fmt.Errorf("ingest source: update source title: %w", err)
-		}
+	if feed.Title != "" {
 		effectiveSource.Title = feed.Title
 	}
-	result := ingestSourceResult{itemsDiscovered: len(feed.Items)}
+	result := ingestSourceResult{itemsDiscovered: len(feed.Items), sourceTitle: feed.Title}
 	itemsToProcess, err := applyFirstFetchLimit(ctx, db, cfg, source.ID, feed.Items)
 	if err != nil {
 		return result, err
@@ -659,8 +744,10 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 	if err := validateProcessingLanguage(targetLanguage); err != nil {
 		return Item{}, fmt.Errorf("build item: target language: %w", err)
 	}
+	generatedFallbackURL := false
 	if strings.TrimSpace(entry.URL) == "" {
 		entry.URL = source.URL + "#" + stableID("entry", entry.Title+entry.Description)
+		generatedFallbackURL = true
 	}
 	item := Item{
 		ID:              stableID("item", source.ID+"|"+entryIdentity(entry)),
@@ -682,7 +769,15 @@ func buildItemWithActiveSteering(ctx context.Context, source Source, entry feedE
 		item.SourceItemTitle = item.Title
 	}
 	sanitizeReadableItem(&item)
-	extracted, extractionStatus := extractArticleText(ctx, entry.URL, entry.Description)
+	extracted := ""
+	extractionStatus := extractionStatusOriginalNA
+	if generatedFallbackURL {
+		if strings.TrimSpace(entry.Description) != "" {
+			extractionStatus = extractionStatusPartial
+		}
+	} else {
+		extracted, extractionStatus = extractArticleText(ctx, entry.URL, entry.Description)
+	}
 	item.ExtractedText = nullableString(extracted)
 	item.ExtractionStatus = extractionStatus
 	available := extracted
@@ -887,12 +982,49 @@ func upsertSearchIndex(ctx context.Context, db *sql.DB, item Item) error {
 	return nil
 }
 
-func updateSourceFetch(ctx context.Context, db *sql.DB, sourceID string, status string, rawErr string) error {
-	_, err := db.ExecContext(ctx, `update sources set last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + 1 where id = ?`, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), sourceID)
+func updateSourceFetch(ctx context.Context, db *sql.DB, sourceID string, status string, rawErr string, parsedTitle string) error {
+	fetchedTitle := strings.TrimSpace(parsedTitle)
+	if fetchedTitle == "" {
+		_, err := execSourceMutation(ctx, db, `update sources set last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + 1 where id = ?`, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), sourceID)
+		if err != nil {
+			return fmt.Errorf("update source fetch %q: %w", sourceID, err)
+		}
+		return nil
+	}
+	_, err := execSourceMutation(ctx, db, `update sources set title = ?, last_fetch_at = ?, last_fetch_status = ?, last_fetch_error = ?, revision = revision + case when title <> ? then 2 else 1 end where id = ?`, fetchedTitle, time.Now().UTC().Format(time.RFC3339), status, nullableString(rawErr), fetchedTitle, sourceID)
 	if err != nil {
 		return fmt.Errorf("update source fetch %q: %w", sourceID, err)
 	}
 	return nil
+}
+
+func execSourceMutation(ctx context.Context, db *sql.DB, query string, args ...any) (sql.Result, error) {
+	var lastErr error
+	for attempt := 0; attempt < 6; attempt++ {
+		result, err := db.ExecContext(ctx, query, args...)
+		if !isSQLiteContention(err) {
+			return result, err
+		}
+		lastErr = err
+		wait := time.NewTimer(time.Duration(attempt+1) * 10 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			if !wait.Stop() {
+				<-wait.C
+			}
+			return nil, ctx.Err()
+		case <-wait.C:
+		}
+	}
+	return nil, lastErr
+}
+
+func isSQLiteContention(err error) bool {
+	if err == nil {
+		return false
+	}
+	message := strings.ToLower(err.Error())
+	return strings.Contains(message, "database is locked") || strings.Contains(message, "database table is locked") || strings.Contains(message, "database is busy")
 }
 
 func parseOPMLFeedURLs(data []byte) ([]string, error) {
