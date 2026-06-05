@@ -116,15 +116,13 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 	}
 }
 
-// IngestOnce performs one ingestion pass over active sources.
+// IngestOnce performs one background ingestion pass over active sources. The
+// pass skips already-busy sources, drains selected idle sources through bounded
+// in-request workers, and never leaves queued work after the tick returns.
 func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
-	release, err := tryAcquireIngestGuardWithActor(ctx, "ingest", "background", "background")
-	if err != nil {
-		return nil
-	}
-	updateCurrentOperation("loading_sources", nil, "background ingest loading active sources")
-	defer releaseGuardRecover(release, &retErr, "ingest once")
-	_, err = ingestOnceUnlocked(ctx, db, cfg)
+	ingestGuardState.current.start("ingest", "background", "background")
+	defer ingestGuardState.current.clear()
+	_, err := ingestOnceBackgroundBounded(ctx, db, cfg)
 	return err
 }
 
@@ -178,29 +176,9 @@ func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source
 
 func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (result ManualFetchResult, retErr error) {
 	result = ManualFetchResult{Operation: ManualFetchOperationIngest, Completed: true, Errors: []ManualFetchSourceError{}}
-	if db == nil {
-		return result, errors.New("ingest once: db required")
-	}
-	rows, err := db.QueryContext(ctx, `select id, url, title from sources where is_active = 1`)
+	sources, err := loadActiveSources(ctx, db)
 	if err != nil {
-		return result, fmt.Errorf("ingest once: query active sources: %w", err)
-	}
-	defer func() {
-		if closeErr := rows.Close(); closeErr != nil && retErr == nil {
-			retErr = fmt.Errorf("ingest once: close source rows: %w", closeErr)
-		}
-	}()
-
-	var sources []Source
-	for rows.Next() {
-		var source Source
-		if err := rows.Scan(&source.ID, &source.URL, &source.Title); err != nil {
-			return result, fmt.Errorf("ingest once: scan source: %w", err)
-		}
-		sources = append(sources, source)
-	}
-	if err := rows.Err(); err != nil {
-		return result, fmt.Errorf("ingest once: source rows: %w", err)
+		return result, err
 	}
 	result.SourcesTotal = len(sources)
 	updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, "ingest fetching active sources")
@@ -225,6 +203,136 @@ func ingestOnceUnlocked(ctx context.Context, db *sql.DB, cfg IngestConfig) (resu
 	}
 	updateCurrentOperation("complete", &CurrentOperationCount{Current: len(sources), Total: len(sources)}, "ingest complete")
 	return result, nil
+}
+
+func ingestOnceBackgroundBounded(ctx context.Context, db *sql.DB, cfg IngestConfig) (ManualFetchResult, error) {
+	result := ManualFetchResult{Operation: ManualFetchOperationIngest, Completed: true, Errors: []ManualFetchSourceError{}}
+	sources, err := loadActiveSources(ctx, db)
+	if err != nil {
+		return result, err
+	}
+	result.SourcesTotal = len(sources)
+	updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest fetching active sources")
+	if len(sources) == 0 {
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: 0}, "background ingest complete")
+		return result, nil
+	}
+
+	coordCfg := cfg.coordinatorConfig()
+	capacity := snapshotSourceRunCapacity(coordCfg)
+	if capacity.globalBusy {
+		for _, source := range sources {
+			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceBusy, Message: "global operation running"})
+		}
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest skipped while global operation was running")
+		return result, nil
+	}
+
+	idleSources := make([]Source, 0, len(sources))
+	for _, source := range sources {
+		if capacity.isSourceBusy(source.ID) {
+			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceBusy, Message: "source already fetching"})
+			continue
+		}
+		idleSources = append(idleSources, source)
+	}
+	if len(idleSources) == 0 {
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest skipped busy sources")
+		return result, nil
+	}
+	if capacity.availableSlots <= 0 {
+		for _, source := range idleSources {
+			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceCapacityExhausted, Message: "source capacity exhausted"})
+		}
+		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, "background ingest skipped capacity-unavailable sources")
+		return result, nil
+	}
+
+	workerCount := minInt(capacity.availableSlots, len(idleSources))
+	jobs := make(chan Source)
+	var wg sync.WaitGroup
+	var resultMu sync.Mutex
+	var firstErr error
+	completed := 0
+
+	recordFatal := func(err error) {
+		if err == nil {
+			return
+		}
+		resultMu.Lock()
+		if firstErr == nil {
+			firstErr = err
+		}
+		resultMu.Unlock()
+	}
+	recordSourceError := func(sourceID string, code string, message string) {
+		resultMu.Lock()
+		result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: sourceID, Code: code, Message: message})
+		completed++
+		current := completed
+		resultMu.Unlock()
+		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, "background ingest source skipped")
+	}
+	recordSourceSuccess := func(sourceResult ingestSourceResult) {
+		resultMu.Lock()
+		result.SourcesFetched++
+		result.ItemsDiscovered += sourceResult.itemsDiscovered
+		result.ItemsUpserted += sourceResult.itemsUpserted
+		completed++
+		current := completed
+		resultMu.Unlock()
+		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, "background ingest source complete")
+	}
+
+	for i := 0; i < workerCount; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for source := range jobs {
+				release, err := tryAcquireIngestGuardWithConfig(ctx, coordCfg, "fetch", source.ID, "background")
+				if err != nil {
+					if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+						recordFatal(err)
+						continue
+					}
+					code, message := skippedSourceErrorFromGuard(err)
+					recordSourceError(source.ID, code, message)
+					continue
+				}
+				sourceResult, sourceErr := ingestSourceWithRelease(ctx, db, cfg, source, release)
+				if sourceErr != nil {
+					if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, sourceErr.Error(), ""); updateErr != nil {
+						recordFatal(updateErr)
+						continue
+					}
+					recordSourceError(source.ID, sourceStatusFetchError, sourceErr.Error())
+					continue
+				}
+				if err := updateSourceFetch(ctx, db, source.ID, sourceStatusOK, "", sourceResult.sourceTitle); err != nil {
+					recordFatal(err)
+					continue
+				}
+				recordSourceSuccess(sourceResult)
+			}
+		}()
+	}
+
+sendLoop:
+	for _, source := range idleSources {
+		select {
+		case <-ctx.Done():
+			recordFatal(ctx.Err())
+			break sendLoop
+		case jobs <- source:
+		}
+	}
+	close(jobs)
+	wg.Wait()
+
+	resultMu.Lock()
+	defer resultMu.Unlock()
+	updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, "background ingest complete")
+	return result, firstErr
 }
 
 // ImportOPML imports source URLs into the flat Source Ledger. OPML folders are
@@ -468,6 +576,52 @@ func conflictDetailsWithReason(details operationGuardDetails, reason string) ope
 	return details
 }
 
+type sourceRunCapacitySnapshot struct {
+	globalBusy     bool
+	busySources    map[string]struct{}
+	availableSlots int
+}
+
+func (s sourceRunCapacitySnapshot) isSourceBusy(sourceID string) bool {
+	if _, ok := s.busySources["source"]; ok {
+		return true
+	}
+	_, ok := s.busySources[sourceFetchGuardKey(sourceID)]
+	return ok
+}
+
+func snapshotSourceRunCapacity(cfg ingestCoordinatorConfig) sourceRunCapacitySnapshot {
+	cfg = cfg.withDefaults()
+	snapshot := sourceRunCapacitySnapshot{busySources: map[string]struct{}{}, availableSlots: cfg.SourceConcurrency}
+	ingestGuardState.mu.Lock()
+	defer ingestGuardState.mu.Unlock()
+	if ingestGuardState.activeGlobal.Operation != "" {
+		snapshot.globalBusy = true
+		snapshot.availableSlots = 0
+		return snapshot
+	}
+	for key := range ingestGuardState.activeFetches {
+		snapshot.busySources[key] = struct{}{}
+	}
+	snapshot.availableSlots = cfg.SourceConcurrency - len(ingestGuardState.activeFetches)
+	if snapshot.availableSlots < 0 {
+		snapshot.availableSlots = 0
+	}
+	return snapshot
+}
+
+func skippedSourceErrorFromGuard(err error) (string, string) {
+	if details, ok := guardConflictDetails(err); ok {
+		if details.Reason == ingestConflictReasonSourceCapacityExhausted || sourceFetchGuardKey(details.Scope) == string(ingestCoordinationScopeSourceCapacity) {
+			return IngestErrorCodeSourceCapacityExhausted, "source capacity exhausted"
+		}
+		if details.Reason == ingestConflictReasonGlobalOperationRunning {
+			return IngestErrorCodeSourceBusy, "global operation running"
+		}
+	}
+	return IngestErrorCodeSourceBusy, "source already fetching"
+}
+
 func (s *guardedOperationState) snapshot() operationGuardDetails {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -560,6 +714,38 @@ func releaseGuardRecover(release func(), retErr *error, label string) {
 	if recovered := recover(); recovered != nil {
 		*retErr = fmt.Errorf("%s: recovered failure: %v", label, recovered)
 	}
+}
+
+func ingestSourceWithRelease(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, release func()) (ret ingestSourceResult, retErr error) {
+	defer releaseGuardRecover(release, &retErr, "background ingest source")
+	return ingestSource(ctx, db, cfg, source)
+}
+
+func loadActiveSources(ctx context.Context, db *sql.DB) (sources []Source, retErr error) {
+	if db == nil {
+		return nil, errors.New("load active sources: db required")
+	}
+	rows, err := db.QueryContext(ctx, `select id, url, title from sources where is_active = 1`)
+	if err != nil {
+		return nil, fmt.Errorf("load active sources: query: %w", err)
+	}
+	defer func() {
+		if closeErr := rows.Close(); closeErr != nil && retErr == nil {
+			retErr = fmt.Errorf("load active sources: close rows: %w", closeErr)
+		}
+	}()
+
+	for rows.Next() {
+		var source Source
+		if err := rows.Scan(&source.ID, &source.URL, &source.Title); err != nil {
+			return nil, fmt.Errorf("load active sources: scan: %w", err)
+		}
+		sources = append(sources, source)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("load active sources: rows: %w", err)
+	}
+	return sources, nil
 }
 
 func loadActiveSource(ctx context.Context, db *sql.DB, sourceID string) (Source, error) {
