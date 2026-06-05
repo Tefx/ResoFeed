@@ -1281,7 +1281,7 @@ func newIngestRunResult(result ManualFetchResult, scope string, sourceID *string
 	itemFailures := 0
 	for _, sourceErr := range result.Errors {
 		id := sourceErr.SourceID
-		ingestErrors = append(ingestErrors, IngestErrorDetail{SourceID: &id, Code: sourceErr.Code, Message: sourceErr.Message})
+		ingestErrors = append(ingestErrors, IngestErrorDetail{SourceID: &id, Code: sourceErr.Code, Reason: sourceErr.Code, Message: sourceErr.Message})
 		if isSkippedIngestErrorCode(sourceErr.Code) {
 			sourcesSkipped++
 			continue
@@ -1445,6 +1445,7 @@ type IngestRunResult struct {
 type IngestErrorDetail struct {
 	SourceID *string `json:"source_id"`
 	Code     string  `json:"code"`
+	Reason   string  `json:"reason"`
 	Message  string  `json:"message"`
 }
 

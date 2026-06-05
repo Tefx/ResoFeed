@@ -272,6 +272,12 @@ func icaAssertIngestError(t *testing.T, body []byte, sourceID string, code strin
 	}
 	for _, ingestErr := range errors {
 		if ingestErr.SourceID != nil && *ingestErr.SourceID == sourceID && ingestErr.Code == code {
+			if ingestErr.Reason != code {
+				t.Fatalf("RUN INGEST error for %s reason = %q, want %q; body=%s", sourceID, ingestErr.Reason, code, string(body))
+			}
+			if ingestErr.Message == "" {
+				t.Fatalf("RUN INGEST error for %s message is empty; body=%s", sourceID, string(body))
+			}
 			return
 		}
 	}

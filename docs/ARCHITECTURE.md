@@ -1348,6 +1348,7 @@ Manual ingest request rules:
 |---|---|---:|---:|---|
 | `source_id` | string | Yes | Yes | source id when error is source-scoped; `null` for global trigger errors |
 | `code` | string enum | Yes | No | `rss_fetch_error`, `timeout`, `source_busy`, `source_capacity_exhausted`, `internal` |
+| `reason` | string enum | Yes | No | same stable enum value as `code`; frontend may use this field directly for skipped-source conflict summaries while preserving `code` compatibility |
 | `message` | string | Yes | No | terse diagnostic suitable for inline `err: <diagnostic>` or skipped-source summary display |
 
 `source_busy` is used only inside an all-source ingest result when a source-scoped lease is already active for that source. `source_capacity_exhausted` is used when a source attempt could not start because external active source work leaves no source-concurrency slot available. For all-source manual/background runs, `source_concurrency` limits simultaneous source attempts, not the total number of selected idle sources attempted by the run; idle sources waiting behind the run's own bounded worker batch are not reported as capacity-exhausted. Neither code is durable pending state, neither means RSS failure, and neither may create a retry job.
@@ -1407,11 +1408,13 @@ If `POST /api/ingest` runs when there are zero active sources, it returns HTTP `
       {
         "source_id": "src_02",
         "code": "rss_fetch_error",
+        "reason": "rss_fetch_error",
         "message": "feed returned HTTP 502"
       },
       {
         "source_id": "src_09",
         "code": "source_busy",
+        "reason": "source_busy",
         "message": "source already fetching"
       }
     ]

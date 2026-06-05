@@ -160,6 +160,12 @@ func TestIngestRunResultSkippedCountersAndErrorEntriesContract(t *testing.T) {
 	if parsed["sources_skipped"] != float64(2) {
 		t.Fatalf("marshaled sources_skipped = %#v, want 2; body=%s", parsed["sources_skipped"], string(body))
 	}
+	var marshaled IngestRunResult
+	if err := json.Unmarshal(body, &marshaled); err != nil {
+		t.Fatalf("unmarshal marshaled IngestRunResult struct: %v", err)
+	}
+	assertIngestErrorDetailReasonAndMessage(t, marshaled.Errors, "src_busy", IngestErrorCodeSourceBusy, "source already fetching")
+	assertIngestErrorDetailReasonAndMessage(t, marshaled.Errors, "src_capacity", IngestErrorCodeSourceCapacityExhausted, "source capacity exhausted")
 }
 
 func TestIngestConflictReasonContract(t *testing.T) {
@@ -200,8 +206,19 @@ func TestIngestConflictReasonContract(t *testing.T) {
 
 func assertIngestErrorDetail(t *testing.T, errors []IngestErrorDetail, sourceID string, code string) {
 	t.Helper()
+	assertIngestErrorDetailReasonAndMessage(t, errors, sourceID, code, "")
+}
+
+func assertIngestErrorDetailReasonAndMessage(t *testing.T, errors []IngestErrorDetail, sourceID string, code string, message string) {
+	t.Helper()
 	for _, detail := range errors {
 		if detail.SourceID != nil && *detail.SourceID == sourceID && detail.Code == code {
+			if detail.Reason != code {
+				t.Fatalf("errors = %+v, source_id=%q code=%q reason=%q, want reason=%q", errors, sourceID, code, detail.Reason, code)
+			}
+			if message != "" && detail.Message != message {
+				t.Fatalf("errors = %+v, source_id=%q code=%q message=%q, want %q", errors, sourceID, code, detail.Message, message)
+			}
 			return
 		}
 	}
