@@ -41,6 +41,9 @@ var ingestGuardState guardedOperationState
 
 var errManualFetchConflict = errors.New("operation already running")
 
+// guardedOperationState is the process-memory coordinator state for source
+// leases, source capacity accounting, and global-exclusive runtime occupancy.
+// It is intentionally not stored in SQLite or exported as portable state.
 type guardedOperationState struct {
 	mu            sync.Mutex
 	holder        atomic.Value
@@ -69,14 +72,18 @@ func (e operationGuardConflictError) guardDetails() operationGuardDetails {
 	return e.details
 }
 
-// IngestConfig defines the background ingestion loop inside the single Go
-// process. Defaults are 15 minute loop interval, 20 second source timeout, and
-// LLM limits owned by OpenRouterConfig.
+// IngestConfig defines ingest runtime settings inside the single Go process.
+// Defaults are 15 minute loop interval, 20 second source timeout, 8 concurrent
+// source attempts, 4 concurrent item attempts per source, and 16 global LLM
+// attempts.
 type IngestConfig struct {
-	Interval           time.Duration
-	SourceFetchTimeout time.Duration
-	LLM                LLMClient
-	FirstFetchMaxItems int
+	Interval                 time.Duration
+	SourceFetchTimeout       time.Duration
+	LLM                      LLMClient
+	SourceConcurrency        int
+	ItemConcurrencyPerSource int
+	GlobalLLMConcurrency     int
+	FirstFetchMaxItems       int
 	// FirstFetchMaxItemsSet distinguishes omitted IngestConfig{} (default 50)
 	// from an explicit zero unlimited cap. It is only needed for direct in-process
 	// callers because the CLI/env parser always materializes an explicit value.
