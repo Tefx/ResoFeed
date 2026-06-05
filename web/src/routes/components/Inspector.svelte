@@ -342,11 +342,9 @@
     return readableText(value.summary) ?? ('feed_excerpt' in value ? readableText(value.feed_excerpt) : null) ?? readableText(value.display_excerpt ?? null);
   }
 
-  function readingSectionLabel(value: InspectableItem): string {
-    if (isFallbackEvidenceState(value)) return localizedChrome('Source evidence:', '出处记录：');
-    return value.extraction_status === 'partial_extraction'
-      ? localizedChrome('source excerpt:', '来源摘录：')
-      : localizedChrome('source text:', '来源文本：');
+  function textEvidenceDepthLabel(value: InspectableItem): string | null {
+    if (isFallbackEvidenceState(value) || value.extraction_status === 'partial_extraction') return localizedChrome('RSS excerpt', 'RSS 摘录');
+    return null;
   }
 
   function originalHref(value: InspectableItem): string {
@@ -444,10 +442,10 @@
   }
 
   function extractionDisclosure(value: InspectableItem): string {
-    if (value.extraction_status === 'partial_extraction') return localizedChrome('source text: RSS excerpt only', '来源文本：仅 RSS 摘录');
+    if (value.extraction_status === 'partial_extraction') return localizedChrome('text evidence: RSS excerpt only', '文本证据：仅 RSS 摘录');
     if (value.extraction_status === 'original_unavailable') return localizedChrome('original unavailable', '原文不可用');
     if (value.extraction_status === 'summary_unavailable') return localizedChrome('summary unavailable', '摘要不可用');
-    return localizedChrome('source text: full', '来源文本：全文');
+    return localizedChrome('text evidence: full', '文本证据：全文');
   }
 
   function extractionFrontmatterToken(value: InspectableItem): string {
@@ -469,7 +467,7 @@
   }
 
   function sourceTextUnavailableNote(): string {
-    return localizedChrome('Source text unavailable; use original link.', '来源文本不可用；请使用原文链接。');
+    return localizedChrome('Text evidence unavailable; use original link.', '文本证据不可用；请使用原文链接。');
   }
 
   function isFallbackEvidenceState(value: InspectableItem): boolean {
@@ -589,7 +587,7 @@
     return title;
   }
 
-  function sectionLabelText(en: 'summary' | 'core insight' | 'source text', zh: '摘要' | '核心洞察' | '来源文本'): string {
+  function sectionLabelText(en: 'summary' | 'core insight', zh: '摘要' | '核心洞察'): string {
     return language === 'zh' ? `${zh}：` : `${en}:`;
   }
 
@@ -882,20 +880,23 @@
         {/if}
       </section>
     {/if}
-    {@const evidenceText = sourceEvidenceText(item)}
-    {#if isFallbackEvidenceState(item) && evidenceText}
-      <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
-        <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')} · {readingSectionLabel(item)}</summary>
-        <p class="inspector-source-evidence">{evidenceText}</p>
-      </details>
-    {:else if evidenceText}
-      <details class="inspector-text-section inspector-reading-section inspector-source-text-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
-        <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')}</summary>
-        <p class="inspector-reading inspector-reading--source-text">{detailText(item)}</p>
-      </details>
-    {:else if !hasModelBackedText(item)}
-      <p class="contract-muted inspector-source-text-unavailable">{sourceTextUnavailableNote()}</p>
-    {/if}
+    {#key item.id}
+      {@const evidenceText = sourceEvidenceText(item)}
+      {@const textEvidenceDepth = textEvidenceDepthLabel(item)}
+      {#if isFallbackEvidenceState(item) && evidenceText}
+        <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
+          <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')}{textEvidenceDepth ? ` · ${textEvidenceDepth}` : ''}</summary>
+          <p class="inspector-source-evidence">{evidenceText}</p>
+        </details>
+      {:else if evidenceText}
+        <details class="inspector-text-section inspector-reading-section inspector-source-text-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
+          <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')}{textEvidenceDepth ? ` · ${textEvidenceDepth}` : ''}</summary>
+          <p class="inspector-reading inspector-reading--source-text">{detailText(item)}</p>
+        </details>
+      {:else if !hasModelBackedText(item)}
+        <p class="contract-muted inspector-source-text-unavailable">{sourceTextUnavailableNote()}</p>
+      {/if}
+    {/key}
     <details class="contract-source-details" aria-label={localizedChrome('Source info', '来源信息')}>
       <summary>{localizedChrome('Source info', '来源信息')}</summary>
       <p translate="no">{sourceTitleProvenanceText(sourceProvenanceTitle(item))}</p>

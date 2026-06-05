@@ -50,7 +50,9 @@ test('Inspector fallback state is low-chrome source evidence, not repeated ghost
   await page.getByRole('button', { name: `Open Inspector for: ${fallbackItem.title}` }).click();
   const inspector = page.getByRole('complementary', { name: fallbackItem.title });
   await expect(inspector).toContainText('中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录');
-  await expect(inspector.getByLabel('出处记录')).toContainText('Browser raw RSS excerpt remains evidence only.');
+  const textEvidence = inspector.getByLabel('文本证据');
+  await expect(textEvidence).not.toHaveAttribute('open', '');
+  await expect(textEvidence).toContainText('Browser raw RSS excerpt remains evidence only.');
   await expect(inspector.getByLabel('摘要')).toHaveCount(0);
   await expect(inspector.getByLabel('核心洞察')).toHaveCount(0);
   await expect(inspector).not.toContainText('Browser unprocessed source body must not be shown');

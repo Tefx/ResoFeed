@@ -287,7 +287,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect((inspector.textContent?.match(/中文处理未完成/g) ?? [])).toHaveLength(1);
     expect(within(inspector).queryByLabelText('摘要')).not.toBeInTheDocument();
     expect(within(inspector).queryByLabelText('核心洞察')).not.toBeInTheDocument();
-    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('出处记录：');
+    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('文本证据 · RSS 摘录');
     expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('This raw English RSS excerpt should remain provenance, not the main Chinese body.');
     expect(inspector).not.toHaveTextContent('This raw English body should not appear as completed Chinese reading content.');
   });

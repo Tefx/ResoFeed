@@ -93,9 +93,9 @@ test('Inspector original link renders as low-chrome provenance text in a real br
   // Current content-contract fallback semantics must not render ghost Summary/Core
   // sections when model-backed generated content is unavailable. The original-link
   // polish proof is about low-chrome provenance; the only text section for this
-  // fixture is the source-text disclosure.
+  // fixture is the Text evidence disclosure.
   expect(inspectorSections).toEqual([
-    { label: 'Source text', classes: 'inspector-text-section inspector-reading-section', heading: 'source text:' }
+    { label: 'Text evidence', classes: 'inspector-text-section inspector-source-evidence-section', heading: 'Text evidence · RSS excerpt' }
   ]);
 
   const screenshotPath = path.join(testInfo.outputDir, 'inspector-original-link-low-chrome.png');

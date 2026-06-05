@@ -200,7 +200,7 @@ test('browser proves source identifiers are non-translatable and desktop panes s
 
   await expect(page.locator('.feed-meta-source').first()).toHaveAttribute('translate', 'no');
 
-  await inspectorSurface.locator('details[aria-label="来源文本"], details[aria-label="Source text"]').evaluate((node) => {
+  await inspectorSurface.locator('details[aria-label="文本证据"], details[aria-label="Text evidence"]').evaluate((node) => {
     if (node instanceof HTMLDetailsElement) node.open = true;
   });
   await expect.poll(async () => inspectorPane.evaluate((node) => node.scrollHeight > node.clientHeight)).toBe(true);
