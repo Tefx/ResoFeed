@@ -148,7 +148,7 @@ test.describe('srdct expected-red Steer, Source Ledger, and split-scroll contrac
     await expect(page.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
   });
 
-  test('Source Ledger exposes flat canonical controls, details semantics, topmost 44px actions, and terse diagnostics', async ({ page, ownerToken }) => {
+  test('Source Ledger exposes flat canonical controls, source-info semantics, topmost 44px actions, and terse diagnostics', async ({ page, ownerToken }) => {
     await openAcceptedShell(page, ownerToken);
     await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
     await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
@@ -162,8 +162,10 @@ test.describe('srdct expected-red Steer, Source Ledger, and split-scroll contrac
     await expect(ledger.getByRole('button', { name: '[IMPORT STATE]' })).toBeVisible();
     await expect(ledger.locator('input[type="url"], input[name*="url" i], textarea[name*="url" i]')).toHaveCount(0);
 
+    await expect(ledger.getByText('[DETAILS]')).toHaveCount(0);
     const details = ledger.locator('details.source-diagnostic-details').first();
-    await expect(details.locator('summary')).toHaveText('[DETAILS]');
+    await expect(details.locator('summary')).toHaveText('source info');
+    await expect(details.locator('summary')).not.toHaveClass(/bracket-action/);
     await expect(details).not.toHaveAttribute('open', '');
     await details.locator('summary').click();
     await expect(details).toHaveAttribute('open', '');

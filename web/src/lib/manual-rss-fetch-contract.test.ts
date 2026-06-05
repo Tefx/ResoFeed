@@ -78,7 +78,8 @@ describe('manual RSS fetch acceptance contract lock', () => {
     expect(sourceLedgerManualFetchRenderContract.activeControlDisabled).toBe(false);
     expect(sourceLedgerManualFetchRenderContract.timestampFormat).toBe('HH:MM:SS');
     expect(sourceLedgerManualFetchRenderContract.timestampInputs).toEqual(['last_fetch']);
-    expect(sourceLedgerManualFetchRenderContract.diagnosticDisclosure).toBe('[DETAILS]');
+    expect(sourceLedgerManualFetchRenderContract.diagnosticDisclosure).toBe('source info / 来源信息');
+    expect(sourceLedgerManualFetchRenderContract.diagnosticDisclosureStyle).toBe('low-chrome-native-disclosure-not-bracket-command');
     expect(sourceLedgerManualFetchRenderContract.bracketActionStyle).toBe(
       'bracket-padding-uppercase-terminal-hover-inversion-focus-visible'
     );

@@ -93,8 +93,8 @@
       confirmAria: (label: string) => `确认删除来源：${label}`,
       delete: '[DELETE]',
       deleteAria: (label: string) => `删除来源：${label}`,
-      details: '[DETAILS]',
-      detailsAria: (label: string) => `诊断详情：${label}`,
+      details: '来源信息',
+      detailsAria: (label: string) => `来源信息：${label}`,
       notRun: '未运行',
       notFetched: '未抓取',
       complete: '完成'
@@ -135,8 +135,8 @@
       confirmAria: (label: string) => `confirm delete source: ${label}`,
       delete: '[DELETE]',
       deleteAria: (label: string) => `Delete source: ${label}`,
-      details: '[DETAILS]',
-      detailsAria: (label: string) => `diagnostic details for ${label}`,
+      details: 'source info',
+      detailsAria: (label: string) => `Source info for ${label}`,
       notRun: 'not_run',
       notFetched: 'not_fetched',
       complete: 'complete'

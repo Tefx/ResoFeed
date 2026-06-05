@@ -145,10 +145,11 @@ describe('UIUX expected-red design contract coverage', () => {
 
   it('DESIGN.SOURCE_LEDGER and DESIGN.STATE_PORTABILITY enforce exact bracket actions, diagnostic exceptions, and active-only state', () => {
     const src = `${ledger()}\n${portability()}`;
-    for (const token of ['[RUN INGEST]', '[INGESTING...]', '[FETCH]', '[FETCHING...]', '[IMPORT OPML]', '[IMPORTING OPML...]', '[EXPORT STATE]', '[EXPORTING STATE...]', '[IMPORT STATE]', '[IMPORTING STATE...]', '[DELETE]', '[DETAILS]']) {
+    for (const token of ['[RUN INGEST]', '[INGESTING...]', '[FETCH]', '[FETCHING...]', '[IMPORT OPML]', '[IMPORTING OPML...]', '[EXPORT STATE]', '[EXPORTING STATE...]', '[IMPORT STATE]', '[IMPORTING STATE...]', '[DELETE]']) {
       expectPresent(src, new RegExp(token.replace(/[\[\].]/g, '\\$&'), 'u'), 'DESIGN.SOURCE_LEDGER.RAW_PROVENANCE_EXCEPTION');
     }
-    expectAbsent(src, /\[运行抓取\]|\[抓取\]|\[导入 OPML\]|\[导出状态\]|\[导入状态\]|\[删除\]|\[详情\]/u, 'DESIGN.SOURCE_LEDGER.RAW_PROVENANCE_EXCEPTION');
+    expectAbsent(src, /\[DETAILS\]|\[运行抓取\]|\[抓取\]|\[导入 OPML\]|\[导出状态\]|\[导入状态\]|\[删除\]|\[详情\]/u, 'DESIGN.SOURCE_LEDGER.RAW_PROVENANCE_EXCEPTION');
+    expectPresent(src, /source info|来源信息/u, 'DESIGN.SOURCE_LEDGER.RAW_PROVENANCE_EXCEPTION');
     expectPresent(src, /source_url:|feed_url:|url:\s*\{source\.url\}|err:/u, 'DESIGN.SOURCE_LEDGER.RAW_PROVENANCE_EXCEPTION');
     expectPresent(src, /Import State replaces active sources, rules, and stars/u, 'DESIGN.STATE_PORTABILITY.ACTIVE_ONLY');
     expectAbsent(src, /reading history|command history|activity ledger|persistent search|sync|merge|settings|receipt/i, 'DESIGN.STATE_PORTABILITY.ACTIVE_ONLY');

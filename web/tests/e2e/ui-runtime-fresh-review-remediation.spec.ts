@@ -12,7 +12,7 @@ const exposedGaps = {
   'FR-02': 'Feed time-group labels are contiguous chronological groups, never TODAY > YESTERDAY > TODAY for one feed page.',
   'FR-04': 'Inspector primary story surface discloses grouped duplicate/source items and provenance.',
   'FR-05': 'Each visible [FETCH] button keeps that text but has source-contextual accessible name.',
-  'FR-06': 'Collapsed [DETAILS] controls do not inflate every Source Ledger row.',
+  'FR-06': 'Collapsed source info disclosures do not inflate every Source Ledger row.',
   'FR-07': 'Source Ledger section is labelled by h1#source-ledger-title through aria-labelledby.',
   'FR-09': 'Mobile feed metadata remains one flat inline monospace truncating line with ellipsis, not multi-line wrapping.'
 } as const;
@@ -427,12 +427,14 @@ test.describe('ui-runtime fresh review contract expected-red coverage', () => {
     }
   });
 
-  test('FR-06: collapsed [DETAILS] controls do not inflate every Source Ledger row', async ({ page }, testInfo) => {
+  test('FR-06: collapsed source info disclosures do not inflate every Source Ledger row', async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     const ledger = await openLedger(page);
     const rows = ledger.locator('.source-ledger__row');
     const firstRow = rows.first();
+    await expect(firstRow.getByText('[DETAILS]')).toHaveCount(0);
     const firstDetails = firstRow.locator('details.source-diagnostic-details');
+    await expect(firstDetails.locator('summary')).toHaveText('source info');
     await expect(firstDetails).not.toHaveAttribute('open', '');
     const rowHeights = await rows.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
     await writeProof(testInfo, 'fr-06-collapsed-details-row-heights', { rowHeights, exposedGap: exposedGaps['FR-06'] });

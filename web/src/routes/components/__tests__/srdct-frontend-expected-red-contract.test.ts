@@ -191,10 +191,12 @@ describe('srdct expected-red frontend UI contracts', () => {
     expect(within(ledger).getByRole('button', { name: '[IMPORT STATE]' })).toBeVisible();
     expect(ledger.querySelectorAll('input[type="url"], input[name*="url" i], textarea[name*="url" i]')).toHaveLength(0);
 
-    const details = within(ledger).getByText('[DETAILS]');
-    expect(details.closest('details')).not.toHaveAttribute('open');
-    await user.click(details);
-    expect(details.closest('details')).toHaveAttribute('open');
+    const sourceInfo = within(ledger).getByText('source info');
+    expect(within(ledger).queryByText('[DETAILS]')).not.toBeInTheDocument();
+    expect(sourceInfo).not.toHaveClass('bracket-action');
+    expect(sourceInfo.closest('details')).not.toHaveAttribute('open');
+    await user.click(sourceInfo);
+    expect(sourceInfo.closest('details')).toHaveAttribute('open');
     expect(within(ledger).getByText(/fetch_error: err: timeout while fetching upstream feed/)).toBeVisible();
 
     await user.click(within(ledger).getByRole('button', { name: '[RUN INGEST]' }));

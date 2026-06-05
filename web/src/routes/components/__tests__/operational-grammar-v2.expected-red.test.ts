@@ -79,7 +79,8 @@ function renderLedger(language: 'en' | 'zh' = 'en'): HTMLElement {
       language
     }
   });
-  return screen.getByRole('region', { name: 'SOURCE LEDGER' });
+  const ledgers = screen.getAllByRole('region', { name: 'SOURCE LEDGER' });
+  return ledgers[ledgers.length - 1];
 }
 
 function collectProductionRouteFiles(dir = path.resolve(process.cwd(), 'src', 'routes')): string[] {
