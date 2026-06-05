@@ -353,7 +353,7 @@ test('ci-safe browser-led source import, background ingest proof, feed, inspect,
   await expect(page.locator('.source-ledger__row', { hasText: /127\.0\.0\.1:\d+/ })).toContainText('last_fetch: not_fetched');
 
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 15_000 });
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/(?:last_fetch: )?\d{2}:\d{2}:\d{2} local/, { timeout: 15_000 });
   await expect(page.getByText('[DELETE]')).toBeVisible();
 
   await roundTripStateThroughLedgerFooter(page, testInfo);
@@ -451,7 +451,7 @@ test('ci-safe real server live audit proof produces complete browser artifacts w
     // DEVIATION RECORD: type=test_error; artifact=web/tests/e2e/real-server-ui.spec.ts; what_changed=live audit OPML receipt expects `OPML outlines flattened` instead of `folders flattened`; why=folder terminology is forbidden product-surface drift while OPML outline flattening remains allowed source-import behavior; impact=browser audit remains blocked on successful import/count but no longer on stale copy.
     await expect(page.getByText('imported 1 sources; OPML outlines flattened')).toBeVisible();
     await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-    await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 20_000 });
+    await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/(?:last_fetch: )?\d{2}:\d{2}:\d{2} local/, { timeout: 20_000 });
 
     const apiFeedAfterIngest = await authorizedGet<{ items: ItemSummary[] }>(request, { baseURL: isolated.baseURL }, ownerToken, '/api/feed/today?limit=20');
     expect(apiFeedAfterIngest.items.some((item) => item.title === 'Live audit item one')).toBe(true);
@@ -493,7 +493,7 @@ test('ci-safe real server live audit proof produces complete browser artifacts w
     await steer.fill('source ledger');
     await steer.press('Enter');
     await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeVisible();
-    await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/);
+    await expect(page.locator('.source-ledger__row', { hasText: 'Live Audit Source' })).toContainText(/(?:last_fetch: )?\d{2}:\d{2}:\d{2} local/);
     await captureAuditState(page, testInfo, 'mobile-source-ledger', metrics);
 
     const apiSearchAfterBrowserSearch = await authorizedGet<{ items: ItemSummary[] }>(request, { baseURL: isolated.baseURL }, ownerToken, '/api/search?q=Live+audit&limit=50');
@@ -561,7 +561,7 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   // DEVIATION RECORD: type=test_error; artifact=web/tests/e2e/real-server-ui.spec.ts; what_changed=parity OPML receipt expects `OPML outlines flattened` instead of `folders flattened`; why=OPML import ignores/flat maps outlines, but folder product semantics remain forbidden by CONSTITUTION/PRD; impact=API/MCP parity setup still proves import success before feed/parity assertions.
   await expect(page.getByText('imported 1 sources; OPML outlines flattened')).toBeVisible();
   await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 15_000 });
+  await expect(page.locator('.source-ledger__row', { hasText: 'ResoFeed E2E Local Source' })).toContainText(/(?:last_fetch: )?\d{2}:\d{2}:\d{2} local/, { timeout: 15_000 });
   await openToday(page);
   await expect(page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' })).toBeVisible();
 
@@ -611,9 +611,9 @@ test('@parity browser-led API/MCP parity probes share one real server fixture', 
   await page.getByRole('button', { name: 'Open Inspector for: Local fixture item one' }).click();
   const reingestPanel = page.getByRole('complementary', { name: 'INSPECTOR' }).getByLabel('Item re-ingest');
   await expect(reingestPanel).toBeVisible();
-  await reingestPanel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await reingestPanel.getByRole('button', { name: 'Options' }).click();
   await reingestPanel.getByLabel('One-time prompt').fill('Runtime parity re-ingest through selected Inspector item.');
-  await reingestPanel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
+  await reingestPanel.getByRole('button', { name: '[REGENERATE]' }).click();
   await expect(reingestPanel.getByLabel('Item re-ingest status')).toContainText(/re-ingest complete · search (refreshed|unchanged)/, { timeout: 15_000 });
   const apiDetailAfterBrowserReingest = await authorizedGet<{ item: ItemDetail }>(request, isolatedRunInfo, ownerToken, `/api/items/${itemID}`);
   expect(apiDetailAfterBrowserReingest.item.id).toBe(itemID);
@@ -782,7 +782,7 @@ test('@llm-deterministic browser-led accepted steering changes ranking, filterin
 
     await openSourceLedger(page);
     await page.getByRole('button', { name: '[RUN INGEST]' }).click();
-    await expect(page.locator('.source-ledger__row', { hasText: 'Policy Ranking Fixture' })).toContainText(/last_fetch: \d{2}:\d{2}:\d{2}/, { timeout: 15_000 });
+    await expect(page.locator('.source-ledger__row', { hasText: 'Policy Ranking Fixture' })).toContainText(/(?:last_fetch: )?\d{2}:\d{2}:\d{2} local/, { timeout: 15_000 });
 
     await openToday(page);
     await expect(page.getByRole('button', { name: 'Open Inspector for: Crypto token launch' })).toBeVisible();

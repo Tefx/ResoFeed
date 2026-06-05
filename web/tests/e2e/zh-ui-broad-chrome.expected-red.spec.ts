@@ -310,7 +310,7 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(ledger.locator('.source-ledger__url').first()).toHaveAttribute('translate', 'no');
     await redExpect(ledger.getByRole('button', { name: `[FETCH] 抓取来源 ${sourceWithoutTranslatedConvenienceName.title}` })).toBeVisible();
     await redExpect(ledger.getByRole('button', { name: `删除来源：${sourceWithoutTranslatedConvenienceName.title}` })).toBeVisible();
-    await redExpect(ledger.getByLabel(`诊断详情：${sourceWithoutTranslatedConvenienceName.title}`)).toBeVisible();
+    await redExpect(ledger.getByLabel(`来源信息：${sourceWithoutTranslatedConvenienceName.title}`)).toBeVisible();
 
     const portability = ledger.locator('.contract-portability');
     await redExpect(portability).toHaveAttribute('aria-label', '状态迁移操作');
@@ -329,11 +329,11 @@ test.describe('expected-red zh UI chrome localization matrix', () => {
     await redExpect(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
     await redExpect(inspector.getByText('为什么：来自已配置来源的新条目')).toHaveCount(0);
     await redExpect(inspector.getByLabel('本文重处理')).toBeVisible();
-    await redExpect(inspector.getByRole('button', { name: '[重新处理本文]' })).toBeVisible();
-    await inspector.getByRole('button', { name: '[重新处理本文]' }).click();
+    await redExpect(inspector.getByRole('button', { name: '[重新生成]' })).toBeVisible();
+    await inspector.getByRole('button', { name: '选项' }).click();
     await redExpect(inspector.getByRole('option', { name: 'GPT 5.1 Mini (openai/gpt-5.1-mini)' })).toHaveAttribute('value', 'openai/gpt-5.1-mini');
     await redExpect(inspector.getByRole('option', { name: 'Claude 3.7 Sonnet (anthropic/claude-3.7-sonnet)' })).toHaveAttribute('value', 'anthropic/claude-3.7-sonnet');
-    await redExpect(inspector.locator('.inspector-reingest-status')).toHaveAttribute('aria-label', '本文重处理状态');
+    await redExpect(inspector.getByRole('button', { name: '选项' })).toHaveAttribute('aria-expanded', 'true');
     await redExpect(inspector.locator('.contract-grouped-sources summary')).toHaveAttribute('aria-label', '分组故事，含 2 个来源条目');
     await redExpect(inspector.locator('.contract-grouped-sources__item').first()).toHaveAttribute('aria-label', `分组来源条目：${sourceWithoutTranslatedConvenienceName.title}（已选择）`);
     await redExpect(inspector.locator('.contract-grouped-sources__feed').first()).toHaveAttribute('aria-label', `来源订阅：${sourceWithoutTranslatedConvenienceName.title}`);

@@ -269,32 +269,32 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
   await expect(inspector.getByRole('link', { name: 'original link' })).toHaveAttribute('translate', 'no');
   await expect(inspector.getByLabel(/Source: Literal Source Identifier/u)).toHaveAttribute('translate', 'no');
 
-  const sourceEvidence = inspector.getByRole('group', { name: 'Source evidence' });
+  const sourceEvidence = inspector.getByLabel('Text evidence');
   await expect(sourceEvidence).not.toHaveAttribute('open', '');
 
   const panel = inspector.getByLabel('Item re-ingest');
   await expect(panel).toBeVisible();
-  await expect(panel).toHaveText(/REGENERATE\s+\[REGENERATE\]/);
+  await expect(panel).toHaveText(/\[REGENERATE\]\s+Options/);
+  await expect(panel.getByText('REGENERATE', { exact: true })).toHaveCount(0);
   await expect.poll(() => inspector.evaluate((root) => {
     const panelNode = root.querySelector('[data-contract="inspector-reingest"]');
-    const sourceEvidenceNode = root.querySelector('[aria-label="Source evidence"]');
+    const sourceEvidenceNode = root.querySelector('[aria-label="Text evidence"]');
     if (!panelNode || !sourceEvidenceNode) return false;
     return (panelNode.compareDocumentPosition(sourceEvidenceNode) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
   })).toBe(true);
-  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
-  await expect(panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' })).toBeFocused();
+  const options = panel.getByRole('button', { name: 'Options' });
   await expect(panel.getByLabel('Model')).toHaveCount(0);
   await expect(panel.getByLabel('One-time prompt')).toHaveCount(0);
-  await expect(panel.getByRole('button', { name: '[ADVANCED OPTIONS ↓]' })).toHaveAttribute('aria-expanded', 'false');
-  await panel.getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }).click();
-  await expect(panel.getByRole('button', { name: '[ADVANCED OPTIONS ↑]' })).toHaveAttribute('aria-expanded', 'true');
+  await expect(options).toHaveAttribute('aria-expanded', 'false');
+  await options.click();
+  await expect(options).toHaveAttribute('aria-expanded', 'true');
   await expect(panel.getByText('model:')).toBeVisible();
   await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeVisible();
   await expect(panel.getByText(/guidance only; cannot override schema, language, source identifiers, safety, status, or persistence/i)).toBeVisible();
   await expect(panel.getByText(/may change emphasis, angle, or fact selection only among source-backed facts/i)).toHaveCount(1);
   await expect(panel.getByLabel('Model')).toHaveValue('default');
   await panel.getByLabel('One-time prompt').fill('Retry with article-only extraction.');
-  await panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
+  await panel.getByRole('button', { name: '[REGENERATE]' }).click();
 
   await expect.poll(() => reingestBodies.length).toBe(1);
   const reingestBody = JSON.parse(reingestBodies[0] ?? '{}') as Record<string, unknown>;
@@ -315,7 +315,7 @@ test('expected-red browser-visible Inspector item re-ingest flow and evidence co
   await expect(page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.toLowerCase().includes('reingest') || key.toLowerCase().includes('prompt') || key.toLowerCase().includes('model')))).resolves.toEqual([]);
   await captureEvidence(page, testInfo, 'inspector-after-reingest-submit');
 
-  await expect(panel.getByRole('button', { name: '[RE-INGEST ITEM]' }), 'R1 DOM proof: success must collapse controls').toBeVisible();
+  await expect(panel.getByRole('button', { name: '[REGENERATE]' }), 'R1 DOM proof: success must collapse controls').toBeVisible();
   await expect(panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' })).toHaveCount(0);
   await expect(panel.getByRole('button', { name: '[CANCEL]' })).toHaveCount(0);
   await expect(panel.getByLabel('Model')).toHaveCount(0);
@@ -331,12 +331,12 @@ test('browser narrow Inspector re-ingest advanced controls stay within viewport 
   await page.getByRole('button', { name: `打开检查器：${item.title} / Open Inspector for: ${item.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   const panel = inspector.getByRole('region', { name: '本文重处理' });
-  await panel.getByRole('button', { name: '[重新处理本文]' }).click();
-  await expect(panel.getByRole('button', { name: '[确认重处理]' })).toBeFocused();
+  await expect(panel.getByRole('button', { name: '[重新生成]' })).toBeVisible();
+  await expect(panel.getByRole('button', { name: '[确认重处理]' })).toHaveCount(0);
   await expect(panel.getByLabel('模型')).toHaveCount(0);
   await expect(panel.getByLabel('一次性提示')).toHaveCount(0);
 
-  await panel.getByRole('button', { name: '[高级选项 ↓]' }).click();
+  await panel.getByRole('button', { name: '选项' }).click();
   await panel.getByLabel('一次性提示').fill('这是一段很长的临时提示，用于验证窄屏下输入框会在容器内换行和滚动，而不是越过检查器边界或视口边界。'.repeat(4));
   await captureEvidence(page, testInfo, 'inspector-zh-narrow-reingest-advanced-bounds');
 
@@ -365,7 +365,7 @@ test('expected-red browser DOM shows model-backed source text disclosure contrac
   await expect(inspector).toContainText('Browser model-backed core insight is present.');
   await captureEvidence(page, testInfo, 'inspector-model-backed-source-disclosure-red');
 
-  const sourceText = inspector.locator('[aria-label="Source text"]');
+  const sourceText = inspector.locator('[aria-label="Text evidence"]');
   await expect(sourceText).toHaveCount(1);
   await expect(sourceText).toHaveJSProperty('tagName', 'DETAILS');
   await expect(sourceText).not.toHaveAttribute('open', '');
@@ -381,9 +381,8 @@ test('expected-red browser DOM shows OpenRouter model list diagnostics in Inspec
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   const panel = inspector.getByLabel('Item re-ingest');
   await expect(panel).toBeVisible();
-  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
   await expect(panel.getByLabel('Model')).toHaveCount(0);
-  await panel.getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }).click();
+  await panel.getByRole('button', { name: 'Options' }).click();
   await captureEvidence(page, testInfo, 'inspector-model-list-diagnostics-red');
 
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
@@ -432,9 +431,8 @@ test('expected-red browser network proof: compatibility OpenRouter route prevent
   await page.getByRole('button', { name: `Open Inspector for: ${item.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   const panel = inspector.getByLabel('Item re-ingest');
-  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
   await expect(panel.getByLabel('Model')).toHaveCount(0);
-  await panel.getByRole('button', { name: '[ADVANCED OPTIONS ↓]' }).click();
+  await panel.getByRole('button', { name: 'Options' }).click();
   await captureEvidence(page, testInfo, 'inspector-model-list-compat-route-red');
   await attachJson(testInfo, 'inspector-model-list-network-red', { modelRequests });
 
@@ -459,14 +457,14 @@ test('expected-red browser zh chrome and post-reingest item text proof', async (
   await expect(inspector.getByText(/中文处理失败|中文处理未完成/u)).toBeVisible();
   await expect(inspector.getByLabel(/Source: Literal Source Identifier/u)).toHaveAttribute('translate', 'no');
   const panel = inspector.getByLabel('本文重处理');
-  await panel.getByRole('button', { name: '[重新处理本文]' }).click();
-  await expect(panel.getByRole('button', { name: '[确认重处理]' })).toBeFocused();
+  await expect(panel.getByRole('button', { name: '[重新生成]' })).toBeVisible();
+  await expect(panel.getByRole('button', { name: '[确认重处理]' })).toHaveCount(0);
   await expect(panel.getByLabel('一次性提示')).toHaveCount(0);
-  await panel.getByRole('button', { name: '[高级选项 ↓]' }).click();
+  await panel.getByRole('button', { name: '选项' }).click();
   await expect(panel.getByLabel('模型')).toHaveValue('default');
   await expect(panel.locator('option[value="default"]')).toHaveText('默认：账户默认模型');
   await panel.getByLabel('一次性提示').fill('请用中文重写摘要和核心洞察。');
-  await panel.getByRole('button', { name: '[确认重处理]' }).click();
+  await panel.getByRole('button', { name: '[重新生成]' }).click();
   await captureEvidence(page, testInfo, 'inspector-zh-after-reingest-red');
 
   await expect(inspector.getByText('摘要：')).toBeVisible();
