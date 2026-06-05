@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, within } from '@testing-library/svelte';
-import { describe, expect, it } from 'vitest';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import Inspector from '../Inspector.svelte';
 import type { ItemDetail, ModelStatus } from '$lib/api-contract';
@@ -19,7 +19,16 @@ const baseDetail: ItemDetail = {
   }
 };
 
+function getInspectorFor(detail: ItemDetail): HTMLElement {
+  return (
+    screen.queryByRole('complementary', { name: detail.title }) ??
+    screen.getByRole('complementary', { name: detail.localized_title ?? detail.title })
+  );
+}
+
 describe('Inspector fallback/source evidence contract', () => {
+  beforeEach(() => cleanup());
+  afterEach(() => cleanup());
   it('renders fallback status exactly once, hides Summary/Core, and shows source evidence', () => {
     const fallbackDetail: ItemDetail = {
       ...baseDetail,
@@ -35,7 +44,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: fallbackDetail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: fallbackDetail.title });
+    const inspector = getInspectorFor(fallbackDetail);
     expect(within(inspector).getByText('中文处理未完成 · 摘要/核心洞察不可用 · 显示来源摘录')).toBeVisible();
     expect((inspector.textContent?.match(/中文处理未完成/g) ?? [])).toHaveLength(1);
     expect(within(inspector).queryByLabelText('摘要')).not.toBeInTheDocument();
@@ -58,7 +67,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: okDetail, mode: 'desktop-split' } });
 
-    const inspector = screen.getByRole('complementary', { name: okDetail.title });
+    const inspector = getInspectorFor(okDetail);
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Model-backed digest explains durable feed retrieval behavior.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Model-backed core insight remains visible.');
     expect(within(inspector).getByLabelText('Text evidence')).toHaveTextContent('Full article text for normal source text rendering.');
@@ -81,7 +90,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'mobile-route', onResonanceToggle: () => undefined } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     const heading = within(inspector).getByRole('heading', { name: detail.title });
     const resonate = within(inspector).getByRole('button', { name: `Resonate item: ${detail.title}` });
     const titleRow = heading.closest('.inspector-title-row');
@@ -105,7 +114,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     const summary = within(inspector).getByLabelText('Summary');
     expect(summary).toHaveTextContent('Generated summary first sentence. Generated summary second sentence.');
     expect(summary).not.toHaveTextContent('\\n');
@@ -128,7 +137,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: generatedOnlyDetail, mode: 'desktop-split' } });
 
-    const inspector = screen.getByRole('complementary', { name: generatedOnlyDetail.title });
+    const inspector = getInspectorFor(generatedOnlyDetail);
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Generated summary must remain only in Summary.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Generated core insight must remain only in Core insight.');
     expect(within(inspector).getByLabelText('Key points')).toHaveTextContent('Generated key point three.');
@@ -160,7 +169,7 @@ describe('Inspector fallback/source evidence contract', () => {
     };
 
     const view = render(Inspector, { props: { item: firstDetail, mode: 'desktop-split' } });
-    const firstInspector = screen.getByRole('complementary', { name: firstDetail.title });
+    const firstInspector = getInspectorFor(firstDetail);
     const firstEvidence = within(firstInspector).getByLabelText('Text evidence');
     expect(firstEvidence).not.toHaveAttribute('open');
 
@@ -168,7 +177,7 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(firstEvidence).toHaveAttribute('open');
 
     await view.rerender({ item: secondDetail, mode: 'desktop-split' });
-    const secondInspector = screen.getByRole('complementary', { name: secondDetail.title });
+    const secondInspector = getInspectorFor(secondDetail);
     const secondEvidence = within(secondInspector).getByLabelText('Text evidence');
     expect(secondEvidence).toHaveTextContent('Second item source-backed evidence.');
     expect(secondEvidence).not.toHaveAttribute('open');
@@ -187,7 +196,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     const originalLink = within(inspector).getByRole('link', { name: 'original link' });
     expect(originalLink).toHaveTextContent(/^original link$/u);
     expect(originalLink).toHaveAttribute('href', expectedRedItem.url);
@@ -222,7 +231,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: generatedOnlyFullDetail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: generatedOnlyFullDetail.title });
+    const inspector = getInspectorFor(generatedOnlyFullDetail);
     expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('Generated summary is present but not source evidence.');
     expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('Generated core insight is present but not source evidence.');
     expect(within(inspector).queryByLabelText('文本证据')).not.toBeInTheDocument();
@@ -247,7 +256,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: fullEvidenceDetail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: fullEvidenceDetail.title });
+    const inspector = getInspectorFor(fullEvidenceDetail);
     expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('Persisted extracted article source evidence remains auditable.');
     expect(within(inspector).getByText('模型支持 · 全文 · 质量：高价值')).toBeVisible();
   });
@@ -268,7 +277,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: partialEvidenceDetail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: partialEvidenceDetail.title });
+    const inspector = getInspectorFor(partialEvidenceDetail);
     expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('RSS excerpt source evidence remains auditable.');
     expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
     expect(inspector).not.toHaveTextContent('文本证据不可用；请使用原文链接。');
@@ -290,7 +299,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: originalUnavailableWithGeneratedContent, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: originalUnavailableWithGeneratedContent.title });
+    const inspector = getInspectorFor(originalUnavailableWithGeneratedContent);
     expect(within(inspector).getByText('模型支持 · 原文不可用 · 质量：高价值')).toBeVisible();
     expect(within(inspector).queryByText('原文不可用 · 摘要/核心洞察可用')).not.toBeInTheDocument();
     expect(inspector).not.toHaveTextContent('原文不可用 · 摘要/核心洞察不可用');
@@ -313,7 +322,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
     expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 来源摘录，质量 高价值"]')).toBeVisible();
     expect(inspector).not.toHaveTextContent('文本证据：仅 RSS 摘录 · 摘要来源：模型支持');
@@ -335,7 +344,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     expect(within(inspector).getAllByText(/质量：简报/).some((element) => element.tagName === 'DD')).toBe(true);
     expect(inspector).not.toHaveTextContent('quality: brief');
   });
@@ -355,7 +364,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     expect(within(inspector).getAllByText(/质量：高价值/).some((element) => element.tagName === 'DD')).toBe(true);
     expect(inspector).not.toHaveTextContent('quality: high');
   });
@@ -377,7 +386,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
       render(Inspector, { props: { item: detail, mode: 'desktop-split' } });
 
-      const inspector = screen.getByRole('complementary', { name: detail.title });
+      const inspector = getInspectorFor(detail);
       expect(within(inspector).getByText(new RegExp(`target-language processing failed · ${modelStatus.replace(/_/g, ' ')}`))).toBeVisible();
       expect(within(inspector).getByLabelText('Text evidence')).toHaveTextContent(`Fallback excerpt for ${modelStatus}.`);
       expect(within(inspector).queryByLabelText('Summary')).not.toBeInTheDocument();
@@ -402,7 +411,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     expect(within(inspector).getByText(`失败 · ${label} · 已保留现有摘要和要点`)).toBeVisible();
     expect(within(inspector).getByText(`上次重处理失败 · ${label} · 已保留现有摘要和要点`)).toBeVisible();
     expect(inspector).not.toHaveTextContent(rawCode);
@@ -420,7 +429,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     expect(within(inspector).getByText('失败 · 解码错误 · 来源校验 · 已保留现有摘要和要点')).toBeVisible();
     expect(within(inspector).getByText('上次重处理失败 · 解码错误 · 来源校验 · 已保留现有摘要和要点')).toBeVisible();
     expect(inspector).not.toHaveTextContent('decode_error:source_grounding');
@@ -439,7 +448,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: detail.title });
+    const inspector = getInspectorFor(detail);
     expect(within(inspector).getByText('失败 · 解码错误 · 已保留现有摘要和要点')).toBeVisible();
     expect(within(inspector).getByText('上次重处理失败 · 解码错误 · 已保留现有摘要和要点')).toBeVisible();
     expect(inspector).not.toHaveTextContent(unsafeMessage);

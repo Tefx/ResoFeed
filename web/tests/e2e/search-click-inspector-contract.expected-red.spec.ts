@@ -131,12 +131,15 @@ test.describe('expected red: search result click keeps filtered slice and Inspec
     await openSearch(page, ownerToken);
 
     const searchSurface = page.getByRole('region', { name: 'Search and Retrieval' });
-    await page.locator('.contract-search').evaluate((node) => { node.scrollTop = 48; });
+    const preservedScrollTop = await page.locator('.contract-search').evaluate((node) => {
+      node.scrollTop = Math.min(48, Math.max(0, node.scrollHeight - node.clientHeight));
+      return node.scrollTop;
+    });
     await page.getByRole('button', { name: `Inspect search result: ${selectedItem.title}` }).click();
 
     await expect(searchSurface).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Plain text query' })).toHaveValue('fallback evidence');
-    await expect.poll(() => page.locator('.contract-search').evaluate((node) => node.scrollTop)).toBe(48);
+    await expect.poll(() => page.locator('.contract-search').evaluate((node) => node.scrollTop)).toBe(preservedScrollTop);
     await expect(page.getByRole('complementary', { name: selectedItem.title })).toContainText(selectedItem.title);
     await expect(page.locator('article.contract-search-result').filter({ hasText: selectedItem.title })).toHaveAttribute('aria-current', 'true');
   });
@@ -177,7 +180,7 @@ test.describe('expected red: search result click keeps filtered slice and Inspec
     await page.getByRole('button', { name: `Inspect search result: ${selectedItem.title}` }).click();
     const inspector = page.getByRole('complementary', { name: selectedItem.title });
     await expect(inspector).toContainText('target-language processing incomplete · summary/core unavailable · showing source excerpt');
-    await expect(inspector.getByLabel('Source evidence')).toContainText('Raw RSS excerpt proves fallback source evidence survives search selection.');
+    await expect(inspector.getByLabel('Text evidence')).toContainText('Raw RSS excerpt proves fallback source evidence survives search selection.');
     await expect(inspector.getByLabel('Summary')).toHaveCount(0);
     await expect(inspector.getByLabel('Core insight')).toHaveCount(0);
     await expect(inspector).not.toContainText('Unprocessed source body must not masquerade');

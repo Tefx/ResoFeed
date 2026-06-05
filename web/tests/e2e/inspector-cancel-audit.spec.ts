@@ -7,7 +7,7 @@ async function fulfillJson(route: Route, payload: object, status = 200) {
   await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(payload) });
 }
 
-test('audit cancel collapse and focus return', async ({ page, ownerToken }, testInfo) => {
+test('audit options collapse and focus remains on disclosure trigger', async ({ page, ownerToken }, testInfo) => {
   await page.addInitScript((token) => {
     window.localStorage.setItem('resofeed.ownerToken', token);
   }, ownerToken);
@@ -38,26 +38,27 @@ test('audit cancel collapse and focus return', async ({ page, ownerToken }, test
 
   await page.getByRole('button', { name: `Open Inspector for: Audit fallback source disclosure target` }).click();
   const panel = page.getByLabel('Item re-ingest');
-  const trigger = panel.getByRole('button', { name: '[RE-INGEST ITEM]' });
-  await expect(trigger).toBeVisible();
+  const regenerate = panel.getByRole('button', { name: '[REGENERATE]' });
+  const options = panel.getByRole('button', { name: 'Options' });
+  await expect(regenerate).toBeVisible();
+  await expect(options).toHaveAttribute('aria-expanded', 'false');
+  await expect(panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' })).toHaveCount(0);
+  await expect(panel.getByRole('button', { name: '[CANCEL]' })).toHaveCount(0);
 
-  await trigger.click();
+  await options.click();
+  await expect(options).toHaveAttribute('aria-expanded', 'true');
   await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeVisible();
   await panel.getByLabel('One-time prompt').fill('Temporary prompt');
-  
-  // Click Cancel
-  await panel.getByRole('button', { name: '[CANCEL]' }).click();
-  
-  // Verify it collapsed
-  await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeHidden();
-  await expect(trigger).toBeVisible();
-  
-  // Verify focus returned to trigger
-  await expect(trigger).toBeFocused();
 
-  // Re-open and verify prompt is cleared
-  await trigger.click();
-  await expect(panel.getByLabel('One-time prompt')).toHaveValue('');
+  await options.focus();
+  await page.keyboard.press('Enter');
+  await expect(options).toHaveAttribute('aria-expanded', 'false');
+  await expect(panel.getByLabel('One-time prompt')).toHaveCount(0);
+  await expect(regenerate).toBeVisible();
+  await expect(options).toBeFocused();
+
+  await page.keyboard.press('Enter');
+  await expect(panel.getByLabel('One-time prompt')).toHaveValue('Temporary prompt');
 
   const evidenceDir = path.join(testInfo.outputDir, 'inspector-cancel-audit');
   fs.mkdirSync(evidenceDir, { recursive: true });

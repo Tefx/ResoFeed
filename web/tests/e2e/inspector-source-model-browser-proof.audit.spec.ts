@@ -97,7 +97,7 @@ const modelBackedItem: ItemSummary = {
 const modelBackedDetail: ItemDetail = {
   ...modelBackedItem,
   feed_excerpt: 'Audit model-backed RSS excerpt remains available.',
-  extracted_text: 'Audit full source text becomes readable when the Source text disclosure expands.',
+  extracted_text: 'Audit full source text becomes readable when the Text evidence disclosure expands.',
   provenance: {
     ...fallbackDetail.provenance,
     canonical_url: modelBackedItem.url,
@@ -159,7 +159,7 @@ test('audit browser proves Inspector source disclosure expansion, reset, model o
 
   await page.getByRole('button', { name: `Open Inspector for: ${fallbackItem.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
-  const sourceEvidence = inspector.getByRole('group', { name: 'Source evidence' });
+  const sourceEvidence = inspector.getByLabel('Text evidence');
   await expect(sourceEvidence).not.toHaveAttribute('open', '');
   await sourceEvidence.click();
   await expect(sourceEvidence).toHaveAttribute('open', '');
@@ -167,14 +167,14 @@ test('audit browser proves Inspector source disclosure expansion, reset, model o
   await captureEvidence(page, testInfo, 'audit-fallback-source-evidence-expanded');
 
   const panel = inspector.getByLabel('Item re-ingest');
-  await expect(panel).toHaveText(/ITEM RE-INGEST\s+\[RE-INGEST ITEM\]/);
+  await expect(panel).toHaveText(/\[REGENERATE\]\s+Options/);
   await expect.poll(() => inspector.evaluate((root) => {
     const panelNode = root.querySelector('[data-contract="inspector-reingest"]');
-    const sourceEvidenceNode = root.querySelector('[aria-label="Source evidence"]');
+    const sourceEvidenceNode = root.querySelector('[aria-label="Text evidence"]');
     if (!panelNode || !sourceEvidenceNode) return false;
     return (panelNode.compareDocumentPosition(sourceEvidenceNode) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
   })).toBe(true);
-  await panel.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+  await panel.getByRole('button', { name: 'Options' }).click();
   await expect(panel.getByText('model:')).toBeVisible();
   await expect(panel.getByText('extra prompt (one-time, not saved)')).toBeVisible();
   await expect(panel.getByLabel('Model')).toHaveValue('default');
@@ -184,19 +184,19 @@ test('audit browser proves Inspector source disclosure expansion, reset, model o
   await expect(panel.getByText(/model list: 2 OpenRouter models available/i)).toBeVisible();
   await panel.getByLabel('One-time prompt').fill('Audit one-time prompt must stay transient.');
   await panel.getByLabel('Model').selectOption('openai/gpt-4.1-mini');
-  await panel.getByRole('button', { name: '[CONFIRM RE-INGEST]' }).click();
+  await panel.getByRole('button', { name: '[REGENERATE]' }).click();
   await expect.poll(() => reingestBodies.length).toBe(1);
   await expect(panel.getByLabel('One-time prompt')).toHaveCount(0);
-  await expect(panel.getByRole('button', { name: '[RE-INGEST ITEM]' })).toBeVisible();
+  await expect(panel.getByRole('button', { name: '[REGENERATE]' })).toBeVisible();
   await expect(page.evaluate(() => Object.keys(window.localStorage).sort())).resolves.toEqual(['resofeed.ownerToken']);
   await expect(inspector.getByText(/settings|history/i)).toHaveCount(0);
   await captureEvidence(page, testInfo, 'audit-after-reingest-no-durable-state');
 
   await page.getByRole('button', { name: `Open Inspector for: ${modelBackedItem.title}` }).click();
-  const sourceText = inspector.getByRole('group', { name: 'Source text' });
+  const sourceText = inspector.getByLabel('Text evidence');
   await expect(sourceText).not.toHaveAttribute('open', '');
   await sourceText.click();
   await expect(sourceText).toHaveAttribute('open', '');
-  await expect(sourceText).toContainText('Audit full source text becomes readable when the Source text disclosure expands.');
+  await expect(sourceText).toContainText('Audit full source text becomes readable when the Text evidence disclosure expands.');
   await captureEvidence(page, testInfo, 'audit-model-backed-source-text-expanded');
 });

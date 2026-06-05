@@ -418,7 +418,7 @@ test.describe('ui-navigation-hover-inspector-repair expected-red browser contrac
     await expect(page.locator('.contract-grouped-sources')).not.toHaveAttribute('open', '');
     await expectReadableChrome(groupedSummary, 'grouped source disclosure collapsed summary');
 
-    await page.getByRole('button', { name: '[RE-INGEST ITEM]' }).click();
+    await page.getByRole('button', { name: 'Options' }).click();
     const prompt = page.getByRole('textbox', { name: 'One-time prompt' });
     await prompt.focus();
     expect(hasVisibleFocusRing(await interactiveStyle(prompt)), 're-ingest textarea focus must be visible').toBe(true);

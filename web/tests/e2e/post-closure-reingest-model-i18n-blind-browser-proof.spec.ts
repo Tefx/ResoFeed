@@ -183,17 +183,17 @@ test('blind proof: zh model-list route parity and successful item re-ingest coll
   await expect(inspector.getByRole('link', { name: '原文链接' })).toHaveAttribute('translate', 'no');
 
   const panel = inspector.getByLabel('本文重处理');
-  await panel.getByRole('button', { name: '[重新处理本文]' }).click();
-  await expect(panel.getByText(/模型列表：2 个 OpenRouter 模型可用|model list: 2 OpenRouter models available/iu)).toBeVisible();
+  await panel.getByRole('button', { name: '选项' }).click();
+  await expect(panel.getByText(/2 个 OpenRouter 模型可选|model list: 2 OpenRouter models available/iu)).toBeVisible();
   await expect(panel.getByRole('option', { name: 'GPT 4.1 Mini (openai/gpt-4.1-mini)' })).toHaveAttribute('value', 'openai/gpt-4.1-mini');
   await panel.getByLabel('模型').selectOption('openai/gpt-4.1-mini');
   await panel.getByLabel('一次性提示').fill('请用中文重写摘要和核心洞察。');
   await captureEvidence(page, testInfo, 'before-positive-confirm', { network });
 
-  await panel.getByRole('button', { name: '[确认重处理]' }).click();
+  await panel.getByRole('button', { name: '[重新生成]' }).click();
   await expect(inspector.getByText('显式重处理后的中文摘要，足以证明目标语言内容已更新。')).toBeVisible();
   await expect(inspector.getByText('显式重处理后的中文核心洞察，说明修复后的浏览器状态。')).toBeVisible();
-  await expect(panel.getByRole('button', { name: '[重新处理本文]' })).toBeVisible();
+  await expect(panel.getByRole('button', { name: '[重新生成]' })).toBeVisible();
   await expect(panel.getByRole('status', { name: /item re-ingest status|本文重处理状态/i })).toContainText('重处理完成 · 搜索已刷新');
   await expect(panel.getByRole('button', { name: '[确认重处理]' })).toHaveCount(0);
   await expect(panel.getByRole('button', { name: '[取消]' })).toHaveCount(0);
@@ -233,7 +233,7 @@ test('blind proof: zh model-list route parity and successful item re-ingest coll
   ]);
 });
 
-test('blind proof: negative re-ingest error keeps correction controls and avoids stale completion', async ({ page, ownerToken }, testInfo) => {
+test('blind proof: negative re-ingest error keeps options draft and localized preserved-content status without stale completion', async ({ page, ownerToken }, testInfo) => {
   const network: NetworkEntry[] = [];
   await page.setViewportSize({ width: 1280, height: 720 });
   await installApiFixtures(page, ownerToken, network, 'negative');
@@ -241,13 +241,16 @@ test('blind proof: negative re-ingest error keeps correction controls and avoids
   await page.getByRole('button', { name: `打开检查器：${item.title}` }).click();
   const inspector = page.getByRole('complementary', { name: 'INSPECTOR' });
   const panel = inspector.getByLabel('本文重处理');
-  await panel.getByRole('button', { name: '[重新处理本文]' }).click();
+  await panel.getByRole('button', { name: '选项' }).click();
   await panel.getByLabel('一次性提示').fill('保留这个失败后的修正提示。');
-  await panel.getByRole('button', { name: '[确认重处理]' }).click();
+  await panel.getByRole('button', { name: '[重新生成]' }).click();
 
-  await expect(panel.getByText(/err: bad_request: conflicting prompt fields rejected safely/u)).toBeVisible();
-  await expect(panel.getByRole('button', { name: '[确认重处理]' })).toBeVisible();
-  await expect(panel.getByRole('button', { name: '[取消]' })).toBeVisible();
+  const status = panel.getByRole('alert', { name: /本文重处理状态|item re-ingest status/i });
+  await expect(status).toContainText(/上次重处理失败 · .* · 已保留现有摘要和要点/u);
+  await expect(status).not.toContainText(/err:/u);
+  await expect(panel.getByRole('button', { name: '[重新生成]' })).toBeVisible();
+  await expect(panel.getByRole('button', { name: '[确认重处理]' })).toHaveCount(0);
+  await expect(panel.getByRole('button', { name: '[取消]' })).toHaveCount(0);
   await expect(panel.getByLabel('一次性提示')).toHaveValue('保留这个失败后的修正提示。');
   await expect(inspector.getByText('显式重处理后的中文摘要，足以证明目标语言内容已更新。')).toHaveCount(0);
   await captureEvidence(page, testInfo, 'negative-error-safe-state', { network });
