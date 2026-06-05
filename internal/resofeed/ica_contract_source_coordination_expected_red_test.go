@@ -64,7 +64,8 @@ func TestICAExpectedRedSlowUnrelatedSourceOverlapAndSameSourceConflict(t *testin
 	duplicateAlpha := stcPostManualFetch(router, "/api/sources/src_ica_coord_alpha/fetch")
 	assertStatus(t, duplicateAlpha, http.StatusConflict)
 	assertErrorCode(t, duplicateAlpha.Body.Bytes(), ManualFetchErrorCodeConflict)
-	t.Log("same-source duplicate fetch returned 409 conflict while original source A request remained in-flight")
+	icaAssertConflictReason(t, duplicateAlpha.Body.Bytes(), "source_busy")
+	t.Log("same-source duplicate fetch returned 409 source_busy conflict while original source A request remained in-flight")
 
 	if got := alphaRequests.Load(); got != 1 {
 		t.Fatalf("source A upstream request count = %d, want one with no queued duplicate", got)
