@@ -4,6 +4,10 @@ const (
 	DefaultIngestSourceConcurrency        = 8
 	DefaultIngestItemConcurrencyPerSource = 4
 	DefaultIngestGlobalLLMConcurrency     = 16
+
+	ingestConflictReasonSourceBusy              = "source_busy"
+	ingestConflictReasonSourceCapacityExhausted = "source_capacity_exhausted"
+	ingestConflictReasonGlobalOperationRunning  = "global_operation_running"
 )
 
 // ingestCoordinationScope names the in-process coordination concepts used by

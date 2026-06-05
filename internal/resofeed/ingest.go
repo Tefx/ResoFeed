@@ -56,6 +56,7 @@ type operationGuardDetails struct {
 	Operation string
 	Scope     any
 	ActorKind string
+	Reason    string
 }
 
 type operationGuardConflictError struct {
@@ -144,7 +145,7 @@ func ManualIngest(ctx context.Context, db *sql.DB, cfg IngestConfig) (ret Manual
 // source. Missing, deleted, and inactive sources are reported by the caller as
 // not_found; operational RSS failures are source-level result entries.
 func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, sourceID string) (ret ManualFetchResult, retErr error) {
-	release, err := tryAcquireIngestGuardWithActor(ctx, "fetch", sourceID, string(ActorKindHuman))
+	release, err := tryAcquireIngestGuardWithConfig(ctx, cfg.coordinatorConfig(), "fetch", sourceID, string(ActorKindHuman))
 	if err != nil {
 		return ManualFetchResult{}, err
 	}
@@ -351,14 +352,19 @@ func tryAcquireIngestGuard(ctx context.Context, operation string, scope any) (fu
 }
 
 func tryAcquireIngestGuardWithActor(ctx context.Context, operation string, scope any, actorKind string) (func(), error) {
+	return tryAcquireIngestGuardWithConfig(ctx, (IngestConfig{}).coordinatorConfig(), operation, scope, actorKind)
+}
+
+func tryAcquireIngestGuardWithConfig(ctx context.Context, cfg ingestCoordinatorConfig, operation string, scope any, actorKind string) (func(), error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
 	}
+	cfg = cfg.withDefaults()
 	details := operationGuardDetails{Operation: operation, Scope: scope, ActorKind: actorKind}
 	ingestGuardState.mu.Lock()
-	if conflict, ok := ingestGuardState.conflictLocked(details); ok {
+	if conflict, ok := ingestGuardState.conflictLocked(details, cfg.SourceConcurrency); ok {
 		ingestGuardState.mu.Unlock()
 		return nil, operationGuardConflictError{details: conflict}
 	}
@@ -387,28 +393,34 @@ func tryAcquireIngestGuardWithActor(ctx context.Context, operation string, scope
 	}, nil
 }
 
-func (s *guardedOperationState) conflictLocked(details operationGuardDetails) (operationGuardDetails, bool) {
+func (s *guardedOperationState) conflictLocked(details operationGuardDetails, sourceCapacity int) (operationGuardDetails, bool) {
 	if s.activeGlobal.Operation != "" {
-		return s.activeGlobal, true
+		return conflictDetailsWithReason(s.activeGlobal, ingestConflictReasonGlobalOperationRunning), true
 	}
 	if details.Operation != "fetch" {
 		if existing, ok := s.anyLocked(); ok {
-			return existing, true
+			return conflictDetailsWithReason(existing, ingestConflictReasonGlobalOperationRunning), true
 		}
 		return operationGuardDetails{}, false
 	}
 	key := sourceFetchGuardKey(details.Scope)
 	if key == "source" {
 		if existing, ok := s.anyLocked(); ok {
-			return existing, true
+			return conflictDetailsWithReason(existing, ingestConflictReasonSourceBusy), true
 		}
 		return operationGuardDetails{}, false
 	}
 	if existing, ok := s.activeFetches["source"]; ok {
-		return existing, true
+		return conflictDetailsWithReason(existing, ingestConflictReasonSourceBusy), true
 	}
 	if existing, ok := s.activeFetches[key]; ok {
-		return existing, true
+		return conflictDetailsWithReason(existing, ingestConflictReasonSourceBusy), true
+	}
+	if sourceCapacity <= 0 {
+		sourceCapacity = DefaultIngestSourceConcurrency
+	}
+	if len(s.activeFetches) >= sourceCapacity {
+		return operationGuardDetails{Operation: "fetch", Scope: ingestCoordinationScopeSourceCapacity, ActorKind: details.ActorKind, Reason: ingestConflictReasonSourceCapacityExhausted}, true
 	}
 	return operationGuardDetails{}, false
 }
@@ -449,6 +461,11 @@ func sourceFetchGuardKey(scope any) string {
 	return fmt.Sprint(scope)
 }
 
+func conflictDetailsWithReason(details operationGuardDetails, reason string) operationGuardDetails {
+	details.Reason = reason
+	return details
+}
+
 func (s *guardedOperationState) snapshot() operationGuardDetails {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -482,12 +499,17 @@ func guardConflictDetailMap(details operationGuardDetails) map[string]any {
 	if currentOperation.ActorKind != nil {
 		actorKind = *currentOperation.ActorKind
 	}
+	reason := details.Reason
+	if reason == "" {
+		reason = ingestConflictReasonGlobalOperationRunning
+	}
 	return map[string]any{
 		"operation_running": true,
 		"operation":         operation,
 		"actor_kind":        actorKind,
 		"retry_allowed":     true,
 		"current_operation": currentOperation,
+		"reason":            reason,
 	}
 }
 
