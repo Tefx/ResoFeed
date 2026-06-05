@@ -130,7 +130,7 @@ describe('expected-red Operational Grammar v2 render contract lock', () => {
     expect(within(panel).queryByRole('button', { name: '[CONFIRM RE-INGEST]' })).not.toBeInTheDocument();
     expect(within(panel).queryByRole('button', { name: '[CANCEL]' })).not.toBeInTheDocument();
 
-    await user.click(within(panel).getByText('Options'));
+    await user.click(within(panel).getByRole('button', { name: 'Options' }));
     await user.selectOptions(within(panel).getByLabelText('Model'), 'openai/gpt-4.1-mini');
     await user.type(within(panel).getByLabelText('One-time prompt'), 'Current temporary prompt');
     await user.click(regenerate);
@@ -192,7 +192,7 @@ describe('expected-red Operational Grammar v2 render contract lock', () => {
     });
 
     const inspector = screen.getByRole('complementary', { name: ogv2Detail.title });
-    disclosureTriggerContract(within(inspector).getByText(/^Options$/u), /^Options$/u);
+    disclosureTriggerContract(within(inspector).getByRole('button', { name: 'Options' }), /^Options$/u);
     disclosureTriggerContract(within(inspector).getByLabelText('Text evidence').querySelector('summary') as HTMLElement, /^Text evidence/u);
     disclosureTriggerContract(within(inspector).getByText(/^Source info$/u), /^Source info$/u);
   });
@@ -211,7 +211,7 @@ describe('expected-red Operational Grammar v2 render contract lock', () => {
     });
 
     const inspector = screen.getByRole('complementary', { name: ogv2Detail.localized_title ?? ogv2Detail.title });
-    disclosureTriggerContract(within(inspector).getByText(/^选项$/u), /^选项$/u);
+    disclosureTriggerContract(within(inspector).getByRole('button', { name: '选项' }), /^选项$/u);
     disclosureTriggerContract(within(inspector).getByLabelText('文本证据').querySelector('summary') as HTMLElement, /^文本证据/u);
     disclosureTriggerContract(within(inspector).getByText(/^来源信息$/u), /^来源信息$/u);
   });

@@ -264,6 +264,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       ...expectedRedItem,
       id: 'item_zh_fallback_source_excerpt',
       title: 'English source fixture awaiting reprocess',
+      localized_title: null,
       summary: null,
       core_insight: null,
       extraction_status: 'partial_extraction',
@@ -296,7 +297,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const mixedDetail: ItemDetail = {
       ...expectedRedItem,
       id: 'item_zh_model_backed_stale_body',
-      title: '中文标题',
+      title: 'Stale English source title',
+      localized_title: '中文标题',
       summary: '这是中文摘要。',
       core_insight: '这是中文核心洞察。',
       extraction_status: 'full',
@@ -315,7 +317,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
 
     render(Inspector, { props: { item: mixedDetail, mode: 'desktop-split', language: 'zh' } });
 
-    const inspector = screen.getByRole('complementary', { name: mixedDetail.title });
+    const inspector = screen.getByRole('complementary', { name: mixedDetail.localized_title ?? mixedDetail.title });
     expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('这是中文摘要。');
     expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('这是中文核心洞察。');
     const generatedText = Array.from(inspector.querySelectorAll('.inspector-section-copy'))
@@ -368,7 +370,8 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect(inspector.querySelector('.contract-source-details')).toBeInstanceOf(HTMLDetailsElement);
     expect(inspector.querySelector('.contract-grouped-sources')).toBeNull();
     expect(within(inspector).getByRole('button', { name: '[REGENERATE]' })).toHaveClass('inspector-reingest-submit');
-    expect(within(inspector).getByText('Options').closest('details')).toBeInstanceOf(HTMLDetailsElement);
+    expect(within(inspector).getByRole('button', { name: 'Options' })).toHaveAttribute('aria-expanded', 'false');
+    expect(within(inspector).getByRole('button', { name: 'Options' })).toHaveAttribute('aria-controls', 'inspector-reingest-advanced');
     expect(within(inspector).queryByText(/^REGENERATE$/u)).not.toBeInTheDocument();
   });
 

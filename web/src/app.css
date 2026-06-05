@@ -1482,24 +1482,25 @@ details.surface-nav button:focus-visible {
   font: var(--rf-typography-chrome);
 }
 
-.inspector-reingest-disclosure summary {
+.inspector-reingest-disclosure-trigger {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
+  border: 0;
+  padding: 0;
   color: var(--rf-color-current-muted);
-  list-style: none;
+  background: transparent;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 
-.inspector-reingest-disclosure summary::-webkit-details-marker {
-  display: none;
-}
-
-.inspector-reingest-disclosure[open] summary,
-.inspector-reingest-disclosure summary:hover {
+.inspector-reingest-disclosure[data-state="open"] .inspector-reingest-disclosure-trigger,
+.inspector-reingest-disclosure-trigger:hover {
   color: var(--rf-color-current-text);
 }
 
-.inspector-reingest-disclosure summary:focus-visible {
+.inspector-reingest-disclosure-trigger:focus-visible {
   color: var(--rf-color-current-text);
   outline: 2px solid var(--rf-color-current-focus);
   outline-offset: 2px;

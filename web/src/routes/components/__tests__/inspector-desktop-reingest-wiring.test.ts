@@ -116,9 +116,11 @@ describe('desktop split-pane Inspector re-ingest wiring', () => {
     expect(within(inspector).queryByRole('textbox', { name: '一次性提示' })).not.toBeInTheDocument();
     expect(within(inspector).queryByRole('button', { name: '[确认重处理]' })).not.toBeInTheDocument();
 
-    const options = within(inspector).getByText('选项');
-    expect(options.closest('details')).toBeInstanceOf(HTMLDetailsElement);
+    const options = within(inspector).getByRole('button', { name: '选项' });
+    expect(options).toHaveAttribute('aria-expanded', 'false');
+    expect(options).toHaveAttribute('aria-controls', 'inspector-reingest-advanced');
     await fireEvent.click(options);
+    expect(options).toHaveAttribute('aria-expanded', 'true');
 
     await waitFor(() => expect(within(inspector).getByRole('combobox', { name: '模型' })).toBeVisible());
     expect(within(inspector).getByRole('textbox', { name: '一次性提示' })).toBeVisible();
@@ -139,7 +141,7 @@ describe('desktop split-pane Inspector re-ingest wiring', () => {
 
     const source = fs.readFileSync(`${process.cwd()}/src/app.css`, 'utf8');
     expect(source).toMatch(/\.inspector-reingest-field select,\s*\.inspector-reingest-field textarea\s*\{[^}]*width: 100%;[^}]*min-width: 0;[^}]*max-width: 100%;/s);
-    expect(source).toMatch(/\.inspector-reingest-disclosure summary\s*\{[^}]*min-height: 44px;[^}]*color: var\(--rf-color-current-muted\);/s);
+    expect(source).toMatch(/\.inspector-reingest-disclosure-trigger\s*\{[^}]*min-height: 44px;[^}]*color: var\(--rf-color-current-muted\);/s);
     expect(source).not.toMatch(/Re-ingest is an inline, low-frequency Inspector utility/s);
     expect(source).not.toMatch(/\.inspector-reingest-actions \.bracket-action\s*\{[^}]*flex: 1 1 100%;/s);
   });
