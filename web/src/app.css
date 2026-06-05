@@ -1473,33 +1473,33 @@ details.surface-nav button:focus-visible {
   align-items: center;
 }
 
-/* [DEVIATION]: Re-ingest is an inline, low-frequency Inspector utility. The global bracket-action focus inversion is too heavy here and caused the narrow-screen overlap shown in user screenshots; keep the 44px target and visible focus ring, but render these as quiet text commands. */
-.inspector-reingest-panel > .bracket-action,
-.inspector-reingest-actions .bracket-action {
+.inspector-reingest-disclosure {
   min-width: 0;
-  margin: 0;
-  padding-inline: 0;
-  overflow-wrap: anywhere;
   color: var(--rf-color-current-muted);
-  background: transparent;
+  font: var(--rf-typography-chrome);
 }
 
-.inspector-reingest-panel > .bracket-action:hover:not(:disabled):not([aria-disabled='true']),
-.inspector-reingest-panel > .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']),
-.inspector-reingest-actions .bracket-action:hover:not(:disabled):not([aria-disabled='true']),
-.inspector-reingest-actions .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']) {
+.inspector-reingest-disclosure summary {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--rf-color-current-muted);
+  list-style: none;
+}
+
+.inspector-reingest-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.inspector-reingest-disclosure[open] summary,
+.inspector-reingest-disclosure summary:hover {
   color: var(--rf-color-current-text);
-  background: transparent;
 }
 
-.inspector-reingest-panel > .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']),
-.inspector-reingest-actions .bracket-action:focus-visible:not(:disabled):not([aria-disabled='true']) {
-  outline: 2px solid var(--rf-component-focus-ring-color);
+.inspector-reingest-disclosure summary:focus-visible {
+  color: var(--rf-color-current-text);
+  outline: 2px solid var(--rf-color-current-focus);
   outline-offset: 2px;
-}
-
-.inspector-reingest-actions .inspector-reingest-submit {
-  color: var(--rf-color-current-text);
 }
 
 .inspector-reingest-advanced {

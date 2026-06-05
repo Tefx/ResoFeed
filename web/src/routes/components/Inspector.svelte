@@ -38,11 +38,9 @@
   let pending = $state(false);
   let reingestModel = $state('default');
   let reingestPrompt = $state('');
-  let reingestState = $state<'idle' | 'confirming' | 'submitting' | 'completed' | 'replayed' | 'conflict' | 'failed'>('idle');
+  let reingestState = $state<'idle' | 'submitting' | 'completed' | 'replayed' | 'conflict' | 'failed'>('idle');
   let reingestStatus = $state('');
-  let reingestConfiguring = $state(false);
   let reingestAdvancedOpen = $state(false);
-  let reingestToggle = $state<HTMLButtonElement | undefined>();
   let reingestSubmit = $state<HTMLButtonElement | undefined>();
   let reingestModelSelect = $state<HTMLSelectElement | undefined>();
   let reingestItemId = $state<string | null>(null);
@@ -641,22 +639,7 @@
     reingestPrompt = '';
     reingestState = 'idle';
     reingestStatus = '';
-    reingestConfiguring = false;
     reingestAdvancedOpen = false;
-  }
-
-  async function openReingestConfig(): Promise<void> {
-    reingestConfiguring = true;
-    reingestAdvancedOpen = false;
-    reingestState = 'confirming';
-    await tick();
-    reingestSubmit?.focus();
-  }
-
-  async function cancelReingestConfig(): Promise<void> {
-    resetReingestTransientState();
-    await tick();
-    reingestToggle?.focus();
   }
 
   function focusIsInsideTextEntry(): boolean {
@@ -669,9 +652,10 @@
   function handleInspectorEscape(event: KeyboardEvent): void {
     if (event.key !== 'Escape' || event.defaultPrevented) return;
     if (focusIsInsideTextEntry()) return;
-    if (reingestConfiguring && reingestState !== 'submitting') {
+    if (reingestAdvancedOpen && reingestState !== 'submitting') {
       event.preventDefault();
-      void cancelReingestConfig();
+      reingestAdvancedOpen = false;
+      void tick().then(() => reingestSubmit?.focus());
       return;
     }
     event.preventDefault();
@@ -698,6 +682,29 @@
     return `${base} · ${search}`;
   }
 
+  function reingestButtonLabel(): string {
+    if (reingestState === 'submitting') return localizedChrome('[RE-INGESTING ITEM...]', '[正在重新生成...]');
+    return localizedChrome('[REGENERATE]', '[重新生成]');
+  }
+
+  function reingestButtonA11yLabel(): string {
+    if (reingestState === 'submitting') return localizedChrome('[RE-INGESTING ITEM...]', '[正在重新生成...]');
+    return localizedChrome('[REGENERATE]', '[重新生成]');
+  }
+
+  function visibleReingestStatus(): string {
+    if (reingestState === 'submitting') return localizedChrome('re-ingesting item', '正在重新生成');
+    return reingestStatus;
+  }
+
+  function reingestStatusRole(): 'status' | 'alert' {
+    return reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status';
+  }
+
+  function reingestStatusLive(): 'polite' | 'assertive' {
+    return reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite';
+  }
+
   async function submitReingest(): Promise<void> {
     if (!item || !onReingestItem || reingestState === 'submitting') return;
     const submittedItem = item;
@@ -715,10 +722,10 @@
       reingestState = response.already_applied ? 'replayed' : 'completed';
       reingestStatus = reingestStatusText(response);
       await tick();
+      reingestAdvancedOpen = false;
       window.setTimeout(() => {
         if (item?.id !== submittedItemId || (reingestState !== 'completed' && reingestState !== 'replayed')) return;
-        reingestConfiguring = false;
-        void tick().then(() => reingestToggle?.focus());
+        void tick().then(() => reingestSubmit?.focus());
       }, 0);
     } catch (error) {
       if (item?.id !== submittedItemId) return;
@@ -841,61 +848,56 @@
     {/if}
     {#if showReingest}
       <section class="inspector-reingest-panel" aria-label={reingestPanelLabel()} data-contract="inspector-reingest">
-        <p class="inspector-section-label">{localizedChrome('REGENERATE', '重新生成')}</p>
-        {#if reingestConfiguring}
-          <div class="inspector-reingest-actions" role="group" aria-label={localizedChrome('Regenerate summary, core insight, key points, and search index for this item.', '重新生成本文摘要、核心洞察、要点，并刷新搜索索引。')}>
-            <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem} aria-label={reingestState === 'submitting' ? localizedChrome('[RE-INGESTING ITEM...]', '[正在重新处理本文...]') : localizedChrome('[CONFIRM RE-INGEST]', '[确认重处理]')} aria-disabled={reingestState === 'submitting' ? 'true' : undefined} onclick={() => void submitReingest()}>{reingestState === 'submitting' ? localizedChrome('[RUNNING...]', '[处理中...]') : localizedChrome('[CONFIRM]', '[确认]')}</button>
-            <button class="bracket-action inspector-reingest-cancel" type="button" disabled={reingestState === 'submitting'} onclick={() => void cancelReingestConfig()}>{localizedChrome('[CANCEL]', '[取消]')}</button>
-            <button class="bracket-action inspector-reingest-advanced-toggle" type="button" aria-label={reingestAdvancedOpen ? localizedChrome('[ADVANCED OPTIONS ↑]', '[高级选项 ↑]') : localizedChrome('[ADVANCED OPTIONS ↓]', '[高级选项 ↓]')} aria-expanded={reingestAdvancedOpen ? 'true' : 'false'} aria-controls="inspector-reingest-advanced" disabled={reingestState === 'submitting'} onclick={() => { reingestAdvancedOpen = !reingestAdvancedOpen; }}>{localizedChrome('[OPTIONS]', '[选项]')}</button>
-          </div>
-          {#if reingestAdvancedOpen}
-            <div id="inspector-reingest-advanced" class="inspector-reingest-advanced" role="region" aria-label={localizedChrome('Advanced re-ingest options', '重处理高级选项')}>
-              <label class="inspector-reingest-field">
-                <span>{localizedChrome('model:', '模型：')}</span>
-                <select bind:this={reingestModelSelect} name="reingest-model" bind:value={reingestModel} aria-label={localizedChrome('Model', '模型')} disabled={!onReingestItem || reingestState === 'submitting'}>
-                  <option value="default">{localizedChrome('default: account_default', '默认：账户默认模型')}</option>
-                  {#each openRouterModels as model (model.id)}
-                    <option value={model.id}>{model.name} ({model.id})</option>
-                  {/each}
-                </select>
-              </label>
-              <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
-              <label class="inspector-reingest-field">
-                <span>{localizedChrome('extra prompt (one-time, not saved)', '额外提示（仅本次，不保存）')}</span>
-                <span class="visually-hidden">extra prompt (one-time, guidance only, not saved)</span>
-                <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label={localizedChrome('One-time prompt', '一次性提示')} aria-describedby="inspector-reingest-prompt-authority" rows="3" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
-              </label>
-              <p id="inspector-reingest-prompt-authority" class="inspector-model-list-diagnostic">
-                {localizedChrome('guidance only; cannot override schema, language, source identifiers, safety, status, or persistence.', '仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。')}
-                <span class="visually-hidden">{localizedChrome(' May change emphasis, angle, or fact selection only among source-backed facts.', '只能在有来源支持的事实中改变重点、角度或事实选择。')}</span>
-              </p>
-            </div>
-          {/if}
-          <p class:visually-hidden={!reingestStatus} class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestState === 'conflict' || reingestState === 'failed' ? 'alert' : 'status'} aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live={reingestState === 'conflict' || reingestState === 'failed' ? 'assertive' : 'polite'}>{reingestStatus || localizedChrome('ready', '就绪')}</p>
-        {:else}
-          <button bind:this={reingestToggle} class="bracket-action inspector-reingest-toggle" type="button" disabled={!onReingestItem} aria-label={localizedChrome('[RE-INGEST ITEM]', '[重新处理本文]')} title={localizedChrome('Regenerate summary, core insight, key points, and search index for this item.', '重新生成本文摘要、核心洞察、要点，并刷新搜索索引。')} onclick={() => void openReingestConfig()}>{localizedChrome('[REGENERATE]', '[重新生成]')}</button>
-          {#if reingestStatus}
-            <p class="inspector-reingest-status" role="status" aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live="polite">{reingestStatus}</p>
-          {/if}
+        <div class="inspector-reingest-actions" role="group" aria-label={localizedChrome('Regenerate summary, core insight, key points, and search index for this item.', '重新生成本文摘要、核心洞察、要点，并刷新搜索索引。')}>
+          <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem} aria-label={reingestButtonA11yLabel()} aria-disabled={reingestState === 'submitting' ? 'true' : undefined} title={localizedChrome('Regenerate summary, core insight, key points, and search index for this item.', '重新生成本文摘要、核心洞察、要点，并刷新搜索索引。')} onclick={() => void submitReingest()}>{reingestButtonLabel()}</button>
+          <details class="inspector-reingest-disclosure" bind:open={reingestAdvancedOpen} ontoggle={(event) => { reingestAdvancedOpen = event.currentTarget instanceof HTMLDetailsElement && event.currentTarget.open; }}>
+            <summary aria-controls="inspector-reingest-advanced">{localizedChrome('Options', '选项')}</summary>
+            {#if reingestAdvancedOpen}
+              <div id="inspector-reingest-advanced" class="inspector-reingest-advanced" role="region" aria-label={localizedChrome('Advanced re-ingest options', '重处理高级选项')}>
+                <label class="inspector-reingest-field">
+                  <span>{localizedChrome('model:', '模型：')}</span>
+                  <select bind:this={reingestModelSelect} name="reingest-model" bind:value={reingestModel} aria-label={localizedChrome('Model', '模型')} disabled={!onReingestItem || reingestState === 'submitting'}>
+                    <option value="default">{localizedChrome('default: account_default', '默认：账户默认模型')}</option>
+                    {#each openRouterModels as model (model.id)}
+                      <option value={model.id}>{model.name} ({model.id})</option>
+                    {/each}
+                  </select>
+                </label>
+                <p class="inspector-model-list-diagnostic" role={openRouterModelListState === 'loading' ? 'status' : undefined} aria-live="polite">{modelListDiagnostic()}</p>
+                <label class="inspector-reingest-field">
+                  <span>{localizedChrome('extra prompt (one-time, not saved)', '额外提示（仅本次，不保存）')}</span>
+                  <span class="visually-hidden">extra prompt (one-time, guidance only, not saved)</span>
+                  <textarea name="reingest-prompt" bind:value={reingestPrompt} aria-label={localizedChrome('One-time prompt', '一次性提示')} aria-describedby="inspector-reingest-prompt-authority" rows="3" disabled={!onReingestItem || reingestState === 'submitting'}></textarea>
+                </label>
+                <p id="inspector-reingest-prompt-authority" class="inspector-model-list-diagnostic">
+                  {localizedChrome('guidance only; cannot override schema, language, source identifiers, safety, status, or persistence.', '仅作指导；不能覆盖结构、语言、来源标识、安全、状态或持久化边界。')}
+                  <span class="visually-hidden">{localizedChrome(' May change emphasis, angle, or fact selection only among source-backed facts.', '只能在有来源支持的事实中改变重点、角度或事实选择。')}</span>
+                </p>
+              </div>
+            {/if}
+          </details>
+        </div>
+        {#if visibleReingestStatus()}
+          <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestStatusRole()} aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live={reingestStatusLive()}>{visibleReingestStatus()}</p>
         {/if}
       </section>
     {/if}
     {@const evidenceText = sourceEvidenceText(item)}
     {#if isFallbackEvidenceState(item) && evidenceText}
-      <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Source evidence', '出处记录')}>
-        <summary class="inspector-section-label">{localizedChrome('Source evidence (collapsed)', '出处记录（已折叠）')} · {readingSectionLabel(item)}</summary>
+      <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
+        <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')} · {readingSectionLabel(item)}</summary>
         <p class="inspector-source-evidence">{evidenceText}</p>
       </details>
     {:else if evidenceText}
-      <details class="inspector-text-section inspector-reading-section inspector-source-text-section" aria-label={localizedChrome('Source text', '来源文本')}>
-        <summary class="inspector-section-label">{sectionLabelText('source text', '来源文本')}</summary>
+      <details class="inspector-text-section inspector-reading-section inspector-source-text-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
+        <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')}</summary>
         <p class="inspector-reading inspector-reading--source-text">{detailText(item)}</p>
       </details>
     {:else if !hasModelBackedText(item)}
       <p class="contract-muted inspector-source-text-unavailable">{sourceTextUnavailableNote()}</p>
     {/if}
-    <details class="contract-source-details" aria-label={localizedChrome('Source details', '来源详情')}>
-      <summary>{localizedChrome('source details', '来源详情')}</summary>
+    <details class="contract-source-details" aria-label={localizedChrome('Source info', '来源信息')}>
+      <summary>{localizedChrome('Source info', '来源信息')}</summary>
       <p translate="no">{sourceTitleProvenanceText(sourceProvenanceTitle(item))}</p>
       {#if sourceFeedUrl(item)}
         <p><a class="inspector-original-link" href={sourceFeedUrl(item) ?? ''} target="_blank" rel="noreferrer noopener" translate={sourceUrlTranslate} aria-label={language === 'zh' ? `来源详情链接：${item.source_title}` : `source detail feed link: ${item.source_title}`} title={language === 'zh' ? `来源链接：${sourceFeedUrl(item)}，来源：${item.source_title}` : `Feed link: ${sourceFeedUrl(item)}; source: ${item.source_title}`}>{localizedChrome('feed link', '来源链接')}</a></p>

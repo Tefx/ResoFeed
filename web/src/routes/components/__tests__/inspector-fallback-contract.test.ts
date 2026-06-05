@@ -40,7 +40,7 @@ describe('Inspector fallback/source evidence contract', () => {
     expect((inspector.textContent?.match(/中文处理未完成/g) ?? [])).toHaveLength(1);
     expect(within(inspector).queryByLabelText('摘要')).not.toBeInTheDocument();
     expect(within(inspector).queryByLabelText('核心洞察')).not.toBeInTheDocument();
-    expect(within(inspector).getByLabelText('出处记录')).toHaveTextContent('Raw RSS excerpt remains source evidence only.');
+    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('Raw RSS excerpt remains source evidence only.');
     expect(inspector).not.toHaveTextContent('Unprocessed source body must not masquerade');
   });
 
@@ -61,8 +61,8 @@ describe('Inspector fallback/source evidence contract', () => {
     const inspector = screen.getByRole('complementary', { name: okDetail.title });
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Model-backed digest explains durable feed retrieval behavior.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Model-backed core insight remains visible.');
-    expect(within(inspector).getByLabelText('Source text')).toHaveTextContent('Full article text for normal source text rendering.');
-    expect(within(inspector).getByLabelText('Source text')).toHaveClass('inspector-source-text-section');
+    expect(within(inspector).getByLabelText('Text evidence')).toHaveTextContent('Full article text for normal source text rendering.');
+    expect(within(inspector).getByLabelText('Text evidence')).toHaveClass('inspector-source-text-section');
     expect(within(inspector).getByText('Full article text for normal source text rendering.')).toHaveClass('inspector-reading--source-text');
     expect(within(inspector).queryByLabelText('Source evidence')).not.toBeInTheDocument();
   });
@@ -130,7 +130,7 @@ describe('Inspector fallback/source evidence contract', () => {
     const inspector = screen.getByRole('complementary', { name: generatedOnlyDetail.title });
     expect(within(inspector).getByLabelText('Summary')).toHaveTextContent('Generated summary must remain only in Summary.');
     expect(within(inspector).getByLabelText('Core insight')).toHaveTextContent('Generated core insight must remain only in Core insight.');
-    expect(within(inspector).queryByLabelText('Source text')).not.toBeInTheDocument();
+    expect(within(inspector).queryByLabelText('Text evidence')).not.toBeInTheDocument();
     expect(within(inspector).queryByText('Source text unavailable; use original link.')).not.toBeInTheDocument();
     expect(within(inspector).getByRole('link', { name: 'original link' })).toBeVisible();
   });
@@ -155,7 +155,7 @@ describe('Inspector fallback/source evidence contract', () => {
     const inspector = screen.getByRole('complementary', { name: generatedOnlyFullDetail.title });
     expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('Generated summary is present but not source evidence.');
     expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('Generated core insight is present but not source evidence.');
-    expect(within(inspector).queryByLabelText('来源文本')).not.toBeInTheDocument();
+    expect(within(inspector).queryByLabelText('文本证据')).not.toBeInTheDocument();
     expect(within(inspector).queryByText('来源文本不可用；请使用原文链接。')).not.toBeInTheDocument();
     expect(within(inspector).getByText('模型支持 · 原文未存 · 质量：高价值')).toBeVisible();
     expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 原文未存，质量 高价值"]')).toBeVisible();
@@ -178,7 +178,7 @@ describe('Inspector fallback/source evidence contract', () => {
     render(Inspector, { props: { item: fullEvidenceDetail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = screen.getByRole('complementary', { name: fullEvidenceDetail.title });
-    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('Persisted extracted article source evidence remains auditable.');
+    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('Persisted extracted article source evidence remains auditable.');
     expect(within(inspector).getByText('模型支持 · 全文 · 质量：高价值')).toBeVisible();
   });
 
@@ -199,7 +199,7 @@ describe('Inspector fallback/source evidence contract', () => {
     render(Inspector, { props: { item: partialEvidenceDetail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = screen.getByRole('complementary', { name: partialEvidenceDetail.title });
-    expect(within(inspector).getByLabelText('来源文本')).toHaveTextContent('RSS excerpt source evidence remains auditable.');
+    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('RSS excerpt source evidence remains auditable.');
     expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
     expect(inspector).not.toHaveTextContent('来源文本不可用；请使用原文链接。');
   });
@@ -309,7 +309,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
       const inspector = screen.getByRole('complementary', { name: detail.title });
       expect(within(inspector).getByText(new RegExp(`target-language processing failed · ${modelStatus.replace(/_/g, ' ')}`))).toBeVisible();
-      expect(within(inspector).getByLabelText('Source evidence')).toHaveTextContent(`Fallback excerpt for ${modelStatus}.`);
+      expect(within(inspector).getByLabelText('Text evidence')).toHaveTextContent(`Fallback excerpt for ${modelStatus}.`);
       expect(within(inspector).queryByLabelText('Summary')).not.toBeInTheDocument();
       expect(within(inspector).queryByLabelText('Core insight')).not.toBeInTheDocument();
     }
