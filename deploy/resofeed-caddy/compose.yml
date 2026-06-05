@@ -20,7 +20,7 @@ services:
       - resofeed-private
 
   resofeed:
-    image: tefx/resofeed:latest
+    image: ${RESOFEED_IMAGE:-tefx/resofeed:latest}
     container_name: resofeed
     restart: unless-stopped
     expose:

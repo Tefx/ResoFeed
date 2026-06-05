@@ -7,7 +7,7 @@ cd "$SCRIPT_DIR"
 COMPOSE_FILE="compose.yml"
 ENV_FILE=".env"
 ENV_EXAMPLE=".env.example"
-RESOFEED_IMAGE="tefx/resofeed:v0.2"
+RESOFEED_IMAGE="tefx/resofeed:latest"
 RESOFEED_VOLUME="resofeed-caddy_resofeed-data"
 
 TAILSCALE_IP=""
@@ -104,7 +104,7 @@ load_env() {
       ''|'#'*) continue ;;
     esac
     case "$line" in
-      TAILSCALE_IP=*|CADDY_LOCAL_HTTPS_PORT=*|RESOFEED_DOMAIN=*|CF_API_TOKEN=*|OPENROUTER_KEY=*)
+      TAILSCALE_IP=*|CADDY_LOCAL_HTTPS_PORT=*|RESOFEED_DOMAIN=*|CF_API_TOKEN=*|OPENROUTER_KEY=*|RESOFEED_IMAGE=*)
         key=${line%%=*}
         value=${line#*=}
         value=${value%$'\r'}
@@ -114,6 +114,7 @@ load_env() {
           RESOFEED_DOMAIN) RESOFEED_DOMAIN=$value ;;
           CF_API_TOKEN) CF_API_TOKEN=$value ;;
           OPENROUTER_KEY) OPENROUTER_KEY=$value ;;
+          RESOFEED_IMAGE) RESOFEED_IMAGE=$value ;;
         esac
         ;;
     esac
@@ -207,7 +208,12 @@ print_dns_guidance() {
   printf 'Proxy status: DNS only / gray cloud\n'
 }
 
+compose_pull_resofeed() {
+  run_quiet "Pulled latest ResoFeed image: ${RESOFEED_IMAGE}" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull resofeed
+}
+
 compose_up_all() {
+  compose_pull_resofeed
   run_quiet "Docker Compose stack is running" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build
 }
 
@@ -216,6 +222,7 @@ compose_stop_resofeed() {
 }
 
 compose_up_resofeed() {
+  compose_pull_resofeed
   run_quiet "Started resofeed service" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d resofeed
 }
 
@@ -304,6 +311,8 @@ reset_token() {
   require_command tailscale
 
   compose_stop_resofeed
+
+  compose_pull_resofeed
 
   run_quiet "Stored owner token hash reset" docker run --rm \
     -v "${RESOFEED_VOLUME}:/data" \
