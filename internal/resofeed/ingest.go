@@ -508,6 +508,7 @@ func guardConflictDetailMap(details operationGuardDetails) map[string]any {
 		"operation":         operation,
 		"actor_kind":        actorKind,
 		"retry_allowed":     true,
+		"reason":            conflictReasonForGuardDetails(details),
 		"current_operation": currentOperation,
 		"reason":            reason,
 	}

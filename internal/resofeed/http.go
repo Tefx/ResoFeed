@@ -1271,19 +1271,19 @@ func loadSourceForResponse(ctx context.Context, db *sql.DB, sourceID string) (So
 }
 
 func newIngestRunResult(result ManualFetchResult, scope string, sourceID *string, started time.Time, completed time.Time) IngestRunResult {
-	errors := make([]IngestErrorDetail, 0, len(result.Errors))
+	ingestErrors := make([]IngestErrorDetail, 0, len(result.Errors))
+	sourcesFailed := 0
+	sourcesSkipped := 0
 	for _, sourceErr := range result.Errors {
 		id := sourceErr.SourceID
-		errors = append(errors, IngestErrorDetail{SourceID: &id, Code: sourceErr.Code, Message: sourceErr.Message})
-	}
-	sourcesFailed := len(errors)
-	status := "completed"
-	if sourcesFailed > 0 {
-		status = "completed_with_errors"
-		if result.SourcesTotal == sourcesFailed || scope == "source" {
-			status = "failed"
+		ingestErrors = append(ingestErrors, IngestErrorDetail{SourceID: &id, Code: sourceErr.Code, Message: sourceErr.Message})
+		if isSkippedIngestErrorCode(sourceErr.Code) {
+			sourcesSkipped++
+			continue
 		}
+		sourcesFailed++
 	}
+	status := deriveIngestRunStatus(scope, sourcesFailed, sourcesSkipped)
 	duration := completed.Sub(started).Milliseconds()
 	if duration < 0 {
 		duration = 0
@@ -1298,8 +1298,9 @@ func newIngestRunResult(result ManualFetchResult, scope string, sourceID *string
 		SourcesAttempted: result.SourcesTotal,
 		SourcesSucceeded: result.SourcesFetched,
 		SourcesFailed:    sourcesFailed,
+		SourcesSkipped:   sourcesSkipped,
 		ItemsUpserted:    result.ItemsUpserted,
-		Errors:           errors,
+		Errors:           ingestErrors,
 	}
 }
 
@@ -1422,6 +1423,7 @@ type IngestRunResult struct {
 	SourcesAttempted int                 `json:"sources_attempted"`
 	SourcesSucceeded int                 `json:"sources_succeeded"`
 	SourcesFailed    int                 `json:"sources_failed"`
+	SourcesSkipped   int                 `json:"sources_skipped"`
 	ItemsUpserted    int                 `json:"items_upserted"`
 	Errors           []IngestErrorDetail `json:"errors"`
 }

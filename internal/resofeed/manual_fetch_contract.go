@@ -22,6 +22,23 @@ const (
 	ManualFetchOperationIngest      = "ingest"
 	ManualFetchOperationSourceFetch = "source_fetch"
 
+	IngestRunScopeAll    = "all"
+	IngestRunScopeSource = "source"
+
+	IngestRunStatusCompleted           = "completed"
+	IngestRunStatusCompletedWithErrors = "completed_with_errors"
+	IngestRunStatusFailed              = "failed"
+
+	IngestErrorCodeRSSFetchError           = "rss_fetch_error"
+	IngestErrorCodeTimeout                 = "timeout"
+	IngestErrorCodeSourceBusy              = "source_busy"
+	IngestErrorCodeSourceCapacityExhausted = "source_capacity_exhausted"
+	IngestErrorCodeInternal                = "internal"
+
+	ConflictReasonSourceBusy              = "source_busy"
+	ConflictReasonSourceCapacityExhausted = "source_capacity_exhausted"
+	ConflictReasonGlobalOperationRunning  = "global_operation_running"
+
 	ManualFetchErrorCodeUnauthorized = "unauthorized"
 	ManualFetchErrorCodeBadRequest   = "bad_request"
 	ManualFetchErrorCodeNotFound     = "not_found"
@@ -46,6 +63,30 @@ const (
 // judgment to make about optional knobs, idempotency keys, queues, jobs, or
 // receipt payloads.
 type ManualFetchRequest struct{}
+
+func isSkippedIngestErrorCode(code string) bool {
+	return code == IngestErrorCodeSourceBusy || code == IngestErrorCodeSourceCapacityExhausted
+}
+
+func deriveIngestRunStatus(scope string, sourcesFailed int, sourcesSkipped int) string {
+	if scope == IngestRunScopeSource && sourcesFailed > 0 {
+		return IngestRunStatusFailed
+	}
+	if sourcesFailed > 0 || sourcesSkipped > 0 {
+		return IngestRunStatusCompletedWithErrors
+	}
+	return IngestRunStatusCompleted
+}
+
+func conflictReasonForGuardDetails(details operationGuardDetails) string {
+	if details.Operation == "fetch" {
+		if sourceFetchGuardKey(details.Scope) == string(ingestCoordinationScopeSourceCapacity) {
+			return ConflictReasonSourceCapacityExhausted
+		}
+		return ConflictReasonSourceBusy
+	}
+	return ConflictReasonGlobalOperationRunning
+}
 
 // ManualFetchResult is the request-level 200 response schema for successful or
 // operationally completed manual RSS fetch triggers. RSS/source failures remain
