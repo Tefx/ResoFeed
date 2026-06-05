@@ -282,15 +282,17 @@ test.describe('OGV2 expected-red browser contract lock', () => {
     expect(collapsedSemantics.nativeDetails || (collapsedSemantics.ariaExpanded === 'false' && Boolean(collapsedSemantics.ariaControls))).toBe(true);
     await options.click();
     await expect(options).toHaveAttribute('aria-expanded', 'true');
-    await expect(inspector.getByLabel('模型')).toBeVisible();
-    await expect(inspector.getByLabel(/额外提示|一次性提示/u)).toBeVisible();
-    await inspector.getByLabel(/额外提示|一次性提示/u).fill('窄屏选项内容必须在检查器阅读宽度内换行，不得越出视口。'.repeat(4));
+    const modelSelect = inspector.getByLabel('模型', { exact: true });
+    const oneTimePrompt = inspector.getByLabel(/额外提示|一次性提示/u);
+    await expect(modelSelect).toBeVisible();
+    await expect(oneTimePrompt).toBeVisible();
+    await oneTimePrompt.fill('窄屏选项内容必须在检查器阅读宽度内换行，不得越出视口。'.repeat(4));
     await captureEvidence(page, testInfo, 'zh-narrow-options-open');
 
     const viewportWidth = page.viewportSize()?.width ?? 390;
     await expectViewportContained(inspector, viewportWidth, 'Inspector');
-    await expectViewportContained(inspector.getByLabel('模型'), viewportWidth, 'Model selector');
-    await expectViewportContained(inspector.getByLabel(/额外提示|一次性提示/u), viewportWidth, 'One-time prompt');
+    await expectViewportContained(modelSelect, viewportWidth, 'Model selector');
+    await expectViewportContained(oneTimePrompt, viewportWidth, 'One-time prompt');
     await expect(inspector.getByRole('button', { name: '[重新生成]' })).toBeVisible();
     await expect(inspector.getByRole('button', { name: /确认|取消/u })).toHaveCount(0);
   });

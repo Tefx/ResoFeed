@@ -58,8 +58,8 @@
   function localizedDisplayTitle(value: InspectableItem): string {
     const transportTitle = titleText(value.title);
     const sourceTitle = titleText(value.source_item_title);
+    if (language === 'zh') return titleText(value.localized_title) ?? transportTitle ?? sourceTitle ?? value.title;
     if (transportTitle && sourceTitle && transportTitle !== sourceTitle) return transportTitle;
-    if (language === 'zh') return titleText(value.localized_title) ?? sourceTitle ?? transportTitle ?? value.title;
     return sourceTitle ?? transportTitle ?? value.title;
   }
 
@@ -622,14 +622,33 @@
     return null;
   }
 
+  function localizedAttemptFailureStatus(label: string): string {
+    return localizedChrome(`last re-ingest failed · ${label} · existing summary and key points preserved`, `上次重处理失败 · ${label} · 已保留现有摘要和要点`);
+  }
+
+  function attemptFailureLabelFromDiagnostic(message: string | null): string {
+    const safeDiagnostic = safeReprocessDiagnosticLabel(message);
+    if (safeDiagnostic) return safeDiagnostic;
+    const normalized = message?.toLowerCase() ?? '';
+    if (normalized.includes('decode_error') || normalized.includes('decode error')) return localizedChrome('decode error', '解码错误');
+    if (normalized.includes('invalid_model') || normalized.includes('invalid model')) return localizedChrome('invalid model', '模型无效');
+    if (normalized.includes('provider_error') || normalized.includes('provider error')) return localizedChrome('provider error', '提供方错误');
+    if (normalized.includes('rate_limited') || normalized.includes('rate limited')) return localizedChrome('rate limited', '速率受限');
+    if (normalized.includes('timeout')) return localizedChrome('timeout', '超时');
+    if (normalized.includes('model_latency_error') || normalized.includes('model latency')) return localizedChrome('model latency error', '模型延迟错误');
+    return localizedChrome('attempt error', '尝试错误');
+  }
+
   function formatReingestError(error: unknown): string {
     if (error instanceof ResoFeedApiError) {
-      const message = `err: ${error.body.error.message}`;
       const operation = detailsCurrentOperation(error);
-      if (error.status === 409 && operation) return `${message} — ${operationDetails(operation)}`;
-      return message;
+      const message = error.body.error.message;
+      if (error.status === 409 && operation) return `err: ${message} — ${operationDetails(operation)}`;
+      const reason = error.body.error.details.reason;
+      const diagnostic = typeof reason === 'string' ? reason : message;
+      return localizedAttemptFailureStatus(attemptFailureLabelFromDiagnostic(diagnostic));
     }
-    return error instanceof Error ? error.message : localizedChrome('err: re-ingest failed', 'err: 本文重处理失败');
+    return localizedAttemptFailureStatus(attemptFailureLabelFromDiagnostic(error instanceof Error ? error.message : null));
   }
 
   function resetReingestTransientState(): void {
@@ -848,8 +867,8 @@
       <section class="inspector-reingest-panel" aria-label={reingestPanelLabel()} data-contract="inspector-reingest">
         <div class="inspector-reingest-actions" role="group" aria-label={localizedChrome('Regenerate summary, core insight, key points, and search index for this item.', '重新生成本文摘要、核心洞察、要点，并刷新搜索索引。')}>
           <button bind:this={reingestSubmit} class="bracket-action inspector-reingest-submit" type="button" disabled={!onReingestItem} aria-label={reingestButtonA11yLabel()} aria-disabled={reingestState === 'submitting' ? 'true' : undefined} title={localizedChrome('Regenerate summary, core insight, key points, and search index for this item.', '重新生成本文摘要、核心洞察、要点，并刷新搜索索引。')} onclick={() => void submitReingest()}>{reingestButtonLabel()}</button>
-          <details class="inspector-reingest-disclosure" bind:open={reingestAdvancedOpen} ontoggle={(event) => { reingestAdvancedOpen = event.currentTarget instanceof HTMLDetailsElement && event.currentTarget.open; }}>
-            <summary aria-controls="inspector-reingest-advanced">{localizedChrome('Options', '选项')}</summary>
+          <div class="inspector-reingest-disclosure" data-state={reingestAdvancedOpen ? 'open' : 'closed'}>
+            <button class="inspector-reingest-disclosure-trigger low-chrome-disclosure" type="button" aria-expanded={reingestAdvancedOpen ? 'true' : 'false'} aria-controls="inspector-reingest-advanced" onclick={() => { if (reingestState !== 'submitting') reingestAdvancedOpen = !reingestAdvancedOpen; }}>{localizedChrome('Options', '选项')}</button>
             {#if reingestAdvancedOpen}
               <div id="inspector-reingest-advanced" class="inspector-reingest-advanced" role="region" aria-label={localizedChrome('Advanced re-ingest options', '重处理高级选项')}>
                 <label class="inspector-reingest-field">
@@ -873,7 +892,7 @@
                 </p>
               </div>
             {/if}
-          </details>
+          </div>
         </div>
         {#if visibleReingestStatus()}
           <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestStatusRole()} aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live={reingestStatusLive()}>{visibleReingestStatus()}</p>

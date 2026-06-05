@@ -210,10 +210,12 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
     expect(within(panel).queryByLabelText('Model')).not.toBeInTheDocument();
     expect(within(panel).queryByLabelText('One-time prompt')).not.toBeInTheDocument();
 
-    const options = within(panel).getByText('Options');
+    const options = within(panel).getByRole('button', { name: 'Options' });
     expect(options).not.toHaveClass('bracket-action');
-    expect(options.closest('details')).toBeInstanceOf(HTMLDetailsElement);
+    expect(options).toHaveAttribute('aria-expanded', 'false');
+    expect(options).toHaveAttribute('aria-controls', 'inspector-reingest-advanced');
     await user.click(options);
+    expect(options).toHaveAttribute('aria-expanded', 'true');
 
     expect(within(panel).getByText('model:')).toBeVisible();
     expect(within(panel).getByText('extra prompt (one-time, not saved)')).toBeVisible();
@@ -323,7 +325,7 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
       }
     });
 
-    const inspector = screen.getByRole('complementary', { name: failedDetail.title });
+    const inspector = screen.getByRole('complementary', { name: failedDetail.localized_title ?? failedDetail.title });
     expect(within(inspector).getByText('检查器')).toBeVisible();
     expect(within(inspector).getByText('摘要：')).toBeVisible();
     expect(within(inspector).getByText('核心洞察：')).toBeVisible();
@@ -450,7 +452,8 @@ describe('expected-red Inspector item re-ingest UI contract', () => {
 
     await within(firstPanel).findByRole('alert', { name: /item re-ingest/i });
     expect(within(firstPanel).getByLabelText('One-time prompt')).toHaveValue('Item 1 prompt');
-    expect(within(firstPanel).getByLabelText('Item re-ingest status')).toHaveTextContent('err: model retry failed for item 1');
+    expect(within(firstPanel).getByLabelText('Item re-ingest status')).toHaveTextContent('last re-ingest failed · attempt error · existing summary and key points preserved');
+    expect(within(firstPanel).getByLabelText('Item re-ingest status')).not.toHaveTextContent('err:');
 
     await view.rerender({
       item: secondDetail,
