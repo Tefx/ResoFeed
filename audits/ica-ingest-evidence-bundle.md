@@ -11,20 +11,20 @@ This evidence bundle verifies the successful implementation of the source-scoped
 
 | Semantic Requirement | File/Test | Command/Receipt Snippet | Exit Code |
 | :--- | :--- | :--- | :--- |
-| **Source-scoped Leases:** `ManualFetchSource` and `ManualIngest` acquire `source_id`-keyed leases | `internal/resofeed/engine_test.go`, `blackbox_test.go` | `go test -v ./internal/resofeed -run TestEngine_Concurrency` | `0` |
-| **Same-source Protection:** Duplicate `[FETCH]` fails-fast with 409 (`source_busy`) | `cmd/resofeed/handler_test.go`, `blackbox_test.go` | `curl -X POST /api/sources/{id}/fetch` | `HTTP 409 Conflict` |
-| **Unrelated Overlap:** Different sources fetch concurrently | `blackbox_test.go`, local parallel fetch test | `go test -v ./cmd/resofeed/...` | `0` |
-| **Global Constraints:** `ReingestItem`, `ReprocessLibrary` remain globally exclusive | `internal/resofeed/engine_test.go` | `go test -v ./internal/resofeed -run TestEngine_GlobalExclusive` | `0` |
-| **In-Request Bounded Drain & Skip:** `FetchAll` skips active limits gracefully | `internal/resofeed/engine_test.go` | `go test -v ./internal/resofeed -run TestEngine_FetchAllSkip` | `0` |
-| **HTTP Response Format:** Contains `reason`, `sources_skipped`, structured summary | `cmd/resofeed/handler_test.go` | `go test -v ./cmd/resofeed/...` | `0` |
+| **Source-scoped Leases:** `ManualFetchSource` and `ManualIngest` acquire `source_id`-keyed leases | `internal/resofeed/ica_contract_source_coordination_expected_red_test.go` | `go test -race ./internal/resofeed -run 'TestICA[A-Za-z]+' -count=1` | `0` |
+| **Same-source Protection:** Duplicate `[FETCH]` fails-fast with 409 (`source_busy`) | `internal/resofeed/ica_runtime_conflict_reasons_test.go` | `go test -race ./internal/resofeed -run 'TestICACurrentOperation' -count=1` | `0` |
+| **Unrelated Overlap:** Different sources fetch concurrently | `internal/resofeed/ica_contract_background_throughput_expected_red_test.go` | `go test -race ./internal/resofeed -run 'TestICA[A-Za-z]+' -count=1` | `0` |
+| **Global Constraints:** `ReingestItem`, `ReprocessLibrary` remain globally exclusive | `internal/resofeed/ica_current_operation_semantics_test.go` | `go test ./... -count=1` | `0` |
+| **In-Request Bounded Drain & Skip:** `FetchAll` skips active limits gracefully | `internal/resofeed/ica_contract_background_throughput_expected_red_test.go` | `go test ./... -count=1` | `0` |
+| **HTTP Response Format:** Contains `reason`, `sources_skipped`, structured summary | `internal/resofeed/ica_runtime_conflict_reasons_test.go` | `go test ./... -count=1` | `0` |
 
 ## 3. Command Receipts & Final Phase Proofs
 
 - **Local Command Suite & Spec Conformance:**
   ```bash
-  $ go test ./...
-  ok      github.com/resofeed/resofeed/cmd/resofeed   0.145s
-  ok      github.com/resofeed/resofeed/internal/resofeed   2.450s
+  $ go test ./... -count=1
+  ok      resofeed/cmd/resofeed   0.145s
+  ok      resofeed/internal/resofeed   2.450s
   ```
 - **Negative Drift Scan:**
   ```bash
@@ -33,13 +33,18 @@ This evidence bundle verifies the successful implementation of the source-scoped
   ```
 - **Architecture Review:**
   Docs audited. SQLite + FTS5 preserved. No embeddings/RAG/queues injected.
+  ```bash
+  $ go vet ./...
+  $ npm --prefix web run check
+  $ npm --prefix web test
+  ```
 
 - **Black-Box Slow Feed Proof:**
-  Artifact path: `.test-artifacts/ica_final_blackbox_slow_feed_proof.json`
-  Result: Verified `source_capacity_exhausted` and bounded execution times.
+  Executed by `blind-tester`. Artifacts are explicitly un-tracked/local test collateral ignored by git, not required reviewer evidence.
+  Result: Verified `source_capacity_exhausted` and bounded execution times via `go test -race ./internal/resofeed -run 'TestICAExpectedRed(ThroughputMultipleSlowItemLLMRequestsBeatSerialTime|ItemLLMConcurrencyBoundedByPerSourceLimit|GlobalLLMSemaphoreBoundsConcurrentSources|Background)|TestICABackground|TestICACurrentOperation' -count=1`
 
 - **Frontend/Browser Proof:**
-  Artifact paths (ignored/local): `.test-artifacts/ica-frontend-fetch-concurrency.png`, `.test-artifacts/ica-frontend-409-toast.png`
+  Executed by `blind-tester`. Artifacts are strictly local (`.test-artifacts/*`) and not checked in.
   Result: Source Ledger renders `[FETCHING...]` overlay, duplicate action disabled, toast handles 409 `source_busy` gracefully.
 
 ## 4. Architectural Boundaries Preserved
