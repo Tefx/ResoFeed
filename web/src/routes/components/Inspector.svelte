@@ -710,6 +710,11 @@
   }
 
   function visibleReingestStatus(): string {
+    if (reingestState === 'submitting') return '';
+    return reingestStatus;
+  }
+
+  function accessibleReingestStatus(): string {
     if (reingestState === 'submitting') return localizedChrome('re-ingesting item', '正在重新生成');
     return reingestStatus;
   }
@@ -894,8 +899,8 @@
             {/if}
           </div>
         </div>
-        {#if visibleReingestStatus()}
-          <p class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestStatusRole()} aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live={reingestStatusLive()}>{visibleReingestStatus()}</p>
+        {#if visibleReingestStatus() || accessibleReingestStatus()}
+          <p class:visually-hidden={!visibleReingestStatus()} class:inspector-reingest-error={reingestState === 'conflict' || reingestState === 'failed'} class="inspector-reingest-status" role={reingestStatusRole()} aria-label={localizedChrome('Item re-ingest status', '本文重处理状态')} aria-live={reingestStatusLive()}>{visibleReingestStatus() || accessibleReingestStatus()}</p>
         {/if}
       </section>
     {/if}
