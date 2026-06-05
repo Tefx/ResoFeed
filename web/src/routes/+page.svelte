@@ -283,11 +283,12 @@
     if (surface === 'feed') await restoreFeedScrollPosition();
   }
 
-  function focusIsInsideTextEntry(): boolean {
-    const active = document.activeElement;
-    if (!(active instanceof HTMLElement)) return false;
-    if (active.isContentEditable) return true;
-    return active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active instanceof HTMLSelectElement;
+  function focusIsInsideTextEntry(target: EventTarget | null = document.activeElement): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    if (target.isContentEditable) return true;
+    if (target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true;
+    if (!(target instanceof HTMLInputElement)) return false;
+    return ['email', 'number', 'password', 'search', 'tel', 'text', 'url'].includes(target.type);
   }
 
   function resetSearchSurfaceState(): void {
@@ -335,7 +336,7 @@
 
   function handleGlobalEscape(event: KeyboardEvent): void {
     if (event.key !== 'Escape' || event.defaultPrevented) return;
-    if (focusIsInsideTextEntry()) return;
+    if (focusIsInsideTextEntry(event.target)) return;
     const target = event.target instanceof Element ? event.target : null;
     const reingestPanel = target?.closest('.inspector-reingest-panel');
     if (reingestPanel?.querySelector('.inspector-reingest-cancel')) return;
@@ -1298,7 +1299,7 @@
     {:else if steerFeedback.kind === 'error'}
       <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{steerFeedback.text}</p>
     {:else if steerFeedback.kind === 'submitting'}
-      <p class="contract-muted shell-status" role="status">{shellChrome.applyingStatus}</p>
+      <p class="contract-muted shell-status visually-hidden" role="status">{shellChrome.applyingStatus}</p>
     {/if}
 
     {#if loadState === 'loading'}

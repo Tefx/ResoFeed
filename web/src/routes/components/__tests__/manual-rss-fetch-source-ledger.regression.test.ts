@@ -142,6 +142,27 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(onRunIngest).not.toHaveBeenCalled();
   });
 
+  it('does not show redundant visible submitting status while RUN INGEST button is already busy', async () => {
+    const user = userEvent.setup();
+    let resolveIngest: ((value: RunIngestSuccessResponse) => void) | undefined;
+    const onRunIngest = vi.fn(() => new Promise<RunIngestSuccessResponse>((resolve) => {
+      resolveIngest = resolve;
+    }));
+    renderLedger({ onRunIngest });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    await user.click(within(ledger).getByRole('button', { name: '[RUN INGEST]' }));
+
+    expect(within(ledger).getByRole('button', { name: '[INGESTING...]' })).toBeDisabled();
+    expect(within(ledger).queryByText('submitting ingest')).not.toBeInTheDocument();
+    expect(within(ledger).queryByText('提交抓取')).not.toBeInTheDocument();
+    expect(ledger.querySelector('.source-ledger__header .source-ledger__status')).toHaveTextContent(/last_ingest:/);
+
+    resolveIngest?.({ operation: 'ingest', source_id: null, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: '2026-05-09T10:25:35Z' });
+    await waitFor(() => expect(within(ledger).getByRole('button', { name: '[RUN INGEST]' })).toBeEnabled());
+    expect(ledger).toHaveTextContent(/last_ingest:/);
+  });
+
   it('shows independent row fetch states concurrently and keeps global ingest available during local fetches', async () => {
     const user = userEvent.setup();
     let resolveFirst: ((value: FetchSourceSuccessResponse) => void) | undefined;

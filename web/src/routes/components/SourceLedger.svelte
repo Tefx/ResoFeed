@@ -73,7 +73,6 @@
       empty: '暂无来源。在导向栏粘贴 RSS URL。',
       lastIngest: '上次抓取',
       lastFetch: '上次抓取',
-      submittingIngest: '提交抓取',
       ingestComplete: '抓取完成',
       ingestFailed: '抓取失败',
       fetchFailed: '抓取失败',
@@ -115,7 +114,6 @@
       empty: 'No sources. Paste RSS URL in Steer.',
       lastIngest: 'last_ingest',
       lastFetch: 'last_fetch',
-      submittingIngest: 'submitting ingest',
       ingestComplete: 'ingest complete',
       ingestFailed: 'ingest failed',
       fetchFailed: 'fetch failed',
@@ -304,10 +302,7 @@
     if (ingestActionRunning) return Promise.resolve();
     isRunningIngest = true;
     globalIngestStatusText = '';
-    return tick().then(() => {
-      globalIngestStatusText = chrome.submittingIngest;
-      return onRunIngest();
-    }).then((result) => {
+    return tick().then(() => onRunIngest()).then((result) => {
       globalIngestStatusText = runIngestResultText(result);
     }).catch((error: unknown) => {
       globalIngestStatusText = ingestErrorText(error);

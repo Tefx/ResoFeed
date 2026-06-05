@@ -174,6 +174,21 @@ test.describe('srdct expected-red Steer, Source Ledger, and split-scroll contrac
     await expect(ledger).not.toContainText(/jobs|queues|dashboards|settings|activity logs|folders|tags|rule builders|semantic answer|chat|RAG/i);
   });
 
+  test('Escape from Source Ledger returns to TODAY instead of getting stranded on the utility surface', async ({ page, ownerToken }) => {
+    await openAcceptedShell(page, ownerToken);
+    await page.locator('details.surface-nav[aria-label="RESOFEED surface menu"] summary').click();
+    await page.getByRole('button', { name: 'SOURCE LEDGER' }).click();
+    await expect(page).toHaveURL(/\/source-ledger$/);
+    await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'ledger');
+    await expect(page.getByRole('heading', { name: 'SOURCE LEDGER' })).toBeFocused();
+
+    await page.keyboard.press('Escape');
+
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('.shell-grid')).toHaveAttribute('data-surface', 'feed');
+    await expect(page.locator('#today-feed')).toBeVisible();
+  });
+
   test('desktop scroll regions are independent and mobile Inspector route preserves Feed scroll', async ({ page, ownerToken }) => {
     await openAcceptedShell(page, ownerToken);
     await page.setViewportSize({ width: 1280, height: 900 });

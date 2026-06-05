@@ -36,8 +36,9 @@ function textResponse(body: string, init: ResponseInit = {}): Response {
   });
 }
 
-function installSteerPreviewApi(options: { revocable?: boolean; warningOnly?: boolean; invalid?: boolean } = {}) {
+function installSteerPreviewApi(options: { revocable?: boolean; warningOnly?: boolean; invalid?: boolean; pendingSteer?: boolean } = {}) {
   const calls: Array<{ readonly url: string; readonly init?: RequestInit }> = [];
+  let resolvePendingSteer: (() => void) | undefined;
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -73,7 +74,7 @@ function installSteerPreviewApi(options: { revocable?: boolean; warningOnly?: bo
         if (options.invalid) {
           return jsonResponse({ error: { code: 'bad_request', message: 'url required', details: {} } }, { status: 400 });
         }
-        return jsonResponse({
+        const response = jsonResponse({
           receipt: {
             interpreted_as: options.warningOnly ? 'find_alias_warning' : 'steer_rule',
             message: options.warningOnly ? 'find maps to SEARCH; retrieval: lexical search' : 'less celebrity coverage',
@@ -81,24 +82,30 @@ function installSteerPreviewApi(options: { revocable?: boolean; warningOnly?: bo
             revocable_id: options.revocable ? 'receipt_revocable_expected_red' : null
           }
         });
+        if (options.pendingSteer) {
+          return new Promise<Response>((resolve) => {
+            resolvePendingSteer = () => resolve(response);
+          });
+        }
+        return response;
       }
       return jsonResponse({ error: { code: 'not_found', message: 'not found', details: {} } }, { status: 404 });
     })
   );
-  return calls;
+  return { calls, resolvePendingSteer: () => resolvePendingSteer?.() };
 }
 
-async function renderAcceptedPage(options: { revocable?: boolean; warningOnly?: boolean; invalid?: boolean } = {}) {
+async function renderAcceptedPage(options: { revocable?: boolean; warningOnly?: boolean; invalid?: boolean; pendingSteer?: boolean } = {}) {
   cleanup();
   window.localStorage.clear();
-  const calls = installSteerPreviewApi(options);
+  const { calls, resolvePendingSteer } = installSteerPreviewApi(options);
   render(Page);
   const user = userEvent.setup();
   await user.type(screen.getByLabelText('Owner token'), ownerToken);
   await user.click(screen.getByRole('button', { name: '[SUBMIT]' }));
   const steer = await screen.findByLabelText('Steer or paste RSS URL');
   expect(steer).toHaveFocus();
-  return { calls, steer, user };
+  return { calls, steer, user, resolvePendingSteer };
 }
 
 afterEach(() => {
@@ -174,6 +181,21 @@ describe('Steer route preview and receipt regression contracts', () => {
     expect(receipt).toHaveAttribute('aria-live', 'polite');
     expect(receipt).toHaveTextContent('find maps to SEARCH; retrieval: lexical search');
     expect(screen.queryByRole('button', { name: '[UNDO]' })).not.toBeInTheDocument();
+  });
+
+  it('keeps Steer submitting copy visually quiet when the command button already says APPLYING', async () => {
+    const { steer, user, resolvePendingSteer } = await renderAcceptedPage({ pendingSteer: true });
+    await user.type(steer, 'less celebrity coverage');
+    const preview = screen.getByRole('status', { name: 'Steer route preview' });
+    await waitFor(() => expect(within(preview).getByText('[STEER RULE]')).toBeVisible());
+
+    await user.click(within(preview).getByRole('button', { name: 'confirm steer route preview' }));
+
+    expect(screen.getByRole('button', { name: 'apply' })).toHaveTextContent('[APPLYING...]');
+    expect(screen.getByText('applying')).toHaveClass('visually-hidden');
+
+    resolvePendingSteer();
+    await waitFor(() => expect(screen.getByRole('status', { name: 'Steer receipt' })).toHaveTextContent('applied: less celebrity coverage'));
   });
 
   it('renders write preview [APPLY]/[CANCEL] and exposes [UNDO] only when backend returns a revocable id', async () => {
