@@ -918,7 +918,10 @@ func effectiveFirstFetchMaxItems(cfg IngestConfig) int {
 
 func countPersistedItemsForSource(ctx context.Context, db *sql.DB, sourceID string) (int, error) {
 	var count int
-	if err := db.QueryRowContext(ctx, `select count(*) from items where source_id = ?`, sourceID).Scan(&count); err != nil {
+	err := retrySQLiteRead(ctx, func() error {
+		return db.QueryRowContext(ctx, `select count(*) from items where source_id = ?`, sourceID).Scan(&count)
+	})
+	if err != nil {
 		return 0, fmt.Errorf("ingest source: count persisted items for source %q: %w", sourceID, err)
 	}
 	return count, nil
@@ -1228,7 +1231,9 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 
 func itemExists(ctx context.Context, db *sql.DB, itemID string) (bool, error) {
 	var exists int
-	err := db.QueryRowContext(ctx, `select 1 from items where id = ? limit 1`, itemID).Scan(&exists)
+	err := retrySQLiteRead(ctx, func() error {
+		return db.QueryRowContext(ctx, `select 1 from items where id = ? limit 1`, itemID).Scan(&exists)
+	})
 	if err == nil {
 		return true, nil
 	}
@@ -1305,17 +1310,39 @@ func execSQLiteMutation(ctx context.Context, db *sql.DB, query string, args ...a
 			return result, err
 		}
 		lastErr = err
-		wait := time.NewTimer(time.Duration(attempt+1) * 10 * time.Millisecond)
-		select {
-		case <-ctx.Done():
-			if !wait.Stop() {
-				<-wait.C
-			}
-			return nil, ctx.Err()
-		case <-wait.C:
+		if err := waitSQLiteRetry(ctx, attempt); err != nil {
+			return nil, err
 		}
 	}
 	return nil, lastErr
+}
+
+func retrySQLiteRead(ctx context.Context, read func() error) error {
+	var lastErr error
+	for attempt := 0; attempt < 6; attempt++ {
+		err := read()
+		if !isSQLiteContention(err) {
+			return err
+		}
+		lastErr = err
+		if err := waitSQLiteRetry(ctx, attempt); err != nil {
+			return err
+		}
+	}
+	return lastErr
+}
+
+func waitSQLiteRetry(ctx context.Context, attempt int) error {
+	wait := time.NewTimer(time.Duration(attempt+1) * 10 * time.Millisecond)
+	select {
+	case <-ctx.Done():
+		if !wait.Stop() {
+			<-wait.C
+		}
+		return ctx.Err()
+	case <-wait.C:
+		return nil
+	}
 }
 
 func isSQLiteContention(err error) bool {

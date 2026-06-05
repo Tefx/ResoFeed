@@ -63,7 +63,10 @@ func readProcessingLanguage(ctx context.Context, db *sql.DB) (ProcessingLanguage
 		return "", errors.New("read processing language: db required")
 	}
 	var raw string
-	err := db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeyProcessingLanguage).Scan(&raw)
+	err := retrySQLiteRead(ctx, func() error {
+		raw = ""
+		return db.QueryRowContext(ctx, `select value from runtime_metadata where key = ?`, RuntimeMetadataKeyProcessingLanguage).Scan(&raw)
+	})
 	if errors.Is(err, sql.ErrNoRows) {
 		return ProcessingLanguageDefault, nil
 	}

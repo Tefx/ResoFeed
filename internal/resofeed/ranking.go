@@ -895,25 +895,37 @@ func loadActiveSteerRules(ctx context.Context, db *sql.DB) ([]SteerRule, error) 
 	if db == nil {
 		return nil, nil
 	}
-	rows, err := db.QueryContext(ctx, `select id, rule_text, is_active, superseded_by, revision, created_by_actor_kind, created_by_actor_id from steer_rules where is_active = 1 order by revision desc, id asc`)
-	if err != nil {
-		return nil, fmt.Errorf("load active steering rules: %w", err)
-	}
-	defer func() { _ = rows.Close() }()
 	var rules []SteerRule
-	for rows.Next() {
-		var rule SteerRule
-		var superseded, actorKind, actorID sql.NullString
-		if err := rows.Scan(&rule.ID, &rule.RuleText, &rule.IsActive, &superseded, &rule.Revision, &actorKind, &actorID); err != nil {
-			return nil, fmt.Errorf("scan active steering rule: %w", err)
+	err := retrySQLiteRead(ctx, func() error {
+		rows, err := db.QueryContext(ctx, `select id, rule_text, is_active, superseded_by, revision, created_by_actor_kind, created_by_actor_id from steer_rules where is_active = 1 order by revision desc, id asc`)
+		if err != nil {
+			return fmt.Errorf("load active steering rules: %w", err)
 		}
-		rule.SupersededBy = stringPtrFromNull(superseded)
-		rule.CreatedByActorKind = stringPtrFromNull(actorKind)
-		rule.CreatedByActorID = stringPtrFromNull(actorID)
-		rules = append(rules, rule)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate active steering rules: %w", err)
+		attemptRules := []SteerRule{}
+		for rows.Next() {
+			var rule SteerRule
+			var superseded, actorKind, actorID sql.NullString
+			if err := rows.Scan(&rule.ID, &rule.RuleText, &rule.IsActive, &superseded, &rule.Revision, &actorKind, &actorID); err != nil {
+				_ = rows.Close()
+				return fmt.Errorf("scan active steering rule: %w", err)
+			}
+			rule.SupersededBy = stringPtrFromNull(superseded)
+			rule.CreatedByActorKind = stringPtrFromNull(actorKind)
+			rule.CreatedByActorID = stringPtrFromNull(actorID)
+			attemptRules = append(attemptRules, rule)
+		}
+		if err := rows.Err(); err != nil {
+			_ = rows.Close()
+			return fmt.Errorf("iterate active steering rules: %w", err)
+		}
+		if err := rows.Close(); err != nil {
+			return fmt.Errorf("close active steering rules: %w", err)
+		}
+		rules = attemptRules
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return rules, nil
 }
