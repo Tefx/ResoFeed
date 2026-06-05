@@ -259,6 +259,33 @@ describe('Manual RSS Fetch Source Ledger regression contract', () => {
     expect(within(ledger).getByRole('button', { name: '[EXPORT OPML]' })).toBeEnabled();
   });
 
+  it('keeps OPML import/export separate from State destructive confirmation warnings', async () => {
+    const user = userEvent.setup();
+    const onImportOpml = vi.fn(async () => {});
+    const onExportOpml = vi.fn(async () => '<opml version="2.0"><body /></opml>');
+    Object.defineProperty(URL, 'createObjectURL', { value: vi.fn(() => 'blob:sources-opml'), configurable: true });
+    Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true });
+    renderLedger({ onImportOpml, onExportOpml });
+
+    const ledger = screen.getByRole('region', { name: 'SOURCE LEDGER' });
+    const sourceListActions = within(ledger).getByRole('group', { name: 'Source list actions' });
+    const warning = within(ledger).getByText('Import State replaces active sources, rules, and stars.');
+    const opmlInput = ledger.querySelector<HTMLInputElement>('#opml-file');
+    expect(opmlInput).toBeInstanceOf(HTMLInputElement);
+
+    await user.upload(opmlInput as HTMLInputElement, new File(['<opml version="2.0"><body /></opml>'], 'sources.opml', { type: 'application/xml' }));
+    await waitFor(() => expect(onImportOpml).toHaveBeenCalledTimes(1));
+    expect(sourceListActions).not.toHaveTextContent('Import State replaces');
+    expect(warning).not.toBeVisible();
+    expect(within(ledger).queryByRole('button', { name: '[CONFIRM IMPORT]' })).not.toBeInTheDocument();
+
+    await user.click(within(ledger).getByRole('button', { name: '[EXPORT OPML]' }));
+    await waitFor(() => expect(onExportOpml).toHaveBeenCalledTimes(1));
+    expect(sourceListActions).not.toHaveTextContent('Import State replaces');
+    expect(warning).not.toBeVisible();
+    expect(within(ledger).queryByRole('button', { name: '[CONFIRM IMPORT]' })).not.toBeInTheDocument();
+  });
+
   it('restores Import State idle label, geometry state, and focus when the file picker is cancelled', async () => {
     const user = userEvent.setup();
     const onImportState = vi.fn(async () => {});
