@@ -98,6 +98,7 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	}
 	lines = append(lines, openRouterProviderDoctorLine(cfg))
 	lines = append(lines, openRouterModelDoctorLine(cfg))
+	lines = append(lines, tavilyConfiguredDoctorLine())
 	lines = append(lines, fmt.Sprintf("openrouter: item_transform_failures=%d", modelFailureCount))
 	lines = append(lines, fmt.Sprintf("openrouter: current_item_transform_failures=%d historic_item_transform_failures=%d", health.CurrentFailures, health.HistoricFailures))
 	lines = append(lines, fmt.Sprintf("openrouter: live_summary_successes=%d fallback_only_current_summaries=%d", health.CurrentLiveSuccesses, health.CurrentFallbackOnly))
@@ -243,6 +244,14 @@ func openRouterModelDoctorLine(cfg DoctorConfig) string {
 		modelResolved = "false"
 	}
 	return "openrouter: model_resolved=" + modelResolved + " resolved_model=" + resolved
+}
+
+func tavilyConfiguredDoctorLine() string {
+	_, present, err := ResolveTavilyRuntimeSecretOptional()
+	if err != nil || !present {
+		return "tavily: configured=missing"
+	}
+	return "tavily: configured=present"
 }
 
 func countItemStatusDiagnostics(ctx context.Context, db *sql.DB, label string, column string, failingStatuses []string) (int, error) {

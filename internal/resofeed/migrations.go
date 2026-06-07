@@ -322,5 +322,15 @@ from items i
 left join sources s on s.id = i.source_id;
 `,
 		},
+		{
+			ID: "005_tavily_source_evidence_columns",
+			SQL: `
+alter table items add column extraction_source text not null default 'none' constraint items_extraction_source_check check (extraction_source in ('local_readable', 'feed_excerpt', 'external_tavily', 'none'));
+alter table items add column source_evidence_text text;
+update items
+set extraction_source = 'none',
+    source_evidence_text = null;
+`,
+		},
 	}
 }

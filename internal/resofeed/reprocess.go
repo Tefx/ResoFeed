@@ -282,6 +282,18 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 		}
 		fallbackURL, fallbackText, fallbackTextSource, ok := reprocessStoredTextFallback(item)
 		if !ok {
+			var tavilyErr *tavilyExtractError
+			if errors.As(err, &tavilyErr) {
+				sourceURL = fallbackReprocessSourceURL(item)
+				switch tavilyErr.code {
+				case ReprocessErrorProviderError:
+					return failedReprocessOutcome(sourceURL, ReprocessErrorProviderError, string(ReprocessErrorProviderError), modelStatusProviderError), nil
+				case ReprocessErrorTimeout:
+					return failedReprocessOutcome(sourceURL, ReprocessErrorTimeout, string(ReprocessErrorTimeout), modelStatusTimeout), nil
+				default:
+					return unavailableReprocessOutcome(sourceURL, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
+				}
+			}
 			return unavailableReprocessOutcome(item.url, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
 		}
 		sourceURL, sourceText, availableTextSource = fallbackURL, fallbackText, fallbackTextSource
@@ -336,7 +348,7 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 	if isUnusableReprocessOutputTitle(title) {
 		title = reprocessInputTitle(item)
 	}
-	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: sourceEvidenceString(out.FeedExcerpt, item.feedExcerpt, availableTextSource == "rss_excerpt", sourceText), extractedText: sourceEvidenceString(out.ExtractedText, item.extractedText, availableTextSource == "fresh_full_text" || availableTextSource == "stored_extracted_text", sourceText), valueTier: nullableString(out.ValueTier), extractStatus: reprocessExtractionStatusForSource(availableTextSource), modelStatus: modelStatusOK}
+	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: sourceEvidenceString(out.FeedExcerpt, item.feedExcerpt, availableTextSource == "rss_excerpt", sourceText), extractedText: sourceEvidenceString(out.ExtractedText, item.extractedText, availableTextSource == "fresh_full_text" || availableTextSource == "stored_extracted_text" || availableTextSource == "external_tavily", sourceText), valueTier: nullableString(out.ValueTier), extractStatus: reprocessExtractionStatusForSource(availableTextSource), modelStatus: modelStatusOK}
 	itemForSanitize := Item{Title: result.title, Summary: result.summary, CoreInsight: result.coreInsight, FeedExcerpt: result.feedExcerpt, ExtractedText: result.extractedText, ValueTier: result.valueTier, ExtractionStatus: result.extractStatus, ModelStatus: result.modelStatus}
 	sanitizeReadableItem(&itemForSanitize)
 	result.title = itemForSanitize.Title
@@ -618,7 +630,7 @@ func sourceEvidenceString(modelValue string, stored sql.NullString, sourceTextAp
 
 func reprocessExtractionStatusForSource(source string) string {
 	switch source {
-	case "fresh_full_text", "stored_extracted_text":
+	case "fresh_full_text", "stored_extracted_text", "external_tavily":
 		return extractionStatusFull
 	case "rss_excerpt":
 		return extractionStatusPartial
@@ -675,7 +687,8 @@ func reprocessErrorCodeForModelStatus(status string) ReprocessErrorCode {
 }
 
 func fetchReprocessSourceText(ctx context.Context, item reprocessItem) (string, string, string, error) {
-	for _, candidate := range reprocessCandidateURLs(item) {
+	candidates := reprocessCandidateURLs(item)
+	for _, candidate := range candidates {
 		text, err := fetchArticleReadableText(ctx, candidate)
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return "", "", "", err
@@ -684,6 +697,19 @@ func fetchReprocessSourceText(ctx context.Context, item reprocessItem) (string, 
 			continue
 		}
 		return candidate, text, "fresh_full_text", nil
+	}
+	for _, candidate := range candidates {
+		text, err := tryTavilyExtractArticleText(ctx, candidate)
+		if err == nil {
+			return candidate, text, "external_tavily", nil
+		}
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return "", "", "", err
+		}
+		if errors.Is(err, errTavilyKeyMissing) || errors.Is(err, errTavilyURLIneligible) {
+			continue
+		}
+		return "", "", "", err
 	}
 	return "", "", "", errors.New("no reprocess source text available")
 }

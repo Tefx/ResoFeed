@@ -61,6 +61,10 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 			cfg.OpenRouterKey = openRouterSecret.Value
 			cfg.OpenRouterKeySource = openRouterSecret.Source
 		}
+		if _, _, err := ResolveTavilyRuntimeSecretOptional(); err != nil {
+			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+			return 2
+		}
 		if err := validateServeConfig(cfg); err != nil {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2

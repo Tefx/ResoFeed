@@ -805,7 +805,7 @@ func summaryCoreInsightDuplicate(summary, coreInsight string) bool {
 			overlap++
 		}
 	}
-	return float64(overlap)/float64(len(shortTokens)) >= 0.85
+	return float64(overlap)/float64(len(shortTokens)) >= 0.90
 }
 
 func normalizeSummaryInsightText(value string) string {
@@ -1181,7 +1181,7 @@ func compilePromptingV21SummaryPrompt(input OpenRouterSummaryInput) (promptingV2
 		availableTextSource = "fresh_full_text"
 	}
 	switch availableTextSource {
-	case "fresh_full_text", "stored_extracted_text", "rss_excerpt", "unavailable":
+	case "fresh_full_text", "stored_extracted_text", "rss_excerpt", "external_tavily", "unavailable":
 	default:
 		return promptingV21SummaryPrompt{}, fmt.Errorf("openrouter summarize: invalid available_text_source %q", input.AvailableTextSource)
 	}
@@ -1335,6 +1335,7 @@ func promptingV21DocumentedQualityProfile() promptingV21QualityProfile {
 			"fresh_full_text":       "Fulltext available; use normal density according to value tier.",
 			"stored_extracted_text": "Stored source text available; use normal density if sufficient.",
 			"rss_excerpt":           "Excerpt-only; avoid pretending fulltext was read and avoid unsupported extrapolation.",
+			"external_tavily":       "External source text recovered after local extraction failed; treat as source evidence after sanitation.",
 			"unavailable":           "Use fallback-style summary and do not invent details.",
 		},
 		LanguageAndFormatGuidance: map[string]string{

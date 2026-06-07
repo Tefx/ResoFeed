@@ -8,16 +8,39 @@ import (
 	"strings"
 )
 
-const openRouterKeyEnvName = "OPENROUTER_KEY"
+const (
+	openRouterKeyEnvName = "OPENROUTER_KEY"
+	tavilyKeyEnvName     = "TAVILY_API_KEY"
+)
 
 const (
 	openRouterKeySourceEnv    = "env:OPENROUTER_KEY"
 	openRouterKeySourceDotEnv = "cwd:.env"
+	tavilyKeySourceEnv        = "env:TAVILY_API_KEY"
+	tavilyKeySourceDotEnv     = "cwd:.env"
 )
 
 type OpenRouterRuntimeSecret struct {
 	Value  string
 	Source string
+}
+
+type TavilyRuntimeSecret struct {
+	Value  string
+	Source string
+}
+
+type runtimeSecret struct {
+	Value  string
+	Source string
+}
+
+type runtimeSecretSpec struct {
+	EnvName      string
+	EnvSource    string
+	DotEnvSource string
+	InvalidCode  string
+	MissingErr   error
 }
 
 // ResolveOpenRouterRuntimeSecret applies the documented runtime-only OpenRouter
@@ -53,37 +76,102 @@ func ResolveOpenRouterRuntimeSecretOptional() (OpenRouterRuntimeSecret, bool, er
 	return secret, true, nil
 }
 
-var errOpenRouterKeyMissing = errors.New("openrouter key missing")
+// ResolveTavilyRuntimeSecret applies the documented runtime-only Tavily secret
+// precedence before source-acquisition construction: OS environment, then local
+// .env fallback. It returns only the secret value and must not be logged or
+// persisted.
+func ResolveTavilyRuntimeSecret() (string, error) {
+	secret, err := ResolveTavilyRuntimeSecretWithSource()
+	if err != nil {
+		return "", err
+	}
+	return secret.Value, nil
+}
+
+// ResolveTavilyRuntimeSecretWithSource resolves Tavily credentials with a
+// non-secret source label for internal wiring. Callers must not log, render, or
+// persist the source label.
+func ResolveTavilyRuntimeSecretWithSource() (TavilyRuntimeSecret, error) {
+	return resolveTavilyRuntimeSecretWithSource(false)
+}
+
+// ResolveTavilyRuntimeSecretOptional resolves Tavily credentials when present.
+// Missing TAVILY_API_KEY in both OS environment and local .env is non-fatal and
+// disables external source recovery; explicit empty/whitespace values remain
+// startup-invalid so misconfiguration fails before bind.
+func ResolveTavilyRuntimeSecretOptional() (TavilyRuntimeSecret, bool, error) {
+	secret, err := resolveTavilyRuntimeSecretWithSource(true)
+	if err != nil {
+		if errors.Is(err, errTavilyKeyMissing) {
+			return TavilyRuntimeSecret{}, false, nil
+		}
+		return TavilyRuntimeSecret{}, false, err
+	}
+	return secret, true, nil
+}
+
+var (
+	errOpenRouterKeyMissing = errors.New("openrouter key missing")
+	errTavilyKeyMissing     = errors.New("tavily key missing")
+)
 
 func resolveOpenRouterRuntimeSecretWithSource(optional bool) (OpenRouterRuntimeSecret, error) {
-	if value, ok := os.LookupEnv(openRouterKeyEnvName); ok {
-		secret, err := requireRuntimeSecretValue(value)
-		if err != nil {
-			return OpenRouterRuntimeSecret{}, err
-		}
-		return OpenRouterRuntimeSecret{Value: secret, Source: openRouterKeySourceEnv}, nil
-	}
-	values, err := readLocalDotEnvRuntimeSecrets(".env")
+	secret, err := resolveRuntimeSecretWithSource(runtimeSecretSpec{
+		EnvName:      openRouterKeyEnvName,
+		EnvSource:    openRouterKeySourceEnv,
+		DotEnvSource: openRouterKeySourceDotEnv,
+		InvalidCode:  "invalid_openrouter_key",
+		MissingErr:   errOpenRouterKeyMissing,
+	}, optional)
 	if err != nil {
 		return OpenRouterRuntimeSecret{}, err
 	}
-	if value, ok := values[openRouterKeyEnvName]; ok {
-		secret, err := requireRuntimeSecretValue(value)
-		if err != nil {
-			return OpenRouterRuntimeSecret{}, err
-		}
-		return OpenRouterRuntimeSecret{Value: secret, Source: openRouterKeySourceDotEnv}, nil
-	}
-	if optional {
-		return OpenRouterRuntimeSecret{}, errOpenRouterKeyMissing
-	}
-	return OpenRouterRuntimeSecret{}, errors.New("invalid_openrouter_key: value required")
+	return OpenRouterRuntimeSecret{Value: secret.Value, Source: secret.Source}, nil
 }
 
-func requireRuntimeSecretValue(value string) (string, error) {
+func resolveTavilyRuntimeSecretWithSource(optional bool) (TavilyRuntimeSecret, error) {
+	secret, err := resolveRuntimeSecretWithSource(runtimeSecretSpec{
+		EnvName:      tavilyKeyEnvName,
+		EnvSource:    tavilyKeySourceEnv,
+		DotEnvSource: tavilyKeySourceDotEnv,
+		InvalidCode:  "invalid_tavily_key",
+		MissingErr:   errTavilyKeyMissing,
+	}, optional)
+	if err != nil {
+		return TavilyRuntimeSecret{}, err
+	}
+	return TavilyRuntimeSecret{Value: secret.Value, Source: secret.Source}, nil
+}
+
+func resolveRuntimeSecretWithSource(spec runtimeSecretSpec, optional bool) (runtimeSecret, error) {
+	if value, ok := os.LookupEnv(spec.EnvName); ok {
+		secret, err := requireRuntimeSecretValue(value, spec.InvalidCode)
+		if err != nil {
+			return runtimeSecret{}, err
+		}
+		return runtimeSecret{Value: secret, Source: spec.EnvSource}, nil
+	}
+	values, err := readLocalDotEnvRuntimeSecrets(".env")
+	if err != nil {
+		return runtimeSecret{}, err
+	}
+	if value, ok := values[spec.EnvName]; ok {
+		secret, err := requireRuntimeSecretValue(value, spec.InvalidCode)
+		if err != nil {
+			return runtimeSecret{}, err
+		}
+		return runtimeSecret{Value: secret, Source: spec.DotEnvSource}, nil
+	}
+	if optional {
+		return runtimeSecret{}, spec.MissingErr
+	}
+	return runtimeSecret{}, fmt.Errorf("%s: value required", spec.InvalidCode)
+}
+
+func requireRuntimeSecretValue(value string, invalidCode string) (string, error) {
 	trimmed := strings.TrimSpace(value)
 	if trimmed == "" {
-		return "", errors.New("invalid_openrouter_key: value required")
+		return "", fmt.Errorf("%s: value required", invalidCode)
 	}
 	return trimmed, nil
 }
