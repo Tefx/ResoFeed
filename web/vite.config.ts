@@ -4,11 +4,13 @@ import { execSync } from 'child_process';
 
 import fs from 'fs';
 
-let commitHash = 'unknown';
-try {
-  commitHash = execSync('git rev-parse --short=8 HEAD').toString().trim();
-} catch (e) {
-  // Ignore
+let commitHash = process.env.VITE_GIT_COMMIT?.trim() || 'unknown';
+if (commitHash === 'unknown') {
+  try {
+    commitHash = execSync('git rev-parse --short=8 HEAD').toString().trim();
+  } catch (e) {
+    // Ignore
+  }
 }
 let pkgVersion = 'unknown';
 try {

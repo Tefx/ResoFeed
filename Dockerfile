@@ -8,6 +8,8 @@ COPY web/package.json web/package-lock.json ./web/
 RUN npm --prefix web ci
 
 COPY web ./web
+ARG VITE_GIT_COMMIT="unknown"
+ENV VITE_GIT_COMMIT=${VITE_GIT_COMMIT}
 RUN npm --prefix web run build
 
 FROM --platform=$BUILDPLATFORM golang:1.22-bookworm AS go-builder
