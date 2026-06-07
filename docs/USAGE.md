@@ -30,32 +30,35 @@ mkdir -p ./bin
 go build -o ./bin/resofeed ./cmd/resofeed
 ```
 
-### 2. Configure the OpenRouter API key safely
+### 2. Configure OpenRouter and optional Tavily keys safely
 
-ResoFeed resolves the OpenRouter API key at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. Live HTTP model listing is the explicit request-time secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.
+ResoFeed resolves provider API keys at runtime. Prefer OS environment variables or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing OpenRouter key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. A missing Tavily key does not prevent the server from binding; it only disables optional external source-text recovery. Live HTTP model listing is the explicit request-time OpenRouter secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.
 
 Safe options:
 
-- Set `OPENROUTER_KEY` through your OS, shell profile, service manager, or hosting platform secret manager without committing it to the repository.
+- Set `OPENROUTER_KEY` and, if you want external source-text recovery, `TAVILY_API_KEY` through your OS, shell profile, service manager, or hosting platform secret manager without committing them to the repository.
 - Create a local `.env` file with your editor or another secret-safe workflow:
 
 ```text
-# .env is local-only; do not commit or print the real value.
-OPENROUTER_KEY=<redacted-local-value>
+# .env is local-only; do not commit or print real values.
+OPENROUTER_KEY=<redacted-openrouter-value>
+TAVILY_API_KEY=<redacted-tavily-value>
 ```
 
 The `.env` file is local runtime input only. Do not commit it, paste it into issue comments, include it in state exports, or print it in logs/evidence.
 
-Secret-source precedence for OpenRouter is:
+Secret-source precedence is:
 
-1. OS environment variable `OPENROUTER_KEY`;
+1. OS environment variable (`OPENROUTER_KEY` or `TAVILY_API_KEY`);
 2. local `.env` fallback.
 
-`OPENROUTER_KEY` is the only documented OpenRouter API-key name. OpenRouter secrets must not be passed through CLI flags.
+`OPENROUTER_KEY` and `TAVILY_API_KEY` are the documented key names. Provider secrets must not be passed through CLI flags.
 
 Explicit empty or whitespace-only values are invalid. Parser and validation errors must not include the secret value.
 
 Local `.env` parsing is intentionally minimal: only `KEY=VALUE` lines are supported; blank lines and `#` comments are ignored. ResoFeed must not source shell scripts, expand variables, run commands, or evaluate command substitution from `.env`.
+
+When `TAVILY_API_KEY` is configured, ResoFeed will attempt Tavily Extract once after local readable extraction and RSS excerpt fallback fail for an eligible HTTP(S) item URL. Tavily is used only to recover source evidence; OpenRouter still performs target-language generated item understanding. External-recovered items should produce the same complete generated fields in the current processing language as locally extracted items.
 
 ### 3. Run with OpenRouter
 
@@ -171,7 +174,7 @@ Changing language affects future ingestion and UI/MCP language metadata immediat
 
 Reprocess is an immediate owner-authorized operation. It preserves source identifiers, rewrites stored readable item fields where source text is available, rebuilds FTS when completion reaches the final indexing step, and reports counts in the response. It does not create a durable job, queue, dashboard, retry panel, activity log, sync record, or portable receipt. If reprocess fails before the final FTS rebuild, `/api/doctor` reports `search_fts: stale since <RFC3339_UTC>` until a later successful rebuild clears the marker.
 
-The web UI renders the control tersely as `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`; updates are announced through live status text and `<html lang>` follows `en` or `zh-CN`. Source identifiers such as URLs, source titles, source URLs, canonical URLs, and original links remain unchanged and are marked non-translatable in the DOM where rendered.
+The web UI renders the control tersely as `LANG: EN`, `LANG: ZH`, `语言：英文`, or `语言：中文`; updates are announced through live status text and `<html lang>` follows `en` or `zh-CN`. Source identifiers such as URLs, source titles, source URLs, canonical URLs, and original links remain unchanged and are marked non-translatable in the DOM where rendered.
 
 ## Container Deployment
 
@@ -780,30 +783,32 @@ Important behavior:
 
 ## Inspector
 
-The Inspector shows item detail.
+The Inspector shows item detail with a compact provenance/frontmatter area followed by reading content.
 
 It should expose:
 
-- title;
-- source;
-- original link;
-- source-text status;
-- summary provenance;
-- summary and core insight when available;
-- extracted text when available;
-- provenance and extraction status;
-- duplicate/story context when relevant;
-- Resonate action.
+- localized display title when generated content exists;
+- original/source title and original link as literal provenance;
+- compact `AI STATUS` / source-depth / source-origin status;
+- summary, core insight, and Key Points when model-backed content is available;
+- default-collapsed source-backed Text evidence when source evidence is retained;
+- provenance and duplicate/story context when relevant;
+- latest re-ingest attempt state.
 
-Fallback and provenance labels should be direct and plain:
+Source-origin labels are direct and plain:
 
-- `source text: RSS excerpt only` — linked-article extraction was blocked or incomplete, but RSS excerpt text was available;
-- `summary provenance: model-backed` — OpenRouter produced validated summary fields, even if the source text was only an RSS excerpt;
+- `SOURCE TEXT: LOCAL READABLE` / `来源文本：本地正文` — linked article text was recovered locally;
+- `SOURCE TEXT: RSS EXCERPT ONLY` / `来源文本：仅 RSS 摘录` — linked-article extraction was blocked or incomplete, but RSS excerpt text was available;
+- `SOURCE TEXT: EXTERNAL / TAVILY` / `来源文本：TAVILY 外部抽取` — configured Tavily external recovery provided the source evidence after local/RSS paths failed;
+- `summary provenance: model-backed` — OpenRouter produced validated summary fields from the available source evidence;
 - `summary provenance: feed excerpt fallback` — no model-backed summary/core insight is available and the UI is showing source excerpt text;
 - `summary unavailable` — the model did not produce a usable summary;
-- `original unavailable` — source link is dead or malformed;
-- `model latency/error` — visible through `/doctor`;
-- `RSS fetch error` — visible through `/doctor`.
+- `original unavailable` — no usable source evidence exists after configured fallbacks;
+- `model latency/error`, `RSS fetch error`, or safe `tavily:` diagnostics — visible through `/doctor`.
+
+Text evidence is source-backed audit material, not primary reading content. It is collapsed by default for each newly opened item and should use accessible disclosure behavior. It may show retained `source_evidence_text`; it must not fabricate evidence from processed `feed_excerpt`, generated summary, core insight, Key Points, or generated `extracted_text`. When the disclosure summary needs Tavily disambiguation, use `Text evidence: external / Tavily` / `文本证据：TAVILY 外部抽取`.
+
+On desktop, the feed keeps the visible Resonate action; Inspector does not duplicate the star in split-pane mode. On mobile, Inspector may expose the Resonate action because the feed row is hidden.
 
 ## Source Ledger and OPML
 
@@ -919,13 +924,14 @@ Expected diagnostic content includes:
 - RSS fetch errors;
 - model latency or model errors;
 - extraction failures;
+- Tavily external-recovery availability and current-state counts: `tavily: configured=present|missing`, `tavily: recovered_items=<n>`, and `tavily: recoverable_unavailable=<n>`;
 - last ingestion run information;
 - other raw status lines useful for debugging.
 - `search_fts: ok` or `search_fts: stale since <RFC3339_UTC>` after reprocess begins or fails before final FTS rebuild.
 
 `/doctor` is plain text. It is not a dashboard, chart surface, friendly remediation wizard, or settings page.
 
-Diagnostics and live-smoke evidence must redact LLM API keys. Acceptable evidence says a key was resolved from `os_env` or `.env` and shows `OPENROUTER_KEY=<redacted>`; it must not show the actual value. `/doctor` OpenRouter lines use the `openrouter:` prefix, include the configured model (`account_default` when omitted), include a resolved model only when available, and never print keys, secret-source metadata, `.env` paths, or provider configuration.
+Diagnostics and live-smoke evidence must redact provider API keys. Acceptable evidence may say a key was configured and show `OPENROUTER_KEY=<redacted>` or `TAVILY_API_KEY=<redacted>`; it must not show actual values. `/doctor` OpenRouter lines use the `openrouter:` prefix, include the configured model (`account_default` when omitted), include a resolved model only when available, and never print keys, secret-source metadata, `.env` paths, or provider configuration. `/doctor` Tavily lines use the `tavily:` prefix and report safe current-state counts only, not live probes or raw provider responses.
 
 ## OpenRouter Configuration Contract
 
@@ -1265,7 +1271,9 @@ ResoFeed intentionally excludes:
 
 - Check whether the item shows `summary unavailable`, `summary provenance: feed excerpt fallback`, or `source text: RSS excerpt only`.
 - `source text: RSS excerpt only` means full article extraction was unavailable; it can still appear with `summary provenance: model-backed` when OpenRouter successfully summarized the RSS excerpt.
-- Open the original link when full extraction is blocked or paywalled.
+- If `TAVILY_API_KEY` is configured, try re-ingesting the item; ResoFeed will attempt Tavily source-text recovery once when local extraction and RSS excerpt fallback both fail for an eligible URL.
+- If external recovery succeeds, the generated summary/core/key points should appear in the current processing language while source/provenance literals remain unchanged.
+- Open the original link when full extraction is blocked, paywalled, or rejected as low-information provider output.
 - Run `/doctor` if many summaries fail at once.
 
 ### Search does not find an expected item
@@ -1286,6 +1294,7 @@ ResoFeed intentionally excludes:
 - Product requirements: [`docs/PRD.md`](PRD.md)
 - Visual/interaction contract: [`docs/DESIGN.md`](DESIGN.md)
 - Technical architecture: [`docs/ARCHITECTURE.md`](ARCHITECTURE.md)
+- Tavily external extraction implementation plan: [`docs/TAVILY_EXTERNAL_EXTRACTION_PLAN.md`](TAVILY_EXTERNAL_EXTRACTION_PLAN.md)
 - Container packaging and runtime usage: [`docs/CONTAINER.md`](CONTAINER.md)
 - Non-core Tailscale deployment example: [`docs/examples/TAILSCALE_CONTAINER.md`](examples/TAILSCALE_CONTAINER.md)
 

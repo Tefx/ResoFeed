@@ -28,6 +28,7 @@ Contract baseline: these decisions are anchored in the current product/design do
 16. **Generated content uses a structured content contract.** Model-backed item content separates literal provenance (`source_item_title`, source/source URLs, source identifiers) from localized generated display content (`localized_title`, `summary`, `core_insight`, `key_points`, `value_tier`, and model semantic status). `key_points` is a first-class 3-5 item generated field for Inspector rendering, not Markdown embedded in summaries. Rationale: explicit fields remove title-localization ambiguity and give list-shaped user intent a safe schema slot. Fails if a future schema collapses source and localized titles back into one overloaded `title` or renders model-generated lists as raw Markdown.
 17. **Re-ingest failures are attempt state, not destructive content state.** Successful re-ingest may atomically replace generated content fields and refresh selected FTS rows; failed provider/decode/schema/semantic attempts update only app-owned attempt diagnostics such as `last_reprocess_*` and must preserve existing valid generated content and `content_status`. Rationale: a failed repair attempt should not degrade a usable item. Trade-off: status modeling is more explicit because current content health and latest attempt outcome are separate. Fails if UI or transport hides current content solely because the latest attempt failed.
 18. **Ingest acceleration is source-scoped and bounded.** Manual row fetch, manual all-source ingest, and background ingest share source-scoped in-process leases so unrelated sources may run concurrently while same-source duplicates still fail fast. Large-library speed comes from bounded source concurrency, bounded per-source item processing, and a global LLM concurrency cap, not from durable queues or multi-article prompt batching. Rationale: source identity is the smallest safe coordination unit for feed status/title/item writes, and bounded in-memory concurrency preserves the one-binary architecture. Trade-off: current-operation reporting becomes approximate for multi-source work. Fails if source attempts start mutating unprotected global state.
+19. **Tavily is an optional external source-text recovery provider, not a second intelligence backend.** When local readable extraction and RSS excerpt fallback cannot produce usable source evidence, ResoFeed may call Tavily Extract from the same Go process to recover source text for general HTTP(S) URLs. Tavily output is cleaned and validated as source evidence, then the existing OpenRouter structured-output path performs target-language item understanding. Tavily never writes durable state directly, never summarizes, never ranks, and never owns orchestration. Rationale: JavaScript-heavy and login-shell pages can still contain public source text that local HTTP extraction cannot recover, while ResoFeed must preserve one-binary control and Go-side validation. Trade-off: a configured external extractor adds latency/cost and provider availability as a source-acquisition concern. Fails if extraction recovery requires browser automation, login scraping, durable queues, sidecars, or a second model-backed content contract.
 
 ## 2. System Boundary
 
@@ -44,14 +45,15 @@ Browser SPA (SvelteKit static)
 | - background ingest      |
 | - SQLite migrations      |
 +--------------------------+
-   |             |        |
-   v             v        v
-SQLite+FTS5   RSS/Atom   OpenRouter API
+   |             |        |              |
+   v             v        v              v
+SQLite+FTS5   RSS/Atom   OpenRouter API  Tavily Extract API
+                                      (optional source-text recovery)
 
 External agents connect to the same Go binary through MCP Streamable HTTP at `/mcp`.
 ```
 
-There are no internal services. Runtime components are the Go process, embedded static assets, one SQLite file, RSS/Atom sources, and OpenRouter as the external LLM API.
+There are no internal services. Runtime components are the Go process, embedded static assets, one SQLite file, RSS/Atom sources, OpenRouter as the external LLM API, and optional Tavily Extract as an external source-text recovery API.
 
 Runtime command contract:
 
@@ -113,15 +115,27 @@ Runtime OpenRouter LLM contract:
 - Live smoke checks must use `OPENROUTER_KEY` from the OS environment or local `.env` and capture redacted evidence only.
 - `/doctor` OpenRouter diagnostics must use an `openrouter:` line prefix, include the configured model (`account_default` when omitted), include a resolved model only when available from runtime responses, and never include the API key, secret source, `.env` path, or raw provider configuration.
 
+Runtime Tavily external extraction contract:
+
+- Tavily is optional. A missing `TAVILY_API_KEY` is not startup-fatal and leaves external source-text recovery unavailable.
+- Tavily API-key resolution follows the same runtime-only secret discipline as OpenRouter: OS environment variable `TAVILY_API_KEY` first, then local `.env` fallback. CLI-passed Tavily API keys are forbidden.
+- Present but empty or whitespace-only `TAVILY_API_KEY` values are invalid and must fail startup before binding, using a terse error that does not include the raw value.
+- Tavily is source-acquisition infrastructure only. It may return markdown/text evidence for a URL, but OpenRouter remains the only LLM backend for item understanding, target-language summaries, steering translation, and generated content fields.
+- When `TAVILY_API_KEY` is configured, Tavily extraction must be attempted once after local readable extraction and RSS excerpt fallback fail to produce usable source evidence for an eligible HTTP(S) URL. It may be applied to any HTTP(S) URL that passes safety and sanitation gates; X/Twitter links are a high-priority known use case, not a hardcoded exclusive case.
+- Tavily output must pass ResoFeed sanitation before model processing or persistence. Login/signup shells, navigation, trend/sidebar/footer blocks, metadata-only pages, and low-information text must be rejected.
+- Tavily recovered source evidence participates in the existing processing-language contract: generated display title, summary, core insight, and Key Points are emitted in the current runtime language; underlying schema enum values such as `value_tier` and status remain literal contract values, while UI/user-facing labels for those enums are localized. Source/provenance literals remain unchanged.
+- Tavily secrets, secret source labels, `.env` paths, raw provider payloads, request headers, and raw error bodies must never be stored in SQLite, exported, logged, returned through HTTP/MCP, rendered in the frontend, committed to fixtures, or included in `/doctor`.
+- `/doctor` must include exactly these safe Tavily lines when the feature is implemented: `tavily: configured=present|missing`, `tavily: recovered_items=<n>`, and `tavily: recoverable_unavailable=<n>`. `recovered_items` counts current rows with `extraction_source='external_tavily'`. `recoverable_unavailable` counts current `original_unavailable` rows whose selected Tavily candidate URL is eligible by the same syntactic safety gates: `items.canonical_url` when valid, otherwise `items.url`; it never uses `sources.url`, `items.source_url`, feed URLs, or generated fields. The count is computed independently of whether `TAVILY_API_KEY` is present; it is a candidate count, not proof that Tavily will succeed. `/doctor` must never live-probe Tavily and must never print secrets.
+
 Local `.env` contract for runtime secret fallback:
 
 - `.env` is a local runtime input only and must not be committed or exported.
 - The parser is intentionally minimal: support only `KEY=VALUE` lines; ignore blank lines and lines whose first non-whitespace character is `#`.
 - Do not source `.env` through a shell. Do not perform shell expansion, command substitution, variable interpolation, command execution, quoting semantics, includes, or multiline parsing.
-- For `OPENROUTER_KEY`, trim surrounding whitespace for validation and use; values that are empty or whitespace-only after trimming are invalid.
+- For `OPENROUTER_KEY` and `TAVILY_API_KEY`, trim surrounding whitespace for validation and use; values that are empty or whitespace-only after trimming are invalid.
 - Parser and validation errors must not print the rejected value.
 
-Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, invalid `--first-fetch-limit`/`RESOFEED_FIRST_FETCH_LIMIT`, explicit empty/whitespace OpenRouter API key values, invalid `--owner-token`, and failed SQLite migrations. A missing OpenRouter key is not startup-fatal; it is reported as provider unavailable after binding.
+Startup validation failures exit before binding the server socket and print a terse error to stderr. This applies to invalid `--addr`, invalid `--public-url`, unwritable `--db`, invalid `--first-fetch-limit`/`RESOFEED_FIRST_FETCH_LIMIT`, explicit empty/whitespace OpenRouter or Tavily API key values, invalid `--owner-token`, and failed SQLite migrations. Missing OpenRouter and Tavily keys are not startup-fatal; they are reported as provider/source-acquisition unavailable after binding.
 
 Startup validation matrix:
 
@@ -134,6 +148,8 @@ Startup validation matrix:
 | `--first-fetch-limit` / `RESOFEED_FIRST_FETCH_LIMIT` | non-integer, negative, or greater than `500`; flag value takes precedence over environment fallback | `2` | `err: invalid_first_fetch_limit: expected integer 0..500` | No |
 | explicit OpenRouter API key value | empty or all whitespace after applying OS environment `OPENROUTER_KEY` > `.env` fallback precedence | `2` | `err: invalid_openrouter_key: value required` | No |
 | missing OpenRouter API key | no usable `OPENROUTER_KEY` in OS environment or local `.env` | N/A | startup continues; runtime reports `openrouter-key: unavailable` and provider-backed operations are unavailable | Yes |
+| explicit Tavily API key value | empty or all whitespace after applying OS environment `TAVILY_API_KEY` > `.env` fallback precedence | `2` | `err: invalid_tavily_key: value required` | No |
+| missing Tavily API key | no usable `TAVILY_API_KEY` in OS environment or local `.env` | N/A | startup continues; runtime reports Tavily unavailable and local/RSS extraction behavior remains unchanged | Yes |
 | `--owner-token` | fewer than 32 visible non-whitespace characters or contains leading/trailing whitespace | `2` | `err: invalid_owner_token: expected at least 32 visible non-whitespace characters` | No |
 | migrations | migration fails | `1` | `err: migration_failed: <migration id>` | No |
 
@@ -175,7 +191,7 @@ Out of scope:
 | Runtime shell | `cmd/resofeed` | Parse `serve` flags, open/migrate SQLite, resolve owner token, start/stop lifecycle | Product behavior beyond wiring |
 | Product core | `internal/resofeed` | Source ledger, item state, ingestion, search, steering, state backup/restore, HTTP/MCP operations | Repositories, factories, plugins, alternate storage engines |
 | Persistence | SQLite file | Durable current state, owner-token runtime metadata, and FTS index | Event log semantics or sync-server behavior |
-| External IO | RSS/Atom + OpenRouter API | Inputs and transformations | Durable source of truth |
+| External IO | RSS/Atom + article HTTP + optional Tavily Extract + OpenRouter API | Source inputs, optional source-text recovery, and model transformations | Durable source of truth, orchestration, direct DB writes |
 
 ### 3.2 Source of Truth
 
@@ -183,6 +199,7 @@ Out of scope:
 |---|---|---|---|
 | Source Ledger | `sources` | Yes | User-owned subscription state. |
 | Feed items | `items` | No by default | Re-fetchable/cache-like content. |
+| Source evidence acquisition provenance | `items.extraction_status`, `items.extraction_source`, and nullable `items.source_evidence_text` | No by default | Current source-text depth, origin, and optional source-backed evidence text for Inspector audit/search diagnostics; values distinguish local readable text, RSS excerpt fallback, Tavily external recovery, and unavailable evidence without creating an extraction history ledger. |
 | Story grouping | fields on `items` | No by default | Transparent grouping without a second story domain. |
 | Current steering policy | `steer_rules` | Yes | User-owned policy state. |
 | Current attention state | `item_state` | Resonance state: yes; inspection/external-surface state: no | Stars are user-owned retrieval state; inspection/external-surface timestamps are operational state. |
@@ -192,7 +209,7 @@ Out of scope:
 | Generated item content | `items` generated-content columns | No by default | Current validated localized content contract for display/search; source provenance remains separate from generated display fields. |
 | Last reprocess attempt | app-owned `last_reprocess_*` diagnostics on the affected item/result surface | No | Latest attempt outcome is operational diagnostics and must not overwrite valid current generated content after a failed attempt. |
 | Lexical index | `search_fts` | No | Derived from canonical rows. |
-| Diagnostics | status/error fields on canonical rows | No | Raw operational truth for `/doctor`, not a dashboard. |
+| Diagnostics | status/error fields on canonical rows | No | Raw operational truth for `/doctor`, not a dashboard. Tavily diagnostics are current-state counts and safe provider availability labels only, not raw provider responses or history. |
 
 ### 3.3 Lifecycle and Coordination
 
@@ -555,6 +572,8 @@ Required fields:
 - current generated content status separate from latest reprocess attempt diagnostics;
 - published and first-seen timestamps;
 - extraction/model fallback status;
+- `extraction_source` enum for current source-evidence origin: `local_readable`, `feed_excerpt`, `external_tavily`, or `none`;
+- nullable `source_evidence_text` for current source-backed evidence text when retained for Inspector Text evidence; this is not generated target-language summary/core/key-points content and is not an extraction history ledger;
 - story grouping key and direct-duplicate pointer when known.
 
 Invariants:
@@ -564,7 +583,16 @@ Invariants:
 - `key_points` is stored and transported as a structured array, not raw Markdown;
 - failed item re-ingest attempts preserve existing generated content and update only attempt diagnostics;
 - grouping never behaves like source suppression or hidden spam filtering;
-- extraction/model failure never deletes the item.
+- extraction/model failure never deletes the item;
+- `extracted_text` remains model-generated target-language representative text when present and must not be treated as raw/source-backed evidence;
+- Inspector Text evidence may use `source_evidence_text`, but must not fabricate evidence from `feed_excerpt`, `summary`, `core_insight`, `key_points`, or `extracted_text`.
+
+#### `items` extraction source migration contract
+
+- Add `items.extraction_source text not null default 'none'` with allowed values `local_readable`, `feed_excerpt`, `external_tavily`, and `none`. Enforce allowed values with the same migration/check style used elsewhere in this SQLite schema.
+- Add `items.source_evidence_text text null` for current source-backed evidence. This field is optional current evidence, not history, not portable state, and not generated target-language content.
+- Legacy backfill is deterministic and conservative: all pre-migration rows get `extraction_source='none'` and `source_evidence_text=null`. Do not infer source evidence from legacy `feed_excerpt` or generated `extracted_text`; those columns are ambiguous before this contract. No legacy row is backfilled as `external_tavily` because that origin did not exist before this migration.
+- New writes set `extraction_source` explicitly; they must not rely on the default except for defensive migration compatibility.
 
 ### 4.3 `item_state`
 
@@ -724,6 +752,7 @@ Responsibilities:
 - update `sources.title` from the parsed feed title after successful fetch when the feed title is non-empty;
 - upsert item cache rows;
 - extract article content when possible;
+- recover source text through optional Tavily Extract only after local readable extraction and RSS excerpt fallback fail;
 - request OpenRouter summary/metadata only after source text or fallback text exists;
 - validate OpenRouter response JSON before saving;
 - update diagnostic fields for failures.
@@ -735,7 +764,24 @@ Extraction semantics:
 - HTML block boundaries must be preserved before readable-text sanitation so one boilerplate paragraph does not discard valid article paragraphs;
 - navigation, headers, footers, sidebars, forms, scripts, styles, JSON-LD metadata, diagnostic-token residue, and known readable boilerplate are removed before model processing or RSS/source fallback use;
 - `extraction_status='full'` means linked-article source acquisition and model processing had non-empty cleaned article evidence available; it does not require raw cleaned article text to be persisted in `items.extracted_text`;
-- if linked-article extraction fails but RSS text exists, the item remains visible with `extraction_status='partial_extraction'` and source text understood as RSS excerpt text.
+- `extraction_source` records the current source-evidence origin: `local_readable`, `feed_excerpt`, `external_tavily`, or `none`; this is provenance for current evidence, not a historical log;
+- if linked-article extraction fails but RSS text exists, the item remains visible with `extraction_status='partial_extraction'`, `extraction_source='feed_excerpt'`, and source-backed RSS evidence stored in `source_evidence_text`; `feed_excerpt` remains a processed/display field and is not reused as source evidence;
+- if both local readable extraction and RSS excerpt fallback fail, and Tavily is configured, a bounded Tavily Extract attempt may recover source text for any eligible HTTP(S) URL; successful cleaned external text uses `extraction_source='external_tavily'`, stores source-backed evidence in `source_evidence_text` when retained for audit, and may be `extraction_status='full'` when it provides article-level evidence;
+- if Tavily output is low-information, login/signup chrome, metadata-only, or otherwise fails sanitation, it must be ignored and the item remains `original_unavailable` unless another valid source exists;
+- Tavily-recovered evidence follows the same multilingual processing path as local evidence: generated user-readable fields are produced in the runtime processing language, while source identifiers, URLs, exact quotes, source titles, and product/company names without conventional translations remain literal.
+
+External extraction eligibility and Tavily call contract:
+
+- eligible URLs must be absolute `http` or `https` item URLs after normalization; unsupported schemes, empty hosts, credentials in the URL, data/blob/file/javascript/mailto schemes, and non-URL strings are ineligible;
+- syntactic host rejection must deny `localhost`, `.localhost`, IPv4/IPv6 loopback, private, link-local, multicast, unspecified, and unique-local IP literals; ResoFeed does not perform DNS resolution or redirect preflight for Tavily eligibility in the first implementation;
+- Tavily receives the selected original article URL, not a locally followed redirect target. For normal ingest/manual fetch the selected URL is the item URL already being processed. For reprocess/re-ingest the candidate order is `items.canonical_url` when valid, then `items.url`; never `sources.url`, `items.source_url`, RSS/Atom feed URLs, or generated fields. Tavily-reported redirects/final URLs, if present, are diagnostics only and must not rewrite original provenance unless existing canonical-url logic already permits it;
+- Tavily is called through a concrete internal helper/client, not a provider registry or plugin interface;
+- Tavily wire contract is `POST https://api.tavily.com/extract` with `Authorization: Bearer <TAVILY_API_KEY>` and JSON body `{ "urls": ["<item-url>"], "extract_depth": "advanced", "format": "markdown", "include_images": false, "timeout": 30 }`; parse `results[0].raw_content` for the single requested URL and treat non-empty `failed_results` without a result as provider-unavailable internally;
+- the endpoint contract is Tavily Extract URL-based extraction with `extract_depth=advanced`, `format=markdown`, no Tavily Search fallback as the normal path, and a maximum provider output body accepted by ResoFeed of 1 MiB before sanitation;
+- per-call Tavily timeout is 30 seconds; no automatic retry is required for provider/network errors in the first implementation; callers may re-ingest explicitly;
+- safe internal Tavily diagnostics are limited to `timeout`, `provider_unavailable`, and `unusable_evidence`; public item/reprocess errors map these to existing schema values (`timeout`, `provider_error`, or `original_unavailable`) and must not create a user-facing state machine or history;
+- provider rate limits, 4xx/5xx responses, malformed JSON, unreadable bodies, and network errors map internally to `provider_unavailable` and publicly to existing item/reprocess `provider_error`; low-information or chrome-only output maps internally to `unusable_evidence` and publicly to `original_unavailable`; deadline/cancellation maps to public `timeout`;
+- usable external source evidence must have at least 500 non-whitespace characters after sanitation and at least three non-boilerplate sentence/paragraph units, unless an existing shorter RSS excerpt path is the selected evidence source. Reject if more than half of retained lines are known chrome labels/links, or if retained text is dominated by login/signup/trending/relevant-people/footer/cookie/navigation blocks. Required fixtures include accepting a long article-like Tavily payload, accepting a non-X JavaScript-heavy article fake-server payload, rejecting an X login shell, rejecting metadata-only author/topic/audio chrome, and rejecting footer/trending-only output.
 
 Runtime limits:
 
@@ -763,9 +809,9 @@ Failure contract:
 - feed failure affects only that source;
 - per-source manual fetch failure returns a request-level error result for that source and also updates source diagnostics where applicable;
 - global manual ingest may complete with source-level failures; source failures are reported in the response summary rather than aborting successful sources;
-- extraction failure maps to `partial_extraction` or `original_unavailable` where appropriate;
+- extraction failure maps to `partial_extraction` or `original_unavailable` where appropriate; Tavily failure maps to safe extraction diagnostics and must not collapse into OpenRouter/model failure;
 - OpenRouter/model failure maps to a safe stable status/diagnostic code. Timeouts remain `model_latency_error`/`timeout` where the existing surface requires it, but invalid model/provider responses, provider errors, rate limits, and decode/validation failures must not all collapse to `model_latency_error`; implementations must expose a constrained code such as `invalid_model`, `provider_error`, `rate_limited`, `decode_error`, or `timeout` through item status, reprocess errors, and/or `/doctor` diagnostics without leaking raw provider payloads, API keys, secret source metadata, `.env` paths, owner tokens, or raw runtime provider configuration;
-- extraction status and model status are separate: an item may have model-backed summary metadata while source text is only an RSS excerpt;
+- extraction status, extraction source, and model status are separate: an item may have model-backed summary metadata while source text is only an RSS excerpt or Tavily-recovered external evidence;
 - timeout of the 20-second source fetch limit maps to an RSS/source fetch diagnostic and leaves no persistent pending job;
 - no failure path creates an elaborate UI degradation mode.
 
@@ -1005,7 +1051,7 @@ Failure contract:
 
 - per-item OpenRouter or extraction failures use the same status taxonomy as ingestion. Invalid model/provider, provider error, rate-limit, decode/validation, and timeout failures must remain distinguishable through a safe stable status/diagnostic path such as `invalid_model`, `provider_error`, `rate_limited`, `decode_error`, and `timeout`, rather than collapsing every non-timeout provider/model/decode failure to `model_latency_error`;
 - per-item failures are returned as HTTP `200` with `reprocess.status` of `completed_with_errors` or `completed` according to the result counts;
-- if a fresh fetch succeeds but OpenRouter fails, all of the item's processed readable fields (`summary`, `core_insight`, `extracted_text`, `feed_excerpt`) must be set to `null` because they cannot be reliably provided in the target language. To satisfy the non-null `title` schema requirement without mixing languages, `title` must fall back to the URL or a generic 'Untitled' label. Old prior-language fields are fully overwritten;
+- if a fresh fetch succeeds but OpenRouter fails during library reprocess, all generated target-language fields that cannot be reliably provided in the target language (`summary`, `core_insight`, generated `extracted_text`) must be set to `null`; source-backed `source_evidence_text` may remain only when it is valid source evidence and not generated interpretation. To satisfy the non-null `title` schema requirement without mixing languages, `title` must fall back to the URL or a generic 'Untitled' label. Old prior-language generated fields are fully overwritten;
 - failure to process one item must not destroy that item's existing provenance identifiers;
 - if reprocess partially succeeds, FTS must still reflect the final stored item rows after the operation's completion path;
 - operation timeout returns HTTP `200` with `reprocess.status: "failed"`, `fts_rebuilt: false`, and a global error with `code: "timeout"`, unless the server cannot serialize a response;
@@ -1015,21 +1061,21 @@ Failure contract:
 Existing library reprocess transaction and recovery contract:
 
 - the reprocess operation processes items in batches;
-- each item's processing is its own SQLite transaction that updates `title`, `summary`, `core_insight`, `feed_excerpt`, and `extracted_text`;
+- each item's processing is its own SQLite transaction that updates `title`, `summary`, `core_insight`, `feed_excerpt`, generated `extracted_text`, `extraction_source`, and `source_evidence_text` where applicable;
 - the operation timeout is 10 minutes. If the HTTP/MCP client disconnects before completion, processing continues until completed, timed out, or crashed;
 - if the process crashes, encounters an unrecoverable SQLite error, or times out mid-run, already-committed item transactions remain stored in the new processing language;
 - FTS rebuild runs in one transaction at the end of the operation;
 - if the operation fails before FTS rebuild succeeds, the system does not automatically recover on startup; the user must trigger the reprocess operation again to process remaining items and rebuild FTS. During this stale interim period or during an active reprocess operation, search queries (`GET /api/search` and MCP `search_items`) continue to execute but may return a mix of languages based on the outdated FTS rows. The stale FTS state must be exposed as a clear diagnostic status in `/doctor`;
 - if the server returns a fatal reprocess result, `items_attempted` counts only items whose processing began; unvisited items are not attempted. When the final FTS rebuild does not complete, `fts_rebuilt` is `false`, and `items_indexed` is the number of rows indexed in the successful final rebuild transaction, usually `0`. A crash may produce no HTTP/MCP response; recovery visibility is only the `/doctor` stale FTS diagnostic.
-- unavailable items whose processed readable fields are cleared and whose title falls back to a URL or generic label count in `items_unavailable`, not `items_updated`; `items_attempted` must equal `items_updated` + `items_unavailable` + `items_failed`.
+- unavailable items whose processed readable fields are cleared and whose title falls back to a URL or generic label count in `items_unavailable`, not `items_updated`; Tavily missing-key/no-eligible-candidate/unusable-evidence cases count as `items_unavailable`; Tavily timeout or provider/network/HTTP/schema/unreadable-body failures count as `items_failed`; `items_attempted` must equal `items_updated` + `items_unavailable` + `items_failed`.
 
 Reprocess input source precedence:
 
 - reprocess must not use existing stored target-language interpretation fields (`title`, `summary`, `core_insight`) as source text to avoid double-translation;
 - reprocess input must fetch fresh source text using canonical storage fields first, in exact order of precedence: `items.canonical_url` if present and valid HTTP/HTTPS, then `items.url` (exposed publicly as both top-level `url` and `provenance.original_url`) if valid HTTP/HTTPS. If a fetch fails (e.g., timeout, 404, refusal), it proceeds to the next candidate in the precedence list;
 - `sources.url`, `items.source_url`, and public `provenance.source_url` must NOT be used to fetch article text for reprocess, as they point to the RSS/Atom feed rather than the specific item;
-- if all fresh fetches fail, reprocess may use already persisted readable target-language fallback text as narrow source-like evidence, in order: non-empty `items.extracted_text`, then non-empty `items.feed_excerpt`. `items.extracted_text` remains the previously generated target-language representative text, not raw fulltext. This fallback is reprocess-specific; it does not weaken normal ingestion/source-fetch provenance rules, does not permit fetching `sources.url`/`items.source_url` as article text, and does not permit invented content. The LLM input URL/provenance remains the original article URL (`items.url`, or the canonical article URL only when that is the selected article candidate), never the RSS/Atom feed URL;
-- if all fresh fetches fail and no readable fallback remains, reprocess must mark the item as `original_unavailable` and set its processed readable fields (`summary`, `core_insight`, `feed_excerpt`, `extracted_text`) to `null`. To satisfy the non-null `title` schema requirement, `title` must fall back to the URL or a generic 'Untitled' label. The FTS index will then only include the item's preserved provenance identifiers;
+- if all fresh fetches fail, reprocess may use already persisted source-backed fallback text only from non-empty `items.source_evidence_text`; if that is missing or low-information and Tavily is configured for an eligible article URL, reprocess then attempts Tavily before declaring the item unavailable. Generated `items.extracted_text` and processed/display `items.feed_excerpt` must not be used as source evidence. This fallback is reprocess-specific; it does not weaken normal ingestion/source-fetch provenance rules, does not permit fetching `sources.url`/`items.source_url` as article text, and does not permit invented content. The LLM input URL/provenance remains the original article URL (`items.url`, or the canonical article URL only when that is the selected article candidate), never the RSS/Atom feed URL;
+- if all fresh fetches, persisted source-backed fallbacks, and configured Tavily recovery fail, reprocess must mark the item as `original_unavailable`, set `extraction_source='none'`, and set unavailable generated/source-evidence fields (`summary`, `core_insight`, generated `extracted_text`, `source_evidence_text`) to `null`. To satisfy the non-null `title` schema requirement, `title` must fall back to the URL or a generic 'Untitled' label. The FTS index will then only include the item's preserved provenance identifiers;
 - this ensures individual item results do not invent content, preserve source identifiers, and avoid durable queues, jobs, retry dashboards, settings dashboards, or additional state-management surfaces.
 
 Concurrency and background ingest:
@@ -1044,7 +1090,7 @@ Inspector item re-ingest is a selected-item operation, not a library job and not
 Responsibilities:
 
 - reprocess exactly one existing item row selected by item ID;
-- use the same source-text precedence as library reprocess: fresh article fetch from `items.canonical_url` when valid, then `items.url`, then narrow persisted target-language fallback evidence from non-empty `items.extracted_text`, then non-empty `items.feed_excerpt`;
+- use the same source-text precedence as library reprocess: fresh article fetch from `items.canonical_url` when valid, then `items.url`, then narrow persisted source-backed fallback evidence from non-empty `items.source_evidence_text`, then configured Tavily for an eligible article URL; generated `items.extracted_text` and processed/display `items.feed_excerpt` must not be used as source evidence;
 - pass the current global processing language into OpenRouter exactly like normal ingest/reprocess;
 - optionally pass a request-scoped OpenRouter model override for this call only;
 - optionally pass a request-scoped prompt for this call only (`prompt` canonical, `extra_prompt` compatibility);
@@ -1100,7 +1146,10 @@ Failure/status contract:
 | any guarded operation already running | `409` | N/A | `conflict` | N/A | no queued work |
 | fresh source succeeds or stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | selected item readable fields updated; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
 | fresh source fails but stored fallback succeeds and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | selected item readable fields updated from fallback input; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | no destructive generated-content rewrite; latest-attempt diagnostics record unavailable source; existing valid content and selected FTS row are preserved unless there was no prior valid generated content to preserve |
+| Tavily succeeds after fresh/stored evidence fails and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | selected item readable fields updated from Tavily-backed source evidence; `extraction_source="external_tavily"`; `source_evidence_text` retained when applicable; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
+| Tavily source-acquisition timeout before source text selection | `200` | `completed_with_errors` | N/A | `timeout` | no generated-content rewrite; `last_reprocess_*` records safe timeout diagnostics; existing valid content and selected FTS row are preserved |
+| Tavily source-acquisition provider/network/HTTP/schema/unreadable-body failure before source text selection | `200` | `completed_with_errors` | N/A | `provider_error` | no generated-content rewrite; `last_reprocess_*` records safe provider diagnostics; existing valid content and selected FTS row are preserved |
+| all source/fallback text unavailable because no eligible Tavily candidate exists, Tavily is unconfigured, or Tavily returned sanitized unusable evidence | `200` | `completed_with_errors` | N/A | `original_unavailable` | no destructive generated-content rewrite; latest-attempt diagnostics record unavailable source; existing valid content and selected FTS row are preserved unless there was no prior valid generated content to preserve |
 | syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | no generated-content rewrite; `last_reprocess_*` records the safe invalid-model attempt result; existing `content_status` and selected FTS row are preserved |
 | provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | no generated-content rewrite; `last_reprocess_*` records the safe attempt result; existing `content_status` and selected FTS row are preserved |
 | OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | no generated-content rewrite; `last_reprocess_*` records the safe validation/decode attempt result; existing `content_status` and selected FTS row are preserved |
@@ -1191,6 +1240,7 @@ Global JSON request body validation rule: for every JSON request body schema in 
 | `value_tier` | string | Yes | Yes | terse quality/value category, e.g. `high`; `null` when unavailable |
 | `published_at` | RFC3339 string | Yes | Yes | `null` when feed lacks date |
 | `extraction_status` | string enum | Yes | No | `full`, `partial_extraction`, `summary_unavailable`, `original_unavailable` |
+| `extraction_source` | string enum | Yes | No | `local_readable`, `feed_excerpt`, `external_tavily`, or `none`; current evidence origin, not a history log |
 | `model_status` | string enum | Yes | No | `ok`, `summary_unavailable`, `model_latency_error`, `invalid_model`, `provider_error`, `rate_limited`, `decode_error`, `timeout` |
 | `is_resonated` | boolean | Yes | No | current resonance state |
 | `human_inspected_at` | RFC3339 string | Yes | Yes | `null` when not inspected |
@@ -1202,7 +1252,8 @@ Global JSON request body validation rule: for every JSON request body schema in 
 
 | Field | Type | Required | Nullable | Notes |
 |---|---|---:|---:|---|
-| `feed_excerpt` | string | Yes | Yes | processed feed excerpt when available |
+| `feed_excerpt` | string | Yes | Yes | processed/display feed excerpt when available; not reusable source evidence |
+| `source_evidence_text` | string | Yes | Yes | the only reusable current source-backed evidence text when retained for audit; may come from local readable extraction, RSS excerpt, or Tavily; never generated summary/core/key-points/feed display text |
 | `extracted_text` | string | Yes | Yes | persisted model-generated target-language representative excerpt/detail text when available; not app-owned raw source extraction |
 | `provenance` | object | Yes | No | source URL, canonical URL, grouping/duplicate context |
 
@@ -1546,6 +1597,7 @@ Shared response shapes:
     "core_insight": "Why this matters.",
     "published_at": "2026-05-09T00:00:00Z",
     "extraction_status": "full",
+    "extraction_source": "local_readable",
     "model_status": "ok",
     "is_resonated": false,
     "human_inspected_at": null,
@@ -1575,7 +1627,7 @@ Endpoint contracts:
 | Method/path | Request | Success | Response |
 |---|---|---:|---|
 | `GET /api/feed/today` | optional query params listed in the feed/today query rules | `200` | `{ "items": [ItemSummary] }` |
-| `GET /api/items/{id}` | path `id` | `200` | `{ "item": ItemDetail }` including extracted text and provenance |
+| `GET /api/items/{id}` | path `id` | `200` | `{ "item": ItemDetail }` including `extraction_source`, source-backed `source_evidence_text`, generated `extracted_text`, and provenance |
 | `POST /api/items/{id}/inspect` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "human_inspected_at": "...", "already_applied": false }` |
 | `POST /api/items/{id}/resonance` | JSON `{ "resonated": true, "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "is_resonated": true, "already_applied": false }` |
 | `POST /api/items/{id}/delivery` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "external_surfaced_at": "...", "already_applied": false }` |
@@ -1950,7 +2002,9 @@ Status/error mapping:
 | item not found | `404` | N/A | `not_found` | N/A | no item write, no FTS write |
 | any guarded operation already running | `409` | N/A | `conflict` | N/A | no queued work |
 | source/fallback text available and OpenRouter returns valid `ok` output | `200` | `completed` | N/A | `null` | readable fields updated; selected FTS row refreshed; `item_updated: true`; `fts_updated: true`; `item` present and non-null unless fatal serialization/internal failure prevents detail reload |
-| all source/fallback text unavailable | `200` | `completed_with_errors` | N/A | `original_unavailable` | no destructive generated-content rewrite; latest-attempt diagnostics record unavailable source; existing valid content and selected FTS row are preserved unless there was no prior valid generated content to preserve |
+| Tavily source-acquisition timeout before source text selection | `200` | `completed_with_errors` | N/A | `timeout` | no generated-content rewrite; latest-attempt diagnostics record safe timeout; existing valid content and selected FTS row are preserved |
+| Tavily source-acquisition provider/network/HTTP/schema/unreadable-body failure before source text selection | `200` | `completed_with_errors` | N/A | `provider_error` | no generated-content rewrite; latest-attempt diagnostics record safe provider failure; existing valid content and selected FTS row are preserved |
+| all source/fallback text unavailable because no eligible Tavily candidate exists, Tavily is unconfigured, or Tavily returned sanitized unusable evidence | `200` | `completed_with_errors` | N/A | `original_unavailable` | no destructive generated-content rewrite; latest-attempt diagnostics record unavailable source; existing valid content and selected FTS row are preserved unless there was no prior valid generated content to preserve |
 | syntactically valid model rejected by provider | `200` | `completed_with_errors` | N/A | `invalid_model` | no generated-content rewrite; `last_reprocess_*` records the safe invalid-model attempt result; existing `content_status` and selected FTS row are preserved |
 | provider error, rate limit, or provider timeout after source text selection | `200` | `completed_with_errors` | N/A | `provider_error`, `rate_limited`, or `timeout` | no generated-content rewrite; `last_reprocess_*` records the safe attempt result; existing `content_status` and selected FTS row are preserved |
 | OpenRouter decode/schema/semantic validation failure after the allowed repair attempt is exhausted | `200` | `completed_with_errors` | N/A | `decode_error` | no generated-content rewrite; `last_reprocess_*` records the safe validation/decode attempt result; existing `content_status` and selected FTS row are preserved |
@@ -2014,7 +2068,7 @@ MCP schema rules:
 
 - missing/invalid auth on `/mcp` returns HTTP `401` before MCP tool/resource handling;
 - resource content types are exactly those listed above (`application/json` or `text/plain`);
-- resource JSON bodies reuse canonical HTTP types;
+- resource JSON bodies reuse canonical HTTP types, including `ItemSummary.extraction_source` and `ItemDetail.source_evidence_text`/`extraction_source`;
 - `resofeed://system/operation` is read-only, authenticated, and exposes only the current in-memory guard snapshot; it must not imply a durable job, queue, history, dashboard, sidecar, sync/merge primitive, or portable operation receipt;
 - unknown tools/resources return MCP tool/resource not found errors, not HTTP `404` after session establishment;
 - `search_items.query` is required even though HTTP search `q` is optional; MCP clients that want empty-feed browsing should use `list_candidate_items`;
@@ -2256,6 +2310,7 @@ Implementation is architecture-conformant when:
 - `resofeed serve` is the single runtime command;
 - `resofeed serve` accepts `--addr`, `--public-url`, `--db`, optional `--openrouter-model`, optional `--owner-token`, and optional `--first-fetch-limit` (`50` default, `RESOFEED_FIRST_FETCH_LIMIT` fallback when the flag is omitted, `0` unlimited, maximum `500`); it does not require CLI API-key flags in the future runtime contract;
 - OpenRouter startup secret resolution follows OS `OPENROUTER_KEY` > local `.env` fallback, rejects explicit empty/whitespace values, allows a missing key as provider-unavailable runtime state, and never persists, exports, logs, prints, or commits raw secrets;
+- Tavily startup secret resolution follows OS `TAVILY_API_KEY` > local `.env` fallback, rejects explicit empty/whitespace values, allows a missing key as external-extraction-unavailable runtime state, and never persists, exports, logs, prints, or commits raw secrets;
 - omitting `--owner-token` reuses a stored token or generates, stores, and prints a first-run token;
 - one Go process serves static UI, HTTP API, MCP endpoint, and ingest loop;
 - no separate `migrate`, `worker`, `doctor`, `admin`, or `sync` process exists;
@@ -2267,8 +2322,8 @@ Implementation is architecture-conformant when:
 - state export/import restores sources, steering, and resonance state without a sync server;
 - state import replaces portable active state with the validated bundle rather than merging or resolving conflicts;
 - duplicate/story grouping preserves every original source item;
-- `/doctor` reports RSS/OpenRouter/extraction failures as raw text with an `openrouter:` prefix and never prints keys;
-- no folders, tags, settings dashboard, archive flow, notification ownership, or RAG surface appears.
+- `/doctor` reports RSS/OpenRouter/Tavily/extraction failures as raw text with `openrouter:` and `tavily:` prefixes where applicable and never prints keys, secret sources, `.env` paths, provider payloads, or raw headers;
+- no folders, tags, settings dashboard, archive flow, notification ownership, browser-automation runtime, durable extraction queue, or RAG surface appears.
 
 Runnable verification commands after implementation:
 
@@ -2306,6 +2361,21 @@ Diagnostics check:
 curl -i http://127.0.0.1:8080/api/doctor \
   -H "Authorization: Bearer <OWNER_TOKEN>"
 # expect 200 text/plain
+# expect openrouter: lines and tavily: configured=present|missing without raw keys or .env paths
+```
+
+Tavily external extraction checks:
+
+```bash
+# With TAVILY_API_KEY available from OS environment or local .env, re-ingest a URL
+# that local readable extraction and RSS excerpt fallback cannot recover.
+curl -i -X POST http://127.0.0.1:8080/api/items/<ITEM_ID>/reingest \
+  -H "Authorization: Bearer <OWNER_TOKEN>" \
+  -H "Content-Type: application/json" \
+  --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"tavily-smoke-1"}'
+# expect successful items to keep source literals unchanged, produce generated fields in the runtime processing language,
+# set extraction_source="external_tavily", refresh FTS, and avoid raw Tavily key/payload leakage.
+# A non-X fake-server ingest/manual-fetch fixture must prove this is a general eligible-URL fallback, not X-only host logic.
 ```
 
 Manual ingest checks:

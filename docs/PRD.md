@@ -297,11 +297,15 @@ ResoFeed must attempt to understand the full linked article, not only the feed e
 Requirements:
 
 - if full content is unavailable, the item **must** remain visible when appropriate rather than silently disappearing;
+- if local full-content extraction and RSS excerpt fallback cannot recover usable source text and external recovery is configured, ResoFeed **must attempt external source-text recovery once** for eligible HTTP(S) links before classifying the original as unavailable;
+- external source-text recovery **must** be general enough for JavaScript-heavy article pages, with X/Twitter links treated as a known high-value case rather than the only allowed host;
 - extraction limitations **must** be visible as source-quality/provenance information (see Fallback Taxonomy);
 - source text quality **must** be described separately from summary/model status: a model-backed summary may still be based on RSS excerpt text when full article extraction is unavailable;
 - unusually large, inaccessible, paywalled, or boilerplate-heavy content **must** degrade gracefully;
-- extractor sanitation **must** preserve valid article paragraphs while removing navigation, sidebars, footer/header content, executable metadata, and obvious newsletter/privacy boilerplate;
-- summary quality expectations **must** adapt to available source quality.
+- extractor sanitation **must** preserve valid article paragraphs while removing navigation, sidebars, footer/header content, executable metadata, login/signup shells, trend/sidebar chrome, metadata-only payloads, and obvious newsletter/privacy boilerplate;
+- summary quality expectations **must** adapt to available source quality;
+- when Chinese is the processing language, external-recovered source evidence must still produce complete Chinese generated reading content under the same contract as locally extracted evidence; source/provenance literals remain unchanged;
+- Tavily source-acquisition failures must remain source-acquisition diagnostics: timeout maps to public item/reprocess `timeout`, provider/network/HTTP/schema failure maps to public item/reprocess `provider_error`, and sanitized unusable evidence maps to public `original_unavailable`; these failures must not be stored as OpenRouter `model_status`.
 
 ### 7.5 Item understanding outputs
 
@@ -316,7 +320,7 @@ Required product-level outputs:
 - concise core insight as exactly one generated sentence;
 - dense factual summary;
 - Key Points as a first-class generated content concept with a fixed 3–5 source-grounded items for successful generated output;
-- source and extraction provenance;
+- source and extraction provenance, including whether usable evidence came from local readable extraction, RSS excerpt fallback, or configured external recovery;
 - topical metadata and searchable text for retrieval and ranking;
 - concise rationale for why the item may deserve attention when surfaced;
 - processing and re-ingest status messages that are user-facing and Chinese-localized when Chinese is the processing language.
@@ -534,7 +538,9 @@ The following are out of scope unless a future product decision explicitly rever
 - dwell-time, viewport, or scroll-depth tracking as preference signals;
 - folder hierarchies or tag trees as the primary organization model;
 - built-in Telegram or notification-channel ownership;
-- multi-user team SaaS features.
+- multi-user team SaaS features;
+- browser-agent scraping, login-cookie scraping, account pools, proxy farms, CAPTCHA-solving workflows, or dedicated extraction sidecars as core runtime behavior.
+
 ## 15. Acceptance Criteria
 
 Acceptance criteria are product-level behavioral tests. Architecture and QA must define measurable corpus thresholds, latency budgets, and exact evaluation fixtures before implementation where this PRD uses terms such as “appropriate,” “enough,” “some,” or “fast enough.”
@@ -646,6 +652,14 @@ Given an item already has usable generated content, when a re-ingest attempt fai
 ### AC-24 Historical content-contract re-ingest
 
 Given the new content contract is implemented, when historical items eligible for re-ingest are processed, then successful attempts should update generated reading fields to the new contract, including localized display titles and Key Points, while failed attempts must preserve existing usable historical content and record only latest-attempt failure status.
+
+### AC-25 External source-text recovery and multilingual completeness
+
+Given local readable extraction and RSS excerpt fallback cannot recover usable source text for an eligible HTTP(S) item, when external recovery is configured, then ResoFeed must attempt the configured external source-text recovery path once before classifying the item as original unavailable.
+
+Given external recovery returns usable source evidence, when the item is processed, then generated display title, summary, core insight, Key Points, value tier, and user-facing processing status must follow the current processing language completely, including Chinese output when `zh` is selected, while URLs, source IDs, source names, source titles, exact source quotes, and product/company names without conventional Chinese renderings remain literal.
+
+Given external recovery returns login chrome, sidebar/trending content, metadata-only text, low-information text, provider errors, or times out, when ResoFeed records the attempt, then it must preserve any existing usable generated content, expose only safe source-acquisition diagnostics, and never leak external provider keys, `.env` paths, raw provider payloads, or request headers.
 
 ## 16. Ownership Boundaries
 

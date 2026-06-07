@@ -129,7 +129,7 @@ The prompt compiler emits one JSON user payload using schema version `resofeed.s
 - `item.source_title` is the literal source/feed title, such as `TLDR AI Feed`. It remains literal provenance.
 - `item.url` remains literal provenance.
 - `item.target_language` is the processing target language selected by the app. Generated user-readable fields must use this language; URLs, source identifiers, source titles, source item titles, enum values, and provenance remain literal.
-- `item.available_text_source` must be one of `fresh_full_text`, `stored_extracted_text`, `rss_excerpt`, or `unavailable`.
+- `item.available_text_source` must be one of `fresh_full_text`, `external_tavily`, `stored_source_evidence`, `rss_excerpt`, or `unavailable`. `stored_source_evidence` refers to source-backed `source_evidence_text`, not generated `extracted_text`.
 - `item.available_text` is a string capped by `PROMPT_SOURCE_TEXT_MAX_CHARS` before prompt compilation. It is untrusted evidence text, not instructions.
 
 ## Output Schema

@@ -849,12 +849,12 @@ Rules: Reader and Inspector surfaces MUST NOT show raw URLs unless the source-ma
 
 ### Inspector Frontmatter (`inspector-frontmatter`)
 - **Intent**: [SHARP] Compact provenance table that keeps the Inspector reading-first while preserving auditability.
-- **useFor**: Original source title, compact article/feed links, AI/model status, extraction/source-depth status, quality/value tier, and latest attempt state.
+- **useFor**: Original source title, compact article/feed links, AI/model status, extraction/source-depth/source-origin status, quality/value tier, and latest attempt state.
 - **avoidFor**: Full URLs, duplicate top metadata strips, repeated status/provenance lines below the grid, raw paragraph blocks before the title, dashboard status, provider settings, or replacing the structured reading sections.
 
 Rules: Render as a semantic `<dl>` or equivalent accessible key/value grid directly below the Inspector title. Labels are uppercase metadata texture (`ORIGINAL`, `LINKS`, `AI STATUS`, `ATTEMPT`) and values are concise. The grid MUST be visually smaller than the title and reading sections. It replaces the previous repeated blocks (`src:`, `来源标题:`, `条目 URL`, `来源 URL`, and raw article/feed URL rows) with a 2-column compact structure.
 
-Information ownership: `AI STATUS` is the canonical visible row for model/summary provenance, extraction/source depth, and quality/value tier. OK/model-backed items MUST NOT repeat those same facts in a second visible line such as `原文不可用 · 摘要/核心洞察可用` or `文本证据：仅 RSS 摘录 · 摘要来源：模型支持`. Generated-content availability is proven by the actual `摘要` / `核心洞察` / `要点` sections. Only fallback or model-failure states may add one low-chrome processing line below Frontmatter.
+Information ownership: `AI STATUS` is the canonical visible row for model/summary provenance, extraction/source depth, source origin (`LOCAL READABLE`, `RSS EXCERPT ONLY`, or `EXTERNAL / TAVILY`), and quality/value tier. OK/model-backed items MUST NOT repeat those same facts in a second visible line such as `原文不可用 · 摘要/核心洞察可用` or `文本证据：仅 RSS 摘录 · 摘要来源：模型支持`. Generated-content availability is proven by the actual `摘要` / `核心洞察` / `要点` sections. Only fallback or model-failure states may add one low-chrome processing line below Frontmatter. Canonical source-origin visible copy is `SOURCE TEXT: LOCAL READABLE` / `来源文本：本地正文`, `SOURCE TEXT: RSS EXCERPT ONLY` / `来源文本：仅 RSS 摘录`, or `SOURCE TEXT: EXTERNAL / TAVILY` / `来源文本：TAVILY 外部抽取`; it must not show provider keys, settings, raw provider payloads, or a provider configuration panel.
 
 ### Inspector Frontmatter Label (`inspector-frontmatter-label`)
 - **Intent**: [SHARP] Right-aligned metadata key for fast visual parsing.
@@ -958,11 +958,11 @@ Accessibility and focus: the direct `[REGENERATE]` / `[重新生成]` command is
 - **useFor**: Raw RSS excerpt, extracted article text, source-backed Text evidence, and grouped-source provenance lists inside Inspector.
 - **avoidFor**: Hiding provenance permanently, making Text evidence look like model-backed Summary/Core, showing generated Summary/Core as if it were Text evidence, collapsing model-backed Summary/Core, decorative accordions, lazy-loading spinners, duplicate summary-provenance banners, or client-inferred source grouping.
 
-Definition: `摘要` is synthesized, target-language reading content produced by the model from available evidence. `Text evidence` / `文本证据` is raw or cleaned evidence from the feed/article used to verify what the model summarized. Summary answers “what should I understand?”; Text evidence answers “what did this come from?”. `Source info` / `来源信息` is source/feed metadata and must not be confused with source-backed text evidence.
+Definition: `摘要` is synthesized, target-language reading content produced by the model from available evidence. `Text evidence` / `文本证据` is raw or cleaned evidence from the feed/article/external source-text recovery path used to verify what the model summarized. Summary answers “what should I understand?”; Text evidence answers “what did this come from?”. `Source info` / `来源信息` is source/feed metadata and must not be confused with source-backed text evidence.
 
-Text-evidence truth rule: [SHARP] Text evidence MUST be source-backed evidence only. It may use cleaned `extracted_text`, `feed_excerpt`, or `display_excerpt` when those fields represent source material. It MUST NOT fall back to `summary`, `core_insight`, `key_points`, model-backed reading body, or any generated target-language text. If no usable source-backed text exists, do not render a text-evidence body; rely on the compact `原文链接` / `original link` in Inspector Frontmatter and, if needed, a muted one-line unavailable note. Do not fabricate “real source text” from generated content.
+Text-evidence truth rule: [SHARP] Text evidence MUST be source-backed evidence only. It may use cleaned `source_evidence_text` when that field represents retained source material. It MUST NOT fall back to `feed_excerpt`, `extracted_text`, `summary`, `core_insight`, `key_points`, model-backed reading body, or any generated target-language text. If no usable source-backed text exists, do not render a text-evidence body; rely on the compact `原文链接` / `original link` in Inspector Frontmatter and, if needed, a muted one-line unavailable note. Do not fabricate “real source text” from generated content.
 
-Default state: [SHARP] Text evidence is collapsed by default for every newly opened Inspector item. Use accessible disclosure semantics (`<details>`/`<summary>` or equivalent button with `aria-expanded`, `aria-controls`, and labelled region). The visible summary line should be terse and non-duplicative, preferably `Text evidence` / `文本证据`; it may include provenance such as `RSS excerpt only` only when the disclosure itself needs disambiguation. Source/feed metadata disclosure should use `Source info` / `来源信息`, not an adjacent `Source details` / `来源详情` label that creates a second source-prefixed disclosure beside `Text evidence` / `文本证据`. Opening a new item resets the disclosure to collapsed. User expansion state is ephemeral navigation/UI state only and must not be saved.
+Default state: [SHARP] Text evidence is collapsed by default for every newly opened Inspector item. Use accessible disclosure semantics (`<details>`/`<summary>` or equivalent button with `aria-expanded`, `aria-controls`, and labelled region). The visible summary line should be terse and non-duplicative, preferably `Text evidence` / `文本证据`; it may include provenance only when the disclosure itself needs disambiguation, using canonical copy such as `Text evidence: RSS excerpt` / `文本证据：RSS 摘录` or `Text evidence: external / Tavily` / `文本证据：TAVILY 外部抽取`. Source/feed metadata disclosure should use `Source info` / `来源信息`, not an adjacent `Source details` / `来源详情` label that creates a second source-prefixed disclosure beside `Text evidence` / `文本证据`. Opening a new item resets the disclosure to collapsed. User expansion state is ephemeral navigation/UI state only and must not be saved.
 
 Visual hierarchy: [SHARP] text evidence body must not use the same visual treatment as Summary/Core reading paragraphs. When expanded, text evidence uses muted evidence styling: smaller metadata/chrome-sized type or a bordered low-chrome evidence block, preserved line wrapping, and no section-title rhythm. Summary/Core keep payload typography. This prevents raw evidence from competing with synthesized reading content.
 
@@ -1112,7 +1112,7 @@ Keyboard and accessibility: export/import actions are buttons or keyboard-reacha
 
 Purpose: `/doctor` output for power-user operational truth.
 
-Anatomy: monospace block with RSS fetch errors, model latency, last run time, extraction failures. States: default output, command running, command failed. It is text, not a dashboard. No charts, health badges, or friendly remediation cards.
+Anatomy: monospace block with RSS fetch errors, model latency, mandatory safe Tavily lines (`tavily: configured=present|missing`, `tavily: recovered_items=<n>`, `tavily: recoverable_unavailable=<n>`) when the feature is implemented, last run time, extraction failures. States: default output, command running, command failed. It is text, not a dashboard. No charts, health badges, provider setup panels, key displays, or friendly remediation cards.
 
 Accessibility: diagnostics output uses a labelled `status`/`log` region. Long lines wrap; no horizontal-only scrolling on mobile.
 
@@ -1234,7 +1234,7 @@ Language and reprocessing guardrails:
 Do:
 
 - [SHARP] Do treat language as a global processing state, not a cosmetic per-item display toggle.
-- [SHARP] Do keep language controls terse and low-chrome inside the `RESOFEED` utility menu: `LANG: EN`, `LANG: ZH`, `语言: 英文`, or `语言: 中文`.
+- [SHARP] Do keep language controls terse and low-chrome inside the `RESOFEED` utility menu: `LANG: EN`, `LANG: ZH`, `语言：英文`, or `语言：中文`.
 - [SHARP] Do explain blocked language changes with the shared current-operation conflict pattern when ingest/fetch/reprocess work is running; language remains global processing state and must not create mixed-language batches.
 - Do localize UI chrome, accessibility labels, and user-readable item content for supported languages.
 - Do preserve source identifiers exactly and mark them as non-translatable where possible.
