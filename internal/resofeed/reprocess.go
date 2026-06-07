@@ -74,8 +74,10 @@ func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string,
 	defer releaseGuardRecover(release, &retErr, "reingest item")
 
 	var response ItemReingestResponse
-	applied, err := withIdempotencyReceipt(ctx, db, req.IdempotencyKey, req.ActorID, "reingest_item", itemID, itemReingestFingerprintPayload(req), &response, func() (ItemReingestResponse, error) {
+	applied, err := withIdempotencyReceiptFinalContext(ctx, db, req.IdempotencyKey, req.ActorID, "reingest_item", itemID, itemReingestFingerprintPayload(req), &response, func() (ItemReingestResponse, error) {
 		return reingestItemUnlocked(ctx, db, llm, itemID, req)
+	}, func() (context.Context, context.CancelFunc) {
+		return context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
 	})
 	if err != nil {
 		return ItemReingestResponse{}, err
@@ -207,7 +209,7 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 		return ItemReingestResponse{}, err
 	}
 	updateCurrentOperation("processing_items", &CurrentOperationCount{Current: 0, Total: 1}, "item reingest processing selected item")
-	outcome, err := processReprocessItemWithRequest(ctx, item, llm, language, req, compileActiveSteeringRulesForPrompt(activeRules))
+	outcome, err := processReprocessItemWithRequest(ctx, item, llm, language, req, compileActiveSteeringRulesForPrompt(activeRules), true)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			outcome = failedReprocessOutcome(fallbackReprocessSourceURL(item), ReprocessErrorTimeout, "item processing timed out", modelStatusTimeout)
@@ -240,15 +242,17 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 		}
 		result.Error = &ReprocessErrorDetail{ItemID: &itemID, Code: code, Message: message}
 	}
+	writeCtx, cancelWrite := reingestNonDestructiveWriteContext(ctx, outcome)
+	defer cancelWrite()
 	if outcome.writable() || outcome.unavailable || outcome.storableFailure() {
-		if err := storeReprocessItem(ctx, db, itemID, outcome); err != nil {
+		if err := storeReprocessItem(writeCtx, db, itemID, outcome); err != nil {
 			return ItemReingestResponse{}, err
 		}
 		result.ItemUpdated = true
 		result.FTSUpdated = outcome.writable()
 	}
 	if result.ItemUpdated {
-		detail, err := ReadItemDetail(ctx, db, itemID)
+		detail, err := ReadItemDetail(writeCtx, db, itemID)
 		if err != nil {
 			return ItemReingestResponse{}, err
 		}
@@ -260,6 +264,13 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 
 func itemReingestErrorResult(itemID string, language ProcessingLanguage, code ReprocessErrorCode, message string) ItemReingestResult {
 	return ItemReingestResult{ItemID: itemID, Status: ReprocessStatusFailed, Language: language, Error: &ReprocessErrorDetail{ItemID: &itemID, Code: code, Message: message}}
+}
+
+func reingestNonDestructiveWriteContext(ctx context.Context, outcome reprocessItemOutcome) (context.Context, context.CancelFunc) {
+	if ctx.Err() == nil || outcome.writable() {
+		return ctx, func() {}
+	}
+	return context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
 }
 
 func loadReprocessItem(ctx context.Context, db *sql.DB, itemID string) (reprocessItem, error) {
@@ -274,10 +285,13 @@ func loadReprocessItem(ctx context.Context, db *sql.DB, itemID string) (reproces
 	return item, nil
 }
 
-func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, req ItemReingestRequest, activeSteeringRules []string) (reprocessItemOutcome, error) {
+func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, req ItemReingestRequest, activeSteeringRules []string, sourceTimeoutAsOutcome bool) (reprocessItemOutcome, error) {
 	sourceURL, sourceText, availableTextSource, err := fetchReprocessSourceText(ctx, item)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			if sourceTimeoutAsOutcome {
+				return failedReprocessOutcome(fallbackReprocessSourceURL(item), ReprocessErrorTimeout, "item processing timed out", modelStatusTimeout), nil
+			}
 			return reprocessItemOutcome{}, err
 		}
 		fallbackURL, fallbackText, fallbackTextSource, ok := reprocessStoredTextFallback(item)
@@ -593,7 +607,7 @@ func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error
 }
 
 func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, activeSteeringRules []string) (reprocessItemOutcome, error) {
-	return processReprocessItemWithRequest(ctx, item, llm, language, ItemReingestRequest{}, activeSteeringRules)
+	return processReprocessItemWithRequest(ctx, item, llm, language, ItemReingestRequest{}, activeSteeringRules, false)
 }
 
 func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bool) {

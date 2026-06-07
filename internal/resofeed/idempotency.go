@@ -20,6 +20,14 @@ var idempotencyReceiptMu sync.Mutex
 // live same-key/different-fingerprint calls are rejected, and expired rows are
 // deleted transactionally before the key is accepted as fresh.
 func withIdempotencyReceipt[T any](ctx context.Context, db *sql.DB, key string, actorID string, operation string, itemID string, fingerprintPayload any, target *T, apply func() (T, error)) (bool, error) {
+	return withIdempotencyReceiptInternal(ctx, db, key, actorID, operation, itemID, fingerprintPayload, target, apply, nil)
+}
+
+func withIdempotencyReceiptFinalContext[T any](ctx context.Context, db *sql.DB, key string, actorID string, operation string, itemID string, fingerprintPayload any, target *T, apply func() (T, error), finalContext func() (context.Context, context.CancelFunc)) (bool, error) {
+	return withIdempotencyReceiptInternal(ctx, db, key, actorID, operation, itemID, fingerprintPayload, target, apply, finalContext)
+}
+
+func withIdempotencyReceiptInternal[T any](ctx context.Context, db *sql.DB, key string, actorID string, operation string, itemID string, fingerprintPayload any, target *T, apply func() (T, error), finalContext func() (context.Context, context.CancelFunc)) (bool, error) {
 	if db == nil {
 		return false, errors.New("idempotency receipt: db is nil")
 	}
@@ -57,7 +65,16 @@ func withIdempotencyReceipt[T any](ctx context.Context, db *sql.DB, key string, 
 	if err != nil {
 		return false, fmt.Errorf("encode idempotency receipt snapshot: %w", err)
 	}
-	if err := insertReceiptLocked(ctx, db, key, actorID, operation, itemID, fingerprint, string(data), now); err != nil {
+	writeCtx := ctx
+	cancelWrite := func() {}
+	if finalContext != nil {
+		writeCtx, cancelWrite = finalContext()
+		if writeCtx == nil {
+			return false, errors.New("idempotency receipt: final context is nil")
+		}
+	}
+	defer cancelWrite()
+	if err := insertReceiptLocked(writeCtx, db, key, actorID, operation, itemID, fingerprint, string(data), now); err != nil {
 		return false, err
 	}
 	*target = result
