@@ -138,6 +138,66 @@ func TestReprocessStoredFallbackSkipsMetadataOnlyExtractedText(t *testing.T) {
 	}
 }
 
+func TestReingestSkipsMetadataOnlyStoredExtractedTextAfterRSSFallback(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	if _, err := SetProcessingLanguage(ctx, db, SetProcessingLanguageRequest{Language: ProcessingLanguageChinese, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "set-zh-metadata-rss-fallback"}}); err != nil {
+		t.Fatalf("SetProcessingLanguage zh: %v", err)
+	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><main>
+			<h1>How AI Quietly Changed Modern UX Patterns</h1>
+			<p>Translations EN KO ES VI JA RO LT GL PL KM ID ZU SK</p>
+			<p>Your browser does not support the audio element.</p>
+			<p>Story's Credibility</p>
+			<p>About Author</p>
+			<p>Read my stories Learn More</p>
+			<p>Comments TOPICS ai-and-ml # ai # ux</p>
+			<p>THIS ARTICLE WAS FEATURED IN Terminal Lite Threads Bsky</p>
+		</main></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_metadata_rss_fallback", server.URL+"/feed.xml", "Metadata RSS Fallback")
+	now := time.Now().UTC().Format(time.RFC3339)
+	metadataOnly := strings.Join([]string{
+		"How AI Quietly Changed Modern UX Patterns",
+		"Translations EN KO ES VI JA RO LT GL PL KM ID ZU SK",
+		"Your browser does not support the audio element.",
+		"Story's Credibility",
+		"About Author",
+		"Read my stories Learn More",
+		"Comments TOPICS ai-and-ml # ai # ux",
+		"THIS ARTICLE WAS FEATURED IN Terminal Lite Threads Bsky",
+	}, "\n")
+	if _, err := db.ExecContext(ctx, `insert into items (id, source_id, source_url, url, title, source_item_title, summary, core_insight, feed_excerpt, extracted_text, value_tier, first_seen_at, extraction_status, model_status) values ('item_metadata_rss_fallback', 'src_metadata_rss_fallback', ?, ?, 'prior title', 'How AI Quietly Changed Modern UX Patterns (9 minute read)', null, null, ?, ?, null, ?, 'full', 'decode_error')`, server.URL+"/feed.xml", server.URL+"/article", "AI has quietly transformed modern UX patterns by integrating intelligent features into user interfaces.", metadataOnly, now); err != nil {
+		t.Fatalf("insert metadata-only fallback item: %v", err)
+	}
+	assertReprocessIndexReady(t, ctx, db)
+
+	resp, err := ReingestItem(ctx, db, emptySourceEvidenceZHLLM{}, "item_metadata_rss_fallback", ItemReingestRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "metadata-rss-fallback-reingest"}})
+	if err != nil {
+		t.Fatalf("ReingestItem returned error: %v", err)
+	}
+	if resp.Reingest.Status != ReprocessStatusCompleted || !resp.Reingest.ItemUpdated || !resp.Reingest.FTSUpdated {
+		t.Fatalf("reingest result = %+v, want completed update", resp.Reingest)
+	}
+	text := readStoredText(t, ctx, db, "item_metadata_rss_fallback")
+	if text.feedExcerpt == "" || !strings.Contains(text.feedExcerpt, "modern UX patterns") {
+		t.Fatalf("feed excerpt = %q, want RSS excerpt preserved as evidence", text.feedExcerpt)
+	}
+	if text.extractedText != "" || strings.Contains(text.extractedText, "Story's Credibility") {
+		t.Fatalf("extracted_text = %q, want metadata-only stored text cleared", text.extractedText)
+	}
+	var extractionStatus, modelStatus string
+	if err := db.QueryRowContext(ctx, `select extraction_status, model_status from items where id = 'item_metadata_rss_fallback'`).Scan(&extractionStatus, &modelStatus); err != nil {
+		t.Fatalf("read statuses: %v", err)
+	}
+	if extractionStatus != extractionStatusPartial || modelStatus != modelStatusOK {
+		t.Fatalf("statuses = extraction:%q model:%q, want partial_extraction/ok", extractionStatus, modelStatus)
+	}
+}
+
 func TestMCPReprocessLibraryIgnoresClientContextCancellation(t *testing.T) {
 	resetIngestCoordinatorForTest(t)
 	ctx := context.Background()

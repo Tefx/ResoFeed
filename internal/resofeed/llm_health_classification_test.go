@@ -121,6 +121,39 @@ values
 	}
 }
 
+func TestDoctorClassifiesOnlyOriginalUnavailableFailuresAsSourceUnavailable(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	insertSource(t, ctx, db, "src_source_unavailable", "https://source-unavailable.example/feed.xml", "Source Unavailable")
+
+	old := time.Now().UTC().Add(-(freshWindow + time.Hour)).Format(time.RFC3339)
+	_, err := db.ExecContext(ctx, `
+insert into items (id, source_id, source_url, url, title, feed_excerpt, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status)
+values ('source_unavailable_only', 'src_source_unavailable', 'https://source-unavailable.example/feed.xml', 'https://x.example/unavailable', 'Original unavailable', null, null, null, null, ?, ?, 'original_unavailable', 'summary_unavailable')`, old, old)
+	if err != nil {
+		t.Fatalf("insert source-unavailable item: %v", err)
+	}
+
+	var out bytes.Buffer
+	if err := WriteDoctorWithConfig(ctx, db, DoctorConfig{ConfiguredOpenRouterModel: "account_default", ResolvedOpenRouterModel: "openrouter/resolved"}, &out); err != nil {
+		t.Fatalf("WriteDoctorWithConfig returned error: %v", err)
+	}
+	body := out.String()
+	assertDoctorHasNoSameLineDuplicateKeys(t, body)
+	for _, want := range []string{
+		"openrouter: item_transform_failures=1",
+		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=1",
+		"openrouter: health_classification=source_unavailable_only",
+	} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("doctor output missing %q:\n%s", want, body)
+		}
+	}
+	if strings.Contains(body, "health_classification=unresolved_product_regression") || strings.Contains(body, "health_classification=openrouter_client_timeout_or_error") {
+		t.Fatalf("doctor misclassified source-only failure:\n%s", body)
+	}
+}
+
 func TestREG2026051206DoctorClassifiesCurrentLiveSummaryWithResolvedModelAsHealthy(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)

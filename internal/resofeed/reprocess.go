@@ -336,7 +336,7 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 	if isUnusableReprocessOutputTitle(title) {
 		title = reprocessInputTitle(item)
 	}
-	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: sourceEvidenceString(out.FeedExcerpt, item.feedExcerpt, availableTextSource == "rss_excerpt", sourceText), extractedText: sourceEvidenceString(out.ExtractedText, item.extractedText, availableTextSource == "fresh_full_text" || availableTextSource == "stored_extracted_text", sourceText), valueTier: nullableString(out.ValueTier), extractStatus: extractionStatusFull, modelStatus: modelStatusOK}
+	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: sourceEvidenceString(out.FeedExcerpt, item.feedExcerpt, availableTextSource == "rss_excerpt", sourceText), extractedText: sourceEvidenceString(out.ExtractedText, item.extractedText, availableTextSource == "fresh_full_text" || availableTextSource == "stored_extracted_text", sourceText), valueTier: nullableString(out.ValueTier), extractStatus: reprocessExtractionStatusForSource(availableTextSource), modelStatus: modelStatusOK}
 	itemForSanitize := Item{Title: result.title, Summary: result.summary, CoreInsight: result.coreInsight, FeedExcerpt: result.feedExcerpt, ExtractedText: result.extractedText, ValueTier: result.valueTier, ExtractionStatus: result.extractStatus, ModelStatus: result.modelStatus}
 	sanitizeReadableItem(&itemForSanitize)
 	result.title = itemForSanitize.Title
@@ -607,10 +607,24 @@ func sourceEvidenceString(modelValue string, stored sql.NullString, sourceTextAp
 	if sourceTextApplies && strings.TrimSpace(sourceText) != "" {
 		return nullableString(sourceText)
 	}
-	if stored.Valid && strings.TrimSpace(stored.String) != "" {
-		return nullableString(stored.String)
+	if stored.Valid {
+		storedText := strings.TrimSpace(stored.String)
+		if storedText != "" && !isUnusableReadablePayload(storedText) && !isLowInformationReadablePayload(storedText) {
+			return nullableString(storedText)
+		}
 	}
 	return nil
+}
+
+func reprocessExtractionStatusForSource(source string) string {
+	switch source {
+	case "fresh_full_text", "stored_extracted_text":
+		return extractionStatusFull
+	case "rss_excerpt":
+		return extractionStatusPartial
+	default:
+		return extractionStatusSummaryNA
+	}
 }
 
 func safePromptValidationDiagnostic(err error) string {

@@ -167,16 +167,21 @@ func readSearchFTSStatusLine(ctx context.Context, db *sql.DB) (string, error) {
 }
 
 type openRouterHealthMetrics struct {
-	TotalItems           int
-	CurrentFailures      int
-	HistoricFailures     int
-	CurrentLiveSuccesses int
-	CurrentFallbackOnly  int
+	TotalItems                int
+	CurrentFailures           int
+	HistoricFailures          int
+	CurrentLiveSuccesses      int
+	CurrentFallbackOnly       int
+	SourceUnavailableFailures int
 }
 
 func (m openRouterHealthMetrics) classification(cfg DoctorConfig) string {
 	if m.TotalItems == 0 && strings.TrimSpace(cfg.ConfiguredOpenRouterModel) != "" {
 		return "no_items_processed_yet"
+	}
+	totalFailures := m.CurrentFailures + m.HistoricFailures
+	if totalFailures > 0 && totalFailures == m.SourceUnavailableFailures {
+		return "source_unavailable_only"
 	}
 	if m.CurrentFailures > 0 {
 		return "openrouter_client_timeout_or_error"
@@ -202,9 +207,10 @@ select
   coalesce(sum(case when model_status != ? and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
   coalesce(sum(case when model_status != ? and coalesce(published_at, first_seen_at) < ? then 1 else 0 end), 0),
   coalesce(sum(case when model_status = ? and coalesce(summary, '') != '' and coalesce(core_insight, '') != '' and coalesce(value_tier, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
-  coalesce(sum(case when model_status != ? and coalesce(summary, '') = '' and coalesce(core_insight, '') = '' and coalesce(feed_excerpt, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0)
-from items`, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff)
-	if err := row.Scan(&metrics.TotalItems, &metrics.CurrentFailures, &metrics.HistoricFailures, &metrics.CurrentLiveSuccesses, &metrics.CurrentFallbackOnly); err != nil {
+  coalesce(sum(case when model_status != ? and coalesce(summary, '') = '' and coalesce(core_insight, '') = '' and coalesce(feed_excerpt, '') != '' and coalesce(published_at, first_seen_at) >= ? then 1 else 0 end), 0),
+  coalesce(sum(case when model_status != ? and extraction_status = ? then 1 else 0 end), 0)
+from items`, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, cutoff, modelStatusOK, extractionStatusOriginalNA)
+	if err := row.Scan(&metrics.TotalItems, &metrics.CurrentFailures, &metrics.HistoricFailures, &metrics.CurrentLiveSuccesses, &metrics.CurrentFallbackOnly, &metrics.SourceUnavailableFailures); err != nil {
 		return openRouterHealthMetrics{}, fmt.Errorf("read openrouter health metrics: %w", err)
 	}
 	return metrics, nil
