@@ -587,7 +587,7 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bool) {
 	if item.extractedText.Valid {
 		if text := strings.TrimSpace(item.extractedText.String); text != "" {
-			if !isUnusableReadablePayload(text) {
+			if !isUnusableReadablePayload(text) && !isLowInformationReadablePayload(text) {
 				return fallbackReprocessSourceURL(item), text, "stored_extracted_text", true
 			}
 		}

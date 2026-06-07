@@ -101,7 +101,7 @@ func isLowInformationReadablePayload(value string) bool {
 		return true
 	}
 	normalized := strings.Join(words, " ")
-	if isShortChromeReadablePayload(normalized, len(words)) {
+	if isShortChromeReadablePayload(normalized, len(words)) || isMetadataOnlyReadablePayload(normalized) {
 		return true
 	}
 	if len(words) <= 18 {
@@ -113,6 +113,25 @@ func isLowInformationReadablePayload(value string) bool {
 		}
 	}
 	return false
+}
+
+func isMetadataOnlyReadablePayload(normalized string) bool {
+	markers := 0
+	for _, marker := range []string{
+		"translations en ko es",
+		"your browser does not support the audio element",
+		"story's credibility",
+		"about author",
+		"read my stories learn more",
+		"comments topics",
+		"this article was featured in",
+		"terminal lite threads bsky",
+	} {
+		if strings.Contains(normalized, marker) {
+			markers++
+		}
+	}
+	return markers >= 3
 }
 
 func isShortChromeReadablePayload(normalized string, wordCount int) bool {

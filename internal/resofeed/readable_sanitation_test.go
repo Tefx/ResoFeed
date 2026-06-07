@@ -95,6 +95,28 @@ func TestExtractArticleTextChoosesDenseWebflowBodyOverShortPostContentWrapper(t 
 	}
 }
 
+func TestSanitizeReadablePayloadTextRejectsMetadataOnlyArticleChrome(t *testing.T) {
+	dirty := strings.Join([]string{
+		"2,075 reads",
+		"How AI Quietly Changed Modern UX Patterns",
+		"by Artem Ivanov",
+		"Translations",
+		"EN KO ES VI JA RO LT GL PL KM ID ZU SK",
+		"Your browser does not support the audio element.",
+		"Story's Credibility",
+		"About Author",
+		"Read my stories Learn More",
+		"Comments",
+		"TOPICS ai-and-ml # ai # ux # product-design",
+		"THIS ARTICLE WAS FEATURED IN",
+		"Terminal Lite Threads Bsky",
+	}, "\n")
+	cleaned, _ := sanitizeReadablePayloadText(dirty)
+	if !isLowInformationReadablePayload(cleaned) {
+		t.Fatalf("metadata-only article chrome not recognized as low information: %q", cleaned)
+	}
+}
+
 func TestExtractArticleTextRejectsTitleAndLoadingChrome(t *testing.T) {
 	tests := []struct {
 		name     string

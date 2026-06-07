@@ -116,6 +116,28 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 }
 
+func TestReprocessStoredFallbackSkipsMetadataOnlyExtractedText(t *testing.T) {
+	item := reprocessItem{
+		url:         "https://hackernoon.example/story",
+		feedExcerpt: sql.NullString{Valid: true, String: "AI has quietly transformed modern UX patterns by integrating intelligent features into user interfaces."},
+		extractedText: sql.NullString{Valid: true, String: strings.Join([]string{
+			"How AI Quietly Changed Modern UX Patterns",
+			"Translations EN KO ES VI JA RO LT GL PL KM ID ZU SK",
+			"Your browser does not support the audio element.",
+			"Story's Credibility",
+			"About Author",
+			"Read my stories Learn More",
+			"Comments TOPICS ai-and-ml # ai # ux",
+			"THIS ARTICLE WAS FEATURED IN Terminal Lite Threads Bsky",
+		}, "\n")},
+	}
+
+	_, text, source, ok := reprocessStoredTextFallback(item)
+	if !ok || source != "rss_excerpt" || !strings.Contains(text, "modern UX patterns") {
+		t.Fatalf("fallback = ok:%v source:%q text:%q, want rss_excerpt over metadata-only extracted text", ok, source, text)
+	}
+}
+
 func TestMCPReprocessLibraryIgnoresClientContextCancellation(t *testing.T) {
 	resetIngestCoordinatorForTest(t)
 	ctx := context.Background()
