@@ -3,7 +3,7 @@
   import type { CurrentOperationInfo, FetchSourceSuccessResponse, ImportOpmlResponse, ItemDetail, ItemReingestResponse, ItemSummary, OpenRouterModelOption, ProcessingLanguage, ProcessingLanguageInfo, ReprocessLibraryResult, RunIngestSuccessResponse, Source, StateBundleV1, SteerPreview, SteerReceipt, SteerRule, SteerUndoRequest } from '$lib/api-contract';
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
-  import { formatCurrentOperationStatus, formatOperationConflictStatus, normalizeCurrentOperationInfo } from '$lib/current-operation';
+  import { formatCurrentOperationStatus, formatOperationConflictStatus, idleOperation, normalizeCurrentOperationInfo } from '$lib/current-operation';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
   import FirstUseEmptyState from './components/FirstUseEmptyState.svelte';
   import Feed from './components/Feed.svelte';
@@ -526,6 +526,16 @@
     };
   }
 
+  function applyCurrentOperationSnapshot(operation: CurrentOperationInfo): void {
+    if (operation.running) {
+      contextualOperation = { kind: 'running', operation };
+      if (operation.kind === 'library_reprocess') reprocessState = 'running';
+      return;
+    }
+    contextualOperation = { kind: 'idle' };
+    if (reprocessState === 'running') reprocessState = 'idle';
+  }
+
   async function refreshCurrentOperationIfAvailable(): Promise<void> {
     try {
       const response = await apiClient().currentOperation();
@@ -538,7 +548,7 @@
           return;
         }
       }
-      contextualOperation = response.operation.running ? { kind: 'running', operation: response.operation } : { kind: 'idle' };
+      applyCurrentOperationSnapshot(response.operation);
     } catch (error) {
       if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) return;
       throw error;
@@ -583,11 +593,12 @@
     try {
       const client = apiClient(token);
       openRouterModelListState = 'loading';
-      const [sourceResponse, feedResponse, languageResponse, modelListResponse] = await Promise.all([
+      const [sourceResponse, feedResponse, languageResponse, modelListResponse, currentOperationResponse] = await Promise.all([
         client.sources(),
         client.today({ limit: feedPageSize }),
         loadProcessingLanguageSafe(client),
-        loadOpenRouterModelsSafe(client)
+        loadOpenRouterModelsSafe(client),
+        loadCurrentOperationSafe(client)
       ]);
       sources = sourceResponse.sources;
       items = feedResponse.items;
@@ -597,6 +608,7 @@
       feedHasMore = feedResponse.items.length === feedPageSize;
       processingLanguage = languageResponse;
       setDocumentLanguage(languageResponse.code);
+      applyCurrentOperationSnapshot(currentOperationResponse);
       agentSteeringRules = await loadAgentSteeringRules(client);
       replaceSurfaceFromLocation();
       reconcileSelectedFeedItem(feedResponse.items);
@@ -640,6 +652,16 @@
         // Product compatibility: runtimes without the language endpoint use the documented effective English default; real auth/server failures remain visible.
         return { code: 'en', label: 'English' };
       }
+      throw error;
+    }
+  }
+
+  async function loadCurrentOperationSafe(client: ResoFeedApiClient): Promise<CurrentOperationInfo> {
+    try {
+      const response = await client.currentOperation();
+      return response.operation;
+    } catch (error) {
+      if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) return idleOperation();
       throw error;
     }
   }

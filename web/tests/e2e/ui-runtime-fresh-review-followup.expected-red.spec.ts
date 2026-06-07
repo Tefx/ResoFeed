@@ -161,8 +161,9 @@ async function installApiFixture(
     readonly currentOperation: RuntimeOperationResponse | (() => RuntimeOperationResponse);
     readonly ingestConflict?: boolean;
   }
-): Promise<{ readonly operationRequestCount: () => number }> {
+): Promise<{ readonly operationRequestCount: () => number; readonly reprocessRequestCount: () => number }> {
   let operationRequests = 0;
+  let reprocessRequests = 0;
   await page.addInitScript((token) => window.localStorage.setItem('resofeed.ownerToken', token), ownerToken);
   await page.route('**/api/**', async (route) => {
     const request = route.request();
@@ -194,12 +195,13 @@ async function installApiFixture(
       return fulfillJson(route, { operation: 'ingest', source_id: null, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: '2026-05-17T14:01:00Z' });
     }
     if (url.pathname === '/api/runtime/reprocess-library' && request.method() === 'POST') {
-      return fulfillJson(route, { already_applied: false, reprocess: { status: 'completed', language: 'en', started_at: '2026-05-17T11:00:00Z', completed_at: '2026-05-17T11:00:10Z', items_total: 5, items_reprocessed: 5, items_failed: 0, search_rebuilt: true, errors: [] } });
+      reprocessRequests += 1;
+      return fulfillJson(route, { already_applied: false, reprocess: { status: 'completed', language: 'en', started_at: '2026-05-17T11:00:00Z', completed_at: '2026-05-17T11:00:10Z', items_attempted: 5, items_updated: 5, items_unavailable: 0, items_failed: 0, items_indexed: 5, fts_rebuilt: true, errors: [] } });
     }
     if (url.pathname === '/api/state/export') return fulfillJson(route, { version: 1, sources: [], steering_rules: [], resonated_items: [] });
     return fulfillJson(route, { error: { code: 'not_found', message: `not found: ${url.pathname}`, details: {} } }, 404);
   });
-  return { operationRequestCount: () => operationRequests };
+  return { operationRequestCount: () => operationRequests, reprocessRequestCount: () => reprocessRequests };
 }
 
 async function waitForShell(page: Page): Promise<void> {
@@ -283,6 +285,23 @@ test.describe('expected-red current-operation and fresh review browser proof', (
     await expect.soft(page.locator('header.shell-command').getByText(/idle|current operation|last_ingest: not_run/i), 'CO-06: no persistent top-chrome idle/current-operation strip is rendered').toHaveCount(0);
   });
 
+  test('CO-07: reload restores in-flight library reprocess and does not expose a new start path', async ({ page, ownerToken }, testInfo) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    const fixture = await installApiFixture(page, ownerToken, { currentOperation: { operation: documentedLibraryReprocessOperation } });
+    await page.goto('/');
+    await waitForShell(page);
+    await page.reload();
+    await waitForShell(page);
+
+    const menu = await openUtilityMenu(page);
+    await attachPageEvidence(page, testInfo, 'reload-restored-library-reprocess', 'details[aria-label="RESOFEED surface menu"]');
+    await expect.soft(menu, 'CO-07: reload must restore the running library_reprocess status from /api/runtime/operation').toContainText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*2\/5/i);
+    const reprocessButton = menu.getByRole('button', { name: /Reprocess existing library/i });
+    await expect.soft(reprocessButton, 'CO-07: reload must not show a fresh reprocess start label while backend reports running').toHaveText('[REPROCESSING...]');
+    await expect.soft(reprocessButton, 'CO-07: reload-restored reprocess action is aria-disabled while guard is running').toHaveAttribute('aria-disabled', 'true');
+    expect.soft(fixture.reprocessRequestCount(), 'CO-07: restoring progress after reload must not POST a new reprocess request').toBe(0);
+  });
+
   test('CO-04/FR-06: visible current-operation surfaces poll bounded updates and clear when idle', async ({ page, ownerToken }) => {
     let operationIndex = 0;
     const fixture = await installApiFixture(page, ownerToken, {
@@ -292,11 +311,11 @@ test.describe('expected-red current-operation and fresh review browser proof', (
     await waitForShell(page);
     const ledger = await openSourceLedger(page);
 
-    await expect.soft(ledger, 'FR-06: initial scoped operation status is visible before polling update').toContainText(/phase:loading_sources.*1\/5.*library reprocess loading sources/i);
+    await expect.soft(ledger, 'FR-06: scoped operation status is visible after startup read').toContainText(/phase:(loading_sources|processing_items).*(1|3)\/5.*library reprocess (loading sources|processing item 3)/i);
     await expect.soft(ledger, 'FR-06: phase/count/message refreshes without a full reload while Source Ledger remains visible').toContainText(/phase:processing_items.*3\/5.*library reprocess processing item 3/i, { timeout: 2500 });
     const requestCount = fixture.operationRequestCount();
     expect.soft(requestCount, 'FR-06: polling performs more than the initial one-shot read while relevant UI is visible').toBeGreaterThanOrEqual(2);
-    expect.soft(requestCount, 'FR-06: polling remains bounded/lightweight for a short visible interval').toBeLessThanOrEqual(4);
+    expect.soft(requestCount, 'FR-06: polling remains bounded/lightweight for a short visible interval').toBeLessThanOrEqual(5);
   });
 
   test('CO-02/FR-03/FR-04: guard conflict copy, shared ingest disabling, and 44px bracket hit targets are browser-visible', async ({ page, ownerToken }, testInfo) => {

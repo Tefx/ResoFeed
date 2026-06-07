@@ -1,6 +1,7 @@
 package resofeed
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -104,6 +105,60 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if ftsCount != 1 {
 		t.Fatalf("FTS core_insight match count = %d, want 1", ftsCount)
 	}
+}
+
+func TestHTTPReprocessLibrarySurvivesClientDisconnectAndKeepsGuard(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>disconnect survival source body</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_reprocess_disconnect", server.URL+"/feed.xml", "Disconnect Reprocess Source")
+	seedReprocessItem(t, ctx, db, "item_disconnect", "src_reprocess_disconnect", server.URL+"/article", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	llm := newBlockingReprocessLLM()
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken, LLM: llm})
+	api := httptest.NewServer(router)
+	t.Cleanup(api.Close)
+
+	requestCtx, cancelRequest := context.WithCancel(ctx)
+	request, err := http.NewRequestWithContext(requestCtx, http.MethodPost, api.URL+RuntimeReprocessLibraryHTTPPath, strings.NewReader(`{"actor_kind":"human","actor_id":"owner","idempotency_key":"disconnect-run"}`))
+	if err != nil {
+		t.Fatalf("create reprocess request: %v", err)
+	}
+	request.Header.Set("Authorization", "Bearer "+contractOwnerToken)
+	request.Header.Set("Content-Type", "application/json")
+
+	resultCh := make(chan error, 1)
+	go func() {
+		resp, err := api.Client().Do(request)
+		if resp != nil {
+			_ = resp.Body.Close()
+		}
+		resultCh <- err
+	}()
+
+	llm.waitEntered(t)
+	cancelRequest()
+
+	waitForCurrentOperationKind(t, api.URL, "library_reprocess")
+
+	conflictRecorder := httptest.NewRecorder()
+	conflictReq := authorizedRequest(http.MethodPost, RuntimeReprocessLibraryHTTPPath, bytes.NewReader([]byte(`{"actor_kind":"human","actor_id":"owner","idempotency_key":"disconnect-second"}`)))
+	conflictReq.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(conflictRecorder, conflictReq)
+	assertStatus(t, conflictRecorder, http.StatusConflict)
+
+	llm.release()
+	select {
+	case <-resultCh:
+	case <-time.After(3 * time.Second):
+		t.Fatal("original canceled HTTP client did not return")
+	}
+	waitForCurrentOperationIdle(t, api.URL)
 }
 
 func TestReprocessLibraryConcurrentProcessingBeatsSerialRuntime(t *testing.T) {
@@ -629,6 +684,103 @@ func TestFetchArticleReadableTextRejectsSniffedBinaryPayload(t *testing.T) {
 	if text != "" {
 		t.Fatalf("fetchArticleReadableText sniffed binary text = %q, want empty", text)
 	}
+}
+
+type blockingReprocessLLM struct {
+	entered chan struct{}
+	releaseCh chan struct{}
+	once sync.Once
+}
+
+func newBlockingReprocessLLM() *blockingReprocessLLM {
+	return &blockingReprocessLLM{entered: make(chan struct{}), releaseCh: make(chan struct{})}
+}
+
+func (l *blockingReprocessLLM) waitEntered(t *testing.T) {
+	t.Helper()
+	select {
+	case <-l.entered:
+	case <-time.After(3 * time.Second):
+		t.Fatal("blocking reprocess LLM was not entered")
+	}
+}
+
+func (l *blockingReprocessLLM) release() {
+	l.once.Do(func() { close(l.releaseCh) })
+}
+
+func (l *blockingReprocessLLM) SummarizeItem(ctx context.Context, input OpenRouterSummaryInput) (OpenRouterSummaryOutput, error) {
+	select {
+	case <-l.entered:
+	default:
+		close(l.entered)
+	}
+	select {
+	case <-ctx.Done():
+		return OpenRouterSummaryOutput{}, ctx.Err()
+	case <-l.releaseCh:
+	}
+	out := ccrTestSummaryOutput("processed "+input.ItemID, "summary disconnect survival source body.", "disconnect survival insight.", "high")
+	out.KeyPoints = []string{
+		"Disconnect survival source point one.",
+		"Disconnect survival source point two.",
+		"Disconnect survival source point three.",
+	}
+	out.FeedExcerpt = input.AvailableText
+	out.ExtractedText = input.AvailableText
+	return out, nil
+}
+
+func (l *blockingReprocessLLM) TranslateSteering(context.Context, OpenRouterSteeringInput) (OpenRouterSteeringOutput, error) {
+	return OpenRouterSteeringOutput{}, nil
+}
+
+func waitForCurrentOperationKind(t *testing.T, baseURL string, want string) {
+	t.Helper()
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		parsed, ok := readCurrentOperationHTTP(t, baseURL)
+		if ok && parsed.Operation.Running && parsed.Operation.Kind != nil && *parsed.Operation.Kind == want {
+			return
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	t.Fatalf("current operation did not become %q; last=%+v", want, currentOperationInfo())
+}
+
+func waitForCurrentOperationIdle(t *testing.T, baseURL string) {
+	t.Helper()
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		parsed, ok := readCurrentOperationHTTP(t, baseURL)
+		if ok && !parsed.Operation.Running {
+			return
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	t.Fatalf("current operation did not become idle; last=%+v", currentOperationInfo())
+}
+
+func readCurrentOperationHTTP(t *testing.T, baseURL string) (CurrentOperationResponse, bool) {
+	t.Helper()
+	request, err := http.NewRequest(http.MethodGet, baseURL+RuntimeOperationHTTPPath, nil)
+	if err != nil {
+		t.Fatalf("create current operation request: %v", err)
+	}
+	request.Header.Set("Authorization", "Bearer "+contractOwnerToken)
+	resp, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return CurrentOperationResponse{}, false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return CurrentOperationResponse{}, false
+	}
+	var parsed CurrentOperationResponse
+	if err := json.NewDecoder(resp.Body).Decode(&parsed); err != nil {
+		return CurrentOperationResponse{}, false
+	}
+	return parsed, true
 }
 
 type slowConcurrentReprocessLLM struct {

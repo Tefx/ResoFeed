@@ -222,7 +222,7 @@ describe('current operation and low-frequency utility placement', () => {
     });
     const menu = await openMenu(user);
 
-    expect(menu.getByText(/20\/591/)).toBeVisible();
+    expect(menu.getByText(/2[01]\/591/)).toBeVisible();
     await waitFor(() => expect(menu.getByText(/21\/591/)).toBeVisible(), { timeout: 1500 });
     expect(screen.getByLabelText('RESOFEED surface menu')).toHaveAttribute('open');
   });

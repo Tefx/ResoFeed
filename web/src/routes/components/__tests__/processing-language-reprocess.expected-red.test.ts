@@ -7,7 +7,7 @@ import Feed from '../Feed.svelte';
 import Inspector from '../Inspector.svelte';
 import SourceLedger from '../SourceLedger.svelte';
 import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtures';
-import type { ItemDetail } from '$lib/api-contract';
+import type { CurrentOperationInfo, ItemDetail } from '$lib/api-contract';
 
 const ownerToken = 'rfeed_expected_red_language_reprocess_0000000000000000';
 
@@ -32,7 +32,7 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
-function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number; reprocessResultStatus?: 'completed' | 'completed_with_errors' | 'failed'; ftsStale?: boolean } = {}) {
+function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number; reprocessResultStatus?: 'completed' | 'completed_with_errors' | 'failed'; ftsStale?: boolean; currentOperation?: CurrentOperationInfo } = {}) {
   const language = options.language ?? 'en';
   const languageStatus = options.languageStatus ?? 200;
   const languagePutStatus = options.languagePutStatus ?? languageStatus;
@@ -48,6 +48,9 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
     }
     if (url.endsWith(`/api/items/${expectedRedItem.id}`)) return jsonResponse({ item: expectedRedDetail });
     if (url.endsWith('/api/steer/active')) return jsonResponse({ rules: [] });
+    if (url.endsWith('/api/runtime/operation') && method === 'GET') {
+      return jsonResponse({ operation: options.currentOperation ?? { running: false } });
+    }
     if (url.endsWith('/api/runtime/language') && method === 'GET') {
       if (languageStatus === 401) {
         return jsonResponse({ error: { code: 'unauthorized', message: 'owner token rejected', details: {} } }, { status: 401 });
@@ -104,7 +107,7 @@ function installAuthenticatedRuntimeFetch(options: { language?: 'en' | 'zh'; lan
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number; reprocessResultStatus?: 'completed' | 'completed_with_errors' | 'failed'; ftsStale?: boolean } = {}) {
+async function renderAuthenticatedPage(options: { language?: 'en' | 'zh'; languageStatus?: number; languagePutStatus?: number; reprocessStatus?: number; reprocessResultStatus?: 'completed' | 'completed_with_errors' | 'failed'; ftsStale?: boolean; currentOperation?: CurrentOperationInfo } = {}) {
   cleanup();
   window.localStorage.clear();
   installAuthenticatedRuntimeFetch(options);
@@ -187,6 +190,37 @@ describe('expected-red processing language and reprocess rendering contracts', (
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('err: owner token rejected'));
     expect(screen.getByLabelText('Owner token')).toHaveFocus();
+  });
+
+  it('restores an in-flight library reprocess after page reload and does not expose a fresh start action', async () => {
+    cleanup();
+    window.localStorage.clear();
+    window.localStorage.setItem('resofeed.ownerToken', ownerToken);
+    const fetcher = installAuthenticatedRuntimeFetch({
+      language: 'zh',
+      currentOperation: {
+        running: true,
+        kind: 'library_reprocess',
+        actor_kind: 'human',
+        phase: 'processing_items',
+        count: { current: 2, total: 6 },
+        message: 'library reprocess item processed',
+        started_at: '2026-05-15T00:00:00Z',
+        updated_at: '2026-05-15T00:00:03Z'
+      }
+    });
+    render(Page);
+
+    await waitFor(() => expect(screen.getByLabelText('Steer or paste RSS URL')).toBeVisible());
+    const surfaceMenu = await openResofeedSurfaceMenu(userEvent.setup());
+    const running = within(surfaceMenu).getByRole('button', { name: /Reprocess existing library/i });
+    expect(running).toHaveTextContent(/\[REPROCESSING\.\.\.\]|\[重处理中\.\.\.\]/);
+    expect(running).toHaveAttribute('aria-disabled', 'true');
+    expect(within(surfaceMenu).getByText(/2\/6/)).toBeVisible();
+    expect(within(surfaceMenu).queryByRole('button', { name: /Confirm reprocess/i })).not.toBeInTheDocument();
+
+    const postCalls = fetcher.mock.calls.filter(([input, init]) => String(input).endsWith('/api/runtime/reprocess-library') && init?.method === 'POST');
+    expect(postCalls).toHaveLength(0);
   });
 
   it('renders reprocess bracket-action default, confirmation, running, complete, conflict, and failure states with live output', async () => {

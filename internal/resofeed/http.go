@@ -507,7 +507,10 @@ func (h apiHandler) handleReprocessLibrary(w http.ResponseWriter, r *http.Reques
 	if !readJSONBodyLimit(w, r, &req, maxRuntimeBodyBytes, "100 KB") || !validateMutationFields(w, req.MutationRequestFields) {
 		return
 	}
-	response, err := ReprocessLibrary(r.Context(), h.cfg.DB, h.cfg.LLM, req)
+	// Library reprocess is an explicit whole-library mutation. Keep it alive after
+	// a browser refresh/client disconnect so the single in-process guard and
+	// /api/runtime/operation remain the source of truth for progress.
+	response, err := ReprocessLibrary(context.WithoutCancel(r.Context()), h.cfg.DB, h.cfg.LLM, req)
 	if err != nil {
 		if details, ok := guardConflictDetails(err); ok {
 			writeGuardConflict(w, details)
