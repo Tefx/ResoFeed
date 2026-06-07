@@ -1427,7 +1427,7 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 		return "", extractionStatusOriginalNA
 	}
 	cleaned, _ := sanitizeReadablePayloadText(extracted)
-	if strings.TrimSpace(cleaned) == "" || isUnusableReadablePayload(cleaned) {
+	if strings.TrimSpace(cleaned) == "" || isUnusableReadablePayload(cleaned) || isLowInformationReadablePayload(cleaned) {
 		if strings.TrimSpace(fallback) != "" {
 			return "", extractionStatusPartial
 		}
@@ -1632,7 +1632,10 @@ var diagnosticTokenRE = regexp.MustCompile(`(?i)\b(?:model_latency_error|summary
 var cssCustomPropertyRE = regexp.MustCompile(`(?i)(?:^|\s)--[a-z0-9-]+\s*:[^;{}]+;?`)
 
 func textFromHTML(value string) string {
-	value = readableHTMLFragment(value)
+	return cleanReadableHTMLFragmentText(readableHTMLFragment(value))
+}
+
+func cleanReadableHTMLFragmentText(value string) string {
 	value = removeEnclosureMetadata(value)
 	value = executableHTMLRE.ReplaceAllString(value, " ")
 	value = structuralBoilerplateHTMLRE.ReplaceAllString(value, " ")
@@ -1723,23 +1726,57 @@ func jsonObjectEnd(value string, start int) int {
 	return -1
 }
 
+type readableFragmentCandidate struct {
+	fragment string
+	priority int
+}
+
 func readableHTMLFragment(value string) string {
-	if match := articleTagRE.FindStringSubmatch(value); len(match) == 2 {
-		return match[1]
+	candidates := make([]readableFragmentCandidate, 0, 8)
+	appendMatches := func(pattern *regexp.Regexp, priority int) {
+		for _, match := range pattern.FindAllStringSubmatch(value, -1) {
+			if len(match) == 2 && strings.TrimSpace(match[1]) != "" {
+				candidates = append(candidates, readableFragmentCandidate{fragment: match[1], priority: priority})
+			}
+		}
 	}
-	if match := articleBodyItempropRE.FindStringSubmatch(value); len(match) == 2 {
-		return match[1]
+	appendMatches(articleTagRE, 500)
+	appendMatches(articleBodyItempropRE, 450)
+	appendMatches(mainTagRE, 350)
+	appendMatches(contentContainerRE, 250)
+	appendMatches(bodyTagRE, 0)
+	candidates = append(candidates, readableFragmentCandidate{fragment: value, priority: -100})
+
+	best := value
+	bestScore := readableFragmentScore(value, -100)
+	for _, candidate := range candidates {
+		score := readableFragmentScore(candidate.fragment, candidate.priority)
+		if score > bestScore {
+			best = candidate.fragment
+			bestScore = score
+		}
 	}
-	if match := mainTagRE.FindStringSubmatch(value); len(match) == 2 {
-		return match[1]
+	return best
+}
+
+func readableFragmentScore(fragment string, priority int) int {
+	text := cleanReadableHTMLFragmentText(fragment)
+	cleaned, _ := sanitizeReadablePayloadText(text)
+	words := strings.Fields(cleaned)
+	if len(words) == 0 || isUnusableReadablePayload(cleaned) {
+		return -10000 + priority
 	}
-	if match := contentContainerRE.FindStringSubmatch(value); len(match) == 2 {
-		return match[1]
+	lineCount := 0
+	for _, line := range strings.Split(cleaned, "\n") {
+		if strings.TrimSpace(line) != "" {
+			lineCount++
+		}
 	}
-	if match := bodyTagRE.FindStringSubmatch(value); len(match) == 2 {
-		return match[1]
+	score := len(words)*10 + lineCount*3 + priority
+	if len(words) < 12 {
+		score -= 1000
 	}
-	return value
+	return score
 }
 
 func decodeHTMLEntities(value string) string {

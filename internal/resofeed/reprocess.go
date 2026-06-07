@@ -759,8 +759,8 @@ func fetchArticleReadableText(ctx context.Context, articleURL string) (text stri
 	}
 	text = textFromHTML(string(body))
 	text, _ = sanitizeReadablePayloadText(text)
-	if strings.TrimSpace(text) == "" {
-		return "", errors.New("reprocess fetch: empty article text")
+	if strings.TrimSpace(text) == "" || isUnusableReadablePayload(text) || isLowInformationReadablePayload(text) {
+		return "", errors.New("reprocess fetch: unusable article text")
 	}
 	return text, nil
 }

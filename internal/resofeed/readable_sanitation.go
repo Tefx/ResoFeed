@@ -27,6 +27,7 @@ var (
 		regexp.MustCompile(`(?i)^(transportation|news|tech|science|entertainment|gaming|reviews|features)(\s+(news|tech|science|entertainment|gaming|reviews|features)){1,}\b`),
 		regexp.MustCompile(`(?i)\b(leaked|cracked)\b.*\b(phone|item|fragment|copy|tail)\b`),
 		regexp.MustCompile(`(?i)^\s*share\s+this\s+page\s*$`),
+		regexp.MustCompile(`(?i)^\s*back\s+to\s+(all\s+)?posts\s*$`),
 		regexp.MustCompile(`(?i)^\s*enter\s+url\s+or\s+id\s+to\s+unroll\b`),
 		regexp.MustCompile(`(?i)^\s*how\s+to\s+get\s+url\s+link\s+on\s+x\b`),
 		regexp.MustCompile(`(?i)^\s*missing\s+some\s+tweet\s+in\s+this\s+thread\?\s*$`),
@@ -50,6 +51,28 @@ func isUnusableReadablePayload(value string) bool {
 		return false
 	}
 	normalized := strings.Join(words, " ")
+	if isShortChromeReadablePayload(normalized, len(words)) {
+		return true
+	}
+	navMarkers := 0
+	for _, marker := range []string{
+		"cookie settings",
+		"all rights reserved",
+		"privacy policy",
+		"privacy notice",
+		"terms of use",
+		"contact us",
+		"free trial",
+		"pricing",
+		"documentation",
+	} {
+		if strings.Contains(normalized, marker) {
+			navMarkers++
+		}
+	}
+	if navMarkers >= 4 {
+		return true
+	}
 	markers := 0
 	for _, marker := range []string{
 		"javascript is not available",
@@ -66,6 +89,43 @@ func isUnusableReadablePayload(value string) bool {
 		}
 	}
 	return markers >= 2 || strings.Contains(normalized, "javascript is not available") && strings.Contains(normalized, "continue using x")
+}
+
+func isLowInformationReadablePayload(value string) bool {
+	text := strings.TrimSpace(value)
+	if text == "" {
+		return true
+	}
+	words := strings.Fields(strings.ToLower(strings.ReplaceAll(text, "\u00a0", " ")))
+	if len(words) == 0 {
+		return true
+	}
+	normalized := strings.Join(words, " ")
+	if isShortChromeReadablePayload(normalized, len(words)) {
+		return true
+	}
+	if len(words) <= 18 {
+		for _, line := range strings.Split(text, "\n") {
+			lineWords := strings.Fields(strings.ToLower(strings.ReplaceAll(line, "\u00a0", " ")))
+			if isShortChromeReadablePayload(strings.Join(lineWords, " "), len(lineWords)) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func isShortChromeReadablePayload(normalized string, wordCount int) bool {
+	if wordCount > 8 {
+		return false
+	}
+	shortChrome := strings.Trim(normalized, " .!?…")
+	for _, marker := range []string{"back to all posts", "back to posts", "all posts", "loading", "loading font", "ok"} {
+		if shortChrome == marker {
+			return true
+		}
+	}
+	return false
 }
 
 func isReadableTextContentType(contentType string) bool {

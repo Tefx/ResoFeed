@@ -346,6 +346,35 @@ func TestPromptValidationSourceGroundingNormalizesPercentSpacing(t *testing.T) {
 	}
 }
 
+func TestPromptValidationSourceGroundingAcceptsReadablePercentVariants(t *testing.T) {
+	tests := []struct {
+		name       string
+		sourceText string
+		claim      string
+	}{
+		{name: "space-before-percent", sourceText: "The leaderboard shows 70 % ± 3 % for the model.", claim: "70%"},
+		{name: "percent-word", sourceText: "The launch claims up to 60 percent lower costs.", claim: "60%"},
+		{name: "to-range", sourceText: "The agent handles 30 to 40 percent of tickets.", claim: "40%"},
+		{name: "hyphen-range", sourceText: "The thread mentions 3-5% cashbacks.", claim: "3%"},
+		{name: "thousands-comma", sourceText: "The AI economy is growing at 2,000% a year.", claim: "2000%"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := validateSummaryOutputForPersistenceWithPrompt(validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
+				out.Summary = "The source-backed benchmark or business result mentions " + tt.claim + "."
+				out.CoreInsight = "The " + tt.claim + " figure is grounded in the source text."
+			}), promptingV21Item{
+				AvailableTextSource: "fresh_full_text",
+				AvailableText:       tt.sourceText,
+				TargetLanguage:      ProcessingLanguageEnglish,
+			})
+			if err != nil {
+				t.Fatalf("validate source-grounded percent variant returned error: %v", err)
+			}
+		})
+	}
+}
+
 func TestPromptValidationSourceGroundingRejectsInventedPercent(t *testing.T) {
 	_, err := validateSummaryOutputForPersistenceWithPrompt(validPromptingV21Output(func(out *OpenRouterSummaryOutput) {
 		out.Summary = "The model reported 99.0% on the benchmark."

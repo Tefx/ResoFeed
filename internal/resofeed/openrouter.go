@@ -519,16 +519,44 @@ func unsupportedNumericClaims(out OpenRouterSummaryOutput, lowerSource string) [
 			continue
 		}
 		seen[match] = struct{}{}
-		if !strings.Contains(lowerSource, match) {
+		if !sourceSupportsPercentClaim(lowerSource, match) {
 			unsupported = append(unsupported, match)
 		}
 	}
 	return unsupported
 }
 
+func sourceSupportsPercentClaim(source string, claim string) bool {
+	if strings.Contains(source, claim) {
+		return true
+	}
+	number := strings.TrimSuffix(claim, "%")
+	if number == "" {
+		return false
+	}
+	escaped := regexp.QuoteMeta(number)
+	patterns := []string{
+		`\b` + escaped + `\s*%`,
+		`\b` + escaped + `\s+percent\b`,
+		`\b` + escaped + `\s*(?:-|–|—|to)\s*\d+(?:\.\d+)?\s*(?:%|percent\b)`,
+		`\b\d+(?:\.\d+)?\s*(?:-|–|—|to)\s*` + escaped + `\s*(?:%|percent\b)`,
+	}
+	for _, pattern := range patterns {
+		if regexp.MustCompile(pattern).FindStringIndex(source) != nil {
+			return true
+		}
+	}
+	return false
+}
+
 func normalizeSourceGroundingText(value string) string {
 	value = strings.ToLower(value)
-	value = regexp.MustCompile(`\b(\d+)\.\s+(\d+)%`).ReplaceAllString(value, `$1.$2%`)
+	value = regexp.MustCompile(`\b\d{1,3}(?:,\d{3})+(?:\.\d+)?`).ReplaceAllStringFunc(value, func(match string) string {
+		return strings.ReplaceAll(match, ",", "")
+	})
+	value = regexp.MustCompile(`\b(\d+)\.\s+(\d+)\s*%`).ReplaceAllString(value, `$1.$2%`)
+	value = regexp.MustCompile(`\b(\d+(?:\.\d+)?)\s*%`).ReplaceAllString(value, `$1%`)
+	value = regexp.MustCompile(`\b(\d+(?:\.\d+)?)\s+percent\b`).ReplaceAllString(value, `$1%`)
 	return regexp.MustCompile(`\s+`).ReplaceAllString(value, " ")
 }
 

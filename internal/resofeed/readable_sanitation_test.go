@@ -3,6 +3,8 @@ package resofeed
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -50,6 +52,71 @@ func TestSanitizeReadablePayloadTextKeepsCleanArticleBody(t *testing.T) {
 	}
 	if cleaned != body {
 		t.Fatalf("cleaned body = %q, want original", cleaned)
+	}
+}
+
+func TestSanitizeReadablePayloadTextRejectsShortLoadingChrome(t *testing.T) {
+	for _, dirty := range []string{"Back to all posts", "Loading", "Loading font.", "OK"} {
+		cleaned, changed := sanitizeReadablePayloadText(dirty)
+		if !changed || strings.TrimSpace(cleaned) != "" {
+			t.Fatalf("sanitizeReadablePayloadText(%q) = changed:%v cleaned:%q, want rejected", dirty, changed, cleaned)
+		}
+	}
+}
+
+func TestExtractArticleTextChoosesDenseWebflowBodyOverShortPostContentWrapper(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = w.Write([]byte(`<!doctype html><html><body>
+			<div class="post-content-wrapper">
+				<div class="back-link-wrapper"><a href="/blog"><div class="mono">Back to all posts</div></a></div>
+				<h1>Introducing 1-bit and Ternary Bonsai Image 4B: Image Generation for Local Devices</h1>
+				<div class="rich-text w-richtext">
+					<p>Today we are releasing Bonsai Image 4B, a family of compact image-generation models designed to run high-quality diffusion inference on local hardware from laptops to phones.</p>
+					<p>The 1-bit variant uses binary transformer weights for maximum compression, while the ternary variant keeps more representational flexibility for visual quality and prompt fidelity.</p>
+					<p>The result is practical local image generation on devices that were previously out of reach for this class of model.</p>
+				</div>
+			</div>
+		</body></html>`))
+	}))
+	defer server.Close()
+
+	text, status := extractArticleText(context.Background(), server.URL, "RSS fallback excerpt")
+	if status != extractionStatusFull {
+		t.Fatalf("extraction status = %q, want %q; text=%q", status, extractionStatusFull, text)
+	}
+	if strings.Contains(text, "Back to all posts") {
+		t.Fatalf("extracted text kept navigation fragment: %q", text)
+	}
+	for _, want := range []string{"Bonsai Image 4B", "1-bit variant", "ternary variant", "local image generation"} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("extracted text missing %q: %q", want, text)
+		}
+	}
+}
+
+func TestExtractArticleTextRejectsTitleAndLoadingChrome(t *testing.T) {
+	tests := []struct {
+		name     string
+		html     string
+		fallback string
+		want     string
+	}{
+		{name: "title-loading", html: `<html><head><title>UX Case Study: How Hinge Keeps You Engaged</title></head><body><main>Loading</main></body></html>`, fallback: "RSS excerpt exists", want: extractionStatusPartial},
+		{name: "title-loading-font", html: `<html><head><title>Letterbox — Letters made of letters</title></head><body><main>Loading font.</main></body></html>`, fallback: "RSS excerpt exists", want: extractionStatusPartial},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				_, _ = w.Write([]byte(tt.html))
+			}))
+			defer server.Close()
+			text, status := extractArticleText(context.Background(), server.URL, tt.fallback)
+			if status != tt.want || strings.TrimSpace(text) != "" {
+				t.Fatalf("extractArticleText status=%q text=%q, want status=%q empty text", status, text, tt.want)
+			}
+		})
 	}
 }
 
