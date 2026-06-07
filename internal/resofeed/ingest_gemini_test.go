@@ -437,7 +437,7 @@ func (c *ingestFakeConn) ExecContext(_ context.Context, query string, args []dri
 		itemID, _ := args[0].Value.(string)
 		valueTier, _ := args[10].Value.(string)
 		extractionStatus, _ := args[18].Value.(string)
-		modelStatus, _ := args[19].Value.(string)
+		modelStatus, _ := args[21].Value.(string)
 		c.state.itemIDs[itemID] = true
 		c.state.items = append(c.state.items, ingestFakeItem{extractionStatus: extractionStatus, modelStatus: modelStatus, valueTier: valueTier})
 		return driver.RowsAffected(1), nil

@@ -512,6 +512,7 @@ func promptingV21ExactDocumentedUserPayloadFixture() map[string]any {
 				"fresh_full_text":       "Fulltext available; use normal density according to value tier.",
 				"stored_extracted_text": "Stored source text available; use normal density if sufficient.",
 				"rss_excerpt":           "Excerpt-only; avoid pretending fulltext was read and avoid unsupported extrapolation.",
+				"external_tavily":       "External source text recovered after local extraction failed; treat as source evidence after sanitation.",
 				"unavailable":           "Use fallback-style summary and do not invent details.",
 			},
 			"language_and_format_guidance": map[string]any{

@@ -32,7 +32,7 @@ go build -o ./bin/resofeed ./cmd/resofeed
 
 ### 2. Configure OpenRouter and optional Tavily keys safely
 
-ResoFeed resolves provider API keys at runtime. Prefer OS environment variables or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing OpenRouter key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. A missing Tavily key does not prevent the server from binding; it only disables optional external source-text recovery. Live HTTP model listing is the explicit request-time OpenRouter secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.
+ResoFeed resolves provider API keys at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing OpenRouter key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. A missing Tavily key does not prevent the server from binding; it only disables optional external source-text recovery. Live HTTP model listing is the explicit request-time OpenRouter secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.
 
 Safe options:
 

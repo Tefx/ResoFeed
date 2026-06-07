@@ -179,22 +179,25 @@ func TestReingestSkipsMetadataOnlyStoredExtractedTextAfterRSSFallback(t *testing
 	if err != nil {
 		t.Fatalf("ReingestItem returned error: %v", err)
 	}
-	if resp.Reingest.Status != ReprocessStatusCompleted || !resp.Reingest.ItemUpdated || !resp.Reingest.FTSUpdated {
-		t.Fatalf("reingest result = %+v, want completed update", resp.Reingest)
+	if resp.Reingest.Status != ReprocessStatusCompletedWithErrors || resp.Reingest.ItemUpdated || resp.Reingest.FTSUpdated || resp.Reingest.Item == nil {
+		t.Fatalf("reingest result = %+v, want non-destructive source-acquisition failure with preserved item detail", resp.Reingest)
+	}
+	if resp.Reingest.Error == nil || resp.Reingest.Error.Code != ReprocessErrorOriginalUnavailable {
+		t.Fatalf("reingest error = %+v, want original_unavailable", resp.Reingest.Error)
 	}
 	text := readStoredText(t, ctx, db, "item_metadata_rss_fallback")
 	if text.feedExcerpt == "" || !strings.Contains(text.feedExcerpt, "modern UX patterns") {
-		t.Fatalf("feed excerpt = %q, want RSS excerpt preserved as evidence", text.feedExcerpt)
+		t.Fatalf("feed excerpt = %q, want pre-existing RSS excerpt preserved non-destructively", text.feedExcerpt)
 	}
-	if text.extractedText != "" || strings.Contains(text.extractedText, "Story's Credibility") {
-		t.Fatalf("extracted_text = %q, want metadata-only stored text cleared", text.extractedText)
+	if !strings.Contains(text.extractedText, "Story's Credibility") {
+		t.Fatalf("extracted_text = %q, want pre-existing fields preserved on selected reingest source-acquisition failure", text.extractedText)
 	}
 	var extractionStatus, modelStatus string
 	if err := db.QueryRowContext(ctx, `select extraction_status, model_status from items where id = 'item_metadata_rss_fallback'`).Scan(&extractionStatus, &modelStatus); err != nil {
 		t.Fatalf("read statuses: %v", err)
 	}
-	if extractionStatus != extractionStatusPartial || modelStatus != modelStatusOK {
-		t.Fatalf("statuses = extraction:%q model:%q, want partial_extraction/ok", extractionStatus, modelStatus)
+	if extractionStatus != extractionStatusFull || modelStatus != modelStatusDecodeError {
+		t.Fatalf("statuses = extraction:%q model:%q, want preserved full/decode_error", extractionStatus, modelStatus)
 	}
 }
 

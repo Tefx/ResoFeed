@@ -251,7 +251,7 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 		result.ItemUpdated = !outcome.preserveExisting
 		result.FTSUpdated = outcome.writable()
 	}
-	if result.ItemUpdated {
+	if result.ItemUpdated || result.Status == ReprocessStatusCompletedWithErrors {
 		detail, err := ReadItemDetail(writeCtx, db, itemID)
 		if err != nil {
 			return ItemReingestResponse{}, err
