@@ -23,6 +23,7 @@ export const expectedRedItem: ItemSummary = {
   last_reprocess_at: null,
   published_at: '2026-05-09T00:00:00Z',
   extraction_status: 'partial_extraction',
+  extraction_source: 'feed_excerpt',
   model_status: 'summary_unavailable',
   is_resonated: false,
   human_inspected_at: null,

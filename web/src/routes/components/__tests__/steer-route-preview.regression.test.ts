@@ -11,6 +11,7 @@ const ownerToken = 'rfeed_expected_red_steer_preview_000000000000000000';
 const expectedRedDetail: ItemDetail = {
   ...expectedRedItem,
   feed_excerpt: 'RSS excerpt for Steer route preview fixture.',
+  source_evidence_text: null,
   extracted_text: 'Readable Inspector text for Steer route preview fixture.',
   provenance: {
     source_url: expectedRedSource.url,

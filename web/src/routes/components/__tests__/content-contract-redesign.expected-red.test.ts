@@ -48,6 +48,7 @@ const contentContractItem: ContentContractSummary = {
   published_at: '2026-05-24T11:00:00Z',
   first_seen_at: '2026-05-24T11:00:00Z',
   extraction_status: 'full',
+  extraction_source: 'local_readable',
   model_status: 'ok',
   is_resonated: false,
   human_inspected_at: null,
@@ -59,6 +60,7 @@ const contentContractItem: ContentContractSummary = {
 const contentContractDetail: ContentContractDetail = {
   ...contentContractItem,
   feed_excerpt: 'Original RSS excerpt with source title: Meta walks away from Manus deal after China order.',
+  source_evidence_text: 'Source article evidence remains literal while generated reading content is Chinese.',
   extracted_text: 'Source article evidence remains literal while generated reading content is Chinese.',
   provenance: {
     source_url: 'https://tldr.tech/ai/feed.xml',
@@ -107,6 +109,8 @@ describe('expected red: content contract redesign frontend runtime gaps', () => 
     expectTypeOf<ItemSummary>().toHaveProperty('key_points');
     expectTypeOf<ItemSummary>().toHaveProperty('content_status');
     expectTypeOf<ItemSummary>().toHaveProperty('last_reprocess_status');
+    expectTypeOf<ItemSummary>().toHaveProperty('extraction_source');
+    expectTypeOf<ItemDetail>().toHaveProperty('source_evidence_text');
     expectTypeOf<ItemDetail>().toHaveProperty('last_reprocess_error_code');
     expectTypeOf<ItemDetail>().toHaveProperty('last_reprocess_error_message');
     expectTypeOf<ItemDetail>().toHaveProperty('last_reprocess_at');

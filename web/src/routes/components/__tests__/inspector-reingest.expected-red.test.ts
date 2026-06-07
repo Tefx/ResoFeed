@@ -28,6 +28,7 @@ const failedItem: ItemSummary = {
   core_insight: null,
   display_excerpt: 'RSS excerpt remains source evidence while model output is unavailable.',
   extraction_status: 'full',
+  extraction_source: 'local_readable',
   model_status: 'model_latency_error',
   story_key: null,
   duplicate_of_item_id: null
@@ -36,6 +37,7 @@ const failedItem: ItemSummary = {
 const failedDetail: ItemDetail = {
   ...failedItem,
   feed_excerpt: 'RSS excerpt remains source evidence while model output is unavailable.',
+  source_evidence_text: null,
   extracted_text: 'Readable source article body exists, but model summary fields failed and should be retryable from Inspector only.',
   provenance: {
     source_url: expectedRedSource.url,

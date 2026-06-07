@@ -14,6 +14,7 @@ const ownerToken = 'rfeed_expected_red_language_reprocess_0000000000000000';
 const expectedRedDetail: ItemDetail = {
   ...expectedRedItem,
   feed_excerpt: 'English fixture excerpt that represents stored target-language content.',
+  source_evidence_text: null,
   extracted_text: 'English fixture article body that should be replaced only by explicit reprocess.',
   provenance: {
     source_url: expectedRedSource.url,

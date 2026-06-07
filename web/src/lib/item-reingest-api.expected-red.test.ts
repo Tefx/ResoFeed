@@ -44,6 +44,7 @@ const preservedContentAfterFailedReingest: ItemDetail = {
   published_at: '2026-05-24T11:00:00Z',
   first_seen_at: '2026-05-24T11:00:00Z',
   extraction_status: 'full',
+  extraction_source: 'local_readable',
   model_status: 'ok',
   is_resonated: false,
   human_inspected_at: null,
@@ -51,6 +52,7 @@ const preservedContentAfterFailedReingest: ItemDetail = {
   story_key: null,
   duplicate_of_item_id: null,
   feed_excerpt: 'Literal feed excerpt keeps provenance context.',
+  source_evidence_text: 'Source evidence remains literal.',
   extracted_text: 'Source evidence remains literal.',
   provenance: {
     source_url: 'https://tldr.tech/ai/feed.xml',
@@ -105,6 +107,7 @@ describe('expected-red item re-ingest API client contract', () => {
           published_at: null,
           first_seen_at: null,
           extraction_status: 'full',
+          extraction_source: 'local_readable',
           model_status: 'ok',
           is_resonated: false,
           human_inspected_at: null,
@@ -112,6 +115,7 @@ describe('expected-red item re-ingest API client contract', () => {
           story_key: null,
           duplicate_of_item_id: null,
           feed_excerpt: null,
+          source_evidence_text: null,
           extracted_text: null,
           provenance: {
             source_url: 'https://example.test/feed.xml',

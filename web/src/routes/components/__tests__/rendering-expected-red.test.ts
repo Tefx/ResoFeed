@@ -23,6 +23,7 @@ import type { ItemDetail } from '$lib/api-contract';
 const expectedRedDetail: ItemDetail = {
   ...expectedRedItem,
   feed_excerpt: 'Raw feed excerpt for detail route.',
+  source_evidence_text: null,
   extracted_text: 'Full extracted text shown only in Inspector.',
   provenance: {
     source_url: expectedRedSource.url,
@@ -225,6 +226,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       extraction_status: 'full',
       model_status: 'summary_unavailable',
       feed_excerpt: 'Readable fallback excerpt for the primary Inspector reading path.',
+      source_evidence_text: null,
       extracted_text: `<script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle"}</script>
         Skip to main content. Advertisement newsletter sign up.
         Readable article paragraph after the metadata blob.
@@ -270,6 +272,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       extraction_status: 'partial_extraction',
       model_status: 'summary_unavailable',
       feed_excerpt: 'This raw English RSS excerpt should remain provenance, not the main Chinese body.',
+      source_evidence_text: null,
       extracted_text: 'This raw English body should not appear as completed Chinese reading content.',
       provenance: {
         source_url: expectedRedSource.url,
@@ -304,6 +307,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       extraction_status: 'full',
       model_status: 'ok',
       feed_excerpt: 'An older English feed excerpt remains stored from before reprocess.',
+      source_evidence_text: null,
       extracted_text: 'An older English full article body remains stored from before reprocess and should not be shown in Chinese mode.',
       provenance: {
         source_url: expectedRedSource.url,
@@ -395,6 +399,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       core_insight: 'Readable core insight remains outside social boilerplate.',
       extraction_status: 'full',
       feed_excerpt: 'Readable fallback excerpt remains available.',
+      source_evidence_text: null,
       extracted_text: `summary-like lead repeated by the site summary-like lead repeated by the site
         Follow us on Twitter for more newsletters
         Readable article prose survives after social boilerplate and repeated lead filler.`,

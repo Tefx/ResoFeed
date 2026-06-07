@@ -39,6 +39,8 @@ export interface ErrorBody {
 }
 
 export type ExtractionStatus = 'full' | 'partial_extraction' | 'summary_unavailable' | 'original_unavailable';
+export const extractionSourceValues = ['local_readable', 'feed_excerpt', 'external_tavily', 'none'] as const;
+export type ExtractionSource = (typeof extractionSourceValues)[number];
 export const modelStatusValues = [
   'ok',
   'summary_unavailable',
@@ -82,6 +84,8 @@ export interface ItemSummary {
   published_at: Rfc3339UtcString | null;
   first_seen_at?: Rfc3339UtcString | null;
   extraction_status: ExtractionStatus;
+  /** Current source-evidence origin; provenance for source acquisition, not a history log. */
+  extraction_source: ExtractionSource;
   model_status: ModelStatus;
   is_resonated: boolean;
   human_inspected_at: Rfc3339UtcString | null;
@@ -120,6 +124,8 @@ export interface GroupedSourceItem {
 
 export interface ItemDetail extends ItemSummary {
   feed_excerpt: string | null;
+  /** Source-backed audit evidence only; never generated summary/core/key-points/feed display text. */
+  source_evidence_text: string | null;
   extracted_text: string | null;
   provenance: Provenance;
 }

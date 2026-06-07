@@ -28,6 +28,7 @@ const item: ItemSummary = {
   published_at: '2026-05-23T09:15:00Z',
   first_seen_at: '2026-05-23T09:15:00Z',
   extraction_status: 'partial_extraction',
+  extraction_source: 'feed_excerpt',
   model_status: 'ok',
   is_resonated: false,
   human_inspected_at: null,

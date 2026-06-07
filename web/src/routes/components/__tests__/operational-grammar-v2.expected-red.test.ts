@@ -27,7 +27,9 @@ const ogv2Detail: ItemDetail = {
   content_status: 'ok',
   model_status: 'ok',
   extraction_status: 'full',
+  extraction_source: 'local_readable',
   feed_excerpt: 'RSS excerpt evidence for the selected item.',
+  source_evidence_text: null,
   extracted_text: 'Full extracted source text used as verification evidence.',
   provenance: {
     source_url: expectedRedSource.url,

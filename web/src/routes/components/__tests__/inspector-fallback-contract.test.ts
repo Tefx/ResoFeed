@@ -8,6 +8,7 @@ import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtu
 const baseDetail: ItemDetail = {
   ...expectedRedItem,
   feed_excerpt: 'Raw RSS excerpt remains source evidence only.',
+  source_evidence_text: null,
   extracted_text: 'Full article text for normal source text rendering.',
   provenance: {
     source_url: expectedRedSource.url,

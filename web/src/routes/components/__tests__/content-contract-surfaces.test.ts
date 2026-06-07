@@ -32,6 +32,7 @@ const item: ItemSummary = {
   published_at: '2026-05-24T11:00:00Z',
   first_seen_at: '2026-05-24T11:00:00Z',
   extraction_status: 'full',
+  extraction_source: 'local_readable',
   model_status: 'ok',
   is_resonated: false,
   human_inspected_at: null,
@@ -43,6 +44,7 @@ const item: ItemSummary = {
 const detail: ItemDetail = {
   ...item,
   feed_excerpt: 'Literal RSS excerpt remains provenance evidence.',
+  source_evidence_text: 'Literal source evidence remains available behind disclosure.',
   extracted_text: 'Literal source evidence remains available behind disclosure.',
   provenance: {
     source_url: 'https://tldr.tech/ai/feed.xml',

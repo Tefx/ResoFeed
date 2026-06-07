@@ -44,6 +44,7 @@ function fragmentItem(index: number): ItemSummary {
     published_at: '2026-05-17T00:00:00Z',
     first_seen_at: '2026-05-17T00:00:00Z',
     extraction_status: 'partial_extraction',
+    extraction_source: 'feed_excerpt',
     model_status: 'ok',
     is_resonated: false,
     human_inspected_at: null,
@@ -58,6 +59,7 @@ const unrelatedFragmentItems = Array.from({ length: 50 }, (_, index) => fragment
 const selectedFragmentDetail: ItemDetail = {
   ...unrelatedFragmentItems[0],
   feed_excerpt: 'Selected TLDR synthetic RSS feed excerpt.',
+  source_evidence_text: null,
   extracted_text: 'Selected TLDR synthetic fragment entry reading body.',
   provenance: {
     source_url: tldrFeedUrl,
@@ -103,6 +105,7 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
       ...selectedGroupedItem,
       story_key: 'story_authoritative_grouping_fixture',
       feed_excerpt: 'Selected grouped item feed excerpt.',
+      source_evidence_text: null,
       extracted_text: 'Selected grouped item reading body.',
       provenance: {
         source_url: tldrFeedUrl,
@@ -174,6 +177,7 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
       story_key: null,
       duplicate_of_item_id: null,
       feed_excerpt: 'Exact URL selected excerpt.',
+      source_evidence_text: null,
       extracted_text: 'Exact URL selected body.',
       provenance: {
         source_url: 'https://example.com/feed.xml',
@@ -224,6 +228,7 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
       story_key: null,
       duplicate_of_item_id: null,
       feed_excerpt: 'Same article selected excerpt.',
+      source_evidence_text: null,
       extracted_text: 'Same article selected body.',
       provenance: {
         source_url: 'https://example.com/feed.xml',
@@ -270,6 +275,7 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
       story_key: 'story_key_backend_authority',
       duplicate_of_item_id: null,
       feed_excerpt: 'Story key selected excerpt.',
+      source_evidence_text: null,
       extracted_text: 'Story key selected body.',
       provenance: {
         source_url: tldrFeedUrl,
@@ -317,6 +323,7 @@ describe('expected-red Inspector synthetic RSS fragment grouping', () => {
       story_key: null,
       duplicate_of_item_id: parentCandidate.id,
       feed_excerpt: 'Duplicate selected excerpt.',
+      source_evidence_text: null,
       extracted_text: 'Duplicate selected body.',
       provenance: {
         source_url: tldrFeedUrl,

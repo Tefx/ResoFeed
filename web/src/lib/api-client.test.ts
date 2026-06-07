@@ -5,11 +5,14 @@ import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
 import {
   type CurrentOperationInfo,
   type CurrentOperationResponse,
+  extractionSourceValues,
   itemDisplayExcerpt,
   itemDisplayTimestamp,
   type ErrorBody,
   type FeedTodayResponse,
   type IngestRunResult,
+  type ItemDetail,
+  type ItemSummary,
   type SearchResponse,
   type SourcesResponse,
   type StateBundleV1,
@@ -60,6 +63,37 @@ function jsonResponse(
 }
 
 describe('ResoFeed API client and rendered sinks', () => {
+  it('pins Tavily extraction-source summary and nullable detail evidence contracts without leaking detail evidence into summaries', () => {
+    expect(extractionSourceValues).toEqual(['local_readable', 'feed_excerpt', 'external_tavily', 'none']);
+
+    const summary = {
+      ...expectedRedItem,
+      extraction_source: 'external_tavily'
+    } satisfies ItemSummary;
+    const detail = {
+      ...summary,
+      feed_excerpt: null,
+      source_evidence_text: null,
+      extracted_text: null,
+      provenance: {
+        source_url: expectedRedSource.url,
+        canonical_url: summary.url,
+        original_url: summary.url,
+        story_key: summary.story_key,
+        duplicate_of_item_id: summary.duplicate_of_item_id,
+        grouped_source_items: []
+      }
+    } satisfies ItemDetail;
+
+    expect(summary.extraction_source).toBe('external_tavily');
+    expect(Object.keys(summary)).not.toContain('source_evidence_text');
+    expect(detail.source_evidence_text).toBeNull();
+    expect({ ...detail, source_evidence_text: 'Retained source-backed evidence.' } satisfies ItemDetail).toMatchObject({
+      extraction_source: 'external_tavily',
+      source_evidence_text: 'Retained source-backed evidence.'
+    });
+  });
+
   it('sends the owner-token header and renders source/feed fixtures into visible DOM', async () => {
     const fetcher = vi.fn<typeof fetch>(async (input, init) => {
       expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });

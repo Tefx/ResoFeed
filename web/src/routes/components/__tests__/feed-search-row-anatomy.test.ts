@@ -31,6 +31,7 @@ function item(overrides: Partial<ItemSummary> = {}): ItemSummary {
     published_at: now,
     first_seen_at: now,
     extraction_status: 'full',
+    extraction_source: 'local_readable',
     model_status: 'ok',
     is_resonated: false,
     human_inspected_at: null,

@@ -12,6 +12,7 @@ const ownerToken = 'rfeed_srdct_expected_red_frontend_tests_000000000000000';
 const expectedDetail: ItemDetail = {
   ...expectedRedItem,
   feed_excerpt: 'RSS excerpt only source text for expected-red Inspector fixture.',
+  source_evidence_text: null,
   extracted_text: 'Readable Inspector body for expected-red split-scroll fixture.',
   provenance: {
     source_url: expectedRedSource.url,

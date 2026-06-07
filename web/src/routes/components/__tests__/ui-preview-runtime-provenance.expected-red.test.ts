@@ -46,6 +46,7 @@ function item(overrides: Partial<ItemSummary> = {}): ItemSummary {
     published_at: '2026-05-17T10:00:00Z',
     first_seen_at: '2026-05-17T10:01:00Z',
     extraction_status: 'partial_extraction',
+    extraction_source: 'feed_excerpt',
     model_status: 'ok',
     is_resonated: false,
     human_inspected_at: null,
@@ -60,6 +61,7 @@ function detail(summary: ItemSummary, overrides: Partial<ItemDetail> = {}): Item
   return {
     ...summary,
     feed_excerpt: 'Documented detail feed excerpt.',
+    source_evidence_text: null,
     extracted_text: 'Documented detail extracted text.',
     provenance: {
       source_url: source.url,
