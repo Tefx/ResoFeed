@@ -122,7 +122,7 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 		return DoctorSnapshot{}, err
 	}
 	lines = append(lines, searchFTSLine)
-	extractionLines, err := readItemStatusDiagnostics(ctx, db, "extraction", "extraction_status", []string{extractionStatusPartial, extractionStatusOriginalNA, extractionStatusSummaryNA})
+	extractionLines, err := readExtractionDiagnostics(ctx, db)
 	if err != nil {
 		return DoctorSnapshot{}, err
 	}
@@ -324,6 +324,35 @@ func readRSSDiagnostics(ctx context.Context, db *sql.DB) ([]string, sql.NullStri
 		lines = append([]string{fmt.Sprintf("rss: errors=%d", failures)}, lines...)
 	}
 	return lines, lastFetch, nil
+}
+
+func readExtractionDiagnostics(ctx context.Context, db *sql.DB) ([]string, error) {
+	rows, err := db.QueryContext(ctx, `
+select id, source_id, title, extraction_status
+from items
+where extraction_status in (?, ?)
+   or (extraction_status = ? and model_status != ?)
+order by first_seen_at desc, id asc
+limit 25`, extractionStatusOriginalNA, extractionStatusSummaryNA, extractionStatusPartial, modelStatusOK)
+	if err != nil {
+		return nil, fmt.Errorf("read extraction diagnostics: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	lines := []string{}
+	for rows.Next() {
+		var id, sourceID, title, status string
+		if err := rows.Scan(&id, &sourceID, &title, &status); err != nil {
+			return nil, fmt.Errorf("scan extraction diagnostics: %w", err)
+		}
+		lines = append(lines, fmt.Sprintf("extraction: item=%s source=%s status=%s title=%s", id, sourceID, status, sanitizeDoctorField(title)))
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate extraction diagnostics: %w", err)
+	}
+	if len(lines) == 0 {
+		return []string{"extraction: ok"}, nil
+	}
+	return append([]string{fmt.Sprintf("extraction: failures=%d", len(lines))}, lines...), nil
 }
 
 func readItemStatusDiagnostics(ctx context.Context, db *sql.DB, label string, column string, failingStatuses []string) ([]string, error) {

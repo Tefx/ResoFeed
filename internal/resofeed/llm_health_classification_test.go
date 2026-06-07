@@ -129,7 +129,9 @@ func TestDoctorClassifiesOnlyOriginalUnavailableFailuresAsSourceUnavailable(t *t
 	old := time.Now().UTC().Add(-(freshWindow + time.Hour)).Format(time.RFC3339)
 	_, err := db.ExecContext(ctx, `
 insert into items (id, source_id, source_url, url, title, feed_excerpt, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status)
-values ('source_unavailable_only', 'src_source_unavailable', 'https://source-unavailable.example/feed.xml', 'https://x.example/unavailable', 'Original unavailable', null, null, null, null, ?, ?, 'original_unavailable', 'summary_unavailable')`, old, old)
+values
+('source_unavailable_only', 'src_source_unavailable', 'https://source-unavailable.example/feed.xml', 'https://x.example/unavailable', 'Original unavailable', null, null, null, null, ?, ?, 'original_unavailable', 'summary_unavailable'),
+('partial_but_model_ok', 'src_source_unavailable', 'https://source-unavailable.example/feed.xml', 'https://example.com/partial-ok', 'Partial but model ok', 'rss excerpt', 'Live-backed summary.', 'Live-backed insight.', 'brief', ?, ?, 'partial_extraction', 'ok')`, old, old, old, old)
 	if err != nil {
 		t.Fatalf("insert source-unavailable item: %v", err)
 	}
@@ -151,6 +153,9 @@ values ('source_unavailable_only', 'src_source_unavailable', 'https://source-una
 	}
 	if strings.Contains(body, "health_classification=unresolved_product_regression") || strings.Contains(body, "health_classification=openrouter_client_timeout_or_error") {
 		t.Fatalf("doctor misclassified source-only failure:\n%s", body)
+	}
+	if strings.Contains(body, "extraction: item=partial_but_model_ok") {
+		t.Fatalf("doctor reported content-ok partial extraction as extraction failure:\n%s", body)
 	}
 }
 
