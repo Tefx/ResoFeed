@@ -48,22 +48,36 @@ function feedItems(count: number, offset = 0) {
     ...expectedRedItem,
     id: `item_feed_${offset + index + 1}`,
     title: `Feed row ${offset + index + 1}`,
+    summary: `Summary for feed row ${offset + index + 1}.`,
     published_at: `2026-05-17T10:${String((offset + index) % 60).padStart(2, '0')}:00Z`
   }));
 }
 
-function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown); readonly pagedFeed?: boolean } = {}) {
+type FeedFixtureItem = ReturnType<typeof feedItems>[number];
+
+function installFetch(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown); readonly pagedFeed?: boolean; readonly feedItemList?: FeedFixtureItem[]; readonly itemDetailDelays?: Record<string, Promise<void>> } = {}) {
   const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     const method = init?.method ?? 'GET';
 
     if (url.endsWith('/api/sources')) return jsonResponse({ sources: [expectedRedSource] });
     if (url.includes('/api/feed/today')) {
+      if (options.feedItemList) return jsonResponse({ items: options.feedItemList });
       if (!options.pagedFeed) return jsonResponse({ items: [expectedRedItem] });
       const parsed = new URL(url, 'http://resofeed.test');
       const offset = Number(parsed.searchParams.get('offset') ?? '0');
       const count = offset === 0 ? 50 : 10;
       return jsonResponse({ items: feedItems(count, offset) });
+    }
+    const itemMatch = url.match(/\/api\/items\/([^/?]+)$/u);
+    if (itemMatch && method === 'GET') {
+      const itemID = decodeURIComponent(itemMatch[1]);
+      const item = (options.feedItemList ?? [expectedRedItem]).find((candidate) => candidate.id === itemID) ?? expectedRedItem;
+      await options.itemDetailDelays?.[itemID];
+      return jsonResponse({ item: { ...item, feed_excerpt: item.summary, extracted_text: `Detail text for ${item.title}.`, provenance: { source_url: expectedRedSource.url, canonical_url: item.url, original_url: item.url, story_key: item.story_key, duplicate_of_item_id: item.duplicate_of_item_id, grouped_source_items: [] } } });
+    }
+    if (url.match(/\/api\/items\/[^/?]+\/inspect$/u) && method === 'POST') {
+      return jsonResponse({ item_id: 'inspected', human_inspected_at: '2026-05-17T11:01:00Z', already_applied: false });
     }
     if (url.endsWith('/api/runtime/language') && method === 'GET') return jsonResponse({ language: { code: 'en', label: 'English' } });
     if (url.endsWith('/api/runtime/operation') && method === 'GET') {
@@ -94,7 +108,7 @@ function installFetch(options: { readonly holdIngest?: Promise<void>; readonly i
   return fetcher;
 }
 
-async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown); readonly pagedFeed?: boolean } = {}) {
+async function renderAuthenticatedPage(options: { readonly holdIngest?: Promise<void>; readonly ingestConflict?: boolean; readonly operation?: unknown | (() => unknown); readonly pagedFeed?: boolean; readonly feedItemList?: FeedFixtureItem[]; readonly itemDetailDelays?: Record<string, Promise<void>> } = {}) {
   cleanup();
   window.localStorage.clear();
   window.history.replaceState({}, '', '/');
@@ -213,6 +227,25 @@ describe('current operation and low-frequency utility placement', () => {
 
     await user.click(menu.getByRole('button', { name: 'SOURCE LEDGER' }));
     expect(within(screen.getByTestId('source-ledger')).getByText(/\[REPROCESSING\.\.\.\].*op:\s*library_reprocess.*actor:human.*phase:\s*processing_items.*2\/5.*library reprocess processing item.*since\s*\d{2}:\d{2}:\d{2} local/i)).toBeVisible();
+  });
+
+  it('keeps article switching responsive during a running library reprocess while the next detail request is pending', async () => {
+    const items = feedItems(2);
+    let releaseSecondDetail!: () => void;
+    const secondDetailDelay = new Promise<void>((resolve) => { releaseSecondDetail = resolve; });
+    const { user } = await renderAuthenticatedPage({
+      operation: runningOperation(),
+      feedItemList: items,
+      itemDetailDelays: { [items[1].id]: secondDetailDelay }
+    });
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: items[0].title })).toBeVisible());
+    await user.click(screen.getByRole('button', { name: `Open Inspector for: ${items[1].title}` }));
+
+    expect(screen.getByRole('heading', { name: items[1].title })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: items[0].title })).not.toBeInTheDocument();
+    releaseSecondDetail();
+    await waitFor(() => expect(screen.getByRole('heading', { name: items[1].title })).toBeVisible());
   });
 
   it('refreshes current operation counts in-place while the RESOFEED menu remains open', async () => {

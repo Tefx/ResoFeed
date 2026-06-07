@@ -300,6 +300,7 @@
 
   function setSelectedItemPreview(item: ItemSummary | null): void {
     selectedItemPreview = item;
+    if (item === null || selectedItemDetail?.id !== item.id) selectedItemDetail = null;
   }
 
   function clearSelectedInspectorContext(): void {

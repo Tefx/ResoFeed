@@ -94,6 +94,17 @@ const itemFixture: ItemFixture = {
   duplicate_of_item_id: null
 };
 
+const secondItemFixture: ItemFixture = {
+  ...itemFixture,
+  id: 'item_fresh_followup_runtime_second',
+  url: 'https://articles.example.test/fresh-followup-runtime-second',
+  title: 'Fresh review second item remains selectable',
+  summary: 'Second item selection must remain responsive while library reprocess runs.',
+  core_insight: 'Reading navigation is independent from reprocess mutation progress.',
+  published_at: '2026-05-17T13:31:00Z',
+  first_seen_at: '2026-05-17T13:36:00Z'
+};
+
 const documentedLibraryReprocessOperation: CanonicalCurrentOperation = {
   running: true,
   kind: 'library_reprocess',
@@ -160,18 +171,28 @@ async function installApiFixture(
   options: {
     readonly currentOperation: RuntimeOperationResponse | (() => RuntimeOperationResponse);
     readonly ingestConflict?: boolean;
+    readonly items?: readonly ItemFixture[];
+    readonly holdItemDetail?: { readonly itemID: string; readonly promise: Promise<void> };
   }
 ): Promise<{ readonly operationRequestCount: () => number; readonly reprocessRequestCount: () => number }> {
   let operationRequests = 0;
   let reprocessRequests = 0;
+  const fixtureItems = options.items ?? [itemFixture];
   await page.addInitScript((token) => window.localStorage.setItem('resofeed.ownerToken', token), ownerToken);
   await page.route('**/api/**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
     if (url.pathname === '/api/sources') return fulfillJson(route, { sources: [sourceFixture] });
-    if (url.pathname === '/api/feed/today') return fulfillJson(route, { items: [itemFixture] });
-    if (url.pathname === `/api/items/${itemFixture.id}`) {
-      return fulfillJson(route, { item: { ...itemFixture, feed_excerpt: 'Fixture feed excerpt.', extracted_text: 'Fixture article text.', provenance: { source_url: sourceFixture.url, canonical_url: itemFixture.url, original_url: itemFixture.url, story_key: null, duplicate_of_item_id: null, grouped_source_items: [] } } });
+    if (url.pathname === '/api/feed/today') return fulfillJson(route, { items: fixtureItems });
+    const itemPathMatch = url.pathname.match(/^\/api\/items\/([^/]+)$/u);
+    if (itemPathMatch) {
+      const itemID = decodeURIComponent(itemPathMatch[1]);
+      const item = fixtureItems.find((candidate) => candidate.id === itemID) ?? itemFixture;
+      if (options.holdItemDetail?.itemID === itemID) await options.holdItemDetail.promise;
+      return fulfillJson(route, { item: { ...item, feed_excerpt: 'Fixture feed excerpt.', extracted_text: `Fixture article text for ${item.title}.`, provenance: { source_url: sourceFixture.url, canonical_url: item.url, original_url: item.url, story_key: null, duplicate_of_item_id: null, grouped_source_items: [] } } });
+    }
+    if (url.pathname.match(/^\/api\/items\/[^/]+\/inspect$/u) && request.method() === 'POST') {
+      return fulfillJson(route, { item_id: 'inspected', human_inspected_at: '2026-05-17T14:03:00Z', already_applied: false });
     }
     if (url.pathname === '/api/runtime/language') return fulfillJson(route, { language: { code: 'en', label: 'English' } });
     if (url.pathname === '/api/runtime/operation') {
@@ -300,6 +321,28 @@ test.describe('expected-red current-operation and fresh review browser proof', (
     await expect.soft(reprocessButton, 'CO-07: reload must not show a fresh reprocess start label while backend reports running').toHaveText('[REPROCESSING...]');
     await expect.soft(reprocessButton, 'CO-07: reload-restored reprocess action is aria-disabled while guard is running').toHaveAttribute('aria-disabled', 'true');
     expect.soft(fixture.reprocessRequestCount(), 'CO-07: restoring progress after reload must not POST a new reprocess request').toBe(0);
+  });
+
+  test('CO-08: article selection remains responsive while library reprocess is running and detail fetch is pending', async ({ page, ownerToken }, testInfo) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    let releaseSecondDetail!: () => void;
+    const secondDetail = new Promise<void>((resolve) => { releaseSecondDetail = resolve; });
+    await installApiFixture(page, ownerToken, {
+      currentOperation: { operation: documentedLibraryReprocessOperation },
+      items: [itemFixture, secondItemFixture],
+      holdItemDetail: { itemID: secondItemFixture.id, promise: secondDetail }
+    });
+    await page.goto('/');
+    await waitForShell(page);
+    await expect(page.getByRole('heading', { name: itemFixture.title })).toBeVisible();
+
+    await page.getByRole('button', { name: `Open Inspector for: ${secondItemFixture.title}` }).click();
+    await attachPageEvidence(page, testInfo, 'reprocess-running-second-item-selected-before-detail', 'main[aria-label="RESOFEED"]');
+    await expect.soft(page.getByRole('heading', { name: secondItemFixture.title }), 'CO-08: selected item preview replaces stale Inspector detail immediately').toBeVisible();
+    await expect.soft(page.getByRole('heading', { name: itemFixture.title }), 'CO-08: stale prior Inspector heading must not remain while next detail is pending').toHaveCount(0);
+
+    releaseSecondDetail();
+    await expect(page.getByRole('heading', { name: secondItemFixture.title })).toBeVisible();
   });
 
   test('CO-04/FR-06: visible current-operation surfaces poll bounded updates and clear when idle', async ({ page, ownerToken }) => {
