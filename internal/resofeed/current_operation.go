@@ -86,6 +86,15 @@ func (s *currentOperationSnapshot) clear() {
 	s.mu.Unlock()
 }
 
+func (s *currentOperationSnapshot) clearIfKind(kind string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.current.Kind == nil || *s.current.Kind != kind {
+		return
+	}
+	s.current = CurrentOperationInfo{}
+}
+
 func (s *currentOperationSnapshot) get() CurrentOperationInfo {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

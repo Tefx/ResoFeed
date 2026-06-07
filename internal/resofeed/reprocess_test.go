@@ -107,6 +107,56 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 }
 
+func TestReprocessCurrentOperationSurvivesBackgroundTickWhileClientGone(t *testing.T) {
+	resetIngestCoordinatorForTest(t)
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>background tick survival source body</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_reprocess_background_tick", server.URL+"/feed.xml", "Background Tick Reprocess Source")
+	seedReprocessItem(t, ctx, db, "item_background_tick", "src_reprocess_background_tick", server.URL+"/article", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	llm := newBlockingReprocessLLM()
+	done := make(chan error, 1)
+	go func() {
+		_, err := ReprocessLibrary(ctx, db, llm, ReprocessLibraryRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "background-tick-run"}})
+		done <- err
+	}()
+	llm.waitEntered(t)
+
+	before := currentOperationInfo()
+	if !before.Running || before.Kind == nil || *before.Kind != "library_reprocess" || before.Count == nil || before.Count.Total != 1 {
+		t.Fatalf("precondition current operation = %+v, want running library_reprocess 0/1", before)
+	}
+
+	if err := IngestOnce(ctx, db, IngestConfig{}); err != nil {
+		t.Fatalf("background ingest tick while reprocess active: %v", err)
+	}
+	afterTick := currentOperationInfo()
+	if !afterTick.Running || afterTick.Kind == nil || *afterTick.Kind != "library_reprocess" || afterTick.Count == nil || afterTick.Count.Total != 1 {
+		t.Fatalf("current operation after skipped background tick = %+v, want reprocess progress preserved for browser reopen", afterTick)
+	}
+
+	_, conflictErr := ReprocessLibrary(ctx, db, llm, ReprocessLibraryRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindHuman, ActorID: "owner", IdempotencyKey: "background-tick-second"}})
+	if conflictErr == nil {
+		t.Fatal("second reprocess acquired guard while first run active; want conflict")
+	}
+
+	llm.release()
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("first reprocess after background tick: %v", err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("first reprocess did not complete after release")
+	}
+}
+
 func TestHTTPReprocessLibrarySurvivesClientDisconnectAndKeepsGuard(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
@@ -687,9 +737,9 @@ func TestFetchArticleReadableTextRejectsSniffedBinaryPayload(t *testing.T) {
 }
 
 type blockingReprocessLLM struct {
-	entered chan struct{}
+	entered   chan struct{}
 	releaseCh chan struct{}
-	once sync.Once
+	once      sync.Once
 }
 
 func newBlockingReprocessLLM() *blockingReprocessLLM {

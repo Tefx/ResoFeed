@@ -189,10 +189,19 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 // pass skips already-busy sources, drains selected idle sources through a bounded
 // in-request goroutine batch, and never leaves delayed work after the tick returns.
 func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
+	if backgroundIngestBlockedByGlobalOperation() {
+		return nil
+	}
 	ingestGuardState.current.start("ingest", "background", "background")
-	defer ingestGuardState.current.clear()
+	defer ingestGuardState.current.clearIfKind("background_ingest")
 	_, err := ingestOnceBackgroundBounded(ctx, db, cfg)
 	return err
+}
+
+func backgroundIngestBlockedByGlobalOperation() bool {
+	ingestGuardState.mu.Lock()
+	defer ingestGuardState.mu.Unlock()
+	return ingestGuardState.activeGlobal.Operation != ""
 }
 
 // ManualIngest triggers one user-requested ingestion pass. It shares the same
