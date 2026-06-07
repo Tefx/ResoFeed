@@ -689,7 +689,7 @@
   }
 
   function normalizeDoctorDiagnostics(text: string): string {
-    return text.replace(/\b(provider_reachable|model_resolved|item_transform_failures)=/g, '$1:');
+    return text.replace(/\b(model_resolved|item_transform_failures)=/g, '$1:');
   }
 
   function handleOwnerTokenAccepted(token: string): void {
