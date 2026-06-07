@@ -82,6 +82,8 @@ type Item struct {
 	LastReprocessAt           *time.Time
 	PublishedAt               *time.Time
 	ExtractionStatus          string
+	ExtractionSource          string
+	SourceEvidenceText        *string
 	ModelStatus               string
 	IsResonated               bool
 	HumanInspectedAt          *time.Time
@@ -113,6 +115,7 @@ type ItemSummary struct {
 	PublishedAt               *time.Time `json:"published_at"`
 	FirstSeenAt               *time.Time `json:"first_seen_at,omitempty"`
 	ExtractionStatus          string     `json:"extraction_status"`
+	ExtractionSource          string     `json:"extraction_source"`
 	ModelStatus               string     `json:"model_status"`
 	ContentStatus             string     `json:"content_status"`
 	LastReprocessStatus       *string    `json:"last_reprocess_status"`
@@ -143,6 +146,7 @@ type ItemDetail struct {
 	ValueTier                 *string    `json:"value_tier"`
 	PublishedAt               *time.Time `json:"published_at"`
 	ExtractionStatus          string     `json:"extraction_status"`
+	ExtractionSource          string     `json:"extraction_source"`
 	ModelStatus               string     `json:"model_status"`
 	ContentStatus             string     `json:"content_status"`
 	LastReprocessStatus       *string    `json:"last_reprocess_status"`
@@ -156,6 +160,7 @@ type ItemDetail struct {
 	DuplicateOfItemID         *string    `json:"duplicate_of_item_id"`
 	FeedExcerpt               *string    `json:"feed_excerpt"`
 	ExtractedText             *string    `json:"extracted_text"`
+	SourceEvidenceText        *string    `json:"source_evidence_text"`
 	Provenance                Provenance `json:"provenance"`
 }
 

@@ -92,7 +92,7 @@ func buildSearchSQL(query SearchQuery, echo SearchQueryEcho) (string, []any) {
 	stmt := fmt.Sprintf(`
 select i.id, i.source_id, coalesce(s.title, ''), i.url, i.title, coalesce(i.source_item_title, i.title), i.localized_title,
        i.summary, i.core_insight, i.value_tier, i.published_at,
-       i.extraction_status, i.model_status, coalesce(i.content_status, i.model_status),
+       i.extraction_status, i.extraction_source, i.model_status, coalesce(i.content_status, i.model_status),
        i.key_points, i.last_reprocess_status, i.last_reprocess_error_code, i.last_reprocess_error_message, i.last_reprocess_at,
        coalesce(st.is_resonated, 0), st.human_inspected_at, st.external_surfaced_at,
        i.story_key, i.duplicate_of_item_id, i.first_seen_at, i.feed_excerpt
@@ -138,9 +138,9 @@ func ReadItemDetail(ctx context.Context, db *sql.DB, itemID string) (ItemDetail,
 	row := db.QueryRowContext(ctx, `
 select i.id, i.source_id, coalesce(s.title, ''), i.url, i.title, coalesce(i.source_item_title, i.title), i.localized_title,
        i.summary, i.core_insight, i.value_tier, i.published_at,
-       i.extraction_status, i.model_status, coalesce(i.content_status, i.model_status),
+       i.extraction_status, i.extraction_source, i.model_status, coalesce(i.content_status, i.model_status),
        coalesce(st.is_resonated, 0), st.human_inspected_at, st.external_surfaced_at,
-       i.story_key, i.duplicate_of_item_id, i.feed_excerpt, i.extracted_text,
+       i.story_key, i.duplicate_of_item_id, i.feed_excerpt, i.extracted_text, i.source_evidence_text,
        coalesce(i.source_url, s.url, ''), i.canonical_url, i.key_points,
        i.last_reprocess_status, i.last_reprocess_error_code, i.last_reprocess_error_message, i.last_reprocess_at
 from items i
@@ -148,8 +148,8 @@ left join sources s on s.id = i.source_id
 left join item_state st on st.item_id = i.id
 where i.id = ?`, itemID)
 	var detail ItemDetail
-	var summary, coreInsight, valueTier, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, feedExcerpt, extractedText, sourceURL, canonicalURL, keyPoints, lastStatus, lastCode, lastMessage, lastAt sql.NullString
-	if err := row.Scan(&detail.ID, &detail.SourceID, &detail.SourceTitle, &detail.URL, &detail.Title, &detail.SourceItemTitle, &detail.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &detail.ExtractionStatus, &detail.ModelStatus, &detail.ContentStatus, &detail.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &feedExcerpt, &extractedText, &sourceURL, &canonicalURL, &keyPoints, &lastStatus, &lastCode, &lastMessage, &lastAt); err != nil {
+	var summary, coreInsight, valueTier, publishedAt, inspectedAt, surfacedAt, storyKey, duplicateOf, feedExcerpt, extractedText, sourceEvidenceText, sourceURL, canonicalURL, keyPoints, lastStatus, lastCode, lastMessage, lastAt sql.NullString
+	if err := row.Scan(&detail.ID, &detail.SourceID, &detail.SourceTitle, &detail.URL, &detail.Title, &detail.SourceItemTitle, &detail.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &detail.ExtractionStatus, &detail.ExtractionSource, &detail.ModelStatus, &detail.ContentStatus, &detail.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &feedExcerpt, &extractedText, &sourceEvidenceText, &sourceURL, &canonicalURL, &keyPoints, &lastStatus, &lastCode, &lastMessage, &lastAt); err != nil {
 		if err == sql.ErrNoRows {
 			return ItemDetail{}, fmt.Errorf("read item detail: %q not found", itemID)
 		}
@@ -165,6 +165,7 @@ where i.id = ?`, itemID)
 	detail.DuplicateOfItemID = stringPtrFromNull(duplicateOf)
 	detail.FeedExcerpt = stringPtrFromNull(feedExcerpt)
 	detail.ExtractedText = stringPtrFromNull(extractedText)
+	detail.SourceEvidenceText = stringPtrFromNull(sourceEvidenceText)
 	detail.KeyPoints = keyPointsFromNull(keyPoints)
 	detail.LastReprocessStatus = stringPtrFromNull(lastStatus)
 	detail.LastReprocessErrorCode = stringPtrFromNull(lastCode)
@@ -238,7 +239,7 @@ left join sources s on s.id = i.source_id`)
 func scanItemSummary(rows *sql.Rows) (ItemSummary, error) {
 	var item ItemSummary
 	var summary, coreInsight, valueTier, publishedAt, keyPoints, lastStatus, lastCode, lastMessage, lastAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen, feedExcerpt sql.NullString
-	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &item.SourceItemTitle, &item.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &item.ContentStatus, &keyPoints, &lastStatus, &lastCode, &lastMessage, &lastAt, &item.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen, &feedExcerpt); err != nil {
+	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &item.SourceItemTitle, &item.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ExtractionSource, &item.ModelStatus, &item.ContentStatus, &keyPoints, &lastStatus, &lastCode, &lastMessage, &lastAt, &item.IsResonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen, &feedExcerpt); err != nil {
 		return ItemSummary{}, fmt.Errorf("scan item summary: %w", err)
 	}
 	item.Summary = stringPtrFromNull(summary)

@@ -248,7 +248,7 @@ func reingestItemUnlocked(ctx context.Context, db *sql.DB, llm LLMClient, itemID
 		if err := storeReprocessItem(writeCtx, db, itemID, outcome); err != nil {
 			return ItemReingestResponse{}, err
 		}
-		result.ItemUpdated = true
+		result.ItemUpdated = !outcome.preserveExisting
 		result.FTSUpdated = outcome.writable()
 	}
 	if result.ItemUpdated {
@@ -274,9 +274,9 @@ func reingestNonDestructiveWriteContext(ctx context.Context, outcome reprocessIt
 }
 
 func loadReprocessItem(ctx context.Context, db *sql.DB, itemID string) (reprocessItem, error) {
-	row := db.QueryRowContext(ctx, `select i.id, coalesce(s.title, ''), coalesce(i.source_item_title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text from items i left join sources s on s.id = i.source_id where i.id = ?`, itemID)
+	row := db.QueryRowContext(ctx, `select i.id, coalesce(s.title, ''), coalesce(i.source_item_title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text, i.extraction_source, i.source_evidence_text from items i left join sources s on s.id = i.source_id where i.id = ?`, itemID)
 	var item reprocessItem
-	if err := row.Scan(&item.id, &item.sourceTitle, &item.sourceItemTitle, &item.title, &item.url, &item.canonicalURL, &item.feedExcerpt, &item.extractedText); err != nil {
+	if err := row.Scan(&item.id, &item.sourceTitle, &item.sourceItemTitle, &item.title, &item.url, &item.canonicalURL, &item.feedExcerpt, &item.extractedText, &item.extractionSource, &item.sourceEvidenceText); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return reprocessItem{}, notFoundError("item", itemID)
 		}
@@ -286,7 +286,13 @@ func loadReprocessItem(ctx context.Context, db *sql.DB, itemID string) (reproces
 }
 
 func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, llm LLMClient, language ProcessingLanguage, req ItemReingestRequest, activeSteeringRules []string, sourceTimeoutAsOutcome bool) (reprocessItemOutcome, error) {
-	sourceURL, sourceText, availableTextSource, err := fetchReprocessSourceText(ctx, item)
+	var selection selectedSourceEvidence
+	var err error
+	if sourceTimeoutAsOutcome {
+		selection, err = selectSelectedReingestSourceEvidence(ctx, item)
+	} else {
+		selection, err = selectLibraryReprocessSourceEvidence(ctx, item)
+	}
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			if sourceTimeoutAsOutcome {
@@ -294,24 +300,23 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 			}
 			return reprocessItemOutcome{}, err
 		}
-		fallbackURL, fallbackText, fallbackTextSource, ok := reprocessStoredTextFallback(item)
-		if !ok {
-			var tavilyErr *tavilyExtractError
-			if errors.As(err, &tavilyErr) {
-				sourceURL = fallbackReprocessSourceURL(item)
-				switch tavilyErr.code {
-				case ReprocessErrorProviderError:
-					return failedReprocessOutcome(sourceURL, ReprocessErrorProviderError, string(ReprocessErrorProviderError), modelStatusProviderError), nil
-				case ReprocessErrorTimeout:
-					return failedReprocessOutcome(sourceURL, ReprocessErrorTimeout, string(ReprocessErrorTimeout), modelStatusTimeout), nil
-				default:
-					return unavailableReprocessOutcome(sourceURL, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
-				}
-			}
-			return unavailableReprocessOutcome(item.url, ReprocessErrorOriginalUnavailable, "original unavailable"), nil
-		}
-		sourceURL, sourceText, availableTextSource = fallbackURL, fallbackText, fallbackTextSource
+		return reprocessItemOutcome{}, err
 	}
+	if selection.failureCode != "" {
+		outcome := failedReprocessOutcome(selection.url, selection.failureCode, string(selection.failureCode), selection.failureStatus)
+		outcome.preserveExisting = sourceTimeoutAsOutcome
+		return outcome, nil
+	}
+	if selection.unavailableCode != "" || !selection.ok() {
+		code := selection.unavailableCode
+		if code == "" {
+			code = ReprocessErrorOriginalUnavailable
+		}
+		outcome := unavailableReprocessOutcome(selection.url, code, "original unavailable")
+		outcome.preserveExisting = sourceTimeoutAsOutcome
+		return outcome, nil
+	}
+	sourceURL, sourceText, availableTextSource := selection.url, selection.text, selection.availableTextSource
 	if llm == nil {
 		return unavailableReprocessOutcome(sourceURL, ReprocessErrorSummaryUnavailable, "summary unavailable"), nil
 	}
@@ -362,7 +367,7 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 	if isUnusableReprocessOutputTitle(title) {
 		title = reprocessInputTitle(item)
 	}
-	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: sourceEvidenceString(out.FeedExcerpt, item.feedExcerpt, availableTextSource == "rss_excerpt", sourceText), extractedText: sourceEvidenceString(out.ExtractedText, item.extractedText, availableTextSource == "fresh_full_text" || availableTextSource == "stored_extracted_text" || availableTextSource == "external_tavily", sourceText), valueTier: nullableString(out.ValueTier), extractStatus: reprocessExtractionStatusForSource(availableTextSource), modelStatus: modelStatusOK}
+	result := reprocessItemOutcome{title: title, localizedTitle: nullableString(generatedTitle(out)), keyPoints: out.KeyPoints, summary: nullableString(out.Summary), coreInsight: nullableString(out.CoreInsight), feedExcerpt: sourceEvidenceString(out.FeedExcerpt, item.feedExcerpt, availableTextSource == availableTextSourceRSSExcerpt, sourceText), extractedText: sourceEvidenceString(out.ExtractedText, item.extractedText, availableTextSource == availableTextSourceFreshFull || availableTextSource == availableTextSourceStoredExtracted || availableTextSource == availableTextSourceExternalTavily, sourceText), valueTier: nullableString(out.ValueTier), extractStatus: selection.extractionStatus, extractionSource: selection.extractionSource, sourceEvidenceText: selection.sourceEvidenceText, modelStatus: modelStatusOK}
 	itemForSanitize := Item{Title: result.title, Summary: result.summary, CoreInsight: result.coreInsight, FeedExcerpt: result.feedExcerpt, ExtractedText: result.extractedText, ValueTier: result.valueTier, ExtractionStatus: result.extractStatus, ModelStatus: result.modelStatus}
 	sanitizeReadableItem(&itemForSanitize)
 	result.title = itemForSanitize.Title
@@ -551,31 +556,36 @@ func reprocessContextFailureMessage(err error) string {
 }
 
 type reprocessItem struct {
-	id              string
-	sourceTitle     string
-	sourceItemTitle string
-	title           string
-	url             string
-	canonicalURL    sql.NullString
-	feedExcerpt     sql.NullString
-	extractedText   sql.NullString
+	id                 string
+	sourceTitle        string
+	sourceItemTitle    string
+	title              string
+	url                string
+	canonicalURL       sql.NullString
+	feedExcerpt        sql.NullString
+	extractedText      sql.NullString
+	extractionSource   sql.NullString
+	sourceEvidenceText sql.NullString
 }
 
 type reprocessItemOutcome struct {
-	title          string
-	summary        *string
-	coreInsight    *string
-	feedExcerpt    *string
-	extractedText  *string
-	localizedTitle *string
-	keyPoints      []string
-	valueTier      *string
-	extractStatus  string
-	modelStatus    string
-	unavailable    bool
-	failed         bool
-	errorCode      ReprocessErrorCode
-	errorMessage   string
+	title              string
+	summary            *string
+	coreInsight        *string
+	feedExcerpt        *string
+	extractedText      *string
+	localizedTitle     *string
+	keyPoints          []string
+	valueTier          *string
+	extractStatus      string
+	extractionSource   string
+	sourceEvidenceText *string
+	modelStatus        string
+	unavailable        bool
+	failed             bool
+	preserveExisting   bool
+	errorCode          ReprocessErrorCode
+	errorMessage       string
 }
 
 func (o reprocessItemOutcome) writable() bool {
@@ -587,7 +597,7 @@ func (o reprocessItemOutcome) storableFailure() bool {
 }
 
 func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error) {
-	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), coalesce(i.source_item_title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text from items i join sources s on s.id = i.source_id where s.is_active = 1 order by case when i.last_reprocess_at is null then 0 else 1 end, i.last_reprocess_at, i.id`)
+	rows, err := db.QueryContext(ctx, `select i.id, coalesce(s.title, ''), coalesce(i.source_item_title, ''), i.title, i.url, i.canonical_url, i.feed_excerpt, i.extracted_text, i.extraction_source, i.source_evidence_text from items i join sources s on s.id = i.source_id where s.is_active = 1 order by case when i.last_reprocess_at is null then 0 else 1 end, i.last_reprocess_at, i.id`)
 	if err != nil {
 		return nil, fmt.Errorf("reprocess library: query items: %w", err)
 	}
@@ -595,7 +605,7 @@ func loadReprocessItems(ctx context.Context, db *sql.DB) ([]reprocessItem, error
 	items := []reprocessItem{}
 	for rows.Next() {
 		var item reprocessItem
-		if err := rows.Scan(&item.id, &item.sourceTitle, &item.sourceItemTitle, &item.title, &item.url, &item.canonicalURL, &item.feedExcerpt, &item.extractedText); err != nil {
+		if err := rows.Scan(&item.id, &item.sourceTitle, &item.sourceItemTitle, &item.title, &item.url, &item.canonicalURL, &item.feedExcerpt, &item.extractedText, &item.extractionSource, &item.sourceEvidenceText); err != nil {
 			return nil, fmt.Errorf("reprocess library: scan item: %w", err)
 		}
 		items = append(items, item)
@@ -847,6 +857,10 @@ func fallbackReprocessTitle(rawURL string) string {
 }
 
 func storeReprocessItem(ctx context.Context, db *sql.DB, itemID string, outcome reprocessItemOutcome) error {
+	outcome.extractionSource = normalizeExtractionSource(outcome.extractionSource)
+	if outcome.extractionSource == extractionSourceFeedExcerpt || outcome.extractionSource == extractionSourceNone {
+		outcome.sourceEvidenceText = nil
+	}
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("reprocess item %q: begin transaction: %w", itemID, err)
@@ -863,7 +877,7 @@ func storeReprocessItem(ctx context.Context, db *sql.DB, itemID string, outcome 
 		if marshalErr != nil {
 			return fmt.Errorf("reprocess item %q: marshal key points: %w", itemID, marshalErr)
 		}
-		_, err = tx.ExecContext(ctx, `update items set title = ?, localized_title = ?, summary = ?, core_insight = ?, key_points = ?, feed_excerpt = ?, extracted_text = ?, value_tier = ?, extraction_status = ?, model_status = ?, content_status = ?, last_reprocess_status = 'ok', last_reprocess_error_code = null, last_reprocess_error_message = null, last_reprocess_at = ? where id = ?`, outcome.title, outcome.localizedTitle, outcome.summary, outcome.coreInsight, string(keyPointsJSON), outcome.feedExcerpt, outcome.extractedText, outcome.valueTier, outcome.extractStatus, outcome.modelStatus, outcome.modelStatus, time.Now().UTC().Format(time.RFC3339), itemID)
+		_, err = tx.ExecContext(ctx, `update items set title = ?, localized_title = ?, summary = ?, core_insight = ?, key_points = ?, feed_excerpt = ?, extracted_text = ?, value_tier = ?, extraction_status = ?, extraction_source = ?, source_evidence_text = ?, model_status = ?, content_status = ?, last_reprocess_status = 'ok', last_reprocess_error_code = null, last_reprocess_error_message = null, last_reprocess_at = ? where id = ?`, outcome.title, outcome.localizedTitle, outcome.summary, outcome.coreInsight, string(keyPointsJSON), outcome.feedExcerpt, outcome.extractedText, outcome.valueTier, outcome.extractStatus, outcome.extractionSource, outcome.sourceEvidenceText, outcome.modelStatus, outcome.modelStatus, time.Now().UTC().Format(time.RFC3339), itemID)
 		if err != nil {
 			return fmt.Errorf("reprocess item %q: update: %w", itemID, err)
 		}

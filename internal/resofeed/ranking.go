@@ -64,7 +64,7 @@ func ListTodayFeed(ctx context.Context, db *sql.DB, opts RankingOptions) ([]Item
 	rows, err := db.QueryContext(ctx, `
 select i.id, i.source_id, coalesce(s.title, ''), i.url, i.title, coalesce(i.source_item_title, i.title), i.localized_title,
        i.summary, i.core_insight, i.value_tier, i.published_at,
-       i.extraction_status, i.model_status, coalesce(i.content_status, i.model_status),
+       i.extraction_status, i.extraction_source, i.model_status, coalesce(i.content_status, i.model_status),
        i.key_points, i.last_reprocess_status, i.last_reprocess_error_code, i.last_reprocess_error_message, i.last_reprocess_at,
        coalesce(st.is_resonated, 0), st.human_inspected_at, st.external_surfaced_at,
        i.story_key, i.duplicate_of_item_id, i.first_seen_at, i.feed_excerpt
@@ -417,7 +417,7 @@ func scanRankedCandidate(rows *sql.Rows, now time.Time, ordinal int) (rankedCand
 	var item ItemSummary
 	var summary, coreInsight, valueTier, publishedAt, keyPoints, lastStatus, lastCode, lastMessage, lastAt, inspectedAt, surfacedAt, storyKey, duplicateOf, firstSeen, feedExcerpt sql.NullString
 	var resonated bool
-	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &item.SourceItemTitle, &item.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ModelStatus, &item.ContentStatus, &keyPoints, &lastStatus, &lastCode, &lastMessage, &lastAt, &resonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen, &feedExcerpt); err != nil {
+	if err := rows.Scan(&item.ID, &item.SourceID, &item.SourceTitle, &item.URL, &item.Title, &item.SourceItemTitle, &item.LocalizedTitle, &summary, &coreInsight, &valueTier, &publishedAt, &item.ExtractionStatus, &item.ExtractionSource, &item.ModelStatus, &item.ContentStatus, &keyPoints, &lastStatus, &lastCode, &lastMessage, &lastAt, &resonated, &inspectedAt, &surfacedAt, &storyKey, &duplicateOf, &firstSeen, &feedExcerpt); err != nil {
 		return rankedCandidate{}, fmt.Errorf("scan today feed row: %w", err)
 	}
 	item.Summary = stringPtrFromNull(summary)

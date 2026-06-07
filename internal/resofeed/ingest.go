@@ -1270,26 +1270,19 @@ func buildItemWithActiveSteeringAndSemaphore(ctx context.Context, source Source,
 		item.SourceItemTitle = item.Title
 	}
 	sanitizeReadableItem(&item)
-	extracted := ""
-	extractionStatus := extractionStatusOriginalNA
-	if generatedFallbackURL {
-		if strings.TrimSpace(entry.Description) != "" {
-			extractionStatus = extractionStatusPartial
-		}
-	} else {
-		extracted, extractionStatus = extractArticleText(ctx, entry.URL, entry.Description)
+	selection := selectNormalIngestSourceEvidence(ctx, entry.URL, entry.Description, generatedFallbackURL)
+	item.ExtractionStatus = selection.extractionStatus
+	item.ExtractionSource = selection.extractionSource
+	item.SourceEvidenceText = selection.sourceEvidenceText
+	if selection.extractionSource == extractionSourceLocalReadable {
+		item.ExtractedText = nullableString(selection.text)
 	}
-	item.ExtractedText = nullableString(extracted)
-	item.ExtractionStatus = extractionStatus
-	available := extracted
-	availableTextSource := "fresh_full_text"
-	if strings.TrimSpace(available) == "" {
-		available = stringValue(item.FeedExcerpt)
-		availableTextSource = "rss_excerpt"
-	}
-	available, _ = sanitizeReadablePayloadText(available)
-	if strings.TrimSpace(available) == "" {
+	available := selection.text
+	availableTextSource := selection.availableTextSource
+	if !selection.ok() {
 		item.ExtractionStatus = extractionStatusOriginalNA
+		item.ExtractionSource = extractionSourceNone
+		item.SourceEvidenceText = nil
 		item.ModelStatus = modelStatusSummaryNA
 		sanitizeReadableItem(&item)
 		return item, nil
@@ -1452,11 +1445,15 @@ func itemExists(ctx context.Context, db *sql.DB, itemID string) (bool, error) {
 
 func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) (bool, error) {
 	sanitizeReadableItem(&item)
+	item.ExtractionSource = normalizeExtractionSource(item.ExtractionSource)
+	if item.ExtractionSource == extractionSourceFeedExcerpt {
+		item.SourceEvidenceText = nil
+	}
 	keyPointsJSON, marshalErr := json.Marshal(item.KeyPoints)
 	if marshalErr != nil {
 		return false, fmt.Errorf("ingest item %q: marshal key points: %w", item.ID, marshalErr)
 	}
-	res, err := execSQLiteMutation(ctx, db, `insert into items (id, source_id, source_url, url, title, source_item_title, localized_title, summary, core_insight, key_points, value_tier, content_status, last_reprocess_status, last_reprocess_error_code, last_reprocess_error_message, last_reprocess_at, published_at, first_seen_at, extraction_status, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.SourceItemTitle, item.LocalizedTitle, item.Summary, item.CoreInsight, string(keyPointsJSON), item.ValueTier, item.ContentStatus, item.LastReprocessStatus, item.LastReprocessErrorCode, item.LastReprocessErrorMessage, formatTimePtr(item.LastReprocessAt), formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
+	res, err := execSQLiteMutation(ctx, db, `insert into items (id, source_id, source_url, url, title, source_item_title, localized_title, summary, core_insight, key_points, value_tier, content_status, last_reprocess_status, last_reprocess_error_code, last_reprocess_error_message, last_reprocess_at, published_at, first_seen_at, extraction_status, extraction_source, source_evidence_text, model_status, feed_excerpt, extracted_text, canonical_url, story_key, duplicate_of_item_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) on conflict(id) do nothing`, item.ID, item.SourceID, item.Provenance.SourceURL, item.URL, item.Title, item.SourceItemTitle, item.LocalizedTitle, item.Summary, item.CoreInsight, string(keyPointsJSON), item.ValueTier, item.ContentStatus, item.LastReprocessStatus, item.LastReprocessErrorCode, item.LastReprocessErrorMessage, formatTimePtr(item.LastReprocessAt), formatTimePtr(item.PublishedAt), time.Now().UTC().Format(time.RFC3339), item.ExtractionStatus, item.ExtractionSource, item.SourceEvidenceText, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.Provenance.CanonicalURL, item.StoryKey, item.DuplicateOfItemID)
 	if err != nil {
 		return false, fmt.Errorf("ingest item %q: %w", item.ID, err)
 	}
