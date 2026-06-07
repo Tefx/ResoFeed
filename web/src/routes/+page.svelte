@@ -513,9 +513,31 @@
     };
   }
 
+  function localLibraryReprocessOperation(startedAt: string): CurrentOperationInfo {
+    return {
+      running: true,
+      kind: 'library_reprocess',
+      actor_kind: 'human',
+      phase: 'starting',
+      count: null,
+      message: processingLanguage.code === 'zh' ? '正在提交重处理请求' : 'submitting reprocess request',
+      started_at: startedAt,
+      updated_at: startedAt
+    };
+  }
+
   async function refreshCurrentOperationIfAvailable(): Promise<void> {
     try {
       const response = await apiClient().currentOperation();
+      const backendIsIdle = !response.operation.running;
+      if (backendIsIdle && contextualOperation.kind === 'running') {
+        const phase = contextualOperation.operation.phase;
+        if (phase === 'starting' || phase === 'submitting_ingest') {
+          // The synthetic state was just created and the backend request is likely still in flight.
+          // Ignore this 'idle' response to prevent the status from flashing or disappearing before the backend starts working.
+          return;
+        }
+      }
       contextualOperation = response.operation.running ? { kind: 'running', operation: response.operation } : { kind: 'idle' };
     } catch (error) {
       if (error instanceof ResoFeedApiError && (error.status === 404 || error.status === 500)) return;
@@ -1098,8 +1120,10 @@
     if (reprocessState === 'running') return;
     reprocessState = 'running';
     reprocessStatus = '';
+    contextualOperation = { kind: 'running', operation: localLibraryReprocessOperation(new Date().toISOString()) };
     await tick();
-    await refreshCurrentOperationIfAvailable();
+    // We intentionally don't await refreshCurrentOperationIfAvailable() here immediately because
+    // it would overwrite our synthetic state with the backend's idle state before the request reaches the server.
     try {
       const response = await apiClient().reprocessLibrary();
       reprocessState = 'complete';
@@ -1253,6 +1277,8 @@
                 <span class="runtime-reprocess-status" role="status" aria-label={shellChrome.reprocessStatusAria} aria-live={reprocessStatus.toLowerCase().startsWith('err:') ? 'assertive' : 'polite'}>{reprocessStatus}</span>
               {/if}
             </div>
+            <hr class="surface-menu-divider" />
+            <p class="contract-muted version-chrome" aria-hidden="true" translate="no">ResoFeed v{import.meta.env.VITE_APP_VERSION} · {import.meta.env.VITE_GIT_COMMIT}</p>
           </div>
         </details>
       </nav>
@@ -1386,7 +1412,10 @@
         {/if}
         <div class="contract-region">
           <h2 id="doctor-heading" tabindex="-1">/doctor</h2>
-          <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">{steerFeedback.text}</pre>
+          <pre class="contract-diagnostics" role="log" aria-label="/doctor diagnostics">version: v{import.meta.env.VITE_APP_VERSION}
+commit: {import.meta.env.VITE_GIT_COMMIT}
+
+{steerFeedback.text}</pre>
         </div>
       </section>
     {/if}
