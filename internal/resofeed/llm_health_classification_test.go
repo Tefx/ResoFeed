@@ -33,7 +33,7 @@ func assertEmptyConfiguredOpenRouterDoctor(t *testing.T, body string) {
 	t.Helper()
 	assertDoctorHasNoSameLineDuplicateKeys(t, body)
 	for _, want := range []string{
-		"openrouter: provider_reachable=unknown configured_model=openai/gpt-4.1-mini",
+		"openrouter: configured_model=openai/gpt-4.1-mini",
 		"openrouter: model_resolved=false resolved_model=unknown",
 		"openrouter: item_transform_failures=0",
 		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=0",
@@ -179,7 +179,7 @@ values ('current_model_success_only', 'src_llm_healthy', 'https://llm-healthy.ex
 	body := out.String()
 	assertDoctorHasNoSameLineDuplicateKeys(t, body)
 	for _, want := range []string{
-		"openrouter: provider_reachable=true configured_model=openrouter/configured",
+		"openrouter: configured_model=openrouter/configured",
 		"openrouter: model_resolved=true resolved_model=openrouter/resolved",
 		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=0",
 		"openrouter: live_summary_successes=1 fallback_only_current_summaries=0",

@@ -187,7 +187,7 @@ func TestExpectedRedBackendDoctorSeparatesOpenRouterModelAndItemTransformHealth(
 	}
 	text := out.String()
 	for _, want := range []string{
-		"openrouter: provider_reachable=unknown configured_model=account_default",
+		"openrouter: configured_model=account_default",
 		"openrouter: model_resolved=false resolved_model=unknown",
 		"openrouter: item_transform_failures=1",
 		"fallback_provenance: item=item_model_failed summary=excerpt model_status=model_latency_error extraction_status=partial_extraction",

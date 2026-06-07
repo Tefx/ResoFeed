@@ -96,7 +96,7 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	if modelFailureCount == 0 && strings.TrimSpace(cfg.ResolvedOpenRouterModel) != "" {
 		lines = append(lines, "openrouter: ok item_transform_failures=0")
 	}
-	lines = append(lines, openRouterProviderDoctorLine(cfg))
+	lines = append(lines, openRouterConfiguredModelDoctorLine(cfg))
 	lines = append(lines, openRouterModelDoctorLine(cfg))
 	tavilyRecoveredCount, err := countTavilyRecoveredItems(ctx, db)
 	if err != nil {
@@ -234,16 +234,12 @@ func hasFailureDiagnostics(lines []string) bool {
 	return !strings.HasSuffix(lines[0], ": ok")
 }
 
-func openRouterProviderDoctorLine(cfg DoctorConfig) string {
+func openRouterConfiguredModelDoctorLine(cfg DoctorConfig) string {
 	configured := strings.TrimSpace(cfg.ConfiguredOpenRouterModel)
 	if configured == "" {
 		configured = "account_default"
 	}
-	providerReachable := "unknown"
-	if strings.TrimSpace(cfg.ResolvedOpenRouterModel) != "" {
-		providerReachable = "true"
-	}
-	return "openrouter: provider_reachable=" + providerReachable + " configured_model=" + configured
+	return "openrouter: configured_model=" + configured
 }
 
 func openRouterModelDoctorLine(cfg DoctorConfig) string {
