@@ -621,16 +621,39 @@ func processReprocessItem(ctx context.Context, item reprocessItem, llm LLMClient
 }
 
 func reprocessStoredTextFallback(item reprocessItem) (string, string, string, bool) {
+	extractionSource := extractionSourceNone
+	if item.extractionSource.Valid {
+		extractionSource = normalizeExtractionSource(item.extractionSource.String)
+	}
+
+	// Rows produced after the source-evidence migration identify their evidence
+	// origin explicitly. If local/Tavily source-backed evidence is missing, the
+	// generated display fields are ambiguous and must not be promoted back into
+	// source evidence or content input. Legacy rows with extraction_source='none'
+	// keep the older best-effort fallback behavior so existing libraries can
+	// still be reprocessed.
+	switch extractionSource {
+	case extractionSourceLocalReadable, extractionSourceExternalTavily:
+		return "", "", "", false
+	case extractionSourceFeedExcerpt:
+		if item.feedExcerpt.Valid {
+			if text := strings.TrimSpace(item.feedExcerpt.String); text != "" {
+				return fallbackReprocessSourceURL(item), text, availableTextSourceRSSExcerpt, true
+			}
+		}
+		return "", "", "", false
+	}
+
 	if item.extractedText.Valid {
 		if text := strings.TrimSpace(item.extractedText.String); text != "" {
 			if !isUnusableReadablePayload(text) && !isLowInformationReadablePayload(text) {
-				return fallbackReprocessSourceURL(item), text, "stored_extracted_text", true
+				return fallbackReprocessSourceURL(item), text, availableTextSourceStoredExtracted, true
 			}
 		}
 	}
 	if item.feedExcerpt.Valid {
 		if text := strings.TrimSpace(item.feedExcerpt.String); text != "" {
-			return fallbackReprocessSourceURL(item), text, "rss_excerpt", true
+			return fallbackReprocessSourceURL(item), text, availableTextSourceRSSExcerpt, true
 		}
 	}
 	return "", "", "", false
@@ -867,10 +890,20 @@ func storeReprocessItem(ctx context.Context, db *sql.DB, itemID string, outcome 
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	if outcome.failed || outcome.unavailable {
+	destructiveUnavailable := outcome.unavailable && !outcome.preserveExisting && outcome.errorCode == ReprocessErrorOriginalUnavailable
+	if outcome.failed || (outcome.unavailable && !destructiveUnavailable) {
 		_, err = tx.ExecContext(ctx, `update items set last_reprocess_status = 'failed', last_reprocess_error_code = ?, last_reprocess_error_message = ?, last_reprocess_at = ? where id = ?`, outcome.errorCode, outcome.errorMessage, time.Now().UTC().Format(time.RFC3339), itemID)
 		if err != nil {
 			return fmt.Errorf("reprocess item %q: update failed status: %w", itemID, err)
+		}
+	} else if destructiveUnavailable {
+		keyPointsJSON, marshalErr := json.Marshal([]string{})
+		if marshalErr != nil {
+			return fmt.Errorf("reprocess item %q: marshal unavailable key points: %w", itemID, marshalErr)
+		}
+		_, err = tx.ExecContext(ctx, `update items set title = ?, localized_title = null, summary = null, core_insight = null, key_points = ?, feed_excerpt = null, extracted_text = null, value_tier = null, extraction_status = ?, extraction_source = ?, source_evidence_text = null, model_status = ?, content_status = ?, last_reprocess_status = 'failed', last_reprocess_error_code = ?, last_reprocess_error_message = ?, last_reprocess_at = ? where id = ?`, outcome.title, string(keyPointsJSON), outcome.extractStatus, outcome.extractionSource, outcome.modelStatus, outcome.modelStatus, outcome.errorCode, outcome.errorMessage, time.Now().UTC().Format(time.RFC3339), itemID)
+		if err != nil {
+			return fmt.Errorf("reprocess item %q: update unavailable state: %w", itemID, err)
 		}
 	} else {
 		keyPointsJSON, marshalErr := json.Marshal(outcome.keyPoints)
@@ -883,7 +916,7 @@ func storeReprocessItem(ctx context.Context, db *sql.DB, itemID string, outcome 
 		}
 	}
 
-	if !outcome.failed && !outcome.unavailable {
+	if !outcome.failed && (!outcome.unavailable || destructiveUnavailable) {
 		if err := refreshSearchIndexForItemTx(ctx, tx, itemID); err != nil {
 			return fmt.Errorf("reprocess item %q: refresh FTS: %w", itemID, err)
 		}

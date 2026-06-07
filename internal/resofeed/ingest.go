@@ -239,7 +239,7 @@ func ManualFetchSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source
 	}
 	updateCurrentOperation("fetching_source", &CurrentOperationCount{Current: 0, Total: 1}, "manual source fetch running")
 	result := ManualFetchResult{Operation: ManualFetchOperationSourceFetch, SourceID: &source.ID, Completed: true, SourcesTotal: 1, Errors: []ManualFetchSourceError{}}
-	sourceResult, err := ingestSource(ctx, db, cfg, source)
+	sourceResult, err := ingestSourceWithOptions(ctx, db, cfg, source, ingestSourceOptions{attemptExistingItems: true})
 	if err != nil {
 		if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, err.Error(), ""); updateErr != nil {
 			return ManualFetchResult{}, updateErr
@@ -917,12 +917,20 @@ type ingestSourceResult struct {
 	itemFailures    []ingestItemFailure
 }
 
+type ingestSourceOptions struct {
+	attemptExistingItems bool
+}
+
 type ingestItemFailure struct {
 	itemID  string
 	message string
 }
 
 func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source) (ingestSourceResult, error) {
+	return ingestSourceWithOptions(ctx, db, cfg, source, ingestSourceOptions{})
+}
+
+func ingestSourceWithOptions(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, opts ingestSourceOptions) (ingestSourceResult, error) {
 	updateCurrentOperation("fetching_feed", nil, "fetching RSS source")
 	language, err := readProcessingLanguage(ctx, db)
 	if err != nil {
@@ -952,14 +960,15 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 	if err != nil {
 		return result, err
 	}
-	return processSourceItems(ctx, db, cfg, effectiveSource, itemsToProcess, len(feed.Items), language, activeSteeringRules, result)
+	return processSourceItems(ctx, db, cfg, effectiveSource, itemsToProcess, len(feed.Items), language, activeSteeringRules, opts, result)
 }
 
 type ingestItemTask struct {
-	entry feedEntry
+	entry    feedEntry
+	existing bool
 }
 
-func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, entries []feedEntry, totalItems int, language ProcessingLanguage, activeSteeringRules []string, result ingestSourceResult) (ingestSourceResult, error) {
+func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, entries []feedEntry, totalItems int, language ProcessingLanguage, activeSteeringRules []string, opts ingestSourceOptions, result ingestSourceResult) (ingestSourceResult, error) {
 	cfg = cfg.withLLMSemaphore(cfg.coordinatorConfig())
 	processed := 0
 	pending := make([]ingestItemTask, 0, len(entries))
@@ -970,12 +979,12 @@ func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, sourc
 		if err != nil {
 			return result, err
 		}
-		if exists {
+		if exists && !opts.attemptExistingItems {
 			processed++
 			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: processed, Total: totalItems}, "processed feed item")
 			continue
 		}
-		pending = append(pending, ingestItemTask{entry: entry})
+		pending = append(pending, ingestItemTask{entry: entry, existing: exists})
 	}
 	if len(pending) == 0 {
 		return result, nil
@@ -1031,13 +1040,18 @@ func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, sourc
 					recordDone(false)
 					continue
 				}
-				inserted, err := upsertIngestedItem(ctx, db, item)
+				stored := false
+				if task.existing {
+					stored, err = updateExistingIngestedItemAttempt(ctx, db, item)
+				} else {
+					stored, err = upsertIngestedItem(ctx, db, item)
+				}
 				if err != nil {
 					recordItemFailure(task, err)
 					recordDone(false)
 					continue
 				}
-				recordDone(inserted)
+				recordDone(stored)
 			}
 		}()
 	}
@@ -1280,10 +1294,18 @@ func buildItemWithActiveSteeringAndSemaphore(ctx context.Context, source Source,
 	available := selection.text
 	availableTextSource := selection.availableTextSource
 	if !selection.ok() {
-		item.ExtractionStatus = extractionStatusOriginalNA
+		item.ExtractionStatus = selection.extractionStatus
+		if strings.TrimSpace(item.ExtractionStatus) == "" {
+			item.ExtractionStatus = extractionStatusOriginalNA
+		}
 		item.ExtractionSource = extractionSourceNone
 		item.SourceEvidenceText = nil
 		item.ModelStatus = modelStatusSummaryNA
+		if strings.TrimSpace(selection.failureStatus) != "" {
+			item.ModelStatus = mapModelStatus(selection.failureStatus)
+		}
+		item.ContentStatus = item.ModelStatus
+		setNormalAttemptFailureDiagnostics(&item, normalAttemptSelectionErrorCode(selection), "")
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
@@ -1300,15 +1322,24 @@ func buildItemWithActiveSteeringAndSemaphore(ctx context.Context, source Source,
 	releaseLLM()
 	if err != nil {
 		item.ModelStatus = classifyModelFailureStatus(err, out.ModelStatus)
+		item.ContentStatus = item.ModelStatus
+		code := reprocessErrorCodeForModelStatus(item.ModelStatus)
+		message := string(code)
+		if code == ReprocessErrorDecodeError {
+			message = safePromptValidationDiagnostic(err)
+		}
+		setNormalAttemptFailureDiagnostics(&item, code, message)
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
 	compiled, compileErr := compilePromptingV21SummaryPrompt(OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableTextSource: availableTextSource, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
 	if compileErr != nil {
 		item.ModelStatus = modelStatusDecodeError
+		item.ContentStatus = modelStatusDecodeError
 		if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
 			item.ExtractionStatus = extractionStatusSummaryNA
 		}
+		setNormalAttemptFailureDiagnostics(&item, ReprocessErrorDecodeError, safePromptValidationDiagnostic(compileErr))
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
@@ -1319,6 +1350,7 @@ func buildItemWithActiveSteeringAndSemaphore(ctx context.Context, source Source,
 		if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
 			item.ExtractionStatus = extractionStatusSummaryNA
 		}
+		setNormalAttemptFailureDiagnostics(&item, ReprocessErrorDecodeError, safePromptValidationDiagnostic(err))
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
@@ -1344,9 +1376,35 @@ func buildItemWithActiveSteeringAndSemaphore(ctx context.Context, source Source,
 		item.ValueTier = nullableString(out.ValueTier)
 	} else if item.ExtractionStatus == extractionStatusFull || item.ExtractionStatus == extractionStatusPartial {
 		item.ExtractionStatus = extractionStatusSummaryNA
+		setNormalAttemptFailureDiagnostics(&item, reprocessErrorCodeForModelStatus(item.ModelStatus), "")
 	}
 	sanitizeReadableItem(&item)
 	return item, nil
+}
+
+func normalAttemptSelectionErrorCode(selection selectedSourceEvidence) ReprocessErrorCode {
+	if selection.failureCode != "" {
+		return selection.failureCode
+	}
+	if selection.unavailableCode != "" {
+		return selection.unavailableCode
+	}
+	return ReprocessErrorOriginalUnavailable
+}
+
+func setNormalAttemptFailureDiagnostics(item *Item, code ReprocessErrorCode, message string) {
+	if item == nil || code == "" {
+		return
+	}
+	message = strings.TrimSpace(message)
+	if message == "" {
+		message = string(code)
+	}
+	now := time.Now().UTC()
+	item.LastReprocessStatus = stringPtr("failed")
+	item.LastReprocessErrorCode = stringPtr(string(code))
+	item.LastReprocessErrorMessage = stringPtr(message)
+	item.LastReprocessAt = timePtr(now)
 }
 
 func ingestedItemID(source Source, entry feedEntry) string {
@@ -1446,7 +1504,7 @@ func itemExists(ctx context.Context, db *sql.DB, itemID string) (bool, error) {
 func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) (bool, error) {
 	sanitizeReadableItem(&item)
 	item.ExtractionSource = normalizeExtractionSource(item.ExtractionSource)
-	if item.ExtractionSource == extractionSourceFeedExcerpt {
+	if item.ExtractionSource == extractionSourceFeedExcerpt || item.ExtractionSource == extractionSourceNone {
 		item.SourceEvidenceText = nil
 	}
 	keyPointsJSON, marshalErr := json.Marshal(item.KeyPoints)
@@ -1466,6 +1524,53 @@ func upsertIngestedItem(ctx context.Context, db *sql.DB, item Item) (bool, error
 	}
 	if err := upsertSearchIndex(ctx, db, item); err != nil {
 		return false, err
+	}
+	return true, nil
+}
+
+func updateExistingIngestedItemAttempt(ctx context.Context, db *sql.DB, item Item) (bool, error) {
+	sanitizeReadableItem(&item)
+	item.ExtractionSource = normalizeExtractionSource(item.ExtractionSource)
+	if item.ExtractionSource == extractionSourceFeedExcerpt || item.ExtractionSource == extractionSourceNone {
+		item.SourceEvidenceText = nil
+	}
+	if item.ModelStatus != modelStatusOK || item.ContentStatus != modelStatusOK {
+		if item.LastReprocessErrorCode == nil || strings.TrimSpace(*item.LastReprocessErrorCode) == "" {
+			return false, nil
+		}
+		status := "failed"
+		message := stringValue(item.LastReprocessErrorMessage)
+		if strings.TrimSpace(message) == "" {
+			message = stringValue(item.LastReprocessErrorCode)
+		}
+		attemptAt := time.Now().UTC().Format(time.RFC3339)
+		if item.LastReprocessAt != nil {
+			attemptAt = item.LastReprocessAt.UTC().Format(time.RFC3339)
+		}
+		_, err := execSQLiteMutation(ctx, db, `update items set last_reprocess_status = ?, last_reprocess_error_code = ?, last_reprocess_error_message = ?, last_reprocess_at = ? where id = ?`, status, stringValue(item.LastReprocessErrorCode), message, attemptAt, item.ID)
+		if err != nil {
+			return false, fmt.Errorf("ingest item %q: update latest-attempt diagnostics: %w", item.ID, err)
+		}
+		return false, nil
+	}
+	keyPointsJSON, marshalErr := json.Marshal(item.KeyPoints)
+	if marshalErr != nil {
+		return false, fmt.Errorf("ingest item %q: marshal key points for update: %w", item.ID, marshalErr)
+	}
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return false, fmt.Errorf("ingest item %q: begin update: %w", item.ID, err)
+	}
+	defer func() { _ = tx.Rollback() }()
+	_, err = tx.ExecContext(ctx, `update items set title = ?, source_item_title = ?, localized_title = ?, summary = ?, core_insight = ?, key_points = ?, value_tier = ?, content_status = ?, last_reprocess_status = null, last_reprocess_error_code = null, last_reprocess_error_message = null, last_reprocess_at = ?, published_at = coalesce(?, published_at), extraction_status = ?, extraction_source = ?, source_evidence_text = ?, model_status = ?, feed_excerpt = ?, extracted_text = ? where id = ?`, item.Title, item.SourceItemTitle, item.LocalizedTitle, item.Summary, item.CoreInsight, string(keyPointsJSON), item.ValueTier, item.ContentStatus, time.Now().UTC().Format(time.RFC3339), formatTimePtr(item.PublishedAt), item.ExtractionStatus, item.ExtractionSource, item.SourceEvidenceText, item.ModelStatus, item.FeedExcerpt, item.ExtractedText, item.ID)
+	if err != nil {
+		return false, fmt.Errorf("ingest item %q: update: %w", item.ID, err)
+	}
+	if err := refreshSearchIndexForItemTx(ctx, tx, item.ID); err != nil {
+		return false, fmt.Errorf("ingest item %q: refresh search index after update: %w", item.ID, err)
+	}
+	if err := tx.Commit(); err != nil {
+		return false, fmt.Errorf("ingest item %q: commit update: %w", item.ID, err)
 	}
 	return true, nil
 }

@@ -41,12 +41,8 @@ func TestTavilyOperationPersistenceNormalIngestManualFetchExpectedRed(t *testing
 			shim := tavilyInstallHTTPShim(t, tc)
 
 			itemURL := "mailto:not-eligible@example.test"
-			article := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				http.NotFound(w, nil)
-			}))
-			t.Cleanup(article.Close)
 			if tc.eligibleURL {
-				itemURL = article.URL + "/article-" + tc.name
+				itemURL = tavilyOperationEligibleArticleURL(tc.name)
 			}
 
 			entry := feedEntry{ID: "guid-" + tc.name, Title: "Tavily Matrix Item " + tc.name, URL: itemURL, Description: ""}
@@ -91,7 +87,7 @@ func TestTavilyOperationPersistenceLibraryReprocessExpectedRed(t *testing.T) {
 			tavilyConfigureKeyForCase(t, tc)
 			shim := tavilyInstallHTTPShim(t, tc)
 
-			itemURL := tavilyArticleURLForCase(t, tc)
+			itemURL := tavilyLibraryArticleURLForCase(t, tc)
 			seedSource(t, ctx, db, "src_tavily_library_"+tc.name, "https://feeds.example.test/"+tc.name+".xml", "Tavily Library Source")
 			itemID := "item_tavily_library_" + tc.name
 			tavilySeedPriorGeneratedItem(t, ctx, db, itemID, "src_tavily_library_"+tc.name, "https://feeds.example.test/"+tc.name+".xml", itemURL, "")
@@ -334,6 +330,7 @@ func tavilyInstallHTTPShim(t *testing.T, tc tavilyOperationCase) *tavilyHTTPShim
 	if oldClient != nil && oldClient.Transport != nil {
 		fallback = oldClient.Transport
 	}
+	fallback = tavilyArticleFailingTransport{base: fallback}
 	shim := &tavilyHTTPShim{fallback: fallback, mode: tc.providerMode}
 	http.DefaultClient = &http.Client{Transport: shim}
 	t.Cleanup(func() { http.DefaultClient = oldClient })
@@ -361,6 +358,9 @@ func (s *tavilyHTTPShim) RoundTrip(req *http.Request) (*http.Response, error) {
 		default:
 			return tavilyJSONResponse(req, http.StatusOK, tavilyProviderPayload(tavilySuccessfulEvidence())), nil
 		}
+	}
+	if req.URL.Host == "article.example.test" {
+		return tavilyJSONResponse(req, http.StatusNotFound, []byte(`{}`)), nil
 	}
 	return s.fallback.RoundTrip(req)
 }
@@ -427,11 +427,22 @@ func tavilyArticleURLForCase(t *testing.T, tc tavilyOperationCase) string {
 	if !tc.eligibleURL {
 		return "not a tavily eligible article url"
 	}
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		http.NotFound(w, nil)
-	}))
-	t.Cleanup(server.Close)
-	return server.URL + "/article-" + tc.name
+	return tavilyOperationEligibleArticleURL(tc.name)
+}
+
+func tavilyOperationEligibleArticleURL(name string) string {
+	return "https://article.example.test/story-" + name
+}
+
+func tavilyLibraryArticleURLForCase(t *testing.T, tc tavilyOperationCase) string {
+	t.Helper()
+	// The library-owned green slice needs to exercise Tavily after the documented
+	// public-URL eligibility gate; normal/selected expected-red fixtures keep their
+	// local httptest URLs until those operation surfaces are wired separately.
+	if !tc.eligibleURL {
+		return "not a tavily eligible article url"
+	}
+	return tavilyExpectedRedArticleURL(tc.name)
 }
 
 func tavilySeedPriorGeneratedItem(t *testing.T, ctx context.Context, db *sql.DB, itemID string, sourceID string, sourceURL string, itemURL string, canonicalURL string) {
