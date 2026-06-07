@@ -21,9 +21,12 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
 
+	requestsMu := sync.Mutex{}
 	requests := map[string]int{}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestsMu.Lock()
 		requests[r.URL.Path]++
+		requestsMu.Unlock()
 		switch r.URL.Path {
 		case "/canonical-success":
 			_, _ = io.WriteString(w, `<html><body><article>canonical body for success</article></body></html>`)
@@ -66,8 +69,14 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	if result.ItemsAttempted != result.ItemsUpdated+result.ItemsUnavailable+result.ItemsFailed {
 		t.Fatalf("attempted invariant broken: %+v", result)
 	}
-	if requests["/canonical-success"] != 1 || requests["/original-unused"] != 0 || requests["/canonical-miss"] != 1 || requests["/original-fallback"] != 1 || requests["/feed.xml"] != 0 {
-		t.Fatalf("unexpected fetch precedence requests: %#v", requests)
+	requestsMu.Lock()
+	requestSnapshot := map[string]int{}
+	for path, count := range requests {
+		requestSnapshot[path] = count
+	}
+	requestsMu.Unlock()
+	if requestSnapshot["/canonical-success"] != 1 || requestSnapshot["/original-unused"] != 0 || requestSnapshot["/canonical-miss"] != 1 || requestSnapshot["/original-fallback"] != 1 || requestSnapshot["/feed.xml"] != 0 {
+		t.Fatalf("unexpected fetch precedence requests: %#v", requestSnapshot)
 	}
 	for _, available := range llm.availableTexts {
 		if strings.Contains(available, "PRIOR summary") || strings.Contains(available, "PRIOR insight") || strings.Contains(available, "PRIOR title") {
@@ -104,6 +113,34 @@ func TestReprocessLibraryAccountingSourcePrecedenceAndFTS(t *testing.T) {
 	}
 	if ftsCount != 1 {
 		t.Fatalf("FTS core_insight match count = %d, want 1", ftsCount)
+	}
+}
+
+func TestMCPReprocessLibraryIgnoresClientContextCancellation(t *testing.T) {
+	resetIngestCoordinatorForTest(t)
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, `<html><body><article>MCP cancellation survival source body</article></body></html>`)
+	}))
+	t.Cleanup(server.Close)
+
+	seedSource(t, ctx, db, "src_mcp_reprocess_cancel", server.URL+"/feed.xml", "MCP Reprocess Cancel Source")
+	seedReprocessItem(t, ctx, db, "item_mcp_reprocess_cancel", "src_mcp_reprocess_cancel", server.URL+"/article", "")
+	assertReprocessIndexReady(t, ctx, db)
+
+	canceledCtx, cancel := context.WithCancel(ctx)
+	cancel()
+	resp, err := ReprocessLibraryForMCP(canceledCtx, db, &reprocessMatrixLLM{}, MCPReprocessLibraryInput{ActorID: "agent", IdempotencyKey: "mcp-cancel-survives"})
+	if err != nil {
+		t.Fatalf("ReprocessLibraryForMCP with canceled client context returned error: %v", err)
+	}
+	if resp.Reprocess.ItemsAttempted != 1 || resp.Reprocess.ItemsUpdated != 1 || !resp.Reprocess.FTSRebuilt || resp.Reprocess.FTSStale {
+		t.Fatalf("MCP reprocess result = %+v, want completed item and rebuilt FTS despite canceled client context", resp.Reprocess)
+	}
+	stored := readStoredText(t, ctx, db, "item_mcp_reprocess_cancel")
+	if stored.summary != "summary MCP cancellation survival source body" {
+		t.Fatalf("stored summary = %q, want MCP cancellation run to complete", stored.summary)
 	}
 }
 

@@ -149,7 +149,11 @@ func SetProcessingLanguageForMCP(ctx context.Context, db *sql.DB, input MCPSetPr
 // reprocess operation used by HTTP.
 func ReprocessLibraryForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPReprocessLibraryInput) (ReprocessLibraryResponse, error) {
 	req := ReprocessLibraryRequest{MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}}
-	return ReprocessLibrary(ctx, db, llm, req)
+	// MCP clients and gateways commonly impose tool-call timeouts. Library
+	// reprocess is an explicit whole-library mutation, so mirror the HTTP
+	// endpoint's browser-disconnect behavior: once admitted, keep the in-process
+	// operation alive and let /runtime/operation report progress.
+	return ReprocessLibrary(context.WithoutCancel(ctx), db, llm, req)
 }
 
 // ReadItemForMCP returns canonical item detail and provenance.
