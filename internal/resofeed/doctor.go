@@ -98,7 +98,17 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	}
 	lines = append(lines, openRouterProviderDoctorLine(cfg))
 	lines = append(lines, openRouterModelDoctorLine(cfg))
+	tavilyRecoveredCount, err := countTavilyRecoveredItems(ctx, db)
+	if err != nil {
+		return DoctorSnapshot{}, err
+	}
+	tavilyRecoverableUnavailable, err := countTavilyRecoverableUnavailable(ctx, db)
+	if err != nil {
+		return DoctorSnapshot{}, err
+	}
 	lines = append(lines, tavilyConfiguredDoctorLine())
+	lines = append(lines, fmt.Sprintf("tavily: recovered_items=%d", tavilyRecoveredCount))
+	lines = append(lines, fmt.Sprintf("tavily: recoverable_unavailable=%d", tavilyRecoverableUnavailable))
 	lines = append(lines, fmt.Sprintf("openrouter: item_transform_failures=%d", modelFailureCount))
 	lines = append(lines, fmt.Sprintf("openrouter: current_item_transform_failures=%d historic_item_transform_failures=%d", health.CurrentFailures, health.HistoricFailures))
 	lines = append(lines, fmt.Sprintf("openrouter: live_summary_successes=%d fallback_only_current_summaries=%d", health.CurrentLiveSuccesses, health.CurrentFallbackOnly))
@@ -252,6 +262,42 @@ func tavilyConfiguredDoctorLine() string {
 		return "tavily: configured=missing"
 	}
 	return "tavily: configured=present"
+}
+
+func countTavilyRecoveredItems(ctx context.Context, db *sql.DB) (int, error) {
+	var count int
+	if err := db.QueryRowContext(ctx, `select count(*) from items where extraction_source = 'external_tavily'`).Scan(&count); err != nil {
+		return 0, fmt.Errorf("count tavily recovered items: %w", err)
+	}
+	return count, nil
+}
+
+func countTavilyRecoverableUnavailable(ctx context.Context, db *sql.DB) (int, error) {
+	rows, err := db.QueryContext(ctx, `select canonical_url, url from items where extraction_status = ?`, extractionStatusOriginalNA)
+	if err != nil {
+		return 0, fmt.Errorf("count tavily recoverable unavailable items: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+
+	count := 0
+	for rows.Next() {
+		var canonicalURL sql.NullString
+		var itemURL string
+		if err := rows.Scan(&canonicalURL, &itemURL); err != nil {
+			return 0, fmt.Errorf("scan tavily recoverable unavailable item: %w", err)
+		}
+		rawCanonicalURL := ""
+		if canonicalURL.Valid {
+			rawCanonicalURL = canonicalURL.String
+		}
+		if _, ok := firstTavilyEligibleArticleURLCandidate(rawCanonicalURL, itemURL); ok {
+			count++
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return 0, fmt.Errorf("iterate tavily recoverable unavailable items: %w", err)
+	}
+	return count, nil
 }
 
 func countItemStatusDiagnostics(ctx context.Context, db *sql.DB, label string, column string, failingStatuses []string) (int, error) {

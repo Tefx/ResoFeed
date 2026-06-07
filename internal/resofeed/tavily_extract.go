@@ -135,6 +135,28 @@ type tavilyExtractResponse struct {
 	} `json:"failed_results"`
 }
 
+func tavilyEligibleArticleURLCandidates(canonicalURL string, itemURL string) []string {
+	candidates := make([]string, 0, 2)
+	for _, raw := range []string{canonicalURL, itemURL} {
+		candidate := strings.TrimSpace(raw)
+		if candidate == "" || !isTavilyEligibleArticleURL(candidate) {
+			continue
+		}
+		if len(candidates) == 0 || candidates[len(candidates)-1] != candidate {
+			candidates = append(candidates, candidate)
+		}
+	}
+	return candidates
+}
+
+func firstTavilyEligibleArticleURLCandidate(canonicalURL string, itemURL string) (string, bool) {
+	candidates := tavilyEligibleArticleURLCandidates(canonicalURL, itemURL)
+	if len(candidates) == 0 {
+		return "", false
+	}
+	return candidates[0], true
+}
+
 func isTavilyEligibleArticleURL(raw string) bool {
 	parsed, err := url.Parse(strings.TrimSpace(raw))
 	if err != nil || parsed == nil {
@@ -146,15 +168,25 @@ func isTavilyEligibleArticleURL(raw string) bool {
 	if parsed.User != nil {
 		return false
 	}
-	host := strings.ToLower(strings.TrimSpace(parsed.Hostname()))
+	host := strings.TrimSuffix(strings.ToLower(strings.TrimSpace(parsed.Hostname())), ".")
 	if host == "" || host == "localhost" || strings.HasSuffix(host, ".localhost") {
 		return false
 	}
-	ip := net.ParseIP(host)
+	ip := parseTavilyHostIP(host)
 	if ip == nil {
 		return true
 	}
 	return isPublicTavilyIP(ip)
+}
+
+func parseTavilyHostIP(host string) net.IP {
+	if ip := net.ParseIP(host); ip != nil {
+		return ip
+	}
+	if scopedHost, _, ok := strings.Cut(host, "%"); ok {
+		return net.ParseIP(scopedHost)
+	}
+	return nil
 }
 
 func isPublicTavilyIP(ip net.IP) bool {

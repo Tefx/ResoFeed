@@ -712,7 +712,7 @@ func fetchReprocessSourceText(ctx context.Context, item reprocessItem) (string, 
 		}
 		return candidate, text, "fresh_full_text", nil
 	}
-	for _, candidate := range candidates {
+	for _, candidate := range tavilyReprocessCandidateURLs(item) {
 		text, err := tryTavilyExtractArticleText(ctx, candidate)
 		if err == nil {
 			return candidate, text, "external_tavily", nil
@@ -740,6 +740,14 @@ func reprocessCandidateURLs(item reprocessItem) []string {
 		}
 	}
 	return candidates
+}
+
+func tavilyReprocessCandidateURLs(item reprocessItem) []string {
+	canonicalURL := ""
+	if item.canonicalURL.Valid {
+		canonicalURL = item.canonicalURL.String
+	}
+	return tavilyEligibleArticleURLCandidates(canonicalURL, item.url)
 }
 
 func fallbackReprocessSourceURL(item reprocessItem) string {
