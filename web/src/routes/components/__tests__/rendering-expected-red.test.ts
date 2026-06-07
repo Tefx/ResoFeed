@@ -23,7 +23,7 @@ import type { ItemDetail } from '$lib/api-contract';
 const expectedRedDetail: ItemDetail = {
   ...expectedRedItem,
   feed_excerpt: 'Raw feed excerpt for detail route.',
-  source_evidence_text: null,
+  source_evidence_text: 'Raw feed excerpt for detail route.',
   extracted_text: 'Full extracted text shown only in Inspector.',
   provenance: {
     source_url: expectedRedSource.url,
@@ -209,7 +209,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       'href',
       expectedRedItem.url
     );
-    expect(within(inspector).getByText('feed excerpt fallback · source excerpt · quality: high')).toBeVisible();
+    expect(within(inspector).getByText('SOURCE TEXT: RSS EXCERPT ONLY')).toBeVisible();
     expect(within(inspector).queryByText('source text: RSS excerpt only')).not.toBeInTheDocument();
     expect(within(inspector).queryByText('why: fresh from configured source')).not.toBeInTheDocument();
     expect(within(inspector).queryByRole('button', { name: `Resonate item: ${expectedRedItem.title}` })).not.toBeInTheDocument();
@@ -226,7 +226,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       extraction_status: 'full',
       model_status: 'summary_unavailable',
       feed_excerpt: 'Readable fallback excerpt for the primary Inspector reading path.',
-      source_evidence_text: null,
+      source_evidence_text: 'Readable fallback excerpt for the primary Inspector reading path.',
       extracted_text: `<script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle"}</script>
         Skip to main content. Advertisement newsletter sign up.
         Readable article paragraph after the metadata blob.
@@ -272,7 +272,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       extraction_status: 'partial_extraction',
       model_status: 'summary_unavailable',
       feed_excerpt: 'This raw English RSS excerpt should remain provenance, not the main Chinese body.',
-      source_evidence_text: null,
+      source_evidence_text: 'This raw English RSS excerpt should remain provenance, not the main Chinese body.',
       extracted_text: 'This raw English body should not appear as completed Chinese reading content.',
       provenance: {
         source_url: expectedRedSource.url,
@@ -291,7 +291,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     expect((inspector.textContent?.match(/中文处理未完成/g) ?? [])).toHaveLength(1);
     expect(within(inspector).queryByLabelText('摘要')).not.toBeInTheDocument();
     expect(within(inspector).queryByLabelText('核心洞察')).not.toBeInTheDocument();
-    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('文本证据 · RSS 摘录');
+    expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('文本证据：RSS 摘录');
     expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('This raw English RSS excerpt should remain provenance, not the main Chinese body.');
     expect(inspector).not.toHaveTextContent('This raw English body should not appear as completed Chinese reading content.');
   });
@@ -345,8 +345,10 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       ...expectedRedDetail,
       model_status: 'ok',
       extraction_status: 'full',
+      extraction_source: 'local_readable',
       summary: 'Dense factual summary for a rendered Inspector section.',
       core_insight: 'Why this matters for retrieval remains model-backed.',
+      source_evidence_text: 'Full extracted text shown only in Inspector.',
       extracted_text: 'Full extracted text shown only in Inspector.'
     };
 
@@ -356,7 +358,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
     const sections = Array.from(inspector.querySelectorAll('.inspector-text-section'));
     expect(sections).toHaveLength(3);
     expect(sections.map((section) => section.getAttribute('aria-label'))).toEqual(['Summary', 'Core insight', 'Text evidence']);
-    expect(sections.map((section) => section.querySelector('.inspector-section-label')?.textContent)).toEqual(['summary:', 'core insight:', 'Text evidence']);
+    expect(sections.map((section) => section.querySelector('.inspector-section-label')?.textContent)).toEqual(['summary:', 'core insight:', 'Text evidence: local readable']);
     expect(sections[0].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[1].querySelector('.inspector-section-copy')).not.toBeNull();
     expect(sections[2]).toHaveClass('inspector-reading-section');
@@ -399,7 +401,7 @@ describe('expected-red rendering contracts from docs/DESIGN.md', () => {
       core_insight: 'Readable core insight remains outside social boilerplate.',
       extraction_status: 'full',
       feed_excerpt: 'Readable fallback excerpt remains available.',
-      source_evidence_text: null,
+      source_evidence_text: 'Readable fallback excerpt remains available.',
       extracted_text: `summary-like lead repeated by the site summary-like lead repeated by the site
         Follow us on Twitter for more newsletters
         Readable article prose survives after social boilerplate and repeated lead filler.`,

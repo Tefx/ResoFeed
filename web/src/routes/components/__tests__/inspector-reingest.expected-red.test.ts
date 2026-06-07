@@ -37,7 +37,7 @@ const failedItem: ItemSummary = {
 const failedDetail: ItemDetail = {
   ...failedItem,
   feed_excerpt: 'RSS excerpt remains source evidence while model output is unavailable.',
-  source_evidence_text: null,
+  source_evidence_text: 'Readable source article body exists, but model summary fields failed and should be retryable from Inspector only.',
   extracted_text: 'Readable source article body exists, but model summary fields failed and should be retryable from Inspector only.',
   provenance: {
     source_url: expectedRedSource.url,
@@ -59,6 +59,7 @@ const modelBackedDetail: ItemDetail = {
   extraction_status: 'full',
   model_status: 'ok',
   feed_excerpt: 'RSS excerpt remains available as source fallback.',
+  source_evidence_text: 'Full source article text remains available for verification behind a collapsed disclosure.',
   extracted_text: 'Full source article text remains available for verification behind a collapsed disclosure.',
   provenance: {
     ...failedDetail.provenance,

@@ -8,7 +8,7 @@ import { expectedRedItem, expectedRedSource } from '../../../test/contract-fixtu
 const baseDetail: ItemDetail = {
   ...expectedRedItem,
   feed_excerpt: 'Raw RSS excerpt remains source evidence only.',
-  source_evidence_text: null,
+  source_evidence_text: 'Full article text for normal source text rendering.',
   extracted_text: 'Full article text for normal source text rendering.',
   provenance: {
     source_url: expectedRedSource.url,
@@ -40,6 +40,7 @@ describe('Inspector fallback/source evidence contract', () => {
       extraction_status: 'partial_extraction',
       model_status: 'summary_unavailable',
       feed_excerpt: 'Raw RSS excerpt remains source evidence only.',
+      source_evidence_text: 'Raw RSS excerpt remains source evidence only.',
       extracted_text: 'Unprocessed source body must not masquerade as synthesized reading content.'
     };
 
@@ -130,7 +131,9 @@ describe('Inspector fallback/source evidence contract', () => {
       core_insight: 'Generated core insight must remain only in Core insight.',
       key_points: ['Generated key point one.', 'Generated key point two.', 'Generated key point three.'],
       extraction_status: 'original_unavailable',
+      extraction_source: 'none',
       model_status: 'ok',
+      source_evidence_text: null,
       extracted_text: null,
       feed_excerpt: null,
       display_excerpt: null
@@ -156,6 +159,7 @@ describe('Inspector fallback/source evidence contract', () => {
       core_insight: 'First generated core insight remains visible.',
       extraction_status: 'full',
       model_status: 'ok',
+      source_evidence_text: 'First item source-backed evidence.',
       extracted_text: 'First item source-backed evidence.'
     };
     const secondDetail: ItemDetail = {
@@ -166,6 +170,7 @@ describe('Inspector fallback/source evidence contract', () => {
       core_insight: 'Second generated core insight remains visible.',
       extraction_status: 'full',
       model_status: 'ok',
+      source_evidence_text: 'Second item source-backed evidence.',
       extracted_text: 'Second item source-backed evidence.'
     };
 
@@ -174,7 +179,7 @@ describe('Inspector fallback/source evidence contract', () => {
     const firstEvidence = within(firstInspector).getByLabelText('Text evidence');
     expect(firstEvidence).not.toHaveAttribute('open');
 
-    await fireEvent.click(within(firstEvidence).getByText('Text evidence'));
+    await fireEvent.click(within(firstEvidence).getByText(/^Text evidence/u));
     expect(firstEvidence).toHaveAttribute('open');
 
     await view.rerender({ item: secondDetail, mode: 'desktop-split' });
@@ -224,7 +229,9 @@ describe('Inspector fallback/source evidence contract', () => {
       core_insight: 'Generated core insight is present but not source evidence.',
       key_points: ['Generated key point one.', 'Generated key point two.', 'Generated key point three.'],
       extraction_status: 'full',
+      extraction_source: 'none',
       model_status: 'ok',
+      source_evidence_text: null,
       extracted_text: null,
       feed_excerpt: null,
       display_excerpt: null
@@ -237,8 +244,8 @@ describe('Inspector fallback/source evidence contract', () => {
     expect(within(inspector).getByLabelText('核心洞察')).toHaveTextContent('Generated core insight is present but not source evidence.');
     expect(within(inspector).queryByLabelText('文本证据')).not.toBeInTheDocument();
     expect(within(inspector).queryByText('文本证据不可用；请使用原文链接。')).not.toBeInTheDocument();
-    expect(within(inspector).getByText('模型支持 · 原文未存 · 质量：高价值')).toBeVisible();
-    expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 原文未存，质量 高价值"]')).toBeVisible();
+    expect(within(inspector).getByText('来源文本：不可用')).toBeVisible();
+    expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源文本：不可用，质量 高价值"]')).toBeVisible();
   });
 
   it('keeps full source text disclosure and full AI status when extracted text is stored', () => {
@@ -249,7 +256,9 @@ describe('Inspector fallback/source evidence contract', () => {
       summary: 'Model-backed summary remains visible.',
       core_insight: 'Model-backed core insight remains visible.',
       extraction_status: 'full',
+      extraction_source: 'local_readable',
       model_status: 'ok',
+      source_evidence_text: 'Persisted extracted article source evidence remains auditable.',
       extracted_text: 'Persisted extracted article source evidence remains auditable.',
       feed_excerpt: null,
       display_excerpt: null
@@ -259,7 +268,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     const inspector = getInspectorFor(fullEvidenceDetail);
     expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('Persisted extracted article source evidence remains auditable.');
-    expect(within(inspector).getByText('模型支持 · 全文 · 质量：高价值')).toBeVisible();
+    expect(within(inspector).getByText('来源文本：本地正文')).toBeVisible();
   });
 
   it('keeps partial RSS excerpt source disclosure when feed excerpt is stored', () => {
@@ -270,7 +279,9 @@ describe('Inspector fallback/source evidence contract', () => {
       summary: 'Model-backed summary remains visible.',
       core_insight: 'Model-backed core insight remains visible.',
       extraction_status: 'partial_extraction',
+      extraction_source: 'feed_excerpt',
       model_status: 'ok',
+      source_evidence_text: 'RSS excerpt source evidence remains auditable.',
       extracted_text: null,
       feed_excerpt: 'RSS excerpt source evidence remains auditable.',
       display_excerpt: null
@@ -280,7 +291,7 @@ describe('Inspector fallback/source evidence contract', () => {
 
     const inspector = getInspectorFor(partialEvidenceDetail);
     expect(within(inspector).getByLabelText('文本证据')).toHaveTextContent('RSS excerpt source evidence remains auditable.');
-    expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
+    expect(within(inspector).getByText('来源文本：仅 RSS 摘录')).toBeVisible();
     expect(inspector).not.toHaveTextContent('文本证据不可用；请使用原文链接。');
   });
 
@@ -293,7 +304,9 @@ describe('Inspector fallback/source evidence contract', () => {
       core_insight: '核心洞察仍然可用。',
       key_points: ['第一条要点仍然可见。', '第二条要点仍然可见。', '第三条要点仍然可见。'],
       extraction_status: 'original_unavailable',
+      extraction_source: 'feed_excerpt',
       model_status: 'ok',
+      source_evidence_text: 'RSS excerpt remains available as source evidence.',
       extracted_text: null,
       feed_excerpt: 'RSS excerpt remains available as source evidence.'
     };
@@ -301,7 +314,7 @@ describe('Inspector fallback/source evidence contract', () => {
     render(Inspector, { props: { item: originalUnavailableWithGeneratedContent, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = getInspectorFor(originalUnavailableWithGeneratedContent);
-    expect(within(inspector).getByText('模型支持 · 原文不可用 · 质量：高价值')).toBeVisible();
+    expect(within(inspector).getByText('来源文本：仅 RSS 摘录')).toBeVisible();
     expect(within(inspector).queryByText('原文不可用 · 摘要/核心洞察可用')).not.toBeInTheDocument();
     expect(inspector).not.toHaveTextContent('原文不可用 · 摘要/核心洞察不可用');
     expect(within(inspector).getByLabelText('摘要')).toHaveTextContent('模型摘要仍然可用。');
@@ -317,15 +330,17 @@ describe('Inspector fallback/source evidence contract', () => {
       summary: '模型摘要可见。',
       core_insight: '模型核心洞察可见。',
       extraction_status: 'partial_extraction',
+      extraction_source: 'feed_excerpt',
       model_status: 'ok',
+      source_evidence_text: 'RSS excerpt source evidence remains auditable.',
       value_tier: 'high'
     };
 
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = getInspectorFor(detail);
-    expect(within(inspector).getByText('模型支持 · 来源摘录 · 质量：高价值')).toBeVisible();
-    expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源深度 来源摘录，质量 高价值"]')).toBeVisible();
+    expect(within(inspector).getByText('来源文本：仅 RSS 摘录')).toBeVisible();
+    expect(inspector.querySelector('[aria-label="AI 状态：模型支持，来源文本：仅 RSS 摘录，质量 高价值"]')).toBeVisible();
     expect(inspector).not.toHaveTextContent('文本证据：仅 RSS 摘录 · 摘要来源：模型支持');
     expect(inspector).not.toHaveTextContent('摘要来源：模型支持');
   });
@@ -346,7 +361,7 @@ describe('Inspector fallback/source evidence contract', () => {
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = getInspectorFor(detail);
-    expect(within(inspector).getAllByText(/质量：简报/).some((element) => element.tagName === 'DD')).toBe(true);
+    expect(within(inspector).getByText('质量：简报')).toBeVisible();
     expect(inspector).not.toHaveTextContent('quality: brief');
   });
 
@@ -366,7 +381,7 @@ describe('Inspector fallback/source evidence contract', () => {
     render(Inspector, { props: { item: detail, mode: 'desktop-split', language: 'zh' } });
 
     const inspector = getInspectorFor(detail);
-    expect(within(inspector).getAllByText(/质量：高价值/).some((element) => element.tagName === 'DD')).toBe(true);
+    expect(within(inspector).getByText('质量：高价值')).toBeVisible();
     expect(inspector).not.toHaveTextContent('quality: high');
   });
 
@@ -382,6 +397,7 @@ describe('Inspector fallback/source evidence contract', () => {
         extraction_status: 'partial_extraction',
         model_status: modelStatus,
         feed_excerpt: `Fallback excerpt for ${modelStatus}.`,
+        source_evidence_text: `Fallback excerpt for ${modelStatus}.`,
         extracted_text: null
       };
 

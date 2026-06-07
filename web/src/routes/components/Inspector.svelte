@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
-  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type ModelStatus, type OpenRouterModelOption, type Source } from '$lib/api-contract';
+  import { processingLanguageRuntimeContract, type CurrentOperationInfo, type ExtractionSource, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type ModelStatus, type OpenRouterModelOption, type Source } from '$lib/api-contract';
   import { ResoFeedApiError } from '$lib/api-client';
   import { operationDetails } from '$lib/current-operation';
   import { itemAnatomyChrome } from './item-anatomy';
@@ -342,9 +342,21 @@
     return readableText(value.summary) ?? ('feed_excerpt' in value ? readableText(value.feed_excerpt) : null) ?? readableText(value.display_excerpt ?? null);
   }
 
-  function textEvidenceDepthLabel(value: InspectableItem): string | null {
-    if (isFallbackEvidenceState(value) || value.extraction_status === 'partial_extraction') return localizedChrome('RSS excerpt', 'RSS 摘录');
-    return null;
+  function textEvidenceSummaryLabel(value: InspectableItem): string {
+    const evidenceSource = textEvidenceSourceLabel(value.extraction_source);
+    const separator = language === 'zh' ? '：' : ': ';
+    return `${localizedChrome('Text evidence', '文本证据')}${separator}${evidenceSource}`;
+  }
+
+  function textEvidenceSourceLabel(source: ExtractionSource): string {
+    const labels: Record<ExtractionSource, { en: string; zh: string }> = {
+      local_readable: { en: 'local readable', zh: '本地正文' },
+      feed_excerpt: { en: 'RSS excerpt', zh: 'RSS 摘录' },
+      external_tavily: { en: 'external / Tavily', zh: 'TAVILY 外部抽取' },
+      none: { en: 'unavailable', zh: '不可用' }
+    };
+    const label = labels[source];
+    return localizedChrome(label.en, label.zh);
   }
 
   function originalHref(value: InspectableItem): string {
@@ -448,22 +460,20 @@
     return localizedChrome('text evidence: full', '文本证据：全文');
   }
 
-  function extractionFrontmatterToken(value: InspectableItem): string {
-    if (value.extraction_status === 'partial_extraction') return localizedChrome('source excerpt', '来源摘录');
-    if (value.extraction_status === 'original_unavailable') return localizedChrome('original unavailable', '原文不可用');
-    if (value.extraction_status === 'summary_unavailable') return localizedChrome('summary unavailable', '摘要不可用');
-    if (value.extraction_status === 'full' && !sourceEvidenceText(value)) return localizedChrome('source not stored', '原文未存');
-    return localizedChrome('full', '全文');
+  function sourceOriginFrontmatterLabel(value: InspectableItem): string {
+    const labels: Record<ExtractionSource, { en: string; zh: string }> = {
+      local_readable: { en: 'SOURCE TEXT: LOCAL READABLE', zh: '来源文本：本地正文' },
+      feed_excerpt: { en: 'SOURCE TEXT: RSS EXCERPT ONLY', zh: '来源文本：仅 RSS 摘录' },
+      external_tavily: { en: 'SOURCE TEXT: EXTERNAL / TAVILY', zh: '来源文本：TAVILY 外部抽取' },
+      none: { en: 'SOURCE TEXT: UNAVAILABLE', zh: '来源文本：不可用' }
+    };
+    const label = labels[value.extraction_source];
+    return localizedChrome(label.en, label.zh);
   }
 
   function sourceEvidenceText(value: InspectableItem): string | null {
-    if ('feed_excerpt' in value) {
-      const extractedText = readableText(value.extracted_text);
-      if (value.model_status !== 'ok') return readableText(value.feed_excerpt) ?? readableText(value.display_excerpt ?? null) ?? extractedText;
-      if (value.extraction_status === 'full' && extractedText) return extractedText;
-      return readableText(value.feed_excerpt) ?? readableText(value.display_excerpt ?? null) ?? extractedText;
-    }
-    return readableText(value.display_excerpt ?? null);
+    if ('source_evidence_text' in value) return readableText(value.source_evidence_text);
+    return null;
   }
 
   function sourceTextUnavailableNote(): string {
@@ -539,18 +549,17 @@
     return summaryText(value) ? localizedChrome('feed excerpt fallback', '订阅摘录回退') : localizedChrome('fallback unavailable', '回退不可用');
   }
 
-  function aiStatusFrontmatter(value: InspectableItem): string {
-    const quality = localizedChrome(`quality: ${qualityValueLabel(value)}`, `质量：${qualityValueLabel(value)}`);
-    return `${summaryProvenanceFrontmatterToken(value)} · ${extractionFrontmatterToken(value)} · ${quality}`;
+  function qualityFrontmatterToken(value: InspectableItem): string {
+    return localizedChrome(`quality: ${qualityValueLabel(value)}`, `质量：${qualityValueLabel(value)}`);
   }
 
   function aiStatusA11yLabel(value: InspectableItem): string {
     const provenance = summaryProvenanceFrontmatterToken(value);
-    const extraction = extractionFrontmatterToken(value);
+    const sourceOrigin = sourceOriginFrontmatterLabel(value);
     const quality = qualityValueLabel(value);
     return localizedChrome(
-      `AI status: ${provenance}; source depth ${extraction}; quality ${quality}`,
-      `AI 状态：${provenance}，来源深度 ${extraction}，质量 ${quality}`
+      `AI status: ${provenance}; ${sourceOrigin}; quality ${quality}`,
+      `AI 状态：${provenance}，${sourceOrigin}，质量 ${quality}`
     );
   }
 
@@ -826,7 +835,9 @@
         </p>
       </dd>
       <dt>AI STATUS</dt>
-      <dd aria-label={aiStatusA11yLabel(item)}>{aiStatusFrontmatter(item)}</dd>
+      <dd aria-label={aiStatusA11yLabel(item)}>
+        <span>{summaryProvenanceFrontmatterToken(item)}</span><span aria-hidden="true"> · </span><span>{sourceOriginFrontmatterLabel(item)}</span><span aria-hidden="true"> · </span><span>{qualityFrontmatterToken(item)}</span>
+      </dd>
       {#if attemptFrontmatterText(item)}
         <dt>ATTEMPT</dt>
         <dd class={attemptFrontmatterClass(item)}>{attemptFrontmatterText(item)}</dd>
@@ -906,15 +917,15 @@
     {/if}
     {#key item.id}
       {@const evidenceText = sourceEvidenceText(item)}
-      {@const textEvidenceDepth = textEvidenceDepthLabel(item)}
+      {@const textEvidenceLabel = textEvidenceSummaryLabel(item)}
       {#if isFallbackEvidenceState(item) && evidenceText}
         <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
-          <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')}{textEvidenceDepth ? ` · ${textEvidenceDepth}` : ''}</summary>
+          <summary class="inspector-section-label">{textEvidenceLabel}</summary>
           <p class="inspector-source-evidence">{evidenceText}</p>
         </details>
       {:else if evidenceText}
         <details class="inspector-text-section inspector-reading-section inspector-source-text-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
-          <summary class="inspector-section-label">{localizedChrome('Text evidence', '文本证据')}{textEvidenceDepth ? ` · ${textEvidenceDepth}` : ''}</summary>
+          <summary class="inspector-section-label">{textEvidenceLabel}</summary>
           <p class="inspector-reading inspector-reading--source-text">{detailText(item)}</p>
         </details>
       {:else if !hasModelBackedText(item)}
