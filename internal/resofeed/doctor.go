@@ -200,7 +200,7 @@ func (m openRouterHealthMetrics) classification(cfg DoctorConfig) string {
 	if m.HistoricFailures > 0 && m.CurrentLiveSuccesses > 0 {
 		return "stale_database_prior_failures"
 	}
-	if m.CurrentLiveSuccesses > 0 && totalFailures == 0 {
+	if totalFailures == 0 && (m.CurrentLiveSuccesses > 0 || strings.TrimSpace(cfg.ResolvedOpenRouterModel) != "") {
 		return "openrouter_live_summary_ok"
 	}
 	if m.CurrentLiveSuccesses == 0 && strings.TrimSpace(cfg.ConfiguredOpenRouterModel) == "" && strings.TrimSpace(cfg.ResolvedOpenRouterModel) == "" {

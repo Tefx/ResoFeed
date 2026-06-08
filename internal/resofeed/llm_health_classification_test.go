@@ -191,6 +191,40 @@ values ('current_model_success_only', 'src_llm_healthy', 'https://llm-healthy.ex
 	}
 }
 
+func TestREG2026060801DoctorClassifiesZeroFailureResolvedHistoricLibraryAsHealthy(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	insertSource(t, ctx, db, "src_llm_historic_healthy", "https://llm-historic-healthy.example/feed.xml", "LLM Historic Healthy")
+
+	old := time.Now().UTC().Add(-(freshWindow + time.Hour)).Format(time.RFC3339)
+	_, err := db.ExecContext(ctx, `
+insert into items (id, source_id, source_url, url, title, feed_excerpt, summary, core_insight, value_tier, published_at, first_seen_at, extraction_status, model_status)
+values ('historic_model_success_only', 'src_llm_historic_healthy', 'https://llm-historic-healthy.example/feed.xml', 'https://llm-historic-healthy.example/old', 'Historic model success', 'historic feed excerpt', 'Historic-backed summary.', 'Historic-backed insight.', 'high', ?, ?, 'full', 'ok')`, old, old)
+	if err != nil {
+		t.Fatalf("insert historic healthy item: %v", err)
+	}
+
+	var out bytes.Buffer
+	if err := WriteDoctorWithConfig(ctx, db, DoctorConfig{ConfiguredOpenRouterModel: "account_default", ResolvedOpenRouterModel: "openrouter/resolved"}, &out); err != nil {
+		t.Fatalf("WriteDoctorWithConfig returned error: %v", err)
+	}
+	body := out.String()
+	assertDoctorHasNoSameLineDuplicateKeys(t, body)
+	for _, want := range []string{
+		"openrouter: model_resolved=true resolved_model=openrouter/resolved",
+		"openrouter: current_item_transform_failures=0 historic_item_transform_failures=0",
+		"openrouter: live_summary_successes=0 fallback_only_current_summaries=0",
+		"openrouter: health_classification=openrouter_live_summary_ok",
+	} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("doctor output missing %q:\n%s", want, body)
+		}
+	}
+	if strings.Contains(body, "health_classification=unresolved_product_regression") {
+		t.Fatalf("doctor misclassified zero-failure resolved historic library:\n%s", body)
+	}
+}
+
 func TestREG2026051206DoctorDoesNotCountFallbackOnlyCurrentSummaryAsLiveSuccess(t *testing.T) {
 	ctx := context.Background()
 	db := newContractDB(t, ctx)
