@@ -15,6 +15,7 @@ CADDY_LOCAL_HTTPS_PORT=""
 RESOFEED_DOMAIN=""
 CF_API_TOKEN=""
 OPENROUTER_KEY=""
+TAVILY_API_KEY=""
 
 usage() {
   cat <<'EOF'
@@ -68,7 +69,7 @@ run_quiet() {
 
 mask_if_secret_key() {
   case "$1" in
-    CF_API_TOKEN|OPENROUTER_KEY) printf '[masked]' ;;
+    CF_API_TOKEN|OPENROUTER_KEY|TAVILY_API_KEY) printf '[masked]' ;;
     *) printf '%s' "$2" ;;
   esac
 }
@@ -104,7 +105,7 @@ load_env() {
       ''|'#'*) continue ;;
     esac
     case "$line" in
-      TAILSCALE_IP=*|CADDY_LOCAL_HTTPS_PORT=*|RESOFEED_DOMAIN=*|CF_API_TOKEN=*|OPENROUTER_KEY=*|RESOFEED_IMAGE=*)
+      TAILSCALE_IP=*|CADDY_LOCAL_HTTPS_PORT=*|RESOFEED_DOMAIN=*|CF_API_TOKEN=*|OPENROUTER_KEY=*|TAVILY_API_KEY=*|RESOFEED_IMAGE=*)
         key=${line%%=*}
         value=${line#*=}
         value=${value%$'\r'}
@@ -114,6 +115,7 @@ load_env() {
           RESOFEED_DOMAIN) RESOFEED_DOMAIN=$value ;;
           CF_API_TOKEN) CF_API_TOKEN=$value ;;
           OPENROUTER_KEY) OPENROUTER_KEY=$value ;;
+          TAVILY_API_KEY) TAVILY_API_KEY=$value ;;
           RESOFEED_IMAGE) RESOFEED_IMAGE=$value ;;
         esac
         ;;
@@ -137,7 +139,7 @@ ensure_env_file() {
     fi
 
     section '[ ACTION REQUIRED: AUTHENTICATION ]'
-    printf '[ FAIL ] Edit .env and set CF_API_TOKEN=[masked]. OPENROUTER_KEY=[masked] is optional.\n' >&2
+    printf '[ FAIL ] Edit .env and set CF_API_TOKEN=[masked]. OPENROUTER_KEY=[masked] and TAVILY_API_KEY=[masked] are optional.\n' >&2
     printf 'Then rerun ./deploy.sh. The local .env file is ignored by git.\n' >&2
     exit 2
   fi
@@ -184,6 +186,12 @@ validate_and_normalize_env() {
     ok "OPENROUTER_KEY configured: [masked]"
   else
     ok "OPENROUTER_KEY empty; model-backed features remain disabled"
+  fi
+
+  if [ -n "$TAVILY_API_KEY" ]; then
+    ok "TAVILY_API_KEY configured: [masked]"
+  else
+    ok "TAVILY_API_KEY empty; external extraction recovery remains disabled"
   fi
 }
 
