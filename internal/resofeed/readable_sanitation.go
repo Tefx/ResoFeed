@@ -20,6 +20,25 @@ var (
 		regexp.MustCompile(`(?i)^\s*read\s+next\b`),
 	}
 	readableDropLinePatterns = []*regexp.Regexp{
+		regexp.MustCompile(`(?i)^\s*this\s+page\s+requires\s+javascript\.?\s*$`),
+		regexp.MustCompile(`(?i)^\s*this\s+page\s+requires\s+javascript\.?\s+please\s+turn\s+on\s+javascript\s+in\s+your\s+browser\s+and\s+refresh\s+the\s+page\s+to\s+view\s+its\s+content\.?\s*$`),
+		regexp.MustCompile(`(?i)^\s*please\s+turn\s+on\s+javascript\s+in\s+your\s+browser\s+and\s+refresh\s+the\s+page\s+to\s+view\s+its\s+content\.?\s*$`),
+		regexp.MustCompile(`(?i)^\s*skip\s+to\s+(main\s+)?content\s*$`),
+		regexp.MustCompile(`(?i)^\s*accessibility\s+overview\s*$`),
+		regexp.MustCompile(`(?i)^\s*support\s*$`),
+		regexp.MustCompile(`(?i)^\s*(english|español|deutsch|简体中文|繁體中文|français|português|日本語|русский|한국어|italiano?|tiếng\s+việt|polski|türkçe|bahasa\s+indonesia|nederlands|svenska)\s*$`),
+		regexp.MustCompile(`(?i)^\s*cookie\s+preferences\s*$`),
+		regexp.MustCompile(`(?i)^\s*do\s+not\s+sell\s+my\s+personal\s+information\s*$`),
+		regexp.MustCompile(`(?i)^\s*copyright\s+©?\s*\d{4}\b`),
+		regexp.MustCompile(`(?i)^\s*privacy\s*&\s*legal\s+policies\s*$`),
+		regexp.MustCompile(`(?i)^\s*follow\s+us\s*$`),
+		regexp.MustCompile(`(?i)^\s*share\s+this\s+article\s*$`),
+		regexp.MustCompile(`(?i)^\s*latest\s+articles\s*$`),
+		regexp.MustCompile(`(?i)^\s*view\s+more\s*$`),
+		regexp.MustCompile(`(?i)^\s*please\s+(login|log\s+in|logout|wait|signup|sign\s+up)\b`),
+		regexp.MustCompile(`(?i)^\s*you\s+must\s+confirm\s+your\s+public\s+display\s+name\b`),
+		regexp.MustCompile(`(?i)^\s*an\s+account\s+already\s+exists\s+for\s+this\s+email\s+address\b`),
+		regexp.MustCompile(`(?i)^\s*you\s+are\s+now\s+subscribed\s*$`),
 		regexp.MustCompile(`(?i)follow\s+(topics|authors?)`),
 		regexp.MustCompile(`(?i)authors?\s+from\s+this\s+story`),
 		regexp.MustCompile(`(?i)personaliz(e|ed|ation)|personalized\s+feed`),
@@ -101,7 +120,7 @@ func isLowInformationReadablePayload(value string) bool {
 		return true
 	}
 	normalized := strings.Join(words, " ")
-	if isShortChromeReadablePayload(normalized, len(words)) || isMetadataOnlyReadablePayload(normalized) {
+	if isShortChromeReadablePayload(normalized, len(words)) || isMetadataOnlyReadablePayload(normalized) || isBrowserChromeOnlyReadablePayload(normalized, len(words)) {
 		return true
 	}
 	if len(words) <= 18 {
@@ -145,6 +164,29 @@ func isShortChromeReadablePayload(normalized string, wordCount int) bool {
 		}
 	}
 	return false
+}
+
+func isBrowserChromeOnlyReadablePayload(normalized string, wordCount int) bool {
+	if wordCount > 80 {
+		return false
+	}
+	markers := 0
+	for _, marker := range []string{
+		"skip to main content",
+		"accessibility overview",
+		"privacy legal policies",
+		"privacy & legal policies",
+		"cookie preferences",
+		"do not sell my personal information",
+		"all rights reserved",
+		"support english english",
+		"support english english español deutsch",
+	} {
+		if strings.Contains(normalized, marker) {
+			markers++
+		}
+	}
+	return markers >= 3
 }
 
 func isReadableTextContentType(contentType string) bool {
@@ -216,7 +258,7 @@ func sanitizeReadablePayloadText(value string) (string, bool) {
 			contaminated = true
 			break
 		}
-		if matchesAny(readableDropLinePatterns, paragraph) {
+		if matchesAny(readableDropLinePatterns, paragraph) || isCodeOrStyleReadableLine(paragraph) {
 			contaminated = true
 			continue
 		}
@@ -296,6 +338,30 @@ func sanitizeReadableSummary(summary *ItemSummary) {
 	summary.Summary, _ = sanitizeReadablePayloadPointer(summary.Summary)
 	summary.CoreInsight, _ = sanitizeReadableInsightPointer(summary.CoreInsight)
 	summary.DisplayExcerpt, _ = sanitizeReadablePayloadPointer(summary.DisplayExcerpt)
+}
+
+func isCodeOrStyleReadableLine(value string) bool {
+	line := strings.TrimSpace(value)
+	if line == "" {
+		return false
+	}
+	lower := strings.ToLower(line)
+	if strings.Contains(lower, "function()") || strings.Contains(lower, "console.error") || strings.Contains(lower, "lazyobserveelement") || strings.Contains(lower, "var triggerhydrate") {
+		return true
+	}
+	if strings.Count(line, "{")+strings.Count(line, "}") >= 2 && (strings.Contains(line, ":") || strings.Contains(line, ";")) {
+		return true
+	}
+	if strings.Count(line, ".") >= 6 && strings.Count(line, ":") >= 3 && strings.Contains(line, "{") {
+		return true
+	}
+	if strings.Contains(lower, "! important") && (strings.Contains(line, "{") || strings.Contains(line, "}")) {
+		return true
+	}
+	if strings.Count(lower, "var(--") >= 2 {
+		return true
+	}
+	return false
 }
 
 func splitReadableParagraphs(value string) []string {

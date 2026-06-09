@@ -156,6 +156,26 @@ func TestPromptValidationLanguageInvalidAllowsChineseCarrierWithEnglishTerms(t *
 	}
 }
 
+func TestPromptingV21RepairInstructionUnavailableMismatchForcesOKWhenEvidenceExists(t *testing.T) {
+	instruction := promptingV21RepairInstruction(PromptValidationUnavailableMismatch)
+	var payload map[string]string
+	if err := json.Unmarshal([]byte(instruction), &payload); err != nil {
+		t.Fatalf("repair instruction is not compact JSON string style: %v", err)
+	}
+	repair := payload["repair_instruction"]
+	for _, required := range []string{
+		"item.available_text is non-empty app-selected evidence",
+		"do not set model_status to summary_unavailable",
+		"Set model_status to ok",
+		"If the evidence is noisy, ignore boilerplate/chrome",
+		"source-grounded facts",
+	} {
+		if !strings.Contains(repair, required) {
+			t.Fatalf("repair instruction %q missing required guidance %q", repair, required)
+		}
+	}
+}
+
 func TestPromptValidationLanguageInvalidAllowsShortNameLikeEnglishReadingFields(t *testing.T) {
 	out := OpenRouterSummaryOutput{
 		LocalizedTitle: "Bonsai Image 4B",

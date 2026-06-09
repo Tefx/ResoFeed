@@ -117,6 +117,66 @@ func TestSanitizeReadablePayloadTextRejectsMetadataOnlyArticleChrome(t *testing.
 	}
 }
 
+func TestSanitizeReadablePayloadTextDropsCSSBeforeArticleBody(t *testing.T) {
+	dirty := strings.Join([]string{
+		`#filter')}. widget-drilldown . refine-filters-toggle. fa . fa:after,. widget-drilldown . refine-filters-toggle. fa . fa:before{width:25px}. widget-dynamic . tabs-content{color:#171e2f;font-size:13px}. widget-customwidgets . bg-white{background-color:rgb(255 255 255)}. widget-customwidgets . transition-all{transition-property:all}`,
+		"Wendy's new branding commits a cardinal design sin",
+		"Fast food chain Wendy's is rolling out a new restaurant look that's breaking all the rules. Forget about hunger-inducing, attention-grabbing red; Wendy's global chains are feeling blue.",
+		"The new blue restaurants were recently introduced as part of Wendy's Future Fresh initiative after debuting in the Philippines.",
+	}, "\n")
+	cleaned, changed := sanitizeReadablePayloadText(dirty)
+	if !changed {
+		t.Fatalf("sanitizeReadablePayloadText changed=false, want CSS line dropped")
+	}
+	if strings.Contains(cleaned, "widget-drilldown") || strings.Contains(cleaned, "transition-property") || strings.Contains(cleaned, "var(--") {
+		t.Fatalf("cleaned payload kept CSS chrome: %q", cleaned)
+	}
+	for _, want := range []string{"Wendy's new branding", "Future Fresh", "Philippines"} {
+		if !strings.Contains(cleaned, want) {
+			t.Fatalf("cleaned payload missing %q: %q", want, cleaned)
+		}
+	}
+}
+
+func TestSanitizeReadablePayloadTextRejectsJavaScriptRequiredAndBrowserChrome(t *testing.T) {
+	tests := []string{
+		"This page requires JavaScript.\nPlease turn on JavaScript in your browser and refresh the page to view its content.",
+		"Skip to Main Content\nAccessibility Overview\nSupport\nEnglish\nEnglish\nEspañol\nDeutsch\nPrivacy & Legal Policies\nDo Not Sell My Personal Information\nCookie Preferences",
+	}
+	for _, dirty := range tests {
+		cleaned, _ := sanitizeReadablePayloadText(dirty)
+		if strings.TrimSpace(cleaned) != "" && !isLowInformationReadablePayload(cleaned) {
+			t.Fatalf("chrome payload accepted as usable evidence: %q", cleaned)
+		}
+	}
+}
+
+func TestExtractArticleTextRejectsJavaScriptRequiredChromeWithFallback(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = w.Write([]byte(`<html><body><main>This page requires JavaScript. Please turn on JavaScript in your browser and refresh the page to view its content.</main></body></html>`))
+	}))
+	defer server.Close()
+
+	text, status := extractArticleText(context.Background(), server.URL, "RSS fallback excerpt remains available")
+	if status != extractionStatusPartial || strings.TrimSpace(text) != "" {
+		t.Fatalf("extractArticleText status=%q text=%q, want partial with empty local text", status, text)
+	}
+}
+
+func TestExtractArticleTextRejectsBrowserChromeOnlyPage(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = w.Write([]byte(`<html><body><main>Skip to Main Content Accessibility Overview Support English English Español Deutsch 简体中文 繁體中文 Français Português 日本語 Русский 한국어 Italian Tiếng Việt Privacy & Legal Policies Do Not Sell My Personal Information Cookie Preferences</main></body></html>`))
+	}))
+	defer server.Close()
+
+	text, status := extractArticleText(context.Background(), server.URL, "")
+	if status != extractionStatusOriginalNA || strings.TrimSpace(text) != "" {
+		t.Fatalf("extractArticleText status=%q text=%q, want original unavailable for browser chrome", status, text)
+	}
+}
+
 func TestExtractArticleTextRejectsTitleAndLoadingChrome(t *testing.T) {
 	tests := []struct {
 		name     string

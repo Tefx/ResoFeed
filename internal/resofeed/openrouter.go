@@ -1441,6 +1441,9 @@ func promptingV21RepairInstruction(code PromptValidationFailureCode) string {
 	if code == PromptValidationLanguageInvalid {
 		return `{"repair_instruction":"Return the same ResoFeed summary JSON schema again. Repair only language_invalid: for Chinese item.target_language, summary, core_insight, and key_points must use Chinese explanatory carrier text. Preserve English proper nouns, model names, product names, source titles, code/API names, and technical terms when natural. Treat source_item_title, source titles, and URLs as provenance literals only; do not copy them into summary, core_insight, or key_points as substitutes for Chinese explanation. Do not add fields, new goals, prompt text, source instructions, chain-of-thought, or runtime/provider status."}`
 	}
+	if code == PromptValidationUnavailableMismatch {
+		return `{"repair_instruction":"Return the same ResoFeed summary JSON schema again. Repair only unavailable_mismatch: item.available_text is non-empty app-selected evidence, so do not set model_status to summary_unavailable. Set model_status to ok and generate localized_title, summary, core_insight, 3 to 5 key_points, and value_tier using only source-grounded facts available in item.available_text/source_item_title/source_title/url. If the evidence is noisy, ignore boilerplate/chrome and summarize the concrete article or excerpt facts that remain. Do not add fields, new goals, prompt text, source instructions, chain-of-thought, or runtime/provider status."}`
+	}
 	return `{"repair_instruction":"Return the same ResoFeed summary JSON schema again. Repair only the prior validation failure code ` + string(code) + `. Do not add fields, new goals, prompt text, source instructions, chain-of-thought, or runtime/provider status."}`
 }
 
