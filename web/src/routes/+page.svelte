@@ -41,6 +41,7 @@
 
   const tokenStorageKey = 'resofeed.ownerToken';
   const feedPageSize = 50;
+  const feedAutoRefreshMs = 30_000;
   const activeOperationPollMs = 800;
   const idleOperationPollMs = 5000;
 
@@ -94,6 +95,8 @@
   let operationPollGeneration = 0;
   let operationPollInFlight = false;
   let operationPollTimer: number | null = null;
+  let feedAutoRefreshInFlight = false;
+  let feedAutoRefreshTimer: number | null = null;
   let suppressFeedScrollRecording = false;
   let openRouterModels = $state<OpenRouterModelOption[]>([]);
   let openRouterModelListState = $state<'loading' | 'available' | 'unavailable'>('unavailable');
@@ -710,6 +713,35 @@
     if (selectedItemId && selectedItemDetail?.id !== selectedItemId) await loadItemDetail(selectedItemId);
   }
 
+  function mergeRefreshedFeedItems(refreshedItems: ItemSummary[], currentItems: ItemSummary[]): ItemSummary[] {
+    const refreshedIds = new Set(refreshedItems.map((item) => item.id));
+    return [...refreshedItems, ...currentItems.filter((item) => !refreshedIds.has(item.id))];
+  }
+
+  async function autoRefreshFeed(): Promise<void> {
+    if (!hasOwnerToken || loadState !== 'ready' || feedLoadingMore || feedAutoRefreshInFlight || document.visibilityState === 'hidden') return;
+    feedAutoRefreshInFlight = true;
+    try {
+      const client = apiClient();
+      const [sourceResponse, feedResponse] = await Promise.all([client.sources(), client.today({ limit: feedPageSize })]);
+      const hadExtendedFeed = items.length > feedPageSize;
+      const refreshedItems = mergeRefreshedFeedItems(feedResponse.items, items);
+      sources = sourceResponse.sources;
+      items = refreshedItems;
+      feedOffset = refreshedItems.length;
+      if (!hadExtendedFeed) feedHasMore = feedResponse.items.length === feedPageSize;
+      reconcileSelectedFeedItem(refreshedItems);
+    } catch (error) {
+      if (error instanceof ResoFeedApiError && error.status === 401) {
+        window.localStorage.removeItem(tokenStorageKey);
+        ownerToken = '';
+        promptState = 'rejected';
+      }
+    } finally {
+      feedAutoRefreshInFlight = false;
+    }
+  }
+
   async function loadAgentSteeringRules(client: ResoFeedApiClient): Promise<SteerRule[]> {
     try {
       const response = await client.activeRules();
@@ -1202,11 +1234,17 @@
       tokenHydrated = true;
     }
 
+    feedAutoRefreshTimer = window.setInterval(() => void autoRefreshFeed(), feedAutoRefreshMs);
+
     return () => {
       media.removeEventListener('change', updateMedia);
       document.removeEventListener('mousedown', preserveKeyboardFocusModality);
       document.removeEventListener('keydown', handleGlobalEscape, true);
       window.removeEventListener('popstate', handlePopState);
+      if (feedAutoRefreshTimer !== null) {
+        window.clearInterval(feedAutoRefreshTimer);
+        feedAutoRefreshTimer = null;
+      }
     };
   });
 </script>
