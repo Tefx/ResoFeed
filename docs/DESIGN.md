@@ -984,6 +984,12 @@ Processing-language addendum: Inspector title, model-backed dense summary, model
 
 On desktop, the Inspector is its own scroll container. Opening a different item resets the Inspector scroll position to the top without moving the Feed scroll. On mobile, Inspector remains a full-screen route.
 
+
+### Mobile Gesture Primitives
+- **Intent**: Provide OS-fluid navigation and network pagination without polluting the visual screen space with permanent buttons.
+- **useFor**: Pull-to-refresh for Feed updates, Pull-to-load-more for Feed pagination, Edge-swipe for mobile Inspector dismissal.
+- **avoidFor**: Desktop views, triggering destructive actions, implementing non-standard custom swipe interactions (like swipe-to-delete), or overriding native OS behaviors with laggy JavaScript simulations.
+
 ### Source Ledger
 - **Intent**: [SHARP] Flat source management and operational context without settings-dashboard behavior.
 - **useFor**: Source rows, OPML source-list import/export, state export/import, manual `[RUN INGEST]`, per-source `[FETCH]`, and visible current operation status when work is running or blocks an action.
@@ -1193,6 +1199,8 @@ Do:
 - [SHARP] Do strip visual metadata prefixes in reader surfaces: source names, time, extraction status, model support, and value tier belong in `list-meta-row` order, while full provenance belongs in `inspector-frontmatter`.
 - [SHARP] Do convert original/article/feed/source URLs into compact evidence links (`原文链接`, `来源链接`, `original link`, `feed link`) in the Inspector; raw URL strings are reserved for Source Ledger management and diagnostics.
 - Do keep accent scarce: Resonate and one active command/focus moment at most.
+- [SHARP] Do support native "Swipe-right to go back" on mobile Inspector routes, binding the gesture to a synchronous view dismissal without arbitrary animations.
+- [SHARP] Do support mobile pull-to-refresh and pull-to-load-more gestures, bound strictly to bracket-text feedback states rather than OS-default graphical spinners.
 - Do enforce minimum 44 CSS px touch targets on mobile web surfaces.
 - Do support keyboard navigation for every action.
 - Do keep exported state human-readable.
@@ -1250,6 +1258,12 @@ Don't:
 - Don't automatically rewrite existing items merely because the user changed language.
 
 ## Micro-interactions & Motion
+
+
+### [SHARP] Mobile Gestures
+- **Pull-down to Refresh**: Native-physics pull on the Feed column MUST reveal a text-only indicator at the upper edge (e.g., `[PULL TO REFRESH]` → `[REFRESHING...]` → disappearance). Do not use native spinner widgets (e.g., iOS `UIRefreshControl` or Android `SwipeRefreshLayout` circular progress). The action triggers a lightweight item fetch without a full blocking page reload.
+- **Pull-up to Load More**: Native-physics overscroll on the Feed bottom MUST reveal a text-only pagination state (`[PULL TO LOAD MORE]` → `[LOADING MORE...]` → disappearance). No loading spinners or skeletal blocks.
+- **Swipe-right to Go Back**: Mobile narrow-viewport Inspector route MUST support native OS edge-swipe navigation to dismiss the Inspector and return to the Feed stack. This gesture must natively sync with the view sliding away. The underlying Feed MUST NOT lose scroll position or selection state during the swipe.
 
 Motion is functional, brief, and optional.
 

@@ -24,6 +24,23 @@ The color system reflects a precision utility without punishing the eyes. Pure t
 - **The Singular Accent (Resonate):** A stark, functional accent (e.g., a pure cyan, amber, or sharp magenta) that cuts through the monochrome like a highlighter pen.
 *(Note: Strict semantic token mappings, contrast pairs, and typography fallback rules are deferred to the `docs/DESIGN.md` phase.)*
 
+
+### Mobile Gestures (Smooth Native Feel)
+To enhance the 'Commute Review' experience without adding heavy UI chrome, we embrace native-feeling mobile gestures. These gestures must respect the 'strict determinism for pure simplicity' rule and never interfere with the primary reading experience.
+
+1. **Pull-down to Refresh (Feed):**
+   - **Intent:** Trigger a lightweight, immediate check for new items without burying the action in a menu or requiring a global 'run ingest' from the Source Ledger.
+   - **Feedback:** A subtle, low-chrome text indicator at the top of the feed (e.g., `[PULL TO REFRESH]` -> `[REFRESHING...]`). No animated spinners. No bouncy elastic rubber-banding beyond standard OS physics.
+   - **Action:** Triggers a fast feed update, not a full blocking reprocess.
+
+2. **Pull-up to Load More (Feed):**
+   - **Intent:** Seamless continuation of the reading session when reaching the end of the current pagination chunk.
+   - **Feedback:** A deterministic, text-only state at the bottom of the feed (e.g., `[PULL TO LOAD MORE]` -> `[LOADING MORE...]`). It should feel like pulling the next sheet of paper, not triggering a complex network state.
+
+3. **Swipe-right to Go Back (Inspector -> Feed):**
+   - **Intent:** The critical one-handed commute gesture. When deep in the Inspector (full-screen mobile route), a horizontal swipe from the left edge dismisses the Inspector and returns to the exact scroll position in the Feed.
+   - **Vibe:** Snappy and OS-native. It should mimic the exact physics of an iOS/Android native back gesture. The feed underneath should not have lost state or geometry while the Inspector was open.
+
 ## 6. Typography & Scale
 Typography separates "Payload" (content) from "Chrome" (utility):
 - **Content Typeface:** A high-legibility, beautiful Serif for article titles, summaries, and full text (preserving the calm, low-fatigue reading experience).
