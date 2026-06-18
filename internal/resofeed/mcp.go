@@ -477,7 +477,7 @@ func (h *mcpHandler) dispatch(ctx context.Context, req mcpRequest) (any, *mcpErr
 }
 
 func (h *mcpHandler) initializeResult() map[string]any {
-	serverInfo := map[string]any{"name": "resofeed", "version": "v0.2"}
+	serverInfo := map[string]any{"name": "resofeed", "version": "v0.2.8"}
 	if h.publicURL != "" {
 		serverInfo["publicUrl"] = h.publicURL
 		serverInfo["mcpUrl"] = mcpEndpointFromPublicURL(h.publicURL)
