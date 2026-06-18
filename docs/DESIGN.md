@@ -511,7 +511,7 @@ Mobile layout:
 - Mobile Inspector/detail routes are [SHARP] full-screen takeovers. They must cover global top chrome and the bottom Steer command area instead of leaving top or bottom color slabs visible behind the route. The back row is the route chrome; the global shell chrome must not show through as a second banner.
 - Source Ledger opens as a flat full-screen utility surface on narrow layouts, reachable from the `RESOFEED` menu and optionally by Steer command text such as `source ledger`.
 - Touch targets must be at least 44 CSS px on web/mobile web. Native shells may map this to platform points.
-- Gestures: Support native OS edge-swipe to dismiss the Inspector (crucial for one-handed use). Feed rows are full-width tap targets (excluding the independent Resonate hit area). Double-tap in the Inspector reading body to toggle Resonate is encouraged as a power-user enhancement, provided the explicit star button remains visible.
+- Gestures: Feed rows are full-width tap targets (excluding the independent Resonate hit area). Do NOT implement double-tap to Resonate in the reading body, to strictly preserve native OS text-selection mechanics.
 
 Feed lifecycle:
 
