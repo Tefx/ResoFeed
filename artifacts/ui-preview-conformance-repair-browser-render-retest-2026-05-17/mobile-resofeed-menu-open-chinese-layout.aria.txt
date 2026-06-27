@@ -1,7 +1,0 @@
-- group "RESOFEED surface menu":
-  - text: RESOFEED
-  - button "TODAY" [pressed]
-  - button "SOURCE LEDGER"
-  - button "处理语言 中文; set English": "语言: 中文"
-  - text: 已存可读内容将被重写。 来源标识保持不变。
-  - button "Reprocess existing library and rebuild search index": "[重处理资料库]"

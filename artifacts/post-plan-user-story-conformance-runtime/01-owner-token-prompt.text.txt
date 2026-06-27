@@ -1,5 +1,0 @@
-RESOFEED
-
-Enter owner token
-Owner token
-[SUBMIT]
