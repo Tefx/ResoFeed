@@ -792,24 +792,26 @@ func conflictsWithInvariants(command string) bool {
 }
 
 func parseRSSURL(command string) (string, bool) {
-	parsed, err := url.Parse(command)
-	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+	parsed, err := normalizedOutboundHTTPURL(command)
+	if err != nil {
 		return "", false
 	}
-	if parsed.Scheme != "http" && parsed.Scheme != "https" {
-		return "", false
-	}
-	return parsed.String(), true
+	return parsed, true
 }
 
 func applySourceURLSteering(ctx context.Context, db *sql.DB, sourceURL string) (SteerResult, error) {
 	if db == nil {
 		return SteerResult{}, errors.New("apply source steering: db is nil")
 	}
+	var err error
+	sourceURL, err = normalizedOutboundHTTPURL(sourceURL)
+	if err != nil {
+		return SteerResult{}, fmt.Errorf("add source through steering: validate url: %w", err)
+	}
 	now := time.Now().UTC().Format(time.RFC3339Nano)
 	id := stableTextID("src", sourceURL)
 	identity := sourceIdentity(sourceURL)
-	_, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, is_active, revision) values (?, ?, ?, ?, 'not_fetched', 1, 1) on conflict(url) do update set is_active = 1, revision = revision + 1`, id, sourceURL, identity, now)
+	_, err = db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, is_active, revision) values (?, ?, ?, ?, 'not_fetched', 1, 1) on conflict(url) do update set is_active = 1, revision = revision + 1`, id, sourceURL, identity, now)
 	if err != nil {
 		return SteerResult{}, fmt.Errorf("add source through steering: %w", err)
 	}

@@ -32,7 +32,7 @@ RUN set -eux; \
 
 FROM gcr.io/distroless/static-debian12:nonroot AS runtime
 
-ARG RESOFEED_VERSION="v0.2.10"
+ARG RESOFEED_VERSION="v0.2.11"
 
 LABEL org.opencontainers.image.title="ResoFeed" \
       org.opencontainers.image.version="${RESOFEED_VERSION}" \

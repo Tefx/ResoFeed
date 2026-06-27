@@ -7,9 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -158,40 +156,5 @@ func firstTavilyEligibleArticleURLCandidate(canonicalURL string, itemURL string)
 }
 
 func isTavilyEligibleArticleURL(raw string) bool {
-	parsed, err := url.Parse(strings.TrimSpace(raw))
-	if err != nil || parsed == nil {
-		return false
-	}
-	if parsed.Scheme != "http" && parsed.Scheme != "https" {
-		return false
-	}
-	if parsed.User != nil {
-		return false
-	}
-	host := strings.TrimSuffix(strings.ToLower(strings.TrimSpace(parsed.Hostname())), ".")
-	if host == "" || host == "localhost" || strings.HasSuffix(host, ".localhost") {
-		return false
-	}
-	ip := parseTavilyHostIP(host)
-	if ip == nil {
-		return true
-	}
-	return isPublicTavilyIP(ip)
-}
-
-func parseTavilyHostIP(host string) net.IP {
-	if ip := net.ParseIP(host); ip != nil {
-		return ip
-	}
-	if scopedHost, _, ok := strings.Cut(host, "%"); ok {
-		return net.ParseIP(scopedHost)
-	}
-	return nil
-}
-
-func isPublicTavilyIP(ip net.IP) bool {
-	if ip == nil {
-		return false
-	}
-	return !ip.IsLoopback() && !ip.IsPrivate() && !ip.IsLinkLocalUnicast() && !ip.IsLinkLocalMulticast() && !ip.IsMulticast() && !ip.IsUnspecified()
+	return isStrictOutboundHTTPURL(raw)
 }

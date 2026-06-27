@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"regexp"
 	"strings"
 	"sync"
@@ -818,19 +817,19 @@ func isUnusableReprocessOutputTitle(title string) bool {
 }
 
 func isHTTPArticleURL(raw string) bool {
-	parsed, err := url.Parse(strings.TrimSpace(raw))
-	if err != nil || parsed.Host == "" {
-		return false
-	}
-	return parsed.Scheme == "http" || parsed.Scheme == "https"
+	return isOutboundHTTPURL(raw)
 }
 
 func fetchArticleReadableText(ctx context.Context, articleURL string) (text string, retErr error) {
+	articleURL, err := normalizedOutboundHTTPURL(articleURL)
+	if err != nil {
+		return "", fmt.Errorf("reprocess fetch: validate url: %w", err)
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, articleURL, nil)
 	if err != nil {
 		return "", fmt.Errorf("reprocess fetch: create request: %w", err)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := outboundHTTPClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("reprocess fetch: %w", err)
 	}

@@ -292,6 +292,9 @@ func validateSourceStates(sources []SourceState) error {
 		if source.URL == "" {
 			return fmt.Errorf("invalid state bundle field %q: required", "sources.url")
 		}
+		if _, err := normalizedOutboundHTTPURL(source.URL); err != nil {
+			return fmt.Errorf("invalid state bundle field %q: %w", "sources.url", err)
+		}
 		if source.Title == "" {
 			return fmt.Errorf("invalid state bundle field %q: required", "sources.title")
 		}
@@ -329,8 +332,14 @@ func validateResonatedItemStates(items []ResonatedItemState) error {
 		if item.URL == "" {
 			return fmt.Errorf("invalid state bundle field %q: required", "resonated_items.url")
 		}
+		if _, err := normalizedOutboundHTTPURL(item.URL); err != nil {
+			return fmt.Errorf("invalid state bundle field %q: %w", "resonated_items.url", err)
+		}
 		if item.SourceURL == "" {
 			return fmt.Errorf("invalid state bundle field %q: required", "resonated_items.source_url")
+		}
+		if _, err := normalizedOutboundHTTPURL(item.SourceURL); err != nil {
+			return fmt.Errorf("invalid state bundle field %q: %w", "resonated_items.source_url", err)
 		}
 	}
 	return nil

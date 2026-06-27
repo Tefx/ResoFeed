@@ -1153,11 +1153,15 @@ type feedEntry struct {
 }
 
 func fetchFeed(ctx context.Context, feedURL string) (feed parsedFeed, retErr error) {
+	feedURL, err := normalizedOutboundHTTPURL(feedURL)
+	if err != nil {
+		return parsedFeed{}, fmt.Errorf("rss fetch: validate url: %w", err)
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, feedURL, nil)
 	if err != nil {
 		return parsedFeed{}, fmt.Errorf("rss fetch: create request: %w", err)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := outboundHTTPClient.Do(req)
 	if err != nil {
 		return parsedFeed{}, fmt.Errorf("rss fetch: %w", err)
 	}
@@ -1415,8 +1419,8 @@ func ingestedItemID(source Source, entry feedEntry) string {
 }
 
 func extractArticleText(ctx context.Context, itemURL string, fallback string) (text string, status string) {
-	parsed, err := url.Parse(itemURL)
-	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+	itemURL, err := normalizedOutboundHTTPURL(itemURL)
+	if err != nil {
 		if strings.TrimSpace(fallback) != "" {
 			return "", extractionStatusPartial
 		}
@@ -1429,7 +1433,7 @@ func extractArticleText(ctx context.Context, itemURL string, fallback string) (t
 		}
 		return "", extractionStatusOriginalNA
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := outboundHTTPClient.Do(req)
 	if err != nil {
 		if strings.TrimSpace(fallback) != "" {
 			return "", extractionStatusPartial
