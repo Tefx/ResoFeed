@@ -157,8 +157,8 @@ func TestOpenRouterStructuredOutputRoutingDoesNotDowngradeAfterGeneratedResponse
 	if err == nil {
 		t.Fatal("SummarizeItem returned nil error for generated invalid JSON")
 	}
-	if len(seen) != 2 {
-		t.Fatalf("attempts = %d, want one normal attempt plus one semantic repair attempt", len(seen))
+	if len(seen) != 3 {
+		t.Fatalf("attempts = %d, want one normal attempt plus two bounded semantic repair attempts", len(seen))
 	}
 	for i, request := range seen {
 		if request.ResponseFormat["type"] != "json_schema" {

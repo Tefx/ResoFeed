@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -196,8 +197,11 @@ func TestReprocessFallbackTextContractExpectedRed(t *testing.T) {
 	db := newContractDB(t, ctx)
 
 	requests := map[string]int{}
+	var requestsMu sync.Mutex
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestsMu.Lock()
 		requests[r.URL.Path]++
+		requestsMu.Unlock()
 		switch r.URL.Path {
 		case "/feed.xml":
 			t.Fatalf("reprocess must not fetch source/feed URL for article text")
@@ -223,8 +227,11 @@ func TestReprocessFallbackTextContractExpectedRed(t *testing.T) {
 	if resp.Reprocess.ItemsUpdated != 2 || resp.Reprocess.ItemsUnavailable != 1 || resp.Reprocess.ItemsFailed != 0 {
 		t.Fatalf("reprocess fallback result = %+v, want extracted_text and feed_excerpt fallback items updated and no-readable item original_unavailable", resp.Reprocess)
 	}
-	if requests["/feed.xml"] != 0 {
-		t.Fatalf("reprocess fetched source/feed URL %d times", requests["/feed.xml"])
+	requestsMu.Lock()
+	feedRequests := requests["/feed.xml"]
+	requestsMu.Unlock()
+	if feedRequests != 0 {
+		t.Fatalf("reprocess fetched source/feed URL %d times", feedRequests)
 	}
 
 	extracted := llm.inputs["item_extracted_fallback"]
