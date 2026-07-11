@@ -182530,15 +182530,15 @@ phases:
 
       - No unresolved residuals.'
 - id: rf-bug-20260712-contract-lock
-  name: RF-BUG-001–010 Contract Lock and Expected-Red Proofs
+  name: RF-BUG-001–010 Contract Lock and Protected Acceptance
   status: pending
-  gate: The authoritative docs/BUG_FIX_PLAN_2026-07-12.md contract and canonical English
-    documents are reconciled before implementation; expected-red proofs cover RF-BUG-001–010,
-    exact Doctor diagnostics, real-stream cancellation, semantic Prompting v2.2, per-test
-    Playwright reset, real-runtime/no-interception behavior, and the Section 7 authoritative
-    active scope. scripts/verify-active-reference-gates.sh and scripts/verify-active-rf-bug-plan.mjs
-    must report the six existing RF-BUG phases with zero stale matches; no duplicate
-    RF-BUG phase or completed-history mutation is permitted.
+  gate: All protected acceptance artifacts are created by authorized contract-test
+    owners; each RF-BUG-001–010 requirement is independently collected and intentionally
+    red; canonical docs reflect the simplified contract; implementation and completed
+    history remain unchanged.
+  context: Contract lock creates route, Inspector, Source Ledger, Prompting, and E2E
+    acceptance artifacts under explicit authority, then protects them from implementation
+    mutation. No phase Full Gate, registry, manifest, or evidence protocol is introduced.
   depends_on:
   - tavily-external-extraction-verification-release
   steps:
