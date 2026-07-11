@@ -183159,7 +183159,6 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - internal/resofeed/http.go
-    - internal/resofeed/http_security.go
     depends_on:
     - embed-ui-assets-in-single-binary
     agent: security-engineer
