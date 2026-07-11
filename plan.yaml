@@ -183050,7 +183050,7 @@ phases:
     - go.mod
     - internal/resofeed
     agent: golang-developer
-  - id: remove-opml-export-active-surface
+  - id: enforce-opml-import-only-surface
     name: Enforce import-only source interchange
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
