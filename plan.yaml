@@ -182558,3 +182558,12 @@ phases:
     under two minutes and three full Chromium runs agree with per-failure artifacts.
   depends_on:
   - rf-bug-20260712-ledger-prompting
+- id: rf-bug-20260712-assurance-closure
+  name: RF-BUG Local, Container, Tailnet, Independent Review, and Closure
+  status: locked
+  gate: Local tests/builds, fresh Docker proof, Tailnet/Caddy header and browser liveness,
+    formal security review, independent runtime/UI verification, English documentation
+    parity, and RF-BUG-001–010 defect-report closure evidence all pass with redacted
+    logs.
+  depends_on:
+  - rf-bug-20260712-e2e-isolation
