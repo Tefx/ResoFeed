@@ -183500,24 +183500,33 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Build a fresh no-cache image from Dockerfile and prove the runtime image contains
-      `/app/resofeed` and writable `/data` without `/app/web/build` or another static
-      asset tree. Start with isolated data and fake owner token; verify root/deep-link
-      UI, arbitrary container cwd, /doctor embedded-asset lines, import-only OPML/state
-      paths, security headers, direct routes, and browser liveness. Repository mutation
-      is absent because this is an ephemeral image/container verification of committed
-      artifacts. Never print environment secrets. Recovery: stop/remove the test container
-      and image; on failure preserve redacted build/runtime logs and block Tailnet
-      deployment.'
-    verification: Capture image digest, no-cache build command/result, runtime file
-      inventory, health/browser/curl probes, header matrix, doctor lines, and cleanup
-      receipt; all checks pass with no external UI tree.
+      Consume the immutable registry-qualified multi-platform image receipt from publish-immutable-two-platform-oci-image;
+      do not rebuild or substitute a local mutable image. Repository mutation is absent
+      because this is ephemeral container verification with evidence under ignored
+      paths. For both amd64 and arm64 manifests, prove `/app/resofeed`, writable `/data`,
+      no external UI tree, non-root runtime, arbitrary cwd, root/deep/dotted UI, embedded
+      Doctor lines, import-only source interchange, JSON state backup/restore, four
+      security headers, and exact fixture A→B persistence. Never print secrets. Recovery
+      stops/removes test containers and blocks deployment on any digest/platform/rootfs/state
+      mismatch.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.fresh-docker-runtime-proof","risk_tier":"R3","risk_reasons":["multi_arch_container_runtime","state_persistence","deployment_prerequisite"],"primary_outcome":"RF-BUG-CONTAINER-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Validate the OCI receipt, then emit a container-runtime receipt
+      with immutable reference/index digest, each platform digest/rootfs hash, exact
+      probes, Doctor/header results, A→B semantic state hash, cleanup, and redaction
+      result. All predicates pass before Tailnet deployment.
     refs:
     - Dockerfile
     - docs/CONTAINER.md
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - scripts/verify-container-contract.sh
     depends_on:
-    - local-full-verification-matrix
+    - publish-immutable-two-platform-oci-image
     agent: integration-verifier
   - id: tailnet-caddy-runtime-proof
     name: Deploy and verify Tailnet/Caddy runtime
