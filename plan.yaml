@@ -183554,16 +183554,23 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Repository mutation is absent because this step consumes committed local artifacts
-      and writes only ignored test output. Run the Section 7 local rows: frontend
-      check and focused render tests; focused Go asset/Doctor/security and Prompting
-      tests; full `go test ./... -count=1`, `go vet ./...`, and `go build ./cmd/resofeed`;
-      named protected browser contracts; timeout-wrapped smoke; runtime lane; legacy
-      old/replacement collection; and three retry-free CI-safe runs. Run the bounded
-      active source/spec gate. Exclude OCI publication, container-runtime, Tailnet,
-      and live-provider rows. Failure reports command, exit, duration, and redacted
-      artifact path; no custom evidence schema, expected-ID inventory, reset/teardown
-      registry, or phase Full Gate is required.
+      Repository mutation is absent because this step consumes committed artifacts
+      and writes only ignored test output. Execute Section 7 exactly: `npm --prefix
+      web run check`; `npm --prefix web run test:render -- web/src/lib/__tests__/workbench-route.test.ts
+      web/src/routes/__tests__/inspector-selection.test.ts web/src/routes/__tests__/steer-invalid.test.ts
+      web/src/routes/components/__tests__/source-ledger-responsive.test.ts --reporter=verbose`;
+      focused `go test -v` RF-BUG-003/004/005 and RF-BUG-009; `go test -v ./... -count=1`,
+      vet, build; browser contracts with a preceding `--list`; RF-BUG-002 EN/ZH `--repeat-each=10
+      --retries=0`; EN/ZH Inspector/routes/OPML-State/accessibility; real-Chromium
+      CSP OPML import and State export/import/download; timeout smoke; runtime; the
+      exact old/replacement list and run checks; and three retry-free CI-safe runs.
+      Every green row records exact file/test IDs and positive counts, requires run
+      count to equal list count, and rejects `No tests found`, `[no tests to run]`,
+      zero tests, skipped required IDs, retries, or generic ok/passed without names.
+      Require failed-test videos plus trace/screenshot/server/browser/network artifacts.
+      Run the complete OPML active scan with only the four named exclusions. Exclude
+      OCI/container/Tailnet/live rows. No custom evidence schema, registry, generator,
+      or phase gate.
 
 
       <vectl_step_policy>
@@ -183571,10 +183578,12 @@ phases:
       {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.local-full-verification-matrix","risk_tier":"R2","risk_reasons":["cross_component_local_acceptance","runtime_browser_proof"],"primary_outcome":"RF-BUG-LOCAL-MATRIX","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["spec-verifier"],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: Execute each local Section 7 row and record ordinary command output.
-      PASS requires all local commands green, smoke under 120 seconds, three retry-free
-      CI-safe runs with the same collected set, protected acceptance artifacts unchanged,
-      and no OCI/Tailnet/live command executed.
+    verification: PASS requires exact named collection/count receipts for every Section
+      7 local row; four frontend render files with at least one test each; exactly
+      20 RF-BUG-002 race passes (ten EN, ten ZH); explicit EN/ZH Inspector/routes/OPML-State/accessibility
+      passes; CSP operations/download green; identical positive old/replacement list/run
+      sets; three identical retry-free CI-safe sets; smoke under 120s; failed-test
+      video contract probed; protected artifacts unchanged; no OCI/Tailnet/live command.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
