@@ -182828,25 +182828,26 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
       \ RF-BUG-006 and RF-BUG-007. Derive the exact neutral, TODAY, SOURCE LEDGER,\
-      \ SEARCH, INSPECTOR, and /doctor document titles from resolved surface state\
-      \ without translation. Replace persistent idle Steer error detail with conditional\
-      \ invalid state: aria-invalid and description exist only while invalid, one\
-      \ live-region message is emitted per invalid transition, and continued input\
-      \ immediately clears the state and relationship in EN/ZH. Update English DESIGN.md\
-      \ and UI preview/contract artifacts with title and accessibility semantics.\
-      \ Preserve valid Steer preview/apply behavior and functional labels. Recovery:\
-      \ revert title/a11y state changes and docs together. Security: error text remains\
-      \ terse and contains no submitted secrets.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n \
-      \   - web/src/routes/+page.svelte\n    - web/src/lib/workbench-state.ts\n  \
-      \  - web/src/lib/workbench-state.test.ts\n    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n\
-      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n    - docs/UI_REGRESSION_CONTRACT.md\n\
-      \  blocked_paths:\n    - internal/resofeed/**\n    - web/playwright.config.ts\n\
-      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
-      \ .test-artifacts/\nclaims:\n  - RF-BUG-006\n  - RF-BUG-007\nchecks:\n  - id:\
-      \ title_steer_a11y_green\n    run:\n      command: [npm, --prefix, web, run,\
-      \ test:e2e, --, bugfix-frontend-behavior.expected-red.spec.ts, --project=chromium-ci-safe]\n\
-      \      timeout_seconds: 300\n    expect:\n      outcome: green\n      exit_codes:\
+      \ SEARCH, INSPECTOR, and /doctor document titles from ResolvedRoute in web/src/lib/workbench-route.ts,\
+      \ with web/src/routes/+page.svelte owning UI state. Replace persistent idle\
+      \ Steer error detail with conditional invalid state: aria-invalid and its error\
+      \ relationship exist only while invalid, one live-region message occurs per\
+      \ invalid transition, and continued input immediately clears both in EN/ZH.\
+      \ Update docs/DESIGN.md and docs/ui-preview.html in English. Preserve valid\
+      \ Steer preview/apply behavior and functional labels. Browser proof uses the\
+      \ real runtime with no product API interception. Recovery reverts title/accessibility\
+      \ code, tests, and docs together. Error text stays terse and excludes submitted\
+      \ secrets.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: generic\nscope:\n  allowed_paths:\n    - web/src/lib/workbench-route.ts\n\
+      \    - web/src/lib/__tests__/workbench-route.test.ts\n    - web/src/routes/+page.svelte\n\
+      \    - web/src/routes/__tests__/steer-invalid.test.ts\n    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n\
+      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n  blocked_paths:\n    - internal/resofeed/**\n\
+      \    - web/playwright.config.ts\n    - web/playwright.*.config.ts\n  ignored_runtime_paths:\n\
+      \    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\nclaims:\n\
+      \  - RF-BUG-006\n  - RF-BUG-007\nchecks:\n  - id: title_steer_a11y_green\n \
+      \   run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
+      \ src/lib/__tests__/workbench-route.test.ts, src/routes/__tests__/steer-invalid.test.ts]\n\
+      \      timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
       \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
       \          - literal: passed\n        forbids:\n          - literal: failed\n\
       \    proves:\n      - RF-BUG-006\n      - RF-BUG-007\nbindings:\n  expected_red:\n\
@@ -182857,15 +182858,18 @@ phases:
       :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"uiux-auditor\"\
       ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[\"web/src/lib/workbench-state.test.ts\"],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
+      :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/__tests__/steer-invalid.test.ts\"\
+      ],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
       ],\"acceptance_check_ids\":[\"title_steer_a11y_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Focused browser proof asserts exact initial/navigation titles and
-      EN/ZH accessibility snapshots for empty, invalid, repeated invalid, and recovery
-      states on desktop/mobile.
+    verification: Run the exact render-contract tests and real-runtime browser proof.
+      Assert exact initial/navigation titles and EN/ZH accessibility snapshots for
+      empty, invalid, repeated-invalid, and recovery states on desktop/mobile, with
+      zero product-route interception.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
+    - web/src/lib/workbench-route.ts
     - web/src/routes/+page.svelte
     depends_on:
     - repair-inspector-selection-and-routing
