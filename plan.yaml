@@ -183166,31 +183166,24 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-010. Implement the four exact Section 4.10 projects/configs and package\
-      \ scripts: browser-contract, smoke, runtime, and opt-in live. Every project\
-      \ executes the real single cmd/resofeed binary and real product APIs; product-response\
-      \ substitution through route handlers, HAR, service workers, or proxies is forbidden.\
-      \ Synthetic states belong only in test:render:contracts. Before every smoke/runtime/live\
-      \ case and every mutating browser-contract case, stop/reap the previous runtime,\
-      \ create a stable case evidence directory, remove prior mutable DB bytes, copy\
-      \ and digest-check the immutable fixture or create/verify a production-migrated\
-      \ fresh DB, launch a new runtime on an actual loopback port, pass authenticated\
-      \ readiness, create a clean browser context, and write canonical reset.json.\
-      \ The case starts only after all predicates pass; teardown stops/reaps the case\
-      \ runtime and proves no DB instance, PID, or port lifetime spans cases. Implement\
-      \ internal/resofeed/playwright_fixture_test.go with TestWritePlaywrightFixtureV1,\
-      \ the exact seed/template command and rows, production migration/FTS rebuild/integrity/vacuum/atomic\
-      \ replacement, and no handwritten E2E DDL. Own web fixture seed/template, config/base\
-      \ contract, TypeScript harness contract, lane/assertion/test-ID registries,\
-      \ package scripts/lockfile, scripts/run-with-timeout.mjs, scripts/verify-playwright-lanes.mjs,\
-      \ and scripts/verify-playwright-isolation.mjs. Preserve per-worker canonical\
-      \ run-info, bounded process/resource evidence, failure artifacts, exact seven\
-      \ smoke/three runtime/one live IDs, 120-second smoke budget, and three-run digest\
-      \ agreement. Synchronize PLAYWRIGHT_E2E_HARNESS_CONTRACT.md and USAGE.md. Recovery\
-      \ reverts harness/config/scripts/fixtures/generator/docs together; product behavior\
-      \ and schema remain unchanged. Secrets remain opt-in and redacted.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
-      \    - internal/resofeed/playwright_fixture_test.go\n    - web/playwright.config.ts\n\
+      \ RF-BUG-010. Implement the four exact Section 4.10 projects/configs and scripts:\
+      \ browser-contract, smoke, runtime, and opt-in live. Each executes the real\
+      \ cmd/resofeed binary and real product APIs; route/HAR/service-worker/proxy\
+      \ response substitution is forbidden. Before every smoke/runtime/live case and\
+      \ every mutating browser-contract case: reap prior runtime, create case evidence,\
+      \ replace mutable DB from immutable fixture or verified production-migrated\
+      \ fresh state, launch a new runtime on an actual loopback port, pass readiness,\
+      \ create a clean browser context, and write reset.json. Case start waits for\
+      \ all predicates; teardown proves no DB instance, PID, or port lifetime spans\
+      \ cases. Implement playwright_fixture_test.go with TestWritePlaywrightFixtureV1,\
+      \ exact seed/template command and rows, production migration/FTS/integrity/vacuum/atomic\
+      \ replace, and no handwritten DDL. Own fixture seed/template, all configs, TypeScript\
+      \ harness, lane/assertion/test-ID registries, package scripts/lockfile, timeout/lane/isolation\
+      \ scripts, docs, run-info, artifacts, exact seven smoke/three runtime/one live\
+      \ IDs, 120-second budget, and three-run agreement. Recovery reverts harness/config/scripts/fixtures/generator/docs;\
+      \ secrets stay opt-in/redacted.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n \
+      \   - internal/resofeed/playwright_fixture_test.go\n    - web/playwright.config.ts\n\
       \    - web/playwright.base.config.ts\n    - web/playwright.browser-contract.config.ts\n\
       \    - web/playwright.smoke.config.ts\n    - web/playwright.runtime.config.ts\n\
       \    - web/playwright.live.config.ts\n    - web/package.json\n    - web/package-lock.json\n\
@@ -183198,16 +183191,15 @@ phases:
       \    - web/tests/e2e/**\n    - scripts/run-with-timeout.mjs\n    - scripts/verify-playwright-lanes.mjs\n\
       \    - scripts/verify-playwright-isolation.mjs\n    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n\
       \    - docs/USAGE.md\n  blocked_paths:\n    - web/src/routes/**\n    - Dockerfile\n\
-      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
-      \ .test-artifacts/\nclaims:\n  - RF-BUG-010\nchecks:\n  - id: e2e_isolation_green\n\
-      \    run:\n      command: [npm, --prefix, web, run, test:e2e:ci-safe]\n    \
-      \  timeout_seconds: 900\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
-      \          - literal: passed\n        forbids:\n          - literal: failed\n\
-      \    proves:\n      - RF-BUG-010\nbindings:\n  expected_red:\n    items: []\n\
-      \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-e2e-isolation.rf-bug-010-isolate-playwright-lanes\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"test_infrastructure\",\"runtime_lifecycle_harness\"\
+      claims:\n  - RF-BUG-010\nchecks:\n  - id: e2e_isolation_green\n    run:\n  \
+      \    command: [npm, --prefix, web, run, test:e2e:ci-safe]\n      timeout_seconds:\
+      \ 900\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: []\n        contains_any:\n          - literal: passed\n\
+      \        forbids:\n          - literal: failed\n    proves:\n      - RF-BUG-010\n\
+      bindings:\n  expected_red:\n    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
+      :\"rf-bug-20260712-e2e-isolation.rf-bug-010-isolate-playwright-lanes\",\"risk_tier\"\
+      :\"R2\",\"risk_reasons\":[\"test_infrastructure\",\"runtime_lifecycle_harness\"\
       ,\"fixture_generator\",\"ci_contract\"],\"primary_outcome\":\"RF-BUG-010\",\"\
       rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
       ,\"REVIEW\"],\"primary_verifier\":\"blind-tester\",\"additional_verifiers\"\
