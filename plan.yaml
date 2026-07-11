@@ -183504,8 +183504,7 @@ phases:
     - docs/CONTAINER.md
     - docs/USAGE.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
-    - scripts/verify-active-reference-gates.sh
-    - scripts/verify-active-rf-bug-plan.mjs
+    - scripts
     depends_on:
     - formal-security-review
     - independent-runtime-ui-verification
