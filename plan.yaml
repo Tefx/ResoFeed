@@ -183370,15 +183370,14 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-009. Before active-name cleanup or verified-status prose, implement\
-      \ v2.2 payloads, structured-output routing, validation, one normal generation\
-      \ plus at most one semantic repair, permitted pre-generation schema downgrade,\
-      \ failure-content preservation, app-owned diagnostics, persistence, and canonical\
-      \ fixtures across ingest, reprocess, selected-item re-ingest, HTTP, and MCP.\
-      \ Keep runtime secrets and prompts out of logs; add no DB migration. Invoke\
-      \ the protected Prompting acceptance file without mutation and update PROMPTING_SYSTEM\
-      \ behavior prose. Recovery reverts semantic runtime/tests/docs.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      \ RF-BUG-009. Implement v2.2 payloads, structured-output routing, validation,\
+      \ one normal generation plus at most one semantic repair, permitted pre-generation\
+      \ schema downgrade, failure-content preservation, app-owned diagnostics, persistence,\
+      \ and canonical fixtures across ingest, reprocess, selected-item re-ingest,\
+      \ HTTP, and MCP. Keep secrets/prompts out of logs and add no DB migration. Protected\
+      \ acceptance is immutable; update PROMPTING_SYSTEM behavior prose. Recovery\
+      \ reverts semantic runtime/tests/docs.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go,\
       \ internal/resofeed/ingest.go, internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go,\
       \ internal/resofeed/reprocess_test.go, internal/resofeed/reingest.go, internal/resofeed/reingest_test.go,\
@@ -183386,15 +183385,17 @@ phases:
       \  blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
       \ docs/ARCHITECTURE.md, docs/USAGE.md, docs/ui-preview.html, plan.yaml]\nclaims:\
       \ [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run: {command: [go, test,\
-      \ ./internal/resofeed, -run, TestRFBugPromptingV22Contract/RF-BUG-009, -count=1],\
+      \ -v, ./internal/resofeed, -run, TestRFBugPromptingV22Contract/RF-BUG-009, -count=1],\
       \ timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_any: [{literal: ok}], forbids: [{literal: FAIL}]}}\n    proves:\
-      \ [RF-BUG-009]\n  - id: rf_bug_009_parity_green\n    run: {command: [go, test,\
-      \ ./internal/resofeed, -run, TestPromptingV22|TestIngest.*V22|TestReprocess.*V22|TestReingest.*V22|TestHTTP.*V22|TestMCP.*V22,\
+      \ {contains_all: [{literal: '--- PASS: TestRFBugPromptingV22Contract/RF-BUG-009'}],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
+      \ to run]'}]}}\n    proves: [RF-BUG-009]\n  - id: rf_bug_009_parity_green\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, 'TestPromptingV22|TestIngest.*V22|TestReprocess.*V22|TestReingest.*V22|TestHTTP.*V22|TestMCP.*V22',\
       \ -count=1], timeout_seconds: 420}\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_any: [{literal: ok}], forbids: [{literal:\
-      \ FAIL}]}}\n    proves: [RF-BUG-009]\nbindings:\n  expected_red: {items: []}\n\
-      \  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN'}, {literal: PASS}],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
+      \ to run]'}]}}\n    proves: [RF-BUG-009]\nbindings:\n  expected_red: {items:\
+      \ []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
       \ source_check: rf_bug_009_expected_red, requirement: RF-BUG-009, assertion_id:\
       \ A-RF-BUG-009-PROMPTING, downstream_check: rf_bug_009_green, receipt: RF-BUG-009-red-to-green}\n\
       </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
@@ -183403,15 +183404,15 @@ phases:
       ,\"persistence_behavior\"],\"primary_outcome\":\"RF-BUG-009\",\"rollback_class\"\
       :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\"\
       :\"spec-verifier\",\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\"\
-      :\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      :\"INDEPENDENT\",\"phase_full_gate_required\":false,\"test_authority\":{\"developer_test_globs\"\
       :[\"internal/resofeed/openrouter_test.go\",\"internal/resofeed/ingest_test.go\"\
       ,\"internal/resofeed/reprocess_test.go\",\"internal/resofeed/reingest_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_009_green\"],\"acceptance_mutation\":\"\
       FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run protected RF-BUG-009 acceptance and focused path-parity suite.
-      Confirm canonical fixtures pass across all transform paths, retry bounds hold,
-      failure content persists, and no secret/prompt values are logged.
+    verification: Run protected and parity suites with `-v`; require exact protected
+      subtest plus positive named parity collection, bounded retries, persisted failure
+      content, and no secret/prompt logs.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
