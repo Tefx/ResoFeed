@@ -183322,12 +183322,9 @@ phases:
       and predicate must pass.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
-    - scripts/verify-active-reference-gates.sh
-    - scripts/verify-active-rf-bug-plan.mjs
-    - scripts/verify-playwright-lanes.mjs
-    - scripts/verify-playwright-isolation.mjs
     - web/package.json
     - go.mod
+    - scripts
     agent: integration-verifier
   - id: fresh-docker-runtime-proof
     name: Prove fresh Docker single-binary runtime
