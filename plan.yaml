@@ -182857,14 +182857,14 @@ phases:
     - ledger-prompting-e2e-expected-red
     agent: plan-readiness-auditor
 - id: rf-bug-20260712-frontend-behavior
-  name: RF-BUG Frontend Selection, Routing, Title, and Accessibility Repair
+  name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
-  gate: RF-BUG-001, RF-BUG-002, RF-BUG-006, and RF-BUG-007 acceptance tests are green
-    across Feed/Search, desktop/mobile, direct/history navigation, EN/ZH, pending/failure/out-of-order
-    responses, titles, and accessibility. Route logic is confined to web/src/lib/workbench-route.ts;
-    +page.svelte owns interaction state. Validated bounded history.state is page-ephemeral
-    Back/Forward restoration only; localStorage, sessionStorage, IndexedDB, SQLite,
-    export, or cross-page persistence of navigation history is forbidden.
+  gate: Protected RF-BUG-001/002/006/007 browser contracts pass against the real single
+    binary; opaque item IDs round-trip reversibly; platform URL/history behavior,
+    stale-response rejection, titles, and Steer accessibility predicates are green.
+  context: Implementation may change named frontend code, tests, and synchronized
+    docs but cannot mutate contract-lock browser artifacts or add custom URL codecs/persistent
+    navigation state.
   depends_on:
   - rf-bug-20260712-contract-lock
   steps:
