@@ -183056,40 +183056,38 @@ phases:
     - Dockerfile
     agent: golang-developer
   - id: enforce-opml-import-only-surface
-    name: Enforce import-only source interchange
+    name: Enforce auth-first OPML import-only boundary
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-004. Enforce import-only OPML across HTTP, Go handlers, frontend client/types,\
-      \ Source Ledger controls, active tests, and active English documentation. Preserve\
-      \ POST import-opml and JSON state backup/restore with unchanged bundle schema\
-      \ and atomic replacement. The removed legacy read path remains only as an auth-first\
-      \ tombstone predicate: unauthorized requests receive canonical 401 and authorized\
-      \ requests receive canonical 404, without a replacement exfiltration or sync\
-      \ surface. Synchronize ARCHITECTURE, DESIGN, USAGE, and ui-preview. Run the\
-      \ Section 7 active-reference gate and require zero active stale matches. Recovery\
-      \ reverts endpoint/client/UI/docs/tests as one public-contract change; state\
-      \ data/schema remain unchanged.\n\n<intent_closure_contract>\nschema_version:\
+      \ RF-BUG-004. Remove active OPML export from Go, HTTP, client, UI, MCP parity,\
+      \ and English docs while preserving POST import-opml and unchanged atomic JSON\
+      \ state backup/restore. Preserve auth precedence: unauthenticated legacy export\
+      \ receives canonical 401; authenticated receives canonical 404. Keep only bounded\
+      \ tombstone tests; add no replacement exfiltration, sync, merge, or history\
+      \ surface. Invoke the protected Go acceptance file without mutation. Synchronize\
+      \ ARCHITECTURE, DESIGN, USAGE, ui-preview. Recovery reverts endpoint/client/UI/docs/tests;\
+      \ state schema/data remain unchanged.\n\n<intent_closure_contract>\nschema_version:\
       \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_impl_test.go,\
-      \ web/src/lib/api-client.ts, web/src/lib/api-client.test.ts, web/src/routes/+page.svelte,\
-      \ web/src/routes/components/SourceLedger.svelte, docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ docs/USAGE.md, docs/ui-preview.html]\n  blocked_paths: [internal/resofeed/state.go,\
-      \ plan.yaml, docs/audits/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
-      \ .test-artifacts/]\nclaims: [RF-BUG-004]\nchecks:\n  - id: opml_import_only_green\n\
-      \    run:\n      command: [go, test, ./internal/resofeed, -run, 'TestRFBugRuntimeContract/RF-BUG-004',\
-      \ -count=1]\n      timeout_seconds: 180\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr: {contains_any: [{literal: ok}],\
-      \ forbids: [{literal: FAIL}]}\n    proves: [RF-BUG-004]\n  - id: opml_active_reference_green\n\
-      \    run:\n      command: [bash, scripts/verify-active-reference-gates.sh]\n\
-      \      timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: '\"match_count\":0'}],\
-      \ forbids: [{literal: FAIL}]}\n    proves: [RF-BUG-004]\nbindings:\n  expected_red:\
-      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
-      \ source_check: runtime_expected_red, requirement: RF-BUG-004, assertion_id:\
-      \ A-RF-BUG-004-IMPORT-ONLY, downstream_check: opml_import_only_green, receipt:\
-      \ RF-BUG-004-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface\"\
+      \ internal/resofeed/mcp.go, web/src/lib/api-client.ts, web/src/lib/api-client.test.ts,\
+      \ web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/USAGE.md, docs/ui-preview.html]\n\
+      \  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ internal/resofeed/state.go, plan.yaml, docs/audits/**]\nclaims: [RF-BUG-004]\n\
+      checks:\n  - id: rf_bug_004_green\n    run: {command: [go, test, ./internal/resofeed,\
+      \ -run, TestRFBugRuntimeContract/RF-BUG-004, -count=1], timeout_seconds: 180}\n\
+      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_any:\
+      \ [{literal: ok}], forbids: [{literal: FAIL}]}}\n    proves: [RF-BUG-004]\n\
+      \  - id: rf_bug_004_active_scan_green\n    run: {command: [bash, scripts/verify-active-reference-gates.sh],\
+      \ timeout_seconds: 180}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_any: [{literal: match_count}, {literal: PASS}], forbids: [{literal:\
+      \ FAIL}]}}\n    proves: [RF-BUG-004]\nbindings:\n  expected_red: {items: []}\n\
+      \  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ source_check: rf_bug_004_expected_red, requirement: RF-BUG-004, assertion_id:\
+      \ A-RF-BUG-004-IMPORT-ONLY, downstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n\
+      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
+      ,\"step_id\":\"rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_api_removal\",\"cross_component_contract\"\
       ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
       :[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
@@ -183097,21 +183095,21 @@ phases:
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"internal/resofeed/http_impl_test.go\",\"web/src/lib/api-client.test.ts\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
-      ],\"acceptance_check_ids\":[\"opml_import_only_green\",\"opml_active_reference_green\"\
-      ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
-      </vectl_step_policy>"
-    verification: Run both checks plus authenticated/unauthenticated black-box tombstone
-      probes. Require import and JSON state portability unchanged, no active stale
-      match, exact scanned_paths, and reciprocal RF-BUG-004 receipt.
+      ],\"acceptance_check_ids\":[\"rf_bug_004_green\"],\"acceptance_mutation\":\"\
+      FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Run the protected RF-BUG-004 subtest, Go/client tests, and active
+      source scan. Verify unauthorized 401, authorized 404, import and JSON state
+      operations remain green, and active OPML export references are absent except
+      bounded tombstones.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - AGENTS.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/USAGE.md
-    - internal/resofeed/http.go
-    - web/src/lib/api-client.ts
-    - web/src/routes/components/SourceLedger.svelte
-    agent: golang-developer
+    - docs/ui-preview.html
+    agent: integration-engineer
   - id: apply-outer-security-middleware-and-csp
     name: Apply outer-mux security headers and artifact-derived CSP
     status: pending
