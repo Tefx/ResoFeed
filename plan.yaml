@@ -182583,9 +182583,9 @@ phases:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/DESIGN.md
-    - web/src/lib/workbench-route.ts
     - web/src/routes/+page.svelte
-    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts
+    - web/src/lib
+    - web/tests/e2e
     agent: frontend-engineer
   - id: runtime-assets-opml-security-expected-red
     name: Lock embedded assets, OPML, and security contracts
