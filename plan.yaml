@@ -182640,18 +182640,18 @@ phases:
       \ succeeds afterward. Tests name RF-BUG-003/004/005 assertions. Runtime/module/UI\
       \ implementation paths remain blocked; recovery reverts docs/tests/fixtures.\
       \ Evidence is redacted.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      profile: expected_red_definition\nscope:\n  allowed_paths:\n    - docs/ARCHITECTURE.md\n\
-      \    - docs/CONTAINER.md\n    - docs/USAGE.md\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
-      \    - internal/resofeed/testdata/webui-valid/**\n    - internal/resofeed/testdata/webui-invalid/**\n\
-      \  blocked_paths:\n    - internal/resofeed/http.go\n    - internal/resofeed/http_security.go\n\
-      \    - internal/resofeed/doctor.go\n    - internal/resofeed/webui/**\n    -\
-      \ Dockerfile\n    - go.mod\n    - go.sum\n    - web/src/**\nclaims: [RF-BUG-003-CONTRACT,\
-      \ RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT]\nchecks:\n  - id: runtime_expected_red\n\
-      \    run:\n      command: [go, test, ./internal/resofeed, -run, 'TestRFBugRuntimeContract/(RF-BUG-003|RF-BUG-004|RF-BUG-005)',\
-      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: red\n \
-      \     exit_codes: [1]\n      stdout_or_stderr:\n        contains_any: [{literal:\
-      \ RF-BUG-003}, {literal: RF-BUG-004}, {literal: RF-BUG-005}]\n        forbids:\
-      \ [{literal: setup failed}, {literal: no test files}]\n    proves: [RF-BUG-003-CONTRACT,\
+      profile: expected_red_definition\nscope:\n  allowed_paths: [docs/ARCHITECTURE.md,\
+      \ docs/CONTAINER.md, docs/USAGE.md, internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ internal/resofeed/testdata/webui-valid/**, internal/resofeed/testdata/webui-invalid/**]\n\
+      \  blocked_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
+      \ internal/resofeed/doctor.go, internal/resofeed/webui/**, Dockerfile, go.mod,\
+      \ go.sum, web/src/**]\nclaims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT]\n\
+      checks:\n  - id: runtime_expected_red\n    run:\n      command: [go, test, ./internal/resofeed,\
+      \ -run, 'TestRFBugRuntimeContract/(RF-BUG-003|RF-BUG-004|RF-BUG-005)', -count=1]\n\
+      \      timeout_seconds: 240\n    expect:\n      outcome: red\n      exit_codes:\
+      \ [1]\n      stdout_or_stderr:\n        contains_any: [{literal: RF-BUG-003},\
+      \ {literal: RF-BUG-004}, {literal: RF-BUG-005}]\n        forbids: [{literal:\
+      \ setup failed}, {literal: no test files}]\n    proves: [RF-BUG-003-CONTRACT,\
       \ RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT]\nbindings:\n  expected_red:\n  \
       \  items:\n      - {requirement: RF-BUG-003, assertion_id: A-RF-BUG-003-EMBED,\
       \ source_check: runtime_expected_red, selector: {type: subtest, value: RF-BUG-003},\
@@ -182659,7 +182659,7 @@ phases:
       \ downstream_check: embedded_ui_green, receipt: RF-BUG-003-red-to-green}\n \
       \     - {requirement: RF-BUG-004, assertion_id: A-RF-BUG-004-IMPORT-ONLY, source_check:\
       \ runtime_expected_red, selector: {type: subtest, value: RF-BUG-004}, downstream_step:\
-      \ rf-bug-20260712-runtime-boundaries.remove-opml-export-active-surface, downstream_check:\
+      \ rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface, downstream_check:\
       \ opml_import_only_green, receipt: RF-BUG-004-red-to-green}\n      - {requirement:\
       \ RF-BUG-005, assertion_id: A-RF-BUG-005-SECURITY, source_check: runtime_expected_red,\
       \ selector: {type: subtest, value: RF-BUG-005}, downstream_step: rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp,\
@@ -182678,9 +182678,8 @@ phases:
       :[]}}\n</vectl_step_policy>"
     verification: Run the exact runtime_expected_red command. It must compile, collect
       named RF-BUG-003/004/005 subtests, and fail only on product predicates. Verify
-      docs/USAGE.md canonical correction ownership, staged-header/status wording,
-      explicit no-body-buffering, exact Doctor grammar fixtures, and unchanged blocked
-      paths.
+      docs/USAGE.md correction ownership, staged-header/status wording, no body buffering,
+      exact Doctor grammar fixtures, and unchanged blocked paths.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/ARCHITECTURE.md
