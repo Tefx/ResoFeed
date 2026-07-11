@@ -183185,7 +183185,6 @@ phases:
     - internal/resofeed/openrouter.go
     - internal/resofeed/ingest.go
     - internal/resofeed/reprocess.go
-    - scripts
     agent: golang-developer
 - id: rf-bug-20260712-e2e-isolation
   name: RF-BUG E2E Isolation and Failure Classification
