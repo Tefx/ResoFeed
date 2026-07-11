@@ -182743,8 +182743,7 @@ phases:
       or stale plan match.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
-    - scripts/verify-active-reference-gates.sh
-    - scripts/verify-active-rf-bug-plan.mjs
+    - scripts
     depends_on:
     - frontend-state-route-a11y-expected-red
     - runtime-assets-opml-security-expected-red
