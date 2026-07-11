@@ -183711,19 +183711,31 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Perform the final evidence-only gate over all prior steps. Confirm phases preserved
-      existing completed history; every RF-BUG-001–010 requirement has expected-red
-      and green proof; source/test/English documentation parity is complete; local,
-      Docker, and Tailnet/Caddy receipts identify the same implementation; security
-      and independent runtime/UI reviews have no unresolved findings; smoke is under
-      two minutes; three full Chromium runs agree; active Export OPML and V21 drift
-      scans are clean; CSP contains no unsafe-inline; and all logs/artifacts are redacted.
-      Repository mutation is absent because this gate only adjudicates immutable evidence
-      and cannot fix or waive defects. Any missing, stale, inconsistent, or secret-bearing
-      evidence keeps the gate closed and routes work back to the owning step.'
-    verification: Record Full Gate checklist, phase/step dependency audit, command/evidence
-      hashes, reviewer identities, open findings, and OPEN/CLOSED result; OPEN requires
-      zero unresolved findings and all ten bug closures proven.
+      Perform the completion-capable final evidence gate over immutable prerequisite
+      receipts. Repository mutation is absent because this verifier can only open
+      or keep closed the gate and routes defects to owners. Validate preserved completed
+      history; all RF-BUG-001–010 reciprocal expected-red/green receipts; canonical
+      docs/source/test parity; local, OCI publication, both platform containers, Tailnet
+      deployment, security review, independent runtime/UI review, and defect-report
+      closure all identify the same commit and immutable image; smoke budget; three-run
+      digest agreement; active-reference scanned_paths; stale_match_count=0; CSP policy;
+      reset/teardown inventory; expected-ID/assertion inventory; and redaction. No
+      prose-only waiver or missing receipt is accepted.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.rf-bug-final-full-gate","risk_tier":"R3","risk_reasons":["release_governance","deployment_acceptance","security_closure"],"primary_outcome":"RF-BUG-FINAL-FULL-GATE","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"gate-reviewer","additional_verifiers":["spec-verifier"],"review_mode":"ADJUDICATED","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Emit exactly one canonical final-gate receipt with schema_version,
+      verifier_id, commit, authoritative reference hash, ordered prerequisite step
+      IDs and receipt hashes/statuses, ten requirement closure statuses, red/green
+      graph hash, expected-ID/assertion hash, active scanned_paths hash, stale_match_count,
+      local/OCI/platform/Tailnet digest equality, review findings count, smoke duration,
+      three normalized digests, reset/teardown counts, redaction result, and OPEN/CLOSED.
+      OPEN requires every prerequisite receipt present, schema-valid, hash-linked,
+      and green with zero findings/stale matches.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
