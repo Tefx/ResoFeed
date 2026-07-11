@@ -182630,39 +182630,62 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-003, RF-BUG-004, RF-BUG-005. Synchronize ARCHITECTURE, CONTAINER, and\
-      \ USAGE with the simplified contract. Define one protected Go acceptance file\
-      \ with separately collected subtests. RF-BUG-003 covers package-local embed.FS,\
-      \ bootstrap validation before bind, explicit SPA fallback, one CSP derivation\
-      \ pass, arbitrary cwd, and Doctor preservation plus `ui_assets=ready` and `ui_asset_source=embedded`;\
-      \ representative dynamic diagnostics redact configured secrets longest-first\
-      \ and replace CR/LF-bearing values wholly. RF-BUG-004 is auth-first OPML import-only.\
-      \ RF-BUG-005 uses outer middleware that sets four headers before delegation\
-      \ and preserves flush streaming and cancellation. No manifest/generator registry,\
-      \ raw RequestURI parser, Doctor protocol, or staged response-writer state machine.\
-      \ Recovery reverts docs and tests.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
-      \ [docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md, internal/resofeed/rf_bug_runtime_contract_expected_red_test.go]\n\
+      \ RF-BUG-003, RF-BUG-004, RF-BUG-005 and canonical prerequisite lock. Before\
+      \ any dependent implementation, correct docs/ARCHITECTURE.md and docs/DESIGN.md\
+      \ to make OPML import-only with JSON State backup/restore unchanged; correct\
+      \ docs/CONTAINER.md to require package-local embedded assets, no final-image\
+      \ web/build tree, no external UI serving, and no cwd dependence. Define bootstrap\
+      \ validation before listener bind: index.html and every local script/link/modulepreload\
+      \ bootstrap reference must be present, non-empty, regular, contained, structurally\
+      \ valid, and free of traversal, malformed escapes, encoded separators, backslashes,\
+      \ NUL, inline handlers, and javascript: URLs; failure exits non-zero with no\
+      \ bound listener. Classify requests from parsed URL.Path/RawPath only: exact\
+      \ SPA routes are /, /source-ledger, /sources, /doctor, and canonical/accepted\
+      \ item routes; GET/HEAD valid files serve embedded bytes, HEAD has empty body,\
+      \ invalid paths are 400, asset-like/unlisted misses are 404, unsupported methods\
+      \ are 405 with Allow: GET, HEAD, and none receive SPA HTML. Define readiness\
+      \ values/transitions from Section 3.4 and the canonical byte-exact CSP `default-src\
+      \ 'self'; script-src 'self'<SCRIPT_HASHES>; style-src 'self'; img-src 'self'\
+      \ data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors\
+      \ 'none'`; derive sorted de-duplicated SHA-256 standard-padded-Base64 inline\
+      \ executable-script expressions once from exact embedded UTF-8 body bytes, with\
+      \ no manifest or generator. Create protected Go acceptance subtests. Recovery\
+      \ reverts only canonical docs and protected tests.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: expected_red_definition\n\
+      scope:\n  allowed_paths: [docs/ARCHITECTURE.md, docs/DESIGN.md, docs/CONTAINER.md,\
+      \ docs/USAGE.md, internal/resofeed/rf_bug_runtime_contract_expected_red_test.go]\n\
       \  blocked_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
       \ internal/resofeed/doctor.go, internal/resofeed/webui/**, Dockerfile, go.mod,\
-      \ go.sum, web/src/**]\nclaims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT]\n\
-      checks:\n  - id: rf_bug_003_expected_red\n    run: {command: [go, test, ./internal/resofeed,\
-      \ -run, TestRFBugRuntimeContract/RF-BUG-003, -count=1], timeout_seconds: 240}\n\
-      \    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
-      \ [{literal: RF-BUG-003}], forbids: [{literal: setup failed}, {literal: no tests\
-      \ to run}]}}\n    proves: [RF-BUG-003-CONTRACT]\n  - id: rf_bug_004_expected_red\n\
-      \    run: {command: [go, test, ./internal/resofeed, -run, TestRFBugRuntimeContract/RF-BUG-004,\
+      \ go.sum, web/src/**]\nclaims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT,\
+      \ RF-BUG-CANONICAL-DOCS]\nchecks:\n  - id: canonical_runtime_docs_green\n  \
+      \  run: {command: [python3, -c, \"from pathlib import Path; a=Path('docs/ARCHITECTURE.md').read_text();\
+      \ d=Path('docs/DESIGN.md').read_text(); c=Path('docs/CONTAINER.md').read_text();\
+      \ assert 'Export OPML' not in a and '[EXPORT OPML]' not in d; assert 'import-only'\
+      \ in a.lower() and 'import-only' in d.lower(); assert 'embed.FS' in a and 'embed.FS'\
+      \ in c; assert 'web/build' not in c; assert \\\"default-src 'self'; script-src\
+      \ 'self'\\\" in a; print('CANONICAL_DOC_PREDICATES=8')\"], timeout_seconds:\
+      \ 60}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: CANONICAL_DOC_PREDICATES=8}], forbids: [{literal: AssertionError}]}}\n\
+      \    proves: [RF-BUG-CANONICAL-DOCS]\n  - id: rf_bug_003_expected_red\n    run:\
+      \ {command: [go, test, -v, ./internal/resofeed, -run, TestRFBugRuntimeContract/RF-BUG-003,\
       \ -count=1], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes: [1],\
-      \ stdout_or_stderr: {contains_all: [{literal: RF-BUG-004}], forbids: [{literal:\
-      \ setup failed}, {literal: no tests to run}]}}\n    proves: [RF-BUG-004-CONTRACT]\n\
-      \  - id: rf_bug_005_expected_red\n    run: {command: [go, test, ./internal/resofeed,\
-      \ -run, TestRFBugRuntimeContract/RF-BUG-005, -count=1], timeout_seconds: 240}\n\
+      \ stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBugRuntimeContract/RF-BUG-003'},\
+      \ {literal: RF-BUG-003}], forbids: [{literal: setup failed}, {literal: no tests\
+      \ to run}, {literal: '[no tests to run]'}]}}\n    proves: [RF-BUG-003-CONTRACT]\n\
+      \  - id: rf_bug_004_expected_red\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, TestRFBugRuntimeContract/RF-BUG-004, -count=1], timeout_seconds: 240}\n\
       \    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
-      \ [{literal: RF-BUG-005}], forbids: [{literal: setup failed}, {literal: no tests\
-      \ to run}]}}\n    proves: [RF-BUG-005-CONTRACT]\nbindings:\n  expected_red:\n\
-      \    items:\n      - {requirement: RF-BUG-003, assertion_id: A-RF-BUG-003-EMBED-DOCTOR,\
-      \ source_check: rf_bug_003_expected_red, selector: {type: subtest, value: RF-BUG-003},\
-      \ downstream_step: rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary,\
+      \ [{literal: '=== RUN   TestRFBugRuntimeContract/RF-BUG-004'}, {literal: RF-BUG-004}],\
+      \ forbids: [{literal: setup failed}, {literal: no tests to run}, {literal: '[no\
+      \ tests to run]'}]}}\n    proves: [RF-BUG-004-CONTRACT]\n  - id: rf_bug_005_expected_red\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, TestRFBugRuntimeContract/RF-BUG-005,\
+      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes: [1],\
+      \ stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBugRuntimeContract/RF-BUG-005'},\
+      \ {literal: RF-BUG-005}], forbids: [{literal: setup failed}, {literal: no tests\
+      \ to run}, {literal: '[no tests to run]'}]}}\n    proves: [RF-BUG-005-CONTRACT]\n\
+      bindings:\n  expected_red:\n    items:\n      - {requirement: RF-BUG-003, assertion_id:\
+      \ A-RF-BUG-003-EMBED-DOCTOR, source_check: rf_bug_003_expected_red, selector:\
+      \ {type: subtest, value: RF-BUG-003}, downstream_step: rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary,\
       \ downstream_check: rf_bug_003_green, receipt: RF-BUG-003-red-to-green}\n  \
       \    - {requirement: RF-BUG-004, assertion_id: A-RF-BUG-004-IMPORT-ONLY, source_check:\
       \ rf_bug_004_expected_red, selector: {type: subtest, value: RF-BUG-004}, downstream_step:\
@@ -182674,24 +182697,27 @@ phases:
       \ []\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"\
       vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"public_http_contract\"\
-      ,\"runtime_asset_contract\"],\"primary_outcome\":\"RF-BUG-003-CONTRACT\",\"\
-      rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"\
-      primary_verifier\":\"gate-reviewer\",\"additional_verifiers\":[\"spec-verifier\"\
-      ],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\":true,\"test_authority\"\
-      :{\"developer_test_globs\":[],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ,\"canonical_document_prerequisite\"],\"primary_outcome\":\"RF-BUG-003-CONTRACT\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"STATIC_ANALYSIS\"\
+      ,\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
+      :[\"spec-verifier\",\"security-reviewer\"],\"review_mode\":\"ADJUDICATED\",\"\
+      phase_full_gate_required\":false,\"test_authority\":{\"developer_test_globs\"\
+      :[],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_003_expected_red\",\"rf_bug_004_expected_red\"\
       ,\"rf_bug_005_expected_red\"],\"acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\"\
       :[{\"ref\":\"authority:acceptance-mutation:rf-bug-runtime-contract\",\"path\"\
       :\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\",\"purpose\"\
       :\"Define protected RF-BUG-003 through RF-BUG-005 acceptance subtests\",\"check_id\"\
       :\"rf_bug_003_expected_red\",\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
-    verification: Run the three focused Go commands separately. Each named subtest
-      must collect and fail only on its declared RF-BUG predicate; inspect diff to
-      confirm only authorized docs and the protected acceptance file changed.
+    verification: Run canonical_runtime_docs_green before downstream contract or implementation
+      work, then run each focused `go test -v` red check separately. Confirm the named
+      subtest collects, canonical docs satisfy all eight predicates, and only authorized
+      docs/protected acceptance change.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
     - docs/CONTAINER.md
     - docs/USAGE.md
     agent: contract-test-author
