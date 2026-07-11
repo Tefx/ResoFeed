@@ -183165,18 +183165,17 @@ phases:
       \    - deploy/resofeed-caddy/caddy/Caddyfile\n    - docs/ARCHITECTURE.md\n \
       \   - docs/DESIGN.md\n    - docs/PROMPTING_SYSTEM.md\n    - docs/CONTAINER.md\n\
       \    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n    - docs/USAGE.md\n    - docs/ui-preview.html\n\
-      \  blocked_paths:\n    - docs/audits/**\n    - docs/contracts/PROMPTING_SYSTEM_V21_RUNTIME_CONFORMANCE_MATRIX.md\n\
-      \    - docs/BUG_REPORT_2026-07-11.md\n    - docs/BUG_FIX_PLAN_2026-07-12.md\n\
-      \    - plan.yaml\n    - internal/resofeed/webui/dist/**\n  ignored_runtime_paths:\n\
-      \    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\nclaims:\n\
-      \  - RF-BUG-009\nchecks:\n  - id: prompting_v22_semantic_green\n    run:\n \
-      \     command: [go, test, ./internal/resofeed, -run, '^TestPromptingV22', -count=1]\n\
-      \      timeout_seconds: 300\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
-      \          - literal: ok\n        forbids:\n          - literal: FAIL\n    proves:\n\
-      \      - RF-BUG-009\nbindings:\n  expected_red:\n    items: []\n  closes_expected_red:\
-      \ []\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"\
-      vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-ledger-prompting.migrate-active-prompting-names-to-v22\"\
+      \  blocked_paths:\n    - docs/audits/**\n    - docs/contracts/**\n    - docs/BUG_REPORT_2026-07-11.md\n\
+      \    - docs/BUG_FIX_PLAN_2026-07-12.md\n    - plan.yaml\n    - internal/resofeed/webui/dist/**\n\
+      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
+      \ .test-artifacts/\nclaims:\n  - RF-BUG-009\nchecks:\n  - id: prompting_v22_semantic_green\n\
+      \    run:\n      command: [go, test, ./internal/resofeed, -run, '^TestPromptingV22',\
+      \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: []\n\
+      \        contains_any:\n          - literal: ok\n        forbids:\n        \
+      \  - literal: FAIL\n    proves:\n      - RF-BUG-009\nbindings:\n  expected_red:\n\
+      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-ledger-prompting.migrate-active-prompting-names-to-v22\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"cross_component_semantic_migration\"\
       ,\"runtime_prompt_contract\",\"persistence_behavior\"],\"primary_outcome\":\"\
       RF-BUG-009\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\"\
