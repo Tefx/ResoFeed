@@ -182552,10 +182552,9 @@ phases:
       \    - web/src/routes/__tests__/inspector-selection.test.ts\n    - web/src/routes/__tests__/steer-invalid.test.ts\n\
       \    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n  blocked_paths:\n\
       \    - internal/resofeed/**\n    - web/src/routes/+page.svelte\n    - web/src/routes/components/**\n\
-      \  ignored_runtime_paths:\n    - .test-artifacts/\nclaims:\n  - RF-BUG-001-CONTRACT\n\
-      \  - RF-BUG-002-CONTRACT\n  - RF-BUG-006-CONTRACT\n  - RF-BUG-007-CONTRACT\n\
-      checks:\n  - id: frontend_expected_red\n    run:\n      command: [npm, --prefix,\
-      \ web, run, test:render:contracts, --, src/lib/__tests__/workbench-route.test.ts,\
+      claims:\n  - RF-BUG-001-CONTRACT\n  - RF-BUG-002-CONTRACT\n  - RF-BUG-006-CONTRACT\n\
+      \  - RF-BUG-007-CONTRACT\nchecks:\n  - id: frontend_expected_red\n    run:\n\
+      \      command: [npm, --prefix, web, run, test:render:contracts, --, src/lib/__tests__/workbench-route.test.ts,\
       \ src/routes/__tests__/inspector-selection.test.ts, src/routes/__tests__/steer-invalid.test.ts]\n\
       \      timeout_seconds: 180\n    expect:\n      outcome: red\n      exit_codes:\
       \ [1]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
