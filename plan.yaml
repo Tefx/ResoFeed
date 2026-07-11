@@ -183395,29 +183395,24 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001 through RF-BUG-010 closure evidence and documentation parity. Update\
-      \ BUG_REPORT_2026-07-11.md in English with each resolved outcome, implementation\
-      \ refs, expected-red-to-green proof, local commands/results, immutable two-platform\
-      \ container proof, Tailnet/Caddy evidence, cancellation timeline, exact Doctor\
-      \ contract evidence, per-test reset/teardown evidence, semantic Prompting v2.2\
-      \ proof, independent reviews, residual risks, and redacted artifact paths. Reconcile\
-      \ ARCHITECTURE.md, DESIGN.md, PROMPTING_SYSTEM.md, CONTAINER.md, USAGE.md, PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ and ui-preview.html with docs/BUG_FIX_PLAN_2026-07-12.md without modifying\
-      \ that authoritative repair input, completed history, or historical audits.\
-      \ Add a deterministic closure contract test and run the Section 7 active-reference\
-      \ and managed-plan scripts; results.json scanned_paths must match the authoritative\
-      \ scope and the six existing RF-BUG phases must have zero stale matches. Recovery\
-      \ reverts report/docs/test closure only; runtime remains deployed and the final\
-      \ gate stays closed. Evidence contains no owner token, provider key, cookie,\
-      \ raw credential, or secret-like value.\n\n<intent_closure_contract>\nschema_version:\
+      \ RF-BUG-001–010 closure and documentation parity. Update BUG_REPORT in English\
+      \ with each resolved outcome, refs, red-to-green proof, local/container/Tailnet\
+      \ evidence, cancellation timeline, exact Doctor evidence, per-test reset/teardown\
+      \ evidence, semantic v2.2 proof, independent reviews, residual risks, and redacted\
+      \ artifacts. Reconcile ARCHITECTURE, DESIGN, PROMPTING_SYSTEM, CONTAINER, USAGE,\
+      \ Playwright harness contract, and ui-preview with BUG_FIX_PLAN without modifying\
+      \ that authoritative input, completed history, or audits. Add deterministic\
+      \ closure test and run active-reference/managed-plan scripts; scanned_paths\
+      \ match Section 7 and the six RF-BUG phases have zero stale matches. Recovery\
+      \ reverts report/docs/test closure; runtime remains and final gate stays closed.\
+      \ No secret-bearing evidence.\n\n<intent_closure_contract>\nschema_version:\
       \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n \
       \   - docs/BUG_REPORT_2026-07-11.md\n    - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n\
       \    - docs/PROMPTING_SYSTEM.md\n    - docs/CONTAINER.md\n    - docs/USAGE.md\n\
       \    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n    - docs/ui-preview.html\n\
       \    - tests/rf_bug_closure_contract_test.go\n  blocked_paths:\n    - docs/BUG_FIX_PLAN_2026-07-12.md\n\
       \    - plan.yaml\n    - internal/resofeed/**\n    - web/src/**\n    - docs/audits/**\n\
-      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
-      \ .test-artifacts/\nclaims:\n  - RF-BUG-001-010-CLOSURE\nchecks:\n  - id: defect_report_closure_green\n\
+      claims:\n  - RF-BUG-001-010-CLOSURE\nchecks:\n  - id: defect_report_closure_green\n\
       \    run:\n      command: [go, test, ./tests, -run, TestRFBugClosureContract,\
       \ -count=1]\n      timeout_seconds: 180\n    expect:\n      outcome: green\n\
       \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: []\n\
@@ -183428,8 +183423,8 @@ phases:
       :\"rf-bug-20260712-assurance-closure.close-defect-report-with-evidence\",\"\
       risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_closure\",\"evidence_metadata\"\
       ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
-      ,\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\":\"doc-reviewer\"\
-      ,\"additional_verifiers\":[\"spec-verifier\"],\"review_mode\":\"INDEPENDENT\"\
+      ,\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
+      ,\"additional_verifiers\":[\"gate-reviewer\"],\"review_mode\":\"INDEPENDENT\"\
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[],\"acceptance_test_paths\":[\"tests/rf_bug_closure_contract_test.go\"],\"\
       acceptance_check_ids\":[\"defect_report_closure_green\"],\"acceptance_mutation\"\
