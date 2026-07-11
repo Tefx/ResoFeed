@@ -183582,7 +183582,7 @@ phases:
       \ verification, update the defect report with each resolved outcome, exact source/test\
       \ refs, local/OCI/container/Tailnet commands and results, residual risks, and\
       \ redacted artifact locations. Synchronize ARCHITECTURE, DESIGN, PROMPTING_SYSTEM,\
-      \ CONTAINER, USAGE, Playwright harness contract, and ui-preview with the implemented\
+      \ CONTAINER, USAGE, Playwright harness contract, and ui-preview with implemented\
       \ behavior. Use ordinary test/command evidence; do not add receipt schemas,\
       \ assertion/expected-ID registries, hash-linked reset evidence, or phase Full\
       \ Gate machinery. Recovery reverts documentation/closure test while runtime\
@@ -183596,21 +183596,26 @@ phases:
       \ -run, TestRFBugClosureContract, -count=1], timeout_seconds: 180}\n    expect:\
       \ {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_any: [{literal:\
       \ ok}], forbids: [{literal: FAIL}]}}\n    proves: [RF-BUG-001-010-CLOSURE]\n\
-      \  - id: closure_active_sources_green\n    run: {command: [bash, scripts/verify-active-reference-gates.sh],\
-      \ timeout_seconds: 240}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_any: [{literal: match_count}, {literal: PASS}], forbids: [{literal:\
-      \ FAIL}]}}\n    proves: [RF-BUG-001-010-CLOSURE]\nbindings: {expected_red: {items:\
-      \ []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      \  - id: closure_active_sources_green\n    run: {command: [bash, -lc, \"if git\
+      \ grep -n -E 'export-opml|Prompting v2\\\\.1|prompting_v21' -- cmd internal\
+      \ web/src web/tests AGENTS.md Dockerfile go.mod go.sum web/package.json 'web/playwright*.config.ts'\
+      \ deploy/resofeed-caddy/caddy/Caddyfile docs/ARCHITECTURE.md docs/DESIGN.md\
+      \ docs/PROMPTING_SYSTEM.md docs/CONTAINER.md docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\
+      \ docs/USAGE.md docs/ui-preview.html; then exit 1; else exit 0; fi\"], timeout_seconds:\
+      \ 240}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [], forbids: [{literal: export-opml}, {literal: Prompting v2.1}, {literal:\
+      \ prompting_v21}]}}\n    proves: [RF-BUG-001-010-CLOSURE]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-assurance-closure.close-defect-report-with-evidence\"\
       ,\"risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_closure\",\"bounded_closure_test\"\
       ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
       ,\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
       ,\"additional_verifiers\":[\"gate-reviewer\"],\"review_mode\":\"INDEPENDENT\"\
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[\"tests/rf_bug_closure_contract_test.go\",\"scripts/verify-active-reference-gates.sh\"\
-      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run the closure contract test and bounded active source/spec gate.
+      :[\"tests/rf_bug_closure_contract_test.go\"],\"acceptance_test_paths\":[],\"\
+      acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
+      :[]}}\n</vectl_step_policy>"
+    verification: Run the closure contract test and bounded inline active-tree scan.
       Confirm each RF-BUG outcome cites its implementation and ordinary local/OCI/container/Tailnet
       proof, all English docs agree, and independent findings are resolved.
     refs:
