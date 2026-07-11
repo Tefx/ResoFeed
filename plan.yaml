@@ -182516,3 +182516,11 @@ phases:
       release, and Docker runtime proof all passed.
 
       - No unresolved residuals.'
+- id: rf-bug-20260712-contract-lock
+  name: RF-BUG-001–010 Contract Lock and Expected-Red Proofs
+  status: pending
+  gate: English contract documentation and expected-red tests define RF-BUG-001 through
+    RF-BUG-010, fail only for the documented defects, preserve architecture non-goals,
+    and receive an evidence-backed pre-implementation review.
+  depends_on:
+  - tavily-external-extraction-verification-release
