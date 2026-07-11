@@ -183168,12 +183168,12 @@ phases:
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger and Prompting v2.2 Semantic Migration
   status: locked
-  gate: RF-BUG-008 responsive Source Ledger proof passes after Export OPML removal.
-    RF-BUG-009 passes the complete canonical docs/PROMPTING_SYSTEM.md v2.2 payload,
-    structured-output routing, validation, retry, persistence, fixture, filename,
-    symbol, and error migration. scripts/verify-active-reference-gates.sh reports
-    the exact Section 7 scanned_paths across recursive code, package/config/deployment,
-    harness artifacts, and active English docs with zero active v2.1 tokens; historical
+  gate: RF-BUG-008 responsive Source Ledger proof passes after import-only source
+    interchange is enforced, including exact 320/390/768/1280/1440 browser contracts,
+    bundled font/license/lock verification, pinned image environment, and zero-diff
+    snapshots. RF-BUG-009 semantic behavior and fixtures pass before active v2.2 names
+    and verified-status documentation; the final active-reference scan reports exact
+    Section 7 scanned_paths with zero forbidden current-version drift while historical
     excluded artifacts remain unchanged.
   depends_on:
   - rf-bug-20260712-frontend-behavior
