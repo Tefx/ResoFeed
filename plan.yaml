@@ -182727,18 +182727,26 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Review the three expected-red artifacts against BUG_FIX_PLAN sections 2, 4–8,
-      and 11. Confirm all RF-BUG-001–010 acceptance outcomes, English documentation
-      obligations, non-goals, owner boundaries, rollback behavior, secret redaction,
-      and exact downstream sequencing are represented. Verify red failures are deterministic
-      defect evidence rather than compile, fixture, selector, or startup failures.
-      Repository mutation is absent because this is an independent evidence gate;
-      findings block implementation and are remediated in the owning contract step.'
-    verification: Record reviewer identity, commands, failing assertions by RF-BUG
-      ID, blocked-path diff checks, and PASS/FAIL disposition; PASS requires all ten
-      bugs mapped and no harness-only red.
+      Independently review the three expected-red artifacts and synchronized canonical
+      docs against docs/BUG_FIX_PLAN_2026-07-12.md Sections 2, 4–8, and 11. Confirm
+      RF-BUG-001–010 outcomes, exact Doctor and cancellation contracts, page-ephemeral
+      history.state, semantic v2.2, the Section 7 authoritative scanned_paths, real-runtime/no-interception
+      lanes, per-test reset evidence, scripts, fixture/generator ownership, golang.org/x/net/html
+      ownership, rollback, redaction, and downstream sequencing. Run bash scripts/verify-active-reference-gates.sh
+      and node scripts/verify-active-rf-bug-plan.mjs; the managed-plan result must
+      include exactly the six existing RF-BUG phases, no duplicate phase, no completed-history
+      mutation, and zero stale patterns. Repository mutation is absent because this
+      independent readiness gate records evidence only and routes defects back to
+      an owning contract step.'
+    verification: Record reviewer identity, exact commands, reference-gate results.json
+      hash/scanned_paths, managed-plan phase/step inventory, failing assertions by
+      RF-BUG ID, blocked-path diffs, and PASS/FAIL. PASS marks the Section 3.13 READY
+      condition satisfied and requires all ten bugs mapped with no harness-only red
+      or stale plan match.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - scripts/verify-active-reference-gates.sh
+    - scripts/verify-active-rf-bug-plan.mjs
     depends_on:
     - frontend-state-route-a11y-expected-red
     - runtime-assets-opml-security-expected-red
