@@ -182536,46 +182536,59 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001, RF-BUG-002, RF-BUG-006, RF-BUG-007. Synchronize docs/DESIGN.md\
-      \ and docs/ui-preview.html with docs/BUG_FIX_PLAN_2026-07-12.md. Create the\
-      \ protected Inspector, route, and combined frontend browser contracts under\
-      \ explicit contract-test-author authority. RF-BUG-002 uses `/items/~<base64url-without-padding\
-      \ of UTF-8 opaque ID bytes>`, preserves every non-empty stored ID including\
-      \ `/`, `\\`, `%`, Unicode, and leading `~`, rejects non-canonical or ambiguous\
-      \ input before lookup, accepts only the bounded unprefixed legacy grammar, and\
-      \ uses platform URL/URLSearchParams plus bounded native history state. Each\
-      \ requirement has its own collection and intentional-red command; one failure\
-      \ cannot prove another. Product runtime interception is forbidden. Recovery\
-      \ reverts only docs and tests.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\n\
-      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n    - web/src/lib/__tests__/workbench-route.test.ts\n\
-      \    - web/src/routes/__tests__/inspector-selection.test.ts\n    - web/src/routes/__tests__/steer-invalid.test.ts\n\
-      \    - web/tests/e2e/inspector-selection.browser-contract.spec.ts\n    - web/tests/e2e/routes.browser-contract.spec.ts\n\
-      \    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n  blocked_paths:\n\
-      \    - internal/resofeed/**\n    - web/src/routes/+page.svelte\n    - web/src/routes/components/**\n\
+      \ RF-BUG-001, RF-BUG-002, RF-BUG-006, RF-BUG-007. Start only after canonical\
+      \ runtime_docs_green. Synchronize docs/ARCHITECTURE.md, docs/DESIGN.md, and\
+      \ docs/ui-preview.html for Inspector selection, canonical opaque IDs, `/source-ledger`\
+      \ plus the sole accepted legacy alias `/sources`, titles, history, and readiness.\
+      \ Define `data-app-ready`/`data-route-ready` exactly as Section 3.4: both false\
+      \ on cold load; synchronous resolution sets canonical URL/title/data-surface\
+      \ before visible rendering; route-ready becomes true after target marker/heading\
+      \ mount; app-ready becomes true after token hydration and shell work settle;\
+      \ target aria-busy tracks route work; navigation returns route-ready to false\
+      \ while app-ready remains true. Create protected EN/ZH Inspector, direct-route,\
+      \ title, and accessibility browser contracts. RF-BUG-002 covers ordinary, dotted,\
+      \ slash, backslash, percent, mixed, Unicode, and leading-tilde IDs, exact byte-preserving\
+      \ lookup, cold/refresh/Back/Forward, and ten consecutive retry-free direct-route\
+      \ runs per locale. Add a separately collected intentional-red unit assertion\
+      \ named `RF-BUG-002 opaque item IDs`. Product interception and custom URL codecs\
+      \ are forbidden. Recovery reverts docs and tests.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: expected_red_definition\n\
+      scope:\n  allowed_paths: [docs/ARCHITECTURE.md, docs/DESIGN.md, docs/ui-preview.html,\
+      \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/__tests__/inspector-selection.test.ts,\
+      \ web/src/routes/__tests__/steer-invalid.test.ts, web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ web/tests/e2e/routes.browser-contract.spec.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts]\n\
+      \  blocked_paths: [internal/resofeed/**, web/src/routes/+page.svelte, web/src/routes/components/**]\n\
       claims: [RF-BUG-001-CONTRACT, RF-BUG-002-CONTRACT, RF-BUG-006-CONTRACT, RF-BUG-007-CONTRACT]\n\
       checks:\n  - id: rf_bug_001_expected_red\n    run: {command: [npm, --prefix,\
       \ web, exec, playwright, test, --, --config, web/playwright.browser-contract.config.ts,\
       \ web/tests/e2e/inspector-selection.browser-contract.spec.ts, --grep, RF-BUG-001],\
       \ timeout_seconds: 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
       \ {contains_all: [{literal: RF-BUG-001}], forbids: [{literal: No tests found},\
-      \ {literal: webServer failed}]}}\n    proves: [RF-BUG-001-CONTRACT]\n  - id:\
-      \ rf_bug_002_expected_red\n    run: {command: [npm, --prefix, web, exec, playwright,\
-      \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
-      \ --grep, RF-BUG-002], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: RF-BUG-002}], forbids: [{literal:\
-      \ No tests found}, {literal: webServer failed}]}}\n    proves: [RF-BUG-002-CONTRACT]\n\
-      \  - id: rf_bug_006_expected_red\n    run: {command: [npm, --prefix, web, exec,\
+      \ {literal: 0 tests}, {literal: webServer failed}]}}\n    proves: [RF-BUG-001-CONTRACT]\n\
+      \  - id: rf_bug_002_expected_red\n    run: {command: [npm, --prefix, web, exec,\
       \ playwright, test, --, --config, web/playwright.browser-contract.config.ts,\
+      \ web/tests/e2e/routes.browser-contract.spec.ts, --grep, RF-BUG-002], timeout_seconds:\
+      \ 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF-BUG-002}], forbids: [{literal: No tests found}, {literal: 0\
+      \ tests}, {literal: webServer failed}]}}\n    proves: [RF-BUG-002-CONTRACT]\n\
+      \  - id: rf_bug_002_route_unit_expected_red\n    run: {command: [npm, --prefix,\
+      \ web, run, test:render, --, web/src/lib/__tests__/workbench-route.test.ts,\
+      \ --reporter=verbose, -t, RF-BUG-002 opaque item IDs], timeout_seconds: 180}\n\
+      \    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \ [{literal: workbench-route.test.ts}, {literal: RF-BUG-002 opaque item IDs}],\
+      \ forbids: [{literal: No tests found}, {literal: 0 test}, {literal: skipped}]}}\n\
+      \    proves: [RF-BUG-002-CONTRACT]\n  - id: rf_bug_006_expected_red\n    run:\
+      \ {command: [npm, --prefix, web, exec, playwright, test, --, --config, web/playwright.browser-contract.config.ts,\
       \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, --grep, RF-BUG-006],\
       \ timeout_seconds: 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
       \ {contains_all: [{literal: RF-BUG-006}], forbids: [{literal: No tests found},\
-      \ {literal: webServer failed}]}}\n    proves: [RF-BUG-006-CONTRACT]\n  - id:\
-      \ rf_bug_007_expected_red\n    run: {command: [npm, --prefix, web, exec, playwright,\
-      \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ --grep, RF-BUG-007], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: RF-BUG-007}], forbids: [{literal:\
-      \ No tests found}, {literal: webServer failed}]}}\n    proves: [RF-BUG-007-CONTRACT]\n\
+      \ {literal: 0 tests}, {literal: webServer failed}]}}\n    proves: [RF-BUG-006-CONTRACT]\n\
+      \  - id: rf_bug_007_expected_red\n    run: {command: [npm, --prefix, web, exec,\
+      \ playwright, test, --, --config, web/playwright.browser-contract.config.ts,\
+      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, --grep, RF-BUG-007],\
+      \ timeout_seconds: 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
+      \ {contains_all: [{literal: RF-BUG-007}], forbids: [{literal: No tests found},\
+      \ {literal: 0 tests}, {literal: webServer failed}]}}\n    proves: [RF-BUG-007-CONTRACT]\n\
       bindings:\n  expected_red:\n    items:\n      - {requirement: RF-BUG-001, assertion_id:\
       \ A-RF-BUG-001-INSPECTOR, source_check: rf_bug_001_expected_red, selector: {type:\
       \ test_id, value: RF-BUG-001}, downstream_step: rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing,\
@@ -182584,7 +182597,11 @@ phases:
       \ rf_bug_002_expected_red, selector: {type: test_id, value: RF-BUG-002}, downstream_step:\
       \ rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing,\
       \ downstream_check: rf_bug_002_green, receipt: RF-BUG-002-red-to-green}\n  \
-      \    - {requirement: RF-BUG-006, assertion_id: A-RF-BUG-006-TITLES, source_check:\
+      \    - {requirement: RF-BUG-002, assertion_id: A-RF-BUG-002-OPAQUE-UNIT, source_check:\
+      \ rf_bug_002_route_unit_expected_red, selector: {type: test_id, value: RF-BUG-002\
+      \ opaque item IDs}, downstream_step: rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing,\
+      \ downstream_check: rf_bug_002_route_unit_green, receipt: RF-BUG-002-opaque-unit-red-to-green}\n\
+      \      - {requirement: RF-BUG-006, assertion_id: A-RF-BUG-006-TITLES, source_check:\
       \ rf_bug_006_expected_red, selector: {type: test_id, value: RF-BUG-006}, downstream_step:\
       \ rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y, downstream_check:\
       \ rf_bug_006_green, receipt: RF-BUG-006-red-to-green}\n      - {requirement:\
@@ -182597,7 +182614,7 @@ phases:
       ],\"primary_outcome\":\"RF-BUG-001-CONTRACT\",\"rollback_class\":\"TRIVIAL\"\
       ,\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
       ,\"additional_verifiers\":[\"client-runtime-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      ,\"phase_full_gate_required\":false,\"test_authority\":{\"developer_test_globs\"\
       :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/__tests__/inspector-selection.test.ts\"\
       ,\"web/src/routes/__tests__/steer-invalid.test.ts\"],\"acceptance_test_paths\"\
       :[\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"web/tests/e2e/routes.browser-contract.spec.ts\"\
@@ -182606,24 +182623,26 @@ phases:
       ,\"rf_bug_007_expected_red\"],\"acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\"\
       :[{\"ref\":\"authority:acceptance-mutation:rf-bug-frontend-inspector\",\"path\"\
       :\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"purpose\"\
-      :\"Define RF-BUG-001 protected browser acceptance\",\"check_id\":\"rf_bug_001_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf-bug-frontend-routes\"\
-      ,\"path\":\"web/tests/e2e/routes.browser-contract.spec.ts\",\"purpose\":\"Define\
-      \ RF-BUG-002 protected browser acceptance\",\"check_id\":\"rf_bug_002_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf-bug-frontend-combined\"\
-      ,\"path\":\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\",\"\
-      purpose\":\"Define RF-BUG-006 and RF-BUG-007 protected browser acceptance\"\
-      ,\"check_id\":\"rf_bug_006_expected_red\",\"actor_id\":\"contract-test-author\"\
-      }]}}\n</vectl_step_policy>"
-    verification: Run each listed Playwright command separately. Confirm each named
-      RF-BUG test is collected and fails only on its declared product predicate; confirm
-      the three protected files are created under the listed authority refs and no
-      product path changes.
+      :\"Define RF-BUG-001 protected EN/ZH Inspector acceptance\",\"check_id\":\"\
+      rf_bug_001_expected_red\",\"actor_id\":\"contract-test-author\"},{\"ref\":\"\
+      authority:acceptance-mutation:rf-bug-frontend-routes\",\"path\":\"web/tests/e2e/routes.browser-contract.spec.ts\"\
+      ,\"purpose\":\"Define RF-BUG-002 protected EN/ZH routing and readiness acceptance\"\
+      ,\"check_id\":\"rf_bug_002_expected_red\",\"actor_id\":\"contract-test-author\"\
+      },{\"ref\":\"authority:acceptance-mutation:rf-bug-frontend-combined\",\"path\"\
+      :\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\",\"purpose\"\
+      :\"Define RF-BUG-006 and RF-BUG-007 protected acceptance\",\"check_id\":\"rf_bug_006_expected_red\"\
+      ,\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
+    verification: After canonical_runtime_docs_green, run all five checks separately.
+      Each named browser/unit test must collect and reach only its intentional product
+      failure; verify explicit EN/ZH readiness coverage and protected-path authority.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/ui-preview.html
+    depends_on:
+    - runtime-assets-opml-security-expected-red
     agent: contract-test-author
   - id: runtime-assets-opml-security-expected-red
     name: Lock embedded UI, Doctor, OPML, and HTTP security contracts
