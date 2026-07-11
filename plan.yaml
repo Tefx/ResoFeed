@@ -183084,7 +183084,7 @@ phases:
       \ source_check: runtime_expected_red, requirement: RF-BUG-004, assertion_id:\
       \ A-RF-BUG-004-IMPORT-ONLY, downstream_check: opml_import_only_green, receipt:\
       \ RF-BUG-004-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.remove-opml-export-active-surface\"\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_api_removal\",\"cross_component_contract\"\
       ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
       :[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
