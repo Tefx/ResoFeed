@@ -182929,47 +182929,41 @@ phases:
     - docs/ui-preview.html
     agent: frontend-engineer
   - id: repair-title-and-steer-invalid-a11y
-    name: Repair surface titles and Steer invalid accessibility state
+    name: Repair route-derived titles and Steer invalid accessibility
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-006 and RF-BUG-007. Derive exact neutral/TODAY/SOURCE LEDGER/SEARCH/INSPECTOR/doctor\
-      \ titles from ResolvedRoute. For exact input `add source`, the matching preview\
-      \ `{ route_kind:\"unknown\", interpreted_as:\"source_command_missing_url\",\
-      \ will_mutate:false }` immediately enters invalid state after POST /api/steer/preview.\
-      \ Render exact English `URL required` and Chinese `需要 URL`; render no second\
-      \ APPLY control; emit zero POST /api/steer requests and no receipt; retain input\
-      \ and focus. Use a monotonically increasing key: repeated submission and locale\
-      \ change remove the current alert, await the next Svelte tick, then mount exactly\
-      \ one replacement. MutationObserver proof requires removal before addition and\
-      \ never more than one matching node. Input clears alert/description/aria-invalid\
-      \ immediately. Stale preview and preview transport failure do not enter this\
-      \ invalid state. Update DESIGN.md/ui-preview. Recovery reverts code/tests/docs;\
-      \ no backend change.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
+      \ RF-BUG-006 and RF-BUG-007. Derive exact titles from the resolved route. For\
+      \ input `add source`, expose URL-required invalid state only after the matching\
+      \ non-mutating preview, render exact English/Chinese copy, issue no steer mutation,\
+      \ retain input/focus, and remount one alert on repeat or locale change with\
+      \ removal before addition. Input clears invalid state; stale or failed preview\
+      \ does not create it. Invoke the protected combined browser artifact without\
+      \ mutation. Update DESIGN/ui-preview. Recovery reverts code/tests/docs.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
       \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/+page.svelte,\
       \ web/src/routes/__tests__/steer-invalid.test.ts, docs/DESIGN.md, docs/ui-preview.html]\n\
-      \  blocked_paths: [internal/resofeed/**, web/playwright.config.ts, web/playwright.*.config.ts]\n\
-      claims: [RF-BUG-006, RF-BUG-007]\nchecks:\n  - id: title_steer_a11y_green\n\
-      \    run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
-      \ src/lib/__tests__/workbench-route.test.ts, src/routes/__tests__/steer-invalid.test.ts]\n\
-      \      timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: passed}], forbids:\
-      \ [{literal: failed}]}\n    proves: [RF-BUG-006, RF-BUG-007]\n  - id: title_steer_browser_green\n\
-      \    run:\n      command: [npm, --prefix, web, exec, playwright, test, --, --config,\
+      \  blocked_paths: [web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
+      \ internal/resofeed/**]\nclaims: [RF-BUG-006, RF-BUG-007]\nchecks:\n  - id:\
+      \ rf_bug_006_green\n    run: {command: [npm, --prefix, web, exec, playwright,\
+      \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
+      \ --grep, RF-BUG-006], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
+      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-006]\n  - id: rf_bug_007_green\n\
+      \    run: {command: [npm, --prefix, web, exec, playwright, test, --, --config,\
       \ web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ --grep, 'RF-BUG-(006|007)']\n      timeout_seconds: 300\n    expect:\n   \
-      \   outcome: green\n      exit_codes: [0]\n      stdout_or_stderr: {contains_any:\
-      \ [{literal: passed}], forbids: [{literal: failed}, {literal: No tests found}]}\n\
-      \    proves: [RF-BUG-006, RF-BUG-007]\nbindings:\n  expected_red: {items: []}\n\
-      \  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
-      \ source_check: frontend_browser_expected_red, requirement: RF-BUG-006, assertion_id:\
-      \ A-RF-BUG-006-TITLES, downstream_check: title_steer_browser_green, receipt:\
-      \ RF-BUG-006-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
-      \ source_check: frontend_browser_expected_red, requirement: RF-BUG-007, assertion_id:\
-      \ A-RF-BUG-007-STEER, downstream_check: title_steer_browser_green, receipt:\
-      \ RF-BUG-007-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y\"\
+      \ --grep, RF-BUG-007], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
+      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-007]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ source_check: rf_bug_006_expected_red, requirement: RF-BUG-006, assertion_id:\
+      \ A-RF-BUG-006-TITLES, downstream_check: rf_bug_006_green, receipt: RF-BUG-006-red-to-green}\n\
+      \    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ source_check: rf_bug_007_expected_red, requirement: RF-BUG-007, assertion_id:\
+      \ A-RF-BUG-007-STEER, downstream_check: rf_bug_007_green, receipt: RF-BUG-007-red-to-green}\n\
+      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
+      ,\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"accessibility_behavior\"\
       ],\"primary_outcome\":\"RF-BUG-006\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
       :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"client-runtime-verifier\"\
@@ -182977,18 +182971,16 @@ phases:
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/__tests__/steer-invalid.test.ts\"\
       ],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
-      ],\"acceptance_check_ids\":[\"title_steer_browser_green\"],\"acceptance_mutation\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_006_green\",\"rf_bug_007_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run both checks against the real runtime. Assert exact preview object,
-      EN/ZH copy, no second confirmation, zero mutation requests/receipts, keyed remove-next-tick-remount
-      ordering, MutationObserver ordering, focus/input retention, stale-response isolation,
-      and exact titles.
+    verification: Run the two protected Playwright grep commands and focused render
+      tests; verify exact titles, EN/ZH alert lifecycle, zero POST /api/steer, and
+      focus/input retention.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/DESIGN.md
     - docs/ui-preview.html
-    - web/src/routes/+page.svelte
     depends_on:
     - repair-inspector-selection-and-routing
     agent: frontend-engineer
