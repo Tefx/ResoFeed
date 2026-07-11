@@ -182541,3 +182541,12 @@ phases:
     probes pass.'
   depends_on:
   - rf-bug-20260712-contract-lock
+- id: rf-bug-20260712-ledger-prompting
+  name: RF-BUG Source Ledger and Prompting v2.2 Repair
+  status: locked
+  gate: RF-BUG-008 responsive Source Ledger proof passes after Export OPML removal,
+    and RF-BUG-009 active v2.2 naming migration passes behavior-parity tests with
+    historical evidence left unchanged.
+  depends_on:
+  - rf-bug-20260712-frontend-behavior
+  - rf-bug-20260712-runtime-boundaries
