@@ -182976,42 +182976,35 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-005. Implement internal/resofeed/http_security.go as the sole outer\
-      \ pre-commit owner for CSP, X-Content-Type-Options, Referrer-Policy, and X-Frame-Options\
-      \ across static, API, MCP, auth, not-found, internal, and JSON-RPC responses.\
-      \ Enforce Section 2.3 zero-inner-occurrence and bounded staged-header conflict\
-      \ rules, canonical 500 suppression, generated manifest/embedded-index hash consistency,\
-      \ constant body memory, immediate Flush delegation, conditional Flusher exposure,\
-      \ and no Hijacker exposure. Cancellation proof uses a real streaming response\
-      \ and cancellation-aware writer: the client observes committed status and the\
-      \ exact non-empty first flushed chunk before cancellation; the blocked handler\
-      \ observes r.Context().Err()==context.Canceled and signals that observation\
-      \ before return; no body write or successful flush occurs afterward; handler\
-      \ return is bounded. Whole-response buffering, cancellation inferred only from\
-      \ client error, return before observation, or post-cancellation writes fail.\
-      \ Add scripts/verify-tailnet-csp.mjs and synchronize ARCHITECTURE.md and CONTAINER.md.\
-      \ Recovery reverts middleware, CSP wiring, scripts, tests, and docs and redeploys\
-      \ the prior binary; no storage change. Evidence is redacted and requires adjudicated\
-      \ security review.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      profile: generic\nscope:\n  allowed_paths:\n    - internal/resofeed/http.go\n\
-      \    - internal/resofeed/http_security.go\n    - internal/resofeed/http_security_test.go\n\
-      \    - internal/resofeed/webui/**\n    - scripts/verify-tailnet-csp.mjs\n  \
-      \  - docs/ARCHITECTURE.md\n    - docs/CONTAINER.md\n  blocked_paths:\n    -\
-      \ internal/resofeed/state.go\n    - internal/resofeed/runtime_secret.go\n  \
-      \  - web/src/routes/**\n  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n\
-      \    - .agent/\n    - .test-artifacts/\nclaims:\n  - RF-BUG-005\nchecks:\n \
-      \ - id: security_headers_green\n    run:\n      command: [go, test, ./internal/resofeed,\
-      \ -run, 'Test(SecurityHeaders|SecurityWriterStreamingCancellation|CSP)', -count=1]\n\
-      \      timeout_seconds: 240\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
-      \          - literal: ok\n        forbids:\n          - literal: unsafe-inline\n\
-      \          - literal: FAIL\n    proves:\n      - RF-BUG-005\nbindings:\n  expected_red:\n\
-      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
+      \ RF-BUG-005. Implement http_security.go as sole outer pre-commit owner for\
+      \ the four browser headers across static/API/MCP/auth/not-found/internal/JSON-RPC\
+      \ responses. Enforce Section 2.3 zero-inner-occurrence and header bounds, canonical\
+      \ 500 suppression, manifest/index hash consistency, constant body memory, immediate\
+      \ Flush delegation, conditional Flusher, and no Hijacker. Cancellation proof\
+      \ uses a real stream: client observes committed status and exact first chunk\
+      \ before cancellation; handler observes context.Canceled and signals before\
+      \ return; no body write or successful flush follows; return is bounded. Whole-response\
+      \ buffering or client-error-only inference fails. Add verify-tailnet-csp.mjs\
+      \ and synchronize ARCHITECTURE.md/CONTAINER.md. Recovery reverts middleware/CSP/script/tests/docs\
+      \ and redeploys prior binary; evidence is redacted and adjudicated.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
+      \    - internal/resofeed/http.go\n    - internal/resofeed/http_security.go\n\
+      \    - internal/resofeed/http_security_test.go\n    - internal/resofeed/webui/**\n\
+      \    - scripts/verify-tailnet-csp.mjs\n    - docs/ARCHITECTURE.md\n    - docs/CONTAINER.md\n\
+      \  blocked_paths:\n    - internal/resofeed/state.go\n    - internal/resofeed/runtime_secret.go\n\
+      \    - web/src/routes/**\nclaims:\n  - RF-BUG-005\nchecks:\n  - id: security_headers_green\n\
+      \    run:\n      command: [go, test, ./internal/resofeed, -run, 'Test(SecurityHeaders|SecurityWriterStreamingCancellation|CSP)',\
+      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: []\n\
+      \        contains_any:\n          - literal: ok\n        forbids:\n        \
+      \  - literal: unsafe-inline\n          - literal: FAIL\n    proves:\n      -\
+      \ RF-BUG-005\nbindings:\n  expected_red:\n    items: []\n  closes_expected_red:\
+      \ []\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"\
+      vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
       ,\"complete_http_mux\",\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\"\
       ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
-      ,\"REVIEW\"],\"primary_verifier\":\"security-reviewer\",\"additional_verifiers\"\
+      ,\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
       :[\"integration-verifier\"],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\"\
       :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
       ,\"internal/resofeed/webui/**/*_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
