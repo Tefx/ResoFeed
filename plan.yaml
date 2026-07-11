@@ -182815,9 +182815,9 @@ phases:
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
-    - web/src/lib/workbench-route.ts
     - web/src/routes/+page.svelte
-    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts
+    - web/src/lib
+    - web/tests/e2e
     agent: frontend-engineer
   - id: repair-title-and-steer-invalid-a11y
     name: Repair surface titles and Steer invalid accessibility state
