@@ -183591,9 +183591,7 @@ phases:
     - docs/CONTAINER.md
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - internal/resofeed/http.go
-    - internal/resofeed/http_security.go
     - Dockerfile
-    - web/playwright.base.config.ts
     depends_on:
     - local-full-verification-matrix
     - fresh-docker-runtime-proof
