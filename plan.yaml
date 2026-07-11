@@ -182769,29 +182769,33 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001 and RF-BUG-002. Implement a pure workbench selection/route state\
-      \ module and wire `web/src/routes/+page.svelte`, Feed, Search, and Inspector\
-      \ so click selection synchronously commits a renderable preview; detail/inspect/re-ingest\
-      \ failures remain separate; late responses require matching item ID and request\
-      \ version; viewport changes only placement; and direct, refresh, back, and forward\
-      \ navigation resolve pathname before token hydration or API work. Render target-surface\
-      \ loading in semantic landmarks with aria-busy and no test-only readiness attributes.\
-      \ Update DESIGN.md and the UI contract/preview artifacts in English in the same\
-      \ change. Preserve owner-token behavior and API contracts. Recovery: revert\
-      \ this cohesive frontend state module/wiring/docs change; no persistence migration\
-      \ occurs. Security: no token values in logs, DOM, fixtures, or screenshots.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ generic\nscope:\n  allowed_paths:\n    - web/src/lib/workbench-state.ts\n\
-      \    - web/src/lib/workbench-state.test.ts\n    - web/src/routes/+page.svelte\n\
-      \    - web/src/routes/components/Feed.svelte\n    - web/src/routes/components/SearchRetrieval.svelte\n\
-      \    - web/src/routes/components/Inspector.svelte\n    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n\
-      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n    - docs/UI_REGRESSION_CONTRACT.md\n\
-      \  blocked_paths:\n    - internal/resofeed/**\n    - web/playwright.config.ts\n\
-      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
-      \ .test-artifacts/\nclaims:\n  - RF-BUG-001\n  - RF-BUG-002\nchecks:\n  - id:\
-      \ frontend_selection_route_green\n    run:\n      command: [npm, --prefix, web,\
-      \ run, test:e2e, --, bugfix-frontend-behavior.expected-red.spec.ts, --project=chromium-ci-safe]\n\
-      \      timeout_seconds: 300\n    expect:\n      outcome: green\n      exit_codes:\
+      \ RF-BUG-001 and RF-BUG-002. Implement only the pure route parser/validator\
+      \ in web/src/lib/workbench-route.ts and keep selection, request generation,\
+      \ preview/detail/re-ingest, viewport, History API, focus, and scroll ownership\
+      \ in web/src/routes/+page.svelte. Selection synchronously commits a renderable\
+      \ preview; late detail responses apply only when item ID and request version\
+      \ match. Pathname-first cold/refresh/popstate resolution runs before token hydration\
+      \ or API work. Validate the exact bounded Section 4.2 history.state shape and\
+      \ treat it as page-ephemeral same-page Back/Forward restoration; do not persist\
+      \ navigation history in localStorage, sessionStorage, IndexedDB, SQLite, exports,\
+      \ or cross-page storage. Use semantic landmarks/data-surface/headings/aria-busy\
+      \ without test-only readiness attributes. Playwright acceptance uses the real\
+      \ single-binary API/runtime and no route/HAR/service-worker/proxy interception.\
+      \ Update docs/DESIGN.md and docs/ui-preview.html in English. Recovery reverts\
+      \ route core, shell wiring, tests, and docs together; no persistence migration.\
+      \ No tokens enter logs, DOM, fixtures, or screenshots.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
+      \    - web/src/lib/workbench-route.ts\n    - web/src/lib/__tests__/workbench-route.test.ts\n\
+      \    - web/src/routes/+page.svelte\n    - web/src/routes/components/Feed.svelte\n\
+      \    - web/src/routes/components/SearchRetrieval.svelte\n    - web/src/routes/components/Inspector.svelte\n\
+      \    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n    - docs/DESIGN.md\n\
+      \    - docs/ui-preview.html\n  blocked_paths:\n    - internal/resofeed/**\n\
+      \    - web/playwright.config.ts\n    - web/playwright.*.config.ts\n  ignored_runtime_paths:\n\
+      \    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\nclaims:\n\
+      \  - RF-BUG-001\n  - RF-BUG-002\nchecks:\n  - id: frontend_selection_route_green\n\
+      \    run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
+      \ src/lib/__tests__/workbench-route.test.ts, src/routes/__tests__/inspector-selection.test.ts]\n\
+      \      timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
       \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
       \          - literal: passed\n        forbids:\n          - literal: failed\n\
       \    proves:\n      - RF-BUG-001\n      - RF-BUG-002\nbindings:\n  expected_red:\n\
@@ -182802,17 +182806,21 @@ phases:
       NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"\
       primary_verifier\":\"integration-verifier\",\"additional_verifiers\":[\"uiux-auditor\"\
       ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
-      :{\"developer_test_globs\":[\"web/src/lib/workbench-state.test.ts\"],\"acceptance_test_paths\"\
+      :{\"developer_test_globs\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
+      ,\"web/src/routes/__tests__/inspector-selection.test.ts\"],\"acceptance_test_paths\"\
       :[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"],\"acceptance_check_ids\"\
       :[\"frontend_selection_route_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
       ,\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run Vitest plus focused Playwright across Feed/Search, desktop/mobile,
-      pending/failure/A→B, cold/refresh/back/forward ten-run EN/ZH matrices; inspect
-      screenshots/traces and confirm no stale TODAY announcement on direct Ledger.
+    verification: Run the exact render-contract tests, then the RF-BUG browser cases
+      through the real runtime across Feed/Search, desktop/mobile, pending/failure/A→B,
+      cold/refresh/back/forward, valid and rejected history.state, and EN/ZH. Prove
+      no product API interception and no durable navigation-history storage.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
+    - web/src/lib/workbench-route.ts
     - web/src/routes/+page.svelte
+    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts
     agent: frontend-engineer
   - id: repair-title-and-steer-invalid-a11y
     name: Repair surface titles and Steer invalid accessibility state
