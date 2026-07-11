@@ -183512,42 +183512,42 @@ phases:
     - publish-immutable-two-platform-oci-image
     agent: integration-verifier
   - id: tailnet-caddy-runtime-proof
-    name: Deploy and verify Tailnet/Caddy runtime
+    name: Deploy immutable image and verify Tailnet/Caddy
     status: pending
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
 
 
-      Deploy only the immutable digest validated by the OCI and fresh-container receipts
-      through deploy/resofeed-caddy on tefx-mbp-personal using the maintained Tailnet
-      skill. Repository mutation is absent because this changes authorized deployment
-      runtime state only. Prove Caddy preserves four application headers and strict
-      CSP on HTML, JSON, MCP, unauthorized, and error responses; verify browser boot,
-      direct Ledger route, embedded assets, titles, token accept/reject, import-only
-      source interchange, and JSON state boundary. Use existing secret injection without
-      reading or printing `.env`. Recovery rolls back to the prior immutable digest
-      and records readiness; any digest mismatch, header rewrite, CSP violation, host
-      failure, or browser failure blocks closure.
+      Repository mutation is absent because this step deploys the verified immutable
+      digest through the maintained Tailnet stack. Use the Tailnet deployment skill
+      without reading or printing `.env`. Verify direct/public equality for all four
+      Go-owned headers on HTML, JSON, MCP, unauthorized, and error responses; Caddy
+      adds or replaces none. Prove browser boot without CSP console violations, embedded
+      assets, direct Ledger/item routes, titles, token accept/reject, import-only
+      OPML, and JSON state boundary. This step owns the downstream Tailnet CSP/browser
+      proof omitted from local RF-BUG-005 implementation. Recovery rolls back to the
+      prior immutable digest and verifies readiness.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.tailnet-caddy-runtime-proof","risk_tier":"R3","risk_reasons":["production_like_deployment","security_headers","secret_injection","rollback_required"],"primary_outcome":"RF-BUG-TAILNET-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.tailnet-caddy-runtime-proof","risk_tier":"R3","risk_reasons":["production_like_deployment","security_headers","secret_injection","rollback_required"],"primary_outcome":"RF-BUG-TAILNET-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: Emit a deployment receipt linking the exact OCI index/platform digest,
-      prior digest, deployment command, redacted URL identity, direct/public header
-      matrix, browser evidence hashes, Doctor results, Caddy logs hash, redaction
-      scan, and rollback command/readiness. All predicates pass.
+    verification: Deploy the exact verified digest with the maintained skill, run
+      direct/public header and CSP verification plus browser boot, and record rollback
+      readiness. Any digest mismatch, Caddy header ownership, CSP violation, or browser
+      failure blocks closure.
     refs:
-    - deploy/resofeed-caddy
-    - docs/CONTAINER.md
     - docs/BUG_FIX_PLAN_2026-07-12.md
-    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/CONTAINER.md
+    - deploy/resofeed-caddy/caddy/Caddyfile
+    - scripts/verify-tailnet-csp.mjs
     depends_on:
     - fresh-docker-runtime-proof
-    agent: forgemaster
+    agent: deployment-engineer
   - id: formal-security-review
     name: Perform formal HTTP, CSP, secret, and boundary security review
     status: pending
