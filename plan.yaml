@@ -183488,7 +183488,6 @@ phases:
     - docs/BUG_REPORT_2026-07-11.md
     - docs/CONTAINER.md
     - deploy/resofeed-caddy/caddy/Caddyfile
-    - scripts/verify-tailnet-csp.mjs
     depends_on:
     - fresh-docker-runtime-proof
     agent: deployment-engineer
