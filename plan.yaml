@@ -182524,3 +182524,11 @@ phases:
     and receive an evidence-backed pre-implementation review.
   depends_on:
   - tavily-external-extraction-verification-release
+- id: rf-bug-20260712-frontend-behavior
+  name: RF-BUG Frontend Selection, Routing, Title, and Accessibility Repair
+  status: locked
+  gate: RF-BUG-001, RF-BUG-002, RF-BUG-006, and RF-BUG-007 acceptance tests are green
+    across Feed/Search, desktop/mobile, direct/history navigation, EN/ZH, pending/failure/out-of-order
+    responses, title transitions, and accessibility state.
+  depends_on:
+  - rf-bug-20260712-contract-lock
