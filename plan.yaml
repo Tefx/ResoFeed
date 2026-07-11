@@ -182635,9 +182635,6 @@ phases:
     - docs/BUG_REPORT_2026-07-11.md
     - docs/DESIGN.md
     - docs/ui-preview.html
-    - authority:acceptance-mutation:rf-bug-frontend-inspector
-    - authority:acceptance-mutation:rf-bug-frontend-routes
-    - authority:acceptance-mutation:rf-bug-frontend-combined
     agent: contract-test-author
   - id: runtime-assets-opml-security-expected-red
     name: Lock embedded UI, Doctor, OPML, and HTTP security contracts
