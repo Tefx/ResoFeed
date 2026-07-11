@@ -183691,3 +183691,39 @@ phases:
     depends_on:
     - close-defect-report-with-evidence
     agent: gate-reviewer
+  - id: publish-immutable-two-platform-oci-image
+    name: Publish immutable amd64 and arm64 OCI image
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Build and push one immutable registry-qualified OCI reference from the verified
+      commit for linux/amd64 and linux/arm64 before any deployment. Repository mutation
+      is absent because this step publishes runtime registry state and writes evidence
+      only under ignored .test-artifacts paths. Use the exact Section 2.2 build pipeline
+      inside Docker, no cache, and a digest-pinned tag/ref. Run buildx build --platform
+      linux/amd64,linux/arm64 --push, inspect the manifest and per-platform config/digest,
+      export canonical rootfs file lists for both runnable images, and run scripts/verify-container-contract.sh
+      against the immutable reference. The probe must prove embedded UI, non-root
+      runtime, no external UI tree, writable SQLite, and exact container A→B state
+      persistence using the pinned state fixture. Never print secret values. Recovery
+      deletes the test tag when authorized or records the immutable orphan digest;
+      deployment remains blocked on any incomplete platform, mutable reference, rootfs
+      drift, or state mismatch.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.publish-immutable-two-platform-oci-image","risk_tier":"R3","risk_reasons":["registry_publication","multi_arch_runtime","deployment_prerequisite","state_persistence_probe"],"primary_outcome":"RF-BUG-OCI-IMMUTABLE","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Emit a canonical OCI receipt containing schema_version, commit,
+      registry reference, index digest, amd64/arm64 manifest/config digests, exact
+      build/push/inspect commands, canonical rootfs list paths and hashes, container-contract
+      result, A→B state comparison hash, redaction scan, and rollback disposition.
+      Every predicate must pass before fresh container or Tailnet proof.
+    depends_on:
+    - local-full-verification-matrix
+    agent: forgemaster
