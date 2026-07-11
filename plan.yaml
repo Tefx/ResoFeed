@@ -182790,24 +182790,41 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently review the three expected-red artifacts and synchronized canonical
-      docs against docs/BUG_FIX_PLAN_2026-07-12.md Sections 2, 4–8, and 11. Confirm
-      RF-BUG-001–010 outcomes, exact Doctor and cancellation contracts, page-ephemeral
-      history.state, semantic v2.2, the Section 7 authoritative scanned_paths, real-runtime/no-interception
-      lanes, per-test reset evidence, scripts, fixture/generator ownership, golang.org/x/net/html
-      ownership, rollback, redaction, and downstream sequencing. Run bash scripts/verify-active-reference-gates.sh
-      and node scripts/verify-active-rf-bug-plan.mjs; the managed-plan result must
-      include exactly the six existing RF-BUG phases, no duplicate phase, no completed-history
-      mutation, and zero stale patterns. Repository mutation is absent because this
-      independent readiness gate records evidence only and routes defects back to
-      an owning contract step.'
-    verification: Record reviewer identity, exact commands, reference-gate results.json
-      hash/scanned_paths, managed-plan phase/step inventory, failing assertions by
-      RF-BUG ID, blocked-path diffs, and PASS/FAIL. PASS marks the Section 3.13 READY
-      condition satisfied and requires all ten bugs mapped with no harness-only red
-      or stale plan match.
+      Independently verify the three expected-red definitions and canonical-correction
+      outputs against docs/BUG_FIX_PLAN_2026-07-12.md. Repository mutation is absent
+      because this gate only validates immutable contract artifacts and routes defects
+      back to their owners. Require docs/USAGE.md, docs/ui-preview.html, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,
+      web/package/package-lock, TypeScript harness, all lane configs, lane manifests,
+      state fixture, and visual-environment lock to be canonical before implementation
+      unlocks. Validate every RF-BUG-001–010 requirement→assertion→selector→downstream
+      check→receipt edge, exact browser commands/test IDs, protected acceptance paths,
+      Doctor/cancellation contracts, 1280/1440 font-backed Ledger proof, per-case
+      reset/teardown schemas, live-lane behavior, and semantic-before-rename prompting
+      order. Run both active-reference gates; require exactly six existing RF-BUG
+      phases, no duplicate phase, no completed-history mutation, exact scanned_paths,
+      and zero active stale matches.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-contract-lock.contract-full-gate","risk_tier":"R2","risk_reasons":["public_contract_gate","acceptance_authority","cross_component_unlock"],"primary_outcome":"RF-BUG-001-010-CONTRACT-READY","rollback_class":"TRIVIAL","proof_modalities":["TEST","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"spec-verifier","additional_verifiers":["plan-readiness-auditor"],"review_mode":"INDEPENDENT","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Emit a deterministic contract-gate receipt with schema_version,
+      reviewer_id, commit, reference hash, each prerequisite step/check/receipt status,
+      expected-red binding graph status, exact active scanned_paths hash, six-phase
+      inventory, stale_match_count=0, protected-path diff status, and PASS/FAIL. PASS
+      requires every field and predicate green.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/PROMPTING_SYSTEM.md
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - docs/USAGE.md
+    - docs/ui-preview.html
     depends_on:
     - frontend-state-route-a11y-expected-red
     - runtime-assets-opml-security-expected-red
