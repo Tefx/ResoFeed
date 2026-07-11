@@ -183242,9 +183242,8 @@ phases:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
     - docs/ui-preview.html
-    - web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts
-    - web/static/fonts/fonts.lock.json
-    - scripts/verify-font-lock.mjs
+    - web/src/routes/components/SourceLedger.svelte
+    - web/src/routes/components/StatePortability.svelte
     agent: frontend-engineer
   - id: migrate-active-prompting-names-to-v22
     name: Finalize Prompting v2.2 active names and verified docs
