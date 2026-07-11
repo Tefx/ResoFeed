@@ -182595,14 +182595,15 @@ phases:
       \ with BUG_FIX_PLAN Sections 2.2–2.3 and 4.3–4.5, then add expected-red Go contracts\
       \ plus valid/invalid webui fixture templates for package-local embedding, raw-path/deep\
       \ links, auth-first OPML tombstone, exact Doctor output, outer header ownership,\
-      \ CSP manifest consistency, and real-stream cancellation. The cancellation proof\
+      \ CSP manifest consistency, and real-stream cancellation. Cancellation proof\
       \ exposes the first flushed chunk before cancellation, observes context.Canceled\
       \ before handler return, uses constant body memory, returns within deadline,\
       \ and records zero post-observation writes/flushes. Doctor assertions cover\
       \ every Section 4.3 singleton, conditional detail count, enum/value form, cardinality,\
       \ order, HTTP/MCP parity, and redaction. Runtime, Dockerfile, module dependency,\
-      \ and UI mutation are blocked. Recovery reverts docs/tests/fixtures only; evidence\
-      \ contains no secret.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      \ and UI mutation are blocked. Recovery reverts docs/tests/fixtures and requires\
+      \ fresh adjudicated revalidation before implementation; evidence contains no\
+      \ secret.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
       profile: generic\nscope:\n  allowed_paths:\n    - docs/ARCHITECTURE.md\n   \
       \ - docs/CONTAINER.md\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
       \    - internal/resofeed/testdata/webui-valid/**\n    - internal/resofeed/testdata/webui-invalid/**\n\
@@ -182621,13 +182622,14 @@ phases:
       :\"rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"public_http_contract\"\
       ,\"runtime_asset_contract\"],\"primary_outcome\":\"RF-BUG-003-CONTRACT\",\"\
-      rollback_class\":\"TRIVIAL\",\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\"\
-      :\"gate-reviewer\",\"additional_verifiers\":[\"spec-verifier\"],\"review_mode\"\
-      :\"ADJUDICATED\",\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[\"internal/resofeed/testdata/webui-valid/**\",\"internal/resofeed/testdata/webui-invalid/**\"\
-      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
-      ],\"acceptance_check_ids\":[\"runtime_expected_red\"],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+      rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"\
+      primary_verifier\":\"gate-reviewer\",\"additional_verifiers\":[\"spec-verifier\"\
+      ],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[\"internal/resofeed/testdata/webui-valid/**\",\"\
+      internal/resofeed/testdata/webui-invalid/**\"],\"acceptance_test_paths\":[\"\
+      internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"],\"acceptance_check_ids\"\
+      :[\"runtime_expected_red\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
+      :[]}}\n</vectl_step_policy>"
     verification: Run the exact focused Go contract command. Tests must compile and
       fail only at RF-BUG-003/004/005 assertions, including exact Doctor multiset/order/redaction
       and observable first-flush/cancellation ordering; blocked runtime/module paths
