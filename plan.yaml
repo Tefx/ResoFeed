@@ -8,22 +8,35 @@
 # =============================================================
 version: 1
 project: ResoFeed
-strategy_ref: Contract-first source title and bounded per-source fetch concurrency
-  delta from docs/ARCHITECTURE.md and docs/DESIGN.md
-context: 'Next implementation round after parent commit 447cf910 (`docs: plan ingest
-  concurrency acceleration`): implement source-scoped ingest concurrency acceleration
-  from docs/INGEST_CONCURRENCY_ACCELERATION_PLAN.md with architecture_basis readiness
-  READY_FOR_IMPLEMENTATION_PLANNING.'
-project_guidance: 'ResoFeed constraints for source-scoped ingest concurrency acceleration:
-  one Go binary (`cmd/resofeed`) only; SQLite/FTS5 only; flat `internal/resofeed`
-  package shape; no durable queues, job tables, workers, sidecars, event buses, operation
-  dashboards, history surfaces, settings drift, or new MCP ingest/fetch tools. Source
-  display/title must remain canonical `sources.title`; do not introduce `feed_title`.
-  OPML remains import/export source-list exchange only. Manual ingest/fetch HTTP bodies
-  remain `{}` with no idempotency key/query params. Background ingest must use bounded
-  in-request draining only and never queue post-tick work. Current-operation is best-effort
-  ephemeral process state, not a ledger. All steps must cite refs and return checklist
-  receipts with raw command/evidence where requested.'
+strategy_ref: docs/BUG_FIX_PLAN_2026-07-12.md (sha256 a50c15accd3f6dbb56a1d51c96a06af7b831264b816de6dd05d9d2102522281a),
+  with docs/ARCHITECTURE.md and docs/DESIGN.md as canonical architecture/design authorities
+  and docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md as the canonical RF-BUG-010 harness
+  authority after the contract-lock correction gate. Implement RF-BUG-001–010 through
+  the six existing rf-bug-20260712-* phases only; preserve completed history. OPML
+  is import-only; JSON state backup/restore remains the sole portable-state mechanism.
+  Contract reconciliation and expected-red ownership precede implementation; semantic
+  Prompting v2.2 acceptance precedes active renames and verified-status documentation;
+  immutable two-platform OCI publication precedes deployment.
+context: Active work is the RF-BUG-001–010 repair defined by docs/BUG_FIX_PLAN_2026-07-12.md.
+  The deployable remains one Go binary backed by one SQLite database. OpenRouter remains
+  a runtime-only JSON transformer. Portable state contains active sources, active
+  steering rules, and resonated items through JSON backup/restore only. OPML accepts
+  imports only; the removed export path is retained solely as an auth-first tombstone
+  acceptance predicate. The six active rf-bug-20260712-* phases own canonical document/harness
+  correction, expected-red contracts, frontend/runtime/Ledger/prompting implementation,
+  per-case Playwright isolation, immutable multi-platform container publication, Tailnet
+  proof, independent review, and receipt-backed closure.
+project_guidance: Read docs/BUG_FIX_PLAN_2026-07-12.md and cited canonical references
+  before work. Preserve the single-binary, SQLite-only, lexical-search, owner-token,
+  import-only OPML, and no-sync/no-merge boundaries. Every modifying RF-BUG step must
+  use the vectl assurance worker protocol, keep protected acceptance artifacts immutable
+  unless explicitly authorized, update code/tests/docs together, and emit deterministic
+  receipts. The contract-lock gate must correct canonical English documents plus active
+  harness/package/config artifacts before dependent implementation. Use real single-binary
+  browser runtimes without response interception; verify case-local reset/teardown
+  evidence. Run the exact Section 7 active-reference and managed-plan gates and require
+  zero active stale matches. Runtime secrets remain redacted and never enter plan
+  evidence.
 phases:
 - id: contract-foundation-and-expected-red-tests
   name: Contract Foundation and Expected-Red Tests
