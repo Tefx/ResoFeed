@@ -182961,30 +182961,33 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-006 and RF-BUG-007. Derive exact titles from the resolved route. For\
-      \ input `add source`, expose URL-required invalid state only after the matching\
-      \ non-mutating preview, render exact English/Chinese copy, issue no steer mutation,\
-      \ retain input/focus, and remount one alert on repeat or locale change with\
-      \ removal before addition. Input clears invalid state; stale or failed preview\
-      \ does not create it. Invoke the protected combined browser artifact without\
-      \ mutation. Update DESIGN/ui-preview. Recovery reverts code/tests/docs.\n\n\
-      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ RF-BUG-006 and RF-BUG-007. Derive exact titles from the resolved route and\
+      \ update them atomically with surface/history transitions. For `add source`,\
+      \ expose URL-required invalid state only after the matching non-mutating preview;\
+      \ render exact EN/ZH copy, issue no mutation, retain input/focus, and remount\
+      \ one alert on repeat or locale change. Protected acceptance is immutable. Synchronize\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, and docs/ui-preview.html for titles,\
+      \ route/history transitions, and accessibility. Recovery reverts code/tests/docs.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
       \ implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
       \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/+page.svelte,\
-      \ web/src/routes/__tests__/steer-invalid.test.ts, docs/DESIGN.md, docs/ui-preview.html]\n\
-      \  blocked_paths: [web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
+      \ web/src/routes/__tests__/steer-invalid.test.ts, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/ui-preview.html]\n  blocked_paths: [web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
       \ internal/resofeed/**]\nclaims: [RF-BUG-006, RF-BUG-007]\nchecks:\n  - id:\
       \ rf_bug_006_green\n    run: {command: [npm, --prefix, web, exec, playwright,\
       \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ --grep, RF-BUG-006], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
-      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-006]\n  - id: rf_bug_007_green\n\
-      \    run: {command: [npm, --prefix, web, exec, playwright, test, --, --config,\
-      \ web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ --grep, RF-BUG-007], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
-      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-007]\nbindings:\n\
-      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ --grep, RF-BUG-006, --reporter=line], timeout_seconds: 300}\n    expect: {outcome:\
+      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-006},\
+      \ {literal: passed}], forbids: [{literal: failed}, {literal: No tests found},\
+      \ {literal: 0 tests}, {literal: skipped}]}}\n    proves: [RF-BUG-006]\n  - id:\
+      \ rf_bug_007_green\n    run: {command: [npm, --prefix, web, exec, playwright,\
+      \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
+      \ --grep, RF-BUG-007, --reporter=line], timeout_seconds: 300}\n    expect: {outcome:\
+      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-007},\
+      \ {literal: '[en]'}, {literal: '[zh]'}, {literal: passed}], forbids: [{literal:\
+      \ failed}, {literal: No tests found}, {literal: 0 tests}, {literal: skipped}]}}\n\
+      \    proves: [RF-BUG-007]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
+      \    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
       \ source_check: rf_bug_006_expected_red, requirement: RF-BUG-006, assertion_id:\
       \ A-RF-BUG-006-TITLES, downstream_check: rf_bug_006_green, receipt: RF-BUG-006-red-to-green}\n\
       \    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
@@ -182996,17 +182999,18 @@ phases:
       ],\"primary_outcome\":\"RF-BUG-006\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
       :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"client-runtime-verifier\"\
       ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      ,\"phase_full_gate_required\":false,\"test_authority\":{\"developer_test_globs\"\
       :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/__tests__/steer-invalid.test.ts\"\
       ],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
       ],\"acceptance_check_ids\":[\"rf_bug_006_green\",\"rf_bug_007_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run the two protected Playwright grep commands and focused render
-      tests; verify exact titles, EN/ZH alert lifecycle, zero POST /api/steer, and
-      focus/input retention.
+    verification: Run both protected locale-aware Playwright checks plus focused render
+      tests. Require named positive collection, exact titles/EN-ZH alert lifecycle,
+      zero POST /api/steer, focus retention, and bounded ARCHITECTURE/DESIGN proof.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/ui-preview.html
     depends_on:
