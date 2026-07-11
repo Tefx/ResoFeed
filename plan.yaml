@@ -183191,24 +183191,29 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
       \ RF-BUG-009 naming/documentation closure. After semantic acceptance is green,\
-      \ rename remaining active pre-v2.2 identifiers/files/tests/fixtures/errors/receipts\
-      \ to truthful v2.2 names, remove obsolete fields, and update verified-status\
-      \ English docs from observed behavior. Keep historical audits/completed plan\
-      \ history unchanged. Run the bounded active source/spec gate; it reports path/line\
-      \ evidence and adds no registry. Recovery reverts naming/docs while semantic\
-      \ behavior remains separately reversible.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths: [cmd/**,\
-      \ internal/**, web/src/**, web/tests/**, scripts/verify-active-reference-gates.sh,\
+      \ rename active pre-v2.2 identifiers/files/tests/fixtures/errors/receipts to\
+      \ truthful v2.2 names, remove obsolete fields, and update verified-status English\
+      \ docs from observed behavior. Keep historical audits/completed plan history\
+      \ unchanged. Use bounded inline `git grep` over tracked active code/config/docs\
+      \ to reject stale active v2.1 naming; do not create a permanent registry. Recovery\
+      \ reverts naming/docs while semantic behavior remains separately reversible.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ generic\nscope:\n  allowed_paths: [cmd/**, internal/**, web/src/**, web/tests/**,\
       \ AGENTS.md, Dockerfile, go.mod, go.sum, web/package.json, web/package-lock.json,\
       \ web/playwright*.config.ts, deploy/resofeed-caddy/caddy/Caddyfile, docs/ARCHITECTURE.md,\
       \ docs/DESIGN.md, docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
       \ docs/USAGE.md, docs/ui-preview.html]\n  blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
       \ docs/audits/**, docs/contracts/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md,\
       \ plan.yaml, internal/resofeed/webui/dist/**]\nclaims: [RF-BUG-009-NAMES]\n\
-      checks:\n  - id: rf_bug_009_names_green\n    run: {command: [bash, scripts/verify-active-reference-gates.sh],\
-      \ timeout_seconds: 240}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_any: [{literal: match_count}, {literal: PASS}], forbids: [{literal:\
-      \ FAIL}]}}\n    proves: [RF-BUG-009-NAMES]\n  - id: rf_bug_009_regression_green\n\
+      checks:\n  - id: rf_bug_009_names_green\n    run: {command: [bash, -lc, \"if\
+      \ git grep -n -E 'Prompting v2\\\\.1|prompting_v21|PromptingV21' -- cmd internal\
+      \ web/src web/tests AGENTS.md Dockerfile go.mod go.sum web/package.json 'web/playwright*.config.ts'\
+      \ deploy/resofeed-caddy/caddy/Caddyfile docs/ARCHITECTURE.md docs/DESIGN.md\
+      \ docs/PROMPTING_SYSTEM.md docs/CONTAINER.md docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\
+      \ docs/USAGE.md docs/ui-preview.html; then exit 1; else exit 0; fi\"], timeout_seconds:\
+      \ 240}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [], forbids: [{literal: Prompting v2.1}, {literal: prompting_v21}, {literal:\
+      \ PromptingV21}]}}\n    proves: [RF-BUG-009-NAMES]\n  - id: rf_bug_009_regression_green\n\
       \    run: {command: [go, test, ./internal/resofeed, -run, TestPromptingV22,\
       \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_any: [{literal: ok}], forbids: [{literal:\
@@ -183221,18 +183226,16 @@ phases:
       ,\"REVIEW\"],\"primary_verifier\":\"spec-verifier\",\"additional_verifiers\"\
       :[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\"\
       :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/**/*_test.go\"\
-      ,\"scripts/verify-active-reference-gates.sh\"],\"acceptance_test_paths\":[],\"\
-      acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
-      :[]}}\n</vectl_step_policy>"
-    verification: Run the bounded active source/spec gate and focused Prompting v2.2
-      regression suite. Confirm active names and docs are truthful, historical exclusions
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Run the bounded inline active-tree scan and focused Prompting v2.2
+      regression suite. Confirm active names/docs are truthful, historical exclusions
       are untouched, and no registry artifact is introduced.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/PROMPTING_SYSTEM.md
     - docs/ARCHITECTURE.md
-    - scripts/verify-active-reference-gates.sh
     depends_on:
     - implement-prompting-v22-semantics
     agent: integration-engineer
