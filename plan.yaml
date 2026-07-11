@@ -182591,32 +182591,26 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-003, RF-BUG-004, RF-BUG-005. Before runtime implementation, synchronize\
-      \ docs/ARCHITECTURE.md and docs/CONTAINER.md with docs/BUG_FIX_PLAN_2026-07-12.md\
-      \ Sections 2.2–2.3 and 4.3–4.5. Add expected-red Go contracts and valid/invalid\
-      \ webui fixture templates for the package-local embedded filesystem, raw-path/deep-link\
-      \ rules, auth-first OPML export tombstone, exact Doctor line/key families and\
-      \ fixed ordering, outer four-header ownership, CSP manifest consistency, and\
-      \ real-stream cancellation. Cancellation proof must expose a non-empty first\
-      \ flushed chunk before cancellation, observe request-context context.Canceled\
-      \ before handler return, keep response-body memory constant, return within the\
-      \ deadline, and record zero post-observation body writes or successful flushes;\
-      \ whole-response recorders are insufficient. Doctor assertions cover every Section\
-      \ 4.3 singleton, conditional detail count, allowed enum/value form, cardinality,\
-      \ ordering, HTTP/MCP parity, and redaction. No runtime, Dockerfile, module dependency,\
-      \ or UI mutation occurs here. Recovery reverts only canonical docs, expected-red\
-      \ tests, and fixture templates. Evidence contains no token or provider secret.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ generic\nscope:\n  allowed_paths:\n    - docs/ARCHITECTURE.md\n    - docs/CONTAINER.md\n\
-      \    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n    -\
-      \ internal/resofeed/testdata/webui-valid/**\n    - internal/resofeed/testdata/webui-invalid/**\n\
+      \ RF-BUG-003, RF-BUG-004, RF-BUG-005. Synchronize ARCHITECTURE.md and CONTAINER.md\
+      \ with BUG_FIX_PLAN Sections 2.2–2.3 and 4.3–4.5, then add expected-red Go contracts\
+      \ plus valid/invalid webui fixture templates for package-local embedding, raw-path/deep\
+      \ links, auth-first OPML tombstone, exact Doctor output, outer header ownership,\
+      \ CSP manifest consistency, and real-stream cancellation. The cancellation proof\
+      \ exposes the first flushed chunk before cancellation, observes context.Canceled\
+      \ before handler return, uses constant body memory, returns within deadline,\
+      \ and records zero post-observation writes/flushes. Doctor assertions cover\
+      \ every Section 4.3 singleton, conditional detail count, enum/value form, cardinality,\
+      \ order, HTTP/MCP parity, and redaction. Runtime, Dockerfile, module dependency,\
+      \ and UI mutation are blocked. Recovery reverts docs/tests/fixtures only; evidence\
+      \ contains no secret.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: generic\nscope:\n  allowed_paths:\n    - docs/ARCHITECTURE.md\n   \
+      \ - docs/CONTAINER.md\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
+      \    - internal/resofeed/testdata/webui-valid/**\n    - internal/resofeed/testdata/webui-invalid/**\n\
       \  blocked_paths:\n    - internal/resofeed/http.go\n    - internal/resofeed/http_security.go\n\
       \    - internal/resofeed/doctor.go\n    - internal/resofeed/webui/**\n    -\
-      \ Dockerfile\n    - go.mod\n    - go.sum\n    - web/src/**\n  ignored_runtime_paths:\n\
-      \    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\nclaims:\n\
-      \  - RF-BUG-003-CONTRACT\n  - RF-BUG-004-CONTRACT\n  - RF-BUG-005-CONTRACT\n\
-      checks:\n  - id: runtime_expected_red\n    run:\n      command: [go, test, ./internal/resofeed,\
-      \ -run, 'Test(EmbeddedUI|StaticHandler|OPMLImportOnly|SecurityHeaders|SecurityWriterStreamingCancellation|CSP|Doctor)',\
+      \ Dockerfile\n    - go.mod\n    - go.sum\n    - web/src/**\nclaims:\n  - RF-BUG-003-CONTRACT\n\
+      \  - RF-BUG-004-CONTRACT\n  - RF-BUG-005-CONTRACT\nchecks:\n  - id: runtime_expected_red\n\
+      \    run:\n      command: [go, test, ./internal/resofeed, -run, 'Test(EmbeddedUI|StaticHandler|OPMLImportOnly|SecurityHeaders|SecurityWriterStreamingCancellation|CSP|Doctor)',\
       \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: red\n \
       \     exit_codes: [1]\n      stdout_or_stderr:\n        contains_all: []\n \
       \       contains_any:\n          - literal: RF-BUG\n        forbids:\n     \
@@ -182628,7 +182622,7 @@ phases:
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"public_http_contract\"\
       ,\"runtime_asset_contract\"],\"primary_outcome\":\"RF-BUG-003-CONTRACT\",\"\
       rollback_class\":\"TRIVIAL\",\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\"\
-      :\"security-reviewer\",\"additional_verifiers\":[\"spec-verifier\"],\"review_mode\"\
+      :\"gate-reviewer\",\"additional_verifiers\":[\"spec-verifier\"],\"review_mode\"\
       :\"ADJUDICATED\",\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"internal/resofeed/testdata/webui-valid/**\",\"internal/resofeed/testdata/webui-invalid/**\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
