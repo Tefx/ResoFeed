@@ -183613,19 +183613,27 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      From a clean context and without relying on implementation notes, verify RF-BUG-001–010
-      through the built binary, fresh container, and Tailnet UI. Cover desktop/mobile
-      Feed/Search Inspector pending/failure/A→B and viewport transitions; cold/refresh/back/forward
-      routes ten times in EN/ZH; exact titles; Steer empty/invalid/recovery accessibility
-      trees; Source Ledger at 320/390/768/desktop with 44px and keyboard file input;
-      import-only OPML/state; arbitrary-cwd/deep links; headers; and E2E lane/artifact
-      behavior. Repository mutation is absent because this is independent acceptance
-      evidence. Use fake tokens where local, never expose deployment secrets, and
-      preserve redacted screenshots/traces. Any reproducible mismatch blocks defect
-      closure and returns to the owning repair step.'
-    verification: Produce a bug-by-bug black-box matrix with environment/build identity,
-      actions, observed outcomes, screenshots/accessibility snapshots/traces, and
-      PASS/FAIL; all ten bugs require PASS.
+      From a clean context, verify RF-BUG-001–010 through the built binary, immutable
+      two-platform image, and Tailnet UI without implementation notes. Cover Inspector
+      pending/failure/A→B and independent provenance-write 500; exact RFC3986 adversarial
+      routes; ten cold/refresh/Back/Forward runs in EN/ZH; titles; direct invalid
+      Steer preview with exact copy, keyed remount order, zero mutation request, and
+      focus/input retention; Ledger at 320/390/768/1280/1440 with bundled fonts, zero-diff
+      snapshots, 44px and keyboard import; embedded assets; import-only/state boundaries;
+      security/cancellation; and E2E reset/artifact behavior. Repository mutation
+      is absent because this is independent acceptance evidence. Any mismatch routes
+      to its owner and blocks closure.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.independent-runtime-ui-verification","risk_tier":"R2","risk_reasons":["cross_component_black_box_acceptance","public_ui_contract","runtime_browser_proof"],"primary_outcome":"RF-BUG-INDEPENDENT-RUNTIME-UI","rollback_class":"TRIVIAL","proof_modalities":["RUNTIME_PROBE","REVIEW"],"primary_verifier":"blind-tester","additional_verifiers":["uiux-auditor"],"review_mode":"INDEPENDENT","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Emit a canonical bug-by-bug receipt with reviewer identity, commit/OCI/deployment
+      digests, prerequisite receipt hashes, actions, observed outcomes, browser artifact
+      hashes, expected-ID/assertion inventory hash, redaction result, and PASS/FAIL
+      for each RF-BUG. PASS requires all ten green.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
