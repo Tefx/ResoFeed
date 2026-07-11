@@ -183133,8 +183133,9 @@ phases:
       RF-BUG-009\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\"\
       ,\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\",\"additional_verifiers\"\
       :[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\"\
-      :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/*prompting*_test.go\"\
-      ,\"internal/resofeed/*openrouter*_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
+      :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/openrouter_test.go\"\
+      ,\"internal/resofeed/ingest_test.go\",\"internal/resofeed/reprocess_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"prompting_v22_semantic_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
     verification: Run go test ./internal/resofeed -run '^TestPromptingV22' -count=1,
