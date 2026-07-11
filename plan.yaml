@@ -183166,10 +183166,13 @@ phases:
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, Container, Tailnet, Independent Review, and Closure
   status: locked
-  gate: Local tests/builds, fresh Docker proof, Tailnet/Caddy header and browser liveness,
-    formal security review, independent runtime/UI verification, English documentation
-    parity, and RF-BUG-001–010 defect-report closure evidence all pass with redacted
-    logs.
+  gate: The exact Section 7 matrix passes locally, in the immutable two-platform container,
+    and through Tailnet/Caddy. The authoritative active-reference and managed-plan
+    scripts report their exact scanned paths and zero stale matches; Doctor, cancellation,
+    per-test reset, real-runtime/no-interception, semantic v2.2, container A→B state,
+    four-header equality, browser bootstrap, independent security/runtime/UI review,
+    English documentation parity, and RF-BUG-001–010 closure evidence all pass with
+    redacted artifacts.
   depends_on:
   - rf-bug-20260712-e2e-isolation
   steps:
