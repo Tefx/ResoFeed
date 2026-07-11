@@ -182550,3 +182550,11 @@ phases:
   depends_on:
   - rf-bug-20260712-frontend-behavior
   - rf-bug-20260712-runtime-boundaries
+- id: rf-bug-20260712-e2e-isolation
+  name: RF-BUG E2E Isolation and Failure Classification
+  status: locked
+  gate: RF-BUG-010 smoke, parallel-safe UI-contract, serialized real-runtime, and
+    isolated live-provider lanes are classified after behavioral repair; smoke completes
+    under two minutes and three full Chromium runs agree with per-failure artifacts.
+  depends_on:
+  - rf-bug-20260712-ledger-prompting
