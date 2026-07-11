@@ -183573,24 +183573,33 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently review RF-BUG-003/004/005/010 implementation and runtime evidence:
-      embedded-FS traversal/method handling, absence of fake/external web roots, complete
-      outer-mux headers, artifact-derived CSP with no unsafe-inline, unchanged owner-token
-      authorization, API/MCP status/body parity, OPML export removal without replacement
-      exfiltration surface, E2E isolation, live-provider opt-in, and artifact/log
-      secret redaction. Repository mutation is absent because this adjudicated review
-      evaluates immutable code, tests, Docker, and Tailnet evidence. On any finding,
-      classify severity, identify exact path/surface, and block the final gate until
-      the owning modifying step is remediated and all runtime proofs rerun.'
-    verification: Produce an adjudicated security report with threat surface, commands/probes,
-      code and runtime evidence, findings disposition, rollback assessment, and explicit
-      PASS only when no unresolved security finding remains.
+      Independently review RF-BUG-003/004/005/010 code and immutable local/OCI/container/Tailnet
+      receipts: embedded-FS traversal/methods, no external UI root, complete outer
+      headers, artifact-derived CSP without unsafe-inline, staged status/header handling
+      with no body buffering, unchanged owner-token authorization, API/MCP parity,
+      import-only OPML with no replacement exfiltration surface, case-local E2E isolation,
+      live-provider opt-in, and artifact/log redaction. Repository mutation is absent
+      because this adjudicated review evaluates immutable artifacts. Any finding routes
+      to its modifying owner and blocks closure.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.formal-security-review","risk_tier":"R3","risk_reasons":["security_boundary_review","deployment_evidence","secret_redaction"],"primary_outcome":"RF-BUG-SECURITY-REVIEW","rollback_class":"TRIVIAL","proof_modalities":["STATIC_ANALYSIS","RUNTIME_PROBE","REVIEW"],"primary_verifier":"security-reviewer","additional_verifiers":["gate-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Emit a canonical security-review receipt with reviewer identity,
+      commit/digests, prerequisite receipt hashes, threat-surface checks, commands/probes,
+      findings and owner dispositions, rollback assessment, redaction scan, and PASS/FAIL.
+      PASS requires zero unresolved findings.
     refs:
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
+    - docs/BUG_FIX_PLAN_2026-07-12.md
     - internal/resofeed/http.go
+    - internal/resofeed/http_security.go
     - Dockerfile
-    - web/playwright.config.ts
+    - web/playwright.base.config.ts
     depends_on:
     - local-full-verification-matrix
     - fresh-docker-runtime-proof
