@@ -182629,35 +182629,43 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-003, RF-BUG-004, RF-BUG-005. Synchronize ARCHITECTURE.md and CONTAINER.md\
-      \ with BUG_FIX_PLAN Sections 2.2–2.3 and 4.3–4.5, then add expected-red Go contracts\
-      \ plus valid/invalid webui fixture templates for package-local embedding, raw-path/deep\
-      \ links, auth-first OPML tombstone, exact Doctor output, outer header ownership,\
-      \ CSP manifest consistency, and real-stream cancellation. Cancellation proof\
-      \ exposes the first flushed chunk before cancellation, observes context.Canceled\
-      \ before handler return, uses constant body memory, returns within deadline,\
-      \ and records zero post-observation writes/flushes. Doctor assertions cover\
-      \ every Section 4.3 singleton, conditional detail count, enum/value form, cardinality,\
-      \ order, HTTP/MCP parity, and redaction. Runtime, Dockerfile, module dependency,\
-      \ and UI mutation are blocked. Recovery reverts docs/tests/fixtures and requires\
-      \ fresh adjudicated revalidation before implementation; evidence contains no\
-      \ secret.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      profile: generic\nscope:\n  allowed_paths:\n    - docs/ARCHITECTURE.md\n   \
-      \ - docs/CONTAINER.md\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
+      \ RF-BUG-003, RF-BUG-004, RF-BUG-005. Before implementation, reconcile docs/ARCHITECTURE.md,\
+      \ docs/CONTAINER.md, and docs/USAGE.md with the authoritative repair contract.\
+      \ Define expected-red Go acceptance for package-local embedded assets, raw-path/deep\
+      \ links, exact Doctor safe-text grammar, auth-first import-only OPML behavior,\
+      \ outer security ownership, artifact-derived CSP, and real streaming cancellation.\
+      \ The security writer stages headers/status only, never buffers response bodies;\
+      \ first chunk must be client-visible before cancellation, context cancellation\
+      \ must be observed before handler return, memory remains constant, and no write/flush\
+      \ succeeds afterward. Tests name RF-BUG-003/004/005 assertions. Runtime/module/UI\
+      \ implementation paths remain blocked; recovery reverts docs/tests/fixtures.\
+      \ Evidence is redacted.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: expected_red_definition\nscope:\n  allowed_paths:\n    - docs/ARCHITECTURE.md\n\
+      \    - docs/CONTAINER.md\n    - docs/USAGE.md\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
       \    - internal/resofeed/testdata/webui-valid/**\n    - internal/resofeed/testdata/webui-invalid/**\n\
       \  blocked_paths:\n    - internal/resofeed/http.go\n    - internal/resofeed/http_security.go\n\
       \    - internal/resofeed/doctor.go\n    - internal/resofeed/webui/**\n    -\
-      \ Dockerfile\n    - go.mod\n    - go.sum\n    - web/src/**\nclaims:\n  - RF-BUG-003-CONTRACT\n\
-      \  - RF-BUG-004-CONTRACT\n  - RF-BUG-005-CONTRACT\nchecks:\n  - id: runtime_expected_red\n\
-      \    run:\n      command: [go, test, ./internal/resofeed, -run, 'Test(EmbeddedUI|StaticHandler|OPMLImportOnly|SecurityHeaders|SecurityWriterStreamingCancellation|CSP|Doctor)',\
+      \ Dockerfile\n    - go.mod\n    - go.sum\n    - web/src/**\nclaims: [RF-BUG-003-CONTRACT,\
+      \ RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT]\nchecks:\n  - id: runtime_expected_red\n\
+      \    run:\n      command: [go, test, ./internal/resofeed, -run, 'TestRFBugRuntimeContract/(RF-BUG-003|RF-BUG-004|RF-BUG-005)',\
       \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: red\n \
-      \     exit_codes: [1]\n      stdout_or_stderr:\n        contains_all: []\n \
-      \       contains_any:\n          - literal: RF-BUG\n        forbids:\n     \
-      \     - literal: setup failed\n          - literal: no test files\n    proves:\n\
-      \      - RF-BUG-003-CONTRACT\n      - RF-BUG-004-CONTRACT\n      - RF-BUG-005-CONTRACT\n\
-      bindings:\n  expected_red:\n    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red\"\
+      \     exit_codes: [1]\n      stdout_or_stderr:\n        contains_any: [{literal:\
+      \ RF-BUG-003}, {literal: RF-BUG-004}, {literal: RF-BUG-005}]\n        forbids:\
+      \ [{literal: setup failed}, {literal: no test files}]\n    proves: [RF-BUG-003-CONTRACT,\
+      \ RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT]\nbindings:\n  expected_red:\n  \
+      \  items:\n      - {requirement: RF-BUG-003, assertion_id: A-RF-BUG-003-EMBED,\
+      \ source_check: runtime_expected_red, selector: {type: subtest, value: RF-BUG-003},\
+      \ downstream_step: rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary,\
+      \ downstream_check: embedded_ui_green, receipt: RF-BUG-003-red-to-green}\n \
+      \     - {requirement: RF-BUG-004, assertion_id: A-RF-BUG-004-IMPORT-ONLY, source_check:\
+      \ runtime_expected_red, selector: {type: subtest, value: RF-BUG-004}, downstream_step:\
+      \ rf-bug-20260712-runtime-boundaries.remove-opml-export-active-surface, downstream_check:\
+      \ opml_import_only_green, receipt: RF-BUG-004-red-to-green}\n      - {requirement:\
+      \ RF-BUG-005, assertion_id: A-RF-BUG-005-SECURITY, source_check: runtime_expected_red,\
+      \ selector: {type: subtest, value: RF-BUG-005}, downstream_step: rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp,\
+      \ downstream_check: security_headers_green, receipt: RF-BUG-005-red-to-green}\n\
+      \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"public_http_contract\"\
       ,\"runtime_asset_contract\"],\"primary_outcome\":\"RF-BUG-003-CONTRACT\",\"\
       rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"\
@@ -182668,14 +182676,16 @@ phases:
       internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"],\"acceptance_check_ids\"\
       :[\"runtime_expected_red\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
       :[]}}\n</vectl_step_policy>"
-    verification: Run the exact focused Go contract command. Tests must compile and
-      fail only at RF-BUG-003/004/005 assertions, including exact Doctor multiset/order/redaction
-      and observable first-flush/cancellation ordering; blocked runtime/module paths
-      remain unchanged.
+    verification: Run the exact runtime_expected_red command. It must compile, collect
+      named RF-BUG-003/004/005 subtests, and fail only on product predicates. Verify
+      docs/USAGE.md canonical correction ownership, staged-header/status wording,
+      explicit no-body-buffering, exact Doctor grammar fixtures, and unchanged blocked
+      paths.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
+    - docs/USAGE.md
     - internal/resofeed
     agent: golang-developer
   - id: ledger-prompting-e2e-expected-red
