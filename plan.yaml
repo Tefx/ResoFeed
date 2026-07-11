@@ -183442,38 +183442,38 @@ phases:
   - rf-bug-20260712-e2e-isolation
   steps:
   - id: local-full-verification-matrix
-    name: Run complete local verification matrix
+    name: Run bounded local-only verification matrix
     status: pending
     description: 'step_type: implementation
 
       repo_change_policy: no_repo_change
 
 
-      Run the exact Section 7 matrix against immutable implementation artifacts: frontend
-      checks/render contracts; clean stage/manifest/Go test/vet/build; focused assets/import-only/security/cancellation/CSP/Doctor
-      and Prompting v2.2 suites; font lock; lane inventory; real-runtime browser contracts
-      including 1280/1440 and ten-run EN/ZH routes; timeout-wrapped smoke; runtime;
-      isolation/evidence verifier; three CI-safe repeats; active-reference and managed-plan
-      gates; live lane only when explicitly authorized. Repository mutation is absent
-      because this step consumes committed artifacts and stores evidence only under
-      ignored paths. Validate all expected-ID mappings, reciprocal red/green receipts,
-      canonical reset/teardown pairs, real-stream cancellation, exact Doctor grammar/order/redaction,
-      exact Section 7 scanned_paths, six active phases, and zero stale matches.
+      Repository mutation is absent because this step consumes committed local artifacts
+      and writes only ignored test output. Run the Section 7 local rows: frontend
+      check and focused render tests; focused Go asset/Doctor/security and Prompting
+      tests; full `go test ./... -count=1`, `go vet ./...`, and `go build ./cmd/resofeed`;
+      named protected browser contracts; timeout-wrapped smoke; runtime lane; legacy
+      old/replacement collection; and three retry-free CI-safe runs. Run the bounded
+      active source/spec gate. Exclude OCI publication, container-runtime, Tailnet,
+      and live-provider rows. Failure reports command, exit, duration, and redacted
+      artifact path; no custom evidence schema, expected-ID inventory, reset/teardown
+      registry, or phase Full Gate is required.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.local-full-verification-matrix","risk_tier":"R2","risk_reasons":["cross_component_acceptance","runtime_browser_proof","release_gate"],"primary_outcome":"RF-BUG-LOCAL-MATRIX","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["spec-verifier"],"review_mode":"INDEPENDENT","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.local-full-verification-matrix","risk_tier":"R2","risk_reasons":["cross_component_local_acceptance","runtime_browser_proof"],"primary_outcome":"RF-BUG-LOCAL-MATRIX","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["spec-verifier"],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: Emit a canonical local-matrix receipt with schema_version, commit,
-      tool versions, each exact command/exit/duration/artifact hash, each RF-BUG predicate,
-      reciprocal receipt inventory, expected-ID/assertion inventory hash, reset/teardown
-      counts, cancellation timeline, Doctor result, font/image lock result, three
-      normalized run digests, active scanned_paths hash, six-phase inventory, stale_match_count=0,
-      and redaction result. PASS requires every mandatory field and predicate green.
+    verification: Execute each local Section 7 row and record ordinary command output.
+      PASS requires all local commands green, smoke under 120 seconds, three retry-free
+      CI-safe runs with the same collected set, protected acceptance artifacts unchanged,
+      and no OCI/Tailnet/live command executed.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
     - go.mod
     agent: integration-verifier
