@@ -182847,32 +182847,50 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001 and RF-BUG-002. Implement only the pure parser/validator in web/src/lib/workbench-route.ts;\
-      \ +page.svelte owns selection, request generation, preview/detail/re-ingest,\
-      \ viewport, History API, focus, and scroll. Selection synchronously commits\
-      \ a preview and late detail applies only for matching item ID/request version.\
-      \ Pathname-first cold/refresh/popstate resolution precedes token hydration/API\
-      \ work. Validate the bounded Section 4.2 history.state shape as page-ephemeral\
-      \ same-page Back/Forward restoration; localStorage, sessionStorage, IndexedDB,\
-      \ SQLite, export, and cross-page persistence are forbidden. Use semantic landmarks/data-surface/headings/aria-busy.\
-      \ Browser acceptance uses the real runtime and real product responses. Update\
-      \ DESIGN.md and ui-preview.html. Recovery reverts route core, wiring, tests,\
-      \ and docs; no persistence migration or token exposure.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
-      \    - web/src/lib/workbench-route.ts\n    - web/src/lib/__tests__/workbench-route.test.ts\n\
-      \    - web/src/routes/+page.svelte\n    - web/src/routes/components/Feed.svelte\n\
-      \    - web/src/routes/components/SearchRetrieval.svelte\n    - web/src/routes/components/Inspector.svelte\n\
-      \    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n    - docs/DESIGN.md\n\
-      \    - docs/ui-preview.html\n  blocked_paths:\n    - internal/resofeed/**\n\
-      \    - web/playwright.config.ts\n    - web/playwright.*.config.ts\nclaims:\n\
-      \  - RF-BUG-001\n  - RF-BUG-002\nchecks:\n  - id: frontend_selection_route_green\n\
+      \ RF-BUG-001 and RF-BUG-002. Implement the pure RFC3986 route parser/serializer\
+      \ in web/src/lib/workbench-route.ts and interaction state in +page.svelte. Encode\
+      \ UTF-8 bytes; leave only ALPHA / DIGIT / `-._~` unescaped; percent-encode every\
+      \ other byte with uppercase hex; preserve reserved characters only when they\
+      \ are structural delimiters, never when part of values. Cover spaces, `%`, `+`,\
+      \ `&`, `=`, `#`, `/`, `?`, non-ASCII, malformed escapes, duplicate/unknown parameters,\
+      \ and dotted IDs. Selection commits readable preview synchronously; matching\
+      \ detail may enrich it, while stale item/version responses cannot replace it.\
+      \ An independent inspect/provenance-write 500 preserves readable Inspector content\
+      \ and adds a separate inline diagnostic. Pathname-first cold/refresh/Back/Forward\
+      \ resolution precedes token/API work. Validate bounded page-ephemeral history.state\
+      \ only. Real-runtime proof covers both languages and a ten-repeat route command.\
+      \ Update DESIGN.md and ui-preview.html. Recovery reverts code/tests/docs; no\
+      \ persistence or secret changes.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [web/src/lib/workbench-route.ts, web/src/lib/__tests__/workbench-route.test.ts,\
+      \ web/src/routes/+page.svelte, web/src/routes/components/Feed.svelte, web/src/routes/components/SearchRetrieval.svelte,\
+      \ web/src/routes/components/Inspector.svelte, docs/DESIGN.md, docs/ui-preview.html]\n\
+      \  blocked_paths: [internal/resofeed/**, web/playwright.config.ts, web/playwright.*.config.ts]\n\
+      claims: [RF-BUG-001, RF-BUG-002]\nchecks:\n  - id: frontend_selection_route_green\n\
       \    run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
       \ src/lib/__tests__/workbench-route.test.ts, src/routes/__tests__/inspector-selection.test.ts]\n\
       \      timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
-      \          - literal: passed\n        forbids:\n          - literal: failed\n\
-      \    proves:\n      - RF-BUG-001\n      - RF-BUG-002\nbindings:\n  expected_red:\n\
-      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: passed}], forbids:\
+      \ [{literal: failed}]}\n    proves: [RF-BUG-001, RF-BUG-002]\n  - id: frontend_selection_route_browser_green\n\
+      \    run:\n      command: [npm, --prefix, web, exec, playwright, test, --, --config,\
+      \ web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
+      \ --grep, 'RF-BUG-(001|002)']\n      timeout_seconds: 300\n    expect:\n   \
+      \   outcome: green\n      exit_codes: [0]\n      stdout_or_stderr: {contains_any:\
+      \ [{literal: passed}], forbids: [{literal: failed}, {literal: No tests found}]}\n\
+      \    proves: [RF-BUG-001, RF-BUG-002]\n  - id: route_repeatability_green\n \
+      \   run:\n      command: [npm, --prefix, web, exec, playwright, test, --, --config,\
+      \ web/playwright.browser-contract.config.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
+      \ --grep, 'ROUTE-REPEATABILITY-(EN|ZH)', --repeat-each=10, --retries=0]\n  \
+      \    timeout_seconds: 900\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: passed}], forbids:\
+      \ [{literal: failed}]}\n    proves: [RF-BUG-002]\nbindings:\n  expected_red:\
+      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ source_check: frontend_browser_expected_red, requirement: RF-BUG-001, assertion_id:\
+      \ A-RF-BUG-001-INSPECTOR, downstream_check: frontend_selection_route_browser_green,\
+      \ receipt: RF-BUG-001-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ source_check: frontend_browser_expected_red, requirement: RF-BUG-002, assertion_id:\
+      \ A-RF-BUG-002-ROUTES, downstream_check: frontend_selection_route_browser_green,\
+      \ receipt: RF-BUG-002-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"async_state_wiring\"\
       ,\"client_routing\"],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"\
@@ -182882,14 +182900,15 @@ phases:
       :{\"developer_test_globs\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
       ,\"web/src/routes/__tests__/inspector-selection.test.ts\"],\"acceptance_test_paths\"\
       :[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"],\"acceptance_check_ids\"\
-      :[\"frontend_selection_route_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
-      ,\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run the exact render-contract tests, then the RF-BUG browser cases
-      through the real runtime across Feed/Search, desktop/mobile, pending/failure/A→B,
-      cold/refresh/back/forward, valid and rejected history.state, and EN/ZH. Prove
-      no product API interception and no durable navigation-history storage.
+      :[\"frontend_selection_route_browser_green\",\"route_repeatability_green\"],\"\
+      acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Run all three checks. Require real single-binary responses, zero
+      interception, provenance-write failure independence, exact RFC3986 adversarial
+      fixtures, ten consecutive cold/refresh/Back/Forward runs in EN and ZH, and no
+      durable navigation-history storage.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
     - docs/DESIGN.md
     - web/src/routes/+page.svelte
     - web/src/lib
