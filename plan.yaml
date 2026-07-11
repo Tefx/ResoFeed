@@ -183347,15 +183347,15 @@ phases:
     - docs/ARCHITECTURE.md
     agent: golang-developer
 - id: rf-bug-20260712-e2e-isolation
-  name: RF-BUG E2E Isolation and Failure Classification
+  name: RF-BUG Real-Runtime E2E Isolation and Migration
   status: locked
-  gate: RF-BUG-010 browser-contract, smoke, runtime, and live lanes run only against
-    real isolated single-binary runtimes with no product-route/HAR/service-worker/proxy
-    interception. Every smoke/runtime/live case and every mutating browser-contract
-    case has a verified case-local DB, runtime, port, browser-context reset, reset.json,
-    and prior-case teardown; no DB instance, PID, or port lifetime spans cases. Smoke
-    completes under 120 seconds and three CI-safe Chromium runs agree with bounded
-    artifacts.
+  gate: Protected RF-BUG-010 acceptance, timeout-wrapped smoke, and three retry-free
+    CI-safe runs pass with case-local mutable state, reliable cleanup, concise redacted
+    diagnostics, and reviewed old/replacement collection.
+  context: Use ordinary Playwright fixtures and one compact legacy checklist. No broad
+    web/tests/e2e authority, product-route interception, reset/teardown schema, hash
+    evidence, assertion registry, expected-ID manifest, or universal fresh-process
+    requirement.
   depends_on:
   - rf-bug-20260712-ledger-prompting
   steps:
