@@ -183274,14 +183274,11 @@ phases:
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
-    - internal/resofeed/playwright_fixture_test.go
-    - web/tests/e2e/fixtures/browser-contract-v1.seed.json
-    - web/tests/e2e/fixtures/browser-contract-v1.sqlite3
     - web/src/lib/playwright-e2e-harness-contract.ts
-    - scripts/run-with-timeout.mjs
-    - scripts/verify-playwright-lanes.mjs
-    - scripts/verify-playwright-isolation.mjs
     - web/package.json
+    - internal/resofeed
+    - web/tests/e2e
+    - scripts
     agent: test-engineer
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, Container, Tailnet, Independent Review, and Closure
