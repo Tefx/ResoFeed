@@ -182644,7 +182644,6 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - internal/resofeed
-    - internal/resofeed/testdata
     agent: golang-developer
   - id: ledger-prompting-e2e-expected-red
     name: Lock Ledger, prompting v2.2, and E2E isolation contracts
