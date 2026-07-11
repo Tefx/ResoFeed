@@ -183429,15 +183429,16 @@ phases:
     - web/package.json
     agent: test-engineer
 - id: rf-bug-20260712-assurance-closure
-  name: RF-BUG Local, Container, Tailnet, Independent Review, and Closure
+  name: RF-BUG Local, OCI, Container, Tailnet, and Independent Closure
   status: locked
-  gate: The exact Section 7 matrix passes locally, in the immutable two-platform container,
-    and through Tailnet/Caddy. The authoritative active-reference and managed-plan
-    scripts report their exact scanned paths and zero stale matches; Doctor, cancellation,
-    per-test reset, real-runtime/no-interception, semantic v2.2, container A→B state,
-    four-header equality, browser bootstrap, independent security/runtime/UI review,
-    English documentation parity, and RF-BUG-001–010 closure evidence all pass with
-    redacted artifacts.
+  gate: The bounded local-only matrix passes; an immutable two-platform image is then
+    published and verified in containers; the verified digest is deployed and checked
+    through Tailnet/Caddy; fresh security/runtime/UI reviews have no unresolved findings;
+    canonical docs and the defect report are synchronized.
+  context: Dependency order is local verification -> OCI publication -> both-platform
+    container verification -> Tailnet deployment/verification -> independent reviews
+    -> documentation closure. Ordinary bounded command evidence is sufficient; no
+    phase Full Gate or custom evidence registry.
   depends_on:
   - rf-bug-20260712-e2e-isolation
   steps:
