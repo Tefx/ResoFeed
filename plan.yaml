@@ -183180,73 +183180,67 @@ phases:
   - rf-bug-20260712-runtime-boundaries
   steps:
   - id: repair-source-ledger-responsive-groups
-    name: Repair Source Ledger responsive action groups
+    name: Repair Source Ledger responsive groups and operational states
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-008. Implement two independent narrow-screen groups: Source List with\
-      \ import-only source intake, and Portable State with JSON backup/restore. Preserve\
-      \ group/control/copy association, unbreakable bracket tokens, keyboard-operable\
-      \ file input, and 44×44 CSS-pixel targets. Own exact render file web/src/routes/components/__tests__/source-ledger-responsive.test.ts\
-      \ and browser file web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ under project chromium-browser-contract. Cover exact 320×800, 390×844, 768×1024,\
-      \ 1280×800, and 1440×900 viewports. Own checked-in JetBrains Mono/Newsreader\
-      \ font files, both OFL licenses, fonts.lock.json, verify-font-lock.mjs, visual-environment.lock.json,\
-      \ pinned Playwright image/environment values, local font readiness/network/computed-family\
-      \ predicates, exact snapshot directory, and zero-diff settings maxDiffPixels:0/threshold:0/scale:css/animations:disabled.\
-      \ Update DESIGN, ui-preview, and UI regression contract. Recovery reverts UI/CSS/fonts/licenses/locks/snapshots/docs/tests\
-      \ as one public UI outcome; backend/state semantics remain unchanged.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths:\n    - web/src/routes/+page.svelte\n    - web/src/routes/components/SourceLedger.svelte\n\
-      \    - web/src/routes/components/StatePortability.svelte\n    - web/src/app.css\n\
-      \    - web/src/routes/components/__tests__/source-ledger-responsive.test.ts\n\
-      \    - web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\n   \
-      \ - web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**\n\
-      \    - web/tests/e2e/visual-environment.lock.json\n    - web/static/fonts/JetBrainsMono[wght].ttf\n\
-      \    - web/static/fonts/Newsreader[opsz,wght].ttf\n    - web/static/fonts/licenses/JetBrainsMono-OFL.txt\n\
-      \    - web/static/fonts/licenses/Newsreader-OFL.txt\n    - web/static/fonts/fonts.lock.json\n\
-      \    - scripts/verify-font-lock.mjs\n    - docs/DESIGN.md\n    - docs/ui-preview.html\n\
-      \    - docs/UI_REGRESSION_CONTRACT.md\n  blocked_paths: [internal/resofeed/**,\
-      \ web/src/lib/api-client.ts]\nclaims: [RF-BUG-008]\nchecks:\n  - id: ledger_render_green\n\
-      \    run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
-      \ src/routes/components/__tests__/source-ledger-responsive.test.ts]\n      timeout_seconds:\
-      \ 180\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\
-      \ {contains_any: [{literal: passed}], forbids: [{literal: failed}]}\n    proves:\
-      \ [RF-BUG-008]\n  - id: font_lock_green\n    run:\n      command: [node, scripts/verify-font-lock.mjs]\n\
-      \      timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: PASS}], forbids: [{literal:\
-      \ FAIL}]}\n    proves: [RF-BUG-008]\n  - id: ledger_responsive_green\n    run:\n\
-      \      command: [npm, --prefix, web, exec, playwright, test, --, --config, web/playwright.browser-contract.config.ts,\
-      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts, --update-snapshots=none]\n\
-      \      timeout_seconds: 600\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: passed}], forbids:\
-      \ [{literal: failed}, {literal: No tests found}]}\n    proves: [RF-BUG-008]\n\
-      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step:\
-      \ rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red, source_check:\
-      \ ledger_browser_expected_red, requirement: RF-BUG-008, assertion_id: A-RF-BUG-008-LEDGER,\
-      \ downstream_check: ledger_responsive_green, receipt: RF-BUG-008-red-to-green}\n\
+      \ RF-BUG-008. Implement separate Source List and Portable State groups, import-only\
+      \ OPML, no second URL field, unbroken bracket tokens, keyboard reachability,\
+      \ 44x44 targets, and no document overflow at 320x800, 390x844, 768x1024, 1280x800,\
+      \ and 1440x900. Preserve DESIGN-required global `[RUN INGEST]`, row `[FETCH]`,\
+      \ pending/success/error/conflict/current-operation states, independent rows,\
+      \ source-specific delete confirmation/cancel/focus/saved-item boundary, and\
+      \ low-chrome source info. Use existing fallback fonts and reviewed screenshots;\
+      \ do not add bundled fonts, font/visual registries, or zero-diff portability.\
+      \ Invoke protected responsive/operations/delete acceptance files without mutation.\
+      \ Synchronize DESIGN, ui-preview, UI regression docs. Recovery reverts UI/CSS/docs/tests.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/routes/+page.svelte,\
+      \ web/src/routes/components/SourceLedger.svelte, web/src/routes/components/StatePortability.svelte,\
+      \ web/src/app.css, web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
+      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
+      \ docs/DESIGN.md, docs/ui-preview.html, docs/UI_REGRESSION_CONTRACT.md]\n  blocked_paths:\
+      \ [web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts, web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
+      \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts, web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts,\
+      \ internal/resofeed/**, web/src/lib/api-client.ts, web/static/fonts/**]\nclaims:\
+      \ [RF-BUG-008]\nchecks:\n  - id: rf_bug_008_green\n    run: {command: [npm,\
+      \ --prefix, web, exec, playwright, test, --, --config, web/playwright.browser-contract.config.ts,\
+      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
+      \ --grep, RF-BUG-008], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
+      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-008]\n  - id: rf_bug_008_operations_green\n\
+      \    run: {command: [npm, --prefix, web, exec, playwright, test, --, --config,\
+      \ web/playwright.runtime.config.ts, web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
+      \ --grep, RF-BUG-008], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
+      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-008]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
+      \ source_check: rf_bug_008_expected_red, requirement: RF-BUG-008, assertion_id:\
+      \ A-RF-BUG-008-LEDGER, downstream_check: rf_bug_008_green, receipt: RF-BUG-008-red-to-green}\n\
       </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
       ,\"step_id\":\"rf-bug-20260712-ledger-prompting.repair-source-ledger-responsive-groups\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"accessibility_behavior\"\
-      ,\"visual_baseline\",\"font_supply_chain\",\"cross_component_browser_contract\"\
-      ],\"primary_outcome\":\"RF-BUG-008\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
-      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"uiux-auditor\"\
-      ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\",\"\
-      scripts/verify-font-lock.mjs\"],\"acceptance_test_paths\":[\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\"\
-      ],\"acceptance_check_ids\":[\"ledger_responsive_green\"],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run all three checks. Require exact 1280/1440 IDs, pinned image/environment
-      lock, bundled font/license/lock and staged-byte evidence, zero font network
-      failures, exact snapshots with zero differing pixels, DOM/keyboard/44px predicates,
-      and reciprocal RF-BUG-008 receipt.
+      ,\"runtime_operations\"],\"primary_outcome\":\"RF-BUG-008\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
+      ],\"primary_verifier\":\"uiux-auditor\",\"additional_verifiers\":[\"integration-verifier\"\
+      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\"\
+      ],\"acceptance_test_paths\":[\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\",\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_008_green\",\"rf_bug_008_operations_green\"\
+      ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
+      </vectl_step_policy>"
+    verification: Run focused render tests and the protected responsive/delete/runtime
+      browser contracts. Review screenshots at all five viewports and verify operational
+      state transitions, no second URL field, focus behavior, 44px targets, grouping,
+      and overflow.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
     - docs/DESIGN.md
     - docs/ui-preview.html
-    - web/src/routes/components/SourceLedger.svelte
-    - web/src/routes/components/StatePortability.svelte
+    - docs/UI_REGRESSION_CONTRACT.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     agent: frontend-engineer
   - id: migrate-active-prompting-names-to-v22
     name: Finalize Prompting v2.2 active names and verified docs
