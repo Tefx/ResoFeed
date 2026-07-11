@@ -183254,56 +183254,57 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-009 active-name and documentation closure. This step is claimable only\
-      \ after implement-prompting-v22-semantics proves the complete semantic behavior\
-      \ and fixtures green. Rename every active pre-v2.2 symbol/file/test/fixture/error/receipt\
-      \ to its canonical v2.2 name, remove obsolete quality-profile and stored-text\
-      \ fields, and then update ARCHITECTURE/PROMPTING_SYSTEM verified-status prose\
-      \ from observed behavior. Run the sole authoritative Section 7 content and filename\
-      \ scans over their exact scanned_paths and require zero forbidden tokens. Do\
-      \ not alter historical excluded artifacts. Recovery reverts active names/docs\
-      \ as one bounded change while the preceding semantic implementation remains\
-      \ independently revertible; no DB migration or secret logging.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\
-      \ [cmd/**, internal/**, web/src/**, web/tests/**, scripts/**, AGENTS.md, Dockerfile,\
-      \ go.mod, go.sum, web/package.json, web/package-lock.json, web/playwright.config.ts,\
-      \ web/playwright.base.config.ts, web/playwright.browser-contract.config.ts,\
+      \ RF-BUG-009 final closure. This step is claimable only after implement-prompting-v22-semantics\
+      \ proves the complete behavior and fixtures green. Rename every active pre-v2.2\
+      \ symbol/file/test/fixture/error/receipt to its canonical v2.2 name, remove\
+      \ obsolete quality-profile and stored-text fields, and only then update ARCHITECTURE/PROMPTING_SYSTEM\
+      \ verified-status prose from observed behavior. Run the sole authoritative Section\
+      \ 7 content/filename scans over exact scanned_paths and require zero forbidden\
+      \ tokens. Historical excluded artifacts remain unchanged. Recovery reverts active\
+      \ names/docs while the semantic implementation retains its separate rollback\
+      \ boundary; no DB migration or secret logging.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [cmd/**, internal/**, web/src/**, web/tests/**, scripts/**,\
+      \ AGENTS.md, Dockerfile, go.mod, go.sum, web/package.json, web/package-lock.json,\
+      \ web/playwright.config.ts, web/playwright.base.config.ts, web/playwright.browser-contract.config.ts,\
       \ web/playwright.smoke.config.ts, web/playwright.runtime.config.ts, web/playwright.live.config.ts,\
       \ deploy/resofeed-caddy/caddy/Caddyfile, docs/ARCHITECTURE.md, docs/DESIGN.md,\
       \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
       \ docs/USAGE.md, docs/ui-preview.html]\n  blocked_paths: [docs/audits/**, docs/contracts/**,\
       \ docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md, plan.yaml,\
-      \ internal/resofeed/webui/dist/**]\nclaims: [RF-BUG-009-ACTIVE-NAMES-DOCS]\n\
-      checks:\n  - id: prompting_v22_names_green\n    run:\n      command: [bash,\
-      \ scripts/verify-active-reference-gates.sh]\n      timeout_seconds: 240\n  \
-      \  expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\
-      \ {contains_any: [{literal: '\"match_count\":0'}], forbids: [{literal: FAIL}]}\n\
-      \    proves: [RF-BUG-009-ACTIVE-NAMES-DOCS]\n  - id: prompting_v22_regression_green\n\
+      \ internal/resofeed/webui/dist/**]\nclaims: [RF-BUG-009]\nchecks:\n  - id: prompting_v22_semantic_green\n\
       \    run:\n      command: [go, test, ./internal/resofeed, -run, '^TestPromptingV22',\
       \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
       \      exit_codes: [0]\n      stdout_or_stderr: {contains_any: [{literal: ok}],\
-      \ forbids: [{literal: FAIL}]}\n    proves: [RF-BUG-009-ACTIVE-NAMES-DOCS]\n\
-      bindings:\n  expected_red: {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-ledger-prompting.migrate-active-prompting-names-to-v22\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"cross_component_active_rename\",\"\
-      verified_status_documentation\"],\"primary_outcome\":\"RF-BUG-009-ACTIVE-NAMES-DOCS\"\
-      ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"STATIC_ANALYSIS\"\
-      ,\"REVIEW\"],\"primary_verifier\":\"spec-verifier\",\"additional_verifiers\"\
+      \ forbids: [{literal: FAIL}]}\n    proves: [RF-BUG-009]\n  - id: prompting_v22_names_green\n\
+      \    run:\n      command: [bash, scripts/verify-active-reference-gates.sh]\n\
+      \      timeout_seconds: 240\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: '\"match_count\":0'}],\
+      \ forbids: [{literal: FAIL}]}\n    proves: [RF-BUG-009]\nbindings:\n  expected_red:\
+      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
+      \ source_check: prompting_expected_red, requirement: RF-BUG-009, assertion_id:\
+      \ A-RF-BUG-009-PROMPTING, downstream_check: prompting_v22_semantic_green, receipt:\
+      \ RF-BUG-009-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-ledger-prompting.migrate-active-prompting-names-to-v22\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"cross_component_semantic_migration\"\
+      ,\"active_rename\",\"verified_status_documentation\"],\"primary_outcome\":\"\
+      RF-BUG-009\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\"\
+      ,\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\",\"additional_verifiers\"\
       :[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\"\
       :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/openrouter_test.go\"\
       ,\"internal/resofeed/ingest_test.go\",\"internal/resofeed/reprocess_test.go\"\
-      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: First validate the prerequisite semantic receipt. Then run both
-      checks and require exact Section 7 scanned_paths, zero forbidden active content/name
-      matches, unchanged historical exclusions, and docs that claim verified status
-      only after semantic acceptance.
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"prompting_v22_semantic_green\",\"prompting_v22_names_green\"\
+      ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
+      </vectl_step_policy>"
+    verification: Validate the semantic prerequisite receipt, then run both checks.
+      Require exact Section 7 scanned_paths, zero forbidden active content/name matches,
+      unchanged historical exclusions, docs claiming verified status only after semantic
+      acceptance, and reciprocal RF-BUG-009 receipt.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/PROMPTING_SYSTEM.md
     - docs/ARCHITECTURE.md
-    - scripts/verify-active-reference-gates.sh
     depends_on:
     - implement-prompting-v22-semantics
     agent: golang-developer
