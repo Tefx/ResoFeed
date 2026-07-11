@@ -183094,39 +183094,32 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-009. Implement the complete canonical docs/PROMPTING_SYSTEM.md v2.2\
-      \ payload, structured-output json_schema/json_object routing, exact validation,\
-      \ one normal semantic generation plus at most one repair, permitted pre-generation\
-      \ unsupported-schema downgrade, failure-content preservation, app-owned diagnostics,\
-      \ persistence, fixtures, and naming migration across ingest, library reprocess,\
-      \ selected-item re-ingest, HTTP, and MCP. Remove obsolete payload fields and\
-      \ emit only schema_version, task, contract, guidance, and item with the documented\
-      \ seven item fields. This is a semantic migration; the runtime remains pre-v2.2\
-      \ until every adoption gate passes. scripts/verify-active-reference-gates.sh\
-      \ is the sole scan authority and must report the exact Section 7 scanned_paths\
-      \ across recursive cmd/internal/web/src/web/tests/scripts content, enumerated\
-      \ root/config/package/deployment files, harness artifacts, and active English\
-      \ docs. Both content and filename gates must have zero forbidden prompting tokens;\
-      \ only the explicitly excluded historical docs/audits, bug artifacts, generated\
-      \ trees, completed history, .test-artifacts, and third-party dependencies remain\
-      \ outside scope. Synchronize ARCHITECTURE.md and PROMPTING_SYSTEM.md to observed\
-      \ behavior. Recovery reverts runtime, fixtures, names, tests, and docs together;\
-      \ no DB schema/content migration. No provider key or prompt payload is logged.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ generic\nscope:\n  allowed_paths:\n    - cmd/**\n    - internal/**\n    -\
-      \ web/src/**\n    - web/tests/**\n    - scripts/**\n    - AGENTS.md\n    - Dockerfile\n\
-      \    - go.mod\n    - go.sum\n    - web/package.json\n    - web/package-lock.json\n\
-      \    - web/playwright.config.ts\n    - web/playwright.base.config.ts\n    -\
-      \ web/playwright.browser-contract.config.ts\n    - web/playwright.smoke.config.ts\n\
+      \ RF-BUG-009. Implement canonical Prompting v2.2 payload, json_schema/json_object\
+      \ routing, exact validation, one normal semantic generation plus at most one\
+      \ repair, permitted pre-generation schema downgrade, failure-content preservation,\
+      \ diagnostics, persistence, fixtures, and naming across ingest/reprocess/item\
+      \ re-ingest/HTTP/MCP. Remove obsolete fields and emit only the documented top-level\
+      \ and seven item fields. Runtime remains pre-v2.2 until all gates pass. verify-active-reference-gates.sh\
+      \ is the sole scan authority and reports exact Section 7 scanned_paths across\
+      \ cmd/internal/web/src/web/tests/scripts, enumerated root/config/package/deployment\
+      \ files, harness artifacts, and active English docs. Content and filename gates\
+      \ require zero forbidden tokens; only stated historical/generated/third-party\
+      \ exclusions remain outside scope. Synchronize ARCHITECTURE.md and PROMPTING_SYSTEM.md.\
+      \ Recovery reverts runtime/fixtures/names/tests/docs; no DB migration or secret/prompt\
+      \ logging.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: generic\nscope:\n  allowed_paths:\n    - cmd/**\n    - internal/**\n\
+      \    - web/src/**\n    - web/tests/**\n    - scripts/**\n    - AGENTS.md\n \
+      \   - Dockerfile\n    - go.mod\n    - go.sum\n    - web/package.json\n    -\
+      \ web/package-lock.json\n    - web/playwright.config.ts\n    - web/playwright.base.config.ts\n\
+      \    - web/playwright.browser-contract.config.ts\n    - web/playwright.smoke.config.ts\n\
       \    - web/playwright.runtime.config.ts\n    - web/playwright.live.config.ts\n\
       \    - deploy/resofeed-caddy/caddy/Caddyfile\n    - docs/ARCHITECTURE.md\n \
       \   - docs/DESIGN.md\n    - docs/PROMPTING_SYSTEM.md\n    - docs/CONTAINER.md\n\
       \    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n    - docs/USAGE.md\n    - docs/ui-preview.html\n\
       \  blocked_paths:\n    - docs/audits/**\n    - docs/contracts/**\n    - docs/BUG_REPORT_2026-07-11.md\n\
       \    - docs/BUG_FIX_PLAN_2026-07-12.md\n    - plan.yaml\n    - internal/resofeed/webui/dist/**\n\
-      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
-      \ .test-artifacts/\nclaims:\n  - RF-BUG-009\nchecks:\n  - id: prompting_v22_semantic_green\n\
-      \    run:\n      command: [go, test, ./internal/resofeed, -run, '^TestPromptingV22',\
+      claims:\n  - RF-BUG-009\nchecks:\n  - id: prompting_v22_semantic_green\n   \
+      \ run:\n      command: [go, test, ./internal/resofeed, -run, '^TestPromptingV22',\
       \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
       \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: []\n\
       \        contains_any:\n          - literal: ok\n        forbids:\n        \
