@@ -182940,7 +182940,6 @@ phases:
     - internal/resofeed/doctor.go
     - Dockerfile
     - internal/resofeed
-    - scripts
     agent: golang-developer
   - id: remove-opml-export-active-surface
     name: Remove OPML export from active product surfaces
