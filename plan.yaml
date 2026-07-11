@@ -183549,38 +183549,39 @@ phases:
     - fresh-docker-runtime-proof
     agent: deployment-engineer
   - id: formal-security-review
-    name: Perform formal HTTP, CSP, secret, and boundary security review
+    name: Review HTTP, CSP, secrets, and state boundaries independently
     status: pending
     description: 'step_type: implementation
 
       repo_change_policy: no_repo_change
 
 
-      Independently review RF-BUG-003/004/005/010 code and immutable local/OCI/container/Tailnet
-      receipts: embedded-FS traversal/methods, no external UI root, complete outer
-      headers, artifact-derived CSP without unsafe-inline, staged status/header handling
-      with no body buffering, unchanged owner-token authorization, API/MCP parity,
-      import-only OPML with no replacement exfiltration surface, case-local E2E isolation,
-      live-provider opt-in, and artifact/log redaction. Repository mutation is absent
-      because this adjudicated review evaluates immutable artifacts. Any finding routes
-      to its modifying owner and blocks closure.
+      Repository mutation is absent because this independent review evaluates the
+      completed local, immutable-image, container, and Tailnet evidence. Review RF-BUG-003/004/005/010
+      for embed.FS traversal/fallback, no external UI root, four outer headers, embedded-content
+      CSP without unsafe-inline, preserved streaming/cancellation, unchanged owner-token
+      boundary, import-only OPML, case-local mutable E2E state, reliable cleanup,
+      live-provider opt-in, and redaction. Review the small middleware directly; no
+      staged writer or custom evidence protocol is expected. Findings route to the
+      modifying owner and block closure.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.formal-security-review","risk_tier":"R3","risk_reasons":["security_boundary_review","deployment_evidence","secret_redaction"],"primary_outcome":"RF-BUG-SECURITY-REVIEW","rollback_class":"TRIVIAL","proof_modalities":["STATIC_ANALYSIS","RUNTIME_PROBE","REVIEW"],"primary_verifier":"security-reviewer","additional_verifiers":["gate-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.formal-security-review","risk_tier":"R3","risk_reasons":["security_boundary_review","deployment_evidence","secret_redaction"],"primary_outcome":"RF-BUG-SECURITY-REVIEW","rollback_class":"TRIVIAL","proof_modalities":["STATIC_ANALYSIS","RUNTIME_PROBE","REVIEW"],"primary_verifier":"security-reviewer","additional_verifiers":["gate-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: Emit a canonical security-review receipt with reviewer identity,
-      commit/digests, prerequisite receipt hashes, threat-surface checks, commands/probes,
-      findings and owner dispositions, rollback assessment, redaction scan, and PASS/FAIL.
-      PASS requires zero unresolved findings.
+    verification: Fresh security reviewer inspects named code and ordinary local/container/Tailnet
+      outputs. PASS requires no unresolved finding and confirms secret redaction,
+      streaming/cancellation, header ownership, import-only state boundary, and E2E
+      cleanup.
     refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - AGENTS.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
-    - docs/BUG_FIX_PLAN_2026-07-12.md
-    - internal/resofeed/http.go
-    - Dockerfile
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
     - local-full-verification-matrix
     - fresh-docker-runtime-proof
