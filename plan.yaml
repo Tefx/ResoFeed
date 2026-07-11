@@ -183057,9 +183057,8 @@ phases:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
-    - internal/resofeed/http_security.go
-    - internal/resofeed/http_security_test.go
-    - scripts/verify-tailnet-csp.mjs
+    - internal/resofeed
+    - scripts
     depends_on:
     - embed-ui-assets-in-single-binary
     agent: security-engineer
