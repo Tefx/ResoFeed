@@ -182567,7 +182567,7 @@ phases:
       risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"acceptance_test_definition\"\
       ],\"primary_outcome\":\"RF-BUG-001-CONTRACT\",\"rollback_class\":\"TRIVIAL\"\
       ,\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
-      ,\"additional_verifiers\":[\"uiux-auditor\"],\"review_mode\":\"INDEPENDENT\"\
+      ,\"additional_verifiers\":[\"client-runtime-verifier\"],\"review_mode\":\"INDEPENDENT\"\
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/__tests__/inspector-selection.test.ts\"\
       ,\"web/src/routes/__tests__/steer-invalid.test.ts\"],\"acceptance_test_paths\"\
