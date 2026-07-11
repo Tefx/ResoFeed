@@ -183312,24 +183312,32 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Run evidence-only local verification after all implementation phases: frontend
-      build, check, Vitest; Go test, vet, canonical single-binary build; focused RF-BUG
-      suites; smoke; parallel-safe UI lane; serialized runtime lane; and three complete
-      Chromium runs. Exercise owner token accepted/rejected/restored, Feed/Search→Inspector
-      pending/failure/out-of-order, direct/history routes, import-only OPML/state
-      portability, arbitrary-cwd embedded UI, headers, titles, Steer accessibility,
-      Ledger widths, and v2.2 parity in EN/ZH as applicable. Repository mutation is
-      absent because this step independently consumes immutable implementation and
-      acceptance tests. Use isolated temp DBs/ports, fake tokens, no live provider
-      calls, and redacted logs. On failure, preserve artifacts and return the defect
-      to its owning implementation step; do not patch during verification.'
-    verification: Record exact commands, versions, durations, exit codes, RF-BUG scenario
-      matrix, three-run consistency, artifact paths, and secret-redaction scan; every
-      command and scenario must pass.
+      Run the exact docs/BUG_FIX_PLAN_2026-07-12.md Section 7 matrix after implementation:
+      frontend check/render contracts; clean stage/cspmanifest/Go test/vet/build;
+      focused assets/static/OPML/security/cancellation/CSP/Doctor and Prompting v2.2
+      suites; lane and isolation scripts; real-runtime browser-contract, timeout-wrapped
+      smoke, runtime, three CI-safe repeats, and authorized live lane only when explicitly
+      enabled; active reference and managed-plan scripts. Verify each applicable browser
+      case has a case-local reset.json and teardown with no DB/PID/port lifetime spanning
+      cases and no product-response substitution. Verify the real-stream first chunk/cancellation
+      ordering and exact Doctor line multiset/order/redaction. Require results.json
+      scanned_paths to equal the authoritative Section 7 active scope, including package/config/deployment
+      and harness artifacts. Repository mutation is absent because this step consumes
+      immutable implementation and acceptance artifacts. Use fake tokens, isolated
+      resources, no default provider calls, and redacted logs; preserve failures and
+      return them to owning steps.'
+    verification: Record every exact Section 7 command, tool version, duration, exit,
+      RF-BUG predicate, reset/teardown inventory, cancellation timeline, Doctor key/cardinality/order
+      result, three-run normalized digests, results.json scanned_paths/hash, managed-plan
+      phase inventory, artifact paths, and redaction scan. Every required command
+      and predicate must pass.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - scripts/verify-active-reference-gates.sh
+    - scripts/verify-active-rf-bug-plan.mjs
+    - scripts/verify-playwright-lanes.mjs
+    - scripts/verify-playwright-isolation.mjs
     - web/package.json
-    - web/playwright.config.ts
     - go.mod
     agent: integration-verifier
   - id: fresh-docker-runtime-proof
