@@ -182713,10 +182713,9 @@ phases:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/PROMPTING_SYSTEM.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
-    - scripts/verify-active-reference-gates.sh
-    - scripts/verify-active-rf-bug-plan.mjs
-    - web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts
-    - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go
+    - scripts
+    - web/src/lib/__tests__
+    - internal/resofeed
     agent: test-engineer
   - id: contract-full-gate
     name: Review expected-red contract completeness
