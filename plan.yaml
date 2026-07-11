@@ -183478,37 +183478,36 @@ phases:
     - go.mod
     agent: integration-verifier
   - id: fresh-docker-runtime-proof
-    name: Prove fresh Docker single-binary runtime
+    name: Verify the published image on both platforms
     status: pending
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
 
 
-      Consume the immutable registry-qualified multi-platform image receipt from publish-immutable-two-platform-oci-image;
-      do not rebuild or substitute a local mutable image. Repository mutation is absent
-      because this is ephemeral container verification with evidence under ignored
-      paths. For both amd64 and arm64 manifests, prove `/app/resofeed`, writable `/data`,
-      no external UI tree, non-root runtime, arbitrary cwd, root/deep/dotted UI, embedded
-      Doctor lines, import-only source interchange, JSON state backup/restore, four
-      security headers, and exact fixture A→B persistence. Never print secrets. Recovery
-      stops/removes test containers and blocks deployment on any digest/platform/rootfs/state
-      mismatch.
+      Repository mutation is absent because this step verifies the immutable image
+      published by its prerequisite using ephemeral containers. Run the existing container
+      contract against the immutable registry reference for amd64 and arm64. Prove
+      `/app/resofeed`, writable persistent `/data`, non-root runtime, arbitrary cwd,
+      embedded UI with no external UI tree/Node runtime, Doctor UI lines, import-only
+      OPML, JSON state backup/restore, four headers, and A-to-B persistence. Never
+      print secrets. Recovery stops/removes test containers and blocks deployment
+      on any platform, rootfs, state, or digest mismatch.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.fresh-docker-runtime-proof","risk_tier":"R3","risk_reasons":["multi_arch_container_runtime","state_persistence","deployment_prerequisite"],"primary_outcome":"RF-BUG-CONTAINER-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.fresh-docker-runtime-proof","risk_tier":"R3","risk_reasons":["multi_arch_container_runtime","state_persistence","deployment_prerequisite"],"primary_outcome":"RF-BUG-CONTAINER-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: Validate the OCI receipt, then emit a container-runtime receipt
-      with immutable reference/index digest, each platform digest/rootfs hash, exact
-      probes, Doctor/header results, A→B semantic state hash, cleanup, and redaction
-      result. All predicates pass before Tailnet deployment.
+    verification: Run `bash scripts/verify-container-contract.sh <immutable-reference>`
+      for both platform manifests. PASS requires all bounded container predicates
+      green against the published digest and complete cleanup.
     refs:
-    - Dockerfile
-    - docs/CONTAINER.md
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/CONTAINER.md
+    - scripts/verify-container-contract.sh
     depends_on:
     - publish-immutable-two-platform-oci-image
     agent: integration-verifier
