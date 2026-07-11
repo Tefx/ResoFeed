@@ -182819,6 +182819,164 @@ phases:
     probes pass.'
   depends_on:
   - rf-bug-20260712-contract-lock
+  steps:
+  - id: embed-ui-assets-in-single-binary
+    name: Embed validated Svelte assets in the Go binary
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
+      \ RF-BUG-003. Add a bounded build pipeline that runs the Svelte build, copies\
+      \ its output into an embed-only Go package, validates a real index.html, and\
+      \ compiles the single cmd/resofeed binary. Serve the read-only embed.FS through\
+      \ the existing HTTP shell with safe GET/HEAD, deep-link fallback, traversal\
+      \ rejection, and no cwd, external web root, runtime build directory, or fake\
+      \ fallback HTML. Add `ui_assets=ready` and `ui_asset_source=embedded` to /doctor.\
+      \ Update Dockerfile so the runtime image contains only the binary plus writable\
+      \ /data, and update ARCHITECTURE.md and CONTAINER.md build/runtime contracts\
+      \ in English. Missing/invalid UI output must fail build or initialization. Recovery:\
+      \ revert embed package, build pipeline, HTTP/doctor wiring, Dockerfile, tests,\
+      \ and docs together; no data migration. Security: embedded files are immutable\
+      \ and traversal/non-GET behavior remains rejected.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
+      \    - internal/resofeed/webui/**\n    - internal/resofeed/http.go\n    - internal/resofeed/doctor.go\n\
+      \    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n    -\
+      \ scripts/build-resofeed.sh\n    - Dockerfile\n    - docs/ARCHITECTURE.md\n\
+      \    - docs/CONTAINER.md\n    - docs/USAGE.md\n  blocked_paths:\n    - internal/resofeed/state.go\n\
+      \    - internal/resofeed/mcp.go\n    - web/src/routes/**\n  ignored_runtime_paths:\n\
+      \    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\nclaims:\n\
+      \  - RF-BUG-003\nchecks:\n  - id: embedded_ui_green\n    run:\n      command:\
+      \ [go, test, ./internal/resofeed, -run, TestRFBugRuntimeContract/EmbeddedUI,\
+      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: []\n\
+      \        contains_any:\n          - literal: ok\n        forbids:\n        \
+      \  - literal: FAIL\n    proves:\n      - RF-BUG-003\nbindings:\n  expected_red:\n\
+      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"build_pipeline\",\"runtime_static_asset_surface\"\
+      ,\"container_contract\"],\"primary_outcome\":\"RF-BUG-003\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"STATIC_ANALYSIS\"\
+      ],\"primary_verifier\":\"integration-verifier\",\"additional_verifiers\":[\"\
+      wiring-auditor\"],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\"\
+      :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/webui/**/*_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"embedded_ui_green\"],\"acceptance_mutation\":\"\
+      FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Build web then Go through the canonical script; prove missing/invalid
+      index fails; run binary from repository root, /tmp, and deployment-like cwd;
+      assert deep links, doctor lines, safe methods/traversal, and no external web/build
+      dependency.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - internal/resofeed/http.go
+    - internal/resofeed/doctor.go
+    agent: golang-developer
+  - id: remove-opml-export-active-surface
+    name: Remove OPML export from active product surfaces
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
+      \ RF-BUG-004. Remove GET /api/sources/export-opml and its Go handler, frontend\
+      \ client method/types, Source Ledger control, active tests, and active documentation.\
+      \ Preserve POST import-opml and JSON state export/import with unchanged bundle\
+      \ schema and atomic replacement. Update ARCHITECTURE.md, DESIGN.md, USAGE.md,\
+      \ ui-preview.html, and contract tests in English; historical plan/audit evidence\
+      \ remains untouched and clearly historical. Add an active-reference scan that\
+      \ excludes completed plan history and historical audits. Recovery: revert endpoint/client/UI/docs/tests\
+      \ as one public-contract change; state data and schema are unchanged. Security:\
+      \ no new export or sync surface and unauthorized behavior remains canonical.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ generic\nscope:\n  allowed_paths:\n    - internal/resofeed/http.go\n    -\
+      \ internal/resofeed/http_impl_test.go\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
+      \    - web/src/lib/api-client.ts\n    - web/src/lib/api-client.test.ts\n   \
+      \ - web/src/routes/+page.svelte\n    - web/src/routes/components/SourceLedger.svelte\n\
+      \    - web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\n    - docs/ARCHITECTURE.md\n\
+      \    - docs/DESIGN.md\n    - docs/USAGE.md\n    - docs/ui-preview.html\n  blocked_paths:\n\
+      \    - internal/resofeed/state.go\n    - plan.yaml\n    - docs/audits/**\n \
+      \ ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\n\
+      claims:\n  - RF-BUG-004\nchecks:\n  - id: opml_import_only_green\n    run:\n\
+      \      command: [go, test, ./internal/resofeed, -run, TestRFBugRuntimeContract/OPMLImportOnly,\
+      \ -count=1]\n      timeout_seconds: 180\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: []\n\
+      \        contains_any:\n          - literal: ok\n        forbids:\n        \
+      \  - literal: FAIL\n    proves:\n      - RF-BUG-004\nbindings:\n  expected_red:\n\
+      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.remove-opml-export-active-surface\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_api_removal\",\"cross_component_contract\"\
+      ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
+      :[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
+      ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
+      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      :[\"internal/resofeed/http_impl_test.go\",\"web/src/lib/api-client.test.ts\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ,\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"opml_import_only_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
+      :[]}}\n</vectl_step_policy>"
+    verification: Go/frontend tests prove import and state portability; black-box
+      GET export-opml returns 404; active-source scan finds no export method, route,
+      control, or current documentation while historical plan/audit evidence remains
+      unchanged.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/USAGE.md
+    - internal/resofeed/http.go
+    - web/src/lib/api-client.ts
+    - web/src/routes/components/SourceLedger.svelte
+    agent: golang-developer
+  - id: apply-outer-security-middleware-and-csp
+    name: Apply outer-mux security headers and artifact-derived CSP
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
+      \ RF-BUG-005. Wrap the complete HTTP mux with one security middleware so embedded\
+      \ HTML/assets, authorized and unauthorized JSON, API 404/500, MCP unauthorized,\
+      \ JSON-RPC success, and JSON-RPC error responses receive the required browser\
+      \ headers. Generate or validate CSP script hashes from the embedded Svelte artifact;\
+      \ reject unsafe-inline and fail tests when inline script count/content changes\
+      \ without metadata update. Update ARCHITECTURE.md and CONTAINER.md in English\
+      \ with header ownership and Caddy pass-through verification. Preserve JSON/MCP\
+      \ bodies, status codes, streaming behavior, auth semantics, and owner-token\
+      \ boundary. Recovery: revert middleware/hash metadata/docs/tests together and\
+      \ redeploy prior binary; no storage change. Security evidence must be redacted\
+      \ and independently adjudicated.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n \
+      \   - internal/resofeed/http.go\n    - internal/resofeed/webui/**\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
+      \    - docs/ARCHITECTURE.md\n    - docs/CONTAINER.md\n  blocked_paths:\n   \
+      \ - internal/resofeed/state.go\n    - internal/resofeed/runtime_secret.go\n\
+      \    - web/src/routes/**\n  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n\
+      \    - .agent/\n    - .test-artifacts/\nclaims:\n  - RF-BUG-005\nchecks:\n \
+      \ - id: security_headers_green\n    run:\n      command: [go, test, ./internal/resofeed,\
+      \ -run, TestRFBugRuntimeContract/SecurityHeaders, -count=1]\n      timeout_seconds:\
+      \ 180\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: []\n        contains_any:\n          - literal: ok\n\
+      \        forbids:\n          - literal: unsafe-inline\n          - literal:\
+      \ FAIL\n    proves:\n      - RF-BUG-005\nbindings:\n  expected_red:\n    items:\
+      \ []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
+      ,\"complete_http_mux\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
+      ],\"primary_verifier\":\"security-reviewer\",\"additional_verifiers\":[\"integration-verifier\"\
+      ],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[\"internal/resofeed/webui/**/*_test.go\"],\"acceptance_test_paths\"\
+      :[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"],\"acceptance_check_ids\"\
+      :[\"security_headers_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
+      :[]}}\n</vectl_step_policy>"
+    verification: Focused Go tests enumerate HTML/assets/API/MCP/error responses and
+      mutate inline bootstrap content to prove CSP contract failure; local curl probes
+      confirm exact headers and unchanged bodies/statuses.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - internal/resofeed/http.go
+    depends_on:
+    - embed-ui-assets-in-single-binary
+    agent: security-engineer
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger and Prompting v2.2 Repair
   status: locked
