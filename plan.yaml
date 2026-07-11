@@ -182697,7 +182697,6 @@ phases:
       bugs mapped and no harness-only red.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
-    - docs/BUG_REPAIR_CONTRACT_2026-07-12.md
     depends_on:
     - frontend-state-route-a11y-expected-red
     - runtime-assets-opml-security-expected-red
