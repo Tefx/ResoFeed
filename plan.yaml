@@ -183111,62 +183111,60 @@ phases:
     - docs/ui-preview.html
     agent: integration-engineer
   - id: apply-outer-security-middleware-and-csp
-    name: Apply outer-mux security headers and artifact-derived CSP
+    name: Apply outer security middleware and embedded-content CSP
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-005. Implement http_security.go as the sole outer pre-commit owner\
-      \ for the four browser headers across every response class. Use staged-header/status\
-      \ handling only and explicitly prohibit response-body buffering. Enforce zero\
-      \ inner occurrences, bounds/conflict handling, canonical 500 suppression, embedded-manifest\
-      \ CSP consistency, constant body memory, immediate Flush delegation, conditional\
-      \ Flusher, and no Hijacker. A real stream must expose the exact first chunk\
-      \ before cancellation, observe context.Canceled before handler return, and record\
-      \ zero writes/flushes afterward. Add Tailnet CSP verification and sync ARCHITECTURE/CONTAINER.\
-      \ Recovery reverts middleware/CSP/script/tests/docs and redeploys the prior\
-      \ binary; evidence is redacted.\n\n<intent_closure_contract>\nschema_version:\
+      \ RF-BUG-005. Set the four Go-owned headers in small outer middleware before\
+      \ delegating to the complete mux. Derive CSP from embedded executable content.\
+      \ Cover HTML/assets, authorized/unauthorized JSON, errors, MCP success/errors,\
+      \ and ordinary internal errors; prove one effective value, no inner owner, multi-flush\
+      \ chunk visibility, request cancellation propagation, and prompt handler exit.\
+      \ Do not add a response-writer state machine, body buffering, conflict-generated\
+      \ 500 protocol, or Tailnet dependency. Tailnet equality/browser proof belongs\
+      \ to downstream deployment closure. Invoke protected Go acceptance without mutation;\
+      \ synchronize ARCHITECTURE and CONTAINER. Recovery reverts middleware/tests/docs\
+      \ and preserves prior deployable.\n\n<intent_closure_contract>\nschema_version:\
       \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
-      \ internal/resofeed/http_security_test.go, internal/resofeed/webui/**, scripts/verify-tailnet-csp.mjs,\
-      \ docs/ARCHITECTURE.md, docs/CONTAINER.md]\n  blocked_paths: [internal/resofeed/state.go,\
-      \ internal/resofeed/runtime_secret.go, web/src/routes/**]\nclaims: [RF-BUG-005]\n\
-      checks:\n  - id: security_headers_green\n    run:\n      command: [go, test,\
-      \ ./internal/resofeed, -run, 'Test(SecurityHeaders|SecurityWriterStreamingCancellation|CSP)',\
-      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr: {contains_any: [{literal: ok}],\
-      \ forbids: [{literal: unsafe-inline}, {literal: FAIL}]}\n    proves: [RF-BUG-005]\n\
-      \  - id: security_runtime_green\n    run:\n      command: [node, scripts/verify-tailnet-csp.mjs,\
-      \ '${RESOFEED_TAILNET_URL}', '${RESOFEED_DIRECT_URL}']\n      timeout_seconds:\
-      \ 300\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\
-      \ {contains_any: [{literal: PASS}], forbids: [{literal: FAIL}]}\n    proves:\
-      \ [RF-BUG-005]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
-      \ source_check: runtime_expected_red, requirement: RF-BUG-005, assertion_id:\
-      \ A-RF-BUG-005-SECURITY, downstream_check: security_headers_green, receipt:\
-      \ RF-BUG-005-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
+      \ internal/resofeed/http_security_test.go, internal/resofeed/webui/**, docs/ARCHITECTURE.md,\
+      \ docs/CONTAINER.md]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ scripts/verify-tailnet-csp.mjs, deploy/**, internal/resofeed/state.go, internal/resofeed/runtime_secret.go,\
+      \ web/src/routes/**]\nclaims: [RF-BUG-005]\nchecks:\n  - id: rf_bug_005_green\n\
+      \    run: {command: [go, test, ./internal/resofeed, -run, TestRFBugRuntimeContract/RF-BUG-005,\
+      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: ok}], forbids: [{literal:\
+      \ unsafe-inline}, {literal: FAIL}]}}\n    proves: [RF-BUG-005]\n  - id: rf_bug_005_local_stream_green\n\
+      \    run: {command: [go, test, ./internal/resofeed, -run, TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP,\
+      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: ok}], forbids: [{literal:\
+      \ FAIL}]}}\n    proves: [RF-BUG-005]\nbindings:\n  expected_red: {items: []}\n\
+      \  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ source_check: rf_bug_005_expected_red, requirement: RF-BUG-005, assertion_id:\
+      \ A-RF-BUG-005-SECURITY, downstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n\
+      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
+      ,\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
-      ,\"complete_http_mux\",\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\"\
-      ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
-      ,\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
-      :[\"integration-verifier\"],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\"\
-      :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
-      ,\"internal/resofeed/webui/**/*_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
-      ],\"acceptance_check_ids\":[\"security_headers_green\",\"security_runtime_green\"\
-      ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
-      </vectl_step_policy>"
-    verification: Run both checks. Prove four-header byte equality for all response
-      classes, manifest-derived CSP, staged header/status behavior, no body buffering,
-      first-chunk/cancellation ordering, constant memory, no post-cancel writes/flushes,
-      and reciprocal RF-BUG-005 receipt.
+      ,\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
+      ],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\":[\"integration-verifier\"\
+      ],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\",\"internal/resofeed/webui/**/*_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_005_green\"],\"acceptance_mutation\":\"\
+      FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Run the protected RF-BUG-005 subtest and focused local security
+      suite. Verify four headers on every local response class, exact CSP browser
+      boot, chunk visibility before cancellation, handler exit, and no Tailnet command
+      or acceptance-file mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
-    - internal/resofeed/http.go
     depends_on:
     - embed-ui-assets-in-single-binary
-    agent: security-engineer
+    agent: golang-developer
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger and Prompting v2.2 Semantic Migration
   status: locked
