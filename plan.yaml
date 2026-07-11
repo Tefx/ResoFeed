@@ -183103,9 +183103,13 @@ phases:
 - id: rf-bug-20260712-e2e-isolation
   name: RF-BUG E2E Isolation and Failure Classification
   status: locked
-  gate: RF-BUG-010 smoke, parallel-safe UI-contract, serialized real-runtime, and
-    isolated live-provider lanes are classified after behavioral repair; smoke completes
-    under two minutes and three full Chromium runs agree with per-failure artifacts.
+  gate: RF-BUG-010 browser-contract, smoke, runtime, and live lanes run only against
+    real isolated single-binary runtimes with no product-route/HAR/service-worker/proxy
+    interception. Every smoke/runtime/live case and every mutating browser-contract
+    case has a verified case-local DB, runtime, port, browser-context reset, reset.json,
+    and prior-case teardown; no DB instance, PID, or port lifetime spans cases. Smoke
+    completes under 120 seconds and three CI-safe Chromium runs agree with bounded
+    artifacts.
   depends_on:
   - rf-bug-20260712-ledger-prompting
   steps:
