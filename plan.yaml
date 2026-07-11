@@ -183188,11 +183188,10 @@ phases:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/PROMPTING_SYSTEM.md
     - docs/ARCHITECTURE.md
-    - scripts/verify-active-reference-gates.sh
     - internal/resofeed/openrouter.go
     - internal/resofeed/ingest.go
     - internal/resofeed/reprocess.go
-    - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go
+    - scripts
     agent: golang-developer
 - id: rf-bug-20260712-e2e-isolation
   name: RF-BUG E2E Isolation and Failure Classification
