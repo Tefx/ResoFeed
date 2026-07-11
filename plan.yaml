@@ -183451,7 +183451,7 @@ phases:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/CONTAINER.md
-    - scripts/verify-container-contract.sh
+    - Dockerfile
     depends_on:
     - publish-immutable-two-platform-oci-image
     agent: integration-verifier
