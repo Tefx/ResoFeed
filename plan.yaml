@@ -183320,26 +183320,22 @@ phases:
       \ re-ingest/HTTP/MCP. Keep existing active identifiers until semantic acceptance\
       \ is green so rollback remains bounded. Do not add a DB migration or log secrets/prompts.\
       \ Recovery reverts semantic runtime/fixtures/tests only.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go,\
-      \ internal/resofeed/ingest.go, internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go,\
-      \ internal/resofeed/reprocess_test.go, internal/resofeed/reingest.go, internal/resofeed/reingest_test.go,\
-      \ internal/resofeed/http.go, internal/resofeed/mcp.go, internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
-      \ docs/PROMPTING_SYSTEM.md]\n  blocked_paths: [docs/ARCHITECTURE.md, docs/USAGE.md,\
-      \ docs/ui-preview.html, plan.yaml]\nclaims: [RF-BUG-009-SEMANTICS]\nchecks:\n\
-      \  - id: prompting_v22_semantic_green\n    run:\n      command: [go, test, ./internal/resofeed,\
-      \ -run, '^TestPromptingV22', -count=1]\n      timeout_seconds: 300\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr: {contains_any:\
-      \ [{literal: ok}], forbids: [{literal: FAIL}]}\n    proves: [RF-BUG-009-SEMANTICS]\n\
+      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go, internal/resofeed/ingest.go,\
+      \ internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go, internal/resofeed/reprocess_test.go,\
+      \ internal/resofeed/reingest.go, internal/resofeed/reingest_test.go, internal/resofeed/http.go,\
+      \ internal/resofeed/mcp.go, docs/PROMPTING_SYSTEM.md]\n  blocked_paths: [docs/ARCHITECTURE.md,\
+      \ docs/USAGE.md, docs/ui-preview.html, plan.yaml]\nclaims: [RF-BUG-009-SEMANTICS]\n\
+      checks:\n  - id: prompting_v22_semantic_green\n    run:\n      command: [go,\
+      \ test, ./internal/resofeed, -run, '^TestPromptingV22', -count=1]\n      timeout_seconds:\
+      \ 300\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\
+      \ {contains_any: [{literal: ok}], forbids: [{literal: FAIL}]}\n    proves: [RF-BUG-009-SEMANTICS]\n\
       \  - id: prompting_v22_parity_green\n    run:\n      command: [go, test, ./internal/resofeed,\
       \ -run, 'Test(Prompting|Ingest|Reprocess|Reingest|HTTP|MCP).*V22', -count=1]\n\
       \      timeout_seconds: 420\n    expect:\n      outcome: green\n      exit_codes:\
       \ [0]\n      stdout_or_stderr: {contains_any: [{literal: ok}], forbids: [{literal:\
       \ FAIL}]}\n    proves: [RF-BUG-009-SEMANTICS]\nbindings:\n  expected_red: {items:\
-      \ []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
-      \ source_check: prompting_expected_red, requirement: RF-BUG-009, assertion_id:\
-      \ A-RF-BUG-009-PROMPTING, downstream_check: prompting_v22_semantic_green, receipt:\
-      \ RF-BUG-009-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      \ []}\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"runtime_prompt_contract\",\"cross_component_behavior\"\
       ,\"persistence_behavior\"],\"primary_outcome\":\"RF-BUG-009-SEMANTICS\",\"rollback_class\"\
@@ -183348,14 +183344,18 @@ phases:
       :\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"internal/resofeed/openrouter_test.go\",\"internal/resofeed/ingest_test.go\"\
       ,\"internal/resofeed/reprocess_test.go\",\"internal/resofeed/reingest_test.go\"\
-      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
-      ],\"acceptance_check_ids\":[\"prompting_v22_semantic_green\",\"prompting_v22_parity_green\"\
-      ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
-      </vectl_step_policy>"
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
     verification: Run both checks. Require exact payload fields, routing/downgrade/generation
       limits, semantic validation, content-preserving failure, app-owned diagnostics,
-      persistence, canonical fixtures, and reciprocal RF-BUG-009 receipt before the
-      rename step becomes claimable.
+      persistence, and canonical fixtures before the rename/documentation owner becomes
+      claimable.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/PROMPTING_SYSTEM.md
+    - internal/resofeed/openrouter.go
+    - internal/resofeed/ingest.go
+    - internal/resofeed/reprocess.go
     agent: golang-developer
 - id: rf-bug-20260712-e2e-isolation
   name: RF-BUG E2E Isolation and Failure Classification
