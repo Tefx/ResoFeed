@@ -182711,6 +182711,105 @@ phases:
     responses, title transitions, and accessibility state.
   depends_on:
   - rf-bug-20260712-contract-lock
+  steps:
+  - id: repair-inspector-selection-and-routing
+    name: Repair Inspector selection and pathname-first routing
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
+      \ RF-BUG-001 and RF-BUG-002. Implement a pure workbench selection/route state\
+      \ module and wire `web/src/routes/+page.svelte`, Feed, Search, and Inspector\
+      \ so click selection synchronously commits a renderable preview; detail/inspect/re-ingest\
+      \ failures remain separate; late responses require matching item ID and request\
+      \ version; viewport changes only placement; and direct, refresh, back, and forward\
+      \ navigation resolve pathname before token hydration or API work. Render target-surface\
+      \ loading in semantic landmarks with aria-busy and no test-only readiness attributes.\
+      \ Update DESIGN.md and the UI contract/preview artifacts in English in the same\
+      \ change. Preserve owner-token behavior and API contracts. Recovery: revert\
+      \ this cohesive frontend state module/wiring/docs change; no persistence migration\
+      \ occurs. Security: no token values in logs, DOM, fixtures, or screenshots.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ generic\nscope:\n  allowed_paths:\n    - web/src/lib/workbench-state.ts\n\
+      \    - web/src/lib/workbench-state.test.ts\n    - web/src/routes/+page.svelte\n\
+      \    - web/src/routes/components/Feed.svelte\n    - web/src/routes/components/SearchRetrieval.svelte\n\
+      \    - web/src/routes/components/Inspector.svelte\n    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n\
+      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n    - docs/UI_REGRESSION_CONTRACT.md\n\
+      \  blocked_paths:\n    - internal/resofeed/**\n    - web/playwright.config.ts\n\
+      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
+      \ .test-artifacts/\nclaims:\n  - RF-BUG-001\n  - RF-BUG-002\nchecks:\n  - id:\
+      \ frontend_selection_route_green\n    run:\n      command: [npm, --prefix, web,\
+      \ run, test:e2e, --, bugfix-frontend-behavior.expected-red.spec.ts, --project=chromium-ci-safe]\n\
+      \      timeout_seconds: 300\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
+      \          - literal: passed\n        forbids:\n          - literal: failed\n\
+      \    proves:\n      - RF-BUG-001\n      - RF-BUG-002\nbindings:\n  expected_red:\n\
+      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"async_state_wiring\"\
+      ,\"client_routing\"],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"\
+      NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"\
+      primary_verifier\":\"integration-verifier\",\"additional_verifiers\":[\"uiux-auditor\"\
+      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[\"web/src/lib/workbench-state.test.ts\"],\"acceptance_test_paths\"\
+      :[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"frontend_selection_route_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
+      ,\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Run Vitest plus focused Playwright across Feed/Search, desktop/mobile,
+      pending/failure/A→B, cold/refresh/back/forward ten-run EN/ZH matrices; inspect
+      screenshots/traces and confirm no stale TODAY announcement on direct Ledger.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/DESIGN.md
+    - web/src/routes/+page.svelte
+    agent: frontend-engineer
+  - id: repair-title-and-steer-invalid-a11y
+    name: Repair surface titles and Steer invalid accessibility state
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
+      \ RF-BUG-006 and RF-BUG-007. Derive the exact neutral, TODAY, SOURCE LEDGER,\
+      \ SEARCH, INSPECTOR, and /doctor document titles from resolved surface state\
+      \ without translation. Replace persistent idle Steer error detail with conditional\
+      \ invalid state: aria-invalid and description exist only while invalid, one\
+      \ live-region message is emitted per invalid transition, and continued input\
+      \ immediately clears the state and relationship in EN/ZH. Update English DESIGN.md\
+      \ and UI preview/contract artifacts with title and accessibility semantics.\
+      \ Preserve valid Steer preview/apply behavior and functional labels. Recovery:\
+      \ revert title/a11y state changes and docs together. Security: error text remains\
+      \ terse and contains no submitted secrets.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n \
+      \   - web/src/routes/+page.svelte\n    - web/src/lib/workbench-state.ts\n  \
+      \  - web/src/lib/workbench-state.test.ts\n    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n\
+      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n    - docs/UI_REGRESSION_CONTRACT.md\n\
+      \  blocked_paths:\n    - internal/resofeed/**\n    - web/playwright.config.ts\n\
+      \  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n    - .agent/\n    -\
+      \ .test-artifacts/\nclaims:\n  - RF-BUG-006\n  - RF-BUG-007\nchecks:\n  - id:\
+      \ title_steer_a11y_green\n    run:\n      command: [npm, --prefix, web, run,\
+      \ test:e2e, --, bugfix-frontend-behavior.expected-red.spec.ts, --project=chromium-ci-safe]\n\
+      \      timeout_seconds: 300\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: []\n        contains_any:\n\
+      \          - literal: passed\n        forbids:\n          - literal: failed\n\
+      \    proves:\n      - RF-BUG-006\n      - RF-BUG-007\nbindings:\n  expected_red:\n\
+      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"accessibility_behavior\"\
+      ],\"primary_outcome\":\"RF-BUG-006\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
+      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"uiux-auditor\"\
+      ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
+      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      :[\"web/src/lib/workbench-state.test.ts\"],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"title_steer_a11y_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Focused browser proof asserts exact initial/navigation titles and
+      EN/ZH accessibility snapshots for empty, invalid, repeated invalid, and recovery
+      states on desktop/mobile.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/DESIGN.md
+    - web/src/routes/+page.svelte
+    depends_on:
+    - repair-inspector-selection-and-routing
+    agent: frontend-engineer
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, OPML Boundary, and HTTP Security Repair
   status: locked
