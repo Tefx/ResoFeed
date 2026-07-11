@@ -182803,23 +182803,19 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-006 and RF-BUG-007. Derive the exact neutral, TODAY, SOURCE LEDGER,\
-      \ SEARCH, INSPECTOR, and /doctor document titles from ResolvedRoute in web/src/lib/workbench-route.ts,\
-      \ with web/src/routes/+page.svelte owning UI state. Replace persistent idle\
-      \ Steer error detail with conditional invalid state: aria-invalid and its error\
-      \ relationship exist only while invalid, one live-region message occurs per\
-      \ invalid transition, and continued input immediately clears both in EN/ZH.\
-      \ Update docs/DESIGN.md and docs/ui-preview.html in English. Preserve valid\
-      \ Steer preview/apply behavior and functional labels. Browser proof uses the\
-      \ real runtime with no product API interception. Recovery reverts title/accessibility\
-      \ code, tests, and docs together. Error text stays terse and excludes submitted\
+      \ RF-BUG-006 and RF-BUG-007. Derive exact neutral/TODAY/SOURCE LEDGER/SEARCH/INSPECTOR/doctor\
+      \ titles from ResolvedRoute in workbench-route.ts; +page.svelte owns UI state.\
+      \ aria-invalid and its error relationship exist only while Steer is invalid,\
+      \ one live-region message occurs per invalid transition, and continued input\
+      \ immediately clears both in EN/ZH. Update DESIGN.md and ui-preview.html; preserve\
+      \ valid Steer behavior and functional labels. Browser proof uses the real runtime\
+      \ and real product responses. Recovery reverts code/tests/docs; error text excludes\
       \ secrets.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
       profile: generic\nscope:\n  allowed_paths:\n    - web/src/lib/workbench-route.ts\n\
       \    - web/src/lib/__tests__/workbench-route.test.ts\n    - web/src/routes/+page.svelte\n\
       \    - web/src/routes/__tests__/steer-invalid.test.ts\n    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n\
       \    - docs/DESIGN.md\n    - docs/ui-preview.html\n  blocked_paths:\n    - internal/resofeed/**\n\
-      \    - web/playwright.config.ts\n    - web/playwright.*.config.ts\n  ignored_runtime_paths:\n\
-      \    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\nclaims:\n\
+      \    - web/playwright.config.ts\n    - web/playwright.*.config.ts\nclaims:\n\
       \  - RF-BUG-006\n  - RF-BUG-007\nchecks:\n  - id: title_steer_a11y_green\n \
       \   run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
       \ src/lib/__tests__/workbench-route.test.ts, src/routes/__tests__/steer-invalid.test.ts]\n\
@@ -182831,7 +182827,7 @@ phases:
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"accessibility_behavior\"\
       ],\"primary_outcome\":\"RF-BUG-006\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
-      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"uiux-auditor\"\
+      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"client-runtime-verifier\"\
       ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/__tests__/steer-invalid.test.ts\"\
