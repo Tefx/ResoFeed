@@ -183462,29 +183462,35 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Run the exact docs/BUG_FIX_PLAN_2026-07-12.md Section 7 matrix after implementation:
-      frontend check/render contracts; clean stage/cspmanifest/Go test/vet/build;
-      focused assets/static/OPML/security/cancellation/CSP/Doctor and Prompting v2.2
-      suites; lane and isolation scripts; real-runtime browser-contract, timeout-wrapped
-      smoke, runtime, three CI-safe repeats, and authorized live lane only when explicitly
-      enabled; active reference and managed-plan scripts. Verify each applicable browser
-      case has a case-local reset.json and teardown with no DB/PID/port lifetime spanning
-      cases and no product-response substitution. Verify the real-stream first chunk/cancellation
-      ordering and exact Doctor line multiset/order/redaction. Require results.json
-      scanned_paths to equal the authoritative Section 7 active scope, including package/config/deployment
-      and harness artifacts. Repository mutation is absent because this step consumes
-      immutable implementation and acceptance artifacts. Use fake tokens, isolated
-      resources, no default provider calls, and redacted logs; preserve failures and
-      return them to owning steps.'
-    verification: Record every exact Section 7 command, tool version, duration, exit,
-      RF-BUG predicate, reset/teardown inventory, cancellation timeline, Doctor key/cardinality/order
-      result, three-run normalized digests, results.json scanned_paths/hash, managed-plan
-      phase inventory, artifact paths, and redaction scan. Every required command
-      and predicate must pass.
+      Run the exact Section 7 matrix against immutable implementation artifacts: frontend
+      checks/render contracts; clean stage/manifest/Go test/vet/build; focused assets/import-only/security/cancellation/CSP/Doctor
+      and Prompting v2.2 suites; font lock; lane inventory; real-runtime browser contracts
+      including 1280/1440 and ten-run EN/ZH routes; timeout-wrapped smoke; runtime;
+      isolation/evidence verifier; three CI-safe repeats; active-reference and managed-plan
+      gates; live lane only when explicitly authorized. Repository mutation is absent
+      because this step consumes committed artifacts and stores evidence only under
+      ignored paths. Validate all expected-ID mappings, reciprocal red/green receipts,
+      canonical reset/teardown pairs, real-stream cancellation, exact Doctor grammar/order/redaction,
+      exact Section 7 scanned_paths, six active phases, and zero stale matches.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.local-full-verification-matrix","risk_tier":"R2","risk_reasons":["cross_component_acceptance","runtime_browser_proof","release_gate"],"primary_outcome":"RF-BUG-LOCAL-MATRIX","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["spec-verifier"],"review_mode":"INDEPENDENT","phase_full_gate_required":true,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Emit a canonical local-matrix receipt with schema_version, commit,
+      tool versions, each exact command/exit/duration/artifact hash, each RF-BUG predicate,
+      reciprocal receipt inventory, expected-ID/assertion inventory hash, reset/teardown
+      counts, cancellation timeline, Doctor result, font/image lock result, three
+      normalized run digests, active scanned_paths hash, six-phase inventory, stale_match_count=0,
+      and redaction result. PASS requires every mandatory field and predicate green.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - web/package.json
     - go.mod
+    - scripts/verify-active-reference-gates.sh
+    - scripts/verify-active-rf-bug-plan.mjs
     agent: integration-verifier
   - id: fresh-docker-runtime-proof
     name: Prove fresh Docker single-binary runtime
