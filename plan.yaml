@@ -183167,15 +183167,14 @@ phases:
     - embed-ui-assets-in-single-binary
     agent: golang-developer
 - id: rf-bug-20260712-ledger-prompting
-  name: RF-BUG Source Ledger and Prompting v2.2 Semantic Migration
+  name: RF-BUG Source Ledger Operations and Prompting v2.2
   status: locked
-  gate: RF-BUG-008 responsive Source Ledger proof passes after import-only source
-    interchange is enforced, including exact 320/390/768/1280/1440 browser contracts,
-    bundled font/license/lock verification, pinned image environment, and zero-diff
-    snapshots. RF-BUG-009 semantic behavior and fixtures pass before active v2.2 names
-    and verified-status documentation; the final active-reference scan reports exact
-    Section 7 scanned_paths with zero forbidden current-version drift while historical
-    excluded artifacts remain unchanged.
+  gate: 'Protected RF-BUG-008/009 contracts pass: responsive and operational Ledger
+    behavior is green at five viewports with reviewed screenshots, and Prompting v2.2
+    semantics pass before active-name/documentation alignment.'
+  context: Preserve fallback fonts and ordinary browser evidence. No bundled-font
+    registry, visual-environment lock, zero-diff portability, or permanent active-name
+    registry.
   depends_on:
   - rf-bug-20260712-frontend-behavior
   - rf-bug-20260712-runtime-boundaries
