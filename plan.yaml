@@ -182941,12 +182941,10 @@ phases:
     - docs/CONTAINER.md
     - go.mod
     - go.sum
-    - internal/resofeed/webui
-    - internal/resofeed/http_static.go
     - internal/resofeed/doctor.go
-    - scripts/build-resofeed.sh
-    - scripts/verify-container-contract.sh
     - Dockerfile
+    - internal/resofeed
+    - scripts
     agent: golang-developer
   - id: remove-opml-export-active-surface
     name: Remove OPML export from active product surfaces
