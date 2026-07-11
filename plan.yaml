@@ -182798,11 +182798,6 @@ phases:
     - docs/DESIGN.md
     - docs/PROMPTING_SYSTEM.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
-    - authority:acceptance-mutation:rf-bug-ledger-responsive
-    - authority:acceptance-mutation:rf-bug-ledger-operations
-    - authority:acceptance-mutation:rf-bug-ledger-delete
-    - authority:acceptance-mutation:rf-bug-e2e-isolation
-    - authority:acceptance-mutation:rf-bug-prompting-v22
     agent: contract-test-author
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
