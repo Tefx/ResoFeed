@@ -183053,7 +183053,6 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - internal/resofeed
-    - scripts
     depends_on:
     - embed-ui-assets-in-single-binary
     agent: security-engineer
