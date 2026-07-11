@@ -183450,9 +183450,12 @@ phases:
       {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.fresh-docker-runtime-proof","risk_tier":"R3","risk_reasons":["multi_arch_container_runtime","state_persistence","deployment_prerequisite"],"primary_outcome":"RF-BUG-CONTAINER-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: Run `bash scripts/verify-container-contract.sh <immutable-reference>`
-      for both platform manifests. PASS requires all bounded container predicates
-      green against the published digest and complete cleanup.
+    verification: Run `docker buildx imagetools inspect <immutable-reference>` and
+      then `docker run --rm --platform linux/amd64 ...` and `docker run --rm --platform
+      linux/arm64 ...` against that exact digest with temporary volumes and bounded
+      HTTP probes. PASS requires both platform manifests, non-root execution, writable
+      `/data`, embedded UI/Doctor/header/import-state predicates, A-to-B persistence,
+      and complete cleanup.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
