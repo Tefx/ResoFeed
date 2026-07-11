@@ -183436,7 +183436,7 @@ phases:
     - web/src/lib/playwright-e2e-harness-contract.ts
     - web/package.json
     - web/tests/e2e
-    - internal/resofeed/playwright_fixture_test.go
+    - internal/resofeed
     agent: test-engineer
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, Container, Tailnet, Independent Review, and Closure
