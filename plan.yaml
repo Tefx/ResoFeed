@@ -182532,3 +182532,12 @@ phases:
     responses, title transitions, and accessibility state.
   depends_on:
   - rf-bug-20260712-contract-lock
+- id: rf-bug-20260712-runtime-boundaries
+  name: RF-BUG Embedded UI, OPML Boundary, and HTTP Security Repair
+  status: locked
+  gate: 'RF-BUG-003, RF-BUG-004, and RF-BUG-005 are green: the binary embeds valid
+    UI assets, OPML is import-only across active surfaces, outer-mux security headers
+    and artifact-derived CSP cover HTML/API/MCP/error responses, and local arbitrary-cwd
+    probes pass.'
+  depends_on:
+  - rf-bug-20260712-contract-lock
