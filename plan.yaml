@@ -182777,7 +182777,6 @@ phases:
     - docs/PROMPTING_SYSTEM.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
-    - web/playwright.browser-contract.config.ts
     - web/tests/e2e
     - internal/resofeed
     agent: test-engineer
