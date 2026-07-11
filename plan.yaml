@@ -182750,29 +182750,24 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001 and RF-BUG-002. Implement only the pure route parser/validator\
-      \ in web/src/lib/workbench-route.ts and keep selection, request generation,\
-      \ preview/detail/re-ingest, viewport, History API, focus, and scroll ownership\
-      \ in web/src/routes/+page.svelte. Selection synchronously commits a renderable\
-      \ preview; late detail responses apply only when item ID and request version\
-      \ match. Pathname-first cold/refresh/popstate resolution runs before token hydration\
-      \ or API work. Validate the exact bounded Section 4.2 history.state shape and\
-      \ treat it as page-ephemeral same-page Back/Forward restoration; do not persist\
-      \ navigation history in localStorage, sessionStorage, IndexedDB, SQLite, exports,\
-      \ or cross-page storage. Use semantic landmarks/data-surface/headings/aria-busy\
-      \ without test-only readiness attributes. Playwright acceptance uses the real\
-      \ single-binary API/runtime and no route/HAR/service-worker/proxy interception.\
-      \ Update docs/DESIGN.md and docs/ui-preview.html in English. Recovery reverts\
-      \ route core, shell wiring, tests, and docs together; no persistence migration.\
-      \ No tokens enter logs, DOM, fixtures, or screenshots.\n\n<intent_closure_contract>\n\
+      \ RF-BUG-001 and RF-BUG-002. Implement only the pure parser/validator in web/src/lib/workbench-route.ts;\
+      \ +page.svelte owns selection, request generation, preview/detail/re-ingest,\
+      \ viewport, History API, focus, and scroll. Selection synchronously commits\
+      \ a preview and late detail applies only for matching item ID/request version.\
+      \ Pathname-first cold/refresh/popstate resolution precedes token hydration/API\
+      \ work. Validate the bounded Section 4.2 history.state shape as page-ephemeral\
+      \ same-page Back/Forward restoration; localStorage, sessionStorage, IndexedDB,\
+      \ SQLite, export, and cross-page persistence are forbidden. Use semantic landmarks/data-surface/headings/aria-busy.\
+      \ Browser acceptance uses the real runtime and real product responses. Update\
+      \ DESIGN.md and ui-preview.html. Recovery reverts route core, wiring, tests,\
+      \ and docs; no persistence migration or token exposure.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
       \    - web/src/lib/workbench-route.ts\n    - web/src/lib/__tests__/workbench-route.test.ts\n\
       \    - web/src/routes/+page.svelte\n    - web/src/routes/components/Feed.svelte\n\
       \    - web/src/routes/components/SearchRetrieval.svelte\n    - web/src/routes/components/Inspector.svelte\n\
       \    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n    - docs/DESIGN.md\n\
       \    - docs/ui-preview.html\n  blocked_paths:\n    - internal/resofeed/**\n\
-      \    - web/playwright.config.ts\n    - web/playwright.*.config.ts\n  ignored_runtime_paths:\n\
-      \    - .git/\n    - .vectl/\n    - .agent/\n    - .test-artifacts/\nclaims:\n\
+      \    - web/playwright.config.ts\n    - web/playwright.*.config.ts\nclaims:\n\
       \  - RF-BUG-001\n  - RF-BUG-002\nchecks:\n  - id: frontend_selection_route_green\n\
       \    run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
       \ src/lib/__tests__/workbench-route.test.ts, src/routes/__tests__/inspector-selection.test.ts]\n\
@@ -182785,7 +182780,7 @@ phases:
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"async_state_wiring\"\
       ,\"client_routing\"],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"\
       NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"\
-      primary_verifier\":\"integration-verifier\",\"additional_verifiers\":[\"uiux-auditor\"\
+      primary_verifier\":\"integration-verifier\",\"additional_verifiers\":[\"client-runtime-verifier\"\
       ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
       :{\"developer_test_globs\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
       ,\"web/src/routes/__tests__/inspector-selection.test.ts\"],\"acceptance_test_paths\"\
