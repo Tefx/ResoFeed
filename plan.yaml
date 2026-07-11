@@ -183316,7 +183316,6 @@ phases:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - web/package.json
     - go.mod
-    - scripts
     agent: integration-verifier
   - id: fresh-docker-runtime-proof
     name: Prove fresh Docker single-binary runtime
