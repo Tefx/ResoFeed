@@ -182866,8 +182866,8 @@ phases:
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
-    - web/src/lib/workbench-route.ts
     - web/src/routes/+page.svelte
+    - web/src/lib
     depends_on:
     - repair-inspector-selection-and-routing
     agent: frontend-engineer
