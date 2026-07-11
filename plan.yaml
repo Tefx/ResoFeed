@@ -182869,76 +182869,64 @@ phases:
   - rf-bug-20260712-contract-lock
   steps:
   - id: repair-inspector-selection-and-routing
-    name: Repair Inspector selection and pathname-first routing
+    name: Repair Inspector selection and reversible opaque-item routing
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001 and RF-BUG-002. Implement the pure RFC3986 route parser/serializer\
-      \ in web/src/lib/workbench-route.ts and interaction state in +page.svelte. Encode\
-      \ UTF-8 bytes; leave only ALPHA / DIGIT / `-._~` unescaped; percent-encode every\
-      \ other byte with uppercase hex; preserve reserved characters only when they\
-      \ are structural delimiters, never when part of values. Cover spaces, `%`, `+`,\
-      \ `&`, `=`, `#`, `/`, `?`, non-ASCII, malformed escapes, duplicate/unknown parameters,\
-      \ and dotted IDs. Selection commits readable preview synchronously; matching\
-      \ detail may enrich it, while stale item/version responses cannot replace it.\
-      \ An independent inspect/provenance-write 500 preserves readable Inspector content\
-      \ and adds a separate inline diagnostic. Pathname-first cold/refresh/Back/Forward\
-      \ resolution precedes token/API work. Validate bounded page-ephemeral history.state\
-      \ only. Real-runtime proof covers both languages and a ten-repeat route command.\
-      \ Update DESIGN.md and ui-preview.html. Recovery reverts code/tests/docs; no\
-      \ persistence or secret changes.\n\n<intent_closure_contract>\nschema_version:\
+      \ RF-BUG-001 and RF-BUG-002. Commit Feed/Search preview synchronously; keep\
+      \ detail and inspect/provenance channels independently versioned by item ID\
+      \ and request version; preserve readable content on either failure; reject stale\
+      \ responses; restore focus on Back. Implement canonical `/items/~<base64url-without-padding\
+      \ of UTF-8 opaque ID bytes>` routes and bounded legacy simple routes exactly\
+      \ as Section 4.2 specifies. Use platform URL/URLSearchParams and minimal validated\
+      \ native history state; re-run lexical Search on restore. Do not add custom\
+      \ RFC3986 parsing, full result snapshots, or persistence. Invoke protected Inspector\
+      \ and route browser contracts without mutating them. Update DESIGN and ui-preview.\
+      \ Recovery reverts this code/docs batch.\n\n<intent_closure_contract>\nschema_version:\
       \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [web/src/lib/workbench-route.ts, web/src/lib/__tests__/workbench-route.test.ts,\
       \ web/src/routes/+page.svelte, web/src/routes/components/Feed.svelte, web/src/routes/components/SearchRetrieval.svelte,\
       \ web/src/routes/components/Inspector.svelte, docs/DESIGN.md, docs/ui-preview.html]\n\
-      \  blocked_paths: [internal/resofeed/**, web/playwright.config.ts, web/playwright.*.config.ts]\n\
-      claims: [RF-BUG-001, RF-BUG-002]\nchecks:\n  - id: frontend_selection_route_green\n\
-      \    run:\n      command: [npm, --prefix, web, run, test:render:contracts, --,\
-      \ src/lib/__tests__/workbench-route.test.ts, src/routes/__tests__/inspector-selection.test.ts]\n\
-      \      timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: passed}], forbids:\
-      \ [{literal: failed}]}\n    proves: [RF-BUG-001, RF-BUG-002]\n  - id: frontend_selection_route_browser_green\n\
-      \    run:\n      command: [npm, --prefix, web, exec, playwright, test, --, --config,\
-      \ web/playwright.browser-contract.config.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ --grep, 'RF-BUG-(001|002)']\n      timeout_seconds: 300\n    expect:\n   \
-      \   outcome: green\n      exit_codes: [0]\n      stdout_or_stderr: {contains_any:\
-      \ [{literal: passed}], forbids: [{literal: failed}, {literal: No tests found}]}\n\
-      \    proves: [RF-BUG-001, RF-BUG-002]\n  - id: route_repeatability_green\n \
-      \   run:\n      command: [npm, --prefix, web, exec, playwright, test, --, --config,\
+      \  blocked_paths: [web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ web/tests/e2e/routes.browser-contract.spec.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
+      \ internal/resofeed/**]\nclaims: [RF-BUG-001, RF-BUG-002]\nchecks:\n  - id:\
+      \ rf_bug_001_green\n    run: {command: [npm, --prefix, web, exec, playwright,\
+      \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ --grep, RF-BUG-001], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
+      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-001]\n  - id: rf_bug_002_green\n\
+      \    run: {command: [npm, --prefix, web, exec, playwright, test, --, --config,\
       \ web/playwright.browser-contract.config.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
-      \ --grep, 'ROUTE-REPEATABILITY-(EN|ZH)', --repeat-each=10, --retries=0]\n  \
-      \    timeout_seconds: 900\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr: {contains_any: [{literal: passed}], forbids:\
-      \ [{literal: failed}]}\n    proves: [RF-BUG-002]\nbindings:\n  expected_red:\
-      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
-      \ source_check: frontend_browser_expected_red, requirement: RF-BUG-001, assertion_id:\
-      \ A-RF-BUG-001-INSPECTOR, downstream_check: frontend_selection_route_browser_green,\
-      \ receipt: RF-BUG-001-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
-      \ source_check: frontend_browser_expected_red, requirement: RF-BUG-002, assertion_id:\
-      \ A-RF-BUG-002-ROUTES, downstream_check: frontend_selection_route_browser_green,\
-      \ receipt: RF-BUG-002-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"async_state_wiring\"\
-      ,\"client_routing\"],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"\
-      NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"\
-      primary_verifier\":\"integration-verifier\",\"additional_verifiers\":[\"client-runtime-verifier\"\
-      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
-      :{\"developer_test_globs\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
-      ,\"web/src/routes/__tests__/inspector-selection.test.ts\"],\"acceptance_test_paths\"\
-      :[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"],\"acceptance_check_ids\"\
-      :[\"frontend_selection_route_browser_green\",\"route_repeatability_green\"],\"\
-      acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run all three checks. Require real single-binary responses, zero
-      interception, provenance-write failure independence, exact RFC3986 adversarial
-      fixtures, ten consecutive cold/refresh/Back/Forward runs in EN and ZH, and no
-      durable navigation-history storage.
+      \ --grep, RF-BUG-002], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_any: [{literal: passed}], forbids: [{literal:\
+      \ failed}, {literal: No tests found}]}}\n    proves: [RF-BUG-002]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ source_check: rf_bug_001_expected_red, requirement: RF-BUG-001, assertion_id:\
+      \ A-RF-BUG-001-INSPECTOR, downstream_check: rf_bug_001_green, receipt: RF-BUG-001-red-to-green}\n\
+      \    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ source_check: rf_bug_002_expected_red, requirement: RF-BUG-002, assertion_id:\
+      \ A-RF-BUG-002-ROUTES, downstream_check: rf_bug_002_green, receipt: RF-BUG-002-red-to-green}\n\
+      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
+      ,\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"client_routing\"\
+      ],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
+      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"integration-verifier\"\
+      ,\"additional_verifiers\":[\"client-runtime-verifier\"],\"review_mode\":\"INDEPENDENT\"\
+      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      :[\"web/src/lib/__tests__/workbench-route.test.ts\"],\"acceptance_test_paths\"\
+      :[\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"web/tests/e2e/routes.browser-contract.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_001_green\",\"rf_bug_002_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Run both named protected Playwright contracts and the focused route
+      unit test. Prove opaque `/`, `\`, `%`, Unicode, and leading-`~` IDs round-trip
+      unchanged; ambiguous input performs no lookup; repeated cold/refresh/Back/Forward
+      flows pass.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
     - docs/DESIGN.md
-    - web/src/routes/+page.svelte
-    - web/src/lib
-    - web/tests/e2e
+    - docs/ui-preview.html
     agent: frontend-engineer
   - id: repair-title-and-steer-invalid-a11y
     name: Repair surface titles and Steer invalid accessibility state
