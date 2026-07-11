@@ -183155,3 +183155,238 @@ phases:
     logs.
   depends_on:
   - rf-bug-20260712-e2e-isolation
+  steps:
+  - id: local-full-verification-matrix
+    name: Run complete local verification matrix
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: no_repo_change
+
+
+      Run evidence-only local verification after all implementation phases: frontend
+      build, check, Vitest; Go test, vet, canonical single-binary build; focused RF-BUG
+      suites; smoke; parallel-safe UI lane; serialized runtime lane; and three complete
+      Chromium runs. Exercise owner token accepted/rejected/restored, Feed/Search→Inspector
+      pending/failure/out-of-order, direct/history routes, import-only OPML/state
+      portability, arbitrary-cwd embedded UI, headers, titles, Steer accessibility,
+      Ledger widths, and v2.2 parity in EN/ZH as applicable. Repository mutation is
+      absent because this step independently consumes immutable implementation and
+      acceptance tests. Use isolated temp DBs/ports, fake tokens, no live provider
+      calls, and redacted logs. On failure, preserve artifacts and return the defect
+      to its owning implementation step; do not patch during verification.'
+    verification: Record exact commands, versions, durations, exit codes, RF-BUG scenario
+      matrix, three-run consistency, artifact paths, and secret-redaction scan; every
+      command and scenario must pass.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - web/package.json
+    - web/playwright.config.ts
+    - go.mod
+    agent: integration-verifier
+  - id: fresh-docker-runtime-proof
+    name: Prove fresh Docker single-binary runtime
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Build a fresh no-cache image from Dockerfile and prove the runtime image contains
+      `/app/resofeed` and writable `/data` without `/app/web/build` or another static
+      asset tree. Start with isolated data and fake owner token; verify root/deep-link
+      UI, arbitrary container cwd, /doctor embedded-asset lines, import-only OPML/state
+      paths, security headers, direct routes, and browser liveness. Repository mutation
+      is absent because this is an ephemeral image/container verification of committed
+      artifacts. Never print environment secrets. Recovery: stop/remove the test container
+      and image; on failure preserve redacted build/runtime logs and block Tailnet
+      deployment.'
+    verification: Capture image digest, no-cache build command/result, runtime file
+      inventory, health/browser/curl probes, header matrix, doctor lines, and cleanup
+      receipt; all checks pass with no external UI tree.
+    refs:
+    - Dockerfile
+    - docs/CONTAINER.md
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    depends_on:
+    - local-full-verification-matrix
+    agent: integration-verifier
+  - id: tailnet-caddy-runtime-proof
+    name: Deploy and verify Tailnet/Caddy runtime
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Using the maintained `resofeed-tailnet-deploy` skill, deploy the verified image
+      through `deploy/resofeed-caddy` on `tefx-mbp-personal`. Prove Caddy preserves
+      the application security headers and strict CSP on HTML, JSON, MCP, unauthorized,
+      and error responses; verify browser liveness, direct /source-ledger, embedded
+      assets, title behavior, owner-token accept/reject, and import-only OPML/state
+      boundary over Tailnet. Repository mutation is absent because this step changes
+      only authorized deployment runtime state. Use existing secret injection without
+      reading or printing `.env`; redact tokens, keys, cookies, and sensitive headers.
+      Recovery: follow the skill rollback to the prior image/config and capture rollback
+      evidence; any header rewrite, CSP failure, unavailable host, or browser failure
+      blocks closure.'
+    verification: Record deployment/image identity, Tailnet URL in redacted-safe form,
+      curl header/status matrix, browser screenshots/accessibility snapshot, doctor
+      lines, Caddy logs, and rollback readiness; all RF-BUG deployment obligations
+      pass.
+    refs:
+    - deploy/resofeed-caddy
+    - docs/CONTAINER.md
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    depends_on:
+    - fresh-docker-runtime-proof
+    agent: forgemaster
+  - id: formal-security-review
+    name: Perform formal HTTP, CSP, secret, and boundary security review
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: no_repo_change
+
+
+      Independently review RF-BUG-003/004/005/010 implementation and runtime evidence:
+      embedded-FS traversal/method handling, absence of fake/external web roots, complete
+      outer-mux headers, artifact-derived CSP with no unsafe-inline, unchanged owner-token
+      authorization, API/MCP status/body parity, OPML export removal without replacement
+      exfiltration surface, E2E isolation, live-provider opt-in, and artifact/log
+      secret redaction. Repository mutation is absent because this adjudicated review
+      evaluates immutable code, tests, Docker, and Tailnet evidence. On any finding,
+      classify severity, identify exact path/surface, and block the final gate until
+      the owning modifying step is remediated and all runtime proofs rerun.'
+    verification: Produce an adjudicated security report with threat surface, commands/probes,
+      code and runtime evidence, findings disposition, rollback assessment, and explicit
+      PASS only when no unresolved security finding remains.
+    refs:
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - internal/resofeed/http.go
+    - Dockerfile
+    - web/playwright.config.ts
+    depends_on:
+    - local-full-verification-matrix
+    - fresh-docker-runtime-proof
+    - tailnet-caddy-runtime-proof
+    agent: security-reviewer
+  - id: independent-runtime-ui-verification
+    name: Perform independent black-box runtime and UI verification
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: no_repo_change
+
+
+      From a clean context and without relying on implementation notes, verify RF-BUG-001–010
+      through the built binary, fresh container, and Tailnet UI. Cover desktop/mobile
+      Feed/Search Inspector pending/failure/A→B and viewport transitions; cold/refresh/back/forward
+      routes ten times in EN/ZH; exact titles; Steer empty/invalid/recovery accessibility
+      trees; Source Ledger at 320/390/768/desktop with 44px and keyboard file input;
+      import-only OPML/state; arbitrary-cwd/deep links; headers; and E2E lane/artifact
+      behavior. Repository mutation is absent because this is independent acceptance
+      evidence. Use fake tokens where local, never expose deployment secrets, and
+      preserve redacted screenshots/traces. Any reproducible mismatch blocks defect
+      closure and returns to the owning repair step.'
+    verification: Produce a bug-by-bug black-box matrix with environment/build identity,
+      actions, observed outcomes, screenshots/accessibility snapshots/traces, and
+      PASS/FAIL; all ten bugs require PASS.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/DESIGN.md
+    - docs/BUG_REPORT_2026-07-11.md
+    depends_on:
+    - local-full-verification-matrix
+    - fresh-docker-runtime-proof
+    - tailnet-caddy-runtime-proof
+    agent: blind-tester
+  - id: close-defect-report-with-evidence
+    name: Close RF-BUG-001–010 in the defect report
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
+      \ RF-BUG-001 through RF-BUG-010 closure evidence and documentation parity. Update\
+      \ BUG_REPORT_2026-07-11.md in English with each defect's resolved outcome, implementation\
+      \ references, expected-red-to-green proof, local commands/results, Docker image\
+      \ proof, Tailnet/Caddy evidence, security review, independent runtime/UI evidence,\
+      \ residual risks, and redacted artifact paths. Reconcile ARCHITECTURE.md, DESIGN.md,\
+      \ PROMPTING_SYSTEM.md, CONTAINER.md, USAGE.md, PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ ui-preview.html, and BUG_REPAIR_CONTRACT_2026-07-12.md for active consistency\
+      \ without rewriting completed plan history or historical audits. Add a deterministic\
+      \ documentation contract test that fails for missing bug IDs, evidence classes,\
+      \ English active content, active Export OPML/V21 drift, unsafe-inline, or secret-like\
+      \ values. Recovery: revert report/docs/test closure commit; runtime remains\
+      \ deployed but plan gate stays blocked. Security: evidence is redacted and contains\
+      \ no owner token, OpenRouter/Tavily key, cookie, or raw credential.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
+      \    - docs/BUG_REPORT_2026-07-11.md\n    - docs/BUG_REPAIR_CONTRACT_2026-07-12.md\n\
+      \    - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n    - docs/PROMPTING_SYSTEM.md\n\
+      \    - docs/CONTAINER.md\n    - docs/USAGE.md\n    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n\
+      \    - docs/ui-preview.html\n    - tests/rf_bug_closure_contract_test.go\n \
+      \ blocked_paths:\n    - plan.yaml\n    - internal/resofeed/**\n    - web/src/**\n\
+      \    - audits/**\n  ignored_runtime_paths:\n    - .git/\n    - .vectl/\n   \
+      \ - .agent/\n    - .test-artifacts/\nclaims:\n  - RF-BUG-001-010-CLOSURE\nchecks:\n\
+      \  - id: defect_report_closure_green\n    run:\n      command: [go, test, ./tests,\
+      \ -run, TestRFBugClosureContract, -count=1]\n      timeout_seconds: 180\n  \
+      \  expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: []\n        contains_any:\n          - literal: ok\n\
+      \        forbids:\n          - literal: FAIL\n          - literal: sk-or-\n\
+      \    proves:\n      - RF-BUG-001-010-CLOSURE\nbindings:\n  expected_red:\n \
+      \   items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-assurance-closure.close-defect-report-with-evidence\"\
+      ,\"risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_closure\",\"evidence_metadata\"\
+      ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
+      ,\"proof_modalities\":[\"TEST\",\"REVIEW\"],\"primary_verifier\":\"doc-reviewer\"\
+      ,\"additional_verifiers\":[\"spec-verifier\"],\"review_mode\":\"INDEPENDENT\"\
+      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      :[],\"acceptance_test_paths\":[\"tests/rf_bug_closure_contract_test.go\"],\"\
+      acceptance_check_ids\":[\"defect_report_closure_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Run closure contract test and active-reference/redaction scans;
+      independently cross-check every report evidence link against local, Docker,
+      Tailnet, security, and black-box receipts; require RF-BUG-001–010 all RESOLVED
+      with no unsupported claim.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/PROMPTING_SYSTEM.md
+    - docs/CONTAINER.md
+    - docs/USAGE.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    depends_on:
+    - formal-security-review
+    - independent-runtime-ui-verification
+    agent: doc-reviewer
+  - id: rf-bug-final-full-gate
+    name: Open final RF-BUG assurance gate
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: no_repo_change
+
+
+      Perform the final evidence-only gate over all prior steps. Confirm phases preserved
+      existing completed history; every RF-BUG-001–010 requirement has expected-red
+      and green proof; source/test/English documentation parity is complete; local,
+      Docker, and Tailnet/Caddy receipts identify the same implementation; security
+      and independent runtime/UI reviews have no unresolved findings; smoke is under
+      two minutes; three full Chromium runs agree; active Export OPML and V21 drift
+      scans are clean; CSP contains no unsafe-inline; and all logs/artifacts are redacted.
+      Repository mutation is absent because this gate only adjudicates immutable evidence
+      and cannot fix or waive defects. Any missing, stale, inconsistent, or secret-bearing
+      evidence keeps the gate closed and routes work back to the owning step.'
+    verification: Record Full Gate checklist, phase/step dependency audit, command/evidence
+      hashes, reviewer identities, open findings, and OPEN/CLOSED result; OPEN requires
+      zero unresolved findings and all ten bug closures proven.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - plan.yaml
+    depends_on:
+    - close-defect-report-with-evidence
+    agent: gate-reviewer
