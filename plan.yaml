@@ -183776,9 +183776,11 @@ phases:
       ,\"internal/resofeed/reprocess_test.go\",\"internal/resofeed/reingest_test.go\"\
       ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Require exact five-scope active scan including Architecture status
-      and all Prompting v2.1/System/standalone variants, exactly four named v2.2 regressions,
-      no broad test authority, and zero diff across every protected contract artifact.
+    verification: Require the exact fail-closed six-scope active scan over cmd, internal/resofeed,
+      web/src, web/tests, Architecture status, and Prompting docs for all Prompting
+      v2.1/System/standalone variants; only git grep status 1 proves absence and statuses
+      greater than 1 propagate. Require exactly four named v2.2 regressions, no broad
+      test authority, and zero diff across every protected contract artifact.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
