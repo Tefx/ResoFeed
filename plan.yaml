@@ -184404,10 +184404,13 @@ phases:
       {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.publish-immutable-two-platform-oci-image","risk_tier":"R3","risk_reasons":["registry_publication","multi_arch_runtime","deployment_prerequisite"],"primary_outcome":"RF-BUG-OCI-IMMUTABLE","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["software-architect"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: Run the maintained buildx publish command for linux/amd64,linux/arm64
-      and inspect the resulting index. PASS requires one immutable index digest, both
-      platform manifests, commit identity, and redacted output; container contract
-      execution remains downstream.
+    verification: Target only docker.io/tefx/resofeed. Before push require repository-scoped
+      authority and credentials from only the Docker credential store or a CI secret;
+      otherwise report BLOCKED and perform no push. Publish linux/amd64 and linux/arm64
+      under an immutable commit/version tag, with latest optional only. PASS requires
+      the immutable tag, verified commit identity, OCI index digest, amd64 digest,
+      arm64 digest, redacted output, and those three digests recorded for downstream
+      container verification.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
