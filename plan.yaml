@@ -182689,7 +182689,7 @@ phases:
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
-    agent: project-guide
+    agent: general
   - id: rf-bug-inspector-selection-expected-red
     name: Lock Inspector selection acceptance
     status: pending
