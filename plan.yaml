@@ -184137,10 +184137,12 @@ phases:
       ],\"acceptance_check_ids\":[\"rf_bug_010_green\",\"rf_bug_010_artifact_proof_green\"\
       ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
       </vectl_step_policy>"
-    verification: Run exact old/replacement list and run checks, exact full-suite
-      list plus three retry-free runs and title-set/run reconciliation, protected
-      RF-BUG-010, and controlled intentional failure. Require complete artifacts and
-      zero protected-path diff before any legacy deletion.
+    verification: Run exact old/replacement list and run checks with deterministic
+      JSON title-multiset/count equality and emitted OLD/REPLACEMENT_RUN_COUNT receipts;
+      run the exact full-suite list plus three retry-free executions and require all
+      six listed/executed multisets and counts to be identical; run protected RF-BUG-010
+      and controlled intentional failure with ordered setup/assertion/teardown markers.
+      Require complete artifacts and zero protected-path diff before any legacy deletion.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
