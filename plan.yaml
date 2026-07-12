@@ -184403,7 +184403,7 @@ phases:
     - Dockerfile
     depends_on:
     - local-full-verification-matrix
-    agent: forgemaster
+    agent: general
   - id: rf-bug-assurance-closure-full-gate
     name: RF-BUG assurance-closure phase Full Gate
     status: pending
