@@ -183428,10 +183428,12 @@ phases:
     header/CSP layer preserves Chromium operations, streaming, and cancellation.'
   context: Implement the embedded/pre-bind UI and Doctor boundary, then remove OPML
     export across product surfaces, then apply outer Go-owned security headers/CSP.
-    Shared paths are ordered by dependencies; protected acceptance is immutable. OCI
-    and Tailnet proof remain downstream.
+    This phase is explicitly serialized after rf-bug-20260712-frontend-behavior so
+    every shared modifying path has a transitive authority order. Shared paths inside
+    this phase are ordered by step dependencies; protected acceptance is immutable.
+    OCI and Tailnet proof remain downstream.
   depends_on:
-  - rf-bug-20260712-contract-lock
+  - rf-bug-20260712-frontend-behavior
   steps:
   - id: embed-ui-assets-in-single-binary
     name: Embed validated UI and preserve safe Doctor diagnostics
