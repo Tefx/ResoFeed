@@ -183113,27 +183113,28 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal bounded phase Full Gate for `rf-bug-20260712-contract-lock`. Repository
-      mutation is absent because this gate reuses declared predicates and records
-      plan-assurance metadata only. Reuse all original expected-red checks plus `r11_corrected_contracts_red`
-      and `r11_product_runtime_diff_guard`. The R11 reconciliation supersedes conflicting
-      earlier predicates. Require browser-compatible script-type fixtures and hash
-      equality, bounded raw-query percent/UTF-8 preflight fixtures with invalid-surface/no-request/no-history
-      proof, active-document reconciliation for ARCHITECTURE, DESIGN, PRD, USAGE,
-      CONTAINER, README, and active ui-preview, the exact nine-document Section 7
-      scan with exactly two exclusions and OPML_EXCLUSIONS=2, and independent intentional-failure
-      collection/ordered line-reporter/complete redacted artifact evidence. Empty
-      stderr is permitted only when the file is present and redaction-scanned. Do
-      not mutate product, docs, tests, runtime state, storage, manifests, registries,
-      schemas, or deployment from this gate.'
-    verification: All original and R11 contract-lock checks reach declared outcomes
-      with exact collection/count evidence; product/runtime diff guard is clean; `vectl
-      validate --check-refs` and phase intent-closure lint are conformant.
+      Terminal bounded Full Gate for contract lock. Repository mutation is absent
+      because the gate only reuses declared canonical-sync and expected-red predicates.
+      Require current authority hashes, exact acceptance collection, assertion-specific
+      red outcomes, reciprocal downstream bindings, authorized acceptance-path ownership,
+      a clean product/runtime diff, and reference-aware Vectl plus phase contract/policy
+      admission. Any collection, compile, startup, auth, timeout, unrelated failure,
+      authority mismatch, path conflict, or product diff blocks implementation. Do
+      not create runtime state, deployment, registries, manifests, schemas, or evidence
+      protocols.'
+    verification: All canonical-sync and expected-red checks reach their declared
+      outcomes; reciprocal bindings and acceptance authority are complete; product/runtime
+      diff is clean; Vectl validation/check-refs and phase Intent-Closure/Assurance
+      admission pass.
     depends_on:
-    - frontend-state-route-a11y-expected-red
+    - rf-bug-canonical-contract-sync
+    - rf-bug-inspector-selection-expected-red
+    - rf-bug-route-search-token-expected-red
+    - rf-bug-title-steer-a11y-expected-red
     - runtime-assets-opml-security-expected-red
-    - ledger-prompting-e2e-expected-red
-    - rf-bug-r11-contract-harness-reconciliation
+    - rf-bug-ledger-state-expected-red
+    - rf-bug-prompting-v22-expected-red
+    - rf-bug-e2e-isolation-artifact-expected-red
     agent: gate-reviewer
   - id: rf-bug-r11-contract-harness-reconciliation
     name: Reconcile R11 browser, query, documentation, and evidence contracts
