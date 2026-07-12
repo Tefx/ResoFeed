@@ -182618,35 +182618,6 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: general
-  - id: rf-bug-contract-lock-full-gate
-    name: RF-BUG contract-lock phase Full Gate
-    status: pending
-    description: 'step_type: gate
-
-      repo_change_policy: no_repo_change
-
-
-      Terminal bounded Full Gate for contract lock. Repository mutation is absent
-      because the gate only reuses declared canonical-sync and expected-red predicates.
-      Require current authority hashes, exact acceptance collection, assertion-specific
-      red outcomes, reciprocal downstream bindings, authorized acceptance-path ownership,
-      a clean product/runtime diff, and reference-aware Vectl plus phase contract/policy
-      admission. Any collection, compile, startup, auth, timeout, unrelated failure,
-      authority mismatch, path conflict, or product diff blocks implementation. Do
-      not create runtime state, deployment, registries, manifests, schemas, or evidence
-      protocols.'
-    verification: All canonical-sync and expected-red checks reach their declared
-      outcomes; reciprocal bindings and acceptance authority are complete; product/runtime
-      diff is clean; Vectl validation/check-refs and phase Intent-Closure/Assurance
-      admission pass.
-    depends_on:
-    - rf-bug-canonical-contract-sync
-    - rf-bug-route-search-token-expected-red
-    - runtime-assets-opml-security-expected-red
-    - rf-bug-ledger-state-expected-red
-    - rf-bug-prompting-v22-expected-red
-    - rf-bug-e2e-isolation-artifact-expected-red
-    agent: gate-reviewer
   - id: rf-bug-canonical-contract-sync
     name: Synchronize RF-BUG canonical contracts
     status: pending
