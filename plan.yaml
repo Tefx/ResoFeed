@@ -183702,10 +183702,12 @@ phases:
       :[\"rf_bug_004_state_import_green\",\"rf_bug_008_render_green\",\"rf_bug_008_green\"\
       ,\"rf_bug_008_operations_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
       :[]}}\n</vectl_step_policy>"
-    verification: Require exact render ID/count, positive per-file browser titles
-      at all five viewports, positive EN and ZH operation counts, zero retries/skips,
-      reviewed baselines, and zero diff across every protected test/baseline/artifact
-      path.
+    verification: Require four exact RF-BUG-004 EN/ZH State-import confirmation/cancellation
+      titles with zero request before confirmation, one atomic-replace request after
+      confirmation, cancellation reset and focus restoration; exact RF-BUG-008 render
+      ID/count; positive per-file browser titles at 320x800, 390x844, 768x1024, 1280x800,
+      and 1440x900; positive EN/ZH operation counts; zero retries/skips; reviewed
+      baselines; and zero protected-artifact diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
