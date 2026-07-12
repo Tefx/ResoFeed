@@ -183957,7 +183957,6 @@ phases:
       admission are conformant.
     depends_on:
     - rf-bug-010-harness-foundation
-    - rf-bug-010-migrate-playwright-lanes
     - rf-bug-010-reproducibility-artifact-proof
     agent: gate-reviewer
   - id: rf-bug-010-migrate-playwright-lanes
