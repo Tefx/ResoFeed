@@ -183400,15 +183400,16 @@ phases:
 
 
       Terminal bounded phase Full Gate for `rf-bug-20260712-frontend-behavior`. Repository
-      mutation is absent because this gate only re-runs existing phase acceptance
-      checks and records normal plan-assurance metadata. Reuse only `rf_bug_001_green`,
-      `rf_bug_002_green`, `rf_bug_002_route_unit_green`, `rf_bug_002_api_green`, `rf_bug_006_green`,
-      and `rf_bug_007_green`. Require the complete exact ten-title EN/ZH RF-BUG-002
-      collection, exactly 100 retry-free executions, exact Go collection/subtest proof,
-      stale-response/focus/title/accessibility predicates, and zero protected-artifact
-      diff. Do not add or modify product code, runtime behavior or processes, storage
-      models, registries, manifests, custom evidence protocols, deployment requirements,
-      acceptance artifacts, or canonical product architecture.'
+      mutation is absent because this gate exclusively reuses existing acceptance
+      predicates and records normal plan-assurance metadata. Reuse exactly `rf_bug_001_green`,
+      `rf_bug_002_green`, `rf_bug_002_search_route_history_expected_red`, `rf_bug_002_search_route_history_green`,
+      `rf_bug_002_route_unit_green`, `rf_bug_002_api_green`, `rf_bug_006_green`, and
+      `rf_bug_007_green`. The independently collected Search expected-red and green
+      receipts must name the identical four-title set and preserve their distinct
+      assertion outcomes. Require ten-title/100-run initial-route proof, exact item
+      API proof, stale-response/focus/title/accessibility predicates, and zero protected-artifact
+      diff. Do not mutate product, docs, tests, runtime state, storage, manifests,
+      registries, schemas, or deployment.'
     verification: All existing frontend phase checks are green with exact collection/run
       equality and protected artifacts unchanged; facade validation and phase intent-closure
       lint are conformant.
