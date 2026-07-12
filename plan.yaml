@@ -184327,3 +184327,28 @@ phases:
     - independent-runtime-ui-verification
     - close-defect-report-with-evidence
     agent: gate-reviewer
+  - id: deployment-operation-authorization-review
+    name: Authorize OCI publication and Tailnet deployment
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Pre-operation read-only authorization review. Before any registry publication
+      or Tailnet/Caddy deployment, verify current explicit human authorization for
+      both operations; exact registry/repository `docker.io/tefx/resofeed`; exact
+      maintained Tailnet/Caddy target; repository-scoped registry credentials and
+      existing runtime secret-injection authority; the verified commit and immutable
+      commit/version tag that will yield a recorded OCI index digest plus amd64/arm64
+      manifest digests; rollback or orphan-digest recovery for publication; prior-digest
+      rollback and readiness recovery for deployment; and prohibition on printing
+      `.env`, tokens, provider keys, or raw credentials. Missing or stale authority
+      returns BLOCKED and permits no publication or deployment.'
+    verification: PASS only with current explicit human authorization, exact repository
+      and deployment target, exact immutable identity/digest-binding procedure, scoped
+      secret authority, and executable rollback/recovery for both operations. Otherwise
+      publication and deployment remain blocked.
+    depends_on:
+    - local-full-verification-matrix
+    agent: software-architect
