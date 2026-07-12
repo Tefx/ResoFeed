@@ -184169,13 +184169,15 @@ phases:
 
 
       Repository mutation is absent because this step verifies the immutable image
-      published by its prerequisite using ephemeral containers. Run the existing container
-      contract against the immutable registry reference for amd64 and arm64. Prove
-      `/app/resofeed`, writable persistent `/data`, non-root runtime, arbitrary cwd,
-      embedded UI with no external UI tree/Node runtime, Doctor UI lines, import-only
-      OPML, JSON state backup/restore, four headers, and A-to-B persistence. Never
-      print secrets. Recovery stops/removes test containers and blocks deployment
-      on any platform, rootfs, state, or digest mismatch.
+      published by its prerequisite using ephemeral containers. Consume the prerequisite’s
+      recorded OCI index digest plus amd64 and arm64 manifest digests, reject any
+      incomplete or mismatched chain, and run the existing container contract against
+      that exact immutable registry identity for both platforms. Prove `/app/resofeed`,
+      writable persistent `/data`, non-root runtime, arbitrary cwd, embedded UI with
+      no external UI tree/Node runtime, Doctor UI lines, import-only OPML, JSON state
+      backup/restore, four headers, and A-to-B persistence. Never print secrets. Recovery
+      stops/removes test containers and blocks deployment on any platform, rootfs,
+      state, or digest mismatch.
 
 
       <vectl_step_policy>
