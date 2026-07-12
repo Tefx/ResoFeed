@@ -183159,35 +183159,30 @@ phases:
       \ viewport changes, direct item pending/failure/success, browser Back, focus\
       \ return, and Escape. Browser state remains transient; Go/SQLite remain authoritative.\
       \ Rollback reverts the workbench selection/components and synchronized Design/preview\
-      \ documentation together. Architecture contract ownership remains in the dedicated\
-      \ canonical synchronization/runtime boundaries. Never persist selection/history,\
-      \ add a modal/detail route system, or expose secrets.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths:\n    - web/src/routes/+page.svelte\n    - web/src/routes/components/Feed.svelte\n\
-      \    - web/src/routes/components/SearchRetrieval.svelte\n    - web/src/routes/components/Inspector.svelte\n\
-      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n  blocked_paths:\n    - docs/ARCHITECTURE.md\n\
-      \    - web/src/routes/__tests__/inspector-selection.test.ts\n    - web/tests/e2e/inspector-selection.browser-contract.spec.ts\n\
-      \    - internal/**\nclaims:\n  - RF-BUG-001\nchecks:\n  - id: rf_bug_001_green\n\
-      \    run:\n      command: [bash, -lc, \"npm --prefix web exec -- playwright\
-      \ test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 web/tests/e2e/inspector-selection.browser-contract.spec.ts --grep\
-      \ '^\\\\[RF-BUG-001\\\\]'\"]\n      timeout_seconds: 600\n    expect:\n    \
-      \  outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
-      \ [{literal: stale detail cannot replace the selected item}]\n        contains_any:\
-      \ [{literal: passed}]\n        forbids: [{literal: failed}, {literal: skipped},\
-      \ {literal: retry}, {literal: No tests found}]\n    proves: [RF-BUG-001]\nbindings:\n\
-      \  expected_red:\n    items: []\n  closes_expected_red:\n    - {source_step:\
-      \ rf-bug-20260712-contract-lock.rf-bug-inspector-selection-expected-red, source_check:\
-      \ rf_bug_001_expected_red, requirement: RF-BUG-001, assertion_id: A-RF-BUG-001-INSPECTOR,\
-      \ downstream_check: rf_bug_001_green, receipt: RF-BUG-001-red-to-green}\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
+      \ documentation together. Never persist selection/history, add a modal/detail\
+      \ route system, or expose secrets.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [web/src/routes/+page.svelte, web/src/routes/components/Feed.svelte,\
+      \ web/src/routes/components/SearchRetrieval.svelte, web/src/routes/components/Inspector.svelte,\
+      \ docs/DESIGN.md, docs/ui-preview.html]\n  blocked_paths: [docs/ARCHITECTURE.md,\
+      \ web/src/routes/__tests__/inspector-selection.test.ts, web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ internal/**]\nclaims: [RF-BUG-001]\nchecks:\n  - id: rf_bug_001_green\n  \
+      \  run: {command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
+      \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
+      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts --grep '^\\\\[RF-BUG-001\\\
+      \\]'\"], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0],\
+      \ stdout_or_stderr: {contains_all: [{literal: stale detail cannot replace the\
+      \ selected item}], contains_any: [{literal: passed}], forbids: [{literal: failed},\
+      \ {literal: skipped}, {literal: retry}, {literal: No tests found}]}}\n    proves:\
+      \ [RF-BUG-001]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
+      \    - {source_step: rf-bug-20260712-contract-lock.rf-bug-inspector-selection-expected-red,\
+      \ source_check: rf_bug_001_expected_red, requirement: RF-BUG-001, assertion_id:\
+      \ A-RF-BUG-001-INSPECTOR, downstream_check: rf_bug_001_green, receipt: RF-BUG-001-red-to-green}\n\
+      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
+      ,\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"asynchronous_selection_state\"\
-      ],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
-      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"client-runtime-verifier\"\
-      ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[],\"acceptance_test_paths\":[\"web/src/routes/__tests__/inspector-selection.test.ts\"\
+      ],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"NONTRIVIAL\",\"test_authority\"\
+      :{\"developer_test_globs\":[],\"acceptance_test_paths\":[\"web/src/routes/__tests__/inspector-selection.test.ts\"\
       ,\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
       :[\"rf_bug_001_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
       :[]}}\n</vectl_step_policy>"
