@@ -182853,16 +182853,16 @@ phases:
       acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\"\
       :\"authority:acceptance-mutation:rf002-route-unit\",\"path\":\"web/src/lib/__tests__/workbench-route.test.ts\"\
       ,\"purpose\":\"Define opaque route-token unit acceptance\",\"check_id\":\"rf_bug_002_route_unit_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf002-initial-route\"\
+      ,\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf002-initial-route\"\
       ,\"path\":\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"purpose\"\
       :\"Define EN/ZH initial-route acceptance\",\"check_id\":\"rf_bug_002_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf002-search-history\"\
+      ,\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf002-search-history\"\
       ,\"path\":\"web/tests/e2e/routes.browser-contract.spec.ts\",\"purpose\":\"Define\
       \ raw-query and Search history acceptance\",\"check_id\":\"rf_bug_002_search_route_history_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf002-item-api\"\
+      ,\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf002-item-api\"\
       ,\"path\":\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\",\"purpose\"\
       :\"Define five-operation opaque item API acceptance\",\"check_id\":\"rf_bug_002_api_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
+      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
     verification: Require exact route/Search collections, raw malformed-query no-request/no-history
       cases, route-token unit red, and 30 opaque API subtests with assertion-specific
       red fingerprints.
