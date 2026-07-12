@@ -183145,11 +183145,10 @@ phases:
       \ Rollback reverts shared shell/title/Steer and synchronized Design/preview\
       \ documentation together. Never add a transcript, persistent error state, duplicate\
       \ alert, or secret-bearing diagnostic.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [web/src/lib/workbench-route.ts, web/src/routes/+page.svelte,\
-      \ docs/DESIGN.md, docs/ui-preview.html]\n  blocked_paths: [docs/ARCHITECTURE.md,\
-      \ web/src/routes/__tests__/steer-invalid.test.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ internal/**]\nclaims: [RF-BUG-006, RF-BUG-007, RF-BUG-006-007]\nchecks:\n\
+      \ intent_closure.contract.v2\nprofile: generic\nscope: {allowed_paths: [web/src/lib/workbench-route.ts,\
+      \ web/src/routes/+page.svelte, docs/DESIGN.md, docs/ui-preview.html], blocked_paths:\
+      \ [docs/ARCHITECTURE.md, web/src/routes/__tests__/steer-invalid.test.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
+      \ internal/**]}\nclaims: [RF-BUG-006, RF-BUG-007, RF-BUG-006-007]\nchecks:\n\
       \  - id: rf_bug_006_green\n    run: {command: [bash, -lc, \"npm --prefix web\
       \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
@@ -183166,15 +183165,9 @@ phases:
       \ invalid add source remounts one alert'}, {literal: '[RF-BUG-007][zh] repeated\
       \ invalid add source remounts one alert'}], contains_any: [{literal: passed}],\
       \ forbids: [{literal: failed}, {literal: skipped}, {literal: retry}, {literal:\
-      \ POST /api/steer}]}}\n    proves: [RF-BUG-007, RF-BUG-006-007]\nbindings:\n\
-      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-title-steer-a11y-expected-red,\
-      \ source_check: rf_bug_006_expected_red, requirement: RF-BUG-006, assertion_id:\
-      \ A-RF-BUG-006-TITLES, downstream_check: rf_bug_006_green, receipt: RF-BUG-006-red-to-green}\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.rf-bug-title-steer-a11y-expected-red,\
-      \ source_check: rf_bug_007_expected_red, requirement: RF-BUG-007, assertion_id:\
-      \ A-RF-BUG-007-STEER, downstream_check: rf_bug_007_green, receipt: RF-BUG-007-red-to-green}\n\
-      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
-      ,\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y\"\
+      \ POST /api/steer}]}}\n    proves: [RF-BUG-007, RF-BUG-006-007]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"accessibility_behavior\"\
       ],\"primary_outcome\":\"RF-BUG-006-007\",\"rollback_class\":\"NONTRIVIAL\",\"\
       test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\":[\"\
