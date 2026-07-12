@@ -183236,74 +183236,68 @@ phases:
     - repair-route-search-and-opaque-item-ids
     agent: frontend-engineer
   - id: repair-title-and-steer-invalid-a11y
-    name: Repair route-derived titles and Steer invalid accessibility
+    name: Repair route titles and Steer invalid accessibility
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-006 and RF-BUG-007. Derive exact titles atomically from resolved routes.\
-      \ For invalid add source, use non-mutating preview, exact EN/ZH copy, no mutation,\
-      \ retained input/focus, and one newly mounted alert on repeat or locale change.\
-      \ Protected artifacts remain immutable. Every npm-exec Playwright command uses\
-      \ root-valid config/spec paths.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [web/src/lib/workbench-route.ts, web/src/routes/+page.svelte,\
-      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/ui-preview.html]\n  blocked_paths:\
-      \ [web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/__tests__/steer-invalid.test.ts,\
-      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
-      \ internal/resofeed/**]\nclaims: [RF-BUG-006, RF-BUG-007]\nchecks:\n  - id:\
-      \ rf_bug_006_green\n    run: {command: [bash, -lc, \"npm --prefix web exec --\
-      \ playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-006\\\\]' | tee /tmp/rf006-green-list; c=$(grep -c '\\\
-      \\[RF-BUG-006\\\\]' /tmp/rf006-green-list); test $c -gt 0; npm --prefix web\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-006-007. Derive exact RESOFEED functional titles atomically from the\
+      \ resolved route, with no host fallback or stale intermediate title. Idle Steer\
+      \ exposes no missing-URL error. Invalid add-source submission uses non-mutating\
+      \ preview, retains input/focus, sends no mutation, exposes one current localized\
+      \ EN/ZH alert, remounts it on repeated invalid submission or locale change,\
+      \ and clears it on edit. Stale preview and transport failure remain distinct.\
+      \ Rollback reverts shared shell/title/Steer/docs together. Never add a transcript,\
+      \ persistent error state, duplicate alert, or secret-bearing diagnostic.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths:\n    - web/src/lib/workbench-route.ts\n\
+      \    - web/src/routes/+page.svelte\n    - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n\
+      \    - docs/ui-preview.html\n  blocked_paths:\n    - web/src/routes/__tests__/steer-invalid.test.ts\n\
+      \    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n    - internal/**\n\
+      claims:\n  - RF-BUG-006\n  - RF-BUG-007\n  - RF-BUG-006-007\nchecks:\n  - id:\
+      \ rf_bug_006_green\n    run:\n      command: [bash, -lc, \"npm --prefix web\
       \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-006\\\\]' --reporter=line; echo RF_BUG_006_EXECUTED_COUNT=$c\"\
-      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: '[RF-BUG-006] route-derived title updates atomically'},\
-      \ {literal: RF_BUG_006_EXECUTED_COUNT=}], forbids: [{literal: failed}, {literal:\
-      \ No tests found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-006]\n\
-      \  - id: rf_bug_007_green\n    run: {command: [bash, -lc, \"npm --prefix web\
-      \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-007\\\\]' | tee /tmp/rf007-green-list; test $(grep -c\
-      \ '\\\\[RF-BUG-007\\\\]' /tmp/rf007-green-list) -eq 2; npm --prefix web exec\
-      \ -- playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep\
-      \ '^\\\\[RF-BUG-007\\\\]' --reporter=line; echo RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2\"\
-      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: '[RF-BUG-007][en] repeated invalid add source remounts\
-      \ one alert'}, {literal: '[RF-BUG-007][zh] repeated invalid add source remounts\
-      \ one alert'}, {literal: RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2}],\
-      \ forbids: [{literal: failed}, {literal: No tests found}, {literal: skipped},\
-      \ {literal: retry}, {literal: POST /api/steer}]}}\n    proves: [RF-BUG-007]\n\
-      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step:\
-      \ rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red, source_check:\
+      \ --grep '^\\\\[RF-BUG-006\\\\]'\"]\n      timeout_seconds: 300\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: route-derived title updates atomically}]\n   \
+      \     contains_any: [{literal: passed}]\n        forbids: [{literal: failed},\
+      \ {literal: skipped}, {literal: retry}, {literal: No tests found}]\n    proves:\
+      \ [RF-BUG-006, RF-BUG-006-007]\n  - id: rf_bug_007_green\n    run:\n      command:\
+      \ [bash, -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
+      \ --grep '^\\\\[RF-BUG-007\\\\]'\"]\n      timeout_seconds: 300\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: '[RF-BUG-007][en] repeated invalid add source\
+      \ remounts one alert'}, {literal: '[RF-BUG-007][zh] repeated invalid add source\
+      \ remounts one alert'}]\n        contains_any: [{literal: passed}]\n       \
+      \ forbids: [{literal: failed}, {literal: skipped}, {literal: retry}, {literal:\
+      \ POST /api/steer}]\n    proves: [RF-BUG-007, RF-BUG-006-007]\nbindings:\n \
+      \ expected_red:\n    items: []\n  closes_expected_red:\n    - {source_step:\
+      \ rf-bug-20260712-contract-lock.rf-bug-title-steer-a11y-expected-red, source_check:\
       \ rf_bug_006_expected_red, requirement: RF-BUG-006, assertion_id: A-RF-BUG-006-TITLES,\
       \ downstream_check: rf_bug_006_green, receipt: RF-BUG-006-red-to-green}\n  \
-      \  - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \  - {source_step: rf-bug-20260712-contract-lock.rf-bug-title-steer-a11y-expected-red,\
       \ source_check: rf_bug_007_expected_red, requirement: RF-BUG-007, assertion_id:\
       \ A-RF-BUG-007-STEER, downstream_check: rf_bug_007_green, receipt: RF-BUG-007-red-to-green}\n\
       </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
       ,\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-title-and-steer-invalid-a11y\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"accessibility_behavior\"\
-      ],\"primary_outcome\":\"RF-BUG-006\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
-      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"client-runtime-verifier\"\
-      ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[],\"acceptance_test_paths\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
-      ,\"web/src/routes/__tests__/steer-invalid.test.ts\",\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
-      ],\"acceptance_check_ids\":[\"rf_bug_006_green\",\"rf_bug_007_green\"],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Require exact RF-BUG-006 collection and two exact RF-BUG-007 EN/ZH
-      titles, root-valid commands, zero retries/skips/mutations, retained focus, and
-      zero protected-artifact diff.
+      ],\"primary_outcome\":\"RF-BUG-006-007\",\"rollback_class\":\"NONTRIVIAL\",\"\
+      proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\"\
+      :\"client-runtime-verifier\",\"additional_verifiers\":[\"integration-verifier\"\
+      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[],\"acceptance_test_paths\":[\"web/src/routes/__tests__/steer-invalid.test.ts\"\
+      ,\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_006_green\",\"rf_bug_007_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
+      ,\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Require exact title and EN/ZH Steer collections, zero retries/skips/mutations,
+      retained focus/input, one current alert, edit recovery, stale/transport separation,
+      and protected acceptance unchanged.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
-    - docs/ui-preview.html
     depends_on:
     - repair-inspector-selection-and-routing
     agent: frontend-engineer
