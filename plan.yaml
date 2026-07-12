@@ -183427,6 +183427,95 @@ phases:
     - repair-inspector-selection-and-routing
     - repair-title-and-steer-invalid-a11y
     agent: gate-reviewer
+  - id: repair-route-search-and-opaque-item-ids
+    name: Repair route, Search history, and opaque item IDs
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-002. Resolve the requested URL before async hydration so the first\
+      \ surface/title is TODAY, SOURCE LEDGER, SEARCH, or the direct item. Use platform\
+      \ URL/URLSearchParams/history for canonical `/` Search; validate duplicates,\
+      \ unknown keys, malformed percent/fatal UTF-8, dates/ranges, booleans, and limits\
+      \ before API/history mutation. Re-execute lexical search on cold load, refresh,\
+      \ Back, and Forward. Encode every opaque item ID as `~` plus unpadded RFC4648\
+      \ base64url across browser and all five item HTTP operations; decoding returns\
+      \ the byte-identical stored ID. `/search` and `/sources` remain misses. Failure\
+      \ selects the bounded invalid surface without request/history change. Rollback\
+      \ reverts route/token/API/docs together. Never add saved searches, custom URL\
+      \ parsers/codecs, persistent navigation state, semantic search, or secret logging.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths:\n    - web/src/lib/workbench-route.ts\n\
+      \    - web/src/lib/api-client.ts\n    - web/src/routes/components/SearchRetrieval.svelte\n\
+      \    - internal/resofeed/item_route_token.go\n    - internal/resofeed/item_route_token_test.go\n\
+      \    - internal/resofeed/http.go\n    - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n\
+      \  blocked_paths:\n    - web/src/lib/__tests__/workbench-route.test.ts\n   \
+      \ - web/tests/e2e/initial-route.browser-contract.spec.ts\n    - web/tests/e2e/routes.browser-contract.spec.ts\n\
+      \    - internal/resofeed/rf_bug_item_id_api_expected_red_test.go\nclaims:\n\
+      \  - RF-BUG-002\nchecks:\n  - id: rf_bug_002_green\n    run:\n      command:\
+      \ [bash, -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --repeat-each=10 web/tests/e2e/initial-route.browser-contract.spec.ts\
+      \ --grep '^\\\\[RF-BUG-002\\\\]'\"]\n      timeout_seconds: 1500\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: TODAY cold load and refresh}, {literal: SOURCE\
+      \ LEDGER cold load and refresh}, {literal: SEARCH cold load and refresh}, {literal:\
+      \ opaque item cold load and refresh}, {literal: Back and Forward preserve TODAY\
+      \ SEARCH and opaque item routes}]\n        contains_any: [{literal: 100 passed}]\n\
+      \        forbids: [{literal: failed}, {literal: skipped}, {literal: retry},\
+      \ {literal: No tests found}]\n    proves: [RF-BUG-002]\n  - id: rf_bug_002_search_route_history_green\n\
+      \    run:\n      command: [bash, -lc, \"npm --prefix web exec -- playwright\
+      \ test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/routes.browser-contract.spec.ts --grep '^\\\\[RF-BUG-002\\\
+      \\] Search'\"]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ Search canonical URL maps search to q}, {literal: Search validates filters\
+      \ and bounds before request}, {literal: Search submit writes bounded history\
+      \ state}, {literal: Search Back Forward refresh restores valid state}]\n   \
+      \     contains_any: [{literal: passed}]\n        forbids: [{literal: failed},\
+      \ {literal: skipped}, {literal: retry}, {literal: No tests found}]\n    proves:\
+      \ [RF-BUG-002]\n  - id: rf_bug_002_route_unit_green\n    run:\n      command:\
+      \ [npm, --prefix, web, run, test:render, --, src/lib/__tests__/workbench-route.test.ts,\
+      \ --reporter=verbose, -t, RF-BUG-002 opaque item IDs]\n      timeout_seconds:\
+      \ 180\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: RF-BUG-002 opaque item IDs}, {literal: canonical\
+      \ ~base64url round-trip cases=9}]\n        contains_any: [{literal: passed}]\n\
+      \        forbids: [{literal: failed}, {literal: skipped}, {literal: No tests\
+      \ found}]\n    proves: [RF-BUG-002]\n  - id: rf_bug_002_api_green\n    run:\n\
+      \      command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG002OpaqueItemIDAPIPaths$,\
+      \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ RF_BUG_002_API_SUBTESTS=30}, {literal: PASS: TestRFBUG002OpaqueItemIDAPIPaths}]\n\
+      \        contains_any: []\n        forbids: [{literal: FAIL}, {literal: no tests\
+      \ to run}, {literal: lookup called for invalid token}]\n    proves: [RF-BUG-002]\n\
+      bindings:\n  expected_red:\n    items: []\n  closes_expected_red:\n    - {source_step:\
+      \ rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red, source_check:\
+      \ rf_bug_002_expected_red, requirement: RF-BUG-002, assertion_id: A-RF-BUG-002-INITIAL-ROUTE,\
+      \ downstream_check: rf_bug_002_green, receipt: RF-BUG-002-route-red-to-green}\n\
+      \    - {source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
+      \ source_check: rf_bug_002_search_route_history_expected_red, requirement: RF-BUG-002,\
+      \ assertion_id: A-RF-BUG-002-SEARCH-HISTORY, downstream_check: rf_bug_002_search_route_history_green,\
+      \ receipt: RF-BUG-002-search-history-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
+      \ source_check: rf_bug_002_route_unit_expected_red, requirement: RF-BUG-002,\
+      \ assertion_id: A-RF-BUG-002-OPAQUE-UNIT, downstream_check: rf_bug_002_route_unit_green,\
+      \ receipt: RF-BUG-002-unit-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
+      \ source_check: rf_bug_002_api_expected_red, requirement: RF-BUG-002, assertion_id:\
+      \ A-RF-BUG-002-OPAQUE-API, downstream_check: rf_bug_002_api_green, receipt:\
+      \ RF-BUG-002-api-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-route-search-and-opaque-item-ids\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_browser_routing\",\"public_http_item_paths\"\
+      ],\"primary_outcome\":\"RF-BUG-002\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
+      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"integration-verifier\"\
+      ,\"additional_verifiers\":[\"client-runtime-verifier\"],\"review_mode\":\"INDEPENDENT\"\
+      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      :[\"internal/resofeed/item_route_token_test.go\"],\"acceptance_test_paths\"\
+      :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/tests/e2e/initial-route.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/routes.browser-contract.spec.ts\",\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_002_green\",\"rf_bug_002_search_route_history_green\"\
+      ,\"rf_bug_002_route_unit_green\",\"rf_bug_002_api_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Require exact EN/ZH route collection and 100 retry-free executions,
+      four Search titles with invalid no-request/no-history cases, nine token round
+      trips, 30 API subtests, and no protected acceptance diff.
+    agent: integration-engineer
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
