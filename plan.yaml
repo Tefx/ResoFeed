@@ -183309,7 +183309,6 @@ phases:
     depends_on:
     - repair-route-search-and-opaque-item-ids
     - repair-inspector-selection-and-routing
-    - repair-title-and-steer-invalid-a11y
     agent: gate-reviewer
   - id: repair-route-search-and-opaque-item-ids
     name: Repair route, Search history, and opaque item IDs
