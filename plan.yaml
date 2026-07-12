@@ -183173,12 +183173,14 @@ phases:
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
-  gate: Protected RF-BUG-001/002/006/007 browser contracts pass against the real single
-    binary; opaque item IDs round-trip reversibly; platform URL/history behavior,
-    stale-response rejection, titles, and Steer accessibility predicates are green.
-  context: Implementation may change named frontend code, tests, and synchronized
-    docs but cannot mutate contract-lock browser artifacts or add custom URL codecs/persistent
-    navigation state.
+  gate: RF-BUG-001/002/006/007 protected acceptance is green with reciprocal red closure,
+    exact EN/ZH route/Search identities, byte-identical item IDs, stale-response rejection,
+    route-correct titles, accessible Steer invalid lifecycle, and no protected or
+    unordered path-authority conflict.
+  context: Implement route/Search/opaque-ID substrate first, then Inspector selection
+    integration, then shared-shell titles and Steer accessibility. Product code may
+    change only in named paths; protected acceptance remains immutable. Browser state
+    stays transient and lexical.
   depends_on:
   - rf-bug-20260712-contract-lock
   steps:
