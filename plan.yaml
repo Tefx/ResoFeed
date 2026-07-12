@@ -183454,7 +183454,7 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     depends_on:
-    - embed-ui-assets-in-single-binary
+    - enforce-opml-import-only-surface
     agent: golang-developer
   - id: rf-bug-runtime-boundaries-full-gate
     name: RF-BUG runtime-boundaries phase Full Gate
