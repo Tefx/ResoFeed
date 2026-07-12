@@ -184068,8 +184068,8 @@ phases:
       \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
       \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
       \ for t in tests); print('RF_BUG_010_FULL_RUN_1_TITLE_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-full-list-1.json web/.test-artifacts/rf-bug-010-full-run-1.json\"\
-      \n      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
+      \ web/.test-artifacts/rf-bug-010-full-list-1.json web/.test-artifacts/rf-bug-010-full-run-1.json\n\
+      \      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
       \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_1_TITLE_COUNT=},\
       \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
       \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
@@ -184090,8 +184090,8 @@ phases:
       \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
       \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
       \ for t in tests); print('RF_BUG_010_FULL_RUN_2_TITLE_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-full-list-2.json web/.test-artifacts/rf-bug-010-full-run-2.json\"\
-      \n      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
+      \ web/.test-artifacts/rf-bug-010-full-list-2.json web/.test-artifacts/rf-bug-010-full-run-2.json\n\
+      \      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
       \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_2_TITLE_COUNT=},\
       \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
       \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
@@ -184112,8 +184112,8 @@ phases:
       \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
       \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
       \ for t in tests); print('RF_BUG_010_FULL_RUN_3_TITLE_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-full-list-3.json web/.test-artifacts/rf-bug-010-full-run-3.json\"\
-      \n      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
+      \ web/.test-artifacts/rf-bug-010-full-list-3.json web/.test-artifacts/rf-bug-010-full-run-3.json\n\
+      \      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
       \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_3_TITLE_COUNT=},\
       \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
       \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
