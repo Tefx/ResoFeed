@@ -184374,19 +184374,25 @@ phases:
 
 
       Repository mutation is absent because this step publishes registry state after
-      local verification and stores redacted evidence under ignored paths. Build and
-      push one immutable registry-qualified image for linux/amd64 and linux/arm64
-      from the verified commit, inspect the index and platform digests, and record
-      the immutable reference for downstream verification. The Docker build uses the
-      simplified Svelte build, clean embed stage, Go test/build flow; it does not
-      invoke a manifest generator or external UI registry. Never print secrets. Recovery
-      deletes the temporary tag when authorized or records the orphan digest; downstream
-      work remains blocked on incomplete platforms or digest mismatch.
+      local verification and stores redacted evidence under ignored paths. Publication
+      authority is exclusive to `docker.io/tefx/resofeed`; the Docker Hub or CI identity
+      must be authorized only for this repository, and credentials may come only from
+      the Docker credential store or a CI secret. If repository authority or credentials
+      are unavailable, report BLOCKED and perform no push. Build and push one immutable
+      `docker.io/tefx/resofeed` image for linux/amd64 and linux/arm64 from the verified
+      commit under an immutable commit or version tag. Inspect and record the OCI
+      index digest plus the linux/amd64 and linux/arm64 manifest digests as explicit
+      downstream inputs; `latest` is an optional alias only and never the immutable
+      identity. The Docker build uses the simplified Svelte build, clean embed stage,
+      Go test/build flow; it does not invoke a manifest generator or external UI registry.
+      Never print secrets. Recovery deletes the temporary tag when authorized or records
+      the orphan digest; downstream work remains blocked on incomplete platforms or
+      digest mismatch.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.publish-immutable-two-platform-oci-image","risk_tier":"R3","risk_reasons":["registry_publication","multi_arch_runtime","deployment_prerequisite"],"primary_outcome":"RF-BUG-OCI-IMMUTABLE","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.publish-immutable-two-platform-oci-image","risk_tier":"R3","risk_reasons":["registry_publication","multi_arch_runtime","deployment_prerequisite"],"primary_outcome":"RF-BUG-OCI-IMMUTABLE","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["software-architect"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
     verification: Run the maintained buildx publish command for linux/amd64,linux/arm64
