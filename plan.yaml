@@ -184823,24 +184823,24 @@ phases:
 
 
       Terminal bounded phase Full Gate for `rf-bug-20260712-assurance-closure`. Repository
-      mutation is absent because this gate only reuses the phase''s existing local,
-      OCI, two-platform container, Tailnet/Caddy, independent review, and documentation-closure
-      acceptance predicates and records normal plan-assurance metadata. It introduces
-      no new deployment requirement and runs only checks already owned by `local-full-verification-matrix`,
-      `publish-immutable-two-platform-oci-image`, `fresh-docker-runtime-proof`, `tailnet-caddy-runtime-proof`,
-      `formal-security-review`, `independent-runtime-ui-verification`, and `close-defect-report-with-evidence`,
-      including `defect_report_closure_green` and `closure_active_sources_green`.
-      Require exact ten-title/100-pass RF-BUG-002 proof, exact collection/run equality,
-      existing immutable digest and two-platform/container/Tailnet evidence, independent-review
-      closure, fail-closed active scans, and protected-path integrity. Do not add
-      or modify product code, runtime behavior or processes, storage models, registries,
-      manifests, custom evidence protocols, deployment requirements, acceptance artifacts,
-      or canonical product architecture.'
-    verification: Every existing assurance-closure acceptance predicate is satisfied
-      in dependency order; no new runtime or deployment action is introduced; facade
-      validation, reference validation, and phase intent-closure lint are conformant.
+      mutation is absent because this gate reuses declared local, OCI, container,
+      Tailnet/Caddy, independent review, and documentation-closure predicates. The
+      authoritative local proof includes `rf-bug-r11-exact-local-evidence-matrix`:
+      exact package-relative frontend render list/run identity equality; exact Section
+      7 OPML_EXCLUSIONS=2 scan; a clean-root ordered three-run RF-BUG-010 suite; independent
+      positive intentional-failure collection and ordered line-reporter output for
+      expected-red and green; non-empty HTML/JSON/trace/screenshots/video/stdout/DB/cleanup/environment/console/network/runtime
+      identity; present and redaction-scanned stderr with empty content allowed; complete
+      runtime identity fields; and fail-closed secret validation. Preserve existing
+      immutable digest, two-platform/container/Tailnet, independent review, active
+      scan, protected-path, and defect closure evidence. Do not add product mutation
+      or a new deployment requirement.'
+    verification: Every original and R11 assurance predicate passes in dependency
+      order; exact local evidence matrix receipt is present; facade/reference validation
+      and phase intent-closure lint are conformant.
     depends_on:
     - local-full-verification-matrix
+    - rf-bug-r11-exact-local-evidence-matrix
     - publish-immutable-two-platform-oci-image
     - fresh-docker-runtime-proof
     - tailnet-caddy-runtime-proof
