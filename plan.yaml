@@ -184824,23 +184824,26 @@ phases:
 
       Terminal bounded phase Full Gate for `rf-bug-20260712-assurance-closure`. Repository
       mutation is absent because this gate reuses declared local, OCI, container,
-      Tailnet/Caddy, independent review, and documentation-closure predicates. The
-      authoritative local proof includes `rf-bug-r11-exact-local-evidence-matrix`:
+      Tailnet/Caddy, independent review, documentation-closure, and digest predicates.
+      The authoritative local proof includes `rf-bug-r11-exact-local-evidence-matrix`:
       exact package-relative frontend render list/run identity equality; exact Section
       7 OPML_EXCLUSIONS=2 scan; a clean-root ordered three-run RF-BUG-010 suite; independent
       positive intentional-failure collection and ordered line-reporter output for
       expected-red and green; non-empty HTML/JSON/trace/screenshots/video/stdout/DB/cleanup/environment/console/network/runtime
       identity; present and redaction-scanned stderr with empty content allowed; complete
       runtime identity fields; and fail-closed secret validation. Preserve existing
-      immutable digest, two-platform/container/Tailnet, independent review, active
-      scan, protected-path, and defect closure evidence. Do not add product mutation
-      or a new deployment requirement.'
+      immutable image digest, two-platform/container/Tailnet, independent review,
+      active scan, protected-path, and defect closure evidence. Require `rf-bug-r11-final-digest-receipt`
+      after reference-aware validation with exact authority SHA-256 and final plan
+      SHA-256; any later plan mutation invalidates the receipt. Do not add product
+      mutation or a new deployment requirement.'
     verification: Every original and R11 assurance predicate passes in dependency
-      order; exact local evidence matrix receipt is present; facade/reference validation
-      and phase intent-closure lint are conformant.
+      order; exact local evidence and final digest receipts are present; facade/reference
+      validation and phase intent-closure lint are conformant.
     depends_on:
     - local-full-verification-matrix
     - rf-bug-r11-exact-local-evidence-matrix
+    - rf-bug-r11-final-digest-receipt
     - publish-immutable-two-platform-oci-image
     - fresh-docker-runtime-proof
     - tailnet-caddy-runtime-proof
