@@ -183561,7 +183561,7 @@ phases:
     - docs/DESIGN.md
     depends_on:
     - embed-ui-assets-in-single-binary
-    agent: integration-engineer
+    agent: general
   - id: apply-outer-security-middleware-and-csp
     name: Apply outer HTTP security headers and embedded-content CSP
     status: pending
