@@ -182756,12 +182756,13 @@ phases:
       \  blocked_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
       \ internal/resofeed/doctor.go, internal/resofeed/webui/**, Dockerfile, web/src/**]\n\
       claims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT, RF-BUG-CANONICAL-DOCS]\n\
-      checks:\n  - id: canonical_runtime_docs_green\n    run: {command: [bash, -lc,\
-      \ \"python3 -c \"from pathlib import Path; import re; a=Path('docs/ARCHITECTURE.md').read_text();\
-      \ d=Path('docs/DESIGN.md').read_text(); c=Path('docs/CONTAINER.md').read_text();\
-      \ u=Path('docs/USAGE.md').read_text(); assert not re.search(r'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML',\
-      \ a+'\\n'+d+'\\n'+u, re.I); portable=('active sources','active steering rules','currently\
-      \ resonated items'); low=(a+'\\n'+d).lower(); assert all(x in low for x in portable);\
+      checks:\n  - id: canonical_runtime_docs_green\n    run:\n      command:\n  \
+      \      - bash\n        - -lc\n        - |-\n        python3 -c \"from pathlib\
+      \ import Path; import re; a=Path('docs/ARCHITECTURE.md').read_text(); d=Path('docs/DESIGN.md').read_text();\
+      \ c=Path('docs/CONTAINER.md').read_text(); u=Path('docs/USAGE.md').read_text();\
+      \ assert not re.search(r'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML', a+'\\n'+d+'\\\
+      n'+u, re.I); portable=('active sources','active steering rules','currently resonated\
+      \ items'); low=(a+'\\n'+d).lower(); assert all(x in low for x in portable);\
       \ assert all(x in low for x in ('does not merge','does not sync')); assert 'embed.FS'\
       \ in a and 'embed.FS' in c; assert all(x in c.lower() for x in ('web build','before\
       \ go compilation','only the binary','/data','does not copy','does not mount','does\
@@ -182774,32 +182775,35 @@ phases:
       \ ':(exclude)web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts' >\"$matches\"\
       ; status=$?; set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"\
       ; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f \"$matches\"\
-      ; exit \"$status\";; esac; echo OPML_ACTIVE_SCAN_MATCHES=0 OPML_EXCLUSIONS=4\"\
-      ], timeout_seconds: 120}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      ; exit \"$status\";; esac; echo OPML_ACTIVE_SCAN_MATCHES=0 OPML_EXCLUSIONS=4\n\
+      \      timeout_seconds: 120\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: CANONICAL_DOC_ASSERTIONS=opml_removed,portable_state_exact,embed,stage,binary_only,no_external,no_node_cwd,csp},\
       \ {literal: OPML_ACTIVE_SCAN_MATCHES=0}, {literal: OPML_EXCLUSIONS=4}], forbids:\
       \ [{literal: AssertionError}]}}\n    proves: [RF-BUG-CANONICAL-DOCS]\n  - id:\
-      \ rf_bug_003_expected_red\n    run: {command: [bash, -lc, \"go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \ rf_bug_003_expected_red\n    run:\n      command:\n        - bash\n      \
+      \  - -lc\n        - |-\n        go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf003-list; test $(grep -Ec '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
       \ /tmp/rf003-list) -eq 2; go test -v ./internal/resofeed -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
-      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes:\
+      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
       \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG003EmbeddedUIContract/bootstrap_missing_script_fails_before_bind'},\
       \ {literal: '=== RUN   TestRFBUG003DoctorRedactionContract/crlf_dynamic_value_is_wholly_redacted'},\
       \ {literal: expected listener to remain unbound}], forbids: [{literal: setup\
       \ failed}, {literal: no tests to run}, {literal: '[no tests to run]'}, {literal:\
       \ compile error}]}}\n    proves: [RF-BUG-003-CONTRACT]\n  - id: rf_bug_004_expected_red\n\
-      \    run: {command: [bash, -lc, \"go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf004-list; test $(grep -Fxc 'TestRFBUG004OPMLImportOnlyContract'\
       \ /tmp/rf004-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG004OPMLImportOnlyContract$'\
-      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes:\
+      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
       \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/legacy_export_auth_precedence'},\
       \ {literal: expected unauthenticated 401 and authenticated 404}], forbids: [{literal:\
       \ setup failed}, {literal: no tests to run}, {literal: '[no tests to run]'},\
       \ {literal: compile error}]}}\n    proves: [RF-BUG-004-CONTRACT]\n  - id: rf_bug_005_expected_red\n\
-      \    run: {command: [bash, -lc, \"go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf005-list; test $(grep -Fxc 'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'\
       \ /tmp/rf005-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
-      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes:\
+      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
       \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/exact_embedded_script_hashes'},\
       \ {literal: expected byte-exact canonical CSP}], forbids: [{literal: setup failed},\
       \ {literal: no tests to run}, {literal: '[no tests to run]'}, {literal: compile\
