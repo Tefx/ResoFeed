@@ -182942,7 +182942,7 @@ phases:
     - docs/DESIGN.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: contract-test-author
+    agent: general
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
     status: pending
