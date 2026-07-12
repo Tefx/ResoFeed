@@ -184235,7 +184235,7 @@ phases:
     - deploy/resofeed-caddy/caddy/Caddyfile
     depends_on:
     - fresh-docker-runtime-proof
-    agent: deployment-engineer
+    agent: general
   - id: formal-security-review
     name: Review HTTP, CSP, secrets, and state boundaries independently
     status: pending
