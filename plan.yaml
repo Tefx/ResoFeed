@@ -184314,12 +184314,17 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
-      \ RF-BUG-001-010-CLOSURE. After independent security and black-box verification,\
-      \ update only the consolidated defect report and bounded closure test with observed\
-      \ evidence for each RF-BUG-001–010. Read canonical docs and ordinary local/container/Tailnet\
-      \ evidence; do not re-own implementation documentation. Require the current\
-      \ report/fix-plan authority hashes, exact ten-requirement closure, final nine-document/two-exclusion\
-      \ OPML scan, and active Prompting v2.1 absence. Preserve the repair plan, canonical\
+      \ RF-BUG-001-010-CLOSURE. Before any authorized update, verify the defect report\
+      \ pre-closure SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`\
+      \ and repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`.\
+      \ After independent security and black-box verification, update only the consolidated\
+      \ defect report and bounded closure test with observed evidence for each RF-BUG-001–010.\
+      \ After the update, record explicit evidence fields `post_closure_report_sha256=<64\
+      \ lowercase hex>` and `closure_commit=<40 lowercase hex>` for the terminal gate.\
+      \ Read canonical docs and ordinary local/container/Tailnet evidence; do not\
+      \ re-own implementation documentation. Require the current report/fix-plan authority\
+      \ hashes, exact ten-requirement closure, final nine-document/two-exclusion OPML\
+      \ scan, and active Prompting v2.1 absence. Preserve the repair plan, canonical\
       \ implementation docs, protected acceptance, audits, and completed history.\
       \ Rollback reverts the report/test closure pair. Never add a registry, generator,\
       \ receipt schema, duplicate phase, secret, or raw runtime credential.\n\n<intent_closure_contract>\n\
