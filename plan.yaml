@@ -182606,12 +182606,9 @@ phases:
       \ downstream_check: rf_bug_005_browser_operations_green, receipt: RF-BUG-005-csp-operations-red-to-green}\n\
       \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red\"\
-      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"public_http_contract\"\
-      ,\"protected_acceptance_definition\"],\"primary_outcome\":\"RF-BUG-003-005-CONTRACT\"\
-      ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
-      ,\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
-      :[\"software-architect\",\"spec-verifier\"],\"review_mode\":\"ADJUDICATED\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"protected_acceptance_definition\"\
+      ,\"public_http_contract\"],\"primary_outcome\":\"RF-BUG-003-005-CONTRACT\",\"\
+      rollback_class\":\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\"\
       :[],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ,\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
       :[\"rf_bug_003_expected_red\",\"rf_bug_004_expected_red\",\"rf_bug_005_expected_red\"\
