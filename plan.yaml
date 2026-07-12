@@ -183309,21 +183309,19 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal bounded phase Full Gate for `rf-bug-20260712-frontend-behavior`. Repository
-      mutation is absent because this gate exclusively reuses existing acceptance
-      predicates and records normal plan-assurance metadata. Reuse exactly `rf_bug_001_green`,
-      `rf_bug_002_green`, `rf_bug_002_search_route_history_expected_red`, `rf_bug_002_search_route_history_green`,
-      `rf_bug_002_route_unit_green`, `rf_bug_002_api_green`, `rf_bug_006_green`, and
-      `rf_bug_007_green`. The independently collected Search expected-red and green
-      receipts must name the identical four-title set and preserve their distinct
-      assertion outcomes. Require ten-title/100-run initial-route proof, exact item
-      API proof, stale-response/focus/title/accessibility predicates, and zero protected-artifact
-      diff. Do not mutate product, docs, tests, runtime state, storage, manifests,
-      registries, schemas, or deployment.'
-    verification: All existing frontend phase checks are green with exact collection/run
-      equality and protected artifacts unchanged; facade validation and phase intent-closure
-      lint are conformant.
+      Terminal bounded Full Gate for frontend behavior. Repository mutation is absent
+      because the gate reuses RF-BUG-001, RF-BUG-002, RF-BUG-006, and RF-BUG-007 checks.
+      Require exact red/green binding identity, EN/ZH cold/refresh/history repetition,
+      Search invalid no-request/no-history behavior, opaque browser/HTTP round trips,
+      stale-response rejection, focus/Escape, route-correct titles, and Steer accessibility.
+      Protected acceptance files must be unchanged. Any missing title, retry, skip,
+      mutation, unrelated failure, path-authority conflict, or contract/policy failure
+      blocks downstream work.'
+    verification: All frontend checks are green with exact collection/run identity;
+      reciprocal expected-red closures and protected paths are intact; Vectl validation/check-refs
+      and phase contract/policy admission pass.
     depends_on:
+    - repair-route-search-and-opaque-item-ids
     - repair-inspector-selection-and-routing
     - repair-title-and-steer-invalid-a11y
     agent: gate-reviewer
