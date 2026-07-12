@@ -184253,7 +184253,7 @@ phases:
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.formal-security-review","risk_tier":"R3","risk_reasons":["security_boundary_review","deployment_evidence","secret_redaction"],"primary_outcome":"RF-BUG-SECURITY-REVIEW","rollback_class":"TRIVIAL","proof_modalities":["STATIC_ANALYSIS","RUNTIME_PROBE","REVIEW"],"primary_verifier":"security-reviewer","additional_verifiers":["gate-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.formal-security-review","risk_tier":"R3","risk_reasons":["security_boundary_review","deployment_evidence","secret_redaction"],"primary_outcome":"RF-BUG-SECURITY-REVIEW","rollback_class":"TRIVIAL","proof_modalities":["STATIC_ANALYSIS","RUNTIME_PROBE","REVIEW"],"primary_verifier":"software-architect","additional_verifiers":["gate-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
     verification: Fresh security reviewer inspects named code and ordinary local/container/Tailnet
