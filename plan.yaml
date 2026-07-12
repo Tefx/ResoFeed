@@ -182573,34 +182573,35 @@ phases:
       \ web/src/lib/workbench-route.ts, web/src/lib/api-client.ts, web/src/routes/+page.svelte,\
       \ web/src/routes/components/**]\nclaims: [RF-BUG-001-CONTRACT, RF-BUG-002-CONTRACT,\
       \ RF-BUG-006-CONTRACT, RF-BUG-007-CONTRACT]\nchecks:\n  - id: rf_bug_001_expected_red\n\
-      \    run: {command: [bash, -lc, \"npm --prefix web exec playwright test -- --config\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/inspector-selection.browser-contract.spec.ts\
+      \ --grep '^\\\\[RF-BUG-001\\\\]' | tee /tmp/rf001-list; test $(grep -c '^.*RF-BUG-001'\
+      \ /tmp/rf001-list) -gt 0; npm --prefix web exec playwright test -- --config\
       \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list tests/e2e/inspector-selection.browser-contract.spec.ts --grep '^\\\\\
-      [RF-BUG-001\\\\]' | tee /tmp/rf001-list; test $(grep -c '^.*RF-BUG-001' /tmp/rf001-list)\
-      \ -gt 0; npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 tests/e2e/inspector-selection.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-001\\\\].*stale detail cannot replace the selected item$'\"\
-      ], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
-      \ {contains_all: [{literal: inspector-selection.browser-contract.spec.ts}, {literal:\
-      \ '[RF-BUG-001] stale detail cannot replace the selected item'}, {literal: Expected\
-      \ selected inspector item to remain current}], forbids: [{literal: No tests\
-      \ found}, {literal: 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n\
-      \    proves: [RF-BUG-001-CONTRACT]\n  - id: rf_bug_002_expected_red\n    run:\
-      \ {command: [bash, -lc, \"npm --prefix web run test:e2e -- --project=chromium-ci-safe\
-      \ tests/e2e/initial-route.browser-contract.spec.ts --grep 'RF-BUG-002' --list\
-      \ | tee /tmp/rf002-list; titles=('[RF-BUG-002][en] TODAY cold load and refresh'\
-      \ '[RF-BUG-002][en] SOURCE LEDGER cold load and refresh' '[RF-BUG-002][en] SEARCH\
-      \ cold load and refresh' '[RF-BUG-002][en] opaque item cold load and refresh'\
-      \ '[RF-BUG-002][en] Back and Forward preserve TODAY SEARCH and opaque item routes'\
-      \ '[RF-BUG-002][zh] TODAY cold load and refresh' '[RF-BUG-002][zh] SOURCE LEDGER\
-      \ cold load and refresh' '[RF-BUG-002][zh] SEARCH cold load and refresh' '[RF-BUG-002][zh]\
-      \ opaque item cold load and refresh' '[RF-BUG-002][zh] Back and Forward preserve\
-      \ TODAY SEARCH and opaque item routes'); for t in \"${titles[@]}\"; do test\
-      \ \"$(grep -Fc -- \"$t\" /tmp/rf002-list)\" -eq 1; done; test \"$(grep -c '\\\
-      [RF-BUG-002\\]' /tmp/rf002-list)\" -eq 10; npm --prefix web run test:e2e --\
-      \ --project=chromium-ci-safe tests/e2e/initial-route.browser-contract.spec.ts\
+      \ tests/e2e/inspector-selection.browser-contract.spec.ts --grep '^\\\\[RF-BUG-001\\\
+      \\].*stale detail cannot replace the selected item$'\n      timeout_seconds:\
+      \ 300\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \ [{literal: inspector-selection.browser-contract.spec.ts}, {literal: '[RF-BUG-001]\
+      \ stale detail cannot replace the selected item'}, {literal: Expected selected\
+      \ inspector item to remain current}], forbids: [{literal: No tests found}, {literal:\
+      \ 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n    proves:\
+      \ [RF-BUG-001-CONTRACT]\n  - id: rf_bug_002_expected_red\n    run:\n      command:\n\
+      \        - bash\n        - -lc\n        - |-\n        npm --prefix web run test:e2e\
+      \ -- --project=chromium-ci-safe tests/e2e/initial-route.browser-contract.spec.ts\
+      \ --grep 'RF-BUG-002' --list | tee /tmp/rf002-list; titles=('[RF-BUG-002][en]\
+      \ TODAY cold load and refresh' '[RF-BUG-002][en] SOURCE LEDGER cold load and\
+      \ refresh' '[RF-BUG-002][en] SEARCH cold load and refresh' '[RF-BUG-002][en]\
+      \ opaque item cold load and refresh' '[RF-BUG-002][en] Back and Forward preserve\
+      \ TODAY SEARCH and opaque item routes' '[RF-BUG-002][zh] TODAY cold load and\
+      \ refresh' '[RF-BUG-002][zh] SOURCE LEDGER cold load and refresh' '[RF-BUG-002][zh]\
+      \ SEARCH cold load and refresh' '[RF-BUG-002][zh] opaque item cold load and\
+      \ refresh' '[RF-BUG-002][zh] Back and Forward preserve TODAY SEARCH and opaque\
+      \ item routes'); for t in \"${titles[@]}\"; do test \"$(grep -Fc -- \"$t\" /tmp/rf002-list)\"\
+      \ -eq 1; done; test \"$(grep -c '\\[RF-BUG-002\\]' /tmp/rf002-list)\" -eq 10;\
+      \ npm --prefix web run test:e2e -- --project=chromium-ci-safe tests/e2e/initial-route.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-002\\\\]\\\\[en\\\\] opaque item cold load and refresh$'\
-      \ --retries=0\"], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes:\
+      \ --retries=0\n      timeout_seconds: 300\n    expect: {outcome: red, exit_codes:\
       \ [1], stdout_or_stderr: {contains_all: [{literal: initial-route.browser-contract.spec.ts},\
       \ {literal: '[RF-BUG-002][en] opaque item cold load and refresh'}, {literal:\
       \ Expected canonical opaque item surface before TODAY}], forbids: [{literal:\
@@ -182613,37 +182614,40 @@ phases:
       \ {literal: expected canonical ~base64url token}], forbids: [{literal: No tests\
       \ found}, {literal: 0 test}, {literal: skipped}, {literal: TypeError}]}}\n \
       \   proves: [RF-BUG-002-CONTRACT]\n  - id: rf_bug_002_api_expected_red\n   \
-      \ run: {command: [bash, -lc, \"go test -list '^TestRFBUG002OpaqueItemIDAPIPaths$'\
-      \ ./internal/resofeed | tee /tmp/rf002-go-list; test \"$(grep -Fxc 'TestRFBUG002OpaqueItemIDAPIPaths'\
+      \ run:\n      command:\n        - bash\n        - -lc\n        - |-\n      \
+      \  go test -list '^TestRFBUG002OpaqueItemIDAPIPaths$' ./internal/resofeed |\
+      \ tee /tmp/rf002-go-list; test \"$(grep -Fxc 'TestRFBUG002OpaqueItemIDAPIPaths'\
       \ /tmp/rf002-go-list)\" -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG002OpaqueItemIDAPIPaths$'\
-      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes:\
+      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
       \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG002OpaqueItemIDAPIPaths'},\
       \ {literal: 'operation=delivery/case=mix-separator-percent-unicode-leading-tilde'},\
       \ {literal: RF_BUG_002_API_SUBTESTS=30}, {literal: expected byte-identical item\
       \ ID}], forbids: [{literal: setup failed}, {literal: no tests to run}, {literal:\
       \ '[no tests to run]'}, {literal: compile error}]}}\n    proves: [RF-BUG-002-CONTRACT]\n\
-      \  - id: rf_bug_006_expected_red\n    run: {command: [bash, -lc, \"npm --prefix\
-      \ web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
+      \  - id: rf_bug_006_expected_red\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n        npm --prefix web exec playwright test\
+      \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
       \ --grep '^\\\\[RF-BUG-006\\\\]' | tee /tmp/rf006-list; test $(grep -c '\\[RF-BUG-006\\\
       ]' /tmp/rf006-list) -gt 0; npm --prefix web exec playwright test -- --config\
       \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
       \ tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\\\[RF-BUG-006\\\
-      \\] route-derived title updates atomically$'\"], timeout_seconds: 300}\n   \
-      \ expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all: [{literal:\
-      \ bugfix-frontend-behavior.expected-red.spec.ts}, {literal: '[RF-BUG-006] route-derived\
-      \ title updates atomically'}, {literal: Expected exact route-derived document\
-      \ title}], forbids: [{literal: No tests found}, {literal: 0 tests}, {literal:\
-      \ webServer failed}, {literal: TypeError}]}}\n    proves: [RF-BUG-006-CONTRACT]\n\
-      \  - id: rf_bug_007_expected_red\n    run: {command: [bash, -lc, \"npm --prefix\
-      \ web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
+      \\] route-derived title updates atomically$'\n      timeout_seconds: 300\n \
+      \   expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \ [{literal: bugfix-frontend-behavior.expected-red.spec.ts}, {literal: '[RF-BUG-006]\
+      \ route-derived title updates atomically'}, {literal: Expected exact route-derived\
+      \ document title}], forbids: [{literal: No tests found}, {literal: 0 tests},\
+      \ {literal: webServer failed}, {literal: TypeError}]}}\n    proves: [RF-BUG-006-CONTRACT]\n\
+      \  - id: rf_bug_007_expected_red\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n        npm --prefix web exec playwright test\
+      \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
       \ --grep '^\\\\[RF-BUG-007\\\\]' | tee /tmp/rf007-list; test $(grep -c '\\[RF-BUG-007\\\
       ]' /tmp/rf007-list) -eq 2; npm --prefix web exec playwright test -- --config\
       \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
       \ tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\\\[RF-BUG-007\\\
-      \\]\\\\[zh\\\\] repeated invalid add source remounts one alert$'\"], timeout_seconds:\
-      \ 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \\]\\\\[zh\\\\] repeated invalid add source remounts one alert$'\n      timeout_seconds:\
+      \ 300\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
       \ [{literal: bugfix-frontend-behavior.expected-red.spec.ts}, {literal: '[RF-BUG-007][zh]\
       \ repeated invalid add source remounts one alert'}, {literal: Expected one newly\
       \ mounted alert and retained focus}], forbids: [{literal: No tests found}, {literal:\
