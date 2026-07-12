@@ -183419,14 +183419,14 @@ phases:
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
-  gate: 'Protected RF-BUG-003/004/005 Go contracts pass locally: package-local embedded
-    UI is cwd-independent and fail-closed, Doctor preserves safe diagnostics with
-    bounded redaction, OPML is auth-first import-only, and outer headers/CSP preserve
-    streaming and cancellation.'
-  context: Use embed.FS, bootstrap validation, explicit SPA fallback, one CSP derivation
-    pass, and small outer middleware. OCI and Tailnet proof remain downstream. No
-    manifest registry, custom RequestURI parser, Doctor wire protocol, or response-writer
-    state machine.
+  gate: 'RF-BUG-003/004/005 protected acceptance is green: one cwd-independent embedded
+    binary fails closed before bind, Doctor remains redacted, OPML is auth-first import-only
+    with atomic minimal JSON State, nine active documents are clean, and one Go-owned
+    header/CSP layer preserves Chromium operations, streaming, and cancellation.'
+  context: Implement the embedded/pre-bind UI and Doctor boundary, then remove OPML
+    export across product surfaces, then apply outer Go-owned security headers/CSP.
+    Shared paths are ordered by dependencies; protected acceptance is immutable. OCI
+    and Tailnet proof remain downstream.
   depends_on:
   - rf-bug-20260712-contract-lock
   steps:
