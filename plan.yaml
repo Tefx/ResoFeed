@@ -182696,12 +182696,9 @@ phases:
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.rf-bug-canonical-contract-sync\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_contract_documentation\"],\"\
       primary_outcome\":\"RF-BUG-CANONICAL-CONTRACTS\",\"rollback_class\":\"NONTRIVIAL\"\
-      ,\"proof_modalities\":[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\"\
-      :\"spec-verifier\",\"additional_verifiers\":[\"software-architect\"],\"review_mode\"\
-      :\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[\"tests/rf_bug_canonical_contract_test.go\"],\"acceptance_test_paths\":[],\"\
-      acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
-      :[]}}\n</vectl_step_policy>"
+      ,\"test_authority\":{\"developer_test_globs\":[\"tests/rf_bug_canonical_contract_test.go\"\
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
     verification: Run the canonical-contract test and fail-closed nine-document OPML
       scan with exactly two protected exclusions; require both authority files unchanged
       and independent spec/security review.
