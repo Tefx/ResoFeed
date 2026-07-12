@@ -183450,41 +183450,33 @@ phases:
       \ Rollback restores the last passing import/State behavior and never restores\
       \ OPML export, merge, sync, history, or portable receipts. Do not expose secrets.\n\
       \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ implementation_closes_expected_red\nscope:\n  allowed_paths:\n    - internal/resofeed/http.go\n\
-      \    - internal/resofeed/http_impl_test.go\n    - internal/resofeed/mcp.go\n\
-      \    - web/src/lib/api-client.ts\n    - web/src/lib/api-client.test.ts\n   \
-      \ - web/src/routes/+page.svelte\n    - web/src/routes/components/SourceLedger.svelte\n\
-      \    - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n    - docs/PRD.md\n    -\
-      \ docs/USAGE.md\n    - docs/CONTAINER.md\n    - docs/PROMPTING_SYSTEM.md\n \
-      \   - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n    - README.md\n    - docs/ui-preview.html\n\
-      \  blocked_paths:\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
-      \    - internal/resofeed/state.go\n    - web/tests/**\n    - docs/audits/**\n\
-      claims:\n  - RF-BUG-004\nchecks:\n  - id: rf_bug_004_green\n    run:\n     \
-      \ command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG004OPMLImportOnlyContract$,\
-      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ legacy_export_auth_precedence}, {literal: import_and_JSON_State_remain_green},\
-      \ {literal: 'PASS: TestRFBUG004OPMLImportOnlyContract'}]\n        contains_any:\
-      \ []\n        forbids: [{literal: FAIL}, {literal: no tests to run}]\n    proves:\
-      \ [RF-BUG-004]\n  - id: rf_bug_004_active_scan_green\n    run:\n      command:\
-      \ [bash, -lc, \"go test -v ./tests -run '^TestRFBugCanonicalContracts/OPMLActiveScan$'\
-      \ -count=1\"]\n      timeout_seconds: 180\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ OPML_ACTIVE_DOCUMENTS=9}, {literal: OPML_ACTIVE_SCAN_MATCHES=0}, {literal:\
-      \ OPML_EXCLUSIONS=2}]\n        contains_any: []\n        forbids: [{literal:\
-      \ FAIL}, {literal: broad exclusion}]\n    proves: [RF-BUG-004]\nbindings:\n\
-      \  expected_red:\n    items: []\n  closes_expected_red:\n    - {source_step:\
-      \ rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red, source_check:\
-      \ rf_bug_004_expected_red, requirement: RF-BUG-004, assertion_id: A-RF-BUG-004-IMPORT-ONLY,\
-      \ downstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface\",\"\
-      risk_tier\":\"R2\",\"risk_reasons\":[\"public_api_removal\",\"cross_component_state_contract\"\
-      ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
-      :[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
-      ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[\"internal/resofeed/http_impl_test.go\",\"web/src/lib/api-client.test.ts\"\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [internal/resofeed/http.go,\
+      \ internal/resofeed/http_impl_test.go, internal/resofeed/mcp.go, web/src/lib/api-client.ts,\
+      \ web/src/lib/api-client.test.ts, web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PRD.md, docs/USAGE.md, docs/CONTAINER.md,\
+      \ docs/PROMPTING_SYSTEM.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, README.md,\
+      \ docs/ui-preview.html]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ internal/resofeed/state.go, web/tests/**, docs/audits/**]\nclaims: [RF-BUG-004]\n\
+      checks:\n  - id: rf_bug_004_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, ^TestRFBUG004OPMLImportOnlyContract$, -count=1], timeout_seconds: 240}\n\
+      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: legacy_export_auth_precedence}, {literal: import_and_JSON_State_remain_green},\
+      \ {literal: 'PASS: TestRFBUG004OPMLImportOnlyContract'}], contains_any: [],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-004]\n\
+      \  - id: rf_bug_004_active_scan_green\n    run: {command: [bash, -lc, \"go test\
+      \ -v ./tests -run '^TestRFBugCanonicalContracts/OPMLActiveScan$' -count=1\"\
+      ], timeout_seconds: 180}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: OPML_ACTIVE_DOCUMENTS=9}, {literal: OPML_ACTIVE_SCAN_MATCHES=0},\
+      \ {literal: OPML_EXCLUSIONS=2}], contains_any: [], forbids: [{literal: FAIL},\
+      \ {literal: broad exclusion}]}}\n    proves: [RF-BUG-004]\nbindings:\n  expected_red:\
+      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ source_check: rf_bug_004_expected_red, requirement: RF-BUG-004, assertion_id:\
+      \ A-RF-BUG-004-IMPORT-ONLY, downstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n\
+      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
+      ,\"step_id\":\"rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_api_removal\",\"cross_component_state_contract\"\
+      ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"test_authority\"\
+      :{\"developer_test_globs\":[\"internal/resofeed/http_impl_test.go\",\"web/src/lib/api-client.test.ts\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_004_green\"],\"acceptance_mutation\":\"\
       FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
