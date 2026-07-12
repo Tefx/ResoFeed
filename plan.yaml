@@ -183009,7 +183009,7 @@ phases:
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_and_accessibility_contract\"\
       ,\"runtime_browser_contract\"],\"primary_outcome\":\"RF-BUG-004-008-CONTRACT\"\
       ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
-      ,\"REVIEW\"],\"primary_verifier\":\"uiux-auditor\",\"additional_verifiers\"\
+      ,\"REVIEW\"],\"primary_verifier\":\"blind-tester\",\"additional_verifiers\"\
       :[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\"\
       :true,\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
       :[\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\",\"\
@@ -183020,16 +183020,16 @@ phases:
       ,\"authorized_mutation_refs\":[{\"ref\":\"authority:acceptance-mutation:rf008-render\"\
       ,\"path\":\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\"\
       ,\"purpose\":\"Define Ledger render and operational-state acceptance\",\"check_id\"\
-      :\"rf_bug_008_browser_expected_red\",\"actor_id\":\"contract-test-author\"},{\"\
-      ref\":\"authority:acceptance-mutation:rf004008-responsive\",\"path\":\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\"\
+      :\"rf_bug_008_browser_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf004008-responsive\"\
+      ,\"path\":\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\"\
       ,\"purpose\":\"Define State-import and five-viewport Ledger acceptance\",\"\
-      check_id\":\"rf_bug_004_state_import_expected_red\",\"actor_id\":\"contract-test-author\"\
+      check_id\":\"rf_bug_004_state_import_expected_red\",\"actor_id\":\"general\"\
       },{\"ref\":\"authority:acceptance-mutation:rf008-operations\",\"path\":\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"\
       ,\"purpose\":\"Define real-runtime Ledger operation acceptance\",\"check_id\"\
-      :\"rf_bug_008_operations_expected_red\",\"actor_id\":\"contract-test-author\"\
-      },{\"ref\":\"authority:acceptance-mutation:rf008-delete\",\"path\":\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
+      :\"rf_bug_008_operations_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"\
+      authority:acceptance-mutation:rf008-delete\",\"path\":\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
       ,\"purpose\":\"Define delete and focus acceptance\",\"check_id\":\"rf_bug_008_browser_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
+      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
     verification: Require exact 14-title/five-screenshot inventory and assertion-specific
       State, responsive, and operation red outcomes; protect all baselines.
     refs:
