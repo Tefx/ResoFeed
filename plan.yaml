@@ -183143,7 +183143,7 @@ phases:
       ,\"protected_acceptance_definition\"],\"primary_outcome\":\"RF-BUG-010-CONTRACT\"\
       ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
       ,\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
-      :[\"security-reviewer\",\"blind-tester\"],\"review_mode\":\"ADJUDICATED\",\"\
+      :[\"software-architect\",\"blind-tester\"],\"review_mode\":\"ADJUDICATED\",\"\
       phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"bin/verify-rf-bug-010-redaction.mjs\"],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"\
       ,\"web/tests/e2e/harness-artifact.intentional-failure.spec.ts\",\"web/playwright.artifact-proof.config.ts\"\
@@ -183151,14 +183151,13 @@ phases:
       ],\"acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\"\
       :\"authority:acceptance-mutation:rf010-isolation\",\"path\":\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"\
       ,\"purpose\":\"Define case-local runtime isolation acceptance\",\"check_id\"\
-      :\"rf_bug_010_expected_red\",\"actor_id\":\"contract-test-author\"},{\"ref\"\
-      :\"authority:acceptance-mutation:rf010-artifact-spec\",\"path\":\"web/tests/e2e/harness-artifact.intentional-failure.spec.ts\"\
-      ,\"purpose\":\"Define ordered intentional-failure acceptance\",\"check_id\"\
-      :\"rf_bug_010_artifact_expected_red\",\"actor_id\":\"contract-test-author\"\
-      },{\"ref\":\"authority:acceptance-mutation:rf010-artifact-config\",\"path\"\
-      :\"web/playwright.artifact-proof.config.ts\",\"purpose\":\"Define standard retained\
-      \ failure evidence\",\"check_id\":\"rf_bug_010_artifact_expected_red\",\"actor_id\"\
-      :\"contract-test-author\"}]}}\n</vectl_step_policy>"
+      :\"rf_bug_010_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf010-artifact-spec\"\
+      ,\"path\":\"web/tests/e2e/harness-artifact.intentional-failure.spec.ts\",\"\
+      purpose\":\"Define ordered intentional-failure acceptance\",\"check_id\":\"\
+      rf_bug_010_artifact_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf010-artifact-config\"\
+      ,\"path\":\"web/playwright.artifact-proof.config.ts\",\"purpose\":\"Define standard\
+      \ retained failure evidence\",\"check_id\":\"rf_bug_010_artifact_expected_red\"\
+      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
     verification: Require isolated-state assertion red and independently collected
       one-failure lifecycle/artifact red with complete fail-closed redaction checks.
     refs:
