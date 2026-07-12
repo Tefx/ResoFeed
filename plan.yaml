@@ -183411,30 +183411,27 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-005. A small outer Go middleware sets one effective CSP, `nosniff`,\
-      \ `no-referrer`, and `DENY` value before the complete mux on static, API, MCP,\
-      \ auth, not-found, and internal-error responses. Derive CSP once before bind\
-      \ from every executable inline body identified by the corrected bootstrap contract,\
-      \ including browser-compatible module/MIME classification and CRLF normalization.\
-      \ Preserve streaming flushes and request cancellation; do not buffer or add\
-      \ writer state. Chromium must boot and complete OPML import plus JSON State\
-      \ export/import/download without CSP violations. Caddy verification remains\
-      \ downstream. Rollback reverts middleware/CSP/docs together and blocks release\
-      \ rather than weakening policy. Never use unsafe-inline, duplicate header owners,\
-      \ or secret-bearing evidence.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
-      \ internal/resofeed/http_security_test.go, internal/resofeed/webui/**, docs/ARCHITECTURE.md,\
-      \ docs/CONTAINER.md]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
-      \ web/tests/e2e/csp-operations.browser-contract.spec.ts, deploy/**, web/src/**]\n\
-      claims: [RF-BUG-005]\nchecks:\n  - id: rf_bug_005_green\n    run: {command:\
-      \ [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$,\
+      \ `no-referrer`, and `DENY` before the complete mux. Derive CSP once before\
+      \ bind from every executable inline body. Preserve streaming flushes and request\
+      \ cancellation; do not buffer or add writer state. Chromium must boot and complete\
+      \ OPML import plus JSON State export/import/download without CSP violations.\
+      \ Rollback reverts middleware/CSP/docs together and blocks release rather than\
+      \ weakening policy. Never use unsafe-inline, duplicate header owners, or secret-bearing\
+      \ evidence.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: implementation_closes_expected_red\nscope: {allowed_paths: [internal/resofeed/http.go,\
+      \ internal/resofeed/http_security.go, internal/resofeed/http_security_test.go,\
+      \ internal/resofeed/webui/**, docs/ARCHITECTURE.md, docs/CONTAINER.md], blocked_paths:\
+      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, web/tests/e2e/csp-operations.browser-contract.spec.ts,\
+      \ deploy/**, web/src/**]}\nclaims: [RF-BUG-005]\nchecks:\n  - id: rf_bug_005_green\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$,\
       \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13},\
       \ {literal: csp_exact_executable_hashes}, {literal: multi_flush_streaming},\
       \ {literal: request_cancellation}], contains_any: [], forbids: [{literal: unsafe-inline},\
       \ {literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-005]\n\
-      \  - id: rf_bug_005_local_stream_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
-      \ -run, '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$',\
+      \    binding_selector: {kind: go_test_run, package: ./internal/resofeed, run:\
+      \ ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$}\n  - id: rf_bug_005_local_stream_green\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$',\
       \ -count=1], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: TestSecurityHeaders}, {literal:\
       \ TestSecurityStreamingCancellation}, {literal: TestCSP}], contains_any: [],\
@@ -183448,15 +183445,10 @@ phases:
       \ State export import download}], contains_any: [{literal: passed}], forbids:\
       \ [{literal: failed}, {literal: CSP violation}, {literal: blocked resource},\
       \ {literal: retry}]}}\n    proves: [RF-BUG-005]\nbindings:\n  expected_red:\
-      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
-      \ source_check: rf_bug_005_expected_red, requirement: RF-BUG-005, assertion_id:\
-      \ A-RF-BUG-005-SECURITY, downstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
-      \ source_check: rf_bug_005_browser_operations_expected_red, requirement: RF-BUG-005,\
-      \ assertion_id: A-RF-BUG-005-CSP-OPERATIONS, downstream_check: rf_bug_005_browser_operations_green,\
-      \ receipt: RF-BUG-005-csp-operations-red-to-green}\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
+      \ {items: []}\n  closes_expected_red:\n    - {requirement_id: RF-BUG-005, source_step:\
+      \ rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red, downstream_check:\
+      \ rf_bug_005_green}\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\"\
+      :\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
       ,\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
       :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
