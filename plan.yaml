@@ -182769,46 +182769,44 @@ phases:
       \ input selects invalid Search, sends no API request, and writes no history.\
       \ Platform URL/URLSearchParams remain the parser after raw preflight. Rollback\
       \ reverts only this acceptance set.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\n\
-      \    - web/src/lib/__tests__/workbench-route.test.ts\n    - web/tests/e2e/initial-route.browser-contract.spec.ts\n\
-      \    - web/tests/e2e/routes.browser-contract.spec.ts\n    - internal/resofeed/rf_bug_item_id_api_expected_red_test.go\n\
-      \  blocked_paths:\n    - web/src/lib/workbench-route.ts\n    - web/src/lib/api-client.ts\n\
-      \    - web/src/routes/**\n    - internal/resofeed/http.go\n    - internal/resofeed/item_route_token.go\n\
-      claims:\n  - RF-BUG-002-CONTRACT\n  - RF-BUG-002-SEARCH-CONTRACT\nchecks:\n\
-      \  - id: rf_bug_002_expected_red\n    run:\n      command: [bash, -lc, \"npm\
-      \ --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
+      \ [web/src/lib/__tests__/workbench-route.test.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
+      \ web/tests/e2e/routes.browser-contract.spec.ts, internal/resofeed/rf_bug_item_id_api_expected_red_test.go]\n\
+      \  blocked_paths: [web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
+      \ web/src/routes/**, internal/resofeed/http.go, internal/resofeed/item_route_token.go]\n\
+      claims: [RF-BUG-002-CONTRACT, RF-BUG-002-SEARCH-CONTRACT]\nchecks:\n  - id:\
+      \ rf_bug_002_expected_red\n    run: {command: [bash, -lc, \"npm --prefix web\
+      \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/initial-route.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-002\\\\]\\\\[en\\\\] opaque item cold load and refresh$'\"\
-      ]\n      timeout_seconds: 300\n    expect:\n      outcome: red\n      exit_codes:\
-      \ [1]\n      stdout_or_stderr:\n        contains_all: [{literal: opaque item\
-      \ cold load and refresh}, {literal: Expected canonical opaque item surface before\
-      \ TODAY}]\n        contains_any: []\n        forbids: [{literal: No tests found},\
-      \ {literal: webServer failed}, {literal: TypeError}]\n    proves: [RF-BUG-002-CONTRACT]\n\
-      \  - id: rf_bug_002_search_route_history_expected_red\n    run:\n      command:\
-      \ [bash, -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/routes.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-002\\\\] Search'\"]\n      timeout_seconds: 300\n   \
-      \ expect:\n      outcome: red\n      exit_codes: [1]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: Search canonical URL maps search to q}, {literal:\
-      \ Search validates filters and bounds before request}, {literal: Search submit\
-      \ writes bounded history state}, {literal: Search Back Forward refresh restores\
-      \ valid state}, {literal: RF-BUG-002_SEARCH_ROUTE_HISTORY_ASSERTION}]\n    \
-      \    contains_any: []\n        forbids: [{literal: No tests found}, {literal:\
-      \ webServer failed}, {literal: TypeError}]\n    proves: [RF-BUG-002-SEARCH-CONTRACT]\n\
-      \  - id: rf_bug_002_route_unit_expected_red\n    run:\n      command: [npm,\
-      \ --prefix, web, run, test:render, --, src/lib/__tests__/workbench-route.test.ts,\
-      \ --reporter=verbose, -t, RF-BUG-002 opaque item IDs]\n      timeout_seconds:\
-      \ 180\n    expect:\n      outcome: red\n      exit_codes: [1]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: RF-BUG-002 opaque item IDs}, {literal: expected\
-      \ canonical ~base64url token}]\n        contains_any: []\n        forbids: [{literal:\
-      \ No tests found}, {literal: skipped}, {literal: TypeError}]\n    proves: [RF-BUG-002-CONTRACT]\n\
-      \  - id: rf_bug_002_api_expected_red\n    run:\n      command: [go, test, -v,\
-      \ ./internal/resofeed, -run, ^TestRFBUG002OpaqueItemIDAPIPaths$, -count=1]\n\
-      \      timeout_seconds: 240\n    expect:\n      outcome: red\n      exit_codes:\
-      \ [1]\n      stdout_or_stderr:\n        contains_all: [{literal: TestRFBUG002OpaqueItemIDAPIPaths},\
+      ], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
+      \ {contains_all: [{literal: opaque item cold load and refresh}, {literal: Expected\
+      \ canonical opaque item surface before TODAY}], contains_any: [], forbids: [{literal:\
+      \ No tests found}, {literal: webServer failed}, {literal: TypeError}]}}\n  \
+      \  proves: [RF-BUG-002-CONTRACT]\n  - id: rf_bug_002_search_route_history_expected_red\n\
+      \    run: {command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
+      \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
+      \ web/tests/e2e/routes.browser-contract.spec.ts --grep '^\\\\[RF-BUG-002\\\\\
+      ] Search'\"], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes:\
+      \ [1], stdout_or_stderr: {contains_all: [{literal: Search canonical URL maps\
+      \ search to q}, {literal: Search validates filters and bounds before request},\
+      \ {literal: Search submit writes bounded history state}, {literal: Search Back\
+      \ Forward refresh restores valid state}, {literal: RF-BUG-002_SEARCH_ROUTE_HISTORY_ASSERTION}],\
+      \ contains_any: [], forbids: [{literal: No tests found}, {literal: webServer\
+      \ failed}, {literal: TypeError}]}}\n    proves: [RF-BUG-002-SEARCH-CONTRACT]\n\
+      \  - id: rf_bug_002_route_unit_expected_red\n    run: {command: [npm, --prefix,\
+      \ web, run, test:render, --, src/lib/__tests__/workbench-route.test.ts, --reporter=verbose,\
+      \ -t, RF-BUG-002 opaque item IDs], timeout_seconds: 180}\n    expect: {outcome:\
+      \ red, exit_codes: [1], stdout_or_stderr: {contains_all: [{literal: RF-BUG-002\
+      \ opaque item IDs}, {literal: expected canonical ~base64url token}], contains_any:\
+      \ [], forbids: [{literal: No tests found}, {literal: skipped}, {literal: TypeError}]}}\n\
+      \    proves: [RF-BUG-002-CONTRACT]\n  - id: rf_bug_002_api_expected_red\n  \
+      \  run: {command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG002OpaqueItemIDAPIPaths$,\
+      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes: [1],\
+      \ stdout_or_stderr: {contains_all: [{literal: TestRFBUG002OpaqueItemIDAPIPaths},\
       \ {literal: RF_BUG_002_API_SUBTESTS=30}, {literal: expected byte-identical item\
-      \ ID}]\n        contains_any: []\n        forbids: [{literal: setup failed},\
-      \ {literal: no tests to run}, {literal: compile error}]\n    proves: [RF-BUG-002-CONTRACT]\n\
+      \ ID}], contains_any: [], forbids: [{literal: setup failed}, {literal: no tests\
+      \ to run}, {literal: compile error}]}}\n    proves: [RF-BUG-002-CONTRACT]\n\
       bindings:\n  expected_red:\n    items:\n      - {requirement: RF-BUG-002, assertion_id:\
       \ A-RF-BUG-002-INITIAL-ROUTE, source_check: rf_bug_002_expected_red, selector:\
       \ {type: test_id, value: '[RF-BUG-002][en] opaque item cold load and refresh'},\
@@ -182831,10 +182829,8 @@ phases:
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_browser_and_http_contract\"\
       ,\"acceptance_test_definition\"],\"primary_outcome\":\"RF-BUG-002-CONTRACT\"\
-      ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"REVIEW\"\
-      ],\"primary_verifier\":\"spec-verifier\",\"additional_verifiers\":[\"client-runtime-verifier\"\
-      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
-      :{\"developer_test_globs\":[],\"acceptance_test_paths\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\"\
+      :[],\"acceptance_test_paths\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
       ,\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"web/tests/e2e/routes.browser-contract.spec.ts\"\
       ,\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"],\"acceptance_check_ids\"\
       :[\"rf_bug_002_expected_red\",\"rf_bug_002_search_route_history_expected_red\"\
