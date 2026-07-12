@@ -183478,47 +183478,58 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-003. After canonical docs, stage the Svelte build into package-local\
-      \ embed.FS and apply the Section 2.2 bounded byte-preserving bootstrap scanner/malformedness\
-      \ grammar and adversarial fixtures before listener bind, validating index, every\
-      \ local bootstrap reference, executable attribute prohibition, structural boundaries,\
-      \ and exact inline-script bytes, and serve only `/`, `/source-ledger`, `/doctor`,\
-      \ and valid canonical item routes. `/sources` is an unlisted static miss. Parsed\
-      \ URL.Path/RawPath handling returns exact GET/HEAD/400/404/405 outcomes without\
-      \ raw RequestURI. Preserve Doctor order and redact secrets longest-first plus\
-      \ whole CR/LF values. No external UI tree, Node runtime, cwd dependence, manifest,\
-      \ generator, or registry. Protected runtime and all frontend/browser contract\
-      \ files remain immutable. Synchronize only observed ARCHITECTURE/CONTAINER/USAGE\
-      \ behavior. Recovery reverts code/build/docs; no data migration.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/webui/**, internal/resofeed/http_static.go,\
-      \ internal/resofeed/http.go, internal/resofeed/doctor.go, internal/resofeed/doctor_test.go,\
-      \ internal/resofeed/http_static_test.go, scripts/build-resofeed.sh, Dockerfile,\
-      \ docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
+      \ RF-BUG-003. Stage the Svelte build into package-local embed.FS and apply the\
+      \ exact Section 2.2 byte-preserving scanner before listener bind. Executable\
+      \ script type classification trims only ASCII whitespace and ASCII-case-folds:\
+      \ absent, empty, module, text/javascript, application/javascript, text/ecmascript,\
+      \ and application/ecmascript are executable; all other non-empty values, including\
+      \ MIME parameters, are non-executable. Hash every executable inline body without\
+      \ src, including module and accepted MIME types, over the exact original body\
+      \ range. Implement deterministic self-closing/end-tag reasons and control-obfuscated\
+      \ javascript URL rejection exactly as Section 2.2. Serve only `/`, `/source-ledger`,\
+      \ `/doctor`, valid canonical item routes, and valid `/` Search query state;\
+      \ `/search` and `/sources` are static misses. Preserve Doctor redaction. RF-BUG-003\
+      \ green output must equal the exact 23-subtest Section 4.3 inventory; aggregate\
+      \ counts or obsolete titles fail. Protected acceptance files remain immutable.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [internal/resofeed/webui/**,\
+      \ internal/resofeed/http_static.go, internal/resofeed/http.go, internal/resofeed/doctor.go,\
+      \ internal/resofeed/doctor_test.go, internal/resofeed/http_static_test.go, scripts/build-resofeed.sh,\
+      \ Dockerfile, docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
       \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
       \ internal/resofeed/state.go, web/src/**, web/tests/**]\nclaims: [RF-BUG-003]\n\
       checks:\n  - id: rf_bug_003_green\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n          go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
-      \ ./internal/resofeed | tee /tmp/rf003-green-list; test $(grep -Ec '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
-      \ /tmp/rf003-green-list) -eq 2; go test -v ./internal/resofeed -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
-      \ -count=1\n      timeout_seconds: 300\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG003EmbeddedUIContract/bootstrap_missing_script_fails_before_bind'},\
-      \ {literal: '=== RUN   TestRFBUG003EmbeddedUIContract/sources_is_unlisted_static_miss'},\
-      \ {literal: '=== RUN   TestRFBUG003DoctorRedactionContract/crlf_dynamic_value_is_wholly_redacted'},\
-      \ {literal: RF_BUG_003_TOP_LEVEL_TESTS=2}, {literal: '--- PASS: TestRFBUG003EmbeddedUIContract'},\
-      \ {literal: '--- PASS: TestRFBUG003DoctorRedactionContract'}], forbids: [{literal:\
-      \ FAIL}, {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n   \
-      \ proves: [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n    run:\n  \
-      \    command:\n        - bash\n        - -lc\n        - |-\n          bash scripts/build-resofeed.sh;\
-      \ test -x bin/resofeed; for d in . /tmp /; do (cd \"$d\" && \"$OLDPWD/bin/resofeed\"\
-      \ --help >/dev/null); done; echo RF_BUG_003_BINARY_PROBES=3 EMBEDDED_UI_SOURCE=package_local\
-      \ BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified\n      timeout_seconds: 600\n  \
-      \  expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: RF_BUG_003_BINARY_PROBES=3}, {literal: EMBEDDED_UI_SOURCE=package_local},\
+      \        - -lc\n        - |-\n          go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
+      \ ./internal/resofeed | tee /tmp/rf003-green-list\n          test \"$(grep -Ec\
+      \ '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$' /tmp/rf003-green-list)\"\
+      \ -eq 2\n          go test -v ./internal/resofeed -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
+      \ -count=1 2>&1 | tee /tmp/rf003-green-run\n          python3 - <<'PY'\n   \
+      \       import re\n          text=open('/tmp/rf003-green-run').read(); expected={'TestRFBUG003EmbeddedUIContract/'+x\
+      \ for x in 'type_absent type_empty type_module type_text_javascript type_application_javascript\
+      \ type_text_ecmascript type_application_ecmascript unsupported_type mime_parameter_rejected\
+      \ all_executable_inline_hashes bootstrap_reason_ids bootstrap_reference_validation\
+      \ static_regular_file static_spa_routes static_invalid_path static_miss static_head_and_method\
+      \ cwd_independence invalid_bootstrap_no_listener'.split()} | {'TestRFBUG003DoctorRedactionContract/'+x\
+      \ for x in 'ui_asset_lines configured_secret_redaction crlf_value_redaction\
+      \ safe_diagnostics_preserved'.split()}; got=set(re.findall(r'^=== RUN\\s+(TestRFBUG003[^\\\
+      s]+)',text,re.M)); assert got==expected,(sorted(expected-got),sorted(got-expected));\
+      \ assert '--- PASS: TestRFBUG003EmbeddedUIContract' in text and '--- PASS: TestRFBUG003DoctorRedactionContract'\
+      \ in text; print('RF-BUG-003_EXACT_SUBTEST_SET=23')\n          PY\n      timeout_seconds:\
+      \ 300\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF-BUG-003_EXACT_SUBTEST_SET=23}, {literal: '=== RUN   TestRFBUG003EmbeddedUIContract/type_module'},\
+      \ {literal: '=== RUN   TestRFBUG003EmbeddedUIContract/all_executable_inline_hashes'},\
+      \ {literal: '=== RUN   TestRFBUG003EmbeddedUIContract/bootstrap_reason_ids'},\
+      \ {literal: '=== RUN   TestRFBUG003DoctorRedactionContract/crlf_value_redaction'}],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-003]\n\
+      \  - id: rf_bug_003_local_binary_green\n    run: {command: [bash, -lc, \"bash\
+      \ scripts/build-resofeed.sh; test -x bin/resofeed; root=$PWD; for d in . /tmp\
+      \ /; do (cd \\\"$d\\\" && \\\"$root/bin/resofeed\\\" --help >/dev/null); done;\
+      \ echo RF_BUG_003_BINARY_PROBES=3 EMBEDDED_UI_SOURCE=package_local BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified\"\
+      ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: RF_BUG_003_BINARY_PROBES=3}, {literal: EMBEDDED_UI_SOURCE=package_local},\
       \ {literal: BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified}], forbids: [{literal:\
-      \ FAIL}, {literal: external UI tree}, {literal: node required}]}}\n    proves:\
-      \ [RF-BUG-003]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ FAIL}, {literal: node required}]}}\n    proves: [RF-BUG-003]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
       \ source_check: rf_bug_003_expected_red, requirement: RF-BUG-003, assertion_id:\
       \ A-RF-BUG-003-EMBED-DOCTOR, downstream_check: rf_bug_003_green, receipt: RF-BUG-003-red-to-green}\n\
       </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
@@ -183533,9 +183544,9 @@ phases:
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_003_green\"],\"acceptance_mutation\":\"\
       FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Require both exact RF-BUG-003 top-level tests and named assertion
-      subtests, three cwd probes, `/sources` 404 behavior, positive embedded/binary-only
-      predicates, protected artifacts unchanged, and independent security review.
+    verification: Require exact 23-subtest equality, all executable-script classes
+      and hashes including module, deterministic grammar/URL reason fixtures, three
+      cwd probes, and independent security review.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
