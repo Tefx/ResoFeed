@@ -182757,7 +182757,7 @@ phases:
       \ internal/resofeed/doctor.go, internal/resofeed/webui/**, Dockerfile, web/src/**]\n\
       claims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT, RF-BUG-CANONICAL-DOCS]\n\
       checks:\n  - id: canonical_runtime_docs_green\n    run:\n      command:\n  \
-      \      - bash\n        - -lc\n        - |-\n        python3 -c \"from pathlib\
+      \      - bash\n        - -lc\n        - |-\n          python3 -c \"from pathlib\
       \ import Path; import re; a=Path('docs/ARCHITECTURE.md').read_text(); d=Path('docs/DESIGN.md').read_text();\
       \ c=Path('docs/CONTAINER.md').read_text(); u=Path('docs/USAGE.md').read_text();\
       \ assert not re.search(r'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML', a+'\\n'+d+'\\\
@@ -182781,7 +182781,7 @@ phases:
       \ {literal: OPML_ACTIVE_SCAN_MATCHES=0}, {literal: OPML_EXCLUSIONS=4}], forbids:\
       \ [{literal: AssertionError}]}}\n    proves: [RF-BUG-CANONICAL-DOCS]\n  - id:\
       \ rf_bug_003_expected_red\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n        go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \  - -lc\n        - |-\n          go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf003-list; test $(grep -Ec '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
       \ /tmp/rf003-list) -eq 2; go test -v ./internal/resofeed -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
@@ -182791,7 +182791,7 @@ phases:
       \ failed}, {literal: no tests to run}, {literal: '[no tests to run]'}, {literal:\
       \ compile error}]}}\n    proves: [RF-BUG-003-CONTRACT]\n  - id: rf_bug_004_expected_red\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \       go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf004-list; test $(grep -Fxc 'TestRFBUG004OPMLImportOnlyContract'\
       \ /tmp/rf004-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG004OPMLImportOnlyContract$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
@@ -182800,7 +182800,7 @@ phases:
       \ setup failed}, {literal: no tests to run}, {literal: '[no tests to run]'},\
       \ {literal: compile error}]}}\n    proves: [RF-BUG-004-CONTRACT]\n  - id: rf_bug_005_expected_red\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \       go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf005-list; test $(grep -Fxc 'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'\
       \ /tmp/rf005-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
