@@ -183660,12 +183660,14 @@ phases:
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger Operations and Prompting v2.2
   status: locked
-  gate: 'Protected RF-BUG-008/009 contracts pass: responsive and operational Ledger
-    behavior is green at five viewports with reviewed screenshots, and Prompting v2.2
-    semantics pass before active-name/documentation alignment.'
-  context: Preserve fallback fonts and ordinary browser evidence. No bundled-font
-    registry, visual-environment lock, zero-diff portability, or permanent active-name
-    registry.
+  gate: RF-BUG-004/008 Ledger and State-import acceptance is green at five viewports
+    with exact title/screenshot inventories and real-runtime operations; RF-BUG-009
+    exact semantics, transport parity, atomic preservation, active naming, and docs
+    are green with no secret output or protected diff.
+  context: Keep Source Ledger responsive layout and operational state in the shared
+    component rollback boundary with separate UI and runtime verification. Implement
+    Prompting v2.2 semantics, active naming, tests, fixtures, and required docs as
+    one atomic application outcome. Protected acceptance and screenshots are immutable.
   depends_on:
   - rf-bug-20260712-frontend-behavior
   - rf-bug-20260712-runtime-boundaries
