@@ -184067,7 +184067,7 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
     - rf-bug-010-harness-foundation
-    agent: test-engineer
+    agent: general
   - id: rf-bug-010-reproducibility-artifact-proof
     name: Prove E2E reproducibility, cleanup, and retained artifacts
     status: pending
