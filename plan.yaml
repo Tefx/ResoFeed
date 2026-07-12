@@ -184119,46 +184119,39 @@ phases:
   - rf-bug-20260712-e2e-isolation
   steps:
   - id: local-full-verification-matrix
-    name: Run bounded local-only verification matrix
+    name: Run authoritative bounded local RF-BUG evidence matrix
     status: pending
-    description: 'step_type: implementation
+    description: 'step_type: verification
 
       repo_change_policy: no_repo_change
 
 
-      Repository mutation is absent because this step consumes committed artifacts
-      and writes only ignored test output. Execute Section 7 exactly: `npm --prefix
-      web run check`; `npm --prefix web run test:render -- web/src/lib/__tests__/workbench-route.test.ts
-      web/src/routes/__tests__/inspector-selection.test.ts web/src/routes/__tests__/steer-invalid.test.ts
-      web/src/routes/components/__tests__/source-ledger-responsive.test.ts --reporter=verbose`;
-      focused `go test -v` RF-BUG-003/004/005 and RF-BUG-009; `go test -v ./... -count=1`,
-      vet, build; browser contracts with a preceding `--list`; RF-BUG-002 EN/ZH `--repeat-each=10
-      --retries=0`; EN/ZH Inspector/routes/OPML-State/accessibility; real-Chromium
-      CSP OPML import and State export/import/download; timeout smoke; runtime; the
-      exact old/replacement list and run checks; and three retry-free CI-safe runs.
-      Every green row records exact file/test IDs and positive counts, requires run
-      count to equal list count, and rejects `No tests found`, `[no tests to run]`,
-      zero tests, skipped required IDs, retries, or generic ok/passed without names.
-      Require failed-test videos plus trace/screenshot/server/browser/network artifacts.
-      Run the complete OPML active scan with only the four named exclusions. Exclude
-      OCI/container/Tailnet/live rows. No custom evidence schema, registry, generator,
-      or additional product/deployment gate. The phase''s terminal no-repo-change
-      Full Gate only reuses this matrix and existing downstream closure predicates.
+      Repository mutation is absent because this step executes committed artifacts
+      and writes only ignored `web/.test-artifacts` output. Run the current Section
+      7 local matrix: package-relative frontend check/render list-run identity for
+      the four named files; focused and full Go tests, vet, build; protected browser
+      contracts; exact ten-title EN/ZH RF-BUG-002 repeated to 100 retry-free executions;
+      Inspector/routes/State/accessibility; Chromium CSP operations; runtime; smoke
+      under 120 seconds; and old/replacement E2E identity. Run the exact nine-active-document
+      OPML scan with exactly two protected exclusions and emit `OPML_EXCLUSIONS=2`.
+      Reuse the single clean-root three-run and intentional-failure evidence from
+      the E2E proof, verifying positive native project/file/title equality, complete
+      standard media/runtime identity, cleanup, present possibly-empty stderr, and
+      fail-closed redaction. Exclude OCI, containers, Tailnet, and live OpenRouter.
+      Any missing identity, generic-only success, retry/skip, residue, secret, authority
+      mismatch, or repository diff blocks publication; recovery removes only owned
+      local processes and ignored artifacts.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.local-full-verification-matrix","risk_tier":"R2","risk_reasons":["cross_component_local_acceptance","runtime_browser_proof"],"primary_outcome":"RF-BUG-LOCAL-MATRIX","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["spec-verifier"],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.local-full-verification-matrix","risk_tier":"R2","risk_reasons":["cross_component_local_acceptance","runtime_browser_evidence","secret_redaction_validation"],"primary_outcome":"RF-BUG-LOCAL-MATRIX","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["security-reviewer","spec-verifier"],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
 
       </vectl_step_policy>'
-    verification: PASS requires exact named collection/count receipts for every Section
-      7 local row; four frontend render files with at least one test each; the complete
-      exact ten-title RF-BUG-002 EN/ZH set with `--repeat-each=10`, exactly 100 retry-free
-      passes, and no missing/extra title; explicit EN/ZH Inspector/routes/OPML-State/accessibility
-      passes; CSP operations/download green; deterministic old/replacement list/run
-      multiset and count equality; three identical retry-free CI-safe executed-title
-      multisets/counts; smoke under 120s; failed-test video contract probed; protected
-      artifacts unchanged; no OCI/Tailnet/live command.
+    verification: PASS requires exact package-relative list/run identities, all named
+      local Go/browser rows, RF-BUG-002 100 retry-free executions, OPML_EXCLUSIONS=2
+      across nine docs, smoke <120s, reused clean-root three-run and one-failure standard
+      evidence, redaction green, current authority hashes, and no repository diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
