@@ -182713,29 +182713,24 @@ phases:
       \ RF-BUG-001-CONTRACT. Define protected EN/ZH desktop and narrow acceptance\
       \ for immediate readable Feed/Search selection, independent detail and inspection-marker\
       \ failures, stale A-after-B rejection, viewport stability, direct item routes,\
-      \ Back, focus return, and Escape. Only the named acceptance files may change.\
-      \ Startup, auth, collection, timeout, or unrelated failure is invalid red evidence.\
-      \ Rollback reverts this protected pair.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
-      \ [web/src/routes/__tests__/inspector-selection.test.ts, web/tests/e2e/inspector-selection.browser-contract.spec.ts]\n\
-      \  blocked_paths: [web/src/routes/+page.svelte, web/src/routes/components/**,\
-      \ internal/**]\nclaims: [RF-BUG-001-CONTRACT]\nchecks:\n  - id: rf_bug_001_expected_red\n\
-      \    run:\n      command: [bash, -lc, \"npm --prefix web exec -- playwright\
-      \ test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 web/tests/e2e/inspector-selection.browser-contract.spec.ts --grep\
-      \ '^\\\\[RF-BUG-001\\\\].*stale detail cannot replace the selected item$'\"\
-      ]\n      timeout_seconds: 300\n    expect:\n      outcome: red\n      exit_codes:\
-      \ [1]\n      stdout_or_stderr:\n        contains_all: [{literal: stale detail\
-      \ cannot replace the selected item}, {literal: Expected selected inspector item\
-      \ to remain current}]\n        contains_any: []\n        forbids: [{literal:\
-      \ No tests found}, {literal: webServer failed}, {literal: TypeError}]\n    proves:\
-      \ [RF-BUG-001-CONTRACT]\nbindings:\n  expected_red:\n    items:\n      - {requirement:\
-      \ RF-BUG-001, assertion_id: A-RF-BUG-001-INSPECTOR, source_check: rf_bug_001_expected_red,\
-      \ selector: {type: test_id, value: '[RF-BUG-001] stale detail cannot replace\
-      \ the selected item'}, downstream_step: rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing,\
-      \ downstream_check: rf_bug_001_green, receipt: RF-BUG-001-red-to-green}\n  closes_expected_red:\
-      \ []\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"\
-      vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.rf-bug-inspector-selection-expected-red\"\
+      \ Back, focus return, and Escape. Startup, auth, collection, timeout, or unrelated\
+      \ failure is invalid red evidence. Rollback reverts this protected pair.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ generic\nscope:\n  allowed_paths: [web/src/routes/__tests__/inspector-selection.test.ts,\
+      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts]\n  blocked_paths:\
+      \ [web/src/routes/+page.svelte, web/src/routes/components/**, internal/**]\n\
+      claims: [RF-BUG-001-CONTRACT]\nchecks:\n  - id: rf_bug_001_expected_red\n  \
+      \  run: {command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
+      \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
+      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts --grep '^\\\\[RF-BUG-001\\\
+      \\].*stale detail cannot replace the selected item$'\"], timeout_seconds: 300}\n\
+      \    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \ [{literal: stale detail cannot replace the selected item}, {literal: Expected\
+      \ selected inspector item to remain current}], contains_any: [], forbids: [{literal:\
+      \ No tests found}, {literal: webServer failed}, {literal: TypeError}]}}\n  \
+      \  proves: [RF-BUG-001-CONTRACT]\nbindings: {expected_red: {items: []}, closes_expected_red:\
+      \ []}\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\"\
+      :\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.rf-bug-inspector-selection-expected-red\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"acceptance_test_definition\"\
       ],\"primary_outcome\":\"RF-BUG-001-CONTRACT\",\"rollback_class\":\"NONTRIVIAL\"\
       ,\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\":[\"\
