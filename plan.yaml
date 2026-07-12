@@ -182740,85 +182740,152 @@ phases:
     - rf-bug-canonical-contract-sync
     agent: general
   - id: rf-bug-route-search-token-expected-red
-    name: Lock route, Search history, and opaque item-ID acceptance
+    name: Lock combined frontend expected-red acceptance
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
-      \ RF-BUG-002-CONTRACT. Define protected EN/ZH cold/refresh/Back/Forward contracts\
-      \ for TODAY, SOURCE LEDGER, SEARCH, and direct items; canonical `/` Search query/history\
-      \ validation; and byte-identical `~` plus unpadded base64url item IDs across\
-      \ browser and all five item HTTP operations. Raw malformed percent/fatal UTF-8\
-      \ input selects invalid Search, sends no API request, and writes no history.\
-      \ Platform URL/URLSearchParams remain the parser after raw preflight. Rollback\
-      \ reverts only this acceptance set.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope: {allowed_paths:\
-      \ [web/src/lib/__tests__/workbench-route.test.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
-      \ web/tests/e2e/routes.browser-contract.spec.ts, internal/resofeed/rf_bug_item_id_api_expected_red_test.go],\
-      \ blocked_paths: [web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
-      \ web/src/routes/**, internal/resofeed/http.go, internal/resofeed/item_route_token.go]}\n\
-      claims: [RF-BUG-002-CONTRACT, RF-BUG-002-SEARCH-CONTRACT]\nchecks:\n  - id:\
-      \ rf_bug_002_expected_red\n    run: {command: [bash, -lc, \"npm --prefix web\
-      \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
+      \ source outcome `rf-bug-route-search-token-expected-red`:\nOutcome: RF-BUG-002-CONTRACT.\
+      \ Define protected EN/ZH cold/refresh/Back/Forward contracts for TODAY, SOURCE\
+      \ LEDGER, SEARCH, and direct items; canonical `/` Search query/history validation;\
+      \ and byte-identical `~` plus unpadded base64url item IDs across browser and\
+      \ all five item HTTP operations. Raw malformed percent/fatal UTF-8 input selects\
+      \ invalid Search, sends no API request, and writes no history. Platform URL/URLSearchParams\
+      \ remain the parser after raw preflight. Rollback reverts only this acceptance\
+      \ set.\n\nPreserved source outcome `rf-bug-inspector-selection-expected-red`:\n\
+      Outcome: RF-BUG-001-CONTRACT. Define protected EN/ZH desktop and narrow acceptance\
+      \ for immediate readable Feed/Search selection, independent detail and inspection-marker\
+      \ failures, stale A-after-B rejection, viewport stability, direct item routes,\
+      \ Back, focus return, and Escape. Startup, auth, collection, timeout, or unrelated\
+      \ failure is invalid red evidence. Rollback reverts this protected pair.\n\n\
+      Preserved source outcome `rf-bug-title-steer-a11y-expected-red`:\nOutcome: RF-BUG-006-007-CONTRACT.\
+      \ Define protected title transitions and EN/ZH Steer invalid-state accessibility.\
+      \ Titles change atomically with resolved route and never show host or stale\
+      \ surface. Idle Steer has no missing-URL error; invalid submit retains input/focus,\
+      \ sends no mutation, remounts one current localized alert, clears on edit, and\
+      \ keeps stale/transport errors distinct. Rollback reverts this acceptance pair.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ expected_red_definition\nscope:\n  allowed_paths:\n  - web/src/lib/__tests__/workbench-route.test.ts\n\
+      \  - web/tests/e2e/initial-route.browser-contract.spec.ts\n  - web/tests/e2e/routes.browser-contract.spec.ts\n\
+      \  - internal/resofeed/rf_bug_item_id_api_expected_red_test.go\n  - web/src/routes/__tests__/inspector-selection.test.ts\n\
+      \  - web/tests/e2e/inspector-selection.browser-contract.spec.ts\n  - web/src/routes/__tests__/steer-invalid.test.ts\n\
+      \  - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n  blocked_paths:\n\
+      \  - web/src/lib/workbench-route.ts\n  - web/src/lib/api-client.ts\n  - internal/resofeed/http.go\n\
+      \  - internal/resofeed/item_route_token.go\n  - web/src/routes/+page.svelte\n\
+      \  - web/src/routes/components/**\nclaims:\n- RF-BUG-002-CONTRACT\n- RF-BUG-002-SEARCH-CONTRACT\n\
+      - RF-BUG-001-CONTRACT\n- RF-BUG-006-CONTRACT\n- RF-BUG-007-CONTRACT\n- RF-BUG-006-007-CONTRACT\n\
+      checks:\n- id: rf_bug_002_expected_red\n  run:\n    command:\n    - bash\n \
+      \   - -lc\n    - npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/initial-route.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-002\\\\]\\\\[en\\\\] opaque item cold load and refresh$'\"\
-      ], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
-      \ {contains_all: [{literal: opaque item cold load and refresh}, {literal: Expected\
-      \ canonical opaque item surface before TODAY}], contains_any: [], forbids: [{literal:\
-      \ No tests found}, {literal: webServer failed}, {literal: TypeError}]}}\n  \
-      \  proves: [RF-BUG-002-CONTRACT]\n  - id: rf_bug_002_search_route_history_expected_red\n\
-      \    run: {command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
+      \ --grep '^\\[RF-BUG-002\\]\\[en\\] opaque item cold load and refresh$'\n  \
+      \  timeout_seconds: 300\n  expect:\n    outcome: red\n    exit_codes:\n    -\
+      \ 1\n    stdout_or_stderr:\n      contains_all:\n      - literal: opaque item\
+      \ cold load and refresh\n      - literal: Expected canonical opaque item surface\
+      \ before TODAY\n      contains_any: []\n      forbids:\n      - literal: No\
+      \ tests found\n      - literal: webServer failed\n      - literal: TypeError\n\
+      \  proves:\n  - RF-BUG-002-CONTRACT\n- id: rf_bug_002_search_route_history_expected_red\n\
+      \  run:\n    command:\n    - bash\n    - -lc\n    - npm --prefix web exec --\
+      \ playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/routes.browser-contract.spec.ts --grep '^\\[RF-BUG-002\\\
+      ] Search'\n    timeout_seconds: 300\n  expect:\n    outcome: red\n    exit_codes:\n\
+      \    - 1\n    stdout_or_stderr:\n      contains_all:\n      - literal: Search\
+      \ canonical URL maps search to q\n      - literal: Search validates filters\
+      \ and bounds before request\n      - literal: Search submit writes bounded history\
+      \ state\n      - literal: Search Back Forward refresh restores valid state\n\
+      \      - literal: RF-BUG-002_SEARCH_ROUTE_HISTORY_ASSERTION\n      contains_any:\
+      \ []\n      forbids:\n      - literal: No tests found\n      - literal: webServer\
+      \ failed\n      - literal: TypeError\n  proves:\n  - RF-BUG-002-SEARCH-CONTRACT\n\
+      - id: rf_bug_002_route_unit_expected_red\n  run:\n    command:\n    - npm\n\
+      \    - --prefix\n    - web\n    - run\n    - test:render\n    - --\n    - src/lib/__tests__/workbench-route.test.ts\n\
+      \    - --reporter=verbose\n    - -t\n    - RF-BUG-002 opaque item IDs\n    timeout_seconds:\
+      \ 180\n  expect:\n    outcome: red\n    exit_codes:\n    - 1\n    stdout_or_stderr:\n\
+      \      contains_all:\n      - literal: RF-BUG-002 opaque item IDs\n      - literal:\
+      \ expected canonical ~base64url token\n      contains_any: []\n      forbids:\n\
+      \      - literal: No tests found\n      - literal: skipped\n      - literal:\
+      \ TypeError\n  proves:\n  - RF-BUG-002-CONTRACT\n- id: rf_bug_002_api_expected_red\n\
+      \  run:\n    command:\n    - go\n    - test\n    - -v\n    - ./internal/resofeed\n\
+      \    - -run\n    - ^TestRFBUG002OpaqueItemIDAPIPaths$\n    - -count=1\n    timeout_seconds:\
+      \ 240\n  expect:\n    outcome: red\n    exit_codes:\n    - 1\n    stdout_or_stderr:\n\
+      \      contains_all:\n      - literal: TestRFBUG002OpaqueItemIDAPIPaths\n  \
+      \    - literal: RF_BUG_002_API_SUBTESTS=30\n      - literal: expected byte-identical\
+      \ item ID\n      contains_any: []\n      forbids:\n      - literal: setup failed\n\
+      \      - literal: no tests to run\n      - literal: compile error\n  proves:\n\
+      \  - RF-BUG-002-CONTRACT\n- id: rf_bug_001_expected_red\n  run:\n    command:\n\
+      \    - bash\n    - -lc\n    - npm --prefix web exec -- playwright test --config\
       \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ web/tests/e2e/routes.browser-contract.spec.ts --grep '^\\\\[RF-BUG-002\\\\\
-      ] Search'\"], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: Search canonical URL maps\
-      \ search to q}, {literal: Search validates filters and bounds before request},\
-      \ {literal: Search submit writes bounded history state}, {literal: Search Back\
-      \ Forward refresh restores valid state}, {literal: RF-BUG-002_SEARCH_ROUTE_HISTORY_ASSERTION}],\
-      \ contains_any: [], forbids: [{literal: No tests found}, {literal: webServer\
-      \ failed}, {literal: TypeError}]}}\n    proves: [RF-BUG-002-SEARCH-CONTRACT]\n\
-      \  - id: rf_bug_002_route_unit_expected_red\n    run: {command: [npm, --prefix,\
-      \ web, run, test:render, --, src/lib/__tests__/workbench-route.test.ts, --reporter=verbose,\
-      \ -t, RF-BUG-002 opaque item IDs], timeout_seconds: 180}\n    expect: {outcome:\
-      \ red, exit_codes: [1], stdout_or_stderr: {contains_all: [{literal: RF-BUG-002\
-      \ opaque item IDs}, {literal: expected canonical ~base64url token}], contains_any:\
-      \ [], forbids: [{literal: No tests found}, {literal: skipped}, {literal: TypeError}]}}\n\
-      \    proves: [RF-BUG-002-CONTRACT]\n  - id: rf_bug_002_api_expected_red\n  \
-      \  run: {command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG002OpaqueItemIDAPIPaths$,\
-      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: red, exit_codes: [1],\
-      \ stdout_or_stderr: {contains_all: [{literal: TestRFBUG002OpaqueItemIDAPIPaths},\
-      \ {literal: RF_BUG_002_API_SUBTESTS=30}, {literal: expected byte-identical item\
-      \ ID}], contains_any: [], forbids: [{literal: setup failed}, {literal: no tests\
-      \ to run}, {literal: compile error}]}}\n    proves: [RF-BUG-002-CONTRACT]\n\
-      bindings:\n  expected_red:\n    items:\n      - {requirement_id: RF-BUG-002,\
-      \ fingerprint: A-RF-BUG-002-OPAQUE-API, expected_red_package: ./internal/resofeed,\
-      \ expected_red_test: TestRFBUG002OpaqueItemIDAPIPaths, downstream_step: rf-bug-20260712-frontend-behavior.repair-route-search-and-opaque-item-ids,\
-      \ downstream_check: rf_bug_002_api_green}\n  closes_expected_red: []\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red\",\"\
-      risk_tier\":\"R2\",\"risk_reasons\":[\"public_browser_and_http_contract\",\"\
-      acceptance_test_definition\"],\"primary_outcome\":\"RF-BUG-002-CONTRACT\",\"\
-      rollback_class\":\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\"\
-      :[],\"acceptance_test_paths\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
-      ,\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"web/tests/e2e/routes.browser-contract.spec.ts\"\
-      ,\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"],\"acceptance_check_ids\"\
-      :[\"rf_bug_002_expected_red\",\"rf_bug_002_search_route_history_expected_red\"\
-      ,\"rf_bug_002_route_unit_expected_red\",\"rf_bug_002_api_expected_red\"],\"\
-      acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\"\
-      :\"authority:acceptance-mutation:rf002-route-unit\",\"path\":\"web/src/lib/__tests__/workbench-route.test.ts\"\
-      ,\"purpose\":\"Define opaque route-token unit acceptance\",\"check_id\":\"rf_bug_002_route_unit_expected_red\"\
-      ,\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf002-initial-route\"\
-      ,\"path\":\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"purpose\"\
-      :\"Define EN/ZH initial-route acceptance\",\"check_id\":\"rf_bug_002_expected_red\"\
-      ,\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf002-search-history\"\
+      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts --grep '^\\[RF-BUG-001\\\
+      ].*stale detail cannot replace the selected item$'\n    timeout_seconds: 300\n\
+      \  expect:\n    outcome: red\n    exit_codes:\n    - 1\n    stdout_or_stderr:\n\
+      \      contains_all:\n      - literal: stale detail cannot replace the selected\
+      \ item\n      - literal: Expected selected inspector item to remain current\n\
+      \      contains_any: []\n      forbids:\n      - literal: No tests found\n \
+      \     - literal: webServer failed\n      - literal: TypeError\n  proves:\n \
+      \ - RF-BUG-001-CONTRACT\n- id: rf_bug_006_expected_red\n  run:\n    command:\n\
+      \    - bash\n    - -lc\n    - npm --prefix web exec -- playwright test --config\
+      \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
+      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\[RF-BUG-006\\\
+      ] route-derived title updates atomically$'\n    timeout_seconds: 300\n  expect:\n\
+      \    outcome: red\n    exit_codes:\n    - 1\n    stdout_or_stderr:\n      contains_all:\n\
+      \      - literal: route-derived title updates atomically\n      - literal: Expected\
+      \ exact route-derived document title\n      contains_any: []\n      forbids:\n\
+      \      - literal: No tests found\n      - literal: webServer failed\n  proves:\n\
+      \  - RF-BUG-006-CONTRACT\n  - RF-BUG-006-007-CONTRACT\n- id: rf_bug_007_expected_red\n\
+      \  run:\n    command:\n    - bash\n    - -lc\n    - npm --prefix web exec --\
+      \ playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep\
+      \ '^\\[RF-BUG-007\\]'\n    timeout_seconds: 300\n  expect:\n    outcome: red\n\
+      \    exit_codes:\n    - 1\n    stdout_or_stderr:\n      contains_all:\n    \
+      \  - literal: repeated invalid add source remounts one alert\n      - literal:\
+      \ Expected one newly mounted alert and retained focus\n      contains_any: []\n\
+      \      forbids:\n      - literal: No tests found\n      - literal: webServer\
+      \ failed\n  proves:\n  - RF-BUG-007-CONTRACT\n  - RF-BUG-006-007-CONTRACT\n\
+      bindings:\n  expected_red:\n    items:\n    - requirement_id: RF-BUG-002\n \
+      \     fingerprint: A-RF-BUG-002-OPAQUE-API\n      expected_red_package: ./internal/resofeed\n\
+      \      expected_red_test: TestRFBUG002OpaqueItemIDAPIPaths\n      downstream_step:\
+      \ rf-bug-20260712-frontend-behavior.repair-route-search-and-opaque-item-ids\n\
+      \      downstream_check: rf_bug_002_api_green\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"primary_outcome\":\"RF-BUG-002-CONTRACT\",\"risk_reasons\"\
+      :[\"public_browser_and_http_contract\",\"acceptance_test_definition\",\"public_ui_contract\"\
+      ,\"accessibility_contract\"],\"risk_tier\":\"R2\",\"rollback_class\":\"NONTRIVIAL\"\
+      ,\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red\"\
+      ,\"test_authority\":{\"acceptance_check_ids\":[\"rf_bug_002_expected_red\",\"\
+      rf_bug_002_search_route_history_expected_red\",\"rf_bug_002_route_unit_expected_red\"\
+      ,\"rf_bug_002_api_expected_red\",\"rf_bug_001_expected_red\",\"rf_bug_006_expected_red\"\
+      ,\"rf_bug_007_expected_red\"],\"acceptance_mutation\":\"AUTHORIZED\",\"acceptance_test_paths\"\
+      :[\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/tests/e2e/initial-route.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/routes.browser-contract.spec.ts\",\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
+      ,\"web/src/routes/__tests__/inspector-selection.test.ts\",\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
+      ,\"web/src/routes/__tests__/steer-invalid.test.ts\",\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
+      ],\"authorized_mutation_refs\":[{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_route_unit_expected_red\"\
+      ,\"path\":\"web/src/lib/__tests__/workbench-route.test.ts\",\"purpose\":\"Define\
+      \ opaque route-token unit acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-route-unit\"\
+      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_expected_red\",\"path\"\
+      :\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"purpose\":\"Define\
+      \ EN/ZH initial-route acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-initial-route\"\
+      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_search_route_history_expected_red\"\
       ,\"path\":\"web/tests/e2e/routes.browser-contract.spec.ts\",\"purpose\":\"Define\
-      \ raw-query and Search history acceptance\",\"check_id\":\"rf_bug_002_search_route_history_expected_red\"\
-      ,\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf002-item-api\"\
-      ,\"path\":\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\",\"purpose\"\
-      :\"Define five-operation opaque item API acceptance\",\"check_id\":\"rf_bug_002_api_expected_red\"\
-      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
-    verification: Require exact route/Search collections, raw malformed-query no-request/no-history
+      \ raw-query and Search history acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-search-history\"\
+      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_api_expected_red\",\"\
+      path\":\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\",\"purpose\"\
+      :\"Define five-operation opaque item API acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-item-api\"\
+      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_001_expected_red\",\"path\"\
+      :\"web/src/routes/__tests__/inspector-selection.test.ts\",\"purpose\":\"Define\
+      \ focused Inspector selection and stale-response acceptance\",\"ref\":\"authority:acceptance-mutation:rf001-inspector-unit\"\
+      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_001_expected_red\",\"path\"\
+      :\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"purpose\"\
+      :\"Define real-browser RF-BUG-001 acceptance\",\"ref\":\"authority:acceptance-mutation:rf001-inspector-browser\"\
+      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_007_expected_red\",\"path\"\
+      :\"web/src/routes/__tests__/steer-invalid.test.ts\",\"purpose\":\"Define focused\
+      \ Steer invalid-state accessibility acceptance\",\"ref\":\"authority:acceptance-mutation:rf007-steer-unit\"\
+      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_006_expected_red\",\"path\"\
+      :\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\",\"purpose\"\
+      :\"Define title and EN/ZH Steer browser acceptance\",\"ref\":\"authority:acceptance-mutation:rf006007-browser\"\
+      }],\"developer_test_globs\":[]}}\n</vectl_step_policy>"
+    verification: 'Require exact route/Search collections, raw malformed-query no-request/no-history
       cases, route-token unit red, and 30 opaque API subtests with assertion-specific
-      red fingerprints.
+      red fingerprints. Combined proof: Collect and run the named RF-BUG-001 assertion;
+      require its assertion-specific red fingerprint and protected-path-only diff.
+      Combined proof: Run title and Steer checks independently; require assertion-specific
+      red, exact EN/ZH collection, no mutation request, and protected-only diff.'
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
