@@ -182755,10 +182755,10 @@ phases:
       :[{\"ref\":\"authority:acceptance-mutation:rf001-inspector-unit\",\"path\":\"\
       web/src/routes/__tests__/inspector-selection.test.ts\",\"purpose\":\"Define\
       \ focused Inspector selection and stale-response acceptance\",\"check_id\":\"\
-      rf_bug_001_expected_red\",\"actor_id\":\"contract-test-author\"},{\"ref\":\"\
-      authority:acceptance-mutation:rf001-inspector-browser\",\"path\":\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
-      ,\"purpose\":\"Define real-browser RF-BUG-001 acceptance\",\"check_id\":\"rf_bug_001_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
+      rf_bug_001_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf001-inspector-browser\"\
+      ,\"path\":\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"\
+      purpose\":\"Define real-browser RF-BUG-001 acceptance\",\"check_id\":\"rf_bug_001_expected_red\"\
+      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
     verification: Collect and run the named RF-BUG-001 assertion; require its assertion-specific
       red fingerprint and protected-path-only diff.
     refs:
