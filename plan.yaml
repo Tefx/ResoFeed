@@ -182536,19 +182536,19 @@ phases:
   - id: runtime-assets-opml-security-expected-red
     name: Lock embedded UI, OPML, and HTTP security acceptance
     status: pending
-    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
-      \ RF-BUG-003-005-CONTRACT. One contract-test owner controls the atomic protected\
-      \ Go file for embedded UI/Doctor, auth-first OPML import-only, and outer HTTP/CSP/streaming/cancellation\
-      \ acceptance, plus the protected Chromium CSP operation spec. Browser script\
-      \ classification accepts absent, exactly empty, unpadded ASCII-case-insensitive\
-      \ module, and all sixteen JavaScript MIME essences; parameters, surrounding\
-      \ whitespace, padded module, importmap, speculationrules, and other values are\
-      \ non-executable. Preserve source bytes/ranges; normalize CRLF and remaining\
-      \ CR to LF only for CSP hashing. Every executable inline body has a matching\
-      \ CSP fixture. Failure must reach the named assertion, never collection/compile/startup/auth/timeout.\
-      \ Rollback reverts this protected set. No secrets, external UI registry, response-writer\
-      \ state machine, or custom protocol.\n\n<intent_closure_contract>\nschema_version:\
+    description: "\nstep_type: implementation\nrepo_change_policy: modifies_repo\n\
+      \n[REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-003-005-CONTRACT. One contract-test owner controls the atomic \nprotected\
+      \ Go file for embedded UI/Doctor, auth-first OPML import-only, and outer\nHTTP/CSP/streaming/cancellation\
+      \ acceptance, plus the protected Chromium CSP \noperation spec. Browser script\
+      \ classification accepts absent, exactly empty, \nunpadded ASCII-case-insensitive\
+      \ module, and all sixteen JavaScript MIME \nessences; parameters, surrounding\
+      \ whitespace, padded module, importmap, \nspeculationrules, and other values\
+      \ are non-executable. Preserve source \nbytes/ranges; normalize CRLF and remaining\
+      \ CR to LF only for CSP hashing. Every \nexecutable inline body has a matching\
+      \ CSP fixture. Failure must reach the named \nassertion, never collection/compile/startup/auth/timeout.\
+      \ Rollback reverts this \nprotected set. No secrets, external UI registry, response-writer\
+      \ state machine, \nor custom protocol.\n\n<intent_closure_contract>\nschema_version:\
       \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\n\
       \    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n    -\
       \ web/tests/e2e/csp-operations.browser-contract.spec.ts\n  blocked_paths:\n\
@@ -182556,74 +182556,75 @@ phases:
       \    - internal/resofeed/doctor.go\n    - internal/resofeed/webui/**\n    -\
       \ web/src/**\n    - docs/**\nclaims:\n  - RF-BUG-003-CONTRACT\n  - RF-BUG-004-CONTRACT\n\
       \  - RF-BUG-005-CONTRACT\n  - RF-BUG-003-005-CONTRACT\nchecks:\n  - id: rf_bug_003_expected_red\n\
-      \    run:\n      command: [go, test, -v, ./internal/resofeed, -run, '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
-      \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: red\n \
-      \     exit_codes: [1]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete}, {literal: RF-BUG-003_CSP_CRLF_NORMALIZED=chromium},\
-      \ {literal: expected listener to remain unbound}]\n        contains_any: []\n\
-      \        forbids: [{literal: setup failed}, {literal: no tests to run}, {literal:\
-      \ compile error}]\n    proves: [RF-BUG-003-CONTRACT, RF-BUG-003-005-CONTRACT]\n\
-      \  - id: rf_bug_004_expected_red\n    run:\n      command: [go, test, -v, ./internal/resofeed,\
-      \ -run, ^TestRFBUG004OPMLImportOnlyContract$, -count=1]\n      timeout_seconds:\
-      \ 240\n    expect:\n      outcome: red\n      exit_codes: [1]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: legacy_export_auth_precedence}, {literal:\
-      \ expected unauthenticated 401 and authenticated 404}]\n        contains_any:\
-      \ []\n        forbids: [{literal: setup failed}, {literal: no tests to run},\
-      \ {literal: compile error}]\n    proves: [RF-BUG-004-CONTRACT, RF-BUG-003-005-CONTRACT]\n\
-      \  - id: rf_bug_005_expected_red\n    run:\n      command: [go, test, -v, ./internal/resofeed,\
-      \ -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$, -count=1]\n\
-      \      timeout_seconds: 240\n    expect:\n      outcome: red\n      exit_codes:\
-      \ [1]\n      stdout_or_stderr:\n        contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13},\
-      \ {literal: expected byte-exact canonical CSP}]\n        contains_any: []\n\
-      \        forbids: [{literal: setup failed}, {literal: no tests to run}, {literal:\
-      \ compile error}]\n    proves: [RF-BUG-005-CONTRACT, RF-BUG-003-005-CONTRACT]\n\
-      \  - id: rf_bug_005_browser_operations_expected_red\n    run:\n      command:\
-      \ [bash, -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-005\\\\] CSP operations import and State export import\
-      \ download$'\"]\n      timeout_seconds: 600\n    expect:\n      outcome: red\n\
+      \    run:\n      command: [go, test, -v, ./internal/resofeed, -run, \n'^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
+      \ \n-count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: red\n\
       \      exit_codes: [1]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ CSP operations import and State export import download}, {literal: expected\
-      \ State download under final CSP}]\n        contains_any: []\n        forbids:\
-      \ [{literal: No tests found}, {literal: webServer failed}]\n    proves: [RF-BUG-005-CONTRACT,\
+      \ \nRF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete}, {literal: \n\
+      RF-BUG-003_CSP_CRLF_NORMALIZED=chromium}, {literal: expected listener to remain\
+      \ \nunbound}]\n        contains_any: []\n        forbids: [{literal: setup failed},\
+      \ {literal: no tests to run}, {literal:\ncompile error}]\n    proves: [RF-BUG-003-CONTRACT,\
+      \ RF-BUG-003-005-CONTRACT]\n  - id: rf_bug_004_expected_red\n    run:\n    \
+      \  command: [go, test, -v, ./internal/resofeed, -run, \n^TestRFBUG004OPMLImportOnlyContract$,\
+      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: red\n \
+      \     exit_codes: [1]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ legacy_export_auth_precedence}, {literal: \nexpected unauthenticated 401 and\
+      \ authenticated 404}]\n        contains_any: []\n        forbids: [{literal:\
+      \ setup failed}, {literal: no tests to run}, {literal:\ncompile error}]\n  \
+      \  proves: [RF-BUG-004-CONTRACT, RF-BUG-003-005-CONTRACT]\n  - id: rf_bug_005_expected_red\n\
+      \    run:\n      command: [go, test, -v, ./internal/resofeed, -run, \n^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$,\
+      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: red\n \
+      \     exit_codes: [1]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ RF-BUG-005_EXACT_SUBTEST_SET=13}, {literal: \nexpected byte-exact canonical\
+      \ CSP}]\n        contains_any: []\n        forbids: [{literal: setup failed},\
+      \ {literal: no tests to run}, {literal:\ncompile error}]\n    proves: [RF-BUG-005-CONTRACT,\
+      \ RF-BUG-003-005-CONTRACT]\n  - id: rf_bug_005_browser_operations_expected_red\n\
+      \    run:\n      command: [bash, -lc, \"npm --prefix web exec -- playwright\
+      \ test --config \nweb/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0\nweb/tests/e2e/csp-operations.browser-contract.spec.ts --grep\
+      \ '^\\\\[RF-BUG-005\\\\] \nCSP operations import and State export import download$'\"\
+      ]\n      timeout_seconds: 600\n    expect:\n      outcome: red\n      exit_codes:\
+      \ [1]\n      stdout_or_stderr:\n        contains_all: [{literal: CSP operations\
+      \ import and State export import \ndownload}, {literal: expected State download\
+      \ under final CSP}]\n        contains_any: []\n        forbids: [{literal: No\
+      \ tests found}, {literal: webServer failed}]\n    proves: [RF-BUG-005-CONTRACT,\
       \ RF-BUG-003-005-CONTRACT]\nbindings:\n  expected_red:\n    items:\n      -\
-      \ {requirement: RF-BUG-003, assertion_id: A-RF-BUG-003-EMBED-DOCTOR, source_check:\
-      \ rf_bug_003_expected_red, selector: {type: test_id, value: TestRFBUG003EmbeddedUIContract},\
-      \ downstream_step: rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary,\
-      \ downstream_check: rf_bug_003_green, receipt: RF-BUG-003-red-to-green}\n  \
-      \    - {requirement: RF-BUG-004, assertion_id: A-RF-BUG-004-IMPORT-ONLY, source_check:\
-      \ rf_bug_004_expected_red, selector: {type: test_id, value: TestRFBUG004OPMLImportOnlyContract},\
-      \ downstream_step: rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface,\
-      \ downstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n  \
-      \    - {requirement: RF-BUG-005, assertion_id: A-RF-BUG-005-SECURITY, source_check:\
-      \ rf_bug_005_expected_red, selector: {type: test_id, value: TestRFBUG005SecurityHeadersCSPStreamingCancellationContract},\
-      \ downstream_step: rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp,\
-      \ downstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n  \
-      \    - {requirement: RF-BUG-005, assertion_id: A-RF-BUG-005-CSP-OPERATIONS,\
-      \ source_check: rf_bug_005_browser_operations_expected_red, selector: {type:\
-      \ test_id, value: '[RF-BUG-005] CSP operations import and State export import\
-      \ download'}, downstream_step: rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp,\
-      \ downstream_check: rf_bug_005_browser_operations_green, receipt: RF-BUG-005-csp-operations-red-to-green}\n\
+      \ {requirement: RF-BUG-003, assertion_id: A-RF-BUG-003-EMBED-DOCTOR, \nsource_check:\
+      \ rf_bug_003_expected_red, selector: {type: test_id, value: \nTestRFBUG003EmbeddedUIContract},\
+      \ downstream_step: \nrf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary,\
+      \ \ndownstream_check: rf_bug_003_green, receipt: RF-BUG-003-red-to-green}\n\
+      \      - {requirement: RF-BUG-004, assertion_id: A-RF-BUG-004-IMPORT-ONLY, \n\
+      source_check: rf_bug_004_expected_red, selector: {type: test_id, value: \nTestRFBUG004OPMLImportOnlyContract},\
+      \ downstream_step: \nrf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface,\
+      \ \ndownstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n\
+      \      - {requirement: RF-BUG-005, assertion_id: A-RF-BUG-005-SECURITY, \nsource_check:\
+      \ rf_bug_005_expected_red, selector: {type: test_id, value: \nTestRFBUG005SecurityHeadersCSPStreamingCancellationContract},\
+      \ downstream_step: \nrf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp,\
+      \ \ndownstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n\
+      \      - {requirement: RF-BUG-005, assertion_id: A-RF-BUG-005-CSP-OPERATIONS,\
+      \ \nsource_check: rf_bug_005_browser_operations_expected_red, selector: {type:\
+      \ \ntest_id, value: '[RF-BUG-005] CSP operations import and State export import\
+      \ \ndownload'}, downstream_step: \nrf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp,\
+      \ \ndownstream_check: rf_bug_005_browser_operations_green, receipt: \nRF-BUG-005-csp-operations-red-to-green}\n\
       \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red\"\
-      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"public_http_contract\"\
-      ,\"protected_acceptance_definition\"],\"primary_outcome\":\"RF-BUG-003-005-CONTRACT\"\
-      ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
-      ,\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
-      :[\"security-reviewer\",\"spec-verifier\"],\"review_mode\":\"ADJUDICATED\",\"\
-      phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
-      ,\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
-      :[\"rf_bug_003_expected_red\",\"rf_bug_004_expected_red\",\"rf_bug_005_expected_red\"\
-      ,\"rf_bug_005_browser_operations_expected_red\"],\"acceptance_mutation\":\"\
-      AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-runtime-contract\"\
-      ,\"path\":\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
-      ,\"purpose\":\"Define atomic RF-BUG-003/004/005 Go acceptance\",\"check_id\"\
-      :\"rf_bug_003_expected_red\",\"actor_id\":\"contract-test-author\"},{\"ref\"\
-      :\"authority:acceptance-mutation:rf005-csp-browser\",\"path\":\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"\
-      ,\"purpose\":\"Define real-Chromium CSP operation acceptance\",\"check_id\"\
-      :\"rf_bug_005_browser_operations_expected_red\",\"actor_id\":\"contract-test-author\"\
-      }]}}\n</vectl_step_policy>"
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-loc\n\
+      k.runtime-assets-opml-security-expected-red\",\"risk_tier\":\"R3\",\"risk_reasons\"\
+      :[\"s\necurity_boundary\",\"public_http_contract\",\"protected_acceptance_definition\"\
+      ],\"pri\nmary_outcome\":\"RF-BUG-003-005-CONTRACT\",\"rollback_class\":\"NONTRIVIAL\"\
+      ,\"proof_mod\nalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\"\
+      :\"gate-reviewer\",\"a\ndditional_verifiers\":[\"software-architect\",\"spec-verifier\"\
+      ],\"review_mode\":\"ADJUDI\nCATED\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":\n[],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_\n\
+      red_test.go\",\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"],\"\
+      acceptanc\ne_check_ids\":[\"rf_bug_003_expected_red\",\"rf_bug_004_expected_red\"\
+      ,\"rf_bug_005_ex\npected_red\",\"rf_bug_005_browser_operations_expected_red\"\
+      ],\"acceptance_mutation\":\n\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"\
+      ref\":\"authority:acceptance-mutation:r\nf-bug-runtime-contract\",\"path\":\"\
+      internal/resofeed/rf_bug_runtime_contract_expect\ned_red_test.go\",\"purpose\"\
+      :\"Define atomic RF-BUG-003/004/005 Go \nacceptance\",\"check_id\":\"rf_bug_003_expected_red\"\
+      ,\"actor_id\":\"contract-test-autho\nr\"},{\"ref\":\"authority:acceptance-mutation:rf005-csp-browser\"\
+      ,\"path\":\"web/tests/e\n2e/csp-operations.browser-contract.spec.ts\",\"purpose\"\
+      :\"Define real-Chromium CSP \noperation \nacceptance\",\"check_id\":\"rf_bug_005_browser_operations_expected_red\"\
+      ,\"actor_id\":\"\ngeneral\"}]}}\n</vectl_step_policy>\n**Depends On:** rf-bug-canonical-contract-sync"
     verification: Run all four checks independently; require corrected script/CRLF
       fixtures, auth-first OPML, exact 13 HTTP subtests, one Chromium CSP operation,
       and no product/docs diff.
