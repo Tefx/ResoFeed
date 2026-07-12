@@ -184292,7 +184292,7 @@ phases:
     depends_on:
     - formal-security-review
     - independent-runtime-ui-verification
-    agent: project-guide
+    agent: general
   - id: publish-immutable-two-platform-oci-image
     name: Publish immutable amd64 and arm64 OCI image
     status: pending
