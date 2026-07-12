@@ -184020,7 +184020,8 @@ phases:
       Require failed-test videos plus trace/screenshot/server/browser/network artifacts.
       Run the complete OPML active scan with only the four named exclusions. Exclude
       OCI/container/Tailnet/live rows. No custom evidence schema, registry, generator,
-      or phase gate.
+      or additional product/deployment gate. The phase''s terminal no-repo-change
+      Full Gate only reuses this matrix and existing downstream closure predicates.
 
 
       <vectl_step_policy>
