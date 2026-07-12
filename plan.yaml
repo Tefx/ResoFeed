@@ -183704,57 +183704,52 @@ phases:
       \ bodies, model overrides, and credentials never enter SQLite, State, diagnostics,\
       \ or logs. No migration or provider abstraction is added.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths:\n    - internal/resofeed/prompting.go\n    - internal/resofeed/prompting_test.go\n\
-      \    - internal/resofeed/openrouter.go\n    - internal/resofeed/openrouter_test.go\n\
-      \    - internal/resofeed/ingest.go\n    - internal/resofeed/ingest_test.go\n\
-      \    - internal/resofeed/reprocess.go\n    - internal/resofeed/reprocess_test.go\n\
-      \    - internal/resofeed/reingest.go\n    - internal/resofeed/reingest_test.go\n\
-      \    - internal/resofeed/http.go\n    - internal/resofeed/mcp.go\n    - internal/resofeed/testdata/prompting_v22/**\n\
-      \    - docs/PROMPTING_SYSTEM.md\n    - docs/ARCHITECTURE.md\n  blocked_paths:\n\
-      \    - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\n    - web/tests/**\n\
-      \    - docs/audits/**\n    - docs/BUG_REPORT_2026-07-11.md\n    - docs/BUG_FIX_PLAN_2026-07-12.md\n\
-      claims:\n  - RF-BUG-009\nchecks:\n  - id: rf_bug_009_green\n    run:\n     \
-      \ command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG009PromptingV22Contract$,\
-      \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ RF-BUG-009_EXACT_SUBTEST_SET=16}, {literal: single_semantic_repair_bound},\
-      \ {literal: library_reprocess_path}, {literal: mcp_path}]\n        contains_any:\
-      \ []\n        forbids: [{literal: FAIL}, {literal: no tests to run}, {literal:\
-      \ OPENROUTER_KEY=}]\n    proves: [RF-BUG-009]\n  - id: rf_bug_009_parity_green\n\
-      \    run:\n      command: [go, test, -v, ./internal/resofeed, -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$',\
-      \ -count=1]\n      timeout_seconds: 420\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ TestPromptingV22Payload}, {literal: TestPromptingV22Repair}, {literal: TestMCPV22}]\n\
-      \        contains_any: []\n        forbids: [{literal: FAIL}, {literal: no tests\
-      \ to run}, {literal: OPENROUTER_KEY=}]\n    proves: [RF-BUG-009]\n  - id: rf_bug_009_names_green\n\
-      \    run:\n      command: [bash, -lc, \"set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
+      scope:\n  allowed_paths: [internal/resofeed/prompting.go, internal/resofeed/prompting_test.go,\
+      \ internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go, internal/resofeed/ingest.go,\
+      \ internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go, internal/resofeed/reprocess_test.go,\
+      \ internal/resofeed/reingest.go, internal/resofeed/reingest_test.go, internal/resofeed/http.go,\
+      \ internal/resofeed/mcp.go, internal/resofeed/testdata/prompting_v22/**, docs/PROMPTING_SYSTEM.md,\
+      \ docs/ARCHITECTURE.md]\n  blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
+      \ web/tests/**, docs/audits/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md]\n\
+      claims: [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run: {command:\
+      \ [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG009PromptingV22Contract$,\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-009_EXACT_SUBTEST_SET=16},\
+      \ {literal: single_semantic_repair_bound}, {literal: library_reprocess_path},\
+      \ {literal: mcp_path}], contains_any: [], forbids: [{literal: FAIL}, {literal:\
+      \ no tests to run}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009]\n\
+      \  - id: rf_bug_009_parity_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$',\
+      \ -count=1], timeout_seconds: 420}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestPromptingV22Payload},\
+      \ {literal: TestPromptingV22Repair}, {literal: TestMCPV22}], contains_any: [],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: OPENROUTER_KEY=}]}}\n\
+      \    proves: [RF-BUG-009]\n  - id: rf_bug_009_names_green\n    run: {command:\
+      \ [bash, -lc, \"set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
       \\.1|(^|[^[:alnum:]_])V2\\\\.1([^[:alnum:]_]|$)' -- cmd internal/resofeed web/src\
       \ web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md; s=$?; set -e; test\
-      \ $s -eq 1; echo PROMPTING_V21_ACTIVE_MATCHES=0\"]\n      timeout_seconds: 240\n\
-      \    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: PROMPTING_V21_ACTIVE_MATCHES=0}]\n       \
-      \ contains_any: []\n        forbids: [{literal: broad exclusion}, {literal:\
-      \ completed plan scanned}]\n    proves: [RF-BUG-009]\n  - id: rf_bug_009_regression_green\n\
-      \    run:\n      command: [go, test, -v, ./internal/resofeed, -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence)$',\
-      \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ TestPromptingV22Payload}, {literal: TestPromptingV22Validation}, {literal:\
-      \ TestPromptingV22Repair}, {literal: TestPromptingV22Persistence}]\n       \
-      \ contains_any: []\n        forbids: [{literal: FAIL}, {literal: no tests to\
-      \ run}]\n    proves: [RF-BUG-009]\nbindings:\n  expected_red:\n    items: []\n\
-      \  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red,\
+      \ $s -eq 1; echo PROMPTING_V21_ACTIVE_MATCHES=0\"], timeout_seconds: 240}\n\
+      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: PROMPTING_V21_ACTIVE_MATCHES=0}], contains_any: [], forbids: [{literal:\
+      \ broad exclusion}, {literal: completed plan scanned}]}}\n    proves: [RF-BUG-009]\n\
+      \  - id: rf_bug_009_regression_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence)$',\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestPromptingV22Payload},\
+      \ {literal: TestPromptingV22Validation}, {literal: TestPromptingV22Repair},\
+      \ {literal: TestPromptingV22Persistence}], contains_any: [], forbids: [{literal:\
+      \ FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-009]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red,\
       \ source_check: rf_bug_009_expected_red, requirement: RF-BUG-009, assertion_id:\
       \ A-RF-BUG-009-PROMPTING, downstream_check: rf_bug_009_green, receipt: RF-BUG-009-red-to-green}\n\
       </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
       ,\"step_id\":\"rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"runtime_prompt_contract\",\"cross_component_behavior\"\
       ,\"persistence_behavior\"],\"primary_outcome\":\"RF-BUG-009\",\"rollback_class\"\
-      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"\
-      ],\"primary_verifier\":\"spec-verifier\",\"additional_verifiers\":[\"integration-verifier\"\
-      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
-      :{\"developer_test_globs\":[\"internal/resofeed/prompting_test.go\",\"internal/resofeed/openrouter_test.go\"\
-      ,\"internal/resofeed/ingest_test.go\",\"internal/resofeed/reprocess_test.go\"\
-      ,\"internal/resofeed/reingest_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
+      :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/prompting_test.go\"\
+      ,\"internal/resofeed/openrouter_test.go\",\"internal/resofeed/ingest_test.go\"\
+      ,\"internal/resofeed/reprocess_test.go\",\"internal/resofeed/reingest_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_009_green\"],\"acceptance_mutation\":\"\
       FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
     verification: Require exact protected 16-subtest equality, nine focused path parents,
