@@ -184358,9 +184358,12 @@ phases:
       :[\"tests/rf_bug_closure_contract_test.go\"],\"acceptance_test_paths\":[],\"\
       acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
       :[]}}\n</vectl_step_policy>"
-    verification: Require ten exact closure subtests, final nine-document/two-exclusion
-      OPML scan, active Prompting scan, current authority hashes, independent review
-      evidence, and no diff outside the report/closure test pair.
+    verification: Before mutation require defect-report SHA-256 017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27
+      and repair-plan SHA-256 185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464.
+      After the authorized update require ten exact closure subtests, the final nine-document/two-exclusion
+      OPML scan, active Prompting scan, explicit post_closure_report_sha256 and closure_commit
+      evidence fields, independent review evidence, and no diff outside the report/closure-test
+      pair.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
