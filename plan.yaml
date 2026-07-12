@@ -184146,7 +184146,7 @@ phases:
   - id: independent-runtime-ui-verification
     name: Perform fresh black-box RF-BUG runtime and UI verification
     status: pending
-    description: 'step_type: implementation
+    description: 'step_type: verification
 
       repo_change_policy: no_repo_change
 
@@ -184158,15 +184158,7 @@ phases:
       import-only OPML/state; four headers/CSP/streaming/cancellation; Source Ledger
       controls/states at five viewports with reviewed screenshots, grouping, overflow,
       keyboard and 44px checks; Prompting v2.2; and E2E case isolation/cleanup. Existing
-      fallback fonts are valid. No bundled-font, zero-diff, reset-schema, expected-ID,
-      or phase-gate evidence is required. Findings route to owners and block closure.
-
-
-      <vectl_step_policy>
-
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.independent-runtime-ui-verification","risk_tier":"R2","risk_reasons":["cross_component_black_box_acceptance","public_ui_contract","runtime_browser_proof"],"primary_outcome":"RF-BUG-INDEPENDENT-RUNTIME-UI","rollback_class":"TRIVIAL","proof_modalities":["RUNTIME_PROBE","REVIEW"],"primary_verifier":"blind-tester","additional_verifiers":["blind-tester"],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
-
-      </vectl_step_policy>'
+      fallback fonts are valid. Findings route to owners and block closure.'
     verification: Fresh blind tester runs the protected acceptance contracts against
       real runtimes and reviews five viewport screenshots. PASS requires every RF-BUG
       outcome green and no unresolved finding; the fixer does not self-approve.
