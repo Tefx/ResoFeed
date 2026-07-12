@@ -183986,13 +183986,14 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-009. Implement v2.2 payloads, structured-output routing, validation,\
-      \ one generation plus at most one semantic repair, permitted pre-generation\
-      \ schema downgrade, failure-content preservation, diagnostics, persistence,\
-      \ and canonical fixtures across ingest, reprocess, selected-item re-ingest,\
-      \ HTTP, and MCP. No secret/prompt logs or DB migration. Protected Prompting\
-      \ and all frontend/browser contracts are immutable. Update PROMPTING_SYSTEM\
-      \ behavior prose. Recovery reverts runtime/tests/docs.\n\n<intent_closure_contract>\n\
+      \ RF-BUG-009. Implement v2.2 payloads, structured-output routing without silent\
+      \ substitution, output and semantic validation, one normal generation plus at\
+      \ most one semantic repair, the documented pre-generation downgrade exception,\
+      \ usable-content preservation, persistence, fixtures, and one compiler/validator\
+      \ path across ingest, library reprocess, selected-item re-ingest, HTTP, and\
+      \ MCP. No secret/prompt logs or DB migration. Protected contracts are immutable.\
+      \ The protected green collection/run set must equal the exact 16 Section 4.9\
+      \ subtests; aggregate counts and obsolete title aliases fail.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go,\
       \ internal/resofeed/ingest.go, internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go,\
@@ -184004,23 +184005,33 @@ phases:
       \ web/tests/**, docs/ARCHITECTURE.md, docs/USAGE.md, docs/ui-preview.html, plan.yaml]\n\
       claims: [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run:\n      command:\n\
       \        - bash\n        - -lc\n        - |-\n          go test -list '^TestRFBUG009PromptingV22Contract$'\
-      \ ./internal/resofeed | tee /tmp/rf009-green-list; test $(grep -Fxc 'TestRFBUG009PromptingV22Contract'\
-      \ /tmp/rf009-green-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG009PromptingV22Contract$'\
-      \ -count=1\n      timeout_seconds: 300\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG009PromptingV22Contract/semantic_repair_at_most_once'},\
-      \ {literal: '=== RUN   TestRFBUG009PromptingV22Contract/ingest_reprocess_reingest_HTTP_MCP_parity'},\
-      \ {literal: RF_BUG_009_SUBTESTS=}, {literal: '--- PASS: TestRFBUG009PromptingV22Contract'}],\
-      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
-      \ to run]'}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009]\n  - id:\
-      \ rf_bug_009_parity_green\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n          go test -list '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
+      \ ./internal/resofeed | tee /tmp/rf009-green-list\n          test \"$(grep -Fxc\
+      \ TestRFBUG009PromptingV22Contract /tmp/rf009-green-list)\" -eq 1\n        \
+      \  go test -v ./internal/resofeed -run '^TestRFBUG009PromptingV22Contract$'\
+      \ -count=1 2>&1 | tee /tmp/rf009-green-run\n          python3 - <<'PY'\n   \
+      \       import re\n          t=open('/tmp/rf009-green-run').read(); expected={'TestRFBUG009PromptingV22Contract/'+x\
+      \ for x in 'payload_fields structured_output_routing no_silent_model_substitution\
+      \ output_validation semantic_validation single_semantic_repair_bound pre_generation_downgrade_exception\
+      \ usable_content_preserved_on_validation_failure ingest_path library_reprocess_path\
+      \ item_reingest_path http_path mcp_path persistence_after_validation required_regression_fixtures\
+      \ active_v22_names'.split()}; got=set(re.findall(r'^=== RUN\\s+(TestRFBUG009PromptingV22Contract/[^\\\
+      s]+)',t,re.M)); assert got==expected,(sorted(expected-got),sorted(got-expected));\
+      \ assert '--- PASS: TestRFBUG009PromptingV22Contract' in t; print('RF-BUG-009_EXACT_SUBTEST_SET=16')\n\
+      \          PY\n      timeout_seconds: 300\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-009_EXACT_SUBTEST_SET=16},\
+      \ {literal: '=== RUN   TestRFBUG009PromptingV22Contract/single_semantic_repair_bound'},\
+      \ {literal: '=== RUN   TestRFBUG009PromptingV22Contract/library_reprocess_path'},\
+      \ {literal: '=== RUN   TestRFBUG009PromptingV22Contract/mcp_path'}, {literal:\
+      \ '--- PASS: TestRFBUG009PromptingV22Contract'}], forbids: [{literal: FAIL},\
+      \ {literal: no tests to run}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009]\n\
+      \  - id: rf_bug_009_parity_green\n    run: {command: [bash, -lc, \"go test -list\
+      \ '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
       \ ./internal/resofeed | tee /tmp/rf009-parity-list; test $(grep -Ec '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
       \ /tmp/rf009-parity-list) -eq 9; go test -v ./internal/resofeed -run '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
-      \ -count=1\n      timeout_seconds: 420\n    expect: {outcome: green, exit_codes:\
+      \ -count=1\"], timeout_seconds: 420}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestPromptingV22Payload'},\
-      \ {literal: '=== RUN   TestPromptingV22Repair'}, {literal: '=== RUN   TestMCPV22'},\
-      \ {literal: RF_BUG_009_PARITY_TOP_LEVEL_TESTS=9}], forbids: [{literal: FAIL},\
-      \ {literal: no tests to run}, {literal: '[no tests to run]'}, {literal: OPENROUTER_KEY=}]}}\n\
+      \ {literal: '=== RUN   TestPromptingV22Repair'}, {literal: '=== RUN   TestMCPV22'}],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: OPENROUTER_KEY=}]}}\n\
       \    proves: [RF-BUG-009]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
       \    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
       \ source_check: rf_bug_009_expected_red, requirement: RF-BUG-009, assertion_id:\
@@ -184037,9 +184048,9 @@ phases:
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_009_green\"],\"acceptance_mutation\":\"\
       FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Require exact protected Prompting test/subtests, exactly nine named
-      parity top-level tests, bounded retry/persistence behavior, no secret/prompt
-      output, and zero protected-artifact diff.
+    verification: Require exact 16-subtest equality, nine focused parity parents,
+      bounded repair/persistence behavior, no secret/prompt output, and zero protected-artifact
+      diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
