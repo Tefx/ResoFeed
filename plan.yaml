@@ -183903,7 +183903,7 @@ phases:
   - id: rf-bug-e2e-isolation-full-gate
     name: RF-BUG e2e-isolation phase Full Gate
     status: pending
-    description: 'step_type: verification
+    description: 'step_type: gate
 
       repo_change_policy: no_repo_change
 
