@@ -184907,7 +184907,7 @@ phases:
       Repository mutation is absent because this step hashes the immutable authority
       input and the finalized managed plan after all R11 reconciliation predicates
       are present. Run `shasum -a 256 docs/BUG_FIX_PLAN_2026-07-12.md plan.yaml`;
-      require the authority digest exactly `9b92857388a30a91a5658177227fa86d81b3f7146081d4b0856247020c9a852d`,
+      require the authority digest exactly `36402b2639b617c5d55548df3c09e8b3d119e2513d1c49ab81fa13c3aa2c7ba6`,
       require the plan digest to be a lowercase 64-hex SHA-256, and record both with
       `AUTHORITY_SHA256=` and `PLAN_SHA256=` labels. Run `vectl validate --check-refs`
       immediately before hashing; any later managed-plan mutation invalidates this
@@ -184920,7 +184920,7 @@ phases:
 
       </vectl_step_policy>'
     verification: Receipt includes VALID reference-aware Vectl validation, exact authority
-      SHA-256 9b92857388a30a91a5658177227fa86d81b3f7146081d4b0856247020c9a852d, and
+      SHA-256 36402b2639b617c5d55548df3c09e8b3d119e2513d1c49ab81fa13c3aa2c7ba6, and
       the final lowercase 64-hex plan SHA-256; no later plan mutation is permitted
       without refreshing it.
     depends_on:
