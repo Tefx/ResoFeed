@@ -184051,7 +184051,7 @@ phases:
   - id: fresh-docker-runtime-proof
     name: Verify the published image on both platforms
     status: pending
-    description: 'step_type: implementation
+    description: 'step_type: verification
 
       repo_change_policy: runtime_state_only
 
@@ -184065,14 +184065,7 @@ phases:
       no external UI tree/Node runtime, Doctor UI lines, import-only OPML, JSON state
       backup/restore, four headers, and A-to-B persistence. Never print secrets. Recovery
       stops/removes test containers and blocks deployment on any platform, rootfs,
-      state, or digest mismatch.
-
-
-      <vectl_step_policy>
-
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.fresh-docker-runtime-proof","risk_tier":"R3","risk_reasons":["multi_arch_container_runtime","state_persistence","deployment_prerequisite"],"primary_outcome":"RF-BUG-CONTAINER-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["software-architect"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
-
-      </vectl_step_policy>'
+      state, or digest mismatch.'
     verification: Run `docker buildx imagetools inspect <immutable-reference>` and
       then `docker run --rm --platform linux/amd64 ...` and `docker run --rm --platform
       linux/arm64 ...` against that exact digest with temporary volumes and bounded
