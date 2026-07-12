@@ -183137,18 +183137,18 @@ phases:
 
 
       Terminal bounded phase Full Gate for `rf-bug-20260712-contract-lock`. Repository
-      mutation is absent because this gate only re-runs the phase''s existing canonical
-      documentation predicate and protected expected-red collection/assertion checks,
-      then records normal plan-assurance metadata. Reuse only `canonical_runtime_docs_green`,
-      `rf_bug_001_expected_red`, `rf_bug_002_expected_red`, `rf_bug_002_route_unit_expected_red`,
-      `rf_bug_002_api_expected_red`, `rf_bug_003_expected_red`, `rf_bug_004_expected_red`,
-      `rf_bug_005_expected_red`, `rf_bug_005_browser_operations_expected_red`, `rf_bug_008_browser_expected_red`,
-      `rf_bug_008_operations_expected_red`, `rf_bug_009_expected_red`, `rf_bug_010_expected_red`,
-      and `rf_bug_010_artifact_expected_red`. Require exact positive collection, intended
-      red assertions, protected-path authority, and canonical-doc scan success. Do
-      not add or modify product code, runtime behavior or processes, storage models,
-      registries, manifests, custom evidence protocols, deployment requirements, acceptance
-      artifacts, or canonical product architecture.'
+      mutation is absent because this gate exclusively reuses the phase''s declared
+      predicates and records normal plan-assurance metadata. Reuse exactly `canonical_runtime_docs_green`,
+      `rf_bug_001_expected_red`, `rf_bug_002_expected_red`, `rf_bug_002_search_route_history_expected_red`,
+      `rf_bug_002_route_unit_expected_red`, `rf_bug_002_api_expected_red`, `rf_bug_003_expected_red`,
+      `rf_bug_004_expected_red`, `rf_bug_004_state_import_expected_red`, `rf_bug_005_expected_red`,
+      `rf_bug_005_browser_operations_expected_red`, `rf_bug_006_expected_red`, `rf_bug_007_expected_red`,
+      `rf_bug_008_browser_expected_red`, `rf_bug_008_operations_expected_red`, `rf_bug_009_expected_red`,
+      `rf_bug_010_expected_red`, and `rf_bug_010_artifact_expected_red`. Require exact
+      collection/title/subtest inventories, Search assertion-specific red evidence,
+      ordered RF-BUG-010 lifecycle evidence, protected-path authority, and the explicit
+      seven-active-document scan. Do not mutate product, docs, tests, runtime state,
+      storage, manifests, registries, schemas, or deployment.'
     verification: All existing contract-lock checks reach their declared outcomes
       with exact collection/count evidence; `vectl validate --check-refs` and phase
       intent-closure lint are conformant; git product/docs/test diff remains unchanged
