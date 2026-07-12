@@ -184060,7 +184060,7 @@ phases:
     - docs/BUG_REPORT_2026-07-11.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
-    - rf-bug-010-migrate-playwright-lanes
+    - rf-bug-010-harness-foundation
     agent: integration-verifier
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, OCI, Container, Tailnet, and Independent Closure
