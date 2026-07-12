@@ -183418,7 +183418,7 @@ phases:
     verification: Require exact EN/ZH route collection and 100 retry-free executions,
       four Search titles with invalid no-request/no-history cases, nine token round
       trips, 30 API subtests, and no protected acceptance diff.
-    agent: integration-engineer
+    agent: general
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
