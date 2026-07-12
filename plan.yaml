@@ -184104,17 +184104,16 @@ phases:
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, OCI, Container, Tailnet, and Independent Closure
   status: locked
-  gate: The bounded local-only matrix passes; an immutable two-platform image is then
-    published and verified in containers; the verified digest is deployed and checked
-    through Tailnet/Caddy; fresh security/runtime/UI reviews have no unresolved findings;
-    canonical docs and the defect report are synchronized; the terminal Full Gate
-    reuses only those existing predicates without repository mutation.
-  context: Dependency order is local verification -> OCI publication -> both-platform
-    container verification -> Tailnet deployment/verification -> independent reviews
-    -> documentation closure -> one terminal bounded no-repo-change Full Gate. Ordinary
-    bounded command evidence and normal plan-assurance metadata are sufficient; no
-    custom evidence registry, new product artifact, runtime process, or additional
-    deployment requirement is introduced.
+  gate: The local matrix is exact and redacted; the verified commit is published as
+    one immutable amd64/arm64 index; both containers and Tailnet/Caddy pass with rollback
+    readiness; independent security and black-box reviews have no findings; RF-BUG-001–010
+    report closure is synchronized; current authority hashes/commit and reference-aware
+    Vectl validation pass with empty active claims.
+  context: Dependency order is authoritative local verification, immutable two-platform
+    OCI publication, both-platform container proof, Tailnet/Caddy deployment, independent
+    security and black-box verification, bounded defect-report closure, then one terminal
+    no-repo-change Full Gate. Each environment keeps its own owner, evidence root,
+    authorization, and rollback boundary.
   depends_on:
   - rf-bug-20260712-e2e-isolation
   steps:
