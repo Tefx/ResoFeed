@@ -73,16 +73,16 @@ Rationale: these cover common Intel/AMD hosts, ARM edge devices, and Apple Silic
 
 ## Image Build Contract
 
-The image should be built with three stages:
+The image must be built with three stages:
 
-1. Build the static web UI:
+1. Build the static web UI in a Node builder stage:
 
    ```text
    npm --prefix web ci
    npm --prefix web run build
    ```
 
-2. Build the Go binary:
+2. Build the Go binary in a Go builder stage after making the validated `web/build` output available to the Go build context used by `cmd/resofeed`. The production UI must be embedded into the resulting binary during this stage:
 
    ```text
    go build -o /out/resofeed ./cmd/resofeed
@@ -98,11 +98,10 @@ The image should be built with three stages:
    -ldflags=-s -w
    ```
 
-3. Copy only these runtime artifacts into the final image:
+3. Copy only the built binary into the final runtime image:
 
    ```text
    /out/resofeed -> /app/resofeed
-   web/build -> /app/web/build
    ```
 
    Create `/data` separately as an empty runtime directory or mount point owned and writable by the final non-root runtime user. `/data` must never be copied from repository local state or from any build stage.
@@ -110,11 +109,10 @@ The image should be built with three stages:
    The final image must declare this invocation contract:
 
    ```text
-   WORKDIR /app
    ENTRYPOINT ["/app/resofeed"]
    ```
 
-   Container command arguments are therefore ResoFeed CLI arguments. For example, `docker run <image-ref> serve ...` runs `/app/resofeed serve ...` from `/app`. The working directory matters because the server resolves the built UI at the relative path `web/build`, which must refer to `/app/web/build` in the final image.
+   Container command arguments are ResoFeed CLI arguments. For example, `docker run <image-ref> serve ...` runs `/app/resofeed serve ...`. Startup and UI serving must work from any working directory. The final runtime must not contain or mount `web/build`, and the server must not resolve UI assets from the process working directory or any external asset directory.
 
    `/data` must be writable by the final non-root runtime user so SQLite can create and update `/data/resofeed.sqlite3`.
 
@@ -122,11 +120,11 @@ The image should be built with three stages:
 
 - The Go build stage may use the Go toolchain compatible with `go.mod` (`go 1.22`) or an approved newer Go toolchain.
 - Node/npm are allowed only in the web build stage, and dependency installation must use `npm ci` from `web/package-lock.json`.
-- The final runtime image must not include Node/npm, a shell, a package manager, or build-only OS packages.
+- The final runtime image may contain the binary, runtime-base certificate/user metadata required by the selected base image, and the empty writable `/data` mount point only.
+- The final runtime image must not include Node/npm, a shell, a package manager, build-only OS packages, or an external UI asset tree.
 - Do not add extra runtime packages unless architecture approval explicitly allows them.
 
-Do not copy `.env`, `.git`, local `data/`, `node_modules/`, test artifacts, or audit evidence into the runtime image.
-
+Do not copy `.env`, `.git`, local `data/`, `node_modules/`, test artifacts, audit evidence, or `web/build` into the runtime image.
 ## Runtime Configuration
 
 ### Recommended container command
@@ -314,6 +312,8 @@ The core container image does not terminate TLS.
 
 For HTTPS, keep ResoFeed listening on plain HTTP inside the container and set `--public-url` to the external HTTPS URL provided by the deployment layer.
 
+Go owns the application security-header contract, including Content Security Policy, `X-Content-Type-Options`, `Referrer-Policy`, and `X-Frame-Options`, for static UI, JSON HTTP, and MCP responses as applicable. Caddy and other reverse proxies must pass those headers through unchanged: they must not remove, replace, duplicate, or weaken them.
+
 Examples of deployment-layer choices:
 
 - [Tailscale Serve/Funnel](examples/TAILSCALE_CONTAINER.md);
@@ -322,17 +322,20 @@ Examples of deployment-layer choices:
 - a host or platform reverse proxy.
 
 These are examples, not core runtime dependencies.
-
 ## Verification Checklist
 
 Before accepting the containerization work:
 
 - Build succeeds for `linux/amd64` and `linux/arm64`.
-- Runtime image does not contain `.env`, `.git`, local `data/`, or `node_modules/`.
-- Final image declares `WORKDIR /app` before `ENTRYPOINT ["/app/resofeed"]` or an equivalent invocation contract that makes relative `web/build` resolve to `/app/web/build`; it also runs as non-root and can create/write `/data/resofeed.sqlite3` through the mounted `/data` volume.
+- Runtime image does not contain `.env`, `.git`, local `data/`, `node_modules`, `web/build`, or any other external UI asset tree.
+- Final image runs as non-root, can create/write `/data/resofeed.sqlite3` through the mounted `/data` volume, and contains no required application runtime artifact beyond `/app/resofeed`.
+- The same final image starts successfully from at least two working directories, including one unrelated to `/app`; UI behavior and generated asset URLs are identical.
 - Container starts with `resofeed serve` and logs `ui: mounted`, `api: enabled`, and `mcp: /mcp`.
-- `GET /` proves the generated SvelteKit UI is served: the HTML must include at least one generated asset reference containing `_app/immutable/`, and at least one extracted referenced asset under `_app/immutable/` must return HTTP `200`. The fallback owner-token HTML alone is insufficient evidence because fallback HTML can pass even when built assets are missing.
-- `/api/doctor` returns `401` without owner token and succeeds with the token.
+- `GET /` proves the generated SvelteKit UI is served from the binary: the HTML includes at least one generated asset reference containing `_app/immutable/`, and at least one extracted referenced asset under `_app/immutable/` returns HTTP `200`. The fallback owner-token HTML alone is insufficient evidence.
+- Binary-only runtime proof removes or makes unavailable every external UI build directory before startup, then verifies root, generated assets, and a valid deep link. Any request-time read of `web/build` or any working-directory-relative UI path fails this gate.
+- Static GET and HEAD behavior, content types, deep-link fallback, and ordinary not-found responses remain correct without an external UI asset directory.
+- `/api/doctor` returns `401` without owner token and succeeds with the token; its safe output reports the documented embedded-asset readiness without exposing tokens, provider keys, `.env` contents, or secret-source paths.
 - `/mcp` returns `401` without owner token before tool handling.
+- Direct and Caddy-fronted responses contain one effective Go-owned Content Security Policy and the required application security headers. Caddy passes them unchanged, with no missing, duplicate, replaced, or weakened values.
 - SQLite state is writable and survives stop/remove/recreate through the same `/data` volume. Gate evidence must show first startup with an empty named volume creates `/data/resofeed.sqlite3`, then a replacement container using that same volume can start and pass `/api/doctor` with the persisted owner-token verifier.
 - Provider HTTPS trust is verified at the app level without shell access inside the final image: run the container with a valid `OPENROUTER_KEY` supplied through the safe `-e OPENROUTER_KEY` host environment pass-through, then from the host call `GET /api/runtime/openrouter-models` with `Authorization: Bearer <OWNER_TOKEN>`. Passing proof is HTTP `200` with the documented JSON model-list shape. `x509: certificate signed by unknown authority` or any TLS trust failure is a failure. Keep the owner token and provider key redacted in evidence.

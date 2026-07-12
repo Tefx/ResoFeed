@@ -13,7 +13,7 @@ Contract baseline: these decisions are anchored in the current product/design do
 1. **One deployable Go process.** ResoFeed is one binary started with `resofeed serve`. It serves the static SvelteKit app, JSON HTTP API, MCP Streamable HTTP at `/mcp`, and background ingestion loop. Rationale: the product is a single-tenant tool, not SaaS infrastructure. Fails if team/multi-tenant scale becomes product scope.
 2. **CLI flags are the primary non-secret runtime configuration surface; LLM secrets are runtime inputs.** `serve` accepts flags for bind address, public URL, SQLite path, optional OpenRouter model, and optional owner token. OpenRouter API keys, when present, must be resolved from runtime-only secret sources and must never be passed by CLI flag, persisted, exported, logged, or committed. Normal model-backed processing uses startup/runtime secret configuration; HTTP model listing is the explicit request-time secret-resolution exception so safe env/`.env` changes can be reflected without making secrets durable state. A missing key is allowed as a provider-unavailable runtime state: the server may bind, while model-backed operations are unavailable and model listing returns the safe empty response. Rationale: command-line flags are concrete and inspectable for non-secret configuration, while API keys must not be placed in shell history, process listings, or durable product state. Fails if deployment later requires a full config-file management surface or a centralized secret/config service.
 3. **One SQLite database.** SQLite is the durable source of truth; FTS5 is the lexical index. Rationale: local ownership and operational simplicity matter more than distributed scale. Fails if multi-writer distributed deployment becomes required.
-4. **Current state only.** Store the present state needed for feed display, search, import/export, agent idempotency, and provenance. Do not build event sourcing, JSONL runtime state, or a user-visible activity ledger. Fails if audit-grade historical reconstruction becomes a hard requirement.
+4. **Current state only.** Store the present state needed for feed display, search, JSON State backup/restore, OPML source intake, agent idempotency, and provenance. OPML is import-only and cannot represent portable state. Do not build event sourcing, JSONL runtime state, or a user-visible activity ledger. Fails if audit-grade historical reconstruction becomes a hard requirement.
 5. **One backend package.** Product behavior lives in `internal/resofeed` as direct functions and SQL, not `app/domain/repository/service` layers. Rationale: there is one runtime and one database. Fails if multiple storage backends or independently deployed services become real requirements.
 6. **Thin transports.** HTTP and MCP validate auth/payloads and call the same product operations. Rationale: humans and agents must share Inspect, Resonate, Steer, search, and retrieval semantics. Fails if MCP gets product concepts unavailable to humans.
 7. **OpenRouter as the sole LLM backend.** LLM calls use OpenRouter chat completions for summaries and steering translation at `https://openrouter.ai/api/v1/chat/completions`. The model is a request/response JSON transformation and never owns durable state, orchestration, or direct database writes; Go validates every structured output before applying or saving it. Rationale: the user explicitly chose an OpenRouter-only migration while the PRD treats AI as utility infrastructure. Fails if a different provider becomes a product requirement.
@@ -914,7 +914,7 @@ Forbidden:
 
 ### 5.5 State Portability
 
-Portable state is a backup/restore contract, not a sync or multi-instance merge protocol.
+Portable state is an atomic JSON backup/restore contract, not a sync or multi-instance merge protocol. JSON State is the only portable-state format. OPML is import-only source intake and cannot export, restore, or otherwise represent portable ResoFeed state.
 
 Portable state bundle includes:
 
@@ -1646,6 +1646,8 @@ Endpoint contracts:
 | `GET /api/doctor` | none | `200` | `text/plain; charset=utf-8` raw diagnostic lines |
 | `GET /api/runtime/operation` | none; no query params | `200` | `{ "operation": CurrentOperationInfo }`; in-memory contextual snapshot only, not durable state |
 
+`GET /api/sources/export-opml` is retired and is not a public capability. The protected `/api/*` authentication boundary still applies before route resolution; with valid Owner Token authentication, the retired path follows the ordinary not-found behavior.
+
 `POST /api/items/{id}/delivery` contract:
 
 - marks that an authorized human or agent surfaced the item outside the ResoFeed UI by setting `item_state.external_surfaced_at` to the required RFC3339 `delivered_at` value;
@@ -1702,36 +1704,6 @@ Idempotency rules:
 - retrying the same mutation with the same live `idempotency_key` and same request fingerprint returns the stored result and `already_applied: true` when applicable;
 - retrying with the same live `idempotency_key` but a different request fingerprint returns `400 bad_request`;
 - new idempotency keys represent new intended operations.
-
-### OPML Export HTTP Addendum
-
-`GET /api/sources/export-opml` exports the active Source Ledger source list as OPML XML. It is the symmetric source-list counterpart to `POST /api/sources/import-opml`; it is not state export.
-
-Contract:
-
-- requires owner-token authorization like every `/api/*` route;
-- accepts no request body and no query parameters;
-- returns `200 OK` with `application/xml; charset=utf-8`;
-- may include `Content-Disposition: attachment; filename="sources.opml"`;
-- includes active sources only, using source title and feed URL;
-- omits inactive/deleted sources, steering rules, resonated items, item state, reading history, command history, receipts, runtime operation state, and sync metadata;
-- does not recreate OPML folders/tags because imported OPML is flattened by design;
-- uses the standard JSON error body for auth/internal failures.
-
-Minimal response shape:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<opml version="2.0">
-  <head><title>ResoFeed Sources</title></head>
-  <body>
-    <outline type="rss" text="Example" title="Example" xmlUrl="https://example.com/feed.xml" />
-  </body>
-</opml>
-```
-
-Failure condition: this endpoint is wrong if it exports portable State JSON fields, embeds steering/resonance data, restores OPML folder hierarchy, or requires a settings/backup-management surface.
-
 
 ### Processing Language and Reprocess HTTP Addendum
 
