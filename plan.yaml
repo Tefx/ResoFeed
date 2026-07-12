@@ -183452,6 +183452,33 @@ phases:
     depends_on:
     - embed-ui-assets-in-single-binary
     agent: golang-developer
+  - id: rf-bug-runtime-boundaries-full-gate
+    name: RF-BUG runtime-boundaries phase Full Gate
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Terminal bounded phase Full Gate for `rf-bug-20260712-runtime-boundaries`. Repository
+      mutation is absent because this gate only re-runs existing phase acceptance
+      checks and records normal plan-assurance metadata. Reuse only `rf_bug_003_green`,
+      `rf_bug_003_local_binary_green`, `rf_bug_004_green`, `rf_bug_004_active_scan_green`,
+      `rf_bug_005_green`, `rf_bug_005_local_stream_green`, and `rf_bug_005_browser_operations_green`.
+      Require exact Go collection before each protected run, package-local embedded
+      bootstrap proof, fail-closed active OPML scan, auth-first import-only behavior,
+      exact CSP/header/streaming/cancellation proof, and zero protected-artifact diff.
+      Do not add or modify product code, runtime behavior or processes, storage models,
+      registries, manifests, custom evidence protocols, deployment requirements, acceptance
+      artifacts, or canonical product architecture.'
+    verification: All existing runtime-boundary checks are green with exact collection/count
+      evidence; facade validation and phase intent-closure lint are conformant; gate
+      writes no repository artifacts.
+    depends_on:
+    - embed-ui-assets-in-single-binary
+    - enforce-opml-import-only-surface
+    - apply-outer-security-middleware-and-csp
+    agent: gate-reviewer
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger Operations and Prompting v2.2
   status: locked
