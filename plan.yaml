@@ -183985,11 +183985,14 @@ phases:
   gate: The bounded local-only matrix passes; an immutable two-platform image is then
     published and verified in containers; the verified digest is deployed and checked
     through Tailnet/Caddy; fresh security/runtime/UI reviews have no unresolved findings;
-    canonical docs and the defect report are synchronized.
+    canonical docs and the defect report are synchronized; the terminal Full Gate
+    reuses only those existing predicates without repository mutation.
   context: Dependency order is local verification -> OCI publication -> both-platform
     container verification -> Tailnet deployment/verification -> independent reviews
-    -> documentation closure. Ordinary bounded command evidence is sufficient; no
-    phase Full Gate or custom evidence registry.
+    -> documentation closure -> one terminal bounded no-repo-change Full Gate. Ordinary
+    bounded command evidence and normal plan-assurance metadata are sufficient; no
+    custom evidence registry, new product artifact, runtime process, or additional
+    deployment requirement is introduced.
   depends_on:
   - rf-bug-20260712-e2e-isolation
   steps:
