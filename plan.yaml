@@ -184298,25 +184298,23 @@ phases:
   - id: rf-bug-assurance-closure-full-gate
     name: RF-BUG assurance-closure phase Full Gate
     status: pending
-    description: 'step_type: verification
+    description: 'step_type: gate
 
       repo_change_policy: no_repo_change
 
 
       Terminal bounded Full Gate for RF-BUG assurance closure. Repository mutation
-      is absent because the gate reuses the authoritative local matrix, immutable
-      OCI publication, both-platform container proof, Tailnet/Caddy deployment, independent
-      security and black-box verification, and defect-report closure. Immediately
-      before closure require `vectl validate --check-refs`, current strategy authority
-      `docs/BUG_FIX_PLAN_2026-07-12.md` SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
+      is absent because the gate consumes the local matrix, pre-operation deployment
+      authorization, immutable OCI publication, both-platform container proof, Tailnet/Caddy
+      deployment, post-runtime security review, independent black-box verification,
+      and defect-report closure. Immediately before closure require `vectl validate
+      --check-refs`, current strategy authority `docs/BUG_FIX_PLAN_2026-07-12.md`
+      SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
       authority-reference commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty
-      active claims, and no unresolved finding. Require predecessor evidence that
-      the report pre-closure SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`
-      was verified before mutation; bind `post_closure_report_sha256` and `closure_commit`
-      from `close-defect-report-with-evidence`, then require the current defect-report
-      SHA-256 and current HEAD to equal those exact bound values. Any later plan mutation
-      requires this gate to rerun. Do not create a standalone plan-digest receipt,
-      product mutation, deployment requirement, registry, or evidence schema.'
+      active claims, current explicit operation authorization, and no unresolved finding.
+      Bind `post_closure_report_sha256` and `closure_commit` from `close-defect-report-with-evidence`,
+      then require the current defect-report SHA-256 and current HEAD to equal those
+      values. Any later plan mutation requires this gate to rerun.'
     verification: Every local, OCI, container, Tailnet, security, black-box, and closure
       predicate passes in dependency order. Confirm the predecessor verified the pre-closure
       report hash, then bind its exact post_closure_report_sha256 and closure_commit
@@ -184325,6 +184323,7 @@ phases:
       phase contract/policy admission, and empty active claims.
     depends_on:
     - local-full-verification-matrix
+    - deployment-operation-authorization-review
     - publish-immutable-two-platform-oci-image
     - fresh-docker-runtime-proof
     - tailnet-caddy-runtime-proof
