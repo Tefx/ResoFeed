@@ -184449,8 +184449,10 @@ phases:
       acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
       :[]}}\n</vectl_step_policy>"
     verification: Require exact RF-BUG-001 and RF-BUG-010 closure subtests plus ten-requirement
-      count, exact OPML and Prompting scans, all docs synchronized to local/OCI/container/Tailnet
-      evidence, and zero protected-artifact diff.
+      count; exact fail-closed OPML scan with four exclusions; exact fail-closed Prompting
+      scan including cmd and Architecture status; all docs synchronized to local/OCI/container/Tailnet
+      evidence; and zero protected-artifact diff. Only git grep status 1 proves no
+      matches; status 0 fails and status greater than 1 propagates.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
