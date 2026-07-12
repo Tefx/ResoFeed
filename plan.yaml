@@ -183926,22 +183926,19 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal bounded phase Full Gate for `rf-bug-20260712-ledger-prompting`. Repository
-      mutation is absent because this gate exclusively reuses existing acceptance
-      predicates and records normal plan-assurance metadata. Reuse exactly `rf_bug_004_state_import_green`,
-      `rf_bug_008_render_green`, `rf_bug_008_green`, `rf_bug_008_operations_green`,
-      `rf_bug_009_green`, `rf_bug_009_parity_green`, `rf_bug_009_names_green`, and
-      `rf_bug_009_regression_green`. Require State-import confirmation/cancellation,
-      exact RF-BUG-008 14-title and five-screenshot inventories, exact RF-BUG-009
-      16-subtest collection/run equality, fail-closed active Prompting scan including
-      cmd/resofeed, and zero protected-artifact diff. Do not mutate product, docs,
-      tests, runtime state, storage, manifests, registries, schemas, or deployment.'
-    verification: All existing ledger/prompting checks are green with exact collection/count
-      evidence; five viewport proof and active-name scan are exact; facade validation
-      and phase intent-closure lint are conformant.
+      Terminal bounded Full Gate for Ledger and Prompting. Repository mutation is
+      absent because the gate reuses RF-BUG-004 State UI, RF-BUG-008 Ledger, and RF-BUG-009
+      Prompting predicates. Require the exact Ledger title/screenshot inventories,
+      accessibility and real-runtime operations, exact Prompting protected/parity/regression
+      identities, active v2.1 absence, atomic content preservation, docs alignment,
+      and unchanged protected artifacts. Any missing identity, retry, skip, secret
+      output, prohibited Ledger concept, stale Prompting name, or contract/policy
+      failure blocks E2E work.'
+    verification: All Ledger/State and combined Prompting checks are green; reciprocal
+      bindings, exact inventories, path authority, Vectl validation/check-refs, and
+      phase contract/policy admission pass.
     depends_on:
     - repair-source-ledger-responsive-groups
-    - migrate-active-prompting-names-to-v22
     - implement-prompting-v22-semantics
     agent: gate-reviewer
 - id: rf-bug-20260712-e2e-isolation
