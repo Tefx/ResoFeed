@@ -184439,9 +184439,11 @@ phases:
       requires this gate to rerun. Do not create a standalone plan-digest receipt,
       product mutation, deployment requirement, registry, or evidence schema.'
     verification: Every local, OCI, container, Tailnet, security, black-box, and closure
-      predicate passes in dependency order; current authority hashes/commit match
-      strategy_ref; Vectl validation/check-refs and phase contract/policy admission
-      pass; active claims are empty.
+      predicate passes in dependency order. Confirm the predecessor verified the pre-closure
+      report hash, then bind its exact post_closure_report_sha256 and closure_commit
+      outputs and require the current report hash and HEAD to match. Retain the immutable
+      repair-plan hash and authority-reference commit checks; require Vectl validation/check-refs,
+      phase contract/policy admission, and empty active claims.
     depends_on:
     - local-full-verification-matrix
     - publish-immutable-two-platform-oci-image
