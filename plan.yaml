@@ -183214,26 +183214,21 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
-      \ RF-BUG-002. Resolve the requested URL before async hydration so the first\
-      \ surface/title is TODAY, SOURCE LEDGER, SEARCH, or the direct item. Use platform\
-      \ URL/URLSearchParams/history for canonical `/` Search; validate duplicates,\
-      \ unknown keys, malformed percent/fatal UTF-8, dates/ranges, booleans, and limits\
-      \ before API/history mutation. Re-execute lexical search on cold load, refresh,\
-      \ Back, and Forward. Encode every opaque item ID as `~` plus unpadded RFC4648\
-      \ base64url across browser and all five item HTTP operations; decoding returns\
-      \ the byte-identical stored ID. `/search` and `/sources` remain misses. Failure\
-      \ selects the bounded invalid surface without request/history change. Rollback\
-      \ reverts route/token/API/docs together. Never add saved searches, custom URL\
-      \ parsers/codecs, persistent navigation state, semantic search, or secret logging.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
-      \ web/src/lib/api-client.ts, web/src/routes/components/SearchRetrieval.svelte,\
-      \ internal/resofeed/item_route_token.go, internal/resofeed/item_route_token_test.go,\
-      \ internal/resofeed/http.go, docs/ARCHITECTURE.md, docs/DESIGN.md]\n  blocked_paths:\
-      \ [web/src/lib/__tests__/workbench-route.test.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
-      \ web/tests/e2e/routes.browser-contract.spec.ts, internal/resofeed/rf_bug_item_id_api_expected_red_test.go]\n\
-      claims: [RF-BUG-002]\nchecks:\n  - id: rf_bug_002_green\n    run: {command:\
-      \ [bash, -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ RF-BUG-002. Resolve the requested URL before async hydration; validate Search\
+      \ before API/history mutation; re-execute lexical search on cold load, refresh,\
+      \ Back, and Forward; and encode opaque item IDs as `~` plus unpadded RFC4648\
+      \ base64url across browser and all five item HTTP operations. Rollback reverts\
+      \ route/token/API/docs together. Never add saved searches, custom URL parsers/codecs,\
+      \ persistent navigation state, semantic search, or secret logging.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope: {allowed_paths: [web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
+      \ web/src/routes/components/SearchRetrieval.svelte, internal/resofeed/item_route_token.go,\
+      \ internal/resofeed/item_route_token_test.go, internal/resofeed/http.go, docs/ARCHITECTURE.md,\
+      \ docs/DESIGN.md], blocked_paths: [web/src/lib/__tests__/workbench-route.test.ts,\
+      \ web/tests/e2e/initial-route.browser-contract.spec.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
+      \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go]}\nclaims: [RF-BUG-002]\n\
+      checks:\n  - id: rf_bug_002_green\n    run: {command: [bash, -lc, \"npm --prefix\
+      \ web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 --repeat-each=10 web/tests/e2e/initial-route.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-002\\\\]'\"], timeout_seconds: 1500}\n    expect: {outcome:\
       \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: TODAY\
@@ -183263,20 +183258,11 @@ phases:
       \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
       \ [{literal: RF_BUG_002_API_SUBTESTS=30}, {literal: 'PASS: TestRFBUG002OpaqueItemIDAPIPaths'}],\
       \ contains_any: [], forbids: [{literal: FAIL}, {literal: no tests to run}, {literal:\
-      \ lookup called for invalid token}]}}\n    proves: [RF-BUG-002]\nbindings:\n\
-      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
-      \ source_check: rf_bug_002_expected_red, requirement: RF-BUG-002, assertion_id:\
-      \ A-RF-BUG-002-INITIAL-ROUTE, downstream_check: rf_bug_002_green, receipt: RF-BUG-002-route-red-to-green}\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
-      \ source_check: rf_bug_002_search_route_history_expected_red, requirement: RF-BUG-002,\
-      \ assertion_id: A-RF-BUG-002-SEARCH-HISTORY, downstream_check: rf_bug_002_search_route_history_green,\
-      \ receipt: RF-BUG-002-search-history-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
-      \ source_check: rf_bug_002_route_unit_expected_red, requirement: RF-BUG-002,\
-      \ assertion_id: A-RF-BUG-002-OPAQUE-UNIT, downstream_check: rf_bug_002_route_unit_green,\
-      \ receipt: RF-BUG-002-unit-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
-      \ source_check: rf_bug_002_api_expected_red, requirement: RF-BUG-002, assertion_id:\
-      \ A-RF-BUG-002-OPAQUE-API, downstream_check: rf_bug_002_api_green, receipt:\
-      \ RF-BUG-002-api-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      \ lookup called for invalid token}]}}\n    proves: [RF-BUG-002]\n    binding_selector:\
+      \ {kind: go_test_run, package: ./internal/resofeed, run: ^TestRFBUG002OpaqueItemIDAPIPaths$}\n\
+      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {requirement_id:\
+      \ RF-BUG-002, source_step: rf-bug-20260712-contract-lock.rf-bug-route-search-token-expected-red,\
+      \ downstream_check: rf_bug_002_api_green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-route-search-and-opaque-item-ids\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_browser_routing\",\"public_http_item_paths\"\
       ],\"primary_outcome\":\"RF-BUG-002\",\"rollback_class\":\"NONTRIVIAL\",\"test_authority\"\
