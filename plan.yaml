@@ -183372,23 +183372,24 @@ phases:
       \ docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
       \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
       \ internal/resofeed/state.go, web/src/**, web/tests/**]\nclaims: [RF-BUG-003]\n\
-      checks:\n  - id: rf_bug_003_green\n    run: {command: [bash, -lc, \"go test\
-      \ -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      checks:\n  - id: rf_bug_003_green\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n        go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf003-green-list; test $(grep -Ec '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
       \ /tmp/rf003-green-list) -eq 2; go test -v ./internal/resofeed -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
-      \ -count=1\"], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ -count=1\n      timeout_seconds: 300\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG003EmbeddedUIContract/bootstrap_missing_script_fails_before_bind'},\
       \ {literal: '=== RUN   TestRFBUG003EmbeddedUIContract/sources_is_unlisted_static_miss'},\
       \ {literal: '=== RUN   TestRFBUG003DoctorRedactionContract/crlf_dynamic_value_is_wholly_redacted'},\
       \ {literal: RF_BUG_003_TOP_LEVEL_TESTS=2}, {literal: '--- PASS: TestRFBUG003EmbeddedUIContract'},\
       \ {literal: '--- PASS: TestRFBUG003DoctorRedactionContract'}], forbids: [{literal:\
       \ FAIL}, {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n   \
-      \ proves: [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n    run: {command:\
-      \ [bash, -lc, \"bash scripts/build-resofeed.sh; test -x bin/resofeed; for d\
-      \ in . /tmp /; do (cd \\\"$d\\\" && \\\"$OLDPWD/bin/resofeed\\\" --help >/dev/null);\
-      \ done; echo RF_BUG_003_BINARY_PROBES=3 EMBEDDED_UI_SOURCE=package_local BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified\"\
-      ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: RF_BUG_003_BINARY_PROBES=3}, {literal: EMBEDDED_UI_SOURCE=package_local},\
+      \ proves: [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n    run:\n  \
+      \    command:\n        - bash\n        - -lc\n        - |-\n        bash scripts/build-resofeed.sh;\
+      \ test -x bin/resofeed; for d in . /tmp /; do (cd \"$d\" && \"$OLDPWD/bin/resofeed\"\
+      \ --help >/dev/null); done; echo RF_BUG_003_BINARY_PROBES=3 EMBEDDED_UI_SOURCE=package_local\
+      \ BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified\n      timeout_seconds: 600\n  \
+      \  expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF_BUG_003_BINARY_PROBES=3}, {literal: EMBEDDED_UI_SOURCE=package_local},\
       \ {literal: BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified}], forbids: [{literal:\
       \ FAIL}, {literal: external UI tree}, {literal: node required}]}}\n    proves:\
       \ [RF-BUG-003]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
