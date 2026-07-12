@@ -183558,75 +183558,55 @@ phases:
     - embed-ui-assets-in-single-binary
     agent: integration-engineer
   - id: apply-outer-security-middleware-and-csp
-    name: Apply outer security middleware and embedded-content CSP
+    name: Apply outer HTTP security headers and embedded-content CSP
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-005. Set four Go-owned headers before the complete mux and emit exact\
-      \ CSP hashes derived once pre-bind from every Section 2.2 executable inline\
-      \ script: absent/empty classic, module, and the four accepted MIME types. Unsupported\
-      \ types and MIME parameters contribute no hash. Preserve streaming/cancellation\
-      \ and avoid a second header owner, writer state machine, or buffering. Protected\
-      \ Go and Chromium artifacts are immutable. RF-BUG-005 Go collection/run must\
-      \ equal the exact 13 Section 4.5 local subtests. Real Chromium must run the\
-      \ one exact CSP operations title with OPML import and State export/import/download\
-      \ and zero violations. Use root-valid npm-exec commands.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
-      \ internal/resofeed/http_security_test.go, internal/resofeed/webui/**, docs/ARCHITECTURE.md,\
-      \ docs/CONTAINER.md]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
-      \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go, web/tests/e2e/csp-operations.browser-contract.spec.ts,\
-      \ web/tests/e2e/initial-route.browser-contract.spec.ts, scripts/verify-tailnet-csp.mjs,\
-      \ deploy/**, internal/resofeed/state.go, web/src/**]\nclaims: [RF-BUG-005]\n\
-      checks:\n  - id: rf_bug_005_green\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n          go test -list '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
-      \ ./internal/resofeed | tee /tmp/rf005-green-list\n          test \"$(grep -Fxc\
-      \ TestRFBUG005SecurityHeadersCSPStreamingCancellationContract /tmp/rf005-green-list)\"\
-      \ -eq 1\n          go test -v ./internal/resofeed -run '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
-      \ -count=1 2>&1 | tee /tmp/rf005-green-run\n          python3 - <<'PY'\n   \
-      \       import re\n          t=open('/tmp/rf005-green-run').read(); expected={'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/'+x\
-      \ for x in 'static_html_headers static_asset_headers authorized_json_headers\
-      \ unauthorized_json_headers api_error_headers mcp_success_headers mcp_error_headers\
-      \ internal_error_headers single_effective_header_values csp_exact_executable_hashes\
-      \ csp_browser_import_state_operations multi_flush_streaming request_cancellation'.split()};\
-      \ got=set(re.findall(r'^=== RUN\\s+(TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/[^\\\
-      s]+)',t,re.M)); assert got==expected,(sorted(expected-got),sorted(got-expected));\
-      \ assert '--- PASS: TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'\
-      \ in t; print('RF-BUG-005_EXACT_SUBTEST_SET=13')\n          PY\n      timeout_seconds:\
-      \ 240\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13}, {literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/csp_exact_executable_hashes'},\
-      \ {literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/multi_flush_streaming'},\
-      \ {literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/request_cancellation'}],\
-      \ forbids: [{literal: unsafe-inline}, {literal: FAIL}, {literal: no tests to\
-      \ run}]}}\n    proves: [RF-BUG-005]\n  - id: rf_bug_005_local_stream_green\n\
-      \    run: {command: [bash, -lc, \"go test -list '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
-      \ ./internal/resofeed | tee /tmp/rf005-local-list; test $(grep -Ec '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
-      \ /tmp/rf005-local-list) -eq 3; go test -v ./internal/resofeed -run '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
-      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestSecurityHeaders'},\
-      \ {literal: '=== RUN   TestSecurityStreamingCancellation'}, {literal: '=== RUN\
-      \   TestCSP'}], forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n \
-      \   proves: [RF-BUG-005]\n  - id: rf_bug_005_browser_operations_green\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n          title='[RF-BUG-005]\
-      \ CSP operations import and State export import download'\n          npm --prefix\
-      \ web exec -- playwright test --config web/playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/csp-operations.browser-contract.spec.ts\
-      \ --grep '^\\[RF-BUG-005\\] CSP operations' | tee /tmp/rf005-browser-list\n\
-      \          test \"$(grep -Fc -- \"$title\" /tmp/rf005-browser-list)\" -eq 1\n\
-      \          test \"$(grep -c '\\[RF-BUG-005\\] CSP operations' /tmp/rf005-browser-list)\"\
-      \ -eq 1\n          npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts\
-      \ --grep '^\\[RF-BUG-005\\] CSP operations import and State export import download$'\
-      \ --reporter=line\n          echo RF_BUG_005_CSP_OPERATIONS_COUNT=1\n      timeout_seconds:\
-      \ 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: '[RF-BUG-005] CSP operations import and State export import download'},\
-      \ {literal: RF_BUG_005_CSP_OPERATIONS_COUNT=1}], forbids: [{literal: failed},\
-      \ {literal: No tests found}, {literal: CSP violation}, {literal: blocked resource},\
-      \ {literal: retry}]}}\n    proves: [RF-BUG-005]\nbindings:\n  expected_red:\
-      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
-      \ source_check: rf_bug_005_expected_red, requirement: RF-BUG-005, assertion_id:\
-      \ A-RF-BUG-005-SECURITY, downstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-005. A small outer Go middleware sets one effective CSP, `nosniff`,\
+      \ `no-referrer`, and `DENY` value before the complete mux on static, API, MCP,\
+      \ auth, not-found, and internal-error responses. Derive CSP once before bind\
+      \ from every executable inline body identified by the corrected bootstrap contract,\
+      \ including browser-compatible module/MIME classification and CRLF normalization.\
+      \ Preserve streaming flushes and request cancellation; do not buffer or add\
+      \ writer state. Chromium must boot and complete OPML import plus JSON State\
+      \ export/import/download without CSP violations. Caddy verification remains\
+      \ downstream. Rollback reverts middleware/CSP/docs together and blocks release\
+      \ rather than weakening policy. Never use unsafe-inline, duplicate header owners,\
+      \ or secret-bearing evidence.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths:\n    - internal/resofeed/http.go\n    - internal/resofeed/http_security.go\n\
+      \    - internal/resofeed/http_security_test.go\n    - internal/resofeed/webui/**\n\
+      \    - docs/ARCHITECTURE.md\n    - docs/CONTAINER.md\n  blocked_paths:\n   \
+      \ - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n    - web/tests/e2e/csp-operations.browser-contract.spec.ts\n\
+      \    - deploy/**\n    - web/src/**\nclaims:\n  - RF-BUG-005\nchecks:\n  - id:\
+      \ rf_bug_005_green\n    run:\n      command: [go, test, -v, ./internal/resofeed,\
+      \ -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$, -count=1]\n\
+      \      timeout_seconds: 300\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13},\
+      \ {literal: csp_exact_executable_hashes}, {literal: multi_flush_streaming},\
+      \ {literal: request_cancellation}]\n        contains_any: []\n        forbids:\
+      \ [{literal: unsafe-inline}, {literal: FAIL}, {literal: no tests to run}]\n\
+      \    proves: [RF-BUG-005]\n  - id: rf_bug_005_local_stream_green\n    run:\n\
+      \      command: [go, test, -v, ./internal/resofeed, -run, '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$',\
+      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ TestSecurityHeaders}, {literal: TestSecurityStreamingCancellation}, {literal:\
+      \ TestCSP}]\n        contains_any: []\n        forbids: [{literal: FAIL}, {literal:\
+      \ no tests to run}]\n    proves: [RF-BUG-005]\n  - id: rf_bug_005_browser_operations_green\n\
+      \    run:\n      command: [bash, -lc, \"npm --prefix web exec -- playwright\
+      \ test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts --grep '^\\\
+      \\[RF-BUG-005\\\\] CSP operations import and State export import download$'\"\
+      ]\n      timeout_seconds: 600\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: CSP operations\
+      \ import and State export import download}]\n        contains_any: [{literal:\
+      \ passed}]\n        forbids: [{literal: failed}, {literal: CSP violation}, {literal:\
+      \ blocked resource}, {literal: retry}]\n    proves: [RF-BUG-005]\nbindings:\n\
+      \  expected_red:\n    items: []\n  closes_expected_red:\n    - {source_step:\
+      \ rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red, source_check:\
+      \ rf_bug_005_expected_red, requirement: RF-BUG-005, assertion_id: A-RF-BUG-005-SECURITY,\
+      \ downstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n  \
+      \  - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
       \ source_check: rf_bug_005_browser_operations_expected_red, requirement: RF-BUG-005,\
       \ assertion_id: A-RF-BUG-005-CSP-OPERATIONS, downstream_check: rf_bug_005_browser_operations_green,\
       \ receipt: RF-BUG-005-csp-operations-red-to-green}\n</intent_closure_contract>\n\
@@ -183642,9 +183622,9 @@ phases:
       ,\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
       :[\"rf_bug_005_green\",\"rf_bug_005_browser_operations_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Require exact 13-subtest equality, CSP hashes for every executable
-      inline script class including module, exact one-title Chromium operations proof,
-      streaming/cancellation, and independent security review.
+    verification: Require exact 13 protected subtests, local header/streaming/cancellation
+      tests, one retry-free Chromium operation, unique headers, corrected CSP hashes,
+      no acceptance diff, and adjudicated security review.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
