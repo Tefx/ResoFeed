@@ -183882,244 +183882,79 @@ phases:
   depends_on:
   - rf-bug-20260712-ledger-prompting
   steps:
-  - id: rf-bug-010-isolate-playwright-lanes
-    name: Isolate real-runtime Playwright lanes and migrate legacy specs
+  - id: rf-bug-010-harness-foundation
+    name: Build isolated real-runtime Playwright harness foundation
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-010. Exercise the real binary with case-local SQLite/browser/runtime\
-      \ state and reliable cleanup. Preserve protected artifacts. Before legacy deletion,\
-      \ run exact old three-file and replacement five-file list/run proofs. Add `scripts/rf-bug-010-standard-json.mjs`\
-      \ only as a bounded parser of standard Playwright JSON: `compare <list> <run>\
-      \ <prefix>` rejects missing project/file/title identity, empty/duplicate sets,\
-      \ list/run inequality, non-passed entries, and results count other than one,\
-      \ then emits every `<prefix>\\t<project>\\t<file>\\t<title>` row and a positive\
-      \ count; `compare-all <dir>` requires all three list/run sets equal. It defines\
-      \ no custom result schema or registry. Three full-suite runs retain JSON, HTML,\
-      \ redacted server stdout/stderr, DB path and cleanup=clean, sanitized environment,\
-      \ browser console, and network summary. The intentional-failure green proof\
-      \ independently validates ordered SETUP, ASSERTION_REACHED, TEARDOWN before\
-      \ complete artifact checks. Every Playwright npm-exec invocation uses the repository-root\
-      \ form with the separator after `exec`, root-relative config, and root-relative\
-      \ spec. A migration assertion assembles forbidden legacy spellings from string\
-      \ fragments so the assertion does not itself preserve them. No reset protocol,\
-      \ manifest, evidence schema, registry, product interception, broad cleanup,\
-      \ or universal fresh process.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/playwright_fixture_test.go, web/playwright.config.ts,\
-      \ web/playwright.base.config.ts, web/playwright.browser-contract.config.ts,\
-      \ web/playwright.smoke.config.ts, web/playwright.runtime.config.ts, web/playwright.live.config.ts,\
-      \ web/playwright.ci-safe.config.ts, web/package.json, web/package-lock.json,\
-      \ web/src/lib/playwright-e2e-harness-contract.ts, web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts,\
-      \ web/tests/e2e/fixtures/runtime-fixture.ts, web/tests/e2e/fixtures/test-db.ts,\
-      \ web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts, web/tests/e2e/mobile-inspector-token-hydration.spec.ts,\
-      \ web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts, docs/audits/rf-bug-010-playwright-migration-checklist.md,\
-      \ web/tests/e2e/smoke.spec.ts, web/tests/e2e/runtime.spec.ts, scripts/run-with-timeout.mjs,\
-      \ scripts/rf-bug-010-standard-json.mjs, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ docs/USAGE.md]\n  blocked_paths: [web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts,\
-      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
-      \ web/tests/e2e/routes.browser-contract.spec.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
-      \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
-      \ web/tests/e2e/csp-operations.browser-contract.spec.ts, web/tests/e2e/harness-artifact.intentional-failure.spec.ts,\
-      \ web/playwright.artifact-proof.config.ts, web/src/routes/**, Dockerfile]\n\
-      claims: [RF-BUG-010]\nchecks:\n  - id: rf_bug_010_green\n    run:\n      command:\n\
-      \        - bash\n        - -lc\n        - |-\n          npm --prefix web exec\
-      \ -- playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep\
-      \ '^\\[RF-BUG-010\\]' | tee /tmp/rf010-green-list\n          c=$(grep -c '\\\
-      [RF-BUG-010\\]' /tmp/rf010-green-list); test \"$c\" -gt 0\n          npm --prefix\
-      \ web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-010-HARNESS. Configure comprehensive Playwright to build and launch\
+      \ the real `cmd/resofeed` binary with case-local mutable SQLite/browser/runtime\
+      \ state, sanitized CI-safe environment, owned ports/processes/contexts, and\
+      \ cleanup that fails on residue. Read-only reuse is allowed only when state\
+      \ cannot leak. Emit ordinary Playwright JSON/HTML/trace/screenshot/video plus\
+      \ redacted server, DB/cleanup, environment, console, network, and runtime identity.\
+      \ Standard JSON helpers may compare native file/title/project identities but\
+      \ define no custom result schema. Rollback reverts configs, fixtures, helper\
+      \ tests/scripts, and harness docs together. Never add a product reset API, route\
+      \ interception for comprehensive claims, universal fresh process, registry,\
+      \ manifest, queue, or secret-bearing artifact.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths:\n    - internal/resofeed/playwright_fixture_test.go\n\
+      \    - web/playwright.config.ts\n    - web/playwright.base.config.ts\n    -\
+      \ web/playwright.browser-contract.config.ts\n    - web/playwright.smoke.config.ts\n\
+      \    - web/playwright.runtime.config.ts\n    - web/playwright.live.config.ts\n\
+      \    - web/playwright.ci-safe.config.ts\n    - web/package.json\n    - web/package-lock.json\n\
+      \    - web/src/lib/playwright-e2e-harness-contract.ts\n    - web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts\n\
+      \    - web/tests/e2e/fixtures/runtime-fixture.ts\n    - web/tests/e2e/fixtures/test-db.ts\n\
+      \    - scripts/run-with-timeout.mjs\n    - scripts/rf-bug-010-standard-json.mjs\n\
+      \    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n    - docs/USAGE.md\n  blocked_paths:\n\
+      \    - web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\n    - web/tests/e2e/harness-artifact.intentional-failure.spec.ts\n\
+      \    - web/playwright.artifact-proof.config.ts\n    - web/src/routes/**\n  \
+      \  - internal/resofeed/http.go\n    - Dockerfile\nclaims:\n  - RF-BUG-010-HARNESS\n\
+      checks:\n  - id: rf_bug_010_green\n    run:\n      command: [bash, -lc, \"npm\
+      \ --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
-      \ --grep '^\\[RF-BUG-010\\]' --reporter=line\n          python3 - <<'PY'\n \
-      \         import yaml\n          p=yaml.safe_load(open('plan.yaml')); forbidden=['npm\
-      \ --prefix web exec'+' playwright','--config '+'.'+'/playwright']\n        \
-      \  bad=[]\n          for ph in p['phases']:\n            if ph['id'].startswith('rf-bug-20260712'):\n\
-      \              for s in ph.get('steps',[]):\n                if any(x in s.get('description','')\
-      \ for x in forbidden): bad.append(ph['id']+'.'+s['id'])\n          assert not\
-      \ bad,bad\n          print('RF_BUG_010_ROOT_COMMAND_FORMS=valid')\n        \
-      \  PY\n          echo RF_BUG_010_EXECUTED_COUNT=$c\n      timeout_seconds: 600\n\
-      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: '[RF-BUG-010] mutating cases own isolated state and cleanup'},\
-      \ {literal: RF_BUG_010_ROOT_COMMAND_FORMS=valid}, {literal: RF_BUG_010_EXECUTED_COUNT=}],\
-      \ forbids: [{literal: failed}, {literal: No tests found}, {literal: skipped},\
-      \ {literal: retry}, {literal: leaked resource}]}}\n    proves: [RF-BUG-010]\n\
-      \  - id: rf_bug_010_old_list_green\n    run: {command: [bash, -lc, \"mkdir -p\
-      \ web/.test-artifacts; npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
-      \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
-      \ | tee web/.test-artifacts/rf-bug-010-old-list.txt; for f in search-click-inspector-contract.expected-red.spec.ts\
-      \ mobile-inspector-token-hydration.spec.ts source-ledger-navigation-regression.expected-red.spec.ts;\
-      \ do grep -F \\\"$f\\\" web/.test-artifacts/rf-bug-010-old-list.txt; done; c=$(grep\
-      \ -c '›' web/.test-artifacts/rf-bug-010-old-list.txt); test $c -gt 0; echo RF_BUG_010_OLD_LIST_COUNT=$c\"\
-      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: search-click-inspector-contract.expected-red.spec.ts},\
-      \ {literal: mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
-      \ {literal: RF_BUG_010_OLD_LIST_COUNT=}], forbids: [{literal: No tests found},\
-      \ {literal: 0 tests}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_old_run_green\n\
-      \    run:\n      command: [bash, -lc, \"mkdir -p web/.test-artifacts; PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-old-list.json\
-      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json --list web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
-      \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts;\
-      \ PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-old-run.json npm\
-      \ --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
-      \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts;\
-      \ node scripts/rf-bug-010-standard-json.mjs compare web/.test-artifacts/rf-bug-010-old-list.json\
-      \ web/.test-artifacts/rf-bug-010-old-run.json RF-BUG-010_OLD\"]\n      timeout_seconds:\
-      \ 900\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: RF-BUG-010_OLD}, {literal: search-click-inspector-contract.expected-red.spec.ts},\
-      \ {literal: mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
-      \ {literal: RF-BUG-010_OLD_COUNT=}], forbids: [{literal: failed}, {literal:\
-      \ No tests found}, {literal: retry}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_replacement_list_green\n\
-      \    run: {command: [bash, -lc, \"mkdir -p web/.test-artifacts; npm --prefix\
-      \ web exec -- playwright test --config web/playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list web/tests/e2e/inspector-selection.browser-contract.spec.ts\
-      \ web/tests/e2e/initial-route.browser-contract.spec.ts web/tests/e2e/routes.browser-contract.spec.ts\
-      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\
-      \ | tee web/.test-artifacts/rf-bug-010-replacement-list.txt; for f in inspector-selection.browser-contract.spec.ts\
-      \ initial-route.browser-contract.spec.ts routes.browser-contract.spec.ts source-ledger-responsive.browser-contract.spec.ts\
-      \ source-ledger-delete.browser-contract.spec.ts; do grep -F \\\"$f\\\" web/.test-artifacts/rf-bug-010-replacement-list.txt;\
-      \ done; c=$(grep -c '›' web/.test-artifacts/rf-bug-010-replacement-list.txt);\
-      \ test $c -gt 0; echo RF_BUG_010_REPLACEMENT_LIST_COUNT=$c\"], timeout_seconds:\
-      \ 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: inspector-selection.browser-contract.spec.ts}, {literal: initial-route.browser-contract.spec.ts},\
-      \ {literal: routes.browser-contract.spec.ts}, {literal: source-ledger-responsive.browser-contract.spec.ts},\
-      \ {literal: source-ledger-delete.browser-contract.spec.ts}, {literal: RF_BUG_010_REPLACEMENT_LIST_COUNT=}],\
-      \ forbids: [{literal: No tests found}, {literal: 0 tests}]}}\n    proves: [RF-BUG-010]\n\
-      \  - id: rf_bug_010_replacement_run_green\n    run:\n      command: [bash, -lc,\
-      \ \"mkdir -p web/.test-artifacts; files='web/tests/e2e/inspector-selection.browser-contract.spec.ts\
-      \ web/tests/e2e/initial-route.browser-contract.spec.ts web/tests/e2e/routes.browser-contract.spec.ts\
-      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts web/tests/e2e/source-ledger-delete.browser-contract.spec.ts';\
-      \ PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-replacement-list.json\
-      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json --list $files; PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-replacement-run.json\
-      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json $files; node scripts/rf-bug-010-standard-json.mjs\
-      \ compare web/.test-artifacts/rf-bug-010-replacement-list.json web/.test-artifacts/rf-bug-010-replacement-run.json\
-      \ RF-BUG-010_REPLACEMENT\"]\n      timeout_seconds: 1200\n    expect: {outcome:\
-      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-010_REPLACEMENT},\
-      \ {literal: inspector-selection.browser-contract.spec.ts}, {literal: initial-route.browser-contract.spec.ts},\
-      \ {literal: routes.browser-contract.spec.ts}, {literal: source-ledger-responsive.browser-contract.spec.ts},\
-      \ {literal: source-ledger-delete.browser-contract.spec.ts}, {literal: RF-BUG-010_REPLACEMENT_COUNT=}],\
-      \ forbids: [{literal: failed}, {literal: No tests found}, {literal: retry}]}}\n\
-      \    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_1_green\n    run:\
-      \ {command: [bash, -lc, \"n=1; root=web/.test-artifacts/rf-bug-010-full; e=$root/evidence-$n;\
-      \ mkdir -p $e; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/list-$n.json npm --prefix web\
-      \ exec -- playwright test --config web/playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --reporter=json --list; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/run-$n.json\
-      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$e/html-report PLAYWRIGHT_HTML_OPEN=never npm --prefix\
-      \ web exec -- playwright test --config web/playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --reporter=json,html --output $e/test-output; node scripts/rf-bug-010-standard-json.mjs\
-      \ compare $root/list-$n.json $root/run-$n.json RF-BUG-010_RUN_1; test -s $root/run-$n.json;\
-      \ test -d $e/html-report; for f in server.stdout.log db-path.txt sanitized-environment.txt\
-      \ browser-console.log network-summary.log; do test $(find $e/test-output -name\
-      \ $f -size +0c | wc -l) -ge 1; done; test $(find $e/test-output -name server.stderr.log\
-      \ | wc -l) -ge 1; test $(find $e/test-output -name cleanup.txt -exec grep -lFx\
-      \ cleanup=clean {} + | wc -l) -ge 1; echo RF_BUG_010_STANDARD_ARTIFACTS_1=complete\"\
-      ], timeout_seconds: 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: RF-BUG-010_RUN_1}, {literal: RF-BUG-010_RUN_1_COUNT=},\
-      \ {literal: RF_BUG_010_STANDARD_ARTIFACTS_1=complete}], forbids: [{literal:\
-      \ failed}, {literal: skipped}, {literal: flaky}, {literal: retry}, {literal:\
-      \ No tests found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_2_green\n\
-      \    run: {command: [bash, -lc, \"n=2; root=web/.test-artifacts/rf-bug-010-full;\
-      \ e=$root/evidence-$n; mkdir -p $e; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/list-$n.json\
-      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json --list; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/run-$n.json\
-      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$e/html-report PLAYWRIGHT_HTML_OPEN=never npm --prefix\
-      \ web exec -- playwright test --config web/playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --reporter=json,html --output $e/test-output; node scripts/rf-bug-010-standard-json.mjs\
-      \ compare $root/list-$n.json $root/run-$n.json RF-BUG-010_RUN_2; test -s $root/run-$n.json;\
-      \ test -d $e/html-report; for f in server.stdout.log db-path.txt sanitized-environment.txt\
-      \ browser-console.log network-summary.log; do test $(find $e/test-output -name\
-      \ $f -size +0c | wc -l) -ge 1; done; test $(find $e/test-output -name server.stderr.log\
-      \ | wc -l) -ge 1; test $(find $e/test-output -name cleanup.txt -exec grep -lFx\
-      \ cleanup=clean {} + | wc -l) -ge 1; echo RF_BUG_010_STANDARD_ARTIFACTS_2=complete\"\
-      ], timeout_seconds: 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: RF-BUG-010_RUN_2}, {literal: RF-BUG-010_RUN_2_COUNT=},\
-      \ {literal: RF_BUG_010_STANDARD_ARTIFACTS_2=complete}], forbids: [{literal:\
-      \ failed}, {literal: skipped}, {literal: flaky}, {literal: retry}, {literal:\
-      \ No tests found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_3_green\n\
-      \    run: {command: [bash, -lc, \"n=3; root=web/.test-artifacts/rf-bug-010-full;\
-      \ e=$root/evidence-$n; mkdir -p $e; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/list-$n.json\
-      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json --list; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/run-$n.json\
-      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$e/html-report PLAYWRIGHT_HTML_OPEN=never npm --prefix\
-      \ web exec -- playwright test --config web/playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --reporter=json,html --output $e/test-output; node scripts/rf-bug-010-standard-json.mjs\
-      \ compare $root/list-$n.json $root/run-$n.json RF-BUG-010_RUN_3; test -s $root/run-$n.json;\
-      \ test -d $e/html-report; for f in server.stdout.log db-path.txt sanitized-environment.txt\
-      \ browser-console.log network-summary.log; do test $(find $e/test-output -name\
-      \ $f -size +0c | wc -l) -ge 1; done; test $(find $e/test-output -name server.stderr.log\
-      \ | wc -l) -ge 1; test $(find $e/test-output -name cleanup.txt -exec grep -lFx\
-      \ cleanup=clean {} + | wc -l) -ge 1; echo RF_BUG_010_STANDARD_ARTIFACTS_3=complete\"\
-      ], timeout_seconds: 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: RF-BUG-010_RUN_3}, {literal: RF-BUG-010_RUN_3_COUNT=},\
-      \ {literal: RF_BUG_010_STANDARD_ARTIFACTS_3=complete}], forbids: [{literal:\
-      \ failed}, {literal: skipped}, {literal: flaky}, {literal: retry}, {literal:\
-      \ No tests found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_title_set_compare_green\n\
-      \    run: {command: [node, scripts/rf-bug-010-standard-json.mjs, compare-all,\
-      \ web/.test-artifacts/rf-bug-010-full], timeout_seconds: 120}\n    expect: {outcome:\
-      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_IDENTICAL_FILE_TITLE_PROJECT_SET=},\
-      \ {literal: RUNS=3}], forbids: [{literal: differs}, {literal: empty}]}}\n  \
-      \  proves: [RF-BUG-010]\n  - id: rf_bug_010_artifact_proof_green\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n          rm -rf\
-      \ web/.test-artifacts/rf-bug-010-intentional-failure; mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure\n\
-      \          root=web/.test-artifacts/rf-bug-010-intentional-failure; output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt\n\
-      \          set +e\n          PLAYWRIGHT_JSON_OUTPUT_NAME=$root/results.json\
-      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$root/html-report PLAYWRIGHT_HTML_OPEN=never npm\
-      \ --prefix web exec -- playwright test --config web/playwright.artifact-proof.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json,html web/tests/e2e/harness-artifact.intentional-failure.spec.ts\
-      \ --grep '^\\[RF-BUG-010\\] intentional failure retains complete artifacts$'\
-      \ >\"$output\" 2>&1\n          status=$?; set -e; test \"$status\" -eq 1\n \
-      \         node - \"$output\" <<'NODE'\n          const fs=require('node:fs'),t=fs.readFileSync(process.argv[2],'utf8');let\
-      \ c=-1;for(const m of ['RF-BUG-010_SETUP=ready','RF-BUG-010_ASSERTION_REACHED=ready','RF-BUG-010_TEARDOWN=clean']){const\
-      \ n=t.indexOf(m,c+1);if(n<0)throw Error(`missing/out-of-order ${m}`);c=n}for(const\
-      \ m of ['[RF-BUG-010] intentional failure retains complete artifacts','RF-BUG-010_INTENTIONAL_ASSERTION:\
-      \ artifact retention proof'])if(!t.includes(m))throw Error(`missing ${m}`);if(!/\\\
-      b1 failed\\b/.test(t)||/\\b(?:[2-9]|[1-9][0-9]+) failed\\b|\\b[1-9][0-9]* (?:skipped|flaky)\\\
-      b|retry #/i.test(t))throw Error('invalid failure set')\n          NODE\n   \
-      \       test -s $root/results.json; test -d $root/html-report; test $(find $root\
-      \ -name trace.zip | wc -l) -eq 1; test $(find $root -name '*.webm' | wc -l)\
-      \ -eq 1; test $(find $root -name '*.png' | wc -l) -ge 1\n          test $(find\
-      \ $root -name server.stdout.log -size +0c | wc -l) -eq 1; test $(find $root\
-      \ -name server.stderr.log | wc -l) -eq 1; test $(find $root -name browser-console.log\
-      \ -size +0c | wc -l) -eq 1; test $(find $root -name network-summary.log -size\
-      \ +0c | wc -l) -eq 1\n          test -s $root/db-path.txt; grep -Fx cleanup=clean\
-      \ $root/cleanup.txt; test -s $root/sanitized-environment.txt\n          cat\
-      \ \"$output\"; echo RF_BUG_010_ARTIFACTS=complete_ordered_standard\n      timeout_seconds:\
-      \ 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: '[RF-BUG-010] intentional failure retains complete artifacts'},\
-      \ {literal: RF-BUG-010_SETUP=ready}, {literal: RF-BUG-010_ASSERTION_REACHED=ready},\
-      \ {literal: 'RF-BUG-010_INTENTIONAL_ASSERTION: artifact retention proof'}, {literal:\
-      \ RF-BUG-010_TEARDOWN=clean}, {literal: RF_BUG_010_ARTIFACTS=complete_ordered_standard}],\
-      \ forbids: [{literal: No tests found}, {literal: webServer failed}, {literal:\
-      \ authentication failed}]}}\n    proves: [RF-BUG-010]\nbindings:\n  expected_red:\
-      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
+      \ --grep '^\\\\[RF-BUG-010\\\\]'\"]\n      timeout_seconds: 600\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: mutating cases own isolated state and cleanup}]\n\
+      \        contains_any: [{literal: passed}]\n        forbids: [{literal: failed},\
+      \ {literal: skipped}, {literal: retry}, {literal: leaked resource}]\n    proves:\
+      \ [RF-BUG-010-HARNESS]\n  - id: rf_bug_010_artifact_contract_green\n    run:\n\
+      \      command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
+      \ web/playwright.artifact-proof.config.ts --project=chromium-ci-safe --retries=0\
+      \ --reporter=line,json,html web/tests/e2e/harness-artifact.intentional-failure.spec.ts\
+      \ --grep '^\\\\[RF-BUG-010\\\\] intentional failure retains complete artifacts$';\
+      \ test $? -eq 1\"]\n      timeout_seconds: 600\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: RF-BUG-010_SETUP=ready}, {literal: RF-BUG-010_ASSERTION_REACHED=ready},\
+      \ {literal: RF-BUG-010_TEARDOWN=clean}]\n        contains_any: []\n        forbids:\
+      \ [{literal: No tests found}, {literal: webServer failed}, {literal: authentication\
+      \ failed}]\n    proves: [RF-BUG-010-HARNESS]\nbindings:\n  expected_red:\n \
+      \   items: []\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-e2e-isolation-artifact-expected-red,\
       \ source_check: rf_bug_010_expected_red, requirement: RF-BUG-010, assertion_id:\
       \ A-RF-BUG-010-ISOLATION, downstream_check: rf_bug_010_green, receipt: RF-BUG-010-red-to-green}\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
+      \    - {source_step: rf-bug-20260712-contract-lock.rf-bug-e2e-isolation-artifact-expected-red,\
       \ source_check: rf_bug_010_artifact_expected_red, requirement: RF-BUG-010, assertion_id:\
-      \ A-RF-BUG-010-ARTIFACTS, downstream_check: rf_bug_010_artifact_proof_green,\
+      \ A-RF-BUG-010-ARTIFACTS, downstream_check: rf_bug_010_artifact_contract_green,\
       \ receipt: RF-BUG-010-artifacts-red-to-green}\n</intent_closure_contract>\n\
       <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-e2e-isolation.rf-bug-010-isolate-playwright-lanes\",\"risk_tier\"\
+      :\"rf-bug-20260712-e2e-isolation.rf-bug-010-harness-foundation\",\"risk_tier\"\
       :\"R2\",\"risk_reasons\":[\"test_infrastructure\",\"runtime_lifecycle_harness\"\
-      ,\"ci_contract\"],\"primary_outcome\":\"RF-BUG-010\",\"rollback_class\":\"NONTRIVIAL\"\
-      ,\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\"\
-      :\"blind-tester\",\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\"\
-      :\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
-      :[\"internal/resofeed/playwright_fixture_test.go\",\"web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts\"\
-      ,\"web/tests/e2e/fixtures/runtime-fixture.ts\",\"web/tests/e2e/fixtures/test-db.ts\"\
-      ,\"scripts/rf-bug-010-standard-json.mjs\"],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"\
+      ,\"ci_contract\"],\"primary_outcome\":\"RF-BUG-010-HARNESS\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
+      ],\"primary_verifier\":\"blind-tester\",\"additional_verifiers\":[\"integration-verifier\"\
+      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[\"internal/resofeed/playwright_fixture_test.go\"\
+      ,\"web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts\",\"web/tests/e2e/fixtures/runtime-fixture.ts\"\
+      ,\"web/tests/e2e/fixtures/test-db.ts\",\"scripts/rf-bug-010-standard-json.mjs\"\
+      ],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"\
       ,\"web/tests/e2e/harness-artifact.intentional-failure.spec.ts\",\"web/playwright.artifact-proof.config.ts\"\
-      ],\"acceptance_check_ids\":[\"rf_bug_010_green\",\"rf_bug_010_artifact_proof_green\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_010_green\",\"rf_bug_010_artifact_contract_green\"\
       ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
       </vectl_step_policy>"
-    verification: Require the root command migration assertion, emitted standard file/title/project
-      rows, exact old/replacement equality, three identical retry-free full-suite
-      sets with complete standard artifacts, ordered intentional-failure lifecycle
-      proof, and zero protected diff.
+    verification: Require protected isolation and artifact contracts green, fixture/helper
+      developer tests, real-binary launch, sanitized environment, residue failure,
+      standard redacted artifacts, and no product/reset/interception diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -184151,7 +183986,7 @@ phases:
       only its named assertion; facade validation and phase intent-closure lint are
       conformant.
     depends_on:
-    - rf-bug-010-isolate-playwright-lanes
+    - rf-bug-010-harness-foundation
     agent: gate-reviewer
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, OCI, Container, Tailnet, and Independent Closure
