@@ -183969,24 +183969,21 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal bounded phase Full Gate for `rf-bug-20260712-e2e-isolation`. Repository
-      mutation is absent because this gate exclusively reuses `rf_bug_010_green`,
-      `rf_bug_010_old_list_green`, `rf_bug_010_old_run_green`, `rf_bug_010_replacement_list_green`,
-      `rf_bug_010_replacement_run_green`, `rf_bug_010_full_suite_run_1_green`, `rf_bug_010_full_suite_run_2_green`,
-      `rf_bug_010_full_suite_run_3_green`, `rf_bug_010_full_suite_title_set_compare_green`,
-      and `rf_bug_010_artifact_proof_green`. Require root-valid command-form migration,
-      emitted and validated standard Playwright file/title/project identities, exact
-      old/replacement list-run equality, three identical positive retry-free full-suite
-      sets, complete standard artifacts for every run, and ordered independently collected
-      expected-red/green SETUP < ASSERTION_REACHED < TEARDOWN evidence. Do not mutate
-      product, docs, tests, runtime state, storage, manifests, registries, schemas,
-      or deployment.'
-    verification: All existing E2E isolation checks are green; list/run multisets
-      and counts reconcile; three runs are identical; intentional failure reaches
-      only its named assertion; facade validation and phase intent-closure lint are
-      conformant.
+      Terminal bounded Full Gate for RF-BUG-010. Repository mutation is absent because
+      the gate reuses harness foundation, lane migration, and reproducibility/artifact
+      predicates. Require real-binary case isolation, old/replacement behavior identity,
+      smoke under 120 seconds, three identical retry-free positive sets, cleanup,
+      and independently collected intentional-failure evidence with fail-closed redaction.
+      Protected acceptance remains unchanged. Any product reset/interception, residue,
+      missing identity/artifact, retry/skip/flake, secret exposure, unordered path
+      conflict, or contract/policy failure blocks assurance closure.'
+    verification: All foundation, migration, and proof checks pass; reciprocal expected-red
+      closures, protected paths, Vectl validation/check-refs, and phase contract/policy
+      admission are conformant.
     depends_on:
     - rf-bug-010-harness-foundation
+    - rf-bug-010-migrate-playwright-lanes
+    - rf-bug-010-reproducibility-artifact-proof
     agent: gate-reviewer
   - id: rf-bug-010-migrate-playwright-lanes
     name: Migrate legacy browser coverage into isolated lanes
