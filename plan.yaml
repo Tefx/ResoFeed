@@ -184586,50 +184586,53 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001–010 documentation closure. After independent security and runtime/UI\
-      \ verification, update the defect report with exact outcomes, source/test references,\
-      \ local/OCI/container/Tailnet results, residual risks, and redacted artifact\
-      \ locations. Synchronize canonical docs from observed behavior. Re-run the exact\
-      \ both-word-order/case OPML scan with exactly four exclusions and the Prompting\
-      \ v2.1/System/standalone fail-closed scan including `cmd/` and Architecture\
-      \ status. Preserve all protected contract-lock tests/baselines/artifact files\
-      \ and the reviewed repair plan. Add no registry, generator, receipt schema,\
-      \ or duplicate phase. Recovery reverts docs and closure test.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\
-      \ [docs/BUG_REPORT_2026-07-11.md, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PROMPTING_SYSTEM.md,\
-      \ docs/CONTAINER.md, docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ docs/ui-preview.html, tests/rf_bug_closure_contract_test.go]\n  blocked_paths:\
-      \ [docs/BUG_FIX_PLAN_2026-07-12.md, plan.yaml, internal/resofeed/**, web/src/**,\
-      \ web/tests/**, web/playwright.artifact-proof.config.ts, docs/audits/**]\nclaims:\
-      \ [RF-BUG-001-010-CLOSURE]\nchecks:\n  - id: defect_report_closure_green\n \
-      \   run: {command: [go, test, -v, ./tests, -run, ^TestRFBugClosureContract$,\
-      \ -count=1], timeout_seconds: 180}\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBugClosureContract/RF-BUG-001'},\
-      \ {literal: '=== RUN   TestRFBugClosureContract/RF-BUG-010'}, {literal: RF_BUG_CLOSURE_REQUIREMENTS=10},\
-      \ {literal: '--- PASS: TestRFBugClosureContract'}], forbids: [{literal: FAIL},\
-      \ {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n    proves:\
-      \ [RF-BUG-001-010-CLOSURE]\n  - id: closure_active_sources_green\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n          matches=$(mktemp);\
-      \ set +e; git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML' -- cmd internal\
-      \ web/src web/tests docs web/package.json web/package-lock.json go.mod go.sum\
-      \ bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
-      \ ':(exclude)docs/BUG_FIX_PLAN_2026-07-12.md' ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
+      \ RF-BUG-001-010 documentation closure. After independent security and runtime/UI\
+      \ verification, update the defect report and synchronize active canonical docs\
+      \ from observed behavior. Re-run the exact Section 7 OPML scan over tracked\
+      \ product surfaces and exactly seven active documents with only two protected\
+      \ expected-red exclusions; preserve all historical evidence unchanged. Re-run\
+      \ the Prompting v2.1/System/standalone fail-closed scan including cmd/resofeed\
+      \ and Architecture status. Preserve protected artifacts and the reviewed repair\
+      \ plan. Add no registry, generator, receipt schema, or duplicate phase.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md, docs/ARCHITECTURE.md,\
+      \ docs/DESIGN.md, docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, docs/ui-preview.html, tests/rf_bug_closure_contract_test.go]\n\
+      \  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, plan.yaml, internal/resofeed/**,\
+      \ web/src/**, web/tests/**, web/playwright.artifact-proof.config.ts, docs/audits/**,\
+      \ docs/implementation-notes/**]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n\
+      \  - id: defect_report_closure_green\n    run: {command: [go, test, -v, ./tests,\
+      \ -run, ^TestRFBugClosureContract$, -count=1], timeout_seconds: 180}\n    expect:\
+      \ {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal:\
+      \ '=== RUN   TestRFBugClosureContract/RF-BUG-001'}, {literal: '=== RUN   TestRFBugClosureContract/RF-BUG-010'},\
+      \ {literal: RF_BUG_CLOSURE_REQUIREMENTS=10}, {literal: '--- PASS: TestRFBugClosureContract'}],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-001-010-CLOSURE]\n\
+      \  - id: closure_active_sources_green\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n          active_docs=(docs/ARCHITECTURE.md docs/DESIGN.md\
+      \ docs/PRD.md docs/USAGE.md docs/CONTAINER.md docs/PROMPTING_SYSTEM.md docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md)\n\
+      \          for path in \"${active_docs[@]}\"; do git ls-files --error-unmatch\
+      \ \"$path\" >/dev/null; done\n          matches=$(mktemp); set +e\n        \
+      \  git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML' -- cmd internal web/src\
+      \ web/tests \"${active_docs[@]}\" web/package.json web/package-lock.json go.mod\
+      \ go.sum bin deploy Dockerfile .dockerignore ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
       \ ':(exclude)web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts' >\"$matches\"\
-      ; status=$?; set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"\
-      ; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f \"$matches\"\
-      ; exit \"$status\";; esac; echo OPML_ACTIVE_SCAN_MATCHES=0 OPML_EXCLUSIONS=4;\
-      \ matches=$(mktemp); set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
+      \n          status=$?; set -e; case \"$status\" in 0) cat \"$matches\"; rm -f\
+      \ \"$matches\"; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm\
+      \ -f \"$matches\"; exit \"$status\";; esac\n          echo OPML_ACTIVE_DOCUMENTS=7\
+      \ OPML_ACTIVE_SCAN_MATCHES=0 OPML_EXCLUSIONS=2\n          matches=$(mktemp);\
+      \ set +e\n          git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
       .1|(^|[^[:alnum:]_])V2\\.1([^[:alnum:]_]|$)' -- cmd internal/resofeed web/src\
-      \ web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md >\"$matches\"; status=$?;\
-      \ set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"; exit\
-      \ 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f \"$matches\"; exit\
-      \ \"$status\";; esac; echo PROMPTING_V21_ACTIVE_MATCHES=0 ARCHITECTURE_STATUS_SCANNED=1\
-      \ CMD_RUNTIME_SCANNED=1\n      timeout_seconds: 240\n    expect: {outcome: green,\
-      \ exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: OPML_ACTIVE_SCAN_MATCHES=0},\
-      \ {literal: OPML_EXCLUSIONS=4}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0}, {literal:\
-      \ ARCHITECTURE_STATUS_SCANNED=1}], forbids: [{literal: broad exclusion}, {literal:\
-      \ docs/audits excluded}]}}\n    proves: [RF-BUG-001-010-CLOSURE]\nbindings:\
-      \ {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      \ web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md >\"$matches\"\n  \
+      \        status=$?; set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"\
+      $matches\"; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f\
+      \ \"$matches\"; exit \"$status\";; esac\n          echo PROMPTING_V21_ACTIVE_MATCHES=0\
+      \ ARCHITECTURE_STATUS_SCANNED=1 CMD_RUNTIME_SCANNED=1\n      timeout_seconds:\
+      \ 240\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: OPML_ACTIVE_DOCUMENTS=7}, {literal: OPML_ACTIVE_SCAN_MATCHES=0},\
+      \ {literal: OPML_EXCLUSIONS=2}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0}, {literal:\
+      \ ARCHITECTURE_STATUS_SCANNED=1}, {literal: CMD_RUNTIME_SCANNED=1}], forbids:\
+      \ [{literal: broad exclusion}, {literal: docs/audits}]}}\n    proves: [RF-BUG-001-010-CLOSURE]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
       <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
       :\"rf-bug-20260712-assurance-closure.close-defect-report-with-evidence\",\"\
       risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_closure\",\"bounded_closure_test\"\
@@ -184640,11 +184643,9 @@ phases:
       :[\"tests/rf_bug_closure_contract_test.go\"],\"acceptance_test_paths\":[],\"\
       acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
       :[]}}\n</vectl_step_policy>"
-    verification: Require exact RF-BUG-001 and RF-BUG-010 closure subtests plus ten-requirement
-      count; exact fail-closed OPML scan with four exclusions; exact fail-closed Prompting
-      scan including cmd and Architecture status; all docs synchronized to local/OCI/container/Tailnet
-      evidence; and zero protected-artifact diff. Only git grep status 1 proves no
-      matches; status 0 fails and status greater than 1 propagates.
+    verification: Require ten exact closure subtests, seven-active-document/two-exclusion
+      OPML scan, active Prompting scan including cmd and Architecture, synchronized
+      evidence, and zero historical/protected diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
