@@ -183041,9 +183041,12 @@ phases:
       ,\"path\":\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\",\"\
       purpose\":\"Define protected exact Prompting v2.2 contract\",\"check_id\":\"\
       rf_bug_009_expected_red\",\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
-    verification: Run six intentional-red checks independently; require exact files/titles/counts
-      and intended assertions. Confirm baselines, token-free checklist, intentional-failure
-      spec/config, and every listed contract path are authorized then protected.
+    verification: Run seven intentional-red checks independently; require exact files/titles/counts
+      and intended assertions, including four exact RF-BUG-004 EN/ZH State-import
+      confirmation/cancellation titles, 320x800 among the five RF-BUG-008 viewports,
+      exact RF-BUG-009 Go collection, and ordered RF-BUG-010 setup/assertion/teardown
+      markers. Confirm baselines, token-free checklist, intentional-failure spec/config,
+      and every listed contract path are authorized then protected.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
