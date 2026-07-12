@@ -183365,39 +183365,37 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
       \ RF-BUG-006 and RF-BUG-007. Derive exact titles atomically from resolved routes.\
-      \ For invalid `add source`, use the non-mutating preview, exact EN/ZH copy,\
-      \ no mutation, retained input/focus, and exactly one newly mounted alert on\
-      \ repeat or locale change. Protected unit and browser artifacts are immutable;\
-      \ only named product/docs paths may change. Recovery reverts code/docs.\n\n\
-      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
-      \ web/src/routes/+page.svelte, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/ui-preview.html]\n\
-      \  blocked_paths: [web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/__tests__/steer-invalid.test.ts,\
+      \ For invalid add source, use non-mutating preview, exact EN/ZH copy, no mutation,\
+      \ retained input/focus, and one newly mounted alert on repeat or locale change.\
+      \ Protected artifacts remain immutable. Every npm-exec Playwright command uses\
+      \ root-valid config/spec paths.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [web/src/lib/workbench-route.ts, web/src/routes/+page.svelte,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/ui-preview.html]\n  blocked_paths:\
+      \ [web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/__tests__/steer-invalid.test.ts,\
       \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
       \ internal/resofeed/**]\nclaims: [RF-BUG-006, RF-BUG-007]\nchecks:\n  - id:\
-      \ rf_bug_006_green\n    run:\n      command:\n        - bash\n        - -lc\n\
-      \        - |-\n          npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
+      \ rf_bug_006_green\n    run: {command: [bash, -lc, \"npm --prefix web exec --\
+      \ playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --list web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
       \ --grep '^\\\\[RF-BUG-006\\\\]' | tee /tmp/rf006-green-list; c=$(grep -c '\\\
-      [RF-BUG-006\\]' /tmp/rf006-green-list); test $c -gt 0; npm --prefix web exec\
-      \ playwright test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep\
-      \ '^\\\\[RF-BUG-006\\\\]' --reporter=line; echo RF_BUG_006_EXECUTED_COUNT=$c\n\
-      \      timeout_seconds: 300\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: bugfix-frontend-behavior.expected-red.spec.ts},\
-      \ {literal: '[RF-BUG-006] route-derived title updates atomically'}, {literal:\
-      \ RF_BUG_006_EXECUTED_COUNT=}], forbids: [{literal: failed}, {literal: No tests\
-      \ found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-006]\n\
-      \  - id: rf_bug_007_green\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n          npm --prefix web exec playwright test -- --config\
-      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\\
-      \\[RF-BUG-007\\\\]' | tee /tmp/rf007-green-list; test $(grep -c '\\[RF-BUG-007\\\
-      ]' /tmp/rf007-green-list) -eq 2; npm --prefix web exec playwright test -- --config\
-      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\\\[RF-BUG-007\\\
-      \\]' --reporter=line; echo RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2\n\
-      \      timeout_seconds: 300\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \\[RF-BUG-006\\\\]' /tmp/rf006-green-list); test $c -gt 0; npm --prefix web\
+      \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
+      \ --grep '^\\\\[RF-BUG-006\\\\]' --reporter=line; echo RF_BUG_006_EXECUTED_COUNT=$c\"\
+      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: '[RF-BUG-006] route-derived title updates atomically'},\
+      \ {literal: RF_BUG_006_EXECUTED_COUNT=}], forbids: [{literal: failed}, {literal:\
+      \ No tests found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-006]\n\
+      \  - id: rf_bug_007_green\n    run: {command: [bash, -lc, \"npm --prefix web\
+      \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
+      \ --grep '^\\\\[RF-BUG-007\\\\]' | tee /tmp/rf007-green-list; test $(grep -c\
+      \ '\\\\[RF-BUG-007\\\\]' /tmp/rf007-green-list) -eq 2; npm --prefix web exec\
+      \ -- playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep\
+      \ '^\\\\[RF-BUG-007\\\\]' --reporter=line; echo RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2\"\
+      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: '[RF-BUG-007][en] repeated invalid add source remounts\
       \ one alert'}, {literal: '[RF-BUG-007][zh] repeated invalid add source remounts\
       \ one alert'}, {literal: RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2}],\
@@ -183421,9 +183419,9 @@ phases:
       ,\"web/src/routes/__tests__/steer-invalid.test.ts\",\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
       ],\"acceptance_check_ids\":[\"rf_bug_006_green\",\"rf_bug_007_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Require exact RF-BUG-006 title collection and two exact RF-BUG-007
-      EN/ZH titles, positive executed counts, zero retries/skips/mutations, retained
-      focus, and zero protected-artifact diff.
+    verification: Require exact RF-BUG-006 collection and two exact RF-BUG-007 EN/ZH
+      titles, root-valid commands, zero retries/skips/mutations, retained focus, and
+      zero protected-artifact diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
