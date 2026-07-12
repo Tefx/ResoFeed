@@ -184288,3 +184288,37 @@ phases:
     depends_on:
     - local-full-verification-matrix
     agent: forgemaster
+  - id: rf-bug-assurance-closure-full-gate
+    name: RF-BUG assurance-closure phase Full Gate
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Terminal bounded phase Full Gate for `rf-bug-20260712-assurance-closure`. Repository
+      mutation is absent because this gate only reuses the phase''s existing local,
+      OCI, two-platform container, Tailnet/Caddy, independent review, and documentation-closure
+      acceptance predicates and records normal plan-assurance metadata. It introduces
+      no new deployment requirement and runs only checks already owned by `local-full-verification-matrix`,
+      `publish-immutable-two-platform-oci-image`, `fresh-docker-runtime-proof`, `tailnet-caddy-runtime-proof`,
+      `formal-security-review`, `independent-runtime-ui-verification`, and `close-defect-report-with-evidence`,
+      including `defect_report_closure_green` and `closure_active_sources_green`.
+      Require exact ten-title/100-pass RF-BUG-002 proof, exact collection/run equality,
+      existing immutable digest and two-platform/container/Tailnet evidence, independent-review
+      closure, fail-closed active scans, and protected-path integrity. Do not add
+      or modify product code, runtime behavior or processes, storage models, registries,
+      manifests, custom evidence protocols, deployment requirements, acceptance artifacts,
+      or canonical product architecture.'
+    verification: Every existing assurance-closure acceptance predicate is satisfied
+      in dependency order; no new runtime or deployment action is introduced; facade
+      validation, reference validation, and phase intent-closure lint are conformant.
+    depends_on:
+    - local-full-verification-matrix
+    - publish-immutable-two-platform-oci-image
+    - fresh-docker-runtime-proof
+    - tailnet-caddy-runtime-proof
+    - formal-security-review
+    - independent-runtime-ui-verification
+    - close-defect-report-with-evidence
+    agent: gate-reviewer
