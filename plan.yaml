@@ -183479,7 +183479,7 @@ phases:
       ,\"doctor_secret_redaction\",\"pre_bind_failure\"],\"primary_outcome\":\"RF-BUG-003\"\
       ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
       ,\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
-      :[\"integration-verifier\",\"security-reviewer\"],\"review_mode\":\"ADJUDICATED\"\
+      :[\"integration-verifier\",\"software-architect\"],\"review_mode\":\"ADJUDICATED\"\
       ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"internal/resofeed/doctor_test.go\",\"internal/resofeed/http_static_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
