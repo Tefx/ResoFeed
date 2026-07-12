@@ -182938,69 +182938,105 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-001 and RF-BUG-002. Implement independently versioned Inspector detail/provenance\
-      \ channels with stale-response rejection and focus restoration. Implement canonical\
-      \ base64url opaque-ID routes and only `/sources` as the legacy Source Ledger\
-      \ alias, using platform URL/URLSearchParams and validated native history. Bind\
-      \ the Playwright helper to the contract-lock data-app-ready/data-route-ready/data-surface/aria-busy\
-      \ transitions. Cover ordinary, dotted, slash, backslash, percent, mixed, Unicode,\
-      \ and leading-tilde IDs byte-for-byte; reject ambiguity before lookup. Prove\
-      \ direct route initialization under EN and ZH and run ten consecutive retry-free\
-      \ cold/refresh/Back/Forward cases per locale. Protected browser artifacts are\
-      \ immutable. Synchronize docs/ARCHITECTURE.md, docs/DESIGN.md, and docs/ui-preview.html\
-      \ for Inspector, routes, IDs, readiness, and history. Recovery reverts this\
-      \ code/tests/docs batch.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      \ RF-BUG-001 and RF-BUG-002. Implement independently versioned Inspector channels\
+      \ with stale-response rejection and focus restoration. Implement one canonical\
+      \ `~base64url` token in one frontend helper and one Go helper for browser and\
+      \ detail/inspect/reingest/resonance/delivery HTTP paths; decoded UTF-8 reaches\
+      \ existing lookup/mutation byte-for-byte. Do not use encodeURIComponent, an\
+      \ operation codec, or another canonical representation. `/sources` remains an\
+      \ unlisted static miss. Bind shellReady to exact readiness markers and platform\
+      \ URL/URLSearchParams/history. Cover the protected exact ten EN/ZH initial-route\
+      \ titles and exactly 100 retry-free repetitions, plus exact Go one-top-level/30-subtest\
+      \ item-path proof. All contract-lock developer and browser artifacts are immutable.\
+      \ Synchronize only named product/docs paths. Recovery reverts this bounded code/docs\
+      \ batch.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
       profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
-      \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/+page.svelte,\
-      \ web/src/routes/components/Feed.svelte, web/src/routes/components/SearchRetrieval.svelte,\
-      \ web/src/routes/components/Inspector.svelte, docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ docs/ui-preview.html]\n  blocked_paths: [web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
-      \ web/tests/e2e/routes.browser-contract.spec.ts, web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts,\
-      \ internal/resofeed/**]\nclaims: [RF-BUG-001, RF-BUG-002]\nchecks:\n  - id:\
-      \ rf_bug_001_green\n    run: {command: [npm, --prefix, web, exec, playwright,\
-      \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
-      \ --grep, RF-BUG-001, --reporter=line], timeout_seconds: 300}\n    expect: {outcome:\
-      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-001},\
-      \ {literal: passed}], forbids: [{literal: failed}, {literal: No tests found},\
-      \ {literal: 0 tests}, {literal: skipped}]}}\n    proves: [RF-BUG-001]\n  - id:\
-      \ rf_bug_002_green\n    run: {command: [npm, --prefix, web, exec, playwright,\
-      \ test, --, --config, web/playwright.browser-contract.config.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
-      \ --grep, RF-BUG-002, --repeat-each=10, --retries=0, --reporter=line], timeout_seconds:\
-      \ 1200}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: RF-BUG-002}, {literal: '[en]'}, {literal: '[zh]'}, {literal: 20\
-      \ passed}], forbids: [{literal: failed}, {literal: No tests found}, {literal:\
-      \ 0 tests}, {literal: retry}]}}\n    proves: [RF-BUG-002]\n  - id: rf_bug_002_route_unit_green\n\
-      \    run: {command: [npm, --prefix, web, run, test:render, --, web/src/lib/__tests__/workbench-route.test.ts,\
-      \ --reporter=verbose, -t, RF-BUG-002 opaque item IDs], timeout_seconds: 180}\n\
+      \ web/src/lib/api-client.ts, web/src/routes/+page.svelte, web/src/routes/components/Feed.svelte,\
+      \ web/src/routes/components/SearchRetrieval.svelte, web/src/routes/components/Inspector.svelte,\
+      \ internal/resofeed/item_route_token.go, internal/resofeed/http.go, internal/resofeed/item_route_token_test.go,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/ui-preview.html]\n  blocked_paths:\
+      \ [web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/__tests__/inspector-selection.test.ts,\
+      \ web/src/routes/__tests__/steer-invalid.test.ts, web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ web/tests/e2e/initial-route.browser-contract.spec.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
+      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, internal/resofeed/rf_bug_item_id_api_expected_red_test.go]\n\
+      claims: [RF-BUG-001, RF-BUG-002]\nchecks:\n  - id: rf_bug_001_green\n    run:\
+      \ {command: [bash, -lc, \"npm --prefix web exec playwright test -- --config\
+      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
+      \ --list tests/e2e/inspector-selection.browser-contract.spec.ts --grep '^\\\\\
+      [RF-BUG-001\\\\]' | tee /tmp/rf001-green-list; c=$(grep -c '\\[RF-BUG-001\\\
+      ]' /tmp/rf001-green-list); test $c -gt 0; npm --prefix web exec playwright test\
+      \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 tests/e2e/inspector-selection.browser-contract.spec.ts --grep\
+      \ '^\\\\[RF-BUG-001\\\\]' --reporter=line | tee /tmp/rf001-green-run; test $(grep\
+      \ -c '\\[RF-BUG-001\\]' /tmp/rf001-green-run) -ge $c; echo RF_BUG_001_EXECUTED_COUNT=$c\"\
+      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: inspector-selection.browser-contract.spec.ts}, {literal:\
+      \ RF_BUG_001_EXECUTED_COUNT=}, {literal: stale detail cannot replace the selected\
+      \ item}], forbids: [{literal: failed}, {literal: No tests found}, {literal:\
+      \ 0 tests}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-001]\n\
+      \  - id: rf_bug_002_green\n    run: {command: [bash, -lc, \"npm --prefix web\
+      \ run test:e2e -- --project=chromium-ci-safe tests/e2e/initial-route.browser-contract.spec.ts\
+      \ --grep 'RF-BUG-002' --list | tee /tmp/rf002-green-list; test $(grep -c '\\\
+      [RF-BUG-002\\]' /tmp/rf002-green-list) -eq 10; npm --prefix web run test:e2e\
+      \ -- --project=chromium-ci-safe tests/e2e/initial-route.browser-contract.spec.ts\
+      \ --grep 'RF-BUG-002' --repeat-each=10 --retries=0 --reporter=line | tee /tmp/rf002-green-run;\
+      \ grep -F '100 passed' /tmp/rf002-green-run; grep -F '[RF-BUG-002][en] TODAY\
+      \ cold load and refresh' /tmp/rf002-green-list; grep -F '[RF-BUG-002][zh] Back\
+      \ and Forward preserve TODAY SEARCH and opaque item routes' /tmp/rf002-green-list;\
+      \ echo RF_BUG_002_TITLES=10 RF_BUG_002_EXECUTED=100\"], timeout_seconds: 1500}\n\
       \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: workbench-route.test.ts}, {literal: RF-BUG-002 opaque item IDs},\
-      \ {literal: passed}], forbids: [{literal: failed}, {literal: No tests found},\
-      \ {literal: 0 test}, {literal: skipped}]}}\n    proves: [RF-BUG-002]\nbindings:\n\
-      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
-      \ source_check: rf_bug_001_expected_red, requirement: RF-BUG-001, assertion_id:\
-      \ A-RF-BUG-001-INSPECTOR, downstream_check: rf_bug_001_green, receipt: RF-BUG-001-red-to-green}\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ [{literal: initial-route.browser-contract.spec.ts}, {literal: RF_BUG_002_TITLES=10\
+      \ RF_BUG_002_EXECUTED=100}, {literal: '[RF-BUG-002][en] TODAY cold load and\
+      \ refresh'}, {literal: '[RF-BUG-002][zh] Back and Forward preserve TODAY SEARCH\
+      \ and opaque item routes'}], forbids: [{literal: failed}, {literal: No tests\
+      \ found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-002]\n\
+      \  - id: rf_bug_002_route_unit_green\n    run: {command: [npm, --prefix, web,\
+      \ run, test:render, --, src/lib/__tests__/workbench-route.test.ts, --reporter=verbose,\
+      \ -t, RF-BUG-002 opaque item IDs], timeout_seconds: 180}\n    expect: {outcome:\
+      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: workbench-route.test.ts},\
+      \ {literal: RF-BUG-002 opaque item IDs}, {literal: canonical ~base64url round-trip\
+      \ cases=9}], forbids: [{literal: failed}, {literal: No tests found}, {literal:\
+      \ 0 test}, {literal: skipped}]}}\n    proves: [RF-BUG-002]\n  - id: rf_bug_002_api_green\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG002OpaqueItemIDAPIPaths$,\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG002OpaqueItemIDAPIPaths'},\
+      \ {literal: 'operation=detail/case=slash'}, {literal: 'operation=delivery/case=mix-separator-percent-unicode-leading-tilde'},\
+      \ {literal: RF_BUG_002_API_SUBTESTS=30}, {literal: '--- PASS: TestRFBUG002OpaqueItemIDAPIPaths'}],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
+      \ to run]'}, {literal: lookup called for invalid token}]}}\n    proves: [RF-BUG-002]\n\
+      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step:\
+      \ rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red, source_check:\
+      \ rf_bug_001_expected_red, requirement: RF-BUG-001, assertion_id: A-RF-BUG-001-INSPECTOR,\
+      \ downstream_check: rf_bug_001_green, receipt: RF-BUG-001-red-to-green}\n  \
+      \  - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
       \ source_check: rf_bug_002_expected_red, requirement: RF-BUG-002, assertion_id:\
-      \ A-RF-BUG-002-ROUTES, downstream_check: rf_bug_002_green, receipt: RF-BUG-002-red-to-green}\n\
+      \ A-RF-BUG-002-INITIAL-ROUTE, downstream_check: rf_bug_002_green, receipt: RF-BUG-002-route-red-to-green}\n\
       \    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
       \ source_check: rf_bug_002_route_unit_expected_red, requirement: RF-BUG-002,\
       \ assertion_id: A-RF-BUG-002-OPAQUE-UNIT, downstream_check: rf_bug_002_route_unit_green,\
-      \ receipt: RF-BUG-002-opaque-unit-red-to-green}\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"client_routing\"\
-      ],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
-      :[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"primary_verifier\":\"integration-verifier\"\
-      ,\"additional_verifiers\":[\"client-runtime-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":false,\"test_authority\":{\"developer_test_globs\"\
-      :[\"web/src/lib/__tests__/workbench-route.test.ts\"],\"acceptance_test_paths\"\
-      :[\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"web/tests/e2e/routes.browser-contract.spec.ts\"\
-      ],\"acceptance_check_ids\":[\"rf_bug_001_green\",\"rf_bug_002_green\"],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run the exact unit test plus protected Inspector and EN/ZH route
-      contracts. Require named positive collection, exactly 20 locale race passes,
-      zero retries, byte-exact opaque-ID lookup, and bounded ARCHITECTURE/DESIGN diff
-      proof for Inspector/routes/readiness/history.
+      \ receipt: RF-BUG-002-unit-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.frontend-state-route-a11y-expected-red,\
+      \ source_check: rf_bug_002_api_expected_red, requirement: RF-BUG-002, assertion_id:\
+      \ A-RF-BUG-002-OPAQUE-API, downstream_check: rf_bug_002_api_green, receipt:\
+      \ RF-BUG-002-api-red-to-green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_behavior\",\"public_http_item_paths\"\
+      ,\"client_routing\"],\"primary_outcome\":\"RF-BUG-001\",\"rollback_class\":\"\
+      NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"],\"\
+      primary_verifier\":\"integration-verifier\",\"additional_verifiers\":[\"client-runtime-verifier\"\
+      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
+      :{\"developer_test_globs\":[\"internal/resofeed/item_route_token_test.go\"],\"\
+      acceptance_test_paths\":[\"web/src/lib/__tests__/workbench-route.test.ts\",\"\
+      web/src/routes/__tests__/inspector-selection.test.ts\",\"web/src/routes/__tests__/steer-invalid.test.ts\"\
+      ,\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"web/tests/e2e/initial-route.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/routes.browser-contract.spec.ts\",\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
+      ,\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_001_green\",\"rf_bug_002_green\",\"rf_bug_002_route_unit_green\"\
+      ,\"rf_bug_002_api_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
+      :[]}}\n</vectl_step_policy>"
+    verification: Require positive exact list/run title counts, exactly ten EN/ZH
+      initial-route titles and 100 retry-free executions, exact route-unit assertion,
+      exactly one Go top-level test and 30 named API subtests, byte-identical lookup,
+      and zero protected-artifact diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
