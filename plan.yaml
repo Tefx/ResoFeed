@@ -183169,7 +183169,7 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: contract-test-author
+    agent: general
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
