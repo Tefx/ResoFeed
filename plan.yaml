@@ -182725,90 +182725,120 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-003, RF-BUG-004, RF-BUG-005 and canonical document lock. Correct ARCHITECTURE/DESIGN\
-      \ to OPML import-only while preserving JSON State; correct CONTAINER/USAGE to\
-      \ state web build plus clean package-local embed staging before Go compilation\
-      \ and a final image containing only the binary plus writable `/data`, with no\
-      \ copied, mounted, or served external UI tree, Node runtime, or cwd dependency.\
-      \ Bootstrap validation uses no parser dependency: implement a bounded byte-preserving\
-      \ scanner limited to the embedded `index.html` start/end-tag and attribute grammar\
-      \ needed to classify local bootstrap `script[src]` and `link[href]` references\
-      \ and inline non-module `script` bodies. Reject unterminated tags/comments/quotes,\
-      \ duplicate attributes, malformed names, mismatched or nested script boundaries,\
-      \ self-closing script tags, character references in bootstrap URLs, case-fold\
-      \ collisions, executable inline event-handler attributes, and any ambiguous\
-      \ construct before bind. Hash the exact bytes strictly between each accepted\
-      \ inline script's closing `>` and matching `</script>` without entity decoding,\
-      \ whitespace normalization, or case conversion. Adversarial fixtures cover mixed-case\
-      \ tags/attributes, single/double/unquoted values, `>` inside quotes, comments,\
-      \ fake script text, duplicate/malformed attributes, unterminated structures,\
-      \ nested/mismatched scripts, and exact byte-boundary preservation. No HTML parser\
-      \ library is added. `/sources` is an unlisted static miss. Define pre-bind embedded\
-      \ bootstrap validation, parsed URL.Path/RawPath classification, exact GET/HEAD/400/404/405\
-      \ behavior, Doctor redaction, four outer headers, byte-exact CSP, streaming/cancellation,\
-      \ auth-first legacy OPML export 401/404, import, and State behavior. Create\
-      \ one protected Go file with exact named top-level tests. Every red check must\
-      \ collect its exact top-level/subtest names and reach the specified assertion\
-      \ failure. Recovery reverts only docs and this protected contract file.\n\n\
-      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ expected_red_definition\nscope:\n  allowed_paths: [docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ docs/CONTAINER.md, docs/USAGE.md, internal/resofeed/rf_bug_runtime_contract_expected_red_test.go]\n\
+      \ RF-BUG-003, RF-BUG-004, RF-BUG-005, and RF-BUG-CANONICAL-DOCS. Correct only\
+      \ the active canonical sections in docs/ARCHITECTURE.md, docs/DESIGN.md, docs/CONTAINER.md,\
+      \ and docs/USAGE.md to the final authority. Preserve dated plans/reports, audits,\
+      \ implementation notes, completed contracts, examples, and preview artifacts\
+      \ unchanged. The single binary embeds a clean staged web build and validates\
+      \ index.html before bind with the bounded byte-preserving Section 2.2 scanner.\
+      \ Executable script classification trims only ASCII whitespace (HT, LF, FF,\
+      \ CR, SP) and compares with ASCII case folding: absent and empty type are classic\
+      \ executable JavaScript; module is executable module JavaScript; text/javascript,\
+      \ application/javascript, text/ecmascript, and application/ecmascript are the\
+      \ only executable MIME values; every other non-empty type, including MIME parameters,\
+      \ is non-executable. Hash the exact body bytes of every executable inline script\
+      \ without src, including module and all accepted MIME classes. Fixtures cover\
+      \ every accepted class, unsupported types, MIME parameters, exact LF/CRLF ranges,\
+      \ and hash-set equality. Deterministic malformed-fixture reasons include unexpected_end_tag_after_self_close,\
+      \ end_tag_for_void_element, raw_text_self_close_forbidden, stray_end_tag, mismatched_end_tag,\
+      \ and unclosed_element. Reject ordinary javascript: values and embedded HT/LF/CR\
+      \ obfuscations after comparison-copy control deletion using javascript_url and\
+      \ javascript_url_control_obfuscation respectively; never normalize source bytes.\
+      \ RF-BUG-003 and RF-BUG-005 collection and run output must equal the exact Section\
+      \ 4.3 inventories: 23 subtests across two RF-BUG-003 parents and 13 RF-BUG-005\
+      \ local subtests. Positive counts alone fail. Doctor redaction, auth-first OPML\
+      \ import-only behavior, parsed URL path classification, exact GET/HEAD/400/404/405\
+      \ behavior, outer headers, CSP, streaming, and cancellation remain bounded by\
+      \ Sections 2.1-2.3 and 4.3-4.5. Recovery reverts only these four active docs\
+      \ and the protected contract file.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
+      \ [docs/ARCHITECTURE.md, docs/DESIGN.md, docs/CONTAINER.md, docs/USAGE.md, internal/resofeed/rf_bug_runtime_contract_expected_red_test.go]\n\
       \  blocked_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
-      \ internal/resofeed/doctor.go, internal/resofeed/webui/**, Dockerfile, web/src/**]\n\
-      claims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT, RF-BUG-CANONICAL-DOCS]\n\
-      checks:\n  - id: canonical_runtime_docs_green\n    run:\n      command:\n  \
-      \      - bash\n        - -lc\n        - |-\n          python3 -c \"from pathlib\
-      \ import Path; import re; a=Path('docs/ARCHITECTURE.md').read_text(); d=Path('docs/DESIGN.md').read_text();\
-      \ c=Path('docs/CONTAINER.md').read_text(); u=Path('docs/USAGE.md').read_text();\
-      \ assert not re.search(r'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML', a+'\\n'+d+'\\\
-      n'+u, re.I); portable=('active sources','active steering rules','currently resonated\
-      \ items'); low=(a+'\\n'+d).lower(); assert all(x in low for x in portable);\
-      \ assert all(x in low for x in ('does not merge','does not sync')); assert 'embed.FS'\
-      \ in a and 'embed.FS' in c; assert all(x in c.lower() for x in ('web build','before\
-      \ go compilation','only the binary','/data','does not copy','does not mount','does\
-      \ not serve','external ui','node','cwd')); assert \"default-src 'self'; script-src\
-      \ 'self'\" in a; print('CANONICAL_DOC_ASSERTIONS=opml_removed,portable_state_exact,embed,stage,binary_only,no_external,no_node_cwd,csp')\"\
-      ; matches=$(mktemp); set +e; git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML'\
-      \ -- cmd internal web/src web/tests docs web/package.json web/package-lock.json\
-      \ go.mod go.sum bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
-      \ ':(exclude)docs/BUG_FIX_PLAN_2026-07-12.md' ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
+      \ internal/resofeed/doctor.go, internal/resofeed/webui/**, Dockerfile, web/src/**,\
+      \ docs/audits/**, docs/implementation-notes/**]\nclaims: [RF-BUG-003-CONTRACT,\
+      \ RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT, RF-BUG-CANONICAL-DOCS]\nchecks:\n\
+      \  - id: canonical_runtime_docs_green\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n          python3 - <<'PY'\n          from pathlib\
+      \ import Path\n          import re\n          a=Path('docs/ARCHITECTURE.md').read_text();\
+      \ d=Path('docs/DESIGN.md').read_text(); c=Path('docs/CONTAINER.md').read_text();\
+      \ u=Path('docs/USAGE.md').read_text()\n          assert not re.search(r'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML',\
+      \ a+'\\n'+d+'\\n'+u, re.I)\n          low=(a+'\\n'+d).lower()\n          assert\
+      \ all(x in low for x in ('active sources','active steering rules','currently\
+      \ resonated items','does not merge','does not sync'))\n          assert 'embed.FS'\
+      \ in a and 'embed.FS' in c\n          assert all(x in c.lower() for x in ('web\
+      \ build','before go compilation','only the binary','/data','does not copy','does\
+      \ not mount','does not serve','external ui','node','cwd'))\n          print('CANONICAL_DOC_ASSERTIONS=opml_removed,portable_state_exact,embed,stage,binary_only,no_external,no_node_cwd,csp')\n\
+      \          PY\n          active_docs=(docs/ARCHITECTURE.md docs/DESIGN.md docs/PRD.md\
+      \ docs/USAGE.md docs/CONTAINER.md docs/PROMPTING_SYSTEM.md docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md)\n\
+      \          for path in \"${active_docs[@]}\"; do git ls-files --error-unmatch\
+      \ \"$path\" >/dev/null; done\n          matches=$(mktemp); set +e\n        \
+      \  git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML' -- cmd internal web/src\
+      \ web/tests \"${active_docs[@]}\" web/package.json web/package-lock.json go.mod\
+      \ go.sum bin deploy Dockerfile .dockerignore ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
       \ ':(exclude)web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts' >\"$matches\"\
-      ; status=$?; set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"\
-      ; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f \"$matches\"\
-      ; exit \"$status\";; esac; echo OPML_ACTIVE_SCAN_MATCHES=0 OPML_EXCLUSIONS=4\n\
-      \      timeout_seconds: 120\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: CANONICAL_DOC_ASSERTIONS=opml_removed,portable_state_exact,embed,stage,binary_only,no_external,no_node_cwd,csp},\
-      \ {literal: OPML_ACTIVE_SCAN_MATCHES=0}, {literal: OPML_EXCLUSIONS=4}], forbids:\
-      \ [{literal: AssertionError}]}}\n    proves: [RF-BUG-CANONICAL-DOCS]\n  - id:\
-      \ rf_bug_003_expected_red\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n          go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
-      \ ./internal/resofeed | tee /tmp/rf003-list; test $(grep -Ec '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
-      \ /tmp/rf003-list) -eq 2; go test -v ./internal/resofeed -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
-      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG003EmbeddedUIContract/bootstrap_missing_script_fails_before_bind'},\
-      \ {literal: '=== RUN   TestRFBUG003DoctorRedactionContract/crlf_dynamic_value_is_wholly_redacted'},\
-      \ {literal: expected listener to remain unbound}], forbids: [{literal: setup\
+      \n          status=$?; set -e\n          case \"$status\" in 0) cat \"$matches\"\
+      ; rm -f \"$matches\"; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2;\
+      \ rm -f \"$matches\"; exit \"$status\";; esac\n          echo OPML_ACTIVE_SCAN_MATCHES=0\
+      \ OPML_ACTIVE_DOCUMENTS=7 OPML_EXCLUSIONS=2\n      timeout_seconds: 120\n  \
+      \  expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all:\n          - {literal: 'CANONICAL_DOC_ASSERTIONS=opml_removed,portable_state_exact,embed,stage,binary_only,no_external,no_node_cwd,csp'}\n\
+      \          - {literal: 'OPML_ACTIVE_SCAN_MATCHES=0'}\n          - {literal:\
+      \ 'OPML_ACTIVE_DOCUMENTS=7'}\n          - {literal: 'OPML_EXCLUSIONS=2'}\n \
+      \       forbids: [{literal: AssertionError}]\n    proves: [RF-BUG-CANONICAL-DOCS]\n\
+      \  - id: rf_bug_003_expected_red\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n          set -e\n          go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
+      \ ./internal/resofeed | tee /tmp/rf003-list\n          test \"$(grep -Ec '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
+      \ /tmp/rf003-list)\" -eq 2\n          set +e; go test -v ./internal/resofeed\
+      \ -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
+      \ -count=1 2>&1 | tee /tmp/rf003-run; status=${PIPESTATUS[0]}; set -e\n    \
+      \      python3 - <<'PY'\n          import re\n          text=open('/tmp/rf003-run').read()\n\
+      \          expected={'TestRFBUG003EmbeddedUIContract/'+x for x in 'type_absent\
+      \ type_empty type_module type_text_javascript type_application_javascript type_text_ecmascript\
+      \ type_application_ecmascript unsupported_type mime_parameter_rejected all_executable_inline_hashes\
+      \ bootstrap_reason_ids bootstrap_reference_validation static_regular_file static_spa_routes\
+      \ static_invalid_path static_miss static_head_and_method cwd_independence invalid_bootstrap_no_listener'.split()}\
+      \ | {'TestRFBUG003DoctorRedactionContract/'+x for x in 'ui_asset_lines configured_secret_redaction\
+      \ crlf_value_redaction safe_diagnostics_preserved'.split()}\n          got=set(re.findall(r'^===\
+      \ RUN\\s+(TestRFBUG003[^\\s]+)',text,re.M)); assert got==expected,(sorted(expected-got),sorted(got-expected))\n\
+      \          assert 'expected listener to remain unbound' in text\n          print('RF-BUG-003_EXACT_SUBTEST_SET=23')\n\
+      \          PY\n          test \"$status\" -eq 1; exit 1\n    expect:\n     \
+      \ outcome: red\n      exit_codes: [1]\n      stdout_or_stderr:\n        contains_all:\n\
+      \          - {literal: 'RF-BUG-003_EXACT_SUBTEST_SET=23'}\n          - {literal:\
+      \ 'expected listener to remain unbound'}\n        forbids: [{literal: setup\
       \ failed}, {literal: no tests to run}, {literal: '[no tests to run]'}, {literal:\
-      \ compile error}]}}\n    proves: [RF-BUG-003-CONTRACT]\n  - id: rf_bug_004_expected_red\n\
+      \ compile error}]\n    proves: [RF-BUG-003-CONTRACT]\n  - id: rf_bug_004_expected_red\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
-      \ ./internal/resofeed | tee /tmp/rf004-list; test $(grep -Fxc 'TestRFBUG004OPMLImportOnlyContract'\
-      \ /tmp/rf004-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG004OPMLImportOnlyContract$'\
-      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/legacy_export_auth_precedence'},\
-      \ {literal: expected unauthenticated 401 and authenticated 404}], forbids: [{literal:\
-      \ setup failed}, {literal: no tests to run}, {literal: '[no tests to run]'},\
-      \ {literal: compile error}]}}\n    proves: [RF-BUG-004-CONTRACT]\n  - id: rf_bug_005_expected_red\n\
-      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
-      \ ./internal/resofeed | tee /tmp/rf005-list; test $(grep -Fxc 'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'\
-      \ /tmp/rf005-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
-      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/exact_embedded_script_hashes'},\
-      \ {literal: expected byte-exact canonical CSP}], forbids: [{literal: setup failed},\
+      \       go test -list '^TestRFBUG004OPMLImportOnlyContract$' ./internal/resofeed\
+      \ | tee /tmp/rf004-list\n          test \"$(grep -Fxc 'TestRFBUG004OPMLImportOnlyContract'\
+      \ /tmp/rf004-list)\" -eq 1\n          go test -v ./internal/resofeed -run '^TestRFBUG004OPMLImportOnlyContract$'\
+      \ -count=1\n      timeout_seconds: 240\n    expect:\n      outcome: red\n  \
+      \    exit_codes: [1]\n      stdout_or_stderr:\n        contains_all:\n     \
+      \     - {literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/legacy_export_auth_precedence'}\n\
+      \          - {literal: 'expected unauthenticated 401 and authenticated 404'}\n\
+      \        forbids: [{literal: setup failed}, {literal: no tests to run}, {literal:\
+      \ '[no tests to run]'}, {literal: compile error}]\n    proves: [RF-BUG-004-CONTRACT]\n\
+      \  - id: rf_bug_005_expected_red\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n          set -e\n          go test -list '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
+      \ ./internal/resofeed | tee /tmp/rf005-list\n          test \"$(grep -Fxc 'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'\
+      \ /tmp/rf005-list)\" -eq 1\n          set +e; go test -v ./internal/resofeed\
+      \ -run '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$' -count=1\
+      \ 2>&1 | tee /tmp/rf005-run; status=${PIPESTATUS[0]}; set -e\n          python3\
+      \ - <<'PY'\n          import re\n          text=open('/tmp/rf005-run').read();\
+      \ expected={'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/'+x\
+      \ for x in 'static_html_headers static_asset_headers authorized_json_headers\
+      \ unauthorized_json_headers api_error_headers mcp_success_headers mcp_error_headers\
+      \ internal_error_headers single_effective_header_values csp_exact_executable_hashes\
+      \ csp_browser_import_state_operations multi_flush_streaming request_cancellation'.split()};\
+      \ got=set(re.findall(r'^=== RUN\\s+(TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/[^\\\
+      s]+)',text,re.M)); assert got==expected,(sorted(expected-got),sorted(got-expected));\
+      \ assert 'expected byte-exact canonical CSP' in text; print('RF-BUG-005_EXACT_SUBTEST_SET=13')\n\
+      \          PY\n          test \"$status\" -eq 1; exit 1\n    expect:\n     \
+      \ outcome: red\n      exit_codes: [1]\n      stdout_or_stderr:\n        contains_all:\n\
+      \          - {literal: 'RF-BUG-005_EXACT_SUBTEST_SET=13'}\n          - {literal:\
+      \ 'expected byte-exact canonical CSP'}\n        forbids: [{literal: setup failed},\
       \ {literal: no tests to run}, {literal: '[no tests to run]'}, {literal: compile\
-      \ error}]}}\n    proves: [RF-BUG-005-CONTRACT]\nbindings:\n  expected_red:\n\
-      \    items:\n      - {requirement: RF-BUG-003, assertion_id: A-RF-BUG-003-EMBED-DOCTOR,\
+      \ error}]\n    proves: [RF-BUG-005-CONTRACT]\nbindings:\n  expected_red:\n \
+      \   items:\n      - {requirement: RF-BUG-003, assertion_id: A-RF-BUG-003-EMBED-DOCTOR,\
       \ source_check: rf_bug_003_expected_red, selector: {type: test_id, value: TestRFBUG003EmbeddedUIContract},\
       \ downstream_step: rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary,\
       \ downstream_check: rf_bug_003_green, receipt: RF-BUG-003-red-to-green}\n  \
@@ -182833,12 +182863,13 @@ phases:
       ,\"rf_bug_005_expected_red\"],\"acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\"\
       :[{\"ref\":\"authority:acceptance-mutation:rf-bug-runtime-contract\",\"path\"\
       :\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\",\"purpose\"\
-      :\"Define protected exact RF-BUG-003/004/005 top-level and subtest assertions\"\
+      :\"Define protected exact RF-BUG-003/004/005 fixture and title inventories\"\
       ,\"check_id\":\"rf_bug_003_expected_red\",\"actor_id\":\"contract-test-author\"\
       }]}}\n</vectl_step_policy>"
-    verification: Run positive canonical documentation predicates, then each exact
-      named red test. Require exact top-level/subtest collection and intended assertion
-      fingerprints; compilation/setup/generic RF-BUG output cannot satisfy red.
+    verification: Run canonical active-document predicates, then exact RF-BUG-003/004/005
+      collection and assertion-specific expected-red checks. Require exact 23- and
+      13-subtest equality, executable-script fixture/hash coverage, deterministic
+      reason IDs, and fail-closed active scan evidence.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
