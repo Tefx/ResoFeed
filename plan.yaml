@@ -182768,7 +182768,7 @@ phases:
     - docs/DESIGN.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: contract-test-author
+    agent: general
   - id: rf-bug-route-search-token-expected-red
     name: Lock route, Search history, and opaque item-ID acceptance
     status: pending
