@@ -184101,22 +184101,26 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-010. Exercise the real binary with case-local SQLite/browser context/runtime\
-      \ state, reliable owned-resource cleanup, and redacted diagnostics. Every failed\
-      \ test retains trace, screenshot, video, server stdout/stderr, browser console,\
-      \ and network summary; no lane may waive retain-on-failure video. Preserve all\
-      \ protected expected-red, browser-contract, baseline, initial-route, and intentional-failure\
-      \ spec/config artifacts. Before deleting any legacy spec, run the exact three-file\
-      \ old list and run, exact five-file replacement list and run, and update only\
-      \ the token-free reviewed checklist. Use `web/playwright.ci-safe.config.ts`\
-      \ as the exact full-suite config; run its exact positive title set three times\
-      \ with retries zero and compare each executed title/count to the identical list\
-      \ set. Run the protected intentional failure and assert its named assertion\
-      \ plus one trace, one video, at least one screenshot, and non-empty server/browser/network\
-      \ files. No reset schema, registry, manifest, hash evidence, broad e2e cleanup,\
-      \ product interception, or universal fresh process. Recovery reverts harness/config/fixture/docs\
-      \ and restores exact legacy files.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      \ RF-BUG-010. Exercise the real binary with case-local SQLite/browser/runtime\
+      \ state and reliable cleanup. Preserve all protected artifacts. Before deleting\
+      \ a legacy spec, run the exact three-file old list/run and five-file replacement\
+      \ list/run from repository root; standard Playwright JSON must emit every validated\
+      \ project/file/title row and prove list/run equality with one passed attempt\
+      \ and zero retry. Use web/playwright.ci-safe.config.ts for the exact full suite.\
+      \ Each of three runs retains standard JSON, HTML, redacted server stdout/stderr,\
+      \ DB path plus cleanup=clean, sanitized environment, browser console, and network\
+      \ summary. Standard JSON parsing emits every validated project/file/title row\
+      \ before predicates; all three list/run sets must be identical, positive, unique,\
+      \ and green. The independently collected intentional-failure green proof validates\
+      \ SETUP < ASSERTION_REACHED < TEARDOWN before artifact checks and retains JSON,\
+      \ HTML, trace, video, screenshot, server stdout/stderr, DB/cleanup, sanitized\
+      \ environment, browser console, and network evidence. Every npm-exec command\
+      \ uses `npm --prefix web exec -- playwright`, root-relative configs, and root-relative\
+      \ specs. A migration assertion rejects `npm --prefix web exec playwright`, `--config\
+      \ ./playwright`, and unprefixed root `tests/e2e/` in active RF-BUG plan predicates.\
+      \ No custom evidence schema, registry, manifest, reset protocol, product interception,\
+      \ broad cleanup authority, or universal fresh process.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/playwright_fixture_test.go, web/playwright.config.ts,\
       \ web/playwright.base.config.ts, web/playwright.browser-contract.config.ts,\
       \ web/playwright.smoke.config.ts, web/playwright.runtime.config.ts, web/playwright.live.config.ts,\
@@ -184133,204 +184137,234 @@ phases:
       \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
       \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
       \ web/tests/e2e/csp-operations.browser-contract.spec.ts, web/tests/e2e/harness-artifact.intentional-failure.spec.ts,\
-      \ web/playwright.artifact-proof.config.ts, web/src/lib/__tests__/workbench-route.test.ts,\
-      \ web/src/routes/components/__tests__/source-ledger-responsive.test.ts, web/src/routes/**,\
-      \ Dockerfile]\nclaims: [RF-BUG-010]\nchecks:\n  - id: rf_bug_010_green\n   \
-      \ run:\n      command:\n        - bash\n        - -lc\n        - |-\n      \
-      \    npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-010\\\\]' | tee /tmp/rf010-green-list; c=$(grep -c '\\\
-      [RF-BUG-010\\]' /tmp/rf010-green-list); test $c -gt 0; npm --prefix web exec\
-      \ playwright test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep '^\\\\\
-      [RF-BUG-010\\\\]' --reporter=line; echo RF_BUG_010_EXECUTED_COUNT=$c\n     \
-      \ timeout_seconds: 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: bugfix-ledger-e2e.expected-red.spec.ts}, {literal:\
-      \ '[RF-BUG-010] mutating cases own isolated state and cleanup'}, {literal: RF_BUG_010_EXECUTED_COUNT=}],\
-      \ forbids: [{literal: failed}, {literal: No tests found}, {literal: skipped},\
-      \ {literal: retry}, {literal: leaked resource}]}}\n    proves: [RF-BUG-010]\n\
-      \  - id: rf_bug_010_old_list_green\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n          npm --prefix web exec playwright test\
-      \ -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list tests/e2e/search-click-inspector-contract.expected-red.spec.ts tests/e2e/mobile-inspector-token-hydration.spec.ts\
-      \ tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts | tee web/.test-artifacts/rf-bug-010-old-list.txt;\
-      \ for f in search-click-inspector-contract.expected-red.spec.ts mobile-inspector-token-hydration.spec.ts\
-      \ source-ledger-navigation-regression.expected-red.spec.ts; do grep -F \"$f\"\
-      \ web/.test-artifacts/rf-bug-010-old-list.txt; done; c=$(grep -c '^.*›' web/.test-artifacts/rf-bug-010-old-list.txt);\
-      \ test $c -gt 0; echo RF_BUG_010_OLD_LIST_COUNT=$c\n      timeout_seconds: 300\n\
-      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: search-click-inspector-contract.expected-red.spec.ts}, {literal:\
-      \ mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
+      \ web/playwright.artifact-proof.config.ts, web/src/routes/**, Dockerfile]\n\
+      claims: [RF-BUG-010]\nchecks:\n  - id: rf_bug_010_green\n    run:\n      command:\n\
+      \        - bash\n        - -lc\n        - |-\n          npm --prefix web exec\
+      \ -- playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --list web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep\
+      \ '^\\[RF-BUG-010\\]' | tee /tmp/rf010-green-list\n          c=$(grep -c '\\\
+      [RF-BUG-010\\]' /tmp/rf010-green-list); test \"$c\" -gt 0\n          npm --prefix\
+      \ web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
+      \ --grep '^\\[RF-BUG-010\\]' --reporter=line\n          python3 - <<'PY'\n \
+      \         import yaml,re\n          p=yaml.safe_load(open('plan.yaml'))\n  \
+      \        bad=[]\n          for ph in p['phases']:\n            if not ph['id'].startswith('rf-bug-20260712'):\
+      \ continue\n            for s in ph.get('steps',[]):\n              d=s.get('description','')\n\
+      \              if 'npm --prefix web exec playwright' in d or '--config ./playwright'\
+      \ in d: bad.append(ph['id']+'.'+s['id'])\n          assert not bad,bad\n   \
+      \       print('RF_BUG_010_ROOT_COMMAND_FORMS=valid')\n          PY\n       \
+      \   echo RF_BUG_010_EXECUTED_COUNT=$c\n      timeout_seconds: 600\n    expect:\
+      \ {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal:\
+      \ '[RF-BUG-010] mutating cases own isolated state and cleanup'}, {literal: RF_BUG_010_ROOT_COMMAND_FORMS=valid},\
+      \ {literal: RF_BUG_010_EXECUTED_COUNT=}], forbids: [{literal: failed}, {literal:\
+      \ No tests found}, {literal: skipped}, {literal: retry}, {literal: leaked resource}]}}\n\
+      \    proves: [RF-BUG-010]\n  - id: rf_bug_010_old_list_green\n    run: {command:\
+      \ [bash, -lc, \"mkdir -p web/.test-artifacts; npm --prefix web exec -- playwright\
+      \ test --config web/playwright.ci-safe.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --list web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
+      \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
+      \ | tee web/.test-artifacts/rf-bug-010-old-list.txt; for f in search-click-inspector-contract.expected-red.spec.ts\
+      \ mobile-inspector-token-hydration.spec.ts source-ledger-navigation-regression.expected-red.spec.ts;\
+      \ do grep -F \\\"$f\\\" web/.test-artifacts/rf-bug-010-old-list.txt; done; c=$(grep\
+      \ -c '›' web/.test-artifacts/rf-bug-010-old-list.txt); test $c -gt 0; echo RF_BUG_010_OLD_LIST_COUNT=$c\"\
+      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: search-click-inspector-contract.expected-red.spec.ts},\
+      \ {literal: mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
       \ {literal: RF_BUG_010_OLD_LIST_COUNT=}], forbids: [{literal: No tests found},\
       \ {literal: 0 tests}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_old_run_green\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       mkdir -p web/.test-artifacts; npm --prefix web exec playwright test\
-      \ -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list --reporter=json tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
-      \ tests/e2e/mobile-inspector-token-hydration.spec.ts tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
-      \ > web/.test-artifacts/rf-bug-010-old-list.json; npm --prefix web exec playwright\
-      \ test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --reporter=json tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
-      \ tests/e2e/mobile-inspector-token-hydration.spec.ts tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
-      \ > web/.test-artifacts/rf-bug-010-old-run.json; python3 -c \"import json,collections,sys;\
-      \ walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
-      \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
-      \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
-      \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
-      \         while stack:\n           s=stack.pop(); stack.extend(s.get('suites',[]));\
-      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
-      \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
-      \ for t in tests); print('RF_BUG_010_OLD_RUN_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-old-list.json web/.test-artifacts/rf-bug-010-old-run.json\n\
-      \      timeout_seconds: 900\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: search-click-inspector-contract.expected-red.spec.ts},\
-      \ {literal: mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
-      \ {literal: RF_BUG_010_OLD_RUN_COUNT=}], forbids: [{literal: failed}, {literal:\
-      \ No tests found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-010]\n\
-      \  - id: rf_bug_010_replacement_list_green\n    run:\n      command:\n     \
-      \   - bash\n        - -lc\n        - |-\n          npm --prefix web exec playwright\
-      \ test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/inspector-selection.browser-contract.spec.ts\
-      \ tests/e2e/initial-route.browser-contract.spec.ts tests/e2e/routes.browser-contract.spec.ts\
-      \ tests/e2e/source-ledger-responsive.browser-contract.spec.ts tests/e2e/source-ledger-delete.browser-contract.spec.ts\
-      \ | tee web/.test-artifacts/rf-bug-010-replacement-list.txt; for f in inspector-selection.browser-contract.spec.ts\
-      \ initial-route.browser-contract.spec.ts routes.browser-contract.spec.ts source-ledger-responsive.browser-contract.spec.ts\
-      \ source-ledger-delete.browser-contract.spec.ts; do grep -F \"$f\" web/.test-artifacts/rf-bug-010-replacement-list.txt;\
-      \ done; c=$(grep -c '^.*›' web/.test-artifacts/rf-bug-010-replacement-list.txt);\
-      \ test $c -gt 0; echo RF_BUG_010_REPLACEMENT_LIST_COUNT=$c\n      timeout_seconds:\
-      \ 300\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \       mkdir -p web/.test-artifacts\n          PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-old-list.json\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json --list web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
+      \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\n\
+      \          PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-old-run.json\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
+      \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\n\
+      \          node - web/.test-artifacts/rf-bug-010-old-list.json web/.test-artifacts/rf-bug-010-old-run.json\
+      \ OLD <<'NODE'\n          const fs=require('node:fs'); function rows(f,run){const\
+      \ r=JSON.parse(fs.readFileSync(f));const o=[];function w(ss){for(const s of\
+      \ ss||[]){for(const p of s.specs||[])for(const t of p.tests||[]){const file=p.file||s.file;if(!file||!p.title||!t.projectName)throw\
+      \ Error('missing identity');if(run&&(t.results?.length!==1||t.results[0].status!=='passed'))throw\
+      \ Error('non-green or retried');o.push(`${t.projectName}\\t${file}\\t${p.title}`)}w(s.suites)}}w(r.suites);o.sort();if(!o.length||new\
+      \ Set(o).size!==o.length)throw Error('empty or duplicate');return o}const a=rows(process.argv[2],false),b=rows(process.argv[3],true);if(JSON.stringify(a)!==JSON.stringify(b))throw\
+      \ Error('list/run mismatch');for(const x of b)console.log(`RF-BUG-010_${process.argv[4]}\\\
+      t${x}`);console.log(`RF_BUG_010_${process.argv[4]}_RUN_COUNT=${b.length}`)\n\
+      \          NODE\n      timeout_seconds: 900\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-010_OLD}, {literal:\
+      \ search-click-inspector-contract.expected-red.spec.ts}, {literal: mobile-inspector-token-hydration.spec.ts},\
+      \ {literal: source-ledger-navigation-regression.expected-red.spec.ts}, {literal:\
+      \ RF_BUG_010_OLD_RUN_COUNT=}], forbids: [{literal: failed}, {literal: No tests\
+      \ found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-010]\n\
+      \  - id: rf_bug_010_replacement_list_green\n    run: {command: [bash, -lc, \"\
+      mkdir -p web/.test-artifacts; npm --prefix web exec -- playwright test --config\
+      \ web/playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0 --list\
+      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts web/tests/e2e/initial-route.browser-contract.spec.ts\
+      \ web/tests/e2e/routes.browser-contract.spec.ts web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts | tee web/.test-artifacts/rf-bug-010-replacement-list.txt;\
+      \ for f in inspector-selection.browser-contract.spec.ts initial-route.browser-contract.spec.ts\
+      \ routes.browser-contract.spec.ts source-ledger-responsive.browser-contract.spec.ts\
+      \ source-ledger-delete.browser-contract.spec.ts; do grep -F \\\"$f\\\" web/.test-artifacts/rf-bug-010-replacement-list.txt;\
+      \ done; c=$(grep -c '›' web/.test-artifacts/rf-bug-010-replacement-list.txt);\
+      \ test $c -gt 0; echo RF_BUG_010_REPLACEMENT_LIST_COUNT=$c\"], timeout_seconds:\
+      \ 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
       \ [{literal: inspector-selection.browser-contract.spec.ts}, {literal: initial-route.browser-contract.spec.ts},\
       \ {literal: routes.browser-contract.spec.ts}, {literal: source-ledger-responsive.browser-contract.spec.ts},\
       \ {literal: source-ledger-delete.browser-contract.spec.ts}, {literal: RF_BUG_010_REPLACEMENT_LIST_COUNT=}],\
       \ forbids: [{literal: No tests found}, {literal: 0 tests}]}}\n    proves: [RF-BUG-010]\n\
       \  - id: rf_bug_010_replacement_run_green\n    run:\n      command:\n      \
-      \  - bash\n        - -lc\n        - |-\n          mkdir -p web/.test-artifacts;\
-      \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list --reporter=json tests/e2e/inspector-selection.browser-contract.spec.ts\
-      \ tests/e2e/initial-route.browser-contract.spec.ts tests/e2e/routes.browser-contract.spec.ts\
-      \ tests/e2e/source-ledger-responsive.browser-contract.spec.ts tests/e2e/source-ledger-delete.browser-contract.spec.ts\
-      \ > web/.test-artifacts/rf-bug-010-replacement-list.json; npm --prefix web exec\
-      \ playwright test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --reporter=json tests/e2e/inspector-selection.browser-contract.spec.ts\
-      \ tests/e2e/initial-route.browser-contract.spec.ts tests/e2e/routes.browser-contract.spec.ts\
-      \ tests/e2e/source-ledger-responsive.browser-contract.spec.ts tests/e2e/source-ledger-delete.browser-contract.spec.ts\
-      \ > web/.test-artifacts/rf-bug-010-replacement-run.json; python3 -c \"import\
-      \ json,collections,sys; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
-      \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
-      \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
-      \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
-      \         while stack:\n           s=stack.pop(); stack.extend(s.get('suites',[]));\
-      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
-      \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
-      \ for t in tests); print('RF_BUG_010_REPLACEMENT_RUN_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-replacement-list.json web/.test-artifacts/rf-bug-010-replacement-run.json\n\
-      \      timeout_seconds: 1200\n    expect: {outcome: green, exit_codes: [0],\
-      \ stdout_or_stderr: {contains_all: [{literal: inspector-selection.browser-contract.spec.ts},\
-      \ {literal: initial-route.browser-contract.spec.ts}, {literal: routes.browser-contract.spec.ts},\
-      \ {literal: source-ledger-responsive.browser-contract.spec.ts}, {literal: source-ledger-delete.browser-contract.spec.ts},\
-      \ {literal: RF_BUG_010_REPLACEMENT_RUN_COUNT=}], forbids: [{literal: failed},\
-      \ {literal: No tests found}, {literal: skipped}, {literal: retry}]}}\n    proves:\
-      \ [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_1_green\n    run:\n      command:\n\
-      \        - bash\n        - -lc\n        - |-\n          mkdir -p web/.test-artifacts;\
-      \ mkdir -p web/.test-artifacts; npm --prefix web exec playwright test -- --config\
-      \ ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0 --list\
-      \ --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-1.json; npm --prefix\
-      \ web exec playwright test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --reporter=json  > web/.test-artifacts/rf-bug-010-full-run-1.json;\
-      \ python3 -c \"import json,collections,sys; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
-      \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
-      \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
-      \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
-      \         while stack:\n           s=stack.pop(); stack.extend(s.get('suites',[]));\
-      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
-      \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
-      \ for t in tests); print('RF_BUG_010_FULL_RUN_1_TITLE_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-full-list-1.json web/.test-artifacts/rf-bug-010-full-run-1.json\n\
-      \      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
-      \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_1_TITLE_COUNT=},\
-      \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
-      \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
-      \ {literal: skipped}, {literal: flaky}, {literal: retry}, {literal: No tests\
-      \ found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_2_green\n\
-      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       mkdir -p web/.test-artifacts; npm --prefix web exec playwright test\
-      \ -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-2.json;\
-      \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json  > web/.test-artifacts/rf-bug-010-full-run-2.json;\
-      \ python3 -c \"import json,collections,sys; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
-      \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
-      \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
-      \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
-      \         while stack:\n           s=stack.pop(); stack.extend(s.get('suites',[]));\
-      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
-      \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
-      \ for t in tests); print('RF_BUG_010_FULL_RUN_2_TITLE_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-full-list-2.json web/.test-artifacts/rf-bug-010-full-run-2.json\n\
-      \      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
-      \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_2_TITLE_COUNT=},\
-      \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
-      \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
-      \ {literal: skipped}, {literal: flaky}, {literal: retry}, {literal: No tests\
-      \ found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_3_green\n\
-      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       mkdir -p web/.test-artifacts; npm --prefix web exec playwright test\
-      \ -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-3.json;\
-      \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json  > web/.test-artifacts/rf-bug-010-full-run-3.json;\
-      \ python3 -c \"import json,collections,sys; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
-      \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
-      \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
-      \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
-      \         while stack:\n           s=stack.pop(); stack.extend(s.get('suites',[]));\
-      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
-      \         assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
-      \ for t in tests); print('RF_BUG_010_FULL_RUN_3_TITLE_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-full-list-3.json web/.test-artifacts/rf-bug-010-full-run-3.json\n\
-      \      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
-      \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_3_TITLE_COUNT=},\
-      \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
-      \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
-      \ {literal: skipped}, {literal: flaky}, {literal: retry}, {literal: No tests\
-      \ found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_title_set_compare_green\n\
-      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       python3 -c \"import json,collections; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
-      \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
-      \ for s in ss),[]); cs=[]; [cs.extend([collections.Counter(walk(json.load(open(f'web/.test-artifacts/rf-bug-010-full-list-{i}.json'))['suites'])),collections.Counter(walk(json.load(open(f'web/.test-artifacts/rf-bug-010-full-run-{i}.json'))['suites']))])\
-      \ for i in (1,2,3)]; assert cs[0] and all(c==cs[0] for c in cs[1:]); print(f'RF_BUG_010_IDENTICAL_EXECUTED_TITLE_MULTISET_COUNT={sum(cs[0].values())}\
-      \ RUNS=3')\"\n      timeout_seconds: 120\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_IDENTICAL_EXECUTED_TITLE_MULTISET_COUNT=},\
-      \ {literal: RUNS=3}], forbids: [{literal: AssertionError}, {literal: differ}]}}\n\
-      \    proves: [RF-BUG-010]\n  - id: rf_bug_010_artifact_proof_green\n    run:\n\
+      \  - bash\n        - -lc\n        - |-\n          mkdir -p web/.test-artifacts\n\
+      \          files='web/tests/e2e/inspector-selection.browser-contract.spec.ts\
+      \ web/tests/e2e/initial-route.browser-contract.spec.ts web/tests/e2e/routes.browser-contract.spec.ts\
+      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'\n\
+      \          PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-replacement-list.json\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json --list $files\n   \
+      \       PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-replacement-run.json\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json $files\n          node\
+      \ - web/.test-artifacts/rf-bug-010-replacement-list.json web/.test-artifacts/rf-bug-010-replacement-run.json\
+      \ REPLACEMENT <<'NODE'\n          const fs=require('node:fs'); function rows(f,run){const\
+      \ r=JSON.parse(fs.readFileSync(f));const o=[];function w(ss){for(const s of\
+      \ ss||[]){for(const p of s.specs||[])for(const t of p.tests||[]){const file=p.file||s.file;if(!file||!p.title||!t.projectName)throw\
+      \ Error('missing identity');if(run&&(t.results?.length!==1||t.results[0].status!=='passed'))throw\
+      \ Error('non-green or retried');o.push(`${t.projectName}\\t${file}\\t${p.title}`)}w(s.suites)}}w(r.suites);o.sort();if(!o.length||new\
+      \ Set(o).size!==o.length)throw Error('empty or duplicate');return o}const a=rows(process.argv[2],false),b=rows(process.argv[3],true);if(JSON.stringify(a)!==JSON.stringify(b))throw\
+      \ Error('list/run mismatch');for(const x of b)console.log(`RF-BUG-010_${process.argv[4]}\\\
+      t${x}`);console.log(`RF_BUG_010_${process.argv[4]}_RUN_COUNT=${b.length}`)\n\
+      \          NODE\n      timeout_seconds: 1200\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-010_REPLACEMENT},\
+      \ {literal: inspector-selection.browser-contract.spec.ts}, {literal: initial-route.browser-contract.spec.ts},\
+      \ {literal: routes.browser-contract.spec.ts}, {literal: source-ledger-responsive.browser-contract.spec.ts},\
+      \ {literal: source-ledger-delete.browser-contract.spec.ts}, {literal: RF_BUG_010_REPLACEMENT_RUN_COUNT=}],\
+      \ forbids: [{literal: failed}, {literal: No tests found}, {literal: skipped},\
+      \ {literal: retry}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_1_green\n\
+      \    run: {command: [bash, -lc, \"n=1; root=web/.test-artifacts/rf-bug-010-full;\
+      \ evidence=$root/evidence-$n; mkdir -p $evidence; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/list-$n.json\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json --list; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/run-$n.json\
+      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$evidence/html-report PLAYWRIGHT_HTML_OPEN=never\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json,html --output $evidence/test-output;\
+      \ node - $root/list-$n.json $root/run-$n.json $n <<'NODE'\nconst fs=require('node:fs');function\
+      \ rows(f,run){const r=JSON.parse(fs.readFileSync(f));const o=[];function w(ss){for(const\
+      \ s of ss||[]){for(const p of s.specs||[])for(const t of p.tests||[]){const\
+      \ file=p.file||s.file;if(!file||!p.title||!t.projectName)throw Error('missing\
+      \ identity');if(run&&(t.results?.length!==1||t.results[0].status!=='passed'))throw\
+      \ Error('non-green or retried');o.push(`${t.projectName}\\t${file}\\t${p.title}`)}w(s.suites)}}w(r.suites);o.sort();if(!o.length||new\
+      \ Set(o).size!==o.length)throw Error('empty or duplicate');return o}const a=rows(process.argv[2],false),b=rows(process.argv[3],true);if(JSON.stringify(a)!==JSON.stringify(b))throw\
+      \ Error('mismatch');for(const x of b)console.log(`RF-BUG-010_RUN_${process.argv[4]}\\\
+      t${x}`);console.log(`RF_BUG_010_FULL_RUN_${process.argv[4]}_TITLE_COUNT=${b.length}`)\n\
+      NODE\ntest -s $root/run-$n.json; test -d $evidence/html-report; test $(find\
+      \ $evidence/test-output -name server.stdout.log -size +0c | wc -l) -ge 1; test\
+      \ $(find $evidence/test-output -name server.stderr.log | wc -l) -ge 1; test\
+      \ $(find $evidence/test-output -name db-path.txt -size +0c | wc -l) -ge 1; test\
+      \ $(find $evidence/test-output -name cleanup.txt -exec grep -lFx cleanup=clean\
+      \ {} + | wc -l) -ge 1; test $(find $evidence/test-output -name sanitized-environment.txt\
+      \ -size +0c | wc -l) -ge 1; test $(find $evidence/test-output -name browser-console.log\
+      \ -size +0c | wc -l) -ge 1; test $(find $evidence/test-output -name network-summary.log\
+      \ -size +0c | wc -l) -ge 1; echo RF_BUG_010_STANDARD_ARTIFACTS_1=complete\"\
+      ], timeout_seconds: 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: RF-BUG-010_RUN_1}, {literal: RF_BUG_010_FULL_RUN_1_TITLE_COUNT=},\
+      \ {literal: RF_BUG_010_STANDARD_ARTIFACTS_1=complete}], forbids: [{literal:\
+      \ failed}, {literal: skipped}, {literal: flaky}, {literal: retry}, {literal:\
+      \ No tests found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_2_green\n\
+      \    run: {command: [bash, -lc, \"n=2; root=web/.test-artifacts/rf-bug-010-full;\
+      \ evidence=$root/evidence-$n; mkdir -p $evidence; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/list-$n.json\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json --list; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/run-$n.json\
+      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$evidence/html-report PLAYWRIGHT_HTML_OPEN=never\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json,html --output $evidence/test-output;\
+      \ node - $root/list-$n.json $root/run-$n.json $n <<'NODE'\nconst fs=require('node:fs');function\
+      \ rows(f,run){const r=JSON.parse(fs.readFileSync(f));const o=[];function w(ss){for(const\
+      \ s of ss||[]){for(const p of s.specs||[])for(const t of p.tests||[]){const\
+      \ file=p.file||s.file;if(!file||!p.title||!t.projectName)throw Error('missing\
+      \ identity');if(run&&(t.results?.length!==1||t.results[0].status!=='passed'))throw\
+      \ Error('non-green or retried');o.push(`${t.projectName}\\t${file}\\t${p.title}`)}w(s.suites)}}w(r.suites);o.sort();if(!o.length||new\
+      \ Set(o).size!==o.length)throw Error('empty or duplicate');return o}const a=rows(process.argv[2],false),b=rows(process.argv[3],true);if(JSON.stringify(a)!==JSON.stringify(b))throw\
+      \ Error('mismatch');for(const x of b)console.log(`RF-BUG-010_RUN_${process.argv[4]}\\\
+      t${x}`);console.log(`RF_BUG_010_FULL_RUN_${process.argv[4]}_TITLE_COUNT=${b.length}`)\n\
+      NODE\ntest -s $root/run-$n.json; test -d $evidence/html-report; for f in server.stdout.log\
+      \ db-path.txt sanitized-environment.txt browser-console.log network-summary.log;\
+      \ do test $(find $evidence/test-output -name $f -size +0c | wc -l) -ge 1; done;\
+      \ test $(find $evidence/test-output -name server.stderr.log | wc -l) -ge 1;\
+      \ test $(find $evidence/test-output -name cleanup.txt -exec grep -lFx cleanup=clean\
+      \ {} + | wc -l) -ge 1; echo RF_BUG_010_STANDARD_ARTIFACTS_2=complete\"], timeout_seconds:\
+      \ 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF-BUG-010_RUN_2}, {literal: RF_BUG_010_FULL_RUN_2_TITLE_COUNT=},\
+      \ {literal: RF_BUG_010_STANDARD_ARTIFACTS_2=complete}], forbids: [{literal:\
+      \ failed}, {literal: skipped}, {literal: flaky}, {literal: retry}, {literal:\
+      \ No tests found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_3_green\n\
+      \    run: {command: [bash, -lc, \"n=3; root=web/.test-artifacts/rf-bug-010-full;\
+      \ evidence=$root/evidence-$n; mkdir -p $evidence; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/list-$n.json\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json --list; PLAYWRIGHT_JSON_OUTPUT_NAME=$root/run-$n.json\
+      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$evidence/html-report PLAYWRIGHT_HTML_OPEN=never\
+      \ npm --prefix web exec -- playwright test --config web/playwright.ci-safe.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json,html --output $evidence/test-output;\
+      \ node - $root/list-$n.json $root/run-$n.json $n <<'NODE'\nconst fs=require('node:fs');function\
+      \ rows(f,run){const r=JSON.parse(fs.readFileSync(f));const o=[];function w(ss){for(const\
+      \ s of ss||[]){for(const p of s.specs||[])for(const t of p.tests||[]){const\
+      \ file=p.file||s.file;if(!file||!p.title||!t.projectName)throw Error('missing\
+      \ identity');if(run&&(t.results?.length!==1||t.results[0].status!=='passed'))throw\
+      \ Error('non-green or retried');o.push(`${t.projectName}\\t${file}\\t${p.title}`)}w(s.suites)}}w(r.suites);o.sort();if(!o.length||new\
+      \ Set(o).size!==o.length)throw Error('empty or duplicate');return o}const a=rows(process.argv[2],false),b=rows(process.argv[3],true);if(JSON.stringify(a)!==JSON.stringify(b))throw\
+      \ Error('mismatch');for(const x of b)console.log(`RF-BUG-010_RUN_${process.argv[4]}\\\
+      t${x}`);console.log(`RF_BUG_010_FULL_RUN_${process.argv[4]}_TITLE_COUNT=${b.length}`)\n\
+      NODE\ntest -s $root/run-$n.json; test -d $evidence/html-report; for f in server.stdout.log\
+      \ db-path.txt sanitized-environment.txt browser-console.log network-summary.log;\
+      \ do test $(find $evidence/test-output -name $f -size +0c | wc -l) -ge 1; done;\
+      \ test $(find $evidence/test-output -name server.stderr.log | wc -l) -ge 1;\
+      \ test $(find $evidence/test-output -name cleanup.txt -exec grep -lFx cleanup=clean\
+      \ {} + | wc -l) -ge 1; echo RF_BUG_010_STANDARD_ARTIFACTS_3=complete\"], timeout_seconds:\
+      \ 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF-BUG-010_RUN_3}, {literal: RF_BUG_010_FULL_RUN_3_TITLE_COUNT=},\
+      \ {literal: RF_BUG_010_STANDARD_ARTIFACTS_3=complete}], forbids: [{literal:\
+      \ failed}, {literal: skipped}, {literal: flaky}, {literal: retry}, {literal:\
+      \ No tests found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_title_set_compare_green\n\
+      \    run: {command: [bash, -lc, \"node - web/.test-artifacts/rf-bug-010-full\
+      \ <<'NODE'\nconst fs=require('node:fs'),p=require('node:path');function rows(f){const\
+      \ r=JSON.parse(fs.readFileSync(f));const o=[];function w(ss){for(const s of\
+      \ ss||[]){for(const q of s.specs||[])for(const t of q.tests||[])o.push(`${t.projectName}\\\
+      t${q.file||s.file}\\t${q.title}`);w(s.suites)}}w(r.suites);return o.sort()}const\
+      \ root=process.argv[2],base=rows(p.join(root,'list-1.json'));if(!base.length)throw\
+      \ Error('empty');for(let n=1;n<=3;n++){for(const kind of ['list','run'])if(JSON.stringify(rows(p.join(root,`${kind}-${n}.json`)))!==JSON.stringify(base))throw\
+      \ Error(`${kind}-${n} differs`)}console.log(`RF_BUG_010_IDENTICAL_FILE_TITLE_PROJECT_SET=${base.length}\
+      \ RUNS=3`)\nNODE\"], timeout_seconds: 120}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_IDENTICAL_FILE_TITLE_PROJECT_SET=},\
+      \ {literal: RUNS=3}], forbids: [{literal: differs}, {literal: empty}]}}\n  \
+      \  proves: [RF-BUG-010]\n  - id: rf_bug_010_artifact_proof_green\n    run:\n\
       \      command:\n        - bash\n        - -lc\n        - |-\n          rm -rf\
-      \ web/.test-artifacts/rf-bug-010-intentional-failure; mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure;\
-      \ output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt; set\
-      \ +e; npm --prefix web exec playwright test -- --config ./playwright.artifact-proof.config.ts\
-      \ --project=chromium-ci-safe --retries=0 tests/e2e/harness-artifact.intentional-failure.spec.ts\
+      \ web/.test-artifacts/rf-bug-010-intentional-failure; mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure\n\
+      \          root=web/.test-artifacts/rf-bug-010-intentional-failure; output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt\n\
+      \          set +e\n          PLAYWRIGHT_JSON_OUTPUT_NAME=$root/results.json\
+      \ PLAYWRIGHT_HTML_OUTPUT_DIR=$root/html-report PLAYWRIGHT_HTML_OPEN=never npm\
+      \ --prefix web exec -- playwright test --config web/playwright.artifact-proof.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --reporter=json,html web/tests/e2e/harness-artifact.intentional-failure.spec.ts\
       \ --grep '^\\[RF-BUG-010\\] intentional failure retains complete artifacts$'\
-      \ >\"$output\" 2>&1; status=$?; set -e; test $status -eq 1; grep -F '[RF-BUG-010]\
-      \ intentional failure retains complete artifacts' \"$output\"; grep -F 'RF-BUG-010_SETUP=ready'\
-      \ \"$output\"; grep -F 'RF-BUG-010_ASSERTION_REACHED=ready' \"$output\"; grep\
-      \ -F 'RF-BUG-010_INTENTIONAL_ASSERTION: artifact retention proof' \"$output\"\
-      ; grep -F 'RF-BUG-010_TEARDOWN=clean' \"$output\"; grep -Eq '\\b1 failed\\b'\
-      \ \"$output\"; ! grep -Eiq '\\b([2-9]|[1-9][0-9]+) failed\\b|\\b[1-9][0-9]*\
-      \ (skipped|flaky)\\b|retry #' \"$output\"; cat \"$output\"; test \"$(find web/.test-artifacts/rf-bug-010-intentional-failure\
-      \ -type f -name trace.zip | wc -l | tr -d ' ')\" -eq 1; test \"$(find web/.test-artifacts/rf-bug-010-intentional-failure\
-      \ -type f -name '*.webm' | wc -l | tr -d ' ')\" -eq 1; test \"$(find web/.test-artifacts/rf-bug-010-intentional-failure\
-      \ -type f -name '*.png' | wc -l | tr -d ' ')\" -ge 1; for f in server.log browser-console.log\
-      \ network-summary.log; do test \"$(find web/.test-artifacts/rf-bug-010-intentional-failure\
-      \ -type f -name $f -size +0c | wc -l | tr -d ' ')\" -eq 1; done; echo RF_BUG_010_ARTIFACTS=trace:1,video:1,screenshot:positive,server:1,browser:1,network:1\n\
-      \      timeout_seconds: 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: '[RF-BUG-010] intentional failure retains complete\
-      \ artifacts'}, {literal: RF-BUG-010_SETUP=ready}, {literal: RF-BUG-010_ASSERTION_REACHED=ready},\
+      \ >\"$output\" 2>&1\n          status=$?; set -e; test \"$status\" -eq 1\n \
+      \         node - \"$output\" <<'NODE'\n          const fs=require('node:fs'),t=fs.readFileSync(process.argv[2],'utf8');let\
+      \ c=-1;for(const m of ['RF-BUG-010_SETUP=ready','RF-BUG-010_ASSERTION_REACHED=ready','RF-BUG-010_TEARDOWN=clean']){const\
+      \ n=t.indexOf(m,c+1);if(n<0)throw Error(`missing/out-of-order ${m}`);c=n}for(const\
+      \ m of ['[RF-BUG-010] intentional failure retains complete artifacts','RF-BUG-010_INTENTIONAL_ASSERTION:\
+      \ artifact retention proof'])if(!t.includes(m))throw Error(`missing ${m}`);if(!/\\\
+      b1 failed\\b/.test(t)||/\\b(?:[2-9]|[1-9][0-9]+) failed\\b|\\b[1-9][0-9]* (?:skipped|flaky)\\\
+      b|retry #/i.test(t))throw Error('invalid failure set')\n          NODE\n   \
+      \       test -s $root/results.json; test -d $root/html-report; test $(find $root\
+      \ -name trace.zip | wc -l) -eq 1; test $(find $root -name '*.webm' | wc -l)\
+      \ -eq 1; test $(find $root -name '*.png' | wc -l) -ge 1\n          test $(find\
+      \ $root -name server.stdout.log -size +0c | wc -l) -eq 1; test $(find $root\
+      \ -name server.stderr.log | wc -l) -eq 1; test $(find $root -name browser-console.log\
+      \ -size +0c | wc -l) -eq 1; test $(find $root -name network-summary.log -size\
+      \ +0c | wc -l) -eq 1\n          test -s $root/db-path.txt; grep -Fx cleanup=clean\
+      \ $root/cleanup.txt; test -s $root/sanitized-environment.txt\n          cat\
+      \ \"$output\"; echo RF_BUG_010_ARTIFACTS=complete_ordered_standard\n      timeout_seconds:\
+      \ 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: '[RF-BUG-010] intentional failure retains complete artifacts'},\
+      \ {literal: RF-BUG-010_SETUP=ready}, {literal: RF-BUG-010_ASSERTION_REACHED=ready},\
       \ {literal: 'RF-BUG-010_INTENTIONAL_ASSERTION: artifact retention proof'}, {literal:\
-      \ RF-BUG-010_TEARDOWN=clean}, {literal: RF_BUG_010_ARTIFACTS=trace:1,video:1,screenshot:positive,server:1,browser:1,network:1}],\
+      \ RF-BUG-010_TEARDOWN=clean}, {literal: RF_BUG_010_ARTIFACTS=complete_ordered_standard}],\
       \ forbids: [{literal: No tests found}, {literal: webServer failed}, {literal:\
       \ authentication failed}]}}\n    proves: [RF-BUG-010]\nbindings:\n  expected_red:\
       \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
@@ -184354,12 +184388,10 @@ phases:
       ],\"acceptance_check_ids\":[\"rf_bug_010_green\",\"rf_bug_010_artifact_proof_green\"\
       ],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n\
       </vectl_step_policy>"
-    verification: Run exact old/replacement list and run checks with deterministic
-      JSON title-multiset/count equality and emitted OLD/REPLACEMENT_RUN_COUNT receipts;
-      run the exact full-suite list plus three retry-free executions and require all
-      six listed/executed multisets and counts to be identical; run protected RF-BUG-010
-      and controlled intentional failure with ordered setup/assertion/teardown markers.
-      Require complete artifacts and zero protected-path diff before any legacy deletion.
+    verification: Require root-valid commands, exact old/replacement standard-JSON
+      identities, three identical positive file/title/project sets, complete standard
+      artifacts for every comprehensive run, ordered intentional-failure lifecycle
+      proof, and zero protected-path diff before deletion.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
