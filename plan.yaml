@@ -183482,17 +183482,21 @@ phases:
       \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go, web/tests/e2e/csp-operations.browser-contract.spec.ts,\
       \ web/tests/e2e/initial-route.browser-contract.spec.ts, scripts/verify-tailnet-csp.mjs,\
       \ deploy/**, internal/resofeed/state.go, web/src/**]\nclaims: [RF-BUG-005]\n\
-      checks:\n  - id: rf_bug_005_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
-      \ -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$, -count=1],\
-      \ timeout_seconds: 240}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/exact_embedded_script_hashes'},\
+      checks:\n  - id: rf_bug_005_green\n    run: {command: [bash, -lc, \"go test\
+      \ -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \ ./internal/resofeed | tee /tmp/rf005-green-list; test $(grep -Fxc 'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'\
+      \ /tmp/rf005-green-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
+      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/exact_embedded_script_hashes'},\
       \ {literal: '=== RUN   TestRFBUG005SecurityHeadersCSPStreamingCancellationContract/streaming_and_cancellation'},\
       \ {literal: RF_BUG_005_SUBTESTS=}, {literal: '--- PASS: TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'}],\
       \ forbids: [{literal: unsafe-inline}, {literal: FAIL}, {literal: no tests to\
       \ run}, {literal: '[no tests to run]'}]}}\n    proves: [RF-BUG-005]\n  - id:\
-      \ rf_bug_005_local_stream_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
-      \ -run, '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$',\
-      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ rf_bug_005_local_stream_green\n    run: {command: [bash, -lc, \"go test -list\
+      \ '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$' ./internal/resofeed\
+      \ | tee /tmp/rf005-local-list; test $(grep -Ec '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
+      \ /tmp/rf005-local-list) -eq 3; go test -v ./internal/resofeed -run '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
+      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestSecurityHeaders'},\
       \ {literal: '=== RUN   TestSecurityStreamingCancellation'}, {literal: '=== RUN\
       \   TestCSP'}, {literal: RF_BUG_005_LOCAL_TOP_LEVEL_TESTS=3}], forbids: [{literal:\
