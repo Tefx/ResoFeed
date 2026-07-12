@@ -183762,15 +183762,16 @@ phases:
       \ web/tests/e2e/harness-artifact.intentional-failure.spec.ts, web/playwright.artifact-proof.config.ts,\
       \ docs/audits/**, docs/contracts/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md,\
       \ plan.yaml]\nclaims: [RF-BUG-009-NAMES]\nchecks:\n  - id: rf_bug_009_names_green\n\
-      \    run: {command: [bash, -lc, \"matches=$(mktemp); set +e; git grep -nEiI\
-      \ 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\.1|(^|[^[:alnum:]_])V2\\.1([^[:alnum:]_]|$)'\
-      \ -- cmd internal/resofeed web/src web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md\
-      \ >\"$matches\"; status=$?; set -e; case \"$status\" in 0) cat \"$matches\"\
-      ; rm -f \"$matches\"; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2;\
-      \ rm -f \"$matches\"; exit \"$status\";; esac; echo PROMPTING_ACTIVE_SCOPES=6\
-      \ PROMPTING_V21_ACTIVE_MATCHES=0 ARCHITECTURE_STATUS_SCANNED=1 CMD_RUNTIME_SCANNED=1\"\
-      ], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: PROMPTING_ACTIVE_SCOPES=6}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0},\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     matches=$(mktemp); set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
+      .1|(^|[^[:alnum:]_])V2\\.1([^[:alnum:]_]|$)' -- cmd internal/resofeed web/src\
+      \ web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md >\"$matches\"; status=$?;\
+      \ set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"; exit\
+      \ 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f \"$matches\"; exit\
+      \ \"$status\";; esac; echo PROMPTING_ACTIVE_SCOPES=6 PROMPTING_V21_ACTIVE_MATCHES=0\
+      \ ARCHITECTURE_STATUS_SCANNED=1 CMD_RUNTIME_SCANNED=1\n      timeout_seconds:\
+      \ 240\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: PROMPTING_ACTIVE_SCOPES=6}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0},\
       \ {literal: ARCHITECTURE_STATUS_SCANNED=1}, {literal: CMD_RUNTIME_SCANNED=1}],\
       \ forbids: [{literal: broad exclusion}, {literal: completed plan scanned}]}}\n\
       \    proves: [RF-BUG-009-NAMES]\n  - id: rf_bug_009_regression_green\n    run:\
