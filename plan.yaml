@@ -184322,8 +184322,9 @@ phases:
       \ After the update, record explicit evidence fields `post_closure_report_sha256=<64\
       \ lowercase hex>` and `closure_commit=<40 lowercase hex>` for the terminal gate.\
       \ Read canonical docs and ordinary local/container/Tailnet evidence; do not\
-      \ re-own implementation documentation. Require the current report/fix-plan authority\
-      \ hashes, exact ten-requirement closure, final nine-document/two-exclusion OPML\
+      \ re-own implementation documentation. Require the verified pre-closure report\
+      \ hash, immutable repair-plan hash, recorded post-closure report hash and closure\
+      \ commit, exact ten-requirement closure, final nine-document/two-exclusion OPML\
       \ scan, and active Prompting v2.1 absence. Preserve the repair plan, canonical\
       \ implementation docs, protected acceptance, audits, and completed history.\
       \ Rollback reverts the report/test closure pair. Never add a registry, generator,\
