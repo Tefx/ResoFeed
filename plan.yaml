@@ -182929,10 +182929,10 @@ phases:
       :\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\":\"authority:acceptance-mutation:rf007-steer-unit\"\
       ,\"path\":\"web/src/routes/__tests__/steer-invalid.test.ts\",\"purpose\":\"\
       Define focused Steer invalid-state accessibility acceptance\",\"check_id\":\"\
-      rf_bug_007_expected_red\",\"actor_id\":\"contract-test-author\"},{\"ref\":\"\
-      authority:acceptance-mutation:rf006007-browser\",\"path\":\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
-      ,\"purpose\":\"Define title and EN/ZH Steer browser acceptance\",\"check_id\"\
-      :\"rf_bug_006_expected_red\",\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
+      rf_bug_007_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf006007-browser\"\
+      ,\"path\":\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\",\"\
+      purpose\":\"Define title and EN/ZH Steer browser acceptance\",\"check_id\":\"\
+      rf_bug_006_expected_red\",\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
     verification: Run title and Steer checks independently; require assertion-specific
       red, exact EN/ZH collection, no mutation request, and protected-only diff.
     refs:
