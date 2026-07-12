@@ -184036,14 +184036,7 @@ phases:
       fail-closed redaction. Exclude OCI, containers, Tailnet, and live OpenRouter.
       Any missing identity, generic-only success, retry/skip, residue, secret, authority
       mismatch, or repository diff blocks publication; recovery removes only owned
-      local processes and ignored artifacts.
-
-
-      <vectl_step_policy>
-
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.local-full-verification-matrix","risk_tier":"R2","risk_reasons":["cross_component_local_acceptance","runtime_browser_evidence","secret_redaction_validation"],"primary_outcome":"RF-BUG-LOCAL-MATRIX","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["software-architect","spec-verifier"],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
-
-      </vectl_step_policy>'
+      local processes and ignored artifacts.'
     verification: PASS requires exact package-relative list/run identities, all named
       local Go/browser rows, RF-BUG-002 100 retry-free executions, OPML_EXCLUSIONS=2
       across nine docs, smoke <120s, reused clean-root three-run and one-failure standard
