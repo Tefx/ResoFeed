@@ -183948,6 +183948,33 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
     agent: test-engineer
+  - id: rf-bug-e2e-isolation-full-gate
+    name: RF-BUG e2e-isolation phase Full Gate
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Terminal bounded phase Full Gate for `rf-bug-20260712-e2e-isolation`. Repository
+      mutation is absent because this gate only re-runs existing phase acceptance
+      checks and records normal plan-assurance metadata. Reuse only `rf_bug_010_green`,
+      `rf_bug_010_old_list_green`, `rf_bug_010_old_run_green`, `rf_bug_010_replacement_list_green`,
+      `rf_bug_010_replacement_run_green`, `rf_bug_010_full_suite_run_1_green`, `rf_bug_010_full_suite_run_2_green`,
+      `rf_bug_010_full_suite_run_3_green`, `rf_bug_010_full_suite_title_set_compare_green`,
+      and `rf_bug_010_artifact_proof_green`. Require deterministic old/replacement
+      list-to-run multiset/count reconciliation, identical positive full-suite executed-title
+      multisets/counts across three retry-free runs, and exact intentional-assertion
+      stage/artifact proof. Do not add or modify product code, runtime behavior or
+      processes, storage models, registries, manifests, custom evidence protocols,
+      deployment requirements, acceptance artifacts, or canonical product architecture.'
+    verification: All existing E2E isolation checks are green; list/run multisets
+      and counts reconcile; three runs are identical; intentional failure reaches
+      only its named assertion; facade validation and phase intent-closure lint are
+      conformant.
+    depends_on:
+    - rf-bug-010-isolate-playwright-lanes
+    agent: gate-reviewer
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, OCI, Container, Tailnet, and Independent Closure
   status: locked
