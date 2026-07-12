@@ -184408,28 +184408,23 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal bounded phase Full Gate for `rf-bug-20260712-assurance-closure`. Repository
-      mutation is absent because this gate reuses declared local, OCI, container,
-      Tailnet/Caddy, independent review, documentation-closure, and digest predicates.
-      The authoritative local proof includes `rf-bug-r11-exact-local-evidence-matrix`:
-      exact package-relative frontend render list/run identity equality; exact Section
-      7 OPML_EXCLUSIONS=2 scan; a clean-root ordered three-run RF-BUG-010 suite; independent
-      positive intentional-failure collection and ordered line-reporter output for
-      expected-red and green; non-empty HTML/JSON/trace/screenshots/video/stdout/DB/cleanup/environment/console/network/runtime
-      identity; present and redaction-scanned stderr with empty content allowed; complete
-      runtime identity fields; and fail-closed secret validation. Preserve existing
-      immutable image digest, two-platform/container/Tailnet, independent review,
-      active scan, protected-path, and defect closure evidence. Require `rf-bug-r11-final-digest-receipt`
-      after reference-aware validation with exact authority SHA-256 and final plan
-      SHA-256; any later plan mutation invalidates the receipt. Do not add product
-      mutation or a new deployment requirement.'
-    verification: Every original and R11 assurance predicate passes in dependency
-      order; exact local evidence and final digest receipts are present; facade/reference
-      validation and phase intent-closure lint are conformant.
+      Terminal bounded Full Gate for RF-BUG assurance closure. Repository mutation
+      is absent because the gate reuses the authoritative local matrix, immutable
+      OCI publication, both-platform container proof, Tailnet/Caddy deployment, independent
+      security and black-box verification, and defect-report closure. Immediately
+      before closure require `vectl validate --check-refs`, current strategy authority
+      `docs/BUG_FIX_PLAN_2026-07-12.md` SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
+      report SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`,
+      authority commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty active claims,
+      and no unresolved finding. Any later plan mutation requires this gate to rerun.
+      Do not create a standalone plan-digest receipt, product mutation, deployment
+      requirement, registry, or evidence schema.'
+    verification: Every local, OCI, container, Tailnet, security, black-box, and closure
+      predicate passes in dependency order; current authority hashes/commit match
+      strategy_ref; Vectl validation/check-refs and phase contract/policy admission
+      pass; active claims are empty.
     depends_on:
     - local-full-verification-matrix
-    - rf-bug-r11-exact-local-evidence-matrix
-    - rf-bug-r11-final-digest-receipt
     - publish-immutable-two-platform-oci-image
     - fresh-docker-runtime-proof
     - tailnet-caddy-runtime-proof
