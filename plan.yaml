@@ -183751,29 +183751,6 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
     agent: general
-  - id: rf-bug-e2e-isolation-full-gate
-    name: RF-BUG e2e-isolation phase Full Gate
-    status: pending
-    description: 'step_type: gate
-
-      repo_change_policy: no_repo_change
-
-
-      Terminal bounded Full Gate for RF-BUG-010. Repository mutation is absent because
-      the gate reuses harness foundation, lane migration, and reproducibility/artifact
-      predicates. Require real-binary case isolation, old/replacement behavior identity,
-      smoke under 120 seconds, three identical retry-free positive sets, cleanup,
-      and independently collected intentional-failure evidence with fail-closed redaction.
-      Protected acceptance remains unchanged. Any product reset/interception, residue,
-      missing identity/artifact, retry/skip/flake, secret exposure, unordered path
-      conflict, or contract/policy failure blocks assurance closure.'
-    verification: All foundation, migration, and proof checks pass; reciprocal expected-red
-      closures, protected paths, Vectl validation/check-refs, and phase contract/policy
-      admission are conformant.
-    depends_on:
-    - rf-bug-010-harness-foundation
-    - rf-bug-010-reproducibility-artifact-proof
-    agent: gate-reviewer
   - id: rf-bug-010-reproducibility-artifact-proof
     name: Prove E2E reproducibility, cleanup, and retained artifacts
     status: pending
