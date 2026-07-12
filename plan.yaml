@@ -183250,16 +183250,17 @@ phases:
       \ preview, retains input/focus, sends no mutation, exposes one current localized\
       \ EN/ZH alert, remounts it on repeated invalid submission or locale change,\
       \ and clears it on edit. Stale preview and transport failure remain distinct.\
-      \ Rollback reverts shared shell/title/Steer/docs together. Never add a transcript,\
-      \ persistent error state, duplicate alert, or secret-bearing diagnostic.\n\n\
-      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ implementation_closes_expected_red\nscope:\n  allowed_paths:\n    - web/src/lib/workbench-route.ts\n\
-      \    - web/src/routes/+page.svelte\n    - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n\
-      \    - docs/ui-preview.html\n  blocked_paths:\n    - web/src/routes/__tests__/steer-invalid.test.ts\n\
-      \    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n    - internal/**\n\
-      claims:\n  - RF-BUG-006\n  - RF-BUG-007\n  - RF-BUG-006-007\nchecks:\n  - id:\
-      \ rf_bug_006_green\n    run:\n      command: [bash, -lc, \"npm --prefix web\
-      \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ Rollback reverts shared shell/title/Steer and synchronized Design/preview\
+      \ documentation together. Architecture contract ownership remains in the dedicated\
+      \ canonical synchronization/runtime boundaries. Never add a transcript, persistent\
+      \ error state, duplicate alert, or secret-bearing diagnostic.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths:\n    - web/src/lib/workbench-route.ts\n    - web/src/routes/+page.svelte\n\
+      \    - docs/DESIGN.md\n    - docs/ui-preview.html\n  blocked_paths:\n    - docs/ARCHITECTURE.md\n\
+      \    - web/src/routes/__tests__/steer-invalid.test.ts\n    - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\n\
+      \    - internal/**\nclaims:\n  - RF-BUG-006\n  - RF-BUG-007\n  - RF-BUG-006-007\n\
+      checks:\n  - id: rf_bug_006_green\n    run:\n      command: [bash, -lc, \"npm\
+      \ --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
       \ --grep '^\\\\[RF-BUG-006\\\\]'\"]\n      timeout_seconds: 300\n    expect:\n\
       \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
