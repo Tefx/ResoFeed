@@ -21,7 +21,7 @@ context: 'RF-BUG-001–010 managed repair plan reconciled to the final 2026-07-1
   Fresh facade parser/binding receipt: command=vectl_validate(check_refs=true) plus
   active-phase Intent-Closure v2/policy parser verification; producer=Vectl MCP facade
   backed by vectl 0.7.0; target=plan.yaml; authority=docs/BUG_FIX_PLAN_2026-07-12.md;
-  authority_sha256=1a17471d6fbb68e87ae88349e4f299653ac4ad2cefbc0814829e0bcd08f8df15;
+  authority_sha256=36402b2639b617c5d55548df3c09e8b3d119e2513d1c49ab81fa13c3aa2c7ba6;
   parsed_changed_intent_closure_v2=13; parsed_changed_vectl_step_policy_v1=13; expected_red_edges=17;
   reciprocal_closure_edges=17; active_phases=6; result=VALID_0_ERRORS_0_WARNINGS_REFS_OK_INTENT_CLOSURE_CONFORMANT.'
 project_guidance: Read docs/BUG_FIX_PLAN_2026-07-12.md and cited canonical references
