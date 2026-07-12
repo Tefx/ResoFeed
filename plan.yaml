@@ -183181,26 +183181,26 @@ phases:
 
 
       Terminal bounded phase Full Gate for `rf-bug-20260712-contract-lock`. Repository
-      mutation is absent because this gate exclusively reuses the phase''s declared
-      predicates and records normal plan-assurance metadata. Reuse exactly `canonical_runtime_docs_green`,
-      `rf_bug_001_expected_red`, `rf_bug_002_expected_red`, `rf_bug_002_search_route_history_expected_red`,
-      `rf_bug_002_route_unit_expected_red`, `rf_bug_002_api_expected_red`, `rf_bug_003_expected_red`,
-      `rf_bug_004_expected_red`, `rf_bug_004_state_import_expected_red`, `rf_bug_005_expected_red`,
-      `rf_bug_005_browser_operations_expected_red`, `rf_bug_006_expected_red`, `rf_bug_007_expected_red`,
-      `rf_bug_008_browser_expected_red`, `rf_bug_008_operations_expected_red`, `rf_bug_009_expected_red`,
-      `rf_bug_010_expected_red`, and `rf_bug_010_artifact_expected_red`. Require exact
-      collection/title/subtest inventories, Search assertion-specific red evidence,
-      ordered RF-BUG-010 lifecycle evidence, protected-path authority, and the explicit
-      seven-active-document scan. Do not mutate product, docs, tests, runtime state,
-      storage, manifests, registries, schemas, or deployment.'
-    verification: All existing contract-lock checks reach their declared outcomes
-      with exact collection/count evidence; `vectl validate --check-refs` and phase
-      intent-closure lint are conformant; git product/docs/test diff remains unchanged
-      by this gate.
+      mutation is absent because this gate reuses declared predicates and records
+      plan-assurance metadata only. Reuse all original expected-red checks plus `r11_corrected_contracts_red`
+      and `r11_product_runtime_diff_guard`. The R11 reconciliation supersedes conflicting
+      earlier predicates. Require browser-compatible script-type fixtures and hash
+      equality, bounded raw-query percent/UTF-8 preflight fixtures with invalid-surface/no-request/no-history
+      proof, active-document reconciliation for ARCHITECTURE, DESIGN, PRD, USAGE,
+      CONTAINER, README, and active ui-preview, the exact nine-document Section 7
+      scan with exactly two exclusions and OPML_EXCLUSIONS=2, and independent intentional-failure
+      collection/ordered line-reporter/complete redacted artifact evidence. Empty
+      stderr is permitted only when the file is present and redaction-scanned. Do
+      not mutate product, docs, tests, runtime state, storage, manifests, registries,
+      schemas, or deployment from this gate.'
+    verification: All original and R11 contract-lock checks reach declared outcomes
+      with exact collection/count evidence; product/runtime diff guard is clean; `vectl
+      validate --check-refs` and phase intent-closure lint are conformant.
     depends_on:
     - frontend-state-route-a11y-expected-red
     - runtime-assets-opml-security-expected-red
     - ledger-prompting-e2e-expected-red
+    - rf-bug-r11-contract-harness-reconciliation
     agent: gate-reviewer
   - id: rf-bug-r11-contract-harness-reconciliation
     name: Reconcile R11 browser, query, documentation, and evidence contracts
