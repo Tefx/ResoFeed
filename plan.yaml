@@ -182876,7 +182876,7 @@ phases:
       \ web/tests/e2e/initial-route.browser-contract.spec.ts]\nclaims: [RF-BUG-004-STATE-UI-CONTRACT,\
       \ RF-BUG-005-BROWSER-CONTRACT, RF-BUG-008-CONTRACT, RF-BUG-009-CONTRACT, RF-BUG-010-CONTRACT]\n\
       checks:\n  - id: rf_bug_004_state_import_expected_red\n    run:\n      command:\n\
-      \        - bash\n        - -lc\n        - |-\n        npm --prefix web exec\
+      \        - bash\n        - -lc\n        - |-\n          npm --prefix web exec\
       \ playwright test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
       \ --retries=0 --list tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
       \ --grep '^\\[RF-BUG-004\\]' | tee /tmp/rf004-state-list; titles=('[RF-BUG-004][en]\
@@ -182896,7 +182896,7 @@ phases:
       \ [{literal: No tests found}, {literal: 0 tests}, {literal: webServer failed},\
       \ {literal: TypeError}]}}\n    proves: [RF-BUG-004-STATE-UI-CONTRACT]\n  - id:\
       \ rf_bug_005_browser_operations_expected_red\n    run:\n      command:\n   \
-      \     - bash\n        - -lc\n        - |-\n        npm --prefix web exec playwright\
+      \     - bash\n        - -lc\n        - |-\n          npm --prefix web exec playwright\
       \ test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
       \ --retries=0 --list tests/e2e/csp-operations.browser-contract.spec.ts --grep\
       \ '^\\\\[RF-BUG-005\\\\] CSP operations' | tee /tmp/rf005-red-list; test $(grep\
@@ -182911,7 +182911,7 @@ phases:
       \ tests found}, {literal: 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n\
       \    proves: [RF-BUG-005-BROWSER-CONTRACT]\n  - id: rf_bug_008_browser_expected_red\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
+      \       npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 --list tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
       \ tests/e2e/source-ledger-delete.browser-contract.spec.ts --grep '^\\\\[RF-BUG-008\\\
       \\]' | tee /tmp/rf008-browser-list; c=$(grep -c '\\[RF-BUG-008\\]' /tmp/rf008-browser-list);\
@@ -182925,21 +182925,22 @@ phases:
       \ without horizontal overflow}], forbids: [{literal: No tests found}, {literal:\
       \ 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n    proves:\
       \ [RF-BUG-008-CONTRACT]\n  - id: rf_bug_008_operations_expected_red\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n        npm --prefix\
-      \ web exec playwright test -- --config ./playwright.runtime.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/source-ledger-operations.runtime.spec.ts --grep\
-      \ '^\\\\[RF-BUG-008\\\\]' | tee /tmp/rf008-ops-list; test $(grep -c '\\[RF-BUG-008\\\
-      ]' /tmp/rf008-ops-list) -ge 2; npm --prefix web exec playwright test -- --config\
-      \ ./playwright.runtime.config.ts --project=chromium-ci-safe --retries=0 tests/e2e/source-ledger-operations.runtime.spec.ts\
-      \ --grep '^\\\\[RF-BUG-008\\\\]\\\\[zh\\\\] independent row operations retain\
-      \ current status$'\n      timeout_seconds: 600\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: source-ledger-operations.runtime.spec.ts},\
-      \ {literal: '[RF-BUG-008][zh] independent row operations retain current status'},\
-      \ {literal: expected independent pending and current-operation state}], forbids:\
-      \ [{literal: No tests found}, {literal: 0 tests}, {literal: webServer failed},\
-      \ {literal: TypeError}]}}\n    proves: [RF-BUG-008-CONTRACT]\n  - id: rf_bug_009_expected_red\n\
+      \      command:\n        - bash\n        - -lc\n        - |-\n          npm\
+      \ --prefix web exec playwright test -- --config ./playwright.runtime.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/source-ledger-operations.runtime.spec.ts\
+      \ --grep '^\\\\[RF-BUG-008\\\\]' | tee /tmp/rf008-ops-list; test $(grep -c '\\\
+      [RF-BUG-008\\]' /tmp/rf008-ops-list) -ge 2; npm --prefix web exec playwright\
+      \ test -- --config ./playwright.runtime.config.ts --project=chromium-ci-safe\
+      \ --retries=0 tests/e2e/source-ledger-operations.runtime.spec.ts --grep '^\\\
+      \\[RF-BUG-008\\\\]\\\\[zh\\\\] independent row operations retain current status$'\n\
+      \      timeout_seconds: 600\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
+      \ {contains_all: [{literal: source-ledger-operations.runtime.spec.ts}, {literal:\
+      \ '[RF-BUG-008][zh] independent row operations retain current status'}, {literal:\
+      \ expected independent pending and current-operation state}], forbids: [{literal:\
+      \ No tests found}, {literal: 0 tests}, {literal: webServer failed}, {literal:\
+      \ TypeError}]}}\n    proves: [RF-BUG-008-CONTRACT]\n  - id: rf_bug_009_expected_red\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     go test -list '^TestRFBUG009PromptingV22Contract$' ./internal/resofeed\
+      \       go test -list '^TestRFBUG009PromptingV22Contract$' ./internal/resofeed\
       \ | tee /tmp/rf009-list; test $(grep -Fxc 'TestRFBUG009PromptingV22Contract'\
       \ /tmp/rf009-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG009PromptingV22Contract$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
@@ -182948,7 +182949,7 @@ phases:
       \ [{literal: setup failed}, {literal: no tests to run}, {literal: '[no tests\
       \ to run]'}, {literal: compile error}]}}\n    proves: [RF-BUG-009-CONTRACT]\n\
       \  - id: rf_bug_010_expected_red\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n        npm --prefix web exec playwright test\
+      \        - -lc\n        - |-\n          npm --prefix web exec playwright test\
       \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
       \ --retries=0 --list tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep\
       \ '^\\\\[RF-BUG-010\\\\]' | tee /tmp/rf010-red-list; test $(grep -c '\\[RF-BUG-010\\\
@@ -182962,7 +182963,7 @@ phases:
       \ database and complete cleanup}], forbids: [{literal: No tests found}, {literal:\
       \ 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n    proves:\
       \ [RF-BUG-010-CONTRACT]\n  - id: rf_bug_010_artifact_expected_red\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n        rm -rf\
+      \      command:\n        - bash\n        - -lc\n        - |-\n          rm -rf\
       \ web/.test-artifacts/rf-bug-010-intentional-failure; mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure;\
       \ output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt; set\
       \ +e; npm --prefix web exec playwright test -- --config ./playwright.artifact-proof.config.ts\
