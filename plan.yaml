@@ -182531,10 +182531,14 @@ phases:
   gate: All protected acceptance artifacts are created by authorized contract-test
     owners; each RF-BUG-001–010 requirement is independently collected and intentionally
     red; canonical docs reflect the simplified contract; implementation and completed
-    history remain unchanged.
+    history remain unchanged; the terminal bounded Full Gate reuses these predicates
+    without repository mutation.
   context: Contract lock creates route, Inspector, Source Ledger, Prompting, and E2E
     acceptance artifacts under explicit authority, then protects them from implementation
-    mutation. No phase Full Gate, registry, manifest, or evidence protocol is introduced.
+    mutation. One terminal bounded no-repo-change Full Gate reuses only existing phase
+    checks and writes normal plan-assurance metadata; no registry, manifest, custom
+    evidence protocol, product artifact, runtime process, or deployment requirement
+    is introduced.
   depends_on:
   - tavily-external-extraction-verification-release
   steps:
