@@ -182874,7 +182874,7 @@ phases:
     - docs/DESIGN.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: contract-test-author
+    agent: general
   - id: rf-bug-title-steer-a11y-expected-red
     name: Lock titles and Steer accessibility acceptance
     status: pending
