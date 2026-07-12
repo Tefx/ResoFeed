@@ -182521,7 +182521,7 @@ phases:
       - No unresolved residuals.'
 - id: rf-bug-20260712-contract-lock
   name: RF-BUG-001–010 Contract Lock and Protected Acceptance
-  status: pending
+  status: in_progress
   gate: Current canonical contracts are synchronized; every RF-BUG-001–010 assertion
     is independently collected and intentionally red for its named product gap; expected-red
     bindings are reciprocal; product/runtime paths are unchanged; reference-aware
@@ -182620,7 +182620,7 @@ phases:
     agent: general
   - id: rf-bug-canonical-contract-sync
     name: Synchronize RF-BUG canonical contracts
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-CANONICAL-CONTRACTS. Align the nine active product documents and active\
@@ -182661,6 +182661,8 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     agent: general
+    claimed_by: general
+    claimed_at: '2026-07-12T19:20:03.775163+00:00'
   - id: rf-bug-route-search-token-expected-red
     name: Lock combined frontend expected-red acceptance
     status: pending
