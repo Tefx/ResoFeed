@@ -183827,20 +183827,21 @@ phases:
       \ internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
       \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
       \ web/tests/**, docs/ARCHITECTURE.md, docs/USAGE.md, docs/ui-preview.html, plan.yaml]\n\
-      claims: [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run: {command:\
-      \ [bash, -lc, \"go test -list '^TestRFBUG009PromptingV22Contract$' ./internal/resofeed\
-      \ | tee /tmp/rf009-green-list; test $(grep -Fxc 'TestRFBUG009PromptingV22Contract'\
+      claims: [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run:\n      command:\n\
+      \        - bash\n        - -lc\n        - |-\n        go test -list '^TestRFBUG009PromptingV22Contract$'\
+      \ ./internal/resofeed | tee /tmp/rf009-green-list; test $(grep -Fxc 'TestRFBUG009PromptingV22Contract'\
       \ /tmp/rf009-green-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG009PromptingV22Contract$'\
-      \ -count=1\"], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ -count=1\n      timeout_seconds: 300\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG009PromptingV22Contract/semantic_repair_at_most_once'},\
       \ {literal: '=== RUN   TestRFBUG009PromptingV22Contract/ingest_reprocess_reingest_HTTP_MCP_parity'},\
       \ {literal: RF_BUG_009_SUBTESTS=}, {literal: '--- PASS: TestRFBUG009PromptingV22Contract'}],\
       \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
       \ to run]'}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009]\n  - id:\
-      \ rf_bug_009_parity_green\n    run: {command: [bash, -lc, \"go test -list '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
+      \ rf_bug_009_parity_green\n    run:\n      command:\n        - bash\n      \
+      \  - -lc\n        - |-\n        go test -list '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
       \ ./internal/resofeed | tee /tmp/rf009-parity-list; test $(grep -Ec '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
       \ /tmp/rf009-parity-list) -eq 9; go test -v ./internal/resofeed -run '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
-      \ -count=1\"], timeout_seconds: 420}\n    expect: {outcome: green, exit_codes:\
+      \ -count=1\n      timeout_seconds: 420\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestPromptingV22Payload'},\
       \ {literal: '=== RUN   TestPromptingV22Repair'}, {literal: '=== RUN   TestMCPV22'},\
       \ {literal: RF_BUG_009_PARITY_TOP_LEVEL_TESTS=9}], forbids: [{literal: FAIL},\
