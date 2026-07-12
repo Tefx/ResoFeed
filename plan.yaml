@@ -183767,7 +183767,7 @@ phases:
       \ docs/audits/**, docs/contracts/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md,\
       \ plan.yaml]\nclaims: [RF-BUG-009-NAMES]\nchecks:\n  - id: rf_bug_009_names_green\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     matches=$(mktemp); set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
+      \       matches=$(mktemp); set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
       .1|(^|[^[:alnum:]_])V2\\.1([^[:alnum:]_]|$)' -- cmd internal/resofeed web/src\
       \ web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md >\"$matches\"; status=$?;\
       \ set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"; exit\
