@@ -184227,11 +184227,13 @@ phases:
 
       </vectl_step_policy>'
     verification: PASS requires exact named collection/count receipts for every Section
-      7 local row; four frontend render files with at least one test each; exactly
-      20 RF-BUG-002 race passes (ten EN, ten ZH); explicit EN/ZH Inspector/routes/OPML-State/accessibility
-      passes; CSP operations/download green; identical positive old/replacement list/run
-      sets; three identical retry-free CI-safe sets; smoke under 120s; failed-test
-      video contract probed; protected artifacts unchanged; no OCI/Tailnet/live command.
+      7 local row; four frontend render files with at least one test each; the complete
+      exact ten-title RF-BUG-002 EN/ZH set with `--repeat-each=10`, exactly 100 retry-free
+      passes, and no missing/extra title; explicit EN/ZH Inspector/routes/OPML-State/accessibility
+      passes; CSP operations/download green; deterministic old/replacement list/run
+      multiset and count equality; three identical retry-free CI-safe executed-title
+      multisets/counts; smoke under 120s; failed-test video contract probed; protected
+      artifacts unchanged; no OCI/Tailnet/live command.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
