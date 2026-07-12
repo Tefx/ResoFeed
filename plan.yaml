@@ -183617,7 +183617,7 @@ phases:
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
       ,\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
       :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
-      ],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\":[\"security-reviewer\"\
+      ],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\":[\"software-architect\"\
       ,\"integration-verifier\"],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\"\
       :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
