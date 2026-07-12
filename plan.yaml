@@ -184454,7 +184454,7 @@ phases:
       \ {literal: '--- PASS: TestRFBugClosureContract'}], forbids: [{literal: FAIL},\
       \ {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n    proves:\
       \ [RF-BUG-001-010-CLOSURE]\n  - id: closure_active_sources_green\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n        matches=$(mktemp);\
+      \      command:\n        - bash\n        - -lc\n        - |-\n          matches=$(mktemp);\
       \ set +e; git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML' -- cmd internal\
       \ web/src web/tests docs web/package.json web/package-lock.json go.mod go.sum\
       \ bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
