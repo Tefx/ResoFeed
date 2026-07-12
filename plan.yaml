@@ -9,14 +9,19 @@
 version: 1
 project: ResoFeed
 strategy_ref: docs/BUG_FIX_PLAN_2026-07-12.md sha256:67b6df6a7f3369c57fcf9140485e3e48a4b3ca6b636d5a6447f1cf643b4061fc
-context: RF-BUG-001–010 managed repair plan reconciled to the reviewed 2026-07-12
+context: 'RF-BUG-001–010 managed repair plan reconciled to the reviewed 2026-07-12
   authority. Vectl structure is reconciled; contract lock and canonical corrections
   remain pending; implementation is not ready. Preserve completed history and the
   six active RF-BUG phases. Enforce import-only OPML, package-local embedded UI, canonical
-  ~base64url item IDs across browser and item APIs, protected expected-red/browser
-  acceptance, exact positive collection/count evidence, retry-free Playwright isolation,
-  and independent local/OCI/container/Tailnet closure. No registries, generators,
-  reset schemas, duplicate phases, broad cleanup authority, or /sources alias.
+  ~base64url item IDs across browser and all five item APIs, protected expected-red/browser
+  acceptance, assertion-specific positive collection/count evidence, retry-free Playwright
+  isolation, and independent local/OCI/container/Tailnet closure. No registries, generators,
+  reset schemas, duplicate phases, broad cleanup authority, or legacy Source Ledger
+  alias. Fresh facade parser/binding receipt: command=vectl_validate(check_refs=true);
+  producer=Vectl MCP facade backed by vectl 0.7.0; target=plan.yaml; authority=docs/BUG_FIX_PLAN_2026-07-12.md;
+  authority_sha256=67b6df6a7f3369c57fcf9140485e3e48a4b3ca6b636d5a6447f1cf643b4061fc;
+  parsed_changed_intent_closure_v2=13; parsed_changed_vectl_step_policy_v1=13; expected_red_edges=15;
+  reciprocal_closure_edges=15; active_phases=6; result=VALID_0_ERRORS_0_WARNINGS_REFS_OK.'
 project_guidance: Read docs/BUG_FIX_PLAN_2026-07-12.md and cited canonical references
   before work. Preserve the single-binary, SQLite-only, lexical-search, owner-token,
   import-only OPML, and no-sync/no-merge boundaries. Contract-lock owners create each
