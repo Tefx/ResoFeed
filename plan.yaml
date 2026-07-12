@@ -183815,38 +183815,35 @@ phases:
       \ interception for comprehensive claims, universal fresh process, registry,\
       \ manifest, queue, or secret-bearing artifact.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths:\n    - internal/resofeed/playwright_fixture_test.go\n\
-      \    - web/playwright.config.ts\n    - web/playwright.base.config.ts\n    -\
-      \ web/playwright.browser-contract.config.ts\n    - web/playwright.smoke.config.ts\n\
-      \    - web/playwright.runtime.config.ts\n    - web/playwright.live.config.ts\n\
-      \    - web/playwright.ci-safe.config.ts\n    - web/package.json\n    - web/package-lock.json\n\
-      \    - web/src/lib/playwright-e2e-harness-contract.ts\n    - web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts\n\
-      \    - web/tests/e2e/fixtures/runtime-fixture.ts\n    - web/tests/e2e/fixtures/test-db.ts\n\
-      \    - scripts/run-with-timeout.mjs\n    - scripts/rf-bug-010-standard-json.mjs\n\
-      \    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n    - docs/USAGE.md\n  blocked_paths:\n\
-      \    - web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\n    - web/tests/e2e/harness-artifact.intentional-failure.spec.ts\n\
-      \    - web/playwright.artifact-proof.config.ts\n    - web/src/routes/**\n  \
-      \  - internal/resofeed/http.go\n    - Dockerfile\nclaims:\n  - RF-BUG-010-HARNESS\n\
-      checks:\n  - id: rf_bug_010_green\n    run:\n      command: [bash, -lc, \"npm\
-      \ --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      scope:\n  allowed_paths: [internal/resofeed/playwright_fixture_test.go, web/playwright.config.ts,\
+      \ web/playwright.base.config.ts, web/playwright.browser-contract.config.ts,\
+      \ web/playwright.smoke.config.ts, web/playwright.runtime.config.ts, web/playwright.live.config.ts,\
+      \ web/playwright.ci-safe.config.ts, web/package.json, web/package-lock.json,\
+      \ web/src/lib/playwright-e2e-harness-contract.ts, web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts,\
+      \ web/tests/e2e/fixtures/runtime-fixture.ts, web/tests/e2e/fixtures/test-db.ts,\
+      \ scripts/run-with-timeout.mjs, scripts/rf-bug-010-standard-json.mjs, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ docs/USAGE.md]\n  blocked_paths: [web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts,\
+      \ web/tests/e2e/harness-artifact.intentional-failure.spec.ts, web/playwright.artifact-proof.config.ts,\
+      \ web/src/routes/**, internal/resofeed/http.go, Dockerfile]\nclaims: [RF-BUG-010-HARNESS]\n\
+      checks:\n  - id: rf_bug_010_green\n    run: {command: [bash, -lc, \"npm --prefix\
+      \ web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-010\\\\]'\"]\n      timeout_seconds: 600\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: mutating cases own isolated state and cleanup}]\n\
-      \        contains_any: [{literal: passed}]\n        forbids: [{literal: failed},\
-      \ {literal: skipped}, {literal: retry}, {literal: leaked resource}]\n    proves:\
-      \ [RF-BUG-010-HARNESS]\n  - id: rf_bug_010_artifact_contract_green\n    run:\n\
-      \      command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
+      \ --grep '^\\\\[RF-BUG-010\\\\]'\"], timeout_seconds: 600}\n    expect: {outcome:\
+      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: mutating\
+      \ cases own isolated state and cleanup}], contains_any: [{literal: passed}],\
+      \ forbids: [{literal: failed}, {literal: skipped}, {literal: retry}, {literal:\
+      \ leaked resource}]}}\n    proves: [RF-BUG-010-HARNESS]\n  - id: rf_bug_010_artifact_contract_green\n\
+      \    run: {command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
       \ web/playwright.artifact-proof.config.ts --project=chromium-ci-safe --retries=0\
       \ --reporter=line,json,html web/tests/e2e/harness-artifact.intentional-failure.spec.ts\
       \ --grep '^\\\\[RF-BUG-010\\\\] intentional failure retains complete artifacts$';\
-      \ test $? -eq 1\"]\n      timeout_seconds: 600\n    expect:\n      outcome:\
-      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
-      \ [{literal: RF-BUG-010_SETUP=ready}, {literal: RF-BUG-010_ASSERTION_REACHED=ready},\
-      \ {literal: RF-BUG-010_TEARDOWN=clean}]\n        contains_any: []\n        forbids:\
-      \ [{literal: No tests found}, {literal: webServer failed}, {literal: authentication\
-      \ failed}]\n    proves: [RF-BUG-010-HARNESS]\nbindings:\n  expected_red:\n \
-      \   items: []\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-e2e-isolation-artifact-expected-red,\
+      \ test $? -eq 1\"], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-010_SETUP=ready},\
+      \ {literal: RF-BUG-010_ASSERTION_REACHED=ready}, {literal: RF-BUG-010_TEARDOWN=clean}],\
+      \ contains_any: [], forbids: [{literal: No tests found}, {literal: webServer\
+      \ failed}, {literal: authentication failed}]}}\n    proves: [RF-BUG-010-HARNESS]\n\
+      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step:\
+      \ rf-bug-20260712-contract-lock.rf-bug-e2e-isolation-artifact-expected-red,\
       \ source_check: rf_bug_010_expected_red, requirement: RF-BUG-010, assertion_id:\
       \ A-RF-BUG-010-ISOLATION, downstream_check: rf_bug_010_green, receipt: RF-BUG-010-red-to-green}\n\
       \    - {source_step: rf-bug-20260712-contract-lock.rf-bug-e2e-isolation-artifact-expected-red,\
@@ -183857,10 +183854,7 @@ phases:
       :\"rf-bug-20260712-e2e-isolation.rf-bug-010-harness-foundation\",\"risk_tier\"\
       :\"R2\",\"risk_reasons\":[\"test_infrastructure\",\"runtime_lifecycle_harness\"\
       ,\"ci_contract\"],\"primary_outcome\":\"RF-BUG-010-HARNESS\",\"rollback_class\"\
-      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
-      ],\"primary_verifier\":\"blind-tester\",\"additional_verifiers\":[\"integration-verifier\"\
-      ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
-      :{\"developer_test_globs\":[\"internal/resofeed/playwright_fixture_test.go\"\
+      :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/playwright_fixture_test.go\"\
       ,\"web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts\",\"web/tests/e2e/fixtures/runtime-fixture.ts\"\
       ,\"web/tests/e2e/fixtures/test-db.ts\",\"scripts/rf-bug-010-standard-json.mjs\"\
       ],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"\
