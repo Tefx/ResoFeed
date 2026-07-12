@@ -183140,8 +183140,8 @@ phases:
       \ web/tests/e2e/initial-route.browser-contract.spec.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
       \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, internal/resofeed/rf_bug_item_id_api_expected_red_test.go]\n\
       claims: [RF-BUG-001, RF-BUG-002]\nchecks:\n  - id: rf_bug_001_green\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n        npm --prefix\
-      \ web exec playwright test -- --config ./playwright.browser-contract.config.ts\
+      \      command:\n        - bash\n        - -lc\n        - |-\n          npm\
+      \ --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 --list tests/e2e/inspector-selection.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-001\\\\]' | tee /tmp/rf001-green-list; c=$(grep -c '\\\
       [RF-BUG-001\\]' /tmp/rf001-green-list); test $c -gt 0; npm --prefix web exec\
@@ -183155,7 +183155,7 @@ phases:
       \ item}], forbids: [{literal: failed}, {literal: No tests found}, {literal:\
       \ 0 tests}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-001]\n\
       \  - id: rf_bug_002_green\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n        npm --prefix web run test:e2e -- --project=chromium-ci-safe\
+      \  - -lc\n        - |-\n          npm --prefix web run test:e2e -- --project=chromium-ci-safe\
       \ tests/e2e/initial-route.browser-contract.spec.ts --grep 'RF-BUG-002' --list\
       \ | tee /tmp/rf002-green-list; titles=('[RF-BUG-002][en] TODAY cold load and\
       \ refresh' '[RF-BUG-002][en] SOURCE LEDGER cold load and refresh' '[RF-BUG-002][en]\
@@ -183187,7 +183187,7 @@ phases:
       \ cases=9}], forbids: [{literal: failed}, {literal: No tests found}, {literal:\
       \ 0 test}, {literal: skipped}]}}\n    proves: [RF-BUG-002]\n  - id: rf_bug_002_api_green\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     go test -list '^TestRFBUG002OpaqueItemIDAPIPaths$' ./internal/resofeed\
+      \       go test -list '^TestRFBUG002OpaqueItemIDAPIPaths$' ./internal/resofeed\
       \ | tee /tmp/rf002-go-list; test \"$(grep -Fxc 'TestRFBUG002OpaqueItemIDAPIPaths'\
       \ /tmp/rf002-go-list)\" -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG002OpaqueItemIDAPIPaths$'\
       \ -count=1\n      timeout_seconds: 300\n    expect: {outcome: green, exit_codes:\
