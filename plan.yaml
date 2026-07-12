@@ -183521,7 +183521,7 @@ phases:
       \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: green\n\
       \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
       \ legacy_export_auth_precedence}, {literal: import_and_JSON_State_remain_green},\
-      \ {literal: PASS: TestRFBUG004OPMLImportOnlyContract}]\n        contains_any:\
+      \ {literal: 'PASS: TestRFBUG004OPMLImportOnlyContract'}]\n        contains_any:\
       \ []\n        forbids: [{literal: FAIL}, {literal: no tests to run}]\n    proves:\
       \ [RF-BUG-004]\n  - id: rf_bug_004_active_scan_green\n    run:\n      command:\
       \ [bash, -lc, \"go test -v ./tests -run '^TestRFBugCanonicalContracts/OPMLActiveScan$'\
