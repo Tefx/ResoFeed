@@ -183772,18 +183772,18 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
       \ RF-BUG-004 State-import confirmation UX and RF-BUG-008. Implement Source List\
-      \ and Portable State groups, import-only OPML, no duplicate URL field, unbroken\
-      \ bracket tokens, keyboard/44px/overflow behavior at five specified viewports,\
-      \ global ingest, row fetch, pending/success/error/conflict/current-operation\
-      \ states, independent rows, delete confirmation/cancel/focus/saved-item boundary,\
-      \ and source info. Protected render test, browser/runtime/delete specs, baselines,\
-      \ all other contract-lock files, and artifact-proof files are immutable. Implementation\
-      \ may create only ignored runtime review screenshots. Synchronize named DESIGN/ui-preview/UI\
-      \ regression docs. Recovery reverts product/CSS/docs.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
-      \ web/src/routes/components/StatePortability.svelte, web/src/app.css, docs/DESIGN.md,\
-      \ docs/ui-preview.html, docs/UI_REGRESSION_CONTRACT.md]\n  blocked_paths: [web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
+      \ and Portable State groups, import-only OPML, responsive accessibility, global\
+      \ ingest, row fetch, errors/conflicts/current-operation, independent rows, delete\
+      \ confirmation/focus/saved-item boundary, and source info. Protected tests and\
+      \ baselines are immutable. Green acceptance equals the exact Section 4.8 14-title\
+      \ inventory: two render, five responsive-browser, five runtime-operation, and\
+      \ two delete titles. The five screenshot filenames must equal the authority\
+      \ inventory. Positive counts alone fail. Every npm-exec command uses root-valid\
+      \ config/spec paths.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/routes/+page.svelte,\
+      \ web/src/routes/components/SourceLedger.svelte, web/src/routes/components/StatePortability.svelte,\
+      \ web/src/app.css, docs/DESIGN.md, docs/ui-preview.html, docs/UI_REGRESSION_CONTRACT.md]\n\
+      \  blocked_paths: [web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
       \ web/src/lib/__tests__/workbench-route.test.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
       \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
       \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
@@ -183791,67 +183791,92 @@ phases:
       \ web/playwright.artifact-proof.config.ts, internal/resofeed/**, web/src/lib/api-client.ts]\n\
       claims: [RF-BUG-004-STATE-UI, RF-BUG-008]\nchecks:\n  - id: rf_bug_004_state_import_green\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ --grep '^\\[RF-BUG-004\\]' | tee /tmp/rf004-state-green-list; titles=('[RF-BUG-004][en]\
-      \ State import confirms before atomic replacement' '[RF-BUG-004][zh] State import\
-      \ confirms before atomic replacement' '[RF-BUG-004][en] State import cancellation\
-      \ resets intent and focus' '[RF-BUG-004][zh] State import cancellation resets\
-      \ intent and focus'); for t in \"${titles[@]}\"; do test \"$(grep -Fc -- \"\
-      $t\" /tmp/rf004-state-green-list)\" -eq 1; done; test \"$(grep -c '\\[RF-BUG-004\\\
-      ]' /tmp/rf004-state-green-list)\" -eq 4; npm --prefix web exec playwright test\
-      \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 tests/e2e/source-ledger-responsive.browser-contract.spec.ts --grep\
-      \ '^\\[RF-BUG-004\\]' --reporter=line; echo RF_BUG_004_STATE_IMPORT_TITLES=4\n\
+      \       titles=('[RF-BUG-004][en] State import confirms before atomic replacement'\
+      \ '[RF-BUG-004][zh] State import confirms before atomic replacement' '[RF-BUG-004][en]\
+      \ State import cancellation resets intent and focus' '[RF-BUG-004][zh] State\
+      \ import cancellation resets intent and focus')\n          npm --prefix web\
+      \ exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ --grep '^\\[RF-BUG-004\\]' | tee /tmp/rf004-state-green-list\n          for\
+      \ t in \"${titles[@]}\"; do test \"$(grep -Fc -- \"$t\" /tmp/rf004-state-green-list)\"\
+      \ -eq 1; done\n          test \"$(grep -c '\\[RF-BUG-004\\]' /tmp/rf004-state-green-list)\"\
+      \ -eq 4\n          npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ --grep '^\\[RF-BUG-004\\]' --reporter=line\n          echo RF_BUG_004_STATE_IMPORT_TITLES=4\n\
       \      timeout_seconds: 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: '[RF-BUG-004][en] State import confirms before atomic\
-      \ replacement'}, {literal: '[RF-BUG-004][zh] State import confirms before atomic\
-      \ replacement'}, {literal: '[RF-BUG-004][en] State import cancellation resets\
-      \ intent and focus'}, {literal: '[RF-BUG-004][zh] State import cancellation\
-      \ resets intent and focus'}, {literal: RF_BUG_004_STATE_IMPORT_TITLES=4}], forbids:\
+      \ replacement'}, {literal: '[RF-BUG-004][zh] State import cancellation resets\
+      \ intent and focus'}, {literal: RF_BUG_004_STATE_IMPORT_TITLES=4}], forbids:\
       \ [{literal: failed}, {literal: No tests found}, {literal: skipped}, {literal:\
       \ retry}]}}\n    proves: [RF-BUG-004-STATE-UI]\n  - id: rf_bug_008_render_green\n\
-      \    run: {command: [npm, --prefix, web, run, test:render, --, src/routes/components/__tests__/source-ledger-responsive.test.ts,\
-      \ --reporter=verbose, -t, RF-BUG-008], timeout_seconds: 180}\n    expect: {outcome:\
-      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: source-ledger-responsive.test.ts},\
-      \ {literal: RF-BUG-008 responsive groups preserve controls and state}, {literal:\
-      \ RF_BUG_008_RENDER_COUNT=}], forbids: [{literal: failed}, {literal: No tests\
-      \ found}, {literal: 0 test}, {literal: skipped}]}}\n    proves: [RF-BUG-008]\n\
-      \  - id: rf_bug_008_green\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n          npm --prefix web exec playwright test -- --config\
-      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list tests/e2e/source-ledger-responsive.browser-contract.spec.ts tests/e2e/source-ledger-delete.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-008\\\\]' | tee /tmp/rf008-green-list; c=$(grep -c '\\\
-      [RF-BUG-008\\]' /tmp/rf008-green-list); test $c -gt 0; for v in 320x800 390x844\
-      \ 768x1024 1280x800 1440x900; do grep -F \"[$v]\" /tmp/rf008-green-list; done;\
-      \ npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ tests/e2e/source-ledger-delete.browser-contract.spec.ts --grep '^\\\\[RF-BUG-008\\\
-      \\]' --reporter=line; echo RF_BUG_008_BROWSER_COUNT=$c VIEWPORTS=5\n      timeout_seconds:\
-      \ 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: source-ledger-responsive.browser-contract.spec.ts}, {literal: source-ledger-delete.browser-contract.spec.ts},\
-      \ {literal: RF_BUG_008_BROWSER_COUNT=}, {literal: VIEWPORTS=5}], forbids: [{literal:\
-      \ failed}, {literal: No tests found}, {literal: skipped}, {literal: retry}]}}\n\
-      \    proves: [RF-BUG-008]\n  - id: rf_bug_008_operations_green\n    run:\n \
-      \     command:\n        - bash\n        - -lc\n        - |-\n          npm --prefix\
-      \ web exec playwright test -- --config ./playwright.runtime.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/source-ledger-operations.runtime.spec.ts --grep\
-      \ '^\\\\[RF-BUG-008\\\\]' | tee /tmp/rf008-ops-green-list; en=$(grep -c '\\\
-      [RF-BUG-008\\]\\[en\\]' /tmp/rf008-ops-green-list); zh=$(grep -c '\\[RF-BUG-008\\\
-      ]\\[zh\\]' /tmp/rf008-ops-green-list); test $en -gt 0; test $zh -gt 0; npm --prefix\
-      \ web exec playwright test -- --config ./playwright.runtime.config.ts --project=chromium-ci-safe\
-      \ --retries=0 tests/e2e/source-ledger-operations.runtime.spec.ts --grep '^\\\
-      \\[RF-BUG-008\\\\]' --reporter=line; echo RF_BUG_008_OPERATION_EN=$en RF_BUG_008_OPERATION_ZH=$zh\n\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \       titles=('[RF-BUG-008] Source Ledger groups and controls render' '[RF-BUG-008]\
+      \ Source Ledger operational states render')\n          npm --prefix web run\
+      \ test:render -- src/routes/components/__tests__/source-ledger-responsive.test.ts\
+      \ --reporter=verbose --list | tee /tmp/rf008-render-green-list\n          for\
+      \ t in \"${titles[@]}\"; do test \"$(grep -Fc -- \"$t\" /tmp/rf008-render-green-list)\"\
+      \ -eq 1; done\n          npm --prefix web run test:render -- src/routes/components/__tests__/source-ledger-responsive.test.ts\
+      \ --reporter=verbose | tee /tmp/rf008-render-green-run\n          for t in \"\
+      ${titles[@]}\"; do test \"$(grep -Fc -- \"$t\" /tmp/rf008-render-green-run)\"\
+      \ -ge 1; done\n          echo RF_BUG_008_RENDER_TITLE_SET=2\n      timeout_seconds:\
+      \ 180\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF_BUG_008_RENDER_TITLE_SET=2}, {literal: '[RF-BUG-008] Source\
+      \ Ledger groups and controls render'}, {literal: '[RF-BUG-008] Source Ledger\
+      \ operational states render'}], forbids: [{literal: failed}, {literal: No tests\
+      \ found}, {literal: skipped}]}}\n    proves: [RF-BUG-008]\n  - id: rf_bug_008_green\n\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \       titles=('[RF-BUG-008][320x800] Source Ledger responsive contract' '[RF-BUG-008][390x844]\
+      \ Source Ledger responsive contract' '[RF-BUG-008][768x1024] Source Ledger responsive\
+      \ contract' '[RF-BUG-008][1280x800] Source Ledger responsive contract' '[RF-BUG-008][1440x900]\
+      \ Source Ledger responsive contract' '[RF-BUG-008] delete cancel restores focus'\
+      \ '[RF-BUG-008] delete success preserves saved items and moves focus')\n   \
+      \       npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts --grep '^\\[RF-BUG-008\\\
+      ]' | tee /tmp/rf008-green-list\n          for t in \"${titles[@]}\"; do test\
+      \ \"$(grep -Fc -- \"$t\" /tmp/rf008-green-list)\" -eq 1; done\n          test\
+      \ \"$(grep -c '\\[RF-BUG-008\\]' /tmp/rf008-green-list)\" -eq 7\n          npm\
+      \ --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts --grep '^\\[RF-BUG-008\\\
+      ]' --reporter=line | tee /tmp/rf008-green-run\n          for t in \"${titles[@]}\"\
+      ; do test \"$(grep -Fc -- \"$t\" /tmp/rf008-green-run)\" -ge 1; done\n     \
+      \     expected=$(printf '%s\\n' source-ledger-320x800.png source-ledger-390x844.png\
+      \ source-ledger-768x1024.png source-ledger-1280x800.png source-ledger-1440x900.png\
+      \ | sort)\n          actual=$(find web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots\
+      \ -type f -name 'source-ledger-*.png' -exec basename {} \\; | sort)\n      \
+      \    test \"$actual\" = \"$expected\"\n          echo RF_BUG_008_BROWSER_TITLE_SET=7\
+      \ RF_BUG_008_SCREENSHOT_SET=5\n      timeout_seconds: 600\n    expect: {outcome:\
+      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: RF_BUG_008_BROWSER_TITLE_SET=7},\
+      \ {literal: RF_BUG_008_SCREENSHOT_SET=5}, {literal: '[RF-BUG-008][320x800] Source\
+      \ Ledger responsive contract'}, {literal: '[RF-BUG-008] delete success preserves\
+      \ saved items and moves focus'}], forbids: [{literal: failed}, {literal: No\
+      \ tests found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-008]\n\
+      \  - id: rf_bug_008_operations_green\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n          titles=('[RF-BUG-008] RUN INGEST transitions'\
+      \ '[RF-BUG-008] FETCH transitions and independent rows' '[RF-BUG-008] ingest\
+      \ and fetch error states' '[RF-BUG-008] current-operation conflict detail' '[RF-BUG-008]\
+      \ source info disclosure')\n          npm --prefix web exec -- playwright test\
+      \ --config web/playwright.runtime.config.ts --project=chromium-ci-safe --retries=0\
+      \ --list web/tests/e2e/source-ledger-operations.runtime.spec.ts --grep '^\\\
+      [RF-BUG-008\\]' | tee /tmp/rf008-ops-green-list\n          for t in \"${titles[@]}\"\
+      ; do test \"$(grep -Fc -- \"$t\" /tmp/rf008-ops-green-list)\" -eq 1; done\n\
+      \          test \"$(grep -c '\\[RF-BUG-008\\]' /tmp/rf008-ops-green-list)\"\
+      \ -eq 5\n          npm --prefix web exec -- playwright test --config web/playwright.runtime.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/source-ledger-operations.runtime.spec.ts\
+      \ --grep '^\\[RF-BUG-008\\]' --reporter=line | tee /tmp/rf008-ops-green-run\n\
+      \          for t in \"${titles[@]}\"; do test \"$(grep -Fc -- \"$t\" /tmp/rf008-ops-green-run)\"\
+      \ -ge 1; done\n          echo RF_BUG_008_OPERATION_TITLE_SET=5 RF_BUG_008_TOTAL_TITLE_SET=14\n\
       \      timeout_seconds: 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: '[RF-BUG-008][en] independent row operations retain\
-      \ current status'}, {literal: '[RF-BUG-008][zh] independent row operations retain\
-      \ current status'}, {literal: RF_BUG_008_OPERATION_EN=}, {literal: RF_BUG_008_OPERATION_ZH=}],\
-      \ forbids: [{literal: failed}, {literal: No tests found}, {literal: skipped},\
-      \ {literal: retry}]}}\n    proves: [RF-BUG-008]\nbindings:\n  expected_red:\
-      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
-      \ source_check: rf_bug_004_state_import_expected_red, requirement: RF-BUG-004,\
-      \ assertion_id: A-RF-BUG-004-STATE-UI, downstream_check: rf_bug_004_state_import_green,\
-      \ receipt: RF-BUG-004-state-ui-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
+      \ {contains_all: [{literal: RF_BUG_008_OPERATION_TITLE_SET=5}, {literal: RF_BUG_008_TOTAL_TITLE_SET=14},\
+      \ {literal: '[RF-BUG-008] RUN INGEST transitions'}, {literal: '[RF-BUG-008]\
+      \ source info disclosure'}], forbids: [{literal: failed}, {literal: No tests\
+      \ found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-008]\n\
+      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step:\
+      \ rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red, source_check:\
+      \ rf_bug_004_state_import_expected_red, requirement: RF-BUG-004, assertion_id:\
+      \ A-RF-BUG-004-STATE-UI, downstream_check: rf_bug_004_state_import_green, receipt:\
+      \ RF-BUG-004-state-ui-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
       \ source_check: rf_bug_008_browser_expected_red, requirement: RF-BUG-008, assertion_id:\
       \ A-RF-BUG-008-LEDGER-BROWSER, downstream_check: rf_bug_008_green, receipt:\
       \ RF-BUG-008-browser-red-to-green}\n    - {source_step: rf-bug-20260712-contract-lock.ledger-prompting-e2e-expected-red,\
@@ -183871,12 +183896,9 @@ phases:
       :[\"rf_bug_004_state_import_green\",\"rf_bug_008_render_green\",\"rf_bug_008_green\"\
       ,\"rf_bug_008_operations_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"authorized_mutation_refs\"\
       :[]}}\n</vectl_step_policy>"
-    verification: Require four exact RF-BUG-004 EN/ZH State-import confirmation/cancellation
-      titles with zero request before confirmation, one atomic-replace request after
-      confirmation, cancellation reset and focus restoration; exact RF-BUG-008 render
-      ID/count; positive per-file browser titles at 320x800, 390x844, 768x1024, 1280x800,
-      and 1440x900; positive EN/ZH operation counts; zero retries/skips; reviewed
-      baselines; and zero protected-artifact diff.
+    verification: Require exact RF-BUG-004 four-title proof and exact RF-BUG-008 14-title/five-screenshot
+      equality, zero retries/skips, reviewed baselines, and zero protected-artifact
+      diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
