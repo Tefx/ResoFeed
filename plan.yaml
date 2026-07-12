@@ -183515,7 +183515,7 @@ phases:
       \ web/tests/e2e/initial-route.browser-contract.spec.ts, scripts/verify-tailnet-csp.mjs,\
       \ deploy/**, internal/resofeed/state.go, web/src/**]\nclaims: [RF-BUG-005]\n\
       checks:\n  - id: rf_bug_005_green\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n        go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \        - -lc\n        - |-\n          go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf005-green-list; test $(grep -Fxc 'TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'\
       \ /tmp/rf005-green-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: green, exit_codes:\
@@ -183525,7 +183525,7 @@ phases:
       \ forbids: [{literal: unsafe-inline}, {literal: FAIL}, {literal: no tests to\
       \ run}, {literal: '[no tests to run]'}]}}\n    proves: [RF-BUG-005]\n  - id:\
       \ rf_bug_005_local_stream_green\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n        go test -list '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
+      \        - -lc\n        - |-\n          go test -list '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
       \ ./internal/resofeed | tee /tmp/rf005-local-list; test $(grep -Ec '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
       \ /tmp/rf005-local-list) -eq 3; go test -v ./internal/resofeed -run '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: green, exit_codes:\
@@ -183534,8 +183534,8 @@ phases:
       \   TestCSP'}, {literal: RF_BUG_005_LOCAL_TOP_LEVEL_TESTS=3}], forbids: [{literal:\
       \ FAIL}, {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n   \
       \ proves: [RF-BUG-005]\n  - id: rf_bug_005_browser_operations_green\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n        npm --prefix\
-      \ web exec playwright test -- --config ./playwright.browser-contract.config.ts\
+      \      command:\n        - bash\n        - -lc\n        - |-\n          npm\
+      \ --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 --list tests/e2e/csp-operations.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-005\\\\] CSP operations' | tee /tmp/rf005-browser-list;\
       \ c=$(grep -c '\\[RF-BUG-005\\] CSP operations' /tmp/rf005-browser-list); test\
