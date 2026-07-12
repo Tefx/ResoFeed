@@ -184938,3 +184938,32 @@ phases:
       validation including present-but-possibly-empty stderr.
     depends_on:
     - local-full-verification-matrix
+  - id: rf-bug-r11-final-digest-receipt
+    name: Record final R11 authority and plan digests
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Repository mutation is absent because this step hashes the immutable authority
+      input and the finalized managed plan after all R11 reconciliation predicates
+      are present. Run `shasum -a 256 docs/BUG_FIX_PLAN_2026-07-12.md plan.yaml`;
+      require the authority digest exactly `9b92857388a30a91a5658177227fa86d81b3f7146081d4b0856247020c9a852d`,
+      require the plan digest to be a lowercase 64-hex SHA-256, and record both with
+      `AUTHORITY_SHA256=` and `PLAN_SHA256=` labels. Run `vectl validate --check-refs`
+      immediately before hashing; any later managed-plan mutation invalidates this
+      receipt and requires regeneration.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.rf-bug-r11-final-digest-receipt","risk_tier":"R0","risk_reasons":["generated_metadata_receipt"],"primary_outcome":"RF-BUG-R11-DIGEST-RECEIPT","rollback_class":"TRIVIAL","proof_modalities":["STATIC_ANALYSIS","REVIEW"],"primary_verifier":"spec-verifier","additional_verifiers":[],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
+
+      </vectl_step_policy>'
+    verification: Receipt includes VALID reference-aware Vectl validation, exact authority
+      SHA-256 9b92857388a30a91a5658177227fa86d81b3f7146081d4b0856247020c9a852d, and
+      the final lowercase 64-hex plan SHA-256; no later plan mutation is permitted
+      without refreshing it.
+    depends_on:
+    - rf-bug-r11-exact-local-evidence-matrix
