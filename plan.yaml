@@ -184113,26 +184113,20 @@ phases:
   - id: formal-security-review
     name: Review HTTP, CSP, secrets, and state boundaries independently
     status: pending
-    description: 'step_type: implementation
+    description: 'step_type: review
 
       repo_change_policy: no_repo_change
 
 
-      Repository mutation is absent because this independent review evaluates the
-      completed local, immutable-image, container, and Tailnet evidence. Review RF-BUG-003/004/005/010
-      for embed.FS traversal/fallback, no external UI root, four outer headers, embedded-content
-      CSP without unsafe-inline, preserved streaming/cancellation, unchanged owner-token
-      boundary, import-only OPML, case-local mutable E2E state, reliable cleanup,
-      live-provider opt-in, and redaction. Review the small middleware directly; no
-      staged writer or custom evidence protocol is expected. Findings route to the
-      modifying owner and block closure.
-
-
-      <vectl_step_policy>
-
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.formal-security-review","risk_tier":"R3","risk_reasons":["security_boundary_review","deployment_evidence","secret_redaction"],"primary_outcome":"RF-BUG-SECURITY-REVIEW","rollback_class":"TRIVIAL","proof_modalities":["STATIC_ANALYSIS","RUNTIME_PROBE","REVIEW"],"primary_verifier":"software-architect","additional_verifiers":["gate-reviewer"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
-
-      </vectl_step_policy>'
+      Repository mutation is absent because this independent post-runtime review evaluates
+      the completed local, immutable-image, container, and Tailnet evidence. Review
+      RF-BUG-003/004/005/010 for embed.FS traversal/fallback, no external UI root,
+      four outer headers, embedded-content CSP without unsafe-inline, preserved streaming/cancellation,
+      unchanged owner-token boundary, import-only OPML, case-local mutable E2E state,
+      reliable cleanup, live-provider opt-in, secret redaction, exact deployed digest,
+      and rollback evidence. Review the small middleware directly; no staged writer
+      or custom evidence protocol is expected. Findings route to the modifying owner
+      and block closure.'
     verification: Fresh security reviewer inspects named code and ordinary local/container/Tailnet
       outputs. PASS requires no unresolved finding and confirms secret redaction,
       streaming/cancellation, header ownership, import-only state boundary, and E2E
