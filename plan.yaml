@@ -182909,16 +182909,22 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirements:\
-      \ RF-BUG-004 State-import confirmation UX, RF-BUG-005 browser operations, RF-BUG-008,\
-      \ RF-BUG-009, RF-BUG-010. After canonical docs, create and authorize exact Source\
-      \ Ledger render/browser/runtime/delete contracts and five-viewport baselines;\
-      \ real-Chromium CSP operations; exact Prompting v2.2 Go contract; RF-BUG-010\
-      \ isolation contract; token-free `docs/audits/rf-bug-010-playwright-migration-checklist.md`;\
-      \ and protected intentional-failure spec/config. Every red check positively\
-      \ collects exact files/test IDs/counts and reaches its named assertion. Contract\
-      \ files, baselines, artifact-proof files, initial-route and other frontend contract-lock\
-      \ artifacts become immutable. No registry, manifest, reset/evidence schema,\
-      \ or product mutation. Recovery reverts only authorized docs/contracts/baselines.\n\
+      \ RF-BUG-004 State-import UX, RF-BUG-005 browser operations, RF-BUG-008, RF-BUG-009,\
+      \ RF-BUG-010. Create and protect the exact Source Ledger render/browser/runtime/delete\
+      \ contracts and five named screenshot baselines, real-Chromium CSP operations,\
+      \ exact 16-subtest Prompting v2.2 contract, token-free migration checklist,\
+      \ isolation contract, and intentional-failure spec/config. RF-BUG-008 collection/run\
+      \ equality is the exact 14-title Section 4.8 inventory, split as two render,\
+      \ five responsive browser, five runtime operations, and two delete titles; screenshot\
+      \ filenames equal the five Section 4.8 names. RF-BUG-009 equals the exact 16\
+      \ Section 4.9 subtests. RF-BUG-010 expected-red independently collects the protected\
+      \ intentional-failure title, proves ordered SETUP < ASSERTION_REACHED < TEARDOWN,\
+      \ and verifies HTML, standard JSON, trace, video, screenshot, redacted server\
+      \ stdout/stderr, DB path plus cleanup=clean, sanitized environment, browser\
+      \ console, and network summary. Missing, empty, unredacted, residue, startup/auth/collection\
+      \ failure, or an additional failed/skipped/flaky/retried result is invalid.\
+      \ Every npm-exec command uses `npm --prefix web exec -- playwright` with root-relative\
+      \ configs/specs. No registry, manifest, reset/evidence schema, or product mutation.\n\
       \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
       \ expected_red_definition\nscope:\n  allowed_paths: [docs/PROMPTING_SYSTEM.md,\
       \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, docs/audits/rf-bug-010-playwright-migration-checklist.md,\
@@ -182932,111 +182938,150 @@ phases:
       \ internal/resofeed/openrouter.go, internal/resofeed/ingest.go, internal/resofeed/reprocess.go,\
       \ web/tests/e2e/initial-route.browser-contract.spec.ts]\nclaims: [RF-BUG-004-STATE-UI-CONTRACT,\
       \ RF-BUG-005-BROWSER-CONTRACT, RF-BUG-008-CONTRACT, RF-BUG-009-CONTRACT, RF-BUG-010-CONTRACT]\n\
-      checks:\n  - id: rf_bug_004_state_import_expected_red\n    run:\n      command:\n\
-      \        - bash\n        - -lc\n        - |-\n          npm --prefix web exec\
-      \ playwright test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ --grep '^\\[RF-BUG-004\\]' | tee /tmp/rf004-state-list; titles=('[RF-BUG-004][en]\
+      checks:\n  - id: rf_bug_004_state_import_expected_red\n    run: {command: [bash,\
+      \ -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ --grep '^\\\\[RF-BUG-004\\\\]' | tee /tmp/rf004-state-list; titles=('[RF-BUG-004][en]\
       \ State import confirms before atomic replacement' '[RF-BUG-004][zh] State import\
       \ confirms before atomic replacement' '[RF-BUG-004][en] State import cancellation\
       \ resets intent and focus' '[RF-BUG-004][zh] State import cancellation resets\
-      \ intent and focus'); for t in \"${titles[@]}\"; do test \"$(grep -Fc -- \"\
-      $t\" /tmp/rf004-state-list)\" -eq 1; done; test \"$(grep -c '\\[RF-BUG-004\\\
-      ]' /tmp/rf004-state-list)\" -eq 4; npm --prefix web exec playwright test --\
-      \ --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 tests/e2e/source-ledger-responsive.browser-contract.spec.ts --grep\
-      \ '^\\[RF-BUG-004\\]\\[en\\] State import confirms before atomic replacement$'\n\
-      \      timeout_seconds: 600\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
-      \ {contains_all: [{literal: source-ledger-responsive.browser-contract.spec.ts},\
-      \ {literal: '[RF-BUG-004][en] State import confirms before atomic replacement'},\
-      \ {literal: expected zero import requests before CONFIRM IMPORT}], forbids:\
-      \ [{literal: No tests found}, {literal: 0 tests}, {literal: webServer failed},\
-      \ {literal: TypeError}]}}\n    proves: [RF-BUG-004-STATE-UI-CONTRACT]\n  - id:\
-      \ rf_bug_005_browser_operations_expected_red\n    run:\n      command:\n   \
-      \     - bash\n        - -lc\n        - |-\n          npm --prefix web exec playwright\
-      \ test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/csp-operations.browser-contract.spec.ts --grep\
-      \ '^\\\\[RF-BUG-005\\\\] CSP operations' | tee /tmp/rf005-red-list; test $(grep\
-      \ -c '\\[RF-BUG-005\\] CSP operations' /tmp/rf005-red-list) -gt 0; npm --prefix\
-      \ web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 tests/e2e/csp-operations.browser-contract.spec.ts\
+      \ intent and focus'); for t in \\\"${titles[@]}\\\"; do test \\\"$(grep -Fc\
+      \ -- \\\"$t\\\" /tmp/rf004-state-list)\\\" -eq 1; done; test \\\"$(grep -c '\\\
+      \\[RF-BUG-004\\\\]' /tmp/rf004-state-list)\\\" -eq 4; npm --prefix web exec\
+      \ -- playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ --grep '^\\\\[RF-BUG-004\\\\]\\\\[en\\\\] State import confirms before atomic\
+      \ replacement$'\"], timeout_seconds: 600}\n    expect: {outcome: red, exit_codes:\
+      \ [1], stdout_or_stderr: {contains_all: [{literal: '[RF-BUG-004][en] State import\
+      \ confirms before atomic replacement'}, {literal: expected zero import requests\
+      \ before CONFIRM IMPORT}], forbids: [{literal: No tests found}, {literal: 0\
+      \ tests}, {literal: webServer failed}]}}\n    proves: [RF-BUG-004-STATE-UI-CONTRACT]\n\
+      \  - id: rf_bug_005_browser_operations_expected_red\n    run: {command: [bash,\
+      \ -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/csp-operations.browser-contract.spec.ts\
+      \ --grep '^\\\\[RF-BUG-005\\\\] CSP operations' | tee /tmp/rf005-red-list; test\
+      \ $(grep -c '\\\\[RF-BUG-005\\\\] CSP operations' /tmp/rf005-red-list) -eq 1;\
+      \ npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-005\\\\] CSP operations import and State export import\
-      \ download$'\n      timeout_seconds: 600\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: csp-operations.browser-contract.spec.ts},\
-      \ {literal: '[RF-BUG-005] CSP operations import and State export import download'},\
-      \ {literal: expected State download under final CSP}], forbids: [{literal: No\
-      \ tests found}, {literal: 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n\
-      \    proves: [RF-BUG-005-BROWSER-CONTRACT]\n  - id: rf_bug_008_browser_expected_red\n\
-      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \       npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ tests/e2e/source-ledger-delete.browser-contract.spec.ts --grep '^\\\\[RF-BUG-008\\\
-      \\]' | tee /tmp/rf008-browser-list; c=$(grep -c '\\[RF-BUG-008\\]' /tmp/rf008-browser-list);\
-      \ test $c -gt 0; npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ tests/e2e/source-ledger-delete.browser-contract.spec.ts --grep '^\\\\[RF-BUG-008\\\
-      \\]\\\\[320x800\\\\] groups remain operable without overflow$'\n      timeout_seconds:\
-      \ 600\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
-      \ [{literal: source-ledger-responsive.browser-contract.spec.ts}, {literal: '[RF-BUG-008][320x800]\
-      \ groups remain operable without overflow'}, {literal: expected 44px controls\
-      \ without horizontal overflow}], forbids: [{literal: No tests found}, {literal:\
-      \ 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n    proves:\
-      \ [RF-BUG-008-CONTRACT]\n  - id: rf_bug_008_operations_expected_red\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - |-\n          npm\
-      \ --prefix web exec playwright test -- --config ./playwright.runtime.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/source-ledger-operations.runtime.spec.ts\
-      \ --grep '^\\\\[RF-BUG-008\\\\]' | tee /tmp/rf008-ops-list; test $(grep -c '\\\
-      [RF-BUG-008\\]' /tmp/rf008-ops-list) -ge 2; npm --prefix web exec playwright\
-      \ test -- --config ./playwright.runtime.config.ts --project=chromium-ci-safe\
-      \ --retries=0 tests/e2e/source-ledger-operations.runtime.spec.ts --grep '^\\\
-      \\[RF-BUG-008\\\\]\\\\[zh\\\\] independent row operations retain current status$'\n\
+      \ download$'\"], timeout_seconds: 600}\n    expect: {outcome: red, exit_codes:\
+      \ [1], stdout_or_stderr: {contains_all: [{literal: '[RF-BUG-005] CSP operations\
+      \ import and State export import download'}, {literal: expected State download\
+      \ under final CSP}], forbids: [{literal: No tests found}, {literal: 0 tests},\
+      \ {literal: webServer failed}]}}\n    proves: [RF-BUG-005-BROWSER-CONTRACT]\n\
+      \  - id: rf_bug_008_browser_expected_red\n    run:\n      command:\n       \
+      \ - bash\n        - -lc\n        - |-\n          render=('[RF-BUG-008] Source\
+      \ Ledger groups and controls render' '[RF-BUG-008] Source Ledger operational\
+      \ states render')\n          browser=('[RF-BUG-008][320x800] Source Ledger responsive\
+      \ contract' '[RF-BUG-008][390x844] Source Ledger responsive contract' '[RF-BUG-008][768x1024]\
+      \ Source Ledger responsive contract' '[RF-BUG-008][1280x800] Source Ledger responsive\
+      \ contract' '[RF-BUG-008][1440x900] Source Ledger responsive contract' '[RF-BUG-008]\
+      \ delete cancel restores focus' '[RF-BUG-008] delete success preserves saved\
+      \ items and moves focus')\n          npm --prefix web run test:render -- src/routes/components/__tests__/source-ledger-responsive.test.ts\
+      \ --reporter=verbose --list | tee /tmp/rf008-render-list\n          for t in\
+      \ \"${render[@]}\"; do test \"$(grep -Fc -- \"$t\" /tmp/rf008-render-list)\"\
+      \ -eq 1; done\n          npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts --grep '^\\[RF-BUG-008\\\
+      ]' | tee /tmp/rf008-browser-list\n          for t in \"${browser[@]}\"; do test\
+      \ \"$(grep -Fc -- \"$t\" /tmp/rf008-browser-list)\" -eq 1; done\n          test\
+      \ \"$(grep -c '\\[RF-BUG-008\\]' /tmp/rf008-browser-list)\" -eq 7\n        \
+      \  for f in source-ledger-320x800.png source-ledger-390x844.png source-ledger-768x1024.png\
+      \ source-ledger-1280x800.png source-ledger-1440x900.png; do find web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots\
+      \ -name \"$f\" -print -quit | grep -q .; done\n          npm --prefix web exec\
+      \ -- playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
+      \ --grep '^\\[RF-BUG-008\\]\\[320x800\\] Source Ledger responsive contract$'\n\
       \      timeout_seconds: 600\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
-      \ {contains_all: [{literal: source-ledger-operations.runtime.spec.ts}, {literal:\
-      \ '[RF-BUG-008][zh] independent row operations retain current status'}, {literal:\
-      \ expected independent pending and current-operation state}], forbids: [{literal:\
-      \ No tests found}, {literal: 0 tests}, {literal: webServer failed}, {literal:\
-      \ TypeError}]}}\n    proves: [RF-BUG-008-CONTRACT]\n  - id: rf_bug_009_expected_red\n\
+      \ {contains_all: [{literal: '[RF-BUG-008][320x800] Source Ledger responsive\
+      \ contract'}, {literal: expected 44px controls without horizontal overflow}],\
+      \ forbids: [{literal: No tests found}, {literal: 0 tests}, {literal: webServer\
+      \ failed}]}}\n    proves: [RF-BUG-008-CONTRACT]\n  - id: rf_bug_008_operations_expected_red\n\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \       titles=('[RF-BUG-008] RUN INGEST transitions' '[RF-BUG-008] FETCH transitions\
+      \ and independent rows' '[RF-BUG-008] ingest and fetch error states' '[RF-BUG-008]\
+      \ current-operation conflict detail' '[RF-BUG-008] source info disclosure')\n\
+      \          npm --prefix web exec -- playwright test --config web/playwright.runtime.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/source-ledger-operations.runtime.spec.ts\
+      \ --grep '^\\[RF-BUG-008\\]' | tee /tmp/rf008-ops-list\n          for t in \"\
+      ${titles[@]}\"; do test \"$(grep -Fc -- \"$t\" /tmp/rf008-ops-list)\" -eq 1;\
+      \ done\n          test \"$(grep -c '\\[RF-BUG-008\\]' /tmp/rf008-ops-list)\"\
+      \ -eq 5\n          npm --prefix web exec -- playwright test --config web/playwright.runtime.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/source-ledger-operations.runtime.spec.ts\
+      \ --grep '^\\[RF-BUG-008\\] FETCH transitions and independent rows$'\n     \
+      \ timeout_seconds: 600\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
+      \ {contains_all: [{literal: '[RF-BUG-008] FETCH transitions and independent\
+      \ rows'}, {literal: expected independent pending and current-operation state}],\
+      \ forbids: [{literal: No tests found}, {literal: 0 tests}, {literal: webServer\
+      \ failed}]}}\n    proves: [RF-BUG-008-CONTRACT]\n  - id: rf_bug_009_expected_red\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
       \       go test -list '^TestRFBUG009PromptingV22Contract$' ./internal/resofeed\
-      \ | tee /tmp/rf009-list; test $(grep -Fxc 'TestRFBUG009PromptingV22Contract'\
-      \ /tmp/rf009-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG009PromptingV22Contract$'\
-      \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
-      \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG009PromptingV22Contract/semantic_repair_at_most_once'},\
-      \ {literal: expected one generation plus at most one semantic repair}], forbids:\
-      \ [{literal: setup failed}, {literal: no tests to run}, {literal: '[no tests\
-      \ to run]'}, {literal: compile error}]}}\n    proves: [RF-BUG-009-CONTRACT]\n\
-      \  - id: rf_bug_010_expected_red\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n          npm --prefix web exec playwright test\
-      \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep\
-      \ '^\\\\[RF-BUG-010\\\\]' | tee /tmp/rf010-red-list; test $(grep -c '\\[RF-BUG-010\\\
-      ]' /tmp/rf010-red-list) -gt 0; npm --prefix web exec playwright test -- --config\
-      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep '^\\\\[RF-BUG-010\\\
-      \\] mutating cases own isolated state and cleanup$'\n      timeout_seconds:\
-      \ 600\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
-      \ [{literal: bugfix-ledger-e2e.expected-red.spec.ts}, {literal: '[RF-BUG-010]\
-      \ mutating cases own isolated state and cleanup'}, {literal: expected case-local\
-      \ database and complete cleanup}], forbids: [{literal: No tests found}, {literal:\
-      \ 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n    proves:\
+      \ | tee /tmp/rf009-list\n          test \"$(grep -Fxc TestRFBUG009PromptingV22Contract\
+      \ /tmp/rf009-list)\" -eq 1\n          set +e; go test -v ./internal/resofeed\
+      \ -run '^TestRFBUG009PromptingV22Contract$' -count=1 2>&1 | tee /tmp/rf009-run;\
+      \ status=${PIPESTATUS[0]}; set -e\n          python3 - <<'PY'\n          import\
+      \ re\n          t=open('/tmp/rf009-run').read(); expected={'TestRFBUG009PromptingV22Contract/'+x\
+      \ for x in 'payload_fields structured_output_routing no_silent_model_substitution\
+      \ output_validation semantic_validation single_semantic_repair_bound pre_generation_downgrade_exception\
+      \ usable_content_preserved_on_validation_failure ingest_path library_reprocess_path\
+      \ item_reingest_path http_path mcp_path persistence_after_validation required_regression_fixtures\
+      \ active_v22_names'.split()}; got=set(re.findall(r'^=== RUN\\s+(TestRFBUG009PromptingV22Contract/[^\\\
+      s]+)',t,re.M)); assert got==expected,(sorted(expected-got),sorted(got-expected));\
+      \ assert 'expected one generation plus at most one semantic repair' in t; print('RF-BUG-009_EXACT_SUBTEST_SET=16')\n\
+      \          PY\n          test \"$status\" -eq 1; exit 1\n      timeout_seconds:\
+      \ 240\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF-BUG-009_EXACT_SUBTEST_SET=16}, {literal: expected one generation\
+      \ plus at most one semantic repair}], forbids: [{literal: setup failed}, {literal:\
+      \ no tests to run}, {literal: compile error}]}}\n    proves: [RF-BUG-009-CONTRACT]\n\
+      \  - id: rf_bug_010_expected_red\n    run: {command: [bash, -lc, \"npm --prefix\
+      \ web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
+      \ --grep '^\\\\[RF-BUG-010\\\\]' | tee /tmp/rf010-red-list; test $(grep -c '\\\
+      \\[RF-BUG-010\\\\]' /tmp/rf010-red-list) -gt 0; npm --prefix web exec -- playwright\
+      \ test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep '^\\\
+      \\[RF-BUG-010\\\\] mutating cases own isolated state and cleanup$'\"], timeout_seconds:\
+      \ 600}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
+      \ [{literal: '[RF-BUG-010] mutating cases own isolated state and cleanup'},\
+      \ {literal: expected case-local database and complete cleanup}], forbids: [{literal:\
+      \ No tests found}, {literal: 0 tests}, {literal: webServer failed}]}}\n    proves:\
       \ [RF-BUG-010-CONTRACT]\n  - id: rf_bug_010_artifact_expected_red\n    run:\n\
       \      command:\n        - bash\n        - -lc\n        - |-\n          rm -rf\
-      \ web/.test-artifacts/rf-bug-010-intentional-failure; mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure;\
-      \ output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt; set\
-      \ +e; npm --prefix web exec playwright test -- --config ./playwright.artifact-proof.config.ts\
-      \ --project=chromium-ci-safe --retries=0 tests/e2e/harness-artifact.intentional-failure.spec.ts\
+      \ web/.test-artifacts/rf-bug-010-intentional-failure; mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure\n\
+      \          output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt\n\
+      \          set +e\n          PLAYWRIGHT_JSON_OUTPUT_NAME=web/.test-artifacts/rf-bug-010-intentional-failure/results.json\
+      \ PLAYWRIGHT_HTML_OUTPUT_DIR=web/.test-artifacts/rf-bug-010-intentional-failure/html-report\
+      \ PLAYWRIGHT_HTML_OPEN=never npm --prefix web exec -- playwright test --config\
+      \ web/playwright.artifact-proof.config.ts --project=chromium-ci-safe --retries=0\
+      \ --reporter=json,html web/tests/e2e/harness-artifact.intentional-failure.spec.ts\
       \ --grep '^\\[RF-BUG-010\\] intentional failure retains complete artifacts$'\
-      \ >\"$output\" 2>&1; status=$?; set -e; test $status -eq 1; grep -F '[RF-BUG-010]\
-      \ intentional failure retains complete artifacts' \"$output\"; grep -F 'RF-BUG-010_SETUP=ready'\
-      \ \"$output\"; grep -F 'RF-BUG-010_ASSERTION_REACHED=ready' \"$output\"; grep\
-      \ -F 'RF-BUG-010_INTENTIONAL_ASSERTION: artifact retention proof' \"$output\"\
-      ; grep -F 'RF-BUG-010_TEARDOWN=clean' \"$output\"; grep -Eq '\\b1 failed\\b'\
-      \ \"$output\"; ! grep -Eiq '\\b([2-9]|[1-9][0-9]+) failed\\b|\\b[1-9][0-9]*\
-      \ (skipped|flaky)\\b|retry #' \"$output\"; cat \"$output\"\n      timeout_seconds:\
-      \ 300\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
-      \ [{literal: harness-artifact.intentional-failure.spec.ts}, {literal: '[RF-BUG-010]\
-      \ intentional failure retains complete artifacts'}, {literal: RF-BUG-010_SETUP=ready},\
-      \ {literal: RF-BUG-010_ASSERTION_REACHED=ready}, {literal: 'RF-BUG-010_INTENTIONAL_ASSERTION:\
+      \ >\"$output\" 2>&1\n          status=$?; set -e; test \"$status\" -eq 1\n \
+      \         node - \"$output\" <<'NODE'\n          const fs=require('node:fs');\
+      \ const text=fs.readFileSync(process.argv[2],'utf8'); let cursor=-1;\n     \
+      \     for (const marker of ['RF-BUG-010_SETUP=ready','RF-BUG-010_ASSERTION_REACHED=ready','RF-BUG-010_TEARDOWN=clean'])\
+      \ { const next=text.indexOf(marker,cursor+1); if(next<0) throw new Error(`missing\
+      \ or out-of-order ${marker}`); cursor=next; }\n          for (const marker of\
+      \ ['[RF-BUG-010] intentional failure retains complete artifacts','RF-BUG-010_INTENTIONAL_ASSERTION:\
+      \ artifact retention proof']) if(!text.includes(marker)) throw new Error(`missing\
+      \ ${marker}`);\n          if(!/\\b1 failed\\b/.test(text)||/\\b(?:[2-9]|[1-9][0-9]+)\
+      \ failed\\b|\\b[1-9][0-9]* (?:skipped|flaky)\\b|retry #/i.test(text)) throw\
+      \ new Error('invalid failure set');\n          NODE\n          root=web/.test-artifacts/rf-bug-010-intentional-failure\n\
+      \          test -s \"$root/results.json\"; test -d \"$root/html-report\"\n \
+      \         test \"$(find \"$root\" -type f -name trace.zip | wc -l | tr -d '\
+      \ ')\" -eq 1\n          test \"$(find \"$root\" -type f -name '*.webm' | wc\
+      \ -l | tr -d ' ')\" -eq 1\n          test \"$(find \"$root\" -type f -name '*.png'\
+      \ | wc -l | tr -d ' ')\" -ge 1\n          test \"$(find \"$root\" -type f -name\
+      \ server.stdout.log -size +0c | wc -l | tr -d ' ')\" -eq 1\n          test \"\
+      $(find \"$root\" -type f -name server.stderr.log | wc -l | tr -d ' ')\" -eq\
+      \ 1\n          test \"$(find \"$root\" -type f -name browser-console.log -size\
+      \ +0c | wc -l | tr -d ' ')\" -eq 1\n          test \"$(find \"$root\" -type\
+      \ f -name network-summary.log -size +0c | wc -l | tr -d ' ')\" -eq 1\n     \
+      \     test -s \"$root/db-path.txt\"; grep -Fx cleanup=clean \"$root/cleanup.txt\"\
+      ; test -s \"$root/sanitized-environment.txt\"\n          cat \"$output\"; exit\
+      \ 1\n      timeout_seconds: 300\n    expect: {outcome: red, exit_codes: [1],\
+      \ stdout_or_stderr: {contains_all: [{literal: '[RF-BUG-010] intentional failure\
+      \ retains complete artifacts'}, {literal: RF-BUG-010_SETUP=ready}, {literal:\
+      \ RF-BUG-010_ASSERTION_REACHED=ready}, {literal: 'RF-BUG-010_INTENTIONAL_ASSERTION:\
       \ artifact retention proof'}, {literal: RF-BUG-010_TEARDOWN=clean}], forbids:\
       \ [{literal: No tests found}, {literal: webServer failed}, {literal: authentication\
       \ failed}]}}\n    proves: [RF-BUG-010-CONTRACT]\nbindings:\n  expected_red:\n\
@@ -183052,12 +183097,12 @@ phases:
       \ downstream_check: rf_bug_005_browser_operations_green, receipt: RF-BUG-005-csp-operations-red-to-green}\n\
       \      - {requirement: RF-BUG-008, assertion_id: A-RF-BUG-008-LEDGER-BROWSER,\
       \ source_check: rf_bug_008_browser_expected_red, selector: {type: test_id, value:\
-      \ '[RF-BUG-008][320x800] groups remain operable without overflow'}, downstream_step:\
+      \ '[RF-BUG-008][320x800] Source Ledger responsive contract'}, downstream_step:\
       \ rf-bug-20260712-ledger-prompting.repair-source-ledger-responsive-groups, downstream_check:\
       \ rf_bug_008_green, receipt: RF-BUG-008-browser-red-to-green}\n      - {requirement:\
       \ RF-BUG-008, assertion_id: A-RF-BUG-008-LEDGER-OPERATIONS, source_check: rf_bug_008_operations_expected_red,\
-      \ selector: {type: test_id, value: '[RF-BUG-008][zh] independent row operations\
-      \ retain current status'}, downstream_step: rf-bug-20260712-ledger-prompting.repair-source-ledger-responsive-groups,\
+      \ selector: {type: test_id, value: '[RF-BUG-008] FETCH transitions and independent\
+      \ rows'}, downstream_step: rf-bug-20260712-ledger-prompting.repair-source-ledger-responsive-groups,\
       \ downstream_check: rf_bug_008_operations_green, receipt: RF-BUG-008-operations-red-to-green}\n\
       \      - {requirement: RF-BUG-009, assertion_id: A-RF-BUG-009-PROMPTING, source_check:\
       \ rf_bug_009_expected_red, selector: {type: test_id, value: TestRFBUG009PromptingV22Contract},\
@@ -183090,35 +183135,32 @@ phases:
       ,\"rf_bug_010_expected_red\",\"rf_bug_010_artifact_expected_red\",\"rf_bug_009_expected_red\"\
       ],\"acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\"\
       :\"authority:acceptance-mutation:rf008-responsive\",\"path\":\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\"\
-      ,\"purpose\":\"Define protected responsive contract and owned baselines\",\"\
-      check_id\":\"rf_bug_008_browser_expected_red\",\"actor_id\":\"contract-test-author\"\
-      },{\"ref\":\"authority:acceptance-mutation:rf008-operations\",\"path\":\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"\
-      ,\"purpose\":\"Define protected EN/ZH operational contract\",\"check_id\":\"\
-      rf_bug_008_operations_expected_red\",\"actor_id\":\"contract-test-author\"},{\"\
-      ref\":\"authority:acceptance-mutation:rf008-delete\",\"path\":\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
-      ,\"purpose\":\"Define protected delete/focus contract\",\"check_id\":\"rf_bug_008_browser_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf005-csp\"\
-      ,\"path\":\"web/tests/e2e/csp-operations.browser-contract.spec.ts\",\"purpose\"\
-      :\"Define protected CSP import and State operations\",\"check_id\":\"rf_bug_005_browser_operations_expected_red\"\
-      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf010-isolation\"\
-      ,\"path\":\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\",\"purpose\"\
-      :\"Define protected isolation contract\",\"check_id\":\"rf_bug_010_expected_red\"\
+      ,\"purpose\":\"Define exact responsive title and screenshot inventory\",\"check_id\"\
+      :\"rf_bug_008_browser_expected_red\",\"actor_id\":\"contract-test-author\"},{\"\
+      ref\":\"authority:acceptance-mutation:rf008-operations\",\"path\":\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"\
+      ,\"purpose\":\"Define exact operational title inventory\",\"check_id\":\"rf_bug_008_operations_expected_red\"\
+      ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf008-delete\"\
+      ,\"path\":\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\",\"\
+      purpose\":\"Define exact delete and focus title inventory\",\"check_id\":\"\
+      rf_bug_008_browser_expected_red\",\"actor_id\":\"contract-test-author\"},{\"\
+      ref\":\"authority:acceptance-mutation:rf005-csp\",\"path\":\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"\
+      ,\"purpose\":\"Define protected CSP import and State operations\",\"check_id\"\
+      :\"rf_bug_005_browser_operations_expected_red\",\"actor_id\":\"contract-test-author\"\
+      },{\"ref\":\"authority:acceptance-mutation:rf010-isolation\",\"path\":\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"\
+      ,\"purpose\":\"Define protected isolation contract\",\"check_id\":\"rf_bug_010_expected_red\"\
       ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf010-artifact-spec\"\
       ,\"path\":\"web/tests/e2e/harness-artifact.intentional-failure.spec.ts\",\"\
       purpose\":\"Define protected named intentional failure\",\"check_id\":\"rf_bug_010_artifact_expected_red\"\
       ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf010-artifact-config\"\
       ,\"path\":\"web/playwright.artifact-proof.config.ts\",\"purpose\":\"Define protected\
-      \ retained-artifact output contract\",\"check_id\":\"rf_bug_010_artifact_expected_red\"\
+      \ standard retained-artifact contract\",\"check_id\":\"rf_bug_010_artifact_expected_red\"\
       ,\"actor_id\":\"contract-test-author\"},{\"ref\":\"authority:acceptance-mutation:rf009-prompting\"\
       ,\"path\":\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\",\"\
-      purpose\":\"Define protected exact Prompting v2.2 contract\",\"check_id\":\"\
+      purpose\":\"Define exact Prompting v2.2 subtest inventory\",\"check_id\":\"\
       rf_bug_009_expected_red\",\"actor_id\":\"contract-test-author\"}]}}\n</vectl_step_policy>"
-    verification: Run seven intentional-red checks independently; require exact files/titles/counts
-      and intended assertions, including four exact RF-BUG-004 EN/ZH State-import
-      confirmation/cancellation titles, 320x800 among the five RF-BUG-008 viewports,
-      exact RF-BUG-009 Go collection, and ordered RF-BUG-010 setup/assertion/teardown
-      markers. Confirm baselines, token-free checklist, intentional-failure spec/config,
-      and every listed contract path are authorized then protected.
+    verification: Run all seven intentional-red checks independently. Require exact
+      RF-BUG-008 14-title/five-screenshot inventory, exact RF-BUG-009 16-subtest equality,
+      and ordered complete RF-BUG-010 expected-red standard artifact proof.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
