@@ -183947,34 +183947,37 @@ phases:
       \ web/playwright.artifact-proof.config.ts, web/src/lib/__tests__/workbench-route.test.ts,\
       \ web/src/routes/components/__tests__/source-ledger-responsive.test.ts, web/src/routes/**,\
       \ Dockerfile]\nclaims: [RF-BUG-010]\nchecks:\n  - id: rf_bug_010_green\n   \
-      \ run: {command: [bash, -lc, \"npm --prefix web exec playwright test -- --config\
-      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ --list tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep '^\\\\[RF-BUG-010\\\
-      \\]' | tee /tmp/rf010-green-list; c=$(grep -c '\\[RF-BUG-010\\]' /tmp/rf010-green-list);\
-      \ test $c -gt 0; npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
-      \ --project=chromium-ci-safe --retries=0 tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-010\\\\]' --reporter=line; echo RF_BUG_010_EXECUTED_COUNT=$c\"\
-      ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ run:\n      command:\n        - bash\n        - -lc\n        - |-\n      \
+      \  npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
+      \ --grep '^\\\\[RF-BUG-010\\\\]' | tee /tmp/rf010-green-list; c=$(grep -c '\\\
+      [RF-BUG-010\\]' /tmp/rf010-green-list); test $c -gt 0; npm --prefix web exec\
+      \ playwright test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
+      \ --retries=0 tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep '^\\\\\
+      [RF-BUG-010\\\\]' --reporter=line; echo RF_BUG_010_EXECUTED_COUNT=$c\n     \
+      \ timeout_seconds: 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: bugfix-ledger-e2e.expected-red.spec.ts}, {literal:\
       \ '[RF-BUG-010] mutating cases own isolated state and cleanup'}, {literal: RF_BUG_010_EXECUTED_COUNT=}],\
       \ forbids: [{literal: failed}, {literal: No tests found}, {literal: skipped},\
       \ {literal: retry}, {literal: leaked resource}]}}\n    proves: [RF-BUG-010]\n\
-      \  - id: rf_bug_010_old_list_green\n    run: {command: [bash, -lc, \"npm --prefix\
-      \ web exec playwright test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
-      \ tests/e2e/mobile-inspector-token-hydration.spec.ts tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
-      \ | tee web/.test-artifacts/rf-bug-010-old-list.txt; for f in search-click-inspector-contract.expected-red.spec.ts\
-      \ mobile-inspector-token-hydration.spec.ts source-ledger-navigation-regression.expected-red.spec.ts;\
-      \ do grep -F \\\"$f\\\" web/.test-artifacts/rf-bug-010-old-list.txt; done; c=$(grep\
-      \ -c '^.*›' web/.test-artifacts/rf-bug-010-old-list.txt); test $c -gt 0; echo\
-      \ RF_BUG_010_OLD_LIST_COUNT=$c\"], timeout_seconds: 300}\n    expect: {outcome:\
-      \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: search-click-inspector-contract.expected-red.spec.ts},\
-      \ {literal: mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
+      \  - id: rf_bug_010_old_list_green\n    run:\n      command:\n        - bash\n\
+      \        - -lc\n        - |-\n        npm --prefix web exec playwright test\
+      \ -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
+      \ --list tests/e2e/search-click-inspector-contract.expected-red.spec.ts tests/e2e/mobile-inspector-token-hydration.spec.ts\
+      \ tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts | tee web/.test-artifacts/rf-bug-010-old-list.txt;\
+      \ for f in search-click-inspector-contract.expected-red.spec.ts mobile-inspector-token-hydration.spec.ts\
+      \ source-ledger-navigation-regression.expected-red.spec.ts; do grep -F \"$f\"\
+      \ web/.test-artifacts/rf-bug-010-old-list.txt; done; c=$(grep -c '^.*›' web/.test-artifacts/rf-bug-010-old-list.txt);\
+      \ test $c -gt 0; echo RF_BUG_010_OLD_LIST_COUNT=$c\n      timeout_seconds: 300\n\
+      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: search-click-inspector-contract.expected-red.spec.ts}, {literal:\
+      \ mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
       \ {literal: RF_BUG_010_OLD_LIST_COUNT=}], forbids: [{literal: No tests found},\
       \ {literal: 0 tests}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_old_run_green\n\
-      \    run: {command: [bash, -lc, \"mkdir -p web/.test-artifacts; npm --prefix\
-      \ web exec playwright test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list --reporter=json tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     mkdir -p web/.test-artifacts; npm --prefix web exec playwright test --\
+      \ --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
+      \ --list --reporter=json tests/e2e/search-click-inspector-contract.expected-red.spec.ts\
       \ tests/e2e/mobile-inspector-token-hydration.spec.ts tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts\
       \ > web/.test-artifacts/rf-bug-010-old-list.json; npm --prefix web exec playwright\
       \ test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
@@ -183985,39 +183988,42 @@ phases:
       \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
       \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
       \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\nwhile\
-      \ stack:\n s=stack.pop(); stack.extend(s.get('suites',[])); tests.extend(t for\
-      \ p in s.get('specs',[]) for t in p.get('tests',[]));\nassert all(len(t.get('results',[]))==1\
-      \ and t['results'][0].get('status')=='passed' for t in tests); print('RF_BUG_010_OLD_RUN_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-old-list.json web/.test-artifacts/rf-bug-010-old-run.json\"\
-      ], timeout_seconds: 900}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
+      \       while stack:\n         s=stack.pop(); stack.extend(s.get('suites',[]));\
+      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
+      \       assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
+      \ for t in tests); print('RF_BUG_010_OLD_RUN_COUNT='+str(sum(A.values())))\"\
+      \ web/.test-artifacts/rf-bug-010-old-list.json web/.test-artifacts/rf-bug-010-old-run.json\n\
+      \      timeout_seconds: 900\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: search-click-inspector-contract.expected-red.spec.ts},\
       \ {literal: mobile-inspector-token-hydration.spec.ts}, {literal: source-ledger-navigation-regression.expected-red.spec.ts},\
       \ {literal: RF_BUG_010_OLD_RUN_COUNT=}], forbids: [{literal: failed}, {literal:\
       \ No tests found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-010]\n\
-      \  - id: rf_bug_010_replacement_list_green\n    run: {command: [bash, -lc, \"\
-      npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/inspector-selection.browser-contract.spec.ts\
+      \  - id: rf_bug_010_replacement_list_green\n    run:\n      command:\n     \
+      \   - bash\n        - -lc\n        - |-\n        npm --prefix web exec playwright\
+      \ test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --list tests/e2e/inspector-selection.browser-contract.spec.ts\
       \ tests/e2e/initial-route.browser-contract.spec.ts tests/e2e/routes.browser-contract.spec.ts\
       \ tests/e2e/source-ledger-responsive.browser-contract.spec.ts tests/e2e/source-ledger-delete.browser-contract.spec.ts\
       \ | tee web/.test-artifacts/rf-bug-010-replacement-list.txt; for f in inspector-selection.browser-contract.spec.ts\
       \ initial-route.browser-contract.spec.ts routes.browser-contract.spec.ts source-ledger-responsive.browser-contract.spec.ts\
-      \ source-ledger-delete.browser-contract.spec.ts; do grep -F \\\"$f\\\" web/.test-artifacts/rf-bug-010-replacement-list.txt;\
+      \ source-ledger-delete.browser-contract.spec.ts; do grep -F \"$f\" web/.test-artifacts/rf-bug-010-replacement-list.txt;\
       \ done; c=$(grep -c '^.*›' web/.test-artifacts/rf-bug-010-replacement-list.txt);\
-      \ test $c -gt 0; echo RF_BUG_010_REPLACEMENT_LIST_COUNT=$c\"], timeout_seconds:\
-      \ 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ test $c -gt 0; echo RF_BUG_010_REPLACEMENT_LIST_COUNT=$c\n      timeout_seconds:\
+      \ 300\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
       \ [{literal: inspector-selection.browser-contract.spec.ts}, {literal: initial-route.browser-contract.spec.ts},\
       \ {literal: routes.browser-contract.spec.ts}, {literal: source-ledger-responsive.browser-contract.spec.ts},\
       \ {literal: source-ledger-delete.browser-contract.spec.ts}, {literal: RF_BUG_010_REPLACEMENT_LIST_COUNT=}],\
       \ forbids: [{literal: No tests found}, {literal: 0 tests}]}}\n    proves: [RF-BUG-010]\n\
-      \  - id: rf_bug_010_replacement_run_green\n    run: {command: [bash, -lc, \"\
-      mkdir -p web/.test-artifacts; npm --prefix web exec playwright test -- --config\
-      \ ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0 --list\
-      \ --reporter=json tests/e2e/inspector-selection.browser-contract.spec.ts tests/e2e/initial-route.browser-contract.spec.ts\
-      \ tests/e2e/routes.browser-contract.spec.ts tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ tests/e2e/source-ledger-delete.browser-contract.spec.ts > web/.test-artifacts/rf-bug-010-replacement-list.json;\
+      \  - id: rf_bug_010_replacement_run_green\n    run:\n      command:\n      \
+      \  - bash\n        - -lc\n        - |-\n        mkdir -p web/.test-artifacts;\
       \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json tests/e2e/inspector-selection.browser-contract.spec.ts\
+      \ --project=chromium-ci-safe --retries=0 --list --reporter=json tests/e2e/inspector-selection.browser-contract.spec.ts\
+      \ tests/e2e/initial-route.browser-contract.spec.ts tests/e2e/routes.browser-contract.spec.ts\
+      \ tests/e2e/source-ledger-responsive.browser-contract.spec.ts tests/e2e/source-ledger-delete.browser-contract.spec.ts\
+      \ > web/.test-artifacts/rf-bug-010-replacement-list.json; npm --prefix web exec\
+      \ playwright test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --reporter=json tests/e2e/inspector-selection.browser-contract.spec.ts\
       \ tests/e2e/initial-route.browser-contract.spec.ts tests/e2e/routes.browser-contract.spec.ts\
       \ tests/e2e/source-ledger-responsive.browser-contract.spec.ts tests/e2e/source-ledger-delete.browser-contract.spec.ts\
       \ > web/.test-artifacts/rf-bug-010-replacement-run.json; python3 -c \"import\
@@ -184025,90 +184031,98 @@ phases:
       \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
       \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
       \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\nwhile\
-      \ stack:\n s=stack.pop(); stack.extend(s.get('suites',[])); tests.extend(t for\
-      \ p in s.get('specs',[]) for t in p.get('tests',[]));\nassert all(len(t.get('results',[]))==1\
-      \ and t['results'][0].get('status')=='passed' for t in tests); print('RF_BUG_010_REPLACEMENT_RUN_COUNT='+str(sum(A.values())))\"\
-      \ web/.test-artifacts/rf-bug-010-replacement-list.json web/.test-artifacts/rf-bug-010-replacement-run.json\"\
-      ], timeout_seconds: 1200}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: inspector-selection.browser-contract.spec.ts}, {literal:\
-      \ initial-route.browser-contract.spec.ts}, {literal: routes.browser-contract.spec.ts},\
+      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
+      \       while stack:\n         s=stack.pop(); stack.extend(s.get('suites',[]));\
+      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
+      \       assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
+      \ for t in tests); print('RF_BUG_010_REPLACEMENT_RUN_COUNT='+str(sum(A.values())))\"\
+      \ web/.test-artifacts/rf-bug-010-replacement-list.json web/.test-artifacts/rf-bug-010-replacement-run.json\n\
+      \      timeout_seconds: 1200\n    expect: {outcome: green, exit_codes: [0],\
+      \ stdout_or_stderr: {contains_all: [{literal: inspector-selection.browser-contract.spec.ts},\
+      \ {literal: initial-route.browser-contract.spec.ts}, {literal: routes.browser-contract.spec.ts},\
       \ {literal: source-ledger-responsive.browser-contract.spec.ts}, {literal: source-ledger-delete.browser-contract.spec.ts},\
       \ {literal: RF_BUG_010_REPLACEMENT_RUN_COUNT=}], forbids: [{literal: failed},\
       \ {literal: No tests found}, {literal: skipped}, {literal: retry}]}}\n    proves:\
-      \ [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_1_green\n    run: {command:\
-      \ [bash, -lc, \"mkdir -p web/.test-artifacts; mkdir -p web/.test-artifacts;\
-      \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --list --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-1.json;\
-      \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
-      \ --project=chromium-ci-safe --retries=0 --reporter=json  > web/.test-artifacts/rf-bug-010-full-run-1.json;\
+      \ [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_1_green\n    run:\n      command:\n\
+      \        - bash\n        - -lc\n        - |-\n        mkdir -p web/.test-artifacts;\
+      \ mkdir -p web/.test-artifacts; npm --prefix web exec playwright test -- --config\
+      \ ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0 --list\
+      \ --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-1.json; npm --prefix\
+      \ web exec playwright test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
+      \ --retries=0 --reporter=json  > web/.test-artifacts/rf-bug-010-full-run-1.json;\
       \ python3 -c \"import json,collections,sys; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
       \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
       \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
       \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\nwhile\
-      \ stack:\n s=stack.pop(); stack.extend(s.get('suites',[])); tests.extend(t for\
-      \ p in s.get('specs',[]) for t in p.get('tests',[]));\nassert all(len(t.get('results',[]))==1\
-      \ and t['results'][0].get('status')=='passed' for t in tests); print('RF_BUG_010_FULL_RUN_1_TITLE_COUNT='+str(sum(A.values())))\"\
+      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
+      \       while stack:\n         s=stack.pop(); stack.extend(s.get('suites',[]));\
+      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
+      \       assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
+      \ for t in tests); print('RF_BUG_010_FULL_RUN_1_TITLE_COUNT='+str(sum(A.values())))\"\
       \ web/.test-artifacts/rf-bug-010-full-list-1.json web/.test-artifacts/rf-bug-010-full-run-1.json\"\
-      \"], timeout_seconds: 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: RF_BUG_010_FULL_RUN_1_TITLE_COUNT=}, {literal: '[RF-BUG-002][en]\
-      \ TODAY cold load and refresh'}, {literal: '[RF-BUG-010] mutating cases own\
-      \ isolated state and cleanup'}], forbids: [{literal: failed}, {literal: skipped},\
-      \ {literal: flaky}, {literal: retry}, {literal: No tests found}]}}\n    proves:\
-      \ [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_2_green\n    run: {command:\
-      \ [bash, -lc, \"mkdir -p web/.test-artifacts; npm --prefix web exec playwright\
-      \ test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-2.json;\
+      \n      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
+      \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_1_TITLE_COUNT=},\
+      \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
+      \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
+      \ {literal: skipped}, {literal: flaky}, {literal: retry}, {literal: No tests\
+      \ found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_2_green\n\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     mkdir -p web/.test-artifacts; npm --prefix web exec playwright test --\
+      \ --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
+      \ --list --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-2.json;\
       \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
       \ --project=chromium-ci-safe --retries=0 --reporter=json  > web/.test-artifacts/rf-bug-010-full-run-2.json;\
       \ python3 -c \"import json,collections,sys; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
       \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
       \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
       \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\nwhile\
-      \ stack:\n s=stack.pop(); stack.extend(s.get('suites',[])); tests.extend(t for\
-      \ p in s.get('specs',[]) for t in p.get('tests',[]));\nassert all(len(t.get('results',[]))==1\
-      \ and t['results'][0].get('status')=='passed' for t in tests); print('RF_BUG_010_FULL_RUN_2_TITLE_COUNT='+str(sum(A.values())))\"\
+      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
+      \       while stack:\n         s=stack.pop(); stack.extend(s.get('suites',[]));\
+      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
+      \       assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
+      \ for t in tests); print('RF_BUG_010_FULL_RUN_2_TITLE_COUNT='+str(sum(A.values())))\"\
       \ web/.test-artifacts/rf-bug-010-full-list-2.json web/.test-artifacts/rf-bug-010-full-run-2.json\"\
-      \"], timeout_seconds: 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: RF_BUG_010_FULL_RUN_2_TITLE_COUNT=}, {literal: '[RF-BUG-002][en]\
-      \ TODAY cold load and refresh'}, {literal: '[RF-BUG-010] mutating cases own\
-      \ isolated state and cleanup'}], forbids: [{literal: failed}, {literal: skipped},\
-      \ {literal: flaky}, {literal: retry}, {literal: No tests found}]}}\n    proves:\
-      \ [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_3_green\n    run: {command:\
-      \ [bash, -lc, \"mkdir -p web/.test-artifacts; npm --prefix web exec playwright\
-      \ test -- --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-3.json;\
+      \n      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
+      \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_2_TITLE_COUNT=},\
+      \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
+      \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
+      \ {literal: skipped}, {literal: flaky}, {literal: retry}, {literal: No tests\
+      \ found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_run_3_green\n\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     mkdir -p web/.test-artifacts; npm --prefix web exec playwright test --\
+      \ --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0\
+      \ --list --reporter=json  > web/.test-artifacts/rf-bug-010-full-list-3.json;\
       \ npm --prefix web exec playwright test -- --config ./playwright.ci-safe.config.ts\
       \ --project=chromium-ci-safe --retries=0 --reporter=json  > web/.test-artifacts/rf-bug-010-full-run-3.json;\
       \ python3 -c \"import json,collections,sys; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
       \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
       \ for s in ss),[]); a=json.load(open(sys.argv[1])); b=json.load(open(sys.argv[2]));\
       \ A=collections.Counter(walk(a.get('suites',[]))); B=collections.Counter(walk(b.get('suites',[])));\
-      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\nwhile\
-      \ stack:\n s=stack.pop(); stack.extend(s.get('suites',[])); tests.extend(t for\
-      \ p in s.get('specs',[]) for t in p.get('tests',[]));\nassert all(len(t.get('results',[]))==1\
-      \ and t['results'][0].get('status')=='passed' for t in tests); print('RF_BUG_010_FULL_RUN_3_TITLE_COUNT='+str(sum(A.values())))\"\
+      \ assert A and A==B,(A-B,B-A); tests=[]; stack=list(b.get('suites',[]));\n \
+      \       while stack:\n         s=stack.pop(); stack.extend(s.get('suites',[]));\
+      \ tests.extend(t for p in s.get('specs',[]) for t in p.get('tests',[]));\n \
+      \       assert all(len(t.get('results',[]))==1 and t['results'][0].get('status')=='passed'\
+      \ for t in tests); print('RF_BUG_010_FULL_RUN_3_TITLE_COUNT='+str(sum(A.values())))\"\
       \ web/.test-artifacts/rf-bug-010-full-list-3.json web/.test-artifacts/rf-bug-010-full-run-3.json\"\
-      \"], timeout_seconds: 1800}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
-      \ {contains_all: [{literal: RF_BUG_010_FULL_RUN_3_TITLE_COUNT=}, {literal: '[RF-BUG-002][en]\
-      \ TODAY cold load and refresh'}, {literal: '[RF-BUG-010] mutating cases own\
-      \ isolated state and cleanup'}], forbids: [{literal: failed}, {literal: skipped},\
-      \ {literal: flaky}, {literal: retry}, {literal: No tests found}]}}\n    proves:\
-      \ [RF-BUG-010]\n  - id: rf_bug_010_full_suite_title_set_compare_green\n    run:\
-      \ {command: [bash, -lc, \"python3 -c \"import json,collections; walk=lambda\
-      \ ss:[(p.get('file',''),p.get('title',''),t.get('projectName','')) for s in\
-      \ ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
+      \n      timeout_seconds: 1800\n    expect: {outcome: green, exit_codes: [0],\
+      \ stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_FULL_RUN_3_TITLE_COUNT=},\
+      \ {literal: '[RF-BUG-002][en] TODAY cold load and refresh'}, {literal: '[RF-BUG-010]\
+      \ mutating cases own isolated state and cleanup'}], forbids: [{literal: failed},\
+      \ {literal: skipped}, {literal: flaky}, {literal: retry}, {literal: No tests\
+      \ found}]}}\n    proves: [RF-BUG-010]\n  - id: rf_bug_010_full_suite_title_set_compare_green\n\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
+      \     python3 -c \"import json,collections; walk=lambda ss:[(p.get('file',''),p.get('title',''),t.get('projectName',''))\
+      \ for s in ss for p in s.get('specs',[]) for t in p.get('tests',[])]+sum((walk(s.get('suites',[]))\
       \ for s in ss),[]); cs=[]; [cs.extend([collections.Counter(walk(json.load(open(f'web/.test-artifacts/rf-bug-010-full-list-{i}.json'))['suites'])),collections.Counter(walk(json.load(open(f'web/.test-artifacts/rf-bug-010-full-run-{i}.json'))['suites']))])\
       \ for i in (1,2,3)]; assert cs[0] and all(c==cs[0] for c in cs[1:]); print(f'RF_BUG_010_IDENTICAL_EXECUTED_TITLE_MULTISET_COUNT={sum(cs[0].values())}\
-      \ RUNS=3')\"\"], timeout_seconds: 120}\n    expect: {outcome: green, exit_codes:\
+      \ RUNS=3')\"\n      timeout_seconds: 120\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: RF_BUG_010_IDENTICAL_EXECUTED_TITLE_MULTISET_COUNT=},\
       \ {literal: RUNS=3}], forbids: [{literal: AssertionError}, {literal: differ}]}}\n\
-      \    proves: [RF-BUG-010]\n  - id: rf_bug_010_artifact_proof_green\n    run:\
-      \ {command: [bash, -lc, \"rm -rf web/.test-artifacts/rf-bug-010-intentional-failure;\
-      \ mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure; output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt;\
-      \ set +e; npm --prefix web exec playwright test -- --config ./playwright.artifact-proof.config.ts\
+      \    proves: [RF-BUG-010]\n  - id: rf_bug_010_artifact_proof_green\n    run:\n\
+      \      command:\n        - bash\n        - -lc\n        - |-\n        rm -rf\
+      \ web/.test-artifacts/rf-bug-010-intentional-failure; mkdir -p web/.test-artifacts/rf-bug-010-intentional-failure;\
+      \ output=web/.test-artifacts/rf-bug-010-intentional-failure-output.txt; set\
+      \ +e; npm --prefix web exec playwright test -- --config ./playwright.artifact-proof.config.ts\
       \ --project=chromium-ci-safe --retries=0 tests/e2e/harness-artifact.intentional-failure.spec.ts\
       \ --grep '^\\[RF-BUG-010\\] intentional failure retains complete artifacts$'\
       \ >\"$output\" 2>&1; status=$?; set -e; test $status -eq 1; grep -F '[RF-BUG-010]\
@@ -184122,8 +184136,8 @@ phases:
       \ -type f -name '*.webm' | wc -l | tr -d ' ')\" -eq 1; test \"$(find web/.test-artifacts/rf-bug-010-intentional-failure\
       \ -type f -name '*.png' | wc -l | tr -d ' ')\" -ge 1; for f in server.log browser-console.log\
       \ network-summary.log; do test \"$(find web/.test-artifacts/rf-bug-010-intentional-failure\
-      \ -type f -name $f -size +0c | wc -l | tr -d ' ')\" -eq 1; done; echo RF_BUG_010_ARTIFACTS=trace:1,video:1,screenshot:positive,server:1,browser:1,network:1\"\
-      ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ -type f -name $f -size +0c | wc -l | tr -d ' ')\" -eq 1; done; echo RF_BUG_010_ARTIFACTS=trace:1,video:1,screenshot:positive,server:1,browser:1,network:1\n\
+      \      timeout_seconds: 600\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: '[RF-BUG-010] intentional failure retains complete\
       \ artifacts'}, {literal: RF-BUG-010_SETUP=ready}, {literal: RF-BUG-010_ASSERTION_REACHED=ready},\
       \ {literal: 'RF-BUG-010_INTENTIONAL_ASSERTION: artifact retention proof'}, {literal:\
