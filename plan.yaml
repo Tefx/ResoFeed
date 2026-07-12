@@ -183614,24 +183614,20 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-009. Implement one v2.2 compiler/validator path across ingest, library\
-      \ reprocess, selected-item re-ingest, HTTP, and MCP. Emit the versioned payload;\
-      \ use selected-model structured-output support without silent model substitution;\
-      \ permit only the documented pre-generation schema-mode downgrade; apply exact\
-      \ shape and semantic validation; allow one normal generation plus at most one\
-      \ semantic repair; preserve usable content and atomic item/FTS state on failure.\
-      \ Align active runtime/test/fixture/error names and Architecture/Prompting docs\
-      \ only after behavior passes. Rollback reverts code, tests, fixtures, names,\
-      \ and docs together. OpenRouter remains a JSON transformer; prompts, provider\
-      \ bodies, model overrides, and credentials never enter SQLite, State, diagnostics,\
-      \ or logs. No migration or provider abstraction is added.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/prompting.go, internal/resofeed/prompting_test.go,\
+      \ reprocess, selected-item re-ingest, HTTP, and MCP. Use selected-model structured-output\
+      \ support without silent model substitution; allow one generation plus at most\
+      \ one semantic repair; preserve usable content and atomic item/FTS state on\
+      \ failure. Rollback reverts code, tests, fixtures, names, and docs together.\
+      \ Prompts, provider bodies, model overrides, and credentials never enter SQLite,\
+      \ State, diagnostics, or logs.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope: {allowed_paths: [internal/resofeed/prompting.go, internal/resofeed/prompting_test.go,\
       \ internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go, internal/resofeed/ingest.go,\
       \ internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go, internal/resofeed/reprocess_test.go,\
       \ internal/resofeed/reingest.go, internal/resofeed/reingest_test.go, internal/resofeed/http.go,\
       \ internal/resofeed/mcp.go, internal/resofeed/testdata/prompting_v22/**, docs/PROMPTING_SYSTEM.md,\
-      \ docs/ARCHITECTURE.md]\n  blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
-      \ web/tests/**, docs/audits/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md]\n\
+      \ docs/ARCHITECTURE.md], blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
+      \ web/tests/**, docs/audits/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md]}\n\
       claims: [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run: {command:\
       \ [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG009PromptingV22Contract$,\
       \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
@@ -183639,8 +183635,9 @@ phases:
       \ {literal: single_semantic_repair_bound}, {literal: library_reprocess_path},\
       \ {literal: mcp_path}], contains_any: [], forbids: [{literal: FAIL}, {literal:\
       \ no tests to run}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009]\n\
-      \  - id: rf_bug_009_parity_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
-      \ -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$',\
+      \    binding_selector: {kind: go_test_run, package: ./internal/resofeed, run:\
+      \ ^TestRFBUG009PromptingV22Contract$}\n  - id: rf_bug_009_parity_green\n   \
+      \ run: {command: [go, test, -v, ./internal/resofeed, -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$',\
       \ -count=1], timeout_seconds: 420}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: TestPromptingV22Payload},\
       \ {literal: TestPromptingV22Repair}, {literal: TestMCPV22}], contains_any: [],\
@@ -183660,11 +183657,10 @@ phases:
       \ {literal: TestPromptingV22Validation}, {literal: TestPromptingV22Repair},\
       \ {literal: TestPromptingV22Persistence}], contains_any: [], forbids: [{literal:\
       \ FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-009]\nbindings:\n\
-      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red,\
-      \ source_check: rf_bug_009_expected_red, requirement: RF-BUG-009, assertion_id:\
-      \ A-RF-BUG-009-PROMPTING, downstream_check: rf_bug_009_green, receipt: RF-BUG-009-red-to-green}\n\
-      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
-      ,\"step_id\":\"rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics\"\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {requirement_id:\
+      \ RF-BUG-009, source_step: rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red,\
+      \ downstream_check: rf_bug_009_green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"runtime_prompt_contract\",\"cross_component_behavior\"\
       ,\"persistence_behavior\"],\"primary_outcome\":\"RF-BUG-009\",\"rollback_class\"\
       :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/prompting_test.go\"\
