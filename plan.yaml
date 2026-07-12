@@ -182973,6 +182973,36 @@ phases:
     depends_on:
     - runtime-assets-opml-security-expected-red
     agent: contract-test-author
+  - id: rf-bug-contract-lock-full-gate
+    name: RF-BUG contract-lock phase Full Gate
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Terminal bounded phase Full Gate for `rf-bug-20260712-contract-lock`. Repository
+      mutation is absent because this gate only re-runs the phase''s existing canonical
+      documentation predicate and protected expected-red collection/assertion checks,
+      then records normal plan-assurance metadata. Reuse only `canonical_runtime_docs_green`,
+      `rf_bug_001_expected_red`, `rf_bug_002_expected_red`, `rf_bug_002_route_unit_expected_red`,
+      `rf_bug_002_api_expected_red`, `rf_bug_003_expected_red`, `rf_bug_004_expected_red`,
+      `rf_bug_005_expected_red`, `rf_bug_005_browser_operations_expected_red`, `rf_bug_008_browser_expected_red`,
+      `rf_bug_008_operations_expected_red`, `rf_bug_009_expected_red`, `rf_bug_010_expected_red`,
+      and `rf_bug_010_artifact_expected_red`. Require exact positive collection, intended
+      red assertions, protected-path authority, and canonical-doc scan success. Do
+      not add or modify product code, runtime behavior or processes, storage models,
+      registries, manifests, custom evidence protocols, deployment requirements, acceptance
+      artifacts, or canonical product architecture.'
+    verification: All existing contract-lock checks reach their declared outcomes
+      with exact collection/count evidence; `vectl validate --check-refs` and phase
+      intent-closure lint are conformant; git product/docs/test diff remains unchanged
+      by this gate.
+    depends_on:
+    - frontend-state-route-a11y-expected-red
+    - runtime-assets-opml-security-expected-red
+    - ledger-prompting-e2e-expected-red
+    agent: gate-reviewer
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
