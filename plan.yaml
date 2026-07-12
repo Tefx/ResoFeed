@@ -183793,7 +183793,7 @@ phases:
   - id: rf-bug-ledger-prompting-full-gate
     name: RF-BUG ledger-prompting phase Full Gate
     status: pending
-    description: 'step_type: verification
+    description: 'step_type: gate
 
       repo_change_policy: no_repo_change
 
