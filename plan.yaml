@@ -8,7 +8,7 @@
 # =============================================================
 version: 1
 project: ResoFeed
-strategy_ref: docs/BUG_FIX_PLAN_2026-07-12.md sha256:67b6df6a7f3369c57fcf9140485e3e48a4b3ca6b636d5a6447f1cf643b4061fc
+strategy_ref: docs/BUG_FIX_PLAN_2026-07-12.md sha256:520f59d57d8e634816714d7dce9a373955ff2b0960bb230d2909050080f99dfd
 context: 'RF-BUG-001–010 managed repair plan reconciled to the reviewed 2026-07-12
   authority. Vectl structure is reconciled; contract lock and canonical corrections
   remain pending; implementation is not ready. Preserve completed history and the
