@@ -183509,39 +183509,36 @@ phases:
       \ rather than weakening policy. Never use unsafe-inline, duplicate header owners,\
       \ or secret-bearing evidence.\n\n<intent_closure_contract>\nschema_version:\
       \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths:\n    - internal/resofeed/http.go\n    - internal/resofeed/http_security.go\n\
-      \    - internal/resofeed/http_security_test.go\n    - internal/resofeed/webui/**\n\
-      \    - docs/ARCHITECTURE.md\n    - docs/CONTAINER.md\n  blocked_paths:\n   \
-      \ - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n    - web/tests/e2e/csp-operations.browser-contract.spec.ts\n\
-      \    - deploy/**\n    - web/src/**\nclaims:\n  - RF-BUG-005\nchecks:\n  - id:\
-      \ rf_bug_005_green\n    run:\n      command: [go, test, -v, ./internal/resofeed,\
-      \ -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$, -count=1]\n\
-      \      timeout_seconds: 300\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13},\
+      scope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
+      \ internal/resofeed/http_security_test.go, internal/resofeed/webui/**, docs/ARCHITECTURE.md,\
+      \ docs/CONTAINER.md]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ web/tests/e2e/csp-operations.browser-contract.spec.ts, deploy/**, web/src/**]\n\
+      claims: [RF-BUG-005]\nchecks:\n  - id: rf_bug_005_green\n    run: {command:\
+      \ [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$,\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13},\
       \ {literal: csp_exact_executable_hashes}, {literal: multi_flush_streaming},\
-      \ {literal: request_cancellation}]\n        contains_any: []\n        forbids:\
-      \ [{literal: unsafe-inline}, {literal: FAIL}, {literal: no tests to run}]\n\
-      \    proves: [RF-BUG-005]\n  - id: rf_bug_005_local_stream_green\n    run:\n\
-      \      command: [go, test, -v, ./internal/resofeed, -run, '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$',\
-      \ -count=1]\n      timeout_seconds: 240\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ TestSecurityHeaders}, {literal: TestSecurityStreamingCancellation}, {literal:\
-      \ TestCSP}]\n        contains_any: []\n        forbids: [{literal: FAIL}, {literal:\
-      \ no tests to run}]\n    proves: [RF-BUG-005]\n  - id: rf_bug_005_browser_operations_green\n\
-      \    run:\n      command: [bash, -lc, \"npm --prefix web exec -- playwright\
-      \ test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts --grep '^\\\
-      \\[RF-BUG-005\\\\] CSP operations import and State export import download$'\"\
-      ]\n      timeout_seconds: 600\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: CSP operations\
-      \ import and State export import download}]\n        contains_any: [{literal:\
-      \ passed}]\n        forbids: [{literal: failed}, {literal: CSP violation}, {literal:\
-      \ blocked resource}, {literal: retry}]\n    proves: [RF-BUG-005]\nbindings:\n\
-      \  expected_red:\n    items: []\n  closes_expected_red:\n    - {source_step:\
-      \ rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red, source_check:\
-      \ rf_bug_005_expected_red, requirement: RF-BUG-005, assertion_id: A-RF-BUG-005-SECURITY,\
-      \ downstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n  \
-      \  - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ {literal: request_cancellation}], contains_any: [], forbids: [{literal: unsafe-inline},\
+      \ {literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-005]\n\
+      \  - id: rf_bug_005_local_stream_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$',\
+      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestSecurityHeaders}, {literal:\
+      \ TestSecurityStreamingCancellation}, {literal: TestCSP}], contains_any: [],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-005]\n\
+      \  - id: rf_bug_005_browser_operations_green\n    run: {command: [bash, -lc,\
+      \ \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts\
+      \ --grep '^\\\\[RF-BUG-005\\\\] CSP operations import and State export import\
+      \ download$'\"], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: CSP operations import and\
+      \ State export import download}], contains_any: [{literal: passed}], forbids:\
+      \ [{literal: failed}, {literal: CSP violation}, {literal: blocked resource},\
+      \ {literal: retry}]}}\n    proves: [RF-BUG-005]\nbindings:\n  expected_red:\
+      \ {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ source_check: rf_bug_005_expected_red, requirement: RF-BUG-005, assertion_id:\
+      \ A-RF-BUG-005-SECURITY, downstream_check: rf_bug_005_green, receipt: RF-BUG-005-red-to-green}\n\
+      \    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
       \ source_check: rf_bug_005_browser_operations_expected_red, requirement: RF-BUG-005,\
       \ assertion_id: A-RF-BUG-005-CSP-OPERATIONS, downstream_check: rf_bug_005_browser_operations_green,\
       \ receipt: RF-BUG-005-csp-operations-red-to-green}\n</intent_closure_contract>\n\
@@ -183549,10 +183546,7 @@ phases:
       :\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
       ,\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
-      :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
-      ],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\":[\"software-architect\"\
-      ,\"integration-verifier\"],\"review_mode\":\"ADJUDICATED\",\"phase_full_gate_required\"\
-      :true,\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
+      :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ,\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
       :[\"rf_bug_005_green\",\"rf_bug_005_browser_operations_green\"],\"acceptance_mutation\"\
