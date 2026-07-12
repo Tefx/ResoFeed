@@ -183421,30 +183421,35 @@ phases:
       \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go, internal/resofeed/state.go,\
       \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
       \ web/tests/**, docs/audits/**, plan.yaml]\nclaims: [RF-BUG-004]\nchecks:\n\
-      \  - id: rf_bug_004_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
-      \ -run, ^TestRFBUG004OPMLImportOnlyContract$, -count=1], timeout_seconds: 240}\n\
-      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/legacy_export_auth_precedence'},\
+      \  - id: rf_bug_004_green\n    run: {command: [bash, -lc, \"go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \ ./internal/resofeed | tee /tmp/rf004-green-list; test $(grep -Fxc 'TestRFBUG004OPMLImportOnlyContract'\
+      \ /tmp/rf004-green-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG004OPMLImportOnlyContract$'\
+      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/legacy_export_auth_precedence'},\
       \ {literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/import_and_JSON_State_remain_green'},\
       \ {literal: RF_BUG_004_SUBTESTS=}, {literal: '--- PASS: TestRFBUG004OPMLImportOnlyContract'}],\
       \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
       \ to run]'}]}}\n    proves: [RF-BUG-004]\n  - id: rf_bug_004_active_scan_green\n\
-      \    run: {command: [bash, -lc, \"if git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML'\
-      \ -- cmd internal web/src web/tests docs web/package.json web/package-lock.json\
-      \ go.mod go.sum bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
-      \ ':(exclude)docs/BUG_FIX_PLAN_2026-07-12.md' ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
-      \ ':(exclude)web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts'; then exit\
-      \ 1; else echo OPML_ACTIVE_SCOPE_COUNT=10 OPML_ACTIVE_SCAN_MATCHES=0 EXCLUSIONS=4;\
-      \ fi\"], timeout_seconds: 180}\n    expect: {outcome: green, exit_codes: [0],\
-      \ stdout_or_stderr: {contains_all: [{literal: OPML_ACTIVE_SCOPE_COUNT=10}, {literal:\
-      \ OPML_ACTIVE_SCAN_MATCHES=0}, {literal: EXCLUSIONS=4}], forbids: [{literal:\
-      \ docs/audits}, {literal: broad exclusion}]}}\n    proves: [RF-BUG-004]\nbindings:\n\
-      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
-      \ source_check: rf_bug_004_expected_red, requirement: RF-BUG-004, assertion_id:\
-      \ A-RF-BUG-004-IMPORT-ONLY, downstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n\
-      </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
-      ,\"step_id\":\"rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_api_removal\",\"cross_component_contract\"\
+      \    run: {command: [bash, -lc, \"matches=$(mktemp); set +e; git grep -nEiI\
+      \ 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML' -- cmd internal web/src web/tests docs\
+      \ web/package.json web/package-lock.json go.mod go.sum bin deploy Dockerfile\
+      \ .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md' ':(exclude)docs/BUG_FIX_PLAN_2026-07-12.md'\
+      \ ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
+      \ ':(exclude)web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts' >\"$matches\"\
+      ; status=$?; set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"\
+      ; exit 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f \"$matches\"\
+      ; exit \"$status\";; esac; echo OPML_ACTIVE_SCOPE_COUNT=10 OPML_ACTIVE_SCAN_MATCHES=0\
+      \ EXCLUSIONS=4\"], timeout_seconds: 180}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: OPML_ACTIVE_SCOPE_COUNT=10},\
+      \ {literal: OPML_ACTIVE_SCAN_MATCHES=0}, {literal: EXCLUSIONS=4}], forbids:\
+      \ [{literal: docs/audits}, {literal: broad exclusion}]}}\n    proves: [RF-BUG-004]\n\
+      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step:\
+      \ rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red, source_check:\
+      \ rf_bug_004_expected_red, requirement: RF-BUG-004, assertion_id: A-RF-BUG-004-IMPORT-ONLY,\
+      \ downstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
+      :\"rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface\",\"\
+      risk_tier\":\"R2\",\"risk_reasons\":[\"public_api_removal\",\"cross_component_contract\"\
       ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
       :[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
       ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
