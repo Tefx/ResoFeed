@@ -183189,36 +183189,42 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-004. Consume the canonical ARCHITECTURE/DESIGN correction, then remove\
-      \ active OPML export from Go, HTTP, MCP parity, client, UI, tests, package/config/deployment\
-      \ surfaces, and English docs while preserving POST import-opml and atomic JSON\
-      \ State backup/restore. Unauthenticated legacy export returns canonical 401;\
-      \ authenticated returns canonical 404. Keep only the four named evidence exclusions\
-      \ in the scan; no broad test/doc exclusion, replacement exfiltration, sync,\
-      \ merge, or history surface. Protected acceptance is immutable. Recovery reverts\
-      \ endpoint/client/UI/docs/tests; state data remains unchanged.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_impl_test.go,\
-      \ internal/resofeed/mcp.go, web/src/lib/api-client.ts, web/src/lib/api-client.test.ts,\
-      \ web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
+      \ RF-BUG-004. Start after embedded UI so shared http/docs paths are serialized.\
+      \ Remove active OPML export from Go, HTTP, MCP, client, UI, tests, package/build/deploy\
+      \ surfaces, and active docs while preserving authenticated POST import-opml\
+      \ and atomic JSON State backup/restore. Legacy export remains auth-first: unauthenticated\
+      \ 401, authenticated 404. Run the exact active-tree gate over cmd/internal/web/src/web/tests/docs/manifests/build/deploy\
+      \ and detect both word orders in every case with regex `OPML.{0,80}EXPORT|EXPORT.{0,80}OPML`.\
+      \ Exclude exactly the four reviewed paths; the token-free migration checklist\
+      \ is not excluded. Protected expected-red/browser artifacts and state.go are\
+      \ immutable. Recovery reverts implementation/docs; stored state is unchanged.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [internal/resofeed/http.go,\
+      \ internal/resofeed/http_impl_test.go, internal/resofeed/mcp.go, web/src/lib/api-client.ts,\
+      \ web/src/lib/api-client.test.ts, web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
       \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/USAGE.md, docs/ui-preview.html]\n\
       \  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
-      \ internal/resofeed/state.go, plan.yaml, docs/audits/**]\nclaims: [RF-BUG-004]\n\
-      checks:\n  - id: rf_bug_004_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
-      \ -run, TestRFBugRuntimeContract/RF-BUG-004, -count=1], timeout_seconds: 180}\n\
+      \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go, internal/resofeed/state.go,\
+      \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
+      \ web/tests/**, docs/audits/**, plan.yaml]\nclaims: [RF-BUG-004]\nchecks:\n\
+      \  - id: rf_bug_004_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, ^TestRFBUG004OPMLImportOnlyContract$, -count=1], timeout_seconds: 240}\n\
       \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: '--- PASS: TestRFBugRuntimeContract/RF-BUG-004'}], forbids: [{literal:\
-      \ FAIL}, {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n   \
-      \ proves: [RF-BUG-004]\n  - id: rf_bug_004_active_scan_green\n    run: {command:\
-      \ [bash, -lc, \"if git grep -n -E 'export-opml|Export OPML|EXPORT OPML' -- cmd\
-      \ internal web/src web/tests docs '*.mod' '*.sum' 'package*.json' 'web/package*.json'\
-      \ scripts Dockerfile 'Dockerfile*' deploy ':!docs/BUG_REPORT_2026-07-11.md'\
-      \ ':!docs/BUG_FIX_PLAN_2026-07-12.md' ':!internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
-      \ ':!web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts'; then exit 1; else\
-      \ echo OPML_ACTIVE_SCAN_MATCHES=0; fi\"], timeout_seconds: 180}\n    expect:\
-      \ {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal:\
-      \ OPML_ACTIVE_SCAN_MATCHES=0}], forbids: [{literal: export-opml}, {literal:\
-      \ Export OPML}, {literal: EXPORT OPML}]}}\n    proves: [RF-BUG-004]\nbindings:\n\
+      \ [{literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/legacy_export_auth_precedence'},\
+      \ {literal: '=== RUN   TestRFBUG004OPMLImportOnlyContract/import_and_JSON_State_remain_green'},\
+      \ {literal: RF_BUG_004_SUBTESTS=}, {literal: '--- PASS: TestRFBUG004OPMLImportOnlyContract'}],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
+      \ to run]'}]}}\n    proves: [RF-BUG-004]\n  - id: rf_bug_004_active_scan_green\n\
+      \    run: {command: [bash, -lc, \"if git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML'\
+      \ -- cmd internal web/src web/tests docs web/package.json web/package-lock.json\
+      \ go.mod go.sum bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
+      \ ':(exclude)docs/BUG_FIX_PLAN_2026-07-12.md' ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
+      \ ':(exclude)web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts'; then exit\
+      \ 1; else echo OPML_ACTIVE_SCOPE_COUNT=10 OPML_ACTIVE_SCAN_MATCHES=0 EXCLUSIONS=4;\
+      \ fi\"], timeout_seconds: 180}\n    expect: {outcome: green, exit_codes: [0],\
+      \ stdout_or_stderr: {contains_all: [{literal: OPML_ACTIVE_SCOPE_COUNT=10}, {literal:\
+      \ OPML_ACTIVE_SCAN_MATCHES=0}, {literal: EXCLUSIONS=4}], forbids: [{literal:\
+      \ docs/audits}, {literal: broad exclusion}]}}\n    proves: [RF-BUG-004]\nbindings:\n\
       \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
       \ source_check: rf_bug_004_expected_red, requirement: RF-BUG-004, assertion_id:\
       \ A-RF-BUG-004-IMPORT-ONLY, downstream_check: rf_bug_004_green, receipt: RF-BUG-004-red-to-green}\n\
@@ -183228,15 +183234,14 @@ phases:
       ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\"\
       :[\"TEST\",\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"spec-verifier\"\
       ,\"additional_verifiers\":[\"integration-verifier\"],\"review_mode\":\"INDEPENDENT\"\
-      ,\"phase_full_gate_required\":false,\"test_authority\":{\"developer_test_globs\"\
+      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
       :[\"internal/resofeed/http_impl_test.go\",\"web/src/lib/api-client.test.ts\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_004_green\"],\"acceptance_mutation\":\"\
       FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run the exact protected verbose subtest, Go/client tests, and complete
-      tracked active-surface scan. Require named collection, unauthorized 401/authenticated
-      404, import and JSON State green, zero active matches, and only the four named
-      evidence exclusions.
+    verification: Require exact protected test/subtest collection, 401/404 auth precedence,
+      import and JSON State green, exact active scope, both word orders/cases, zero
+      matches outside exactly four exclusions, and zero protected-artifact diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -183245,6 +183250,8 @@ phases:
     - docs/DESIGN.md
     - docs/USAGE.md
     - docs/ui-preview.html
+    depends_on:
+    - embed-ui-assets-in-single-binary
     agent: integration-engineer
   - id: apply-outer-security-middleware-and-csp
     name: Apply outer security middleware and embedded-content CSP
