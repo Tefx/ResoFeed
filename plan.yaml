@@ -183966,7 +183966,7 @@ phases:
     - docs/BUG_REPORT_2026-07-11.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
-    agent: test-engineer
+    agent: general
   - id: rf-bug-e2e-isolation-full-gate
     name: RF-BUG e2e-isolation phase Full Gate
     status: pending
