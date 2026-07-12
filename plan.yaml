@@ -183334,15 +183334,17 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
       \ RF-BUG-003. After canonical docs, stage the Svelte build into package-local\
-      \ embed.FS, validate index and every local bootstrap reference before listener\
-      \ bind, and serve only `/`, `/source-ledger`, `/doctor`, and valid canonical\
-      \ item routes. `/sources` is an unlisted static miss. Parsed URL.Path/RawPath\
-      \ handling returns exact GET/HEAD/400/404/405 outcomes without raw RequestURI.\
-      \ Preserve Doctor order and redact secrets longest-first plus whole CR/LF values.\
-      \ No external UI tree, Node runtime, cwd dependence, manifest, generator, or\
-      \ registry. Protected runtime and all frontend/browser contract files remain\
-      \ immutable. Synchronize only observed ARCHITECTURE/CONTAINER/USAGE behavior.\
-      \ Recovery reverts code/build/docs; no data migration.\n\n<intent_closure_contract>\n\
+      \ embed.FS and apply the Section 2.2 bounded byte-preserving bootstrap scanner/malformedness\
+      \ grammar and adversarial fixtures before listener bind, validating index, every\
+      \ local bootstrap reference, executable attribute prohibition, structural boundaries,\
+      \ and exact inline-script bytes, and serve only `/`, `/source-ledger`, `/doctor`,\
+      \ and valid canonical item routes. `/sources` is an unlisted static miss. Parsed\
+      \ URL.Path/RawPath handling returns exact GET/HEAD/400/404/405 outcomes without\
+      \ raw RequestURI. Preserve Doctor order and redact secrets longest-first plus\
+      \ whole CR/LF values. No external UI tree, Node runtime, cwd dependence, manifest,\
+      \ generator, or registry. Protected runtime and all frontend/browser contract\
+      \ files remain immutable. Synchronize only observed ARCHITECTURE/CONTAINER/USAGE\
+      \ behavior. Recovery reverts code/build/docs; no data migration.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/webui/**, internal/resofeed/http_static.go,\
       \ internal/resofeed/http.go, internal/resofeed/doctor.go, internal/resofeed/doctor_test.go,\
@@ -183350,9 +183352,11 @@ phases:
       \ docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
       \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
       \ internal/resofeed/state.go, web/src/**, web/tests/**]\nclaims: [RF-BUG-003]\n\
-      checks:\n  - id: rf_bug_003_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
-      \ -run, '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
-      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      checks:\n  - id: rf_bug_003_green\n    run: {command: [bash, -lc, \"go test\
+      \ -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \ ./internal/resofeed | tee /tmp/rf003-green-list; test $(grep -Ec '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
+      \ /tmp/rf003-green-list) -eq 2; go test -v ./internal/resofeed -run '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$'\
+      \ -count=1\"], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG003EmbeddedUIContract/bootstrap_missing_script_fails_before_bind'},\
       \ {literal: '=== RUN   TestRFBUG003EmbeddedUIContract/sources_is_unlisted_static_miss'},\
       \ {literal: '=== RUN   TestRFBUG003DoctorRedactionContract/crlf_dynamic_value_is_wholly_redacted'},\
