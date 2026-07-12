@@ -183123,36 +183123,42 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nRequirement:\
-      \ RF-BUG-003. Consume the canonical-doc prerequisite. Stage the built Svelte\
-      \ output into package-local embed.FS, validate index.html and every local script/link/modulepreload\
-      \ bootstrap reference before bind, and serve only explicit SPA routes (`/`,\
-      \ `/source-ledger`, `/sources`, `/doctor`, valid item routes). Missing/empty/non-regular/escaping/malformed\
-      \ bootstrap content exits non-zero before listener bind. GET/HEAD parsed-path\
-      \ handling returns 400 for malformed/traversal, 404 for asset-like/unlisted\
-      \ misses, 405 with Allow for unsupported methods, and never inspects raw RequestURI.\
-      \ Root/assets/deep links must be cwd-independent. Preserve Doctor formatting/order,\
-      \ append only `ui_assets=ready` and `ui_asset_source=embedded`, redact configured\
-      \ secrets longest-first, and wholly redact CR/LF dynamic values. No manifest,\
-      \ generator, registry, external UI tree, Node runtime, or new Doctor protocol.\
-      \ Protected acceptance is immutable; synchronize ARCHITECTURE/CONTAINER/USAGE\
-      \ only to observed implementation. Recovery reverts code/build/docs; no data\
-      \ migration.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [internal/resofeed/webui/**,\
-      \ internal/resofeed/http_static.go, internal/resofeed/http.go, internal/resofeed/doctor.go,\
-      \ internal/resofeed/*doctor*_test.go, internal/resofeed/*static*_test.go, scripts/build-resofeed.sh,\
-      \ Dockerfile, docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
-      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, internal/resofeed/state.go,\
-      \ web/src/routes/**]\nclaims: [RF-BUG-003]\nchecks:\n  - id: rf_bug_003_green\n\
-      \    run: {command: [go, test, -v, ./internal/resofeed, -run, TestRFBugRuntimeContract/RF-BUG-003,\
+      \ RF-BUG-003. After canonical docs, stage the Svelte build into package-local\
+      \ embed.FS, validate index and every local bootstrap reference before listener\
+      \ bind, and serve only `/`, `/source-ledger`, `/doctor`, and valid canonical\
+      \ item routes. `/sources` is an unlisted static miss. Parsed URL.Path/RawPath\
+      \ handling returns exact GET/HEAD/400/404/405 outcomes without raw RequestURI.\
+      \ Preserve Doctor order and redact secrets longest-first plus whole CR/LF values.\
+      \ No external UI tree, Node runtime, cwd dependence, manifest, generator, or\
+      \ registry. Protected runtime and all frontend/browser contract files remain\
+      \ immutable. Synchronize only observed ARCHITECTURE/CONTAINER/USAGE behavior.\
+      \ Recovery reverts code/build/docs; no data migration.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [internal/resofeed/webui/**, internal/resofeed/http_static.go,\
+      \ internal/resofeed/http.go, internal/resofeed/doctor.go, internal/resofeed/doctor_test.go,\
+      \ internal/resofeed/http_static_test.go, scripts/build-resofeed.sh, Dockerfile,\
+      \ docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
+      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
+      \ internal/resofeed/state.go, web/src/**, web/tests/**]\nclaims: [RF-BUG-003]\n\
+      checks:\n  - id: rf_bug_003_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
       \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_all: [{literal: '--- PASS: TestRFBugRuntimeContract/RF-BUG-003'}],\
-      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
-      \ to run]'}]}}\n    proves: [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n\
-      \    run: {command: [bash, scripts/build-resofeed.sh], timeout_seconds: 600}\n\
-      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
-      \ [{literal: PASS}], forbids: [{literal: FAIL}, {literal: no tests to run},\
-      \ {literal: '[no tests to run]'}]}}\n    proves: [RF-BUG-003]\nbindings:\n \
-      \ expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG003EmbeddedUIContract/bootstrap_missing_script_fails_before_bind'},\
+      \ {literal: '=== RUN   TestRFBUG003EmbeddedUIContract/sources_is_unlisted_static_miss'},\
+      \ {literal: '=== RUN   TestRFBUG003DoctorRedactionContract/crlf_dynamic_value_is_wholly_redacted'},\
+      \ {literal: RF_BUG_003_TOP_LEVEL_TESTS=2}, {literal: '--- PASS: TestRFBUG003EmbeddedUIContract'},\
+      \ {literal: '--- PASS: TestRFBUG003DoctorRedactionContract'}], forbids: [{literal:\
+      \ FAIL}, {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n   \
+      \ proves: [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n    run: {command:\
+      \ [bash, -lc, \"bash scripts/build-resofeed.sh; test -x bin/resofeed; for d\
+      \ in . /tmp /; do (cd \\\"$d\\\" && \\\"$OLDPWD/bin/resofeed\\\" --help >/dev/null);\
+      \ done; echo RF_BUG_003_BINARY_PROBES=3 EMBEDDED_UI_SOURCE=package_local BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified\"\
+      ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: RF_BUG_003_BINARY_PROBES=3}, {literal: EMBEDDED_UI_SOURCE=package_local},\
+      \ {literal: BINARY_ONLY_FINAL_IMAGE_CONTRACT=verified}], forbids: [{literal:\
+      \ FAIL}, {literal: external UI tree}, {literal: node required}]}}\n    proves:\
+      \ [RF-BUG-003]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
+      \    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
       \ source_check: rf_bug_003_expected_red, requirement: RF-BUG-003, assertion_id:\
       \ A-RF-BUG-003-EMBED-DOCTOR, downstream_check: rf_bug_003_green, receipt: RF-BUG-003-red-to-green}\n\
       </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
@@ -183162,15 +183168,14 @@ phases:
       ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
       ,\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
       :[\"integration-verifier\",\"security-reviewer\"],\"review_mode\":\"ADJUDICATED\"\
-      ,\"phase_full_gate_required\":false,\"test_authority\":{\"developer_test_globs\"\
-      :[\"internal/resofeed/webui/**/*_test.go\",\"internal/resofeed/*doctor*_test.go\"\
-      ,\"internal/resofeed/*static*_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      :[\"internal/resofeed/doctor_test.go\",\"internal/resofeed/http_static_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_003_green\"],\"acceptance_mutation\":\"\
       FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
-    verification: Run the exact protected subtest with verbose named collection and
-      the local build/probe. Verify three cwd values, all bootstrap/path/GET/HEAD
-      failure classes, no bound listener on invalid bootstrap, Doctor redaction, embedded-only
-      image, and independent security-capable review.
+    verification: Require both exact RF-BUG-003 top-level tests and named assertion
+      subtests, three cwd probes, `/sources` 404 behavior, positive embedded/binary-only
+      predicates, protected artifacts unchanged, and independent security review.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
