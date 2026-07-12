@@ -183712,6 +183712,33 @@ phases:
     - docs/PROMPTING_SYSTEM.md
     - docs/ARCHITECTURE.md
     agent: golang-developer
+  - id: rf-bug-ledger-prompting-full-gate
+    name: RF-BUG ledger-prompting phase Full Gate
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Terminal bounded phase Full Gate for `rf-bug-20260712-ledger-prompting`. Repository
+      mutation is absent because this gate only re-runs existing phase acceptance
+      checks and records normal plan-assurance metadata. Reuse only `rf_bug_008_render_green`,
+      `rf_bug_008_green`, `rf_bug_008_operations_green`, `rf_bug_009_green`, `rf_bug_009_parity_green`,
+      `rf_bug_009_names_green`, and `rf_bug_009_regression_green`. Require the five
+      authoritative viewports including 320x800, State-import confirmation/cancellation
+      predicates, exact Go collection before RF-BUG-009 runs, fail-closed active Prompting
+      scan including `cmd/`, and zero protected-artifact diff. Do not add or modify
+      product code, runtime behavior or processes, storage models, registries, manifests,
+      custom evidence protocols, deployment requirements, acceptance artifacts, or
+      canonical product architecture.'
+    verification: All existing ledger/prompting checks are green with exact collection/count
+      evidence; five viewport proof and active-name scan are exact; facade validation
+      and phase intent-closure lint are conformant.
+    depends_on:
+    - repair-source-ledger-responsive-groups
+    - migrate-active-prompting-names-to-v22
+    - implement-prompting-v22-semantics
+    agent: gate-reviewer
 - id: rf-bug-20260712-e2e-isolation
   name: RF-BUG Real-Runtime E2E Isolation and Migration
   status: locked
