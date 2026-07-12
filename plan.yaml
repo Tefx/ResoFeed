@@ -183396,39 +183396,32 @@ phases:
       \ embed/static/Doctor/build/container docs together. Never add an external UI\
       \ root, Node runtime, asset registry, persisted asset metadata, or secret output.\n\
       \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ implementation_closes_expected_red\nscope:\n  allowed_paths:\n    - internal/resofeed/webui/**\n\
-      \    - internal/resofeed/http_static.go\n    - internal/resofeed/http.go\n \
-      \   - internal/resofeed/doctor.go\n    - internal/resofeed/doctor_test.go\n\
-      \    - internal/resofeed/http_static_test.go\n    - scripts/build-resofeed.sh\n\
-      \    - Dockerfile\n    - docs/ARCHITECTURE.md\n    - docs/CONTAINER.md\n   \
-      \ - docs/USAGE.md\n  blocked_paths:\n    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\n\
-      \    - web/src/**\n    - web/tests/**\nclaims:\n  - RF-BUG-003\nchecks:\n  -\
-      \ id: rf_bug_003_green\n    run:\n      command: [go, test, -v, ./internal/resofeed,\
-      \ -run, '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
-      \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ RF-BUG-003_EXACT_SUBTEST_SET=23}, {literal: RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete},\
-      \ {literal: RF-BUG-003_CSP_CRLF_NORMALIZED=chromium}]\n        contains_any:\
-      \ []\n        forbids: [{literal: FAIL}, {literal: no tests to run}]\n    proves:\
-      \ [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n    run:\n      command:\
-      \ [bash, -lc, \"bash scripts/build-resofeed.sh && test -x bin/resofeed && root=$PWD;\
-      \ for d in . /tmp /; do (cd \\\"$d\\\" && \\\"$root/bin/resofeed\\\" --help\
-      \ >/dev/null); done; echo RF_BUG_003_BINARY_PROBES=3\"]\n      timeout_seconds:\
-      \ 600\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: RF_BUG_003_BINARY_PROBES=3}]\n        contains_any:\
-      \ []\n        forbids: [{literal: FAIL}, {literal: node required}]\n    proves:\
-      \ [RF-BUG-003]\nbindings:\n  expected_red:\n    items: []\n  closes_expected_red:\n\
-      \    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ implementation_closes_expected_red\nscope:\n  allowed_paths: [internal/resofeed/webui/**,\
+      \ internal/resofeed/http_static.go, internal/resofeed/http.go, internal/resofeed/doctor.go,\
+      \ internal/resofeed/doctor_test.go, internal/resofeed/http_static_test.go, scripts/build-resofeed.sh,\
+      \ Dockerfile, docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
+      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, web/src/**,\
+      \ web/tests/**]\nclaims: [RF-BUG-003]\nchecks:\n  - id: rf_bug_003_green\n \
+      \   run: {command: [go, test, -v, ./internal/resofeed, -run, '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-003_EXACT_SUBTEST_SET=23},\
+      \ {literal: RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete}, {literal:\
+      \ RF-BUG-003_CSP_CRLF_NORMALIZED=chromium}], contains_any: [], forbids: [{literal:\
+      \ FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n\
+      \    run: {command: [bash, -lc, \"bash scripts/build-resofeed.sh && test -x\
+      \ bin/resofeed && root=$PWD; for d in . /tmp /; do (cd \\\"$d\\\" && \\\"$root/bin/resofeed\\\
+      \" --help >/dev/null); done; echo RF_BUG_003_BINARY_PROBES=3\"], timeout_seconds:\
+      \ 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF_BUG_003_BINARY_PROBES=3}], contains_any: [], forbids: [{literal:\
+      \ FAIL}, {literal: node required}]}}\n    proves: [RF-BUG-003]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
       \ source_check: rf_bug_003_expected_red, requirement: RF-BUG-003, assertion_id:\
       \ A-RF-BUG-003-EMBED-DOCTOR, downstream_check: rf_bug_003_green, receipt: RF-BUG-003-red-to-green}\n\
       </intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\"\
       ,\"step_id\":\"rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"runtime_static_asset_security_boundary\"\
       ,\"doctor_secret_redaction\",\"pre_bind_failure\"],\"primary_outcome\":\"RF-BUG-003\"\
-      ,\"rollback_class\":\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\"\
-      ,\"STATIC_ANALYSIS\",\"REVIEW\"],\"primary_verifier\":\"gate-reviewer\",\"additional_verifiers\"\
-      :[\"integration-verifier\",\"software-architect\"],\"review_mode\":\"ADJUDICATED\"\
-      ,\"phase_full_gate_required\":true,\"test_authority\":{\"developer_test_globs\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\"\
       :[\"internal/resofeed/doctor_test.go\",\"internal/resofeed/http_static_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_003_green\"],\"acceptance_mutation\":\"\
