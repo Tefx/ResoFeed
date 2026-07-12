@@ -183641,20 +183641,17 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal bounded phase Full Gate for `rf-bug-20260712-runtime-boundaries`. Repository
-      mutation is absent because this gate only re-runs existing phase acceptance
-      checks and records normal plan-assurance metadata. Reuse only `rf_bug_003_green`,
-      `rf_bug_003_local_binary_green`, `rf_bug_004_green`, `rf_bug_004_active_scan_green`,
-      `rf_bug_005_green`, `rf_bug_005_local_stream_green`, and `rf_bug_005_browser_operations_green`.
-      Require exact Go collection before each protected run, package-local embedded
-      bootstrap proof, fail-closed active OPML scan, auth-first import-only behavior,
-      exact CSP/header/streaming/cancellation proof, and zero protected-artifact diff.
-      Do not add or modify product code, runtime behavior or processes, storage models,
-      registries, manifests, custom evidence protocols, deployment requirements, acceptance
-      artifacts, or canonical product architecture.'
-    verification: All existing runtime-boundary checks are green with exact collection/count
-      evidence; facade validation and phase intent-closure lint are conformant; gate
-      writes no repository artifacts.
+      Terminal bounded Full Gate for runtime boundaries. Repository mutation is absent
+      because the gate reuses RF-BUG-003/004/005 predicates. Require embedded pre-bind
+      and arbitrary-cwd behavior, safe Doctor output, auth-first import-only OPML
+      and atomic minimal State, exact nine-document/two-exclusion scan, one effective
+      Go-owned header set, corrected CSP, streaming/cancellation, and Chromium operations.
+      Protected acceptance must be unchanged. Any secret exposure, external UI dependency,
+      OPML export, unsafe CSP, duplicate header, buffering, collection mismatch, or
+      contract/policy failure blocks downstream work.'
+    verification: All runtime checks are green with exact protected identities; reciprocal
+      bindings, docs parity, path authority, Vectl validation/check-refs, and phase
+      contract/policy admission pass.
     depends_on:
     - embed-ui-assets-in-single-binary
     - enforce-opml-import-only-surface
