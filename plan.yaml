@@ -182574,7 +182574,7 @@ phases:
       \ web/src/routes/components/**]\nclaims: [RF-BUG-001-CONTRACT, RF-BUG-002-CONTRACT,\
       \ RF-BUG-006-CONTRACT, RF-BUG-007-CONTRACT]\nchecks:\n  - id: rf_bug_001_expected_red\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
+      \       npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 --list tests/e2e/inspector-selection.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-001\\\\]' | tee /tmp/rf001-list; test $(grep -c '^.*RF-BUG-001'\
       \ /tmp/rf001-list) -gt 0; npm --prefix web exec playwright test -- --config\
@@ -182587,8 +182587,8 @@ phases:
       \ inspector item to remain current}], forbids: [{literal: No tests found}, {literal:\
       \ 0 tests}, {literal: webServer failed}, {literal: TypeError}]}}\n    proves:\
       \ [RF-BUG-001-CONTRACT]\n  - id: rf_bug_002_expected_red\n    run:\n      command:\n\
-      \        - bash\n        - -lc\n        - |-\n        npm --prefix web run test:e2e\
-      \ -- --project=chromium-ci-safe tests/e2e/initial-route.browser-contract.spec.ts\
+      \        - bash\n        - -lc\n        - |-\n          npm --prefix web run\
+      \ test:e2e -- --project=chromium-ci-safe tests/e2e/initial-route.browser-contract.spec.ts\
       \ --grep 'RF-BUG-002' --list | tee /tmp/rf002-list; titles=('[RF-BUG-002][en]\
       \ TODAY cold load and refresh' '[RF-BUG-002][en] SOURCE LEDGER cold load and\
       \ refresh' '[RF-BUG-002][en] SEARCH cold load and refresh' '[RF-BUG-002][en]\
@@ -182615,8 +182615,8 @@ phases:
       \ found}, {literal: 0 test}, {literal: skipped}, {literal: TypeError}]}}\n \
       \   proves: [RF-BUG-002-CONTRACT]\n  - id: rf_bug_002_api_expected_red\n   \
       \ run:\n      command:\n        - bash\n        - -lc\n        - |-\n      \
-      \  go test -list '^TestRFBUG002OpaqueItemIDAPIPaths$' ./internal/resofeed |\
-      \ tee /tmp/rf002-go-list; test \"$(grep -Fxc 'TestRFBUG002OpaqueItemIDAPIPaths'\
+      \    go test -list '^TestRFBUG002OpaqueItemIDAPIPaths$' ./internal/resofeed\
+      \ | tee /tmp/rf002-go-list; test \"$(grep -Fxc 'TestRFBUG002OpaqueItemIDAPIPaths'\
       \ /tmp/rf002-go-list)\" -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG002OpaqueItemIDAPIPaths$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: red, exit_codes:\
       \ [1], stdout_or_stderr: {contains_all: [{literal: '=== RUN   TestRFBUG002OpaqueItemIDAPIPaths'},\
@@ -182625,7 +182625,7 @@ phases:
       \ ID}], forbids: [{literal: setup failed}, {literal: no tests to run}, {literal:\
       \ '[no tests to run]'}, {literal: compile error}]}}\n    proves: [RF-BUG-002-CONTRACT]\n\
       \  - id: rf_bug_006_expected_red\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n        npm --prefix web exec playwright test\
+      \        - -lc\n        - |-\n          npm --prefix web exec playwright test\
       \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
       \ --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
       \ --grep '^\\\\[RF-BUG-006\\\\]' | tee /tmp/rf006-list; test $(grep -c '\\[RF-BUG-006\\\
@@ -182639,7 +182639,7 @@ phases:
       \ document title}], forbids: [{literal: No tests found}, {literal: 0 tests},\
       \ {literal: webServer failed}, {literal: TypeError}]}}\n    proves: [RF-BUG-006-CONTRACT]\n\
       \  - id: rf_bug_007_expected_red\n    run:\n      command:\n        - bash\n\
-      \        - -lc\n        - |-\n        npm --prefix web exec playwright test\
+      \        - -lc\n        - |-\n          npm --prefix web exec playwright test\
       \ -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
       \ --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
       \ --grep '^\\\\[RF-BUG-007\\\\]' | tee /tmp/rf007-list; test $(grep -c '\\[RF-BUG-007\\\
