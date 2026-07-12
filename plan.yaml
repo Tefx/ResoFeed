@@ -184417,10 +184417,11 @@ phases:
       \ {literal: '=== RUN   TestRFBugClosureContract/RF-BUG-010'}, {literal: RF_BUG_CLOSURE_REQUIREMENTS=10},\
       \ {literal: '--- PASS: TestRFBugClosureContract'}], forbids: [{literal: FAIL},\
       \ {literal: no tests to run}, {literal: '[no tests to run]'}]}}\n    proves:\
-      \ [RF-BUG-001-010-CLOSURE]\n  - id: closure_active_sources_green\n    run: {command:\
-      \ [bash, -lc, \"matches=$(mktemp); set +e; git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML'\
-      \ -- cmd internal web/src web/tests docs web/package.json web/package-lock.json\
-      \ go.mod go.sum bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
+      \ [RF-BUG-001-010-CLOSURE]\n  - id: closure_active_sources_green\n    run:\n\
+      \      command:\n        - bash\n        - -lc\n        - |-\n        matches=$(mktemp);\
+      \ set +e; git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML' -- cmd internal\
+      \ web/src web/tests docs web/package.json web/package-lock.json go.mod go.sum\
+      \ bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
       \ ':(exclude)docs/BUG_FIX_PLAN_2026-07-12.md' ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
       \ ':(exclude)web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts' >\"$matches\"\
       ; status=$?; set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"\
@@ -184432,7 +184433,7 @@ phases:
       \ set -e; case \"$status\" in 0) cat \"$matches\"; rm -f \"$matches\"; exit\
       \ 1;; 1) rm -f \"$matches\";; *) cat \"$matches\" >&2; rm -f \"$matches\"; exit\
       \ \"$status\";; esac; echo PROMPTING_V21_ACTIVE_MATCHES=0 ARCHITECTURE_STATUS_SCANNED=1\
-      \ CMD_RUNTIME_SCANNED=1\"], timeout_seconds: 240}\n    expect: {outcome: green,\
+      \ CMD_RUNTIME_SCANNED=1\n      timeout_seconds: 240\n    expect: {outcome: green,\
       \ exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: OPML_ACTIVE_SCAN_MATCHES=0},\
       \ {literal: OPML_EXCLUSIONS=4}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0}, {literal:\
       \ ARCHITECTURE_STATUS_SCANNED=1}], forbids: [{literal: broad exclusion}, {literal:\
