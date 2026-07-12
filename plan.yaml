@@ -183586,6 +183586,32 @@ phases:
     - enforce-opml-import-only-surface
     - apply-outer-security-middleware-and-csp
     agent: gate-reviewer
+  - id: rf-bug-runtime-security-architecture-review
+    name: Review runtime security boundaries and rollback
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Independent read-only architecture/security review after both R3 implementations
+      and their OPML/state prerequisite. Verify CSP is derived before bind from the
+      protected executable-body contract; outer HTTP middleware ordering covers static,
+      API, MCP, auth, not-found, and internal-error responses exactly once; Doctor
+      and runtime evidence redact secrets; invalid embedded bootstrap fails before
+      listener bind; streaming flush and request cancellation remain intact; and rollback
+      restores the prior embedded binary and middleware/CSP state without weakening
+      headers or exposing an external UI tree. Any unresolved authorization, redaction,
+      ordering, cancellation, pre-bind, or rollback finding blocks the terminal gate.'
+    verification: Read-only review of committed code, protected RF-BUG-003/005 acceptance,
+      and local runtime evidence. PASS requires explicit findings for CSP, middleware
+      order, redaction, pre-bind failure, streaming/cancellation, and rollback, with
+      no unresolved finding.
+    depends_on:
+    - embed-ui-assets-in-single-binary
+    - enforce-opml-import-only-surface
+    - apply-outer-security-middleware-and-csp
+    agent: software-architect
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger Operations and Prompting v2.2
   status: locked
