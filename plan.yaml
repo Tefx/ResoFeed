@@ -183383,7 +183383,7 @@ phases:
       \      command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG002OpaqueItemIDAPIPaths$,\
       \ -count=1]\n      timeout_seconds: 300\n    expect:\n      outcome: green\n\
       \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ RF_BUG_002_API_SUBTESTS=30}, {literal: PASS: TestRFBUG002OpaqueItemIDAPIPaths}]\n\
+      \ RF_BUG_002_API_SUBTESTS=30}, {literal: 'PASS: TestRFBUG002OpaqueItemIDAPIPaths'}]\n\
       \        contains_any: []\n        forbids: [{literal: FAIL}, {literal: no tests\
       \ to run}, {literal: lookup called for invalid token}]\n    proves: [RF-BUG-002]\n\
       bindings:\n  expected_red:\n    items: []\n  closes_expected_red:\n    - {source_step:\
