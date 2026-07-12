@@ -184083,27 +184083,21 @@ phases:
   - id: tailnet-caddy-runtime-proof
     name: Deploy immutable image and verify Tailnet/Caddy
     status: pending
-    description: 'step_type: implementation
+    description: 'step_type: verification
 
       repo_change_policy: runtime_state_only
 
 
       Repository mutation is absent because this step deploys the verified immutable
       digest through the maintained Tailnet stack. Use the Tailnet deployment skill
-      without reading or printing `.env`. Verify direct/public equality for all four
-      Go-owned headers on HTML, JSON, MCP, unauthorized, and error responses; Caddy
-      adds or replaces none. Prove browser boot without CSP console violations, embedded
-      assets, direct Ledger/item routes, titles, token accept/reject, import-only
-      OPML, and JSON state boundary. This step owns the downstream Tailnet CSP/browser
-      proof omitted from local RF-BUG-005 implementation. Recovery rolls back to the
-      prior immutable digest and verifies readiness.
-
-
-      <vectl_step_policy>
-
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-assurance-closure.tailnet-caddy-runtime-proof","risk_tier":"R3","risk_reasons":["production_like_deployment","security_headers","secret_injection","rollback_required"],"primary_outcome":"RF-BUG-TAILNET-RUNTIME","rollback_class":"NONTRIVIAL","proof_modalities":["RUNTIME_PROBE","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["software-architect"],"review_mode":"ADJUDICATED","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
-
-      </vectl_step_policy>'
+      without reading or printing `.env`. Target only the exact maintained Tailnet/Caddy
+      deployment authorized by the pre-operation review, inject secrets only through
+      existing runtime authority, and preserve the prior immutable digest for rollback.
+      Verify direct/public equality for all four Go-owned headers on HTML, JSON, MCP,
+      unauthorized, and error responses; Caddy adds or replaces none. Prove browser
+      boot without CSP console violations, embedded assets, direct Ledger/item routes,
+      titles, token accept/reject, import-only OPML, and JSON state boundary. Recovery
+      rolls back to the prior immutable digest and verifies readiness.'
     verification: Deploy the exact verified digest with the maintained skill, run
       direct/public header and CSP verification plus browser boot, and record rollback
       readiness. Any digest mismatch, Caddy header ownership, CSP violation, or browser
