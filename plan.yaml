@@ -183986,14 +183986,7 @@ phases:
       complete standard artifacts, present possibly-empty stderr, and fail-closed
       redaction. Any residue, identity mismatch, missing artifact, secret, timeout,
       or unrelated failure blocks the phase; recovery removes only owned test processes
-      and ignored artifacts.
-
-
-      <vectl_step_policy>
-
-      {"schema_version":"vectl.step.policy.v1","step_id":"rf-bug-20260712-e2e-isolation.rf-bug-010-reproducibility-artifact-proof","risk_tier":"R2","risk_reasons":["runtime_browser_evidence","secret_redaction_validation"],"primary_outcome":"RF-BUG-010-REPRODUCIBILITY","rollback_class":"TRIVIAL","proof_modalities":["TEST","RUNTIME_PROBE","STATIC_ANALYSIS","REVIEW"],"primary_verifier":"integration-verifier","additional_verifiers":["software-architect","blind-tester"],"review_mode":"INDEPENDENT","phase_full_gate_required":false,"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","authorized_mutation_refs":[]}}
-
-      </vectl_step_policy>'
+      and ignored artifacts.'
     verification: Require smoke <120s; three identical positive retry-free native
       identity sets from one clean root; complete per-run standard evidence and cleanup;
       independently collected one-failure lifecycle proof; redaction verifier green;
