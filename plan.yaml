@@ -183251,28 +183251,29 @@ phases:
       \  blocked_paths: [web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/__tests__/steer-invalid.test.ts,\
       \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
       \ internal/resofeed/**]\nclaims: [RF-BUG-006, RF-BUG-007]\nchecks:\n  - id:\
-      \ rf_bug_006_green\n    run: {command: [bash, -lc, \"npm --prefix web exec playwright\
-      \ test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
+      \ rf_bug_006_green\n    run:\n      command:\n        - bash\n        - -lc\n\
+      \        - |-\n        npm --prefix web exec playwright test -- --config ./playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
       \ --grep '^\\\\[RF-BUG-006\\\\]' | tee /tmp/rf006-green-list; c=$(grep -c '\\\
       [RF-BUG-006\\]' /tmp/rf006-green-list); test $c -gt 0; npm --prefix web exec\
       \ playwright test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
       \ --retries=0 tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep\
-      \ '^\\\\[RF-BUG-006\\\\]' --reporter=line; echo RF_BUG_006_EXECUTED_COUNT=$c\"\
-      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ '^\\\\[RF-BUG-006\\\\]' --reporter=line; echo RF_BUG_006_EXECUTED_COUNT=$c\n\
+      \      timeout_seconds: 300\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: bugfix-frontend-behavior.expected-red.spec.ts},\
       \ {literal: '[RF-BUG-006] route-derived title updates atomically'}, {literal:\
       \ RF_BUG_006_EXECUTED_COUNT=}], forbids: [{literal: failed}, {literal: No tests\
       \ found}, {literal: skipped}, {literal: retry}]}}\n    proves: [RF-BUG-006]\n\
-      \  - id: rf_bug_007_green\n    run: {command: [bash, -lc, \"npm --prefix web\
-      \ exec playwright test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-007\\\\]' | tee /tmp/rf007-green-list; test $(grep -c\
-      \ '\\[RF-BUG-007\\]' /tmp/rf007-green-list) -eq 2; npm --prefix web exec playwright\
-      \ test -- --config ./playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep\
-      \ '^\\\\[RF-BUG-007\\\\]' --reporter=line; echo RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2\"\
-      ], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \  - id: rf_bug_007_green\n    run:\n      command:\n        - bash\n      \
+      \  - -lc\n        - |-\n        npm --prefix web exec playwright test -- --config\
+      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
+      \ --list tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\\
+      \\[RF-BUG-007\\\\]' | tee /tmp/rf007-green-list; test $(grep -c '\\[RF-BUG-007\\\
+      ]' /tmp/rf007-green-list) -eq 2; npm --prefix web exec playwright test -- --config\
+      \ ./playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
+      \ tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\\\[RF-BUG-007\\\
+      \\]' --reporter=line; echo RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2\n\
+      \      timeout_seconds: 300\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: '[RF-BUG-007][en] repeated invalid add source remounts\
       \ one alert'}, {literal: '[RF-BUG-007][zh] repeated invalid add source remounts\
       \ one alert'}, {literal: RF_BUG_007_LOCALES=en,zh RF_BUG_007_EXECUTED_COUNT=2}],\
