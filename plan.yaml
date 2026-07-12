@@ -183040,7 +183040,7 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: contract-test-author
+    agent: general
   - id: rf-bug-prompting-v22-expected-red
     name: Lock Prompting v2.2 acceptance
     status: pending
