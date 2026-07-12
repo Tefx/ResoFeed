@@ -183444,7 +183444,7 @@ phases:
       \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
       \ web/tests/**, docs/audits/**, plan.yaml]\nclaims: [RF-BUG-004]\nchecks:\n\
       \  - id: rf_bug_004_green\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n        go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
+      \  - -lc\n        - |-\n          go test -list '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract|TestRFBUG004OPMLImportOnlyContract|TestRFBUG005SecurityHeadersCSPStreamingCancellationContract)$'\
       \ ./internal/resofeed | tee /tmp/rf004-green-list; test $(grep -Fxc 'TestRFBUG004OPMLImportOnlyContract'\
       \ /tmp/rf004-green-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG004OPMLImportOnlyContract$'\
       \ -count=1\n      timeout_seconds: 240\n    expect: {outcome: green, exit_codes:\
@@ -183454,7 +183454,7 @@ phases:
       \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
       \ to run]'}]}}\n    proves: [RF-BUG-004]\n  - id: rf_bug_004_active_scan_green\n\
       \    run:\n      command:\n        - bash\n        - -lc\n        - |-\n   \
-      \     matches=$(mktemp); set +e; git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML'\
+      \       matches=$(mktemp); set +e; git grep -nEiI 'OPML.{0,80}EXPORT|EXPORT.{0,80}OPML'\
       \ -- cmd internal web/src web/tests docs web/package.json web/package-lock.json\
       \ go.mod go.sum bin deploy Dockerfile .dockerignore ':(exclude)docs/BUG_REPORT_2026-07-11.md'\
       \ ':(exclude)docs/BUG_FIX_PLAN_2026-07-12.md' ':(exclude)internal/resofeed/rf_bug_runtime_contract_expected_red_test.go'\
