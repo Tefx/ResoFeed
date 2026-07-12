@@ -183833,7 +183833,7 @@ phases:
       \ web/src/lib/__tests__/workbench-route.test.ts, web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
       \ web/tests/**, docs/ARCHITECTURE.md, docs/USAGE.md, docs/ui-preview.html, plan.yaml]\n\
       claims: [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run:\n      command:\n\
-      \        - bash\n        - -lc\n        - |-\n        go test -list '^TestRFBUG009PromptingV22Contract$'\
+      \        - bash\n        - -lc\n        - |-\n          go test -list '^TestRFBUG009PromptingV22Contract$'\
       \ ./internal/resofeed | tee /tmp/rf009-green-list; test $(grep -Fxc 'TestRFBUG009PromptingV22Contract'\
       \ /tmp/rf009-green-list) -eq 1; go test -v ./internal/resofeed -run '^TestRFBUG009PromptingV22Contract$'\
       \ -count=1\n      timeout_seconds: 300\n    expect: {outcome: green, exit_codes:\
@@ -183843,7 +183843,7 @@ phases:
       \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: '[no tests\
       \ to run]'}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009]\n  - id:\
       \ rf_bug_009_parity_green\n    run:\n      command:\n        - bash\n      \
-      \  - -lc\n        - |-\n        go test -list '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
+      \  - -lc\n        - |-\n          go test -list '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
       \ ./internal/resofeed | tee /tmp/rf009-parity-list; test $(grep -Ec '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
       \ /tmp/rf009-parity-list) -eq 9; go test -v ./internal/resofeed -run '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$'\
       \ -count=1\n      timeout_seconds: 420\n    expect: {outcome: green, exit_codes:\
