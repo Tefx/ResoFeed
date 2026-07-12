@@ -182986,10 +182986,10 @@ phases:
       \ identity. No provider secrets, prompts, responses, or model overrides enter\
       \ logs, SQLite, State, or diagnostics. Rollback reverts this one protected Go\
       \ file.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      profile: expected_red_definition\nscope:\n  allowed_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go]\n\
-      \  blocked_paths: [internal/resofeed/openrouter.go, internal/resofeed/ingest.go,\
+      profile: expected_red_definition\nscope: {allowed_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go],\
+      \ blocked_paths: [internal/resofeed/openrouter.go, internal/resofeed/ingest.go,\
       \ internal/resofeed/reprocess.go, internal/resofeed/reingest.go, internal/resofeed/http.go,\
-      \ internal/resofeed/mcp.go]\nclaims: [RF-BUG-009-CONTRACT]\nchecks:\n  - id:\
+      \ internal/resofeed/mcp.go]}\nclaims: [RF-BUG-009-CONTRACT]\nchecks:\n  - id:\
       \ rf_bug_009_expected_red\n    run: {command: [go, test, -v, ./internal/resofeed,\
       \ -run, ^TestRFBUG009PromptingV22Contract$, -count=1], timeout_seconds: 300}\n\
       \    expect: {outcome: red, exit_codes: [1], stdout_or_stderr: {contains_all:\
@@ -182997,13 +182997,13 @@ phases:
       \ {literal: expected one generation plus at most one semantic repair}], contains_any:\
       \ [], forbids: [{literal: setup failed}, {literal: no tests to run}, {literal:\
       \ compile error}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009-CONTRACT]\n\
-      bindings:\n  expected_red:\n    items:\n      - {requirement: RF-BUG-009, assertion_id:\
-      \ A-RF-BUG-009-PROMPTING, source_check: rf_bug_009_expected_red, selector: {type:\
-      \ test_id, value: TestRFBUG009PromptingV22Contract}, downstream_step: rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics,\
-      \ downstream_check: rf_bug_009_green, receipt: RF-BUG-009-red-to-green}\n  closes_expected_red:\
-      \ []\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\":\"\
-      vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"runtime_prompt_contract\",\"persistence_contract\"\
+      bindings:\n  expected_red:\n    items:\n      - {requirement_id: RF-BUG-009,\
+      \ fingerprint: A-RF-BUG-009-PROMPTING, expected_red_package: ./internal/resofeed,\
+      \ expected_red_test: TestRFBUG009PromptingV22Contract, downstream_step: rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics,\
+      \ downstream_check: rf_bug_009_green}\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
+      :\"rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red\",\"risk_tier\"\
+      :\"R2\",\"risk_reasons\":[\"runtime_prompt_contract\",\"persistence_contract\"\
       ,\"acceptance_test_definition\"],\"primary_outcome\":\"RF-BUG-009-CONTRACT\"\
       ,\"rollback_class\":\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\"\
       :[],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
