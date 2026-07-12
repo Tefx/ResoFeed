@@ -183752,7 +183752,7 @@ phases:
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_ui_contract\",\"accessibility_behavior\"\
       ,\"runtime_operations\"],\"primary_outcome\":\"RF-BUG-004-008\",\"rollback_class\"\
       :\"NONTRIVIAL\",\"proof_modalities\":[\"TEST\",\"RUNTIME_PROBE\",\"REVIEW\"\
-      ],\"primary_verifier\":\"uiux-auditor\",\"additional_verifiers\":[\"integration-verifier\"\
+      ],\"primary_verifier\":\"blind-tester\",\"additional_verifiers\":[\"integration-verifier\"\
       ],\"review_mode\":\"INDEPENDENT\",\"phase_full_gate_required\":true,\"test_authority\"\
       :{\"developer_test_globs\":[],\"acceptance_test_paths\":[\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\"\
       ,\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\",\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"\
