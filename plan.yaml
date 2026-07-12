@@ -8,13 +8,15 @@
 # =============================================================
 version: 1
 project: ResoFeed
-strategy_ref: docs/BUG_FIX_PLAN_2026-07-12.md
-context: Active rf-bug-20260712 phases implement RF-BUG-001–010 from docs/BUG_REPORT_2026-07-11.md
-  under the simplified minimum-remnant contract in docs/BUG_FIX_PLAN_2026-07-12.md
-  (sha256 c2e02c105b286ff9406bdd8cd669f0e75d527a6a8574415b3a984645c45805bc). Completed
-  history is preserved. Reachable closure order is contract lock; local frontend/runtime
-  repair; Ledger/Prompting; E2E isolation; local-only matrix; OCI publication; both-platform
-  container verification; Tailnet deployment; independent reviews; documentation closure.
+strategy_ref: docs/BUG_FIX_PLAN_2026-07-12.md sha256:67b6df6a7f3369c57fcf9140485e3e48a4b3ca6b636d5a6447f1cf643b4061fc
+context: RF-BUG-001–010 managed repair plan reconciled to the reviewed 2026-07-12
+  authority. Vectl structure is reconciled; contract lock and canonical corrections
+  remain pending; implementation is not ready. Preserve completed history and the
+  six active RF-BUG phases. Enforce import-only OPML, package-local embedded UI, canonical
+  ~base64url item IDs across browser and item APIs, protected expected-red/browser
+  acceptance, exact positive collection/count evidence, retry-free Playwright isolation,
+  and independent local/OCI/container/Tailnet closure. No registries, generators,
+  reset schemas, duplicate phases, broad cleanup authority, or /sources alias.
 project_guidance: Read docs/BUG_FIX_PLAN_2026-07-12.md and cited canonical references
   before work. Preserve the single-binary, SQLite-only, lexical-search, owner-token,
   import-only OPML, and no-sync/no-merge boundaries. Contract-lock owners create each
