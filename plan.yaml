@@ -183009,7 +183009,7 @@ phases:
       checks:\n  - id: rf_bug_010_expected_red\n    run: {command: [bash, -lc, \"\
       npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\
-      \ --grep '^\\\\[RF-BUG-010\\\\] mutating cases own isolated state and cleanup$'\"\
+      \ --grep '\\[RF-BUG-010\\] mutating cases own isolated state and cleanup$'\"\
       ], timeout_seconds: 600}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
       \ {contains_all: [{literal: mutating cases own isolated state and cleanup},\
       \ {literal: expected case-local database and complete cleanup}], contains_any:\
@@ -183018,7 +183018,7 @@ phases:
       \    run: {command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
       \ web/playwright.artifact-proof.config.ts --project=chromium-ci-safe --retries=0\
       \ --reporter=line,json,html web/tests/e2e/harness-artifact.intentional-failure.spec.ts\
-      \ --grep '^\\\\[RF-BUG-010\\\\] intentional failure retains complete artifacts$'\"\
+      \ --grep '\\[RF-BUG-010\\] intentional failure retains complete artifacts$'\"\
       ], timeout_seconds: 600}\n    expect: {outcome: red, exit_codes: [1], stdout_or_stderr:\
       \ {contains_all: [{literal: RF-BUG-010_SETUP=ready}, {literal: RF-BUG-010_ASSERTION_REACHED=ready},\
       \ {literal: RF-BUG-010_INTENTIONAL_ASSERTION}, {literal: RF-BUG-010_TEARDOWN=clean}],\
