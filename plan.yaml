@@ -183593,7 +183593,7 @@ phases:
       worktree.
   - id: rf-bug-frontend-doc-design-remediation
     name: Close frontend RF-BUG documentation and preview contracts
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE. Synchronize only `docs/DESIGN.md` and\
@@ -183672,6 +183672,13 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T11:57:49.175271+00:00'
+    done_at: '2026-07-13T12:05:05.072491+00:00'
+    evidence: Integrated commit e3fd09b6 (worktree cb14c644fe854d81d6acaa419d22f2f009eab3c9)
+      updates only DESIGN and ui-preview. Dispatch sha256:ea384ef3ab9551b0ec857bfb1e6dbd366c434d4fe62c18c6462fb45b774f3b50
+      and receipt sha256:1cf0ef54e5dcdf2c005665ba93920de725f9a57187f6d9842a18e9ec6106695f
+      admitted CONFORMANT. Canonical docs test and explicit RF-BUG atom/Invalid Search
+      checks reran green; exact Source Ledger title present. Sidecar CONFORMANT at
+      cb14c644fe854d81d6acaa419d22f2f009eab3c9, clean worktree.
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
