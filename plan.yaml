@@ -182687,7 +182687,7 @@ phases:
       and remains untracked.
   - id: rf-bug-route-search-token-expected-red
     name: Lock combined frontend expected-red acceptance
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
       \ source outcome `rf-bug-route-search-token-expected-red`:\nOutcome: RF-BUG-002-CONTRACT.\
@@ -182842,8 +182842,6 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: general
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-13T07:09:08.573763+00:00'
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
     status: pending
