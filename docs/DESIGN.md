@@ -1235,6 +1235,23 @@ Examples: `no new items`, `err: summary unavailable`, `Text evidence: RSS excerp
 - Selecting a Feed or Search row immediately opens a readable Inspector preview. Detail and inspection-marker requests enhance it independently. Pending, failure, viewport changes, and late responses for a prior item preserve the current selection, URL, readable content, and expected focus/Escape behavior.
 - Idle Steer has no missing-URL error. A matching invalid submission exposes one localized accessible error, retains input and focus, performs no mutation, and clears on edit. Stale preview and transport failures use distinct feedback.
 - Source Ledger keeps `SOURCE LIST` and `PORTABLE STATE` as separately labelled groups on desktop and narrow surfaces. The only source-list transfer action is `[IMPORT OPML]`; portable backup/restore uses `[EXPORT STATE]` and `[IMPORT STATE]`. Controls remain keyboard reachable, visibly focused, at least 44 by 44 CSS pixels, and free of document-level horizontal overflow.
+## RF-BUG Interface-Contract Atom Inventory
+
+### RF-BUG-001 — Inspector selection atom
+Selecting a Feed or Search row immediately commits that row's opaque item ID as the active selection and opens its readable summary preview without blanking the Inspector. Detail retrieval and inspection-marker recording remain independent request channels keyed to that active selection. A pending, failed, or late detail/marker response for a previous item cannot change the current preview, loading/error state, focus, URL, or content; viewport transitions, Back, and Escape preserve the current readable selection according to the Inspector contract.
+
+### RF-BUG-002 — Route, opaque ID, and Search atom
+Route resolution precedes token hydration and chooses the correct EN/ZH Today, Source Ledger, Search, Inspector, or `/doctor` surface on cold load, refresh, Back, and Forward. Direct Inspector routes use only the canonical opaque item token: `~` plus unpadded RFC4648 base64url, shared by UI navigation and the item API request. Search restores supported lexical fields from route state, validates route and submit input before network/history effects, and persists only bounded route primitives rather than results, items, saved searches, reading history, or another product concept.
+
+### Invalid Search visible/accessibility/recovery contract
+The Search surface and entered filter/query values remain visible throughout an invalid route or submit state. Exactly one localized current error uses `role="alert"` with `aria-live="assertive"`; it replaces any prior Search validation alert rather than accumulating duplicate live regions. An invalid route or submission sends no `/api/search` request and performs no history push or replace.
+
+Editing retains focus and entered values, sends no request, performs no history write, and leaves the current alert visible until the user submits corrected input. A corrected valid submission replaces the alert with the ordinary loading/status lifecycle, issues exactly one lexical Search request, and writes only bounded canonical `q` history state plus documented valid lexical filters.
+### RF-BUG-006 — Resolved-route title atom
+The resolved route surface and its document title commit atomically before hydration or asynchronous work can paint. Cold load, refresh, direct Inspector navigation, Search, Today, Source Ledger, `/doctor`, Back, and Forward expose no intermediate title from another route. Functional titles remain the exact invariant English tokens `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor` in both processing languages.
+
+### RF-BUG-007 — Steer invalid-state atom
+Idle Steer exposes no missing-URL state. An invalid add-source command retains the localized command text and input focus, sends no `/api/steer` mutation, and exposes exactly one current localized `URL required` / `需要 URL` error using `role="alert"` and `aria-live="assertive"`. Repeated invalid submit and processing-language change remount that one current alert for a fresh announcement; editing clears it immediately. Preview-unavailable and transport failures retain their distinct localized feedback and cannot inherit or submit the invalid add-source mutation.
 ## Do's and Don'ts
 Do:
 
