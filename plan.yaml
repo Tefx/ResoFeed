@@ -183344,7 +183344,7 @@ phases:
     agent: general
   - id: rf-bug-002-initial-route-acceptance-remediation
     name: Remediate RF-BUG-002 initial-route acceptance coverage
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-002-INITIAL-ROUTE-ACCEPTANCE. Append the missing protected EN/ZH Playwright\
@@ -183419,6 +183419,13 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T09:41:00.291392+00:00'
+    done_at: '2026-07-13T09:51:57.787457+00:00'
+    evidence: Integrated commit 2e7434a3 (worktree 06281c28634c96dd7dab0078273727496c692eae)
+      appends only the missing protected EN/ZH initial-route cases. Dispatch sha256:d8c10db795d4b18b63b94e17cb24d1ea0e2515316e47152a6fb51f9962e555ec
+      and receipt sha256:2663614c4b914498f6572607fd7f846c9747796c3f096044950dd7b5d87d32ba
+      admitted CONFORMANT. Native list reports exactly 10 RF-BUG-002 tests with all
+      required titles; the eight appended cases rerun exit 1/red at RF-BUG-002_INITIAL_ROUTE_MATRIX_ASSERTION.
+      Sidecar CONFORMANT at 06281c28634c96dd7dab0078273727496c692eae, clean worktree.
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
