@@ -182535,7 +182535,7 @@ phases:
   steps:
   - id: runtime-assets-opml-security-expected-red
     name: Lock embedded UI, OPML, and HTTP security acceptance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-003-005-CONTRACT. One contract-test owner controls the atomic protected\
@@ -182620,6 +182620,8 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T07:09:08.573981+00:00'
   - id: rf-bug-canonical-contract-sync
     name: Synchronize RF-BUG canonical contracts
     status: done
@@ -182685,7 +182687,7 @@ phases:
       and remains untracked.
   - id: rf-bug-route-search-token-expected-red
     name: Lock combined frontend expected-red acceptance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
       \ source outcome `rf-bug-route-search-token-expected-red`:\nOutcome: RF-BUG-002-CONTRACT.\
@@ -182840,9 +182842,11 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T07:09:08.573763+00:00'
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-004-008-CONTRACT. Define protected State-import confirm/cancel/focus\
@@ -182918,9 +182922,11 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T07:09:08.573320+00:00'
   - id: rf-bug-prompting-v22-expected-red
     name: Lock Prompting v2.2 acceptance
-    status: pending
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-009-CONTRACT. Define the exact protected 16-subtest Prompting v2.2\
@@ -182967,9 +182973,21 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T07:09:08.573546+00:00'
+    done_at: '2026-07-13T07:31:12.803187+00:00'
+    evidence: Integrated commit 3cef838a (worktree commit 5c124ead7f72cb9647b6becdc32123a1c67f415d)
+      adds internal/resofeed/rf_bug_prompting_v22_expected_red_test.go only. Admitted
+      dispatch sha256:bfba321dd7f922c4f8dba1569fa5b947f16d2e308f6603961556b34252e66118.
+      Production worker receipt validation CONFORMANT, receipt sha256:07beb7eee61235249bc080d2da288f5b06531a3960a98c511d580a61d2d15ffe.
+      Intent-Closure sidecar CONFORMANT at checked commit 5c124ead7f72cb9647b6becdc32123a1c67f415d
+      with clean worktree; rf_bug_009_expected_red reran exit 1/outcome red and matched
+      TestRFBUG009PromptingV22Contract, RF-BUG-009_EXACT_SUBTEST_SET=16, and expected
+      one generation plus at most one semantic repair. Scope contained to the single
+      authorized acceptance path; no unresolved obligations.
   - id: rf-bug-e2e-isolation-artifact-expected-red
     name: Lock E2E isolation and failure-artifact acceptance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-010-CONTRACT. Define protected real-runtime isolation and one intentional\
@@ -183030,6 +183048,8 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T07:09:08.573061+00:00'
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
