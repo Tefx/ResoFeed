@@ -183246,6 +183246,7 @@ phases:
     - docs/DESIGN.md
     depends_on:
     - repair-route-search-and-opaque-item-ids
+    - rf-bug-001-inspector-mock-route-remediation
     agent: frontend-engineer
   - id: rf-bug-frontend-behavior-full-gate
     name: RF-BUG frontend-behavior phase Full Gate
