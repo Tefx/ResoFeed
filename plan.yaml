@@ -182877,16 +182877,16 @@ phases:
       ,\"authorized_mutation_refs\":[{\"ref\":\"authority:acceptance-mutation:rf008-render\"\
       ,\"path\":\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\"\
       ,\"purpose\":\"Define Ledger render and operational-state acceptance\",\"check_id\"\
-      :\"rf_bug_008_browser_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf004008-responsive\"\
-      ,\"path\":\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\"\
+      :\"rf_bug_008_browser_expected_red\",\"actor_id\":\"spec-verifier\"},{\"ref\"\
+      :\"authority:acceptance-mutation:rf004008-responsive\",\"path\":\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\"\
       ,\"purpose\":\"Define State-import and five-viewport Ledger acceptance\",\"\
-      check_id\":\"rf_bug_004_state_import_expected_red\",\"actor_id\":\"general\"\
+      check_id\":\"rf_bug_004_state_import_expected_red\",\"actor_id\":\"spec-verifier\"\
       },{\"ref\":\"authority:acceptance-mutation:rf008-operations\",\"path\":\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"\
       ,\"purpose\":\"Define real-runtime Ledger operation acceptance\",\"check_id\"\
-      :\"rf_bug_008_operations_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"\
-      authority:acceptance-mutation:rf008-delete\",\"path\":\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
+      :\"rf_bug_008_operations_expected_red\",\"actor_id\":\"spec-verifier\"},{\"\
+      ref\":\"authority:acceptance-mutation:rf008-delete\",\"path\":\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
       ,\"purpose\":\"Define delete and focus acceptance\",\"check_id\":\"rf_bug_008_browser_expected_red\"\
-      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
+      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
     verification: Require exact 14-title/five-screenshot inventory and assertion-specific
       State, responsive, and operation red outcomes; protect all baselines.
     refs:
@@ -182896,7 +182896,7 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: general
+    agent: frontend-engineer
   - id: rf-bug-prompting-v22-expected-red
     name: Lock Prompting v2.2 acceptance
     status: pending
