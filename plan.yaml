@@ -183339,6 +183339,8 @@ phases:
     verification: Require exact EN/ZH route collection and 100 retry-free executions,
       four Search titles with invalid no-request/no-history cases, nine token round
       trips, 30 API subtests, and no protected acceptance diff.
+    depends_on:
+    - rf-bug-002-initial-route-acceptance-remediation
     agent: general
   - id: rf-bug-002-initial-route-acceptance-remediation
     name: Remediate RF-BUG-002 initial-route acceptance coverage
