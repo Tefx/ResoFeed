@@ -183260,7 +183260,7 @@ phases:
       clean worktree.
   - id: rf-bug-frontend-behavior-full-gate
     name: RF-BUG frontend-behavior phase Full Gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -183282,6 +183282,8 @@ phases:
     - repair-inspector-selection-and-routing
     - rf-bug-frontend-doc-design-remediation
     agent: gate-reviewer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T12:05:26.577551+00:00'
   - id: repair-route-search-and-opaque-item-ids
     name: Repair route, Search history, and opaque item IDs
     status: done
