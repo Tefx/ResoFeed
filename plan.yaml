@@ -183712,7 +183712,7 @@ phases:
       cb14c644fe854d81d6acaa419d22f2f009eab3c9, clean worktree.
   - id: rf-bug-frontend-runtime-acceptance-remediation
     name: Lock frontend runtime race and real-seam acceptance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-FRONTEND-RUNTIME-ACCEPTANCE. Append protected acceptance for the second\
@@ -183814,9 +183814,11 @@ phases:
     - web/tests/e2e/routes.browser-contract.spec.ts
     - web/tests/e2e/inspector-selection.browser-contract.spec.ts
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T12:33:24.376858+00:00'
   - id: rf-bug-go-token-parity-acceptance-remediation
     name: Lock canonical HTTP rejection and HTTP/MCP parity acceptance
-    status: pending
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY-CONTRACT. Append one protected Go test `TestRFBUG002CanonicalHTTPMCPParity`\
@@ -183880,6 +183882,13 @@ phases:
     - internal/resofeed/mcp.go
     - internal/resofeed/reprocess.go
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T12:33:24.377198+00:00'
+    done_at: '2026-07-13T12:58:32.015606+00:00'
+    evidence: Integrated c72331b6 (worktree c6eaf3ec). Expected-red check matched
+      canonical rejection and HTTP/MCP parity fingerprints after standalone boundary-safe
+      emissions. Dispatch/receipt CONFORMANT; receipt sha256:93e456e1999b553c529c6e8330244b5dd952cb6b259ff7348ee5554e6eef5f8e.
+      Protected acceptance authorization spec-verifier admitted. Clean sidecar CONFORMANT.
   - id: rf-bug-frontend-runtime-remediation
     name: Repair initial title, Search ownership, and Steer runtime semantics
     status: pending
