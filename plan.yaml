@@ -182622,7 +182622,7 @@ phases:
     agent: general
   - id: rf-bug-canonical-contract-sync
     name: Synchronize RF-BUG canonical contracts
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-CANONICAL-CONTRACTS. Align the nine active product documents and active\
@@ -182668,6 +182668,21 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T06:42:32.099697+00:00'
+    done_at: '2026-07-13T06:55:48.338775+00:00'
+    evidence: Recovered preserved worktree /Users/tefx/Projects/ResoFeed-worktrees/rf-bug-canonical-contract-sync
+      from base a6bbb9079a65edf45fd1592c674c5bd44eb6749b under claim owner vectl-orchestrator
+      and admitted dispatch sha256:b56ed4da2b7a240c34ac629704a3fa18ebc32501d3c6e2d8002cbd898f86b6f7.
+      Worker general returned admitted vectl.worker.execution.v1 receipt sha256:31b01cf425421c67d95bfae7c1edd62dd2f25fb5fec37768faa2b5f555b8cbaf;
+      central --validate-worker-receipt returned CONFORMANT and independently reran
+      go test -v ./tests -run ^TestRFBugCanonicalContracts$ -count=1 with exit 0,
+      RF_BUG_CANONICAL_DOCUMENTS=9, OPML_EXCLUSIONS=2, PASS. Central clean-final sidecar
+      returned CONFORMANT before and after bounded rebase. Integrated by git rebase
+      --onto 5f557113a5f84d01a73d652f7adac5d2a2f74a25 a6bbb9079a65edf45fd1592c674c5bd44eb6749b
+      425b400e7f86833be4da91803e706dace7489246 followed by git merge --ff-only 543438bfd8040994aab2e84aebab533f867c93dd.
+      Integrated commit 543438bfd8040994aab2e84aebab533f867c93dd. Authority files
+      unchanged; changed paths exactly the ten allowed paths. Preserved .pi/remote-pi/config.json
+      SHA-256 remained 7e07a445efa5a6a63b4c0d8249222a46415264ac3199d2840d94131173d09605
+      and remains untracked.
   - id: rf-bug-route-search-token-expected-red
     name: Lock combined frontend expected-red acceptance
     status: pending
