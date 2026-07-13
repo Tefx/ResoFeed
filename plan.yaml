@@ -183590,6 +183590,86 @@ phases:
       diagnostic and preserved readable-detail behavior fingerprint, no 404/setup
       errors. Sidecar CONFORMANT at 0377bd0351b3411f06490d9f67902744a1dd59bf, clean
       worktree.
+  - id: rf-bug-frontend-doc-design-remediation
+    name: Close frontend RF-BUG documentation and preview contracts
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE. Synchronize only `docs/DESIGN.md` and\
+      \ `docs/ui-preview.html` with the integrated RF-BUG-001/002/006/007 behavior\
+      \ already proven green. In the preview, set the exact canonical document title\
+      \ `<title>RESOFEED · SOURCE LEDGER</title>` without changing the archival Source\
+      \ Ledger surface or introducing another product concept. In DESIGN, add one\
+      \ explicit interface-contract atom inventory with separately named atoms for\
+      \ RF-BUG-001 Inspector selection/stale-response behavior, RF-BUG-002 route-first\
+      \ EN/ZH surfaces/canonical opaque IDs/Search validation and history, RF-BUG-006\
+      \ atomic resolved-route titles, and RF-BUG-007 localized accessible Steer invalid-state\
+      \ recovery. Define Invalid Search precisely: the Search surface and entered\
+      \ values remain visible; exactly one localized current `role=\"alert\"` with\
+      \ `aria-live=\"assertive\"` communicates the validation failure; invalid route\
+      \ or submit state sends no `/api/search` request and performs no history push/replace;\
+      \ editing retains focus and values and causes no request/history write while\
+      \ the current alert remains until corrected submission; corrected valid submission\
+      \ replaces the alert with the ordinary loading/status lifecycle, issues one\
+      \ lexical Search request, and writes only bounded canonical `q` history state.\
+      \ Keep DESIGN and preview examples synchronized. Do not change product code,\
+      \ tests, architecture, APIs, routing, screenshots, or completed evidence. Rollback\
+      \ reverts these two documentation artifacts together.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
+      \  - docs/DESIGN.md\n  - docs/ui-preview.html\n  blocked_paths:\n  - docs/ARCHITECTURE.md\n\
+      \  - docs/PRD.md\n  - docs/BUG_FIX_PLAN_2026-07-12.md\n  - docs/BUG_REPORT_2026-07-11.md\n\
+      \  - web/**\n  - internal/**\n  - tests/**\nclaims:\n- RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE\n\
+      checks:\n- id: rf_bug_frontend_canonical_docs_green\n  run:\n    command:\n\
+      \    - go\n    - test\n    - -v\n    - ./tests\n    - -run\n    - ^TestRFBugCanonicalContracts$\n\
+      \    - -count=1\n    timeout_seconds: 240\n  expect:\n    outcome: green\n \
+      \   exit_codes: [0]\n    stdout_or_stderr:\n      contains_all:\n      - {literal:\
+      \ TestRFBugCanonicalContracts}\n      - {literal: PASS}\n      contains_any:\
+      \ []\n      forbids:\n      - {literal: FAIL}\n      - {literal: no tests to\
+      \ run}\n      - {literal: missing required canonical fragment}\n  proves: [RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE]\n\
+      - id: rf_bug_frontend_interface_atoms_green\n  run:\n    command:\n    - bash\n\
+      \    - -lc\n    - |\n      python3 - <<'PY'\n      from pathlib import Path\n\
+      \      design = Path('docs/DESIGN.md').read_text(encoding='utf-8')\n      preview\
+      \ = Path('docs/ui-preview.html').read_text(encoding='utf-8')\n      required\
+      \ = [\n          '## RF-BUG Interface-Contract Atom Inventory',\n          'RF-BUG-001\
+      \ — Inspector selection atom',\n          'RF-BUG-002 — Route, opaque ID, and\
+      \ Search atom',\n          'RF-BUG-006 — Resolved-route title atom',\n     \
+      \     'RF-BUG-007 — Steer invalid-state atom',\n          '### Invalid Search\
+      \ visible/accessibility/recovery contract',\n          'role=\"alert\"',\n \
+      \         'aria-live=\"assertive\"',\n          'no `/api/search` request',\n\
+      \          'no history push or replace',\n          'Editing retains focus and\
+      \ entered values',\n          'corrected valid submission',\n          'bounded\
+      \ canonical `q` history state',\n      ]\n      missing = [literal for literal\
+      \ in required if literal not in design]\n      if missing:\n          raise\
+      \ SystemExit(f'missing RF-BUG interface atoms: {missing!r}')\n      if '<title>RESOFEED\
+      \ · SOURCE LEDGER</title>' not in preview:\n          raise SystemExit('missing\
+      \ exact Source Ledger preview title')\n      print('RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007')\n\
+      \      print('RF-BUG_INVALID_SEARCH_CONTRACT=visible,alert,no-request,no-history,edit,recovery')\n\
+      \      PY\n    timeout_seconds: 120\n  expect:\n    outcome: green\n    exit_codes:\
+      \ [0]\n    stdout_or_stderr:\n      contains_all:\n      - {literal: \"RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007\"\
+      }\n      - {literal: \"RF-BUG_INVALID_SEARCH_CONTRACT=visible,alert,no-request,no-history,edit,recovery\"\
+      }\n      contains_any: []\n      forbids:\n      - {literal: missing RF-BUG\
+      \ interface atoms}\n      - {literal: missing exact Source Ledger preview title}\n\
+      \      - {literal: Traceback}\n  proves: [RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE]\n\
+      bindings:\n  expected_red:\n    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
+      :\"rf-bug-20260712-frontend-behavior.rf-bug-frontend-doc-design-remediation\"\
+      ,\"risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_contract\",\"design_preview_sync\"\
+      ,\"gate_blocker_remediation\"],\"primary_outcome\":\"RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE\"\
+      ,\"rollback_class\":\"TRIVIAL\",\"test_authority\":{\"developer_test_globs\"\
+      :[],\"acceptance_test_paths\":[\"tests/rf_bug_canonical_contract_test.go\"],\"\
+      acceptance_check_ids\":[\"rf_bug_frontend_canonical_docs_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Require exact Source Ledger preview title and `TestRFBugCanonicalContracts`
+      green; require the four named RF-BUG interface atoms plus complete Invalid Search
+      visible/alert/no-request/no-history/edit/recovery literals; allow only DESIGN
+      and preview diffs; preserve all integrated product and acceptance artifacts.
+    evidence_template: Two-doc diff; canonical Go contract command/exit; atom inventory
+      check output; Invalid Search contract literals; product/test/docs-scope diff
+      guard.
+    depends_on:
+    - repair-route-search-and-opaque-item-ids
+    - repair-inspector-selection-and-routing
+    agent: frontend-engineer
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
