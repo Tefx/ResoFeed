@@ -183591,7 +183591,7 @@ phases:
       checks:\n  - id: rf_bug_004_state_import_green\n    run: {command: [bash, -lc,\
       \ \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-004\\\\]'\"], timeout_seconds: 600}\n    expect: {outcome:\
+      \ --grep '\\[RF-BUG-004\\]'\"], timeout_seconds: 600}\n    expect: {outcome:\
       \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: State\
       \ import confirms before atomic replacement}, {literal: State import cancellation\
       \ resets intent and focus}], contains_any: [{literal: passed}], forbids: [{literal:\
@@ -183606,7 +183606,7 @@ phases:
       \    run: {command: [bash, -lc, \"npm --prefix web exec -- playwright test --config\
       \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
       \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-008\\\\]'\"], timeout_seconds: 600}\n    expect: {outcome:\
+      \ --grep '\\[RF-BUG-008\\]'\"], timeout_seconds: 600}\n    expect: {outcome:\
       \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: '[RF-BUG-008][320x800]\
       \ Source Ledger responsive contract'}, {literal: '[RF-BUG-008][1440x900] Source\
       \ Ledger responsive contract'}, {literal: delete cancel restores focus}, {literal:\
@@ -183616,7 +183616,7 @@ phases:
       \ - id: rf_bug_008_operations_green\n    run: {command: [bash, -lc, \"npm --prefix\
       \ web exec -- playwright test --config web/playwright.runtime.config.ts --project=chromium-ci-safe\
       \ --retries=0 web/tests/e2e/source-ledger-operations.runtime.spec.ts --grep\
-      \ '^\\\\[RF-BUG-008\\\\]'\"], timeout_seconds: 600}\n    expect: {outcome: green,\
+      \ '\\[RF-BUG-008\\]'\"], timeout_seconds: 600}\n    expect: {outcome: green,\
       \ exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: RUN INGEST transitions},\
       \ {literal: FETCH transitions and independent rows}, {literal: current-operation\
       \ conflict detail}, {literal: source info disclosure}], contains_any: [{literal:\
