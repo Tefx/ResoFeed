@@ -182535,7 +182535,7 @@ phases:
   steps:
   - id: runtime-assets-opml-security-expected-red
     name: Lock embedded UI, OPML, and HTTP security acceptance
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-003-005-CONTRACT. One contract-test owner controls the atomic protected\
@@ -182620,8 +182620,6 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: general
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-13T07:09:08.573981+00:00'
   - id: rf-bug-canonical-contract-sync
     name: Synchronize RF-BUG canonical contracts
     status: done
