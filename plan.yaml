@@ -183639,10 +183639,10 @@ phases:
       \ request',\n          'no history push or replace',\n          'Editing retains\
       \ focus and entered values',\n          'corrected valid submission',\n    \
       \      'bounded canonical `q` history state',\n      ]\n      missing = [literal\
-      \ for literal in required if literal not in design]\n      if missing:\n   \
-      \       raise SystemExit(f'missing RF-BUG interface atoms: {missing!r}')\n \
-      \     if '<title>RESOFEED · SOURCE LEDGER</title>' not in preview:\n       \
-      \   raise SystemExit('missing exact Source Ledger preview title')\n      print('RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007')\n\
+      \ for literal in required if literal not in design]\n      assert not missing,\
+      \ f'missing RF-BUG interface atoms: {missing!r}'\n      assert '<title>RESOFEED\
+      \ · SOURCE LEDGER</title>' in preview, 'missing exact Source Ledger preview\
+      \ title'\n      print('RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007')\n\
       \      print('RF-BUG_INVALID_SEARCH_CONTRACT=visible,alert,no-request,no-history,edit,recovery')\n\
       \    timeout_seconds: 120\n  expect:\n    outcome: green\n    exit_codes: [0]\n\
       \    stdout_or_stderr:\n      contains_all:\n      - {literal: \"RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007\"\
