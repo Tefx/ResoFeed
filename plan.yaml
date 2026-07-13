@@ -183906,7 +183906,7 @@ phases:
     depends_on:
     - fresh-docker-runtime-proof
     - deployment-operation-authorization-review
-    agent: general
+    agent: integration-verifier
   - id: formal-security-review
     name: Review HTTP, CSP, secrets, and state boundaries independently
     status: pending
