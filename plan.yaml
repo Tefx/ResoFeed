@@ -182838,7 +182838,7 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     depends_on:
-    - rf-bug-canonical-contract-sync
+    - rf-bug-playwright-command-config-foundation
     agent: general
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
