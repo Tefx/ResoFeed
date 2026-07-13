@@ -182992,13 +182992,13 @@ phases:
       ],\"acceptance_mutation\":\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\"\
       :\"authority:acceptance-mutation:rf010-isolation\",\"path\":\"web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts\"\
       ,\"purpose\":\"Define case-local runtime isolation acceptance\",\"check_id\"\
-      :\"rf_bug_010_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf010-artifact-spec\"\
+      :\"rf_bug_010_expected_red\",\"actor_id\":\"spec-verifier\"},{\"ref\":\"authority:acceptance-mutation:rf010-artifact-spec\"\
       ,\"path\":\"web/tests/e2e/harness-artifact.intentional-failure.spec.ts\",\"\
       purpose\":\"Define ordered intentional-failure acceptance\",\"check_id\":\"\
-      rf_bug_010_artifact_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf010-artifact-config\"\
-      ,\"path\":\"web/playwright.artifact-proof.config.ts\",\"purpose\":\"Define standard\
-      \ retained failure evidence\",\"check_id\":\"rf_bug_010_artifact_expected_red\"\
-      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
+      rf_bug_010_artifact_expected_red\",\"actor_id\":\"spec-verifier\"},{\"ref\"\
+      :\"authority:acceptance-mutation:rf010-artifact-config\",\"path\":\"web/playwright.artifact-proof.config.ts\"\
+      ,\"purpose\":\"Define standard retained failure evidence\",\"check_id\":\"rf_bug_010_artifact_expected_red\"\
+      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
     verification: Require isolated-state assertion red and independently collected
       one-failure lifecycle/artifact red with complete fail-closed redaction checks.
     refs:
@@ -183007,7 +183007,7 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: general
+    agent: frontend-engineer
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
