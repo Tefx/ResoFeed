@@ -182995,7 +182995,7 @@ phases:
       authorized acceptance path; no unresolved obligations.
   - id: rf-bug-e2e-isolation-artifact-expected-red
     name: Lock E2E isolation and failure-artifact acceptance
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-010-CONTRACT. Define protected real-runtime isolation and one intentional\
@@ -183056,8 +183056,6 @@ phases:
     depends_on:
     - rf-bug-playwright-command-config-foundation
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-13T07:56:14.603335+00:00'
   - id: rf-bug-playwright-command-config-foundation
     name: Establish preliminary Playwright command configs
     status: done
