@@ -140,17 +140,17 @@ After reset, either:
 There is intentionally no HTTP API, MCP tool, Settings screen, or browser UI action for server-side token reset. Do not use or persist a `serve --reset-owner-token` style startup flag.
 
 ### 5. Open the UI
-
 ```text
 http://127.0.0.1:8080
 ```
 
 On first open, paste the owner token printed at startup or supplied with `--owner-token`. The browser stores it locally as `resofeed.ownerToken` and sends it as `Authorization: Bearer <OWNER_TOKEN>` for every `/api/*` request.
 
-The top chrome stays sparse. Use the `RESOFEED` menu to reach utility surfaces such as `TODAY` and `SOURCE LEDGER`; those entries may be hidden while the menu is closed.
+The top chrome stays sparse. Use the `RESOFEED` menu to reach `TODAY` and `SOURCE LEDGER`; those entries may be hidden while the menu is closed. Cold load, refresh, Back, and Forward must show the requested surface from the first visible frame. Functional titles are `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor` in both processing languages.
 
-Deleting `localStorage['resofeed.ownerToken']` or clearing browser storage only forgets the browser-local copy. It does not rotate or reset the server-side owner token stored as a SQLite hash. If the browser has a stale token, the UI should prompt for the current owner token again after `401 unauthorized`.
+Selecting a Feed or Search item immediately opens a readable Inspector preview. Pending or failed detail/inspection requests do not clear it, and a late response for an earlier item cannot replace the current selection.
 
+Deleting `localStorage['resofeed.ownerToken']` or clearing browser storage only forgets the browser-local copy. It does not rotate or reset the server-side owner token stored as a SQLite hash. If the browser has a stale token, the UI prompts for the current owner token again after `401 unauthorized`.
 ### 6. Add sources
 
 - Paste an RSS/Atom URL into Steer; or
@@ -834,18 +834,6 @@ Rules:
 - all feeds become one flat source list;
 - no tags, categories, pause/resume toggles, drag ordering, or source scoring sliders are created.
 
-### Export OPML
-
-Use the Source Ledger `[EXPORT OPML]` action or `GET /api/sources/export-opml` to export the active Source Ledger as OPML XML.
-
-```bash
-curl -sS "http://127.0.0.1:8080/api/sources/export-opml" \
-  -H "Authorization: Bearer <OWNER_TOKEN>" \
-  -o sources.opml
-```
-
-OPML export is source-list exchange only. It is not complete state portability and does not include steering rules, resonated items, item cache rows, runtime metadata, receipts, operation state, or history.
-
 ### Refresh sources manually
 
 Use `[RUN INGEST]` in the Source Ledger header to fetch all active sources, or `[FETCH]` on a single source row.
@@ -892,47 +880,27 @@ Search must not use:
 RAG-grade retrieval is out of scope for ResoFeed search.
 
 ## State Export and Import
+ResoFeed moves portable active state through JSON State only.
 
-ResoFeed must let you move your active state without vendor lock-in.
+Export contains exactly:
 
-Export includes at minimum:
-
-- Source Ledger;
+- active Source Ledger rows;
 - current active steering policy rules;
 - currently resonated items.
 
-Import replaces that portable active state with the bundle. Local portable rows absent from the bundle are removed.
+Import validates the bundle before one atomic replacement transaction. Local portable rows absent from the bundle are removed; invalid input leaves all prior portable state unchanged.
 
-Rules:
+OPML remains import-only source intake. It does not output, restore, merge, or synchronize ResoFeed state. The UI exposes `[IMPORT OPML]` under Source List and `[EXPORT STATE]` / `[IMPORT STATE]` under the separately labelled Portable State group.
 
-- export/import is current-state based;
-- no event-sourced activity ledger is created;
-- source OPML import/export remain flat source-list exchange only and are not complete state portability;
-- import should fail cleanly rather than partially corrupt state;
-- derived search indexes may be rebuilt after import.
-
-The UI for export/import should remain terse. It must not become a cloud backup dashboard, account system, sync service, or privacy/security product surface.
-
-Architecture note: if older design wording mentions steering or resonance “history,” treat that as this current-state bundle only. ResoFeed does not export or maintain a general command history, reading history, or activity ledger.
-
+The UI remains terse. It must not become a cloud backup dashboard, account system, sync service, command/reading history, activity ledger, portable receipt, or merge/conflict resolver.
 ## Diagnostics: `/doctor`
-
 Type `/doctor` into Steer to see raw operational health.
 
-Expected diagnostic content includes:
-
-- RSS fetch errors;
-- model latency or model errors;
-- extraction failures;
-- Tavily external-recovery availability and current-state counts: `tavily: configured=present|missing`, `tavily: recovered_items=<n>`, and `tavily: recoverable_unavailable=<n>`;
-- last ingestion run information;
-- other raw status lines useful for debugging.
-- `search_fts: ok` or `search_fts: stale since <RFC3339_UTC>` after reprocess begins or fails before final FTS rebuild.
+Expected diagnostic content includes RSS, model, extraction, Tavily, ingestion, and FTS status plus the packaged-UI lines `ui_assets=ready` and `ui_asset_source=embedded`. `/doctor` uses the exact functional title `RESOFEED · /doctor`.
 
 `/doctor` is plain text. It is not a dashboard, chart surface, friendly remediation wizard, or settings page.
 
-Diagnostics and live-smoke evidence must redact provider API keys. Acceptable evidence may say a key was configured and show `OPENROUTER_KEY=<redacted>` or `TAVILY_API_KEY=<redacted>`; it must not show actual values. `/doctor` OpenRouter lines use the `openrouter:` prefix, include the configured model (`account_default` when omitted), include a resolved model only when available, and never print keys, secret-source metadata, `.env` paths, or provider configuration. `/doctor` Tavily lines use the `tavily:` prefix and report safe current-state counts only, not live probes or raw provider responses.
-
+Diagnostics and live-smoke evidence redact provider API keys, owner tokens, authorization values, cookies, provider bodies, and `.env` contents. Acceptable evidence may show `OPENROUTER_KEY=<redacted>`, `TAVILY_API_KEY=<redacted>`, or a redacted secret source. OpenRouter lines use the `openrouter:` prefix; Tavily lines use the `tavily:` prefix and report safe current-state counts only. Neither diagnostics nor browser evidence prints raw keys, secret-source metadata, `.env` paths, provider configuration, or provider responses.
 ## OpenRouter Configuration Contract
 
 OpenRouter is the sole LLM backend. ResoFeed sends JSON-in/JSON-out requests to the OpenRouter chat completions endpoint:

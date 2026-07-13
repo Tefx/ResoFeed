@@ -1226,6 +1226,13 @@ Purpose: raw system strings for errors, empty states, imports, text-evidence pro
 
 Examples: `no new items`, `err: summary unavailable`, `Text evidence: RSS excerpt`, `re-ingest complete · search refreshed`, `re-ingest failed · decode error · preserved existing title, summary, core insight, and Key Points`, `re-ingest failed · timeout · preserved existing title, summary, core insight, and Key Points`, `重处理完成 · 搜索已刷新`, `上次重处理失败 · 解码错误 · 已保留现有标题、摘要、核心洞察和要点`, `上次重处理失败 · 超时 · 已保留现有标题、摘要、核心洞察和要点`, `doctor: model latency 842ms`. OK/model-backed AI provenance belongs in the Inspector `AI STATUS` / `AI 状态` Frontmatter row, not in duplicate feedback lines. No cute illustrations, skeleton characters, confetti, or apology copy.
 
+## RF-BUG Canonical Interaction Contract
+
+- Route resolution owns the first visible surface and title before token hydration. TODAY, SOURCE LEDGER, SEARCH, direct Inspector routes, Back, and Forward must never expose an intermediate wrong surface or title. Functional document titles remain exact English tokens: `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor`.
+- Selecting a Feed or Search row immediately opens a readable Inspector preview. Detail and inspection-marker requests enhance it independently. Pending, failure, viewport changes, and late responses for a prior item preserve the current selection, URL, readable content, and expected focus/Escape behavior.
+- Idle Steer has no missing-URL error. A matching invalid submission exposes one localized accessible error, retains input and focus, performs no mutation, and clears on edit. Stale preview and transport failures use distinct feedback.
+- Source Ledger keeps `SOURCE LIST` and `PORTABLE STATE` as separately labelled groups on desktop and narrow surfaces. The only source-list transfer action is `[IMPORT OPML]`; portable backup/restore uses `[EXPORT STATE]` and `[IMPORT STATE]`. Controls remain keyboard reachable, visibly focused, at least 44 by 44 CSS pixels, and free of document-level horizontal overflow.
+
 ## Do's and Don'ts
 Do:
 

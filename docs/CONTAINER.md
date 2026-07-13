@@ -322,6 +322,17 @@ Examples of deployment-layer choices:
 - a host or platform reverse proxy.
 
 These are examples, not core runtime dependencies.
+## Application-Owned Browser Security
+
+The Go binary emits one effective value for each browser security header on static, API, MCP, authorization-error, not-found, and internal-error responses:
+
+- `Content-Security-Policy`;
+- `X-Content-Type-Options: nosniff`;
+- `Referrer-Policy: no-referrer`;
+- `X-Frame-Options: DENY`.
+
+Caddy and other reverse proxies must pass these application-owned values unchanged. The policy must boot the embedded UI and preserve ordinary authenticated product operations, MCP streaming, and request cancellation. Container and browser evidence must redact owner tokens, provider keys, authorization values, cookies, provider bodies, and `.env` contents.
+
 ## Verification Checklist
 
 Before accepting the containerization work:

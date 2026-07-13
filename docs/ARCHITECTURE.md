@@ -1,10 +1,10 @@
 # ResoFeed Architecture Spec
 
-Version: 1.2
-Status: Core runtime implemented for the previously documented v2.1 path; Prompting System v2.2/content-contract redesign is the accepted target for generated content fields and re-ingest semantics
-Source contracts: `docs/PRD.md`, `docs/DESIGN.md`, `docs/PROMPTING_SYSTEM.md` for prompt compilation, structured-output routing, and OpenRouter summary output schema
+Version: 1.3
+Status: Prompting System v2.2 and the RF-BUG canonical runtime contracts are active for generated content, re-ingest, packaged UI, routes, security, and browser acceptance.
+Source contracts: `docs/PRD.md`, `docs/DESIGN.md`, `docs/PROMPTING_SYSTEM.md` for product outcomes, interaction behavior, prompt compilation, structured-output routing, and OpenRouter summary output schema.
 
-Status note: the core runtime, processing-language, reprocess, runtime metadata, FTS, delivery, UI language/split-scroll, Prompting System v2.1 dynamic `json_schema` routing, and MCP prompt/model parity contracts described here were implemented behavior as of the prior documentation sync. `docs/PROMPTING_SYSTEM.md` now defines the v2.2 generated-content contract. Runtime v2.2 compliance depends on emitting `schema_version: "resofeed.summarize.v2.2"`, using the v2.2 payload/output fields, routing structured output according to `docs/PROMPTING_SYSTEM.md`, and validating the v2.2 schema plus Go semantic boundary before persistence. Future changes must keep this file aligned with runtime behavior and clearly distinguish implemented behavior from accepted targets.
+All canonical ingest and reprocess transforms use `schema_version: "resofeed.summarize.v2.2"`, the v2.2 payload/output fields, the structured-output routing in `docs/PROMPTING_SYSTEM.md`, and Go schema plus semantic validation before atomic persistence. Active runtime identities, errors, tests, and aligned documentation use the v2.2 identity.
 
 ## 1. Decisions
 
@@ -2529,6 +2529,19 @@ curl -i -X POST http://127.0.0.1:8080/api/items/item_01/reingest \
 # expect 200 JSON body: {"already_applied":false,"reingest":{"item_id":"item_01",...}}
 # captured evidence must not echo prompt text, API keys, provider raw payloads, or secret-source metadata
 ```
+
+## RF-BUG Canonical Runtime Contract
+
+The following requirements are active product contracts:
+
+- `cmd/resofeed` validates and embeds the production UI before binding; the built binary serves root, generated assets, and valid deep links independently of the process working directory. `/doctor` adds only `ui_assets=ready` and `ui_asset_source=embedded` for packaged-asset readiness.
+- Go applies one effective `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, and `X-Frame-Options: DENY` value to static, API, MCP, authorization-error, not-found, and internal-error responses. Reverse proxies pass these application-owned values unchanged.
+- Initial route resolution controls the first visible surface and document title before token hydration or shell API work. Functional titles are `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor`; processing language does not translate them. Opaque item IDs round-trip unchanged.
+- Feed and Search selection immediately render a readable Inspector preview. Detail and inspection-marker requests complete independently, and responses for a prior selection cannot replace the current selection. Pending or failed enhancement requests preserve the selected item, direct route, URL, content, and focus behavior.
+- Idle Steer exposes no missing-URL error. Only a matching invalid submission creates one localized accessible error; it retains input and focus, sends no mutation, clears on edit, and stays distinct from stale-preview or transport failures.
+- Source Ledger keeps separately labelled Source List and Portable State groups. It exposes OPML import, JSON State export/import, global ingest, per-source fetch, source information, status/diagnostics, and delete confirmation/cancel. It exposes no OPML output capability, second URL field, hierarchy, settings, sync, or activity history.
+- Every canonical ingest and reprocess transform identifies and enforces Prompting System v2.2 (`resofeed.summarize.v2.2`). OpenRouter remains a runtime JSON transformer; Go validates output and owns atomic item/FTS persistence. Request-only prompts, model choices, provider data, and credentials remain non-durable.
+- Comprehensive Playwright acceptance launches the real binary and uses real product APIs. Mutating cases receive case-local SQLite state and clean browser contexts; bounded reuse is read-only, cleanup residue fails the case, and product API interception cannot establish comprehensive behavior.
 
 ## 11. Open Questions
 

@@ -404,13 +404,11 @@ Repair prompt boundary:
 - This receipt is runtime observability only and must not be exported/imported as portable state or treated as model output.
 
 ## v2.2 Adoption and Migration Note
+Every canonical ingest and reprocess transform identifies and enforces this v2.2 contract. Each path emits input payload `schema_version: "resofeed.summarize.v2.2"`, uses the v2.2 payload and output fields, applies the OpenRouter constraint strategy, validates the strict output schema, and passes Go semantic validation before one atomic item/FTS persistence operation.
 
-Existing or future runtime paths must not claim v2.2 compliance unless all of the following are true for that path: they emit input payload `schema_version: "resofeed.summarize.v2.2"`, use the v2.2 payload, route structured output according to the OpenRouter Constraint Strategy in this document, validate the strict v2.2 output schema, and apply the v2.2 semantic validation boundary before persistence.
+Active runtime identities, errors, tests, and aligned documentation must not use an earlier Prompting System identity. OpenRouter is a request/response JSON transformer only: it does not orchestrate, hold durable state, or write SQLite. Provider data, credentials, request-only prompts, and model overrides do not enter diagnostics, portable State, or durable item provenance.
 
-Documentation, tests, logs, and runtime receipts may describe older paths as pre-v2.2 compatibility, but they must not label those paths as v2.2-compliant.
-
-Historical re-ingest of existing rows must run only after schema, prompt compilation, validation, HTTP/MCP transport, and UI compatibility for `source_item_title`, `localized_title`, `key_points`, `content_status`, and `last_reprocess_*` are in place. Until then, old rows may be compatibility-seeded but must not be destructively rewritten by a partial v2.2 path.
-
+Historical rows are reprocessed only through this complete contract; malformed, unavailable, retry, and fallback outcomes cannot partially update generated item text or FTS state.
 ## Required Regression Fixtures
 
 | Fixture | Input trigger | Expected constraint mode / validation result | Retry expectation | Persistence outcome |

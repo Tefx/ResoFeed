@@ -17,15 +17,14 @@ Use ResoFeed if you want to:
 ResoFeed is not a team SaaS, OAuth app, notification system, folder/tag reader, vector search product, RAG chatbot, or activity-dashboard platform.
 
 ## What you get
-
 - **TODAY** — a dense daily surface for fresh feed items.
-- **INSPECTOR** — source-backed detail view with provenance, original links, generated summaries, key points, and item-level re-ingest.
-- **SOURCE LEDGER** — active sources, OPML import/export, manual source fetch, and all-source ingest.
-- **Steer** — natural-language source add/search/policy commands.
+- **INSPECTOR** — an immediate source-backed preview that remains readable while detail and inspection requests complete independently.
+- **SOURCE LEDGER** — active sources, import-only OPML intake, JSON State export/import, manual source fetch, and all-source ingest.
+- **Steer** — natural-language source add/search/policy commands with localized accessible validation after invalid submission.
 - **SQLite FTS5 search** — lexical search with metadata filters; no embeddings or vector database.
-- **Runtime language** — `en` / `zh` processing language for future ingest, plus explicit library reprocess for existing content.
+- **Runtime language** — `en` / `zh` processing language for future ingest, plus explicit library reprocess using Prompting System v2.2.
 - **MCP at `/mcp`** — agent access to the same product operations available to humans.
-- **Portable state export/import** — active sources, active steering rules, and resonated items only.
+- **Portable JSON State** — atomic replacement backup/restore for active sources, active steering rules, and resonated items only.
 
 ## Fastest start with Docker
 
@@ -117,17 +116,17 @@ If you lose the plaintext owner token, stop the server and run the offline reset
 Then start `serve` again to generate or set a replacement token. There is intentionally no HTTP, MCP, or browser UI reset path.
 
 ## Runtime boundaries
-
 ResoFeed keeps the operational model deliberately narrow:
 
-- one deployable command: `resofeed serve`;
-- one SQLite database plus FTS5 as durable storage/search;
-- one owner token for all `/api/*` and `/mcp` requests;
-- OpenRouter as request/response JSON transformation only;
-- no vector DB, embeddings, built-in RAG, semantic answer engine, queues, sidecars, background job services, teams, accounts, OAuth, folders, tags, unread-count workflows, or activity ledgers.
+- one embedded deployable command, `resofeed serve`, serves validated UI assets, JSON HTTP, MCP Streamable HTTP, and the background ingest loop independently of the process working directory;
+- one SQLite database plus FTS5 provides durable storage and lexical search;
+- one owner token authorizes all `/api/*` and `/mcp` requests; `actor_id` is attribution/idempotency only;
+- OpenRouter performs Prompting System v2.2 request/response JSON transformation only; Go validates and persists atomically;
+- Go owns one effective CSP, `nosniff`, `no-referrer`, and `DENY` framing value across the HTTP surface; reverse proxies pass them unchanged;
+- OPML is import-only source intake; JSON State atomically replaces only active sources, active steering rules, and currently resonated items;
+- no vector DB, embeddings, built-in RAG, semantic answer engine, sync/merge service, queues, sidecars, background job services, teams, accounts, OAuth, folders, tags, unread-count workflows, or activity ledgers.
 
-Existing-library reprocess is explicit and non-durable. It can take a long time for large libraries, runs as a bounded in-process operation, and does not become a job dashboard or persistent queue. If the hosting layer cancels the request or stops the process, rerun reprocess; ResoFeed prioritizes never/oldest-processed items first.
-
+Existing-library reprocess is explicit and non-durable. It runs as a bounded in-process operation and does not become a job dashboard or persistent queue. If the hosting layer cancels the request or stops the process, rerun reprocess; ResoFeed prioritizes never/oldest-processed items first.
 ## HTTP and MCP
 
 Static UI assets are public so the token prompt can load. Product operations require:

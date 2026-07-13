@@ -157,9 +157,7 @@ We explicitly forbid "cute" illustrations, skeleton loaders, or conversational a
 The product is a single-user tool, not a multi-tenant SaaS. There is no account registration flow, no onboarding wizards, no "ghost briefings" for empty states, and no complex auth models.
 
 ### 4.8 Complete State Portability
-
-The user owns their data. Complete active-state portability is the JSON state bundle defined by `docs/ARCHITECTURE.md §5.5 State Portability`. Complete state includes the Source Ledger, current active steering policy rules, and currently resonated items. OPML import/export remains source-list exchange only and is not a complete state-restore format. Raw text may be used for human-readable feedback or diagnostics, but it is not a separate complete-state import contract.
-
+The user owns their data. Complete active-state portability is the JSON State bundle defined by `docs/ARCHITECTURE.md §5.5 State Portability`. It contains only active Source Ledger rows, current active steering policy rules, and currently resonated items. OPML is import-only source intake; imported folders/tags are flattened, and OPML never exports or restores ResoFeed state. State import validates before one atomic replacement transaction and never merges local and imported state.
 ## 5. Core Product Primitives
 
 ResoFeed has exactly three core user-visible primitives.
@@ -505,22 +503,22 @@ Requirements:
 - re-ingest failures **must** preserve existing usable content and communicate the latest attempt failure without presenting the item as newly empty or unusable.
 
 ## 13. Experience Requirements
-
 These are product-level experience outcomes, not layout prescriptions.
 
 ResoFeed must feel:
 
-- fast enough that inspecting an item does not interrupt reading flow;
+- fast enough that selecting a Feed or Search item immediately opens a readable Inspector preview while detail and inspection-marker requests complete independently;
+- stable under late responses, failures, direct item routes, viewport changes, Back, Forward, focus return, and Escape;
+- route-correct from the first visible frame, with exact functional titles for TODAY, SOURCE LEDGER, SEARCH, INSPECTOR, and `/doctor` in every processing language;
 - predictable, with no requirement to clear a queue;
 - transparent enough that users understand why surprising items appear;
 - correctable through natural language rather than configuration panels;
+- accessible: idle Steer exposes no missing-URL error, while invalid submission exposes one localized error, retains input/focus, sends no mutation, and clears on edit;
+- usable on narrow screens: Source List and Portable State stay separately labelled, controls remain at least 44 by 44 CSS pixels, and long source content does not create document-level horizontal overflow;
 - consistent across human and agent-mediated workflows;
-- localized for Chinese reading workflows, with generated reading content and user-facing processing/re-ingest messages in Chinese while source/provenance literals remain unchanged.
+- localized for Chinese reading workflows, with generated reading content and user-facing processing/re-ingest messages in Chinese while source/provenance literals and functional route titles remain unchanged.
 
-The feed list must remain optimized for scanning, while Inspector must serve as the structured reading surface for summary, core insight, Key Points, provenance, and re-ingest status.
-
-UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details. Frontend details such as design tokens and font fallbacks are explicitly deferred to the later `docs/DESIGN.md` phase.
-
+The feed list remains optimized for scanning, while Inspector serves as the structured reading surface for summary, core insight, Key Points, provenance, and re-ingest status. UI/UX owns visual form, interaction details, motion, density, information hierarchy, microcopy, and accessibility implementation details within `docs/DESIGN.md`.
 ## 14. Explicit Non-Goals
 The following are out of scope unless a future product decision explicitly reverses them:
 
@@ -606,9 +604,7 @@ Given source extraction is partial, unavailable, contradictory, or low-confidenc
 Given a new user imports or configures sources, when enough items are available, then ResoFeed must produce a usable first daily experience without requiring folders, archive rules, ranking sliders, or delivery-channel configuration.
 
 ### AC-16 State Portability
-
-Given the user requests a complete state export, when executed, the system must output the JSON state bundle defined by architecture, including the Source Ledger, current active steering policy rules, and currently resonated items, and that exported state must be completely restorable via state import. OPML import/export remains source-list exchange only and is not complete state portability or complete state restore format.
-
+Given the user requests portable backup or restore, the system exports and atomically replaces the JSON State bundle defined by architecture, containing only active Source Ledger rows, current active steering policy rules, and currently resonated items. OPML remains import-only source intake and is never an output, backup, restore, merge, or sync format. A failed State import leaves the prior portable state unchanged.
 ### AC-17 Diagnostics Output
 
 Given the user inputs `/doctor` in the Steer input, when processed, the system must output raw system health data (including RSS fetch errors and LLM API latency) in plain text.

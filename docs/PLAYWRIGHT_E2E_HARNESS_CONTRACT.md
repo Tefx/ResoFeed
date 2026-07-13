@@ -62,21 +62,19 @@ npm --prefix web run test:e2e
 The Playwright config must be responsible for building or reusing the real binary, launching the real server, setting the base URL from the bound server, writing all artifacts under a test-artifact directory, and cleaning up the temporary SQLite DB unless preservation is explicitly requested for failed-run evidence.
 
 ## Deterministic CI-Safe Matrix
+These cases run with zero retries and without live LLM credentials; the child environment explicitly clears `OPENROUTER_KEY`.
 
-These cases must run without live LLM credentials and must explicitly clear `OPENROUTER_KEY` from the child process environment.
-
-1. **Real server/UI boot**: static UI loads from the Go binary; `/api/*` is unauthorized before token entry; no mocked API server.
-2. **First-use owner token**: prompt appears before API calls, token input receives initial focus, invalid token shows `err: owner token rejected`, accepted token stores `resofeed.ownerToken`, and focus moves to Steer or first feed item.
-3. **First-use empty state**: no sources renders the specified lines (`Paste RSS URL in Steer or import OPML.`, `Inspect opens the item.`, `Star preserves durable value.`, `Steer is optional correction.`) inside the normal shell.
-4. **Surface menu/navigation**: the `RESOFEED` menu is visible after token acceptance, opens through real pointer and keyboard input, exposes `TODAY` and `SOURCE LEDGER`, and activates the correct surface without leaving the wrong panel active.
-5. **Source/feed operations**: paste RSS URL via Steer or import OPML fixture, verify flat Source Ledger rows, deletion confirmation/error states, OPML folder flattening evidence, no folders/tags/settings affordances.
-6. **Source Ledger manual controls**: verify Source Ledger exposes lightweight `[RUN INGEST]` and per-source `[FETCH]` bracket actions; pending states render `[INGESTING...]` / `[FETCHING...]`; success updates `last_ingest` / `last_fetch`; source-level errors and conflicts render terse raw `err:`/conflict feedback; row/header geometry and 44px hit targets remain stable.
-7. **Source Ledger anti-dashboard boundary**: verify manual controls do not create or expose job queues, retry dashboards, command histories, activity ledgers, sync/merge controls, portable manual-ingest receipts, source hierarchy, folders, tags, pause/resume toggles, or a second source URL paste field.
-8. **Today/feed**: `GET /api/feed/today` backs the Today surface, covers loading, empty, populated, grouped, partial, summary-unavailable, selected, hover, focus, and keyboard-open Inspector states.
-9. **Inspect/retrieve/search**: opening an item retrieves detail, marks human Inspect through the real API when required, displays provenance/original link/extracted or excerpt text, and lexical search covers query/source/date/resonated filters plus strict query validation errors.
-10. **LLM failure/mock boundary**: CI-safe tests simulate missing/invalid OpenRouter startup/runtime paths deterministically by absence or invalid value only, asserting startup skip/failure or fallback taxonomy without committed secrets or network LLM calls.
-11. **API/MCP parity probes**: authenticated HTTP and MCP probes compare equivalent product operations for Today/list candidates, search, read item, inspect, resonate, steer, report delivery, auth failure, idempotency, and strict schema validation.
-12. **Visual/UX invariants**: screenshots verify dense archival layout, muted palette, rare accent star, visible focus, no decorative gradients/mascots/skeletons, responsive desktop split vs mobile Inspector route, no clipping/overflow with long RSS strings, and no layout shift on hover/focus/selected/loading/error states.
+1. **Real server/UI boot:** build and launch the real embedded Go binary from a working directory outside the repository. Static UI and valid deep links load; `/api/*` is unauthorized before token entry; no mocked product runtime or product API interception is used.
+2. **Route and title matrix:** cold load, refresh, Back, and Forward cover TODAY, SOURCE LEDGER, SEARCH, and direct Inspector routes in English and Chinese. Every readiness transition shows the route-correct surface and exact functional title without host fallback or intermediate TODAY content. Valid opaque item IDs round-trip unchanged.
+3. **Inspector selection:** Feed and Search selections cover pending/success/failure, inspection-marker failure, rapid A-to-B selection with late A completion, viewport changes, direct routes, Escape, and focus return. Current item, URL, readable content, and errors agree after every transition.
+4. **Steer accessibility:** empty, invalid submission, edit recovery, repeated invalid submission, locale change, stale preview, and transport failure expose one current localized announcement and never mutate on missing URL.
+5. **Source Ledger:** desktop and narrow cases cover separately labelled Source List and Portable State groups, OPML import, JSON State export/import, ingest/fetch states and conflicts, delete confirm/cancel/success, source information, long content, focus, 44-by-44 CSS-pixel targets, overflow, and prohibited-control absence.
+6. **CSP and headers:** Chromium boots under Go-owned security headers and completes OPML import plus JSON State export/import without CSP console violations or blocked required resources. Streaming and cancellation retain their ordinary behavior.
+7. **Prompting v2.2:** real-runtime ingest/reprocess cases use deterministic provider seams only where the Go runtime already exposes them, cover valid and failure classifications, and prove malformed output cannot partially update item/FTS state.
+8. **API/MCP parity:** authenticated probes compare equivalent retrieve, inspect, resonate, steer, and source/state operations, including strict validation and authorization precedence.
+9. **Isolation and cleanup:** every mutating test owns case-local SQLite state, a clean browser context, an allocated port, and its launched process. Runtime reuse is limited to proven read-only cases. Teardown verifies process, port, context, logs, and temporary database cleanup; residue fails the test.
+10. **Determinism:** the CI-safe smoke lane completes under two minutes; the full Chromium list and run contain the same positive title set; three clean full runs pass that same set.
+11. **Intentional failure proof:** one deliberate assertion failure retains the ordinary Playwright report, trace, screenshot, video, redacted runtime/browser diagnostics, runtime identity, database location, and cleanup outcome.
 
 ## Live OpenRouter Smoke Boundary
 
