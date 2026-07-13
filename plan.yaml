@@ -184053,7 +184053,7 @@ phases:
     depends_on:
     - local-full-verification-matrix
     - deployment-operation-authorization-review
-    agent: general
+    agent: integration-verifier
   - id: rf-bug-assurance-closure-full-gate
     name: RF-BUG assurance-closure phase Full Gate
     status: pending
