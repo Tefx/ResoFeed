@@ -182732,8 +182732,8 @@ phases:
       checks:\n- id: rf_bug_002_expected_red\n  run:\n    command:\n    - bash\n \
       \   - -lc\n    - npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/initial-route.browser-contract.spec.ts\
-      \ --grep '^\\[RF-BUG-002\\]\\[en\\] opaque item cold load and refresh$'\n  \
-      \  timeout_seconds: 300\n  expect:\n    outcome: red\n    exit_codes:\n    -\
+      \ --grep '\\[RF-BUG-002\\]\\[en\\] opaque item cold load and refresh$'\n   \
+      \ timeout_seconds: 300\n  expect:\n    outcome: red\n    exit_codes:\n    -\
       \ 1\n    stdout_or_stderr:\n      contains_all:\n      - literal: opaque item\
       \ cold load and refresh\n      - literal: Expected canonical opaque item surface\
       \ before TODAY\n      contains_any: []\n      forbids:\n      - literal: No\
@@ -182741,7 +182741,7 @@ phases:
       \  proves:\n  - RF-BUG-002-CONTRACT\n- id: rf_bug_002_search_route_history_expected_red\n\
       \  run:\n    command:\n    - bash\n    - -lc\n    - npm --prefix web exec --\
       \ playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 web/tests/e2e/routes.browser-contract.spec.ts --grep '^\\[RF-BUG-002\\\
+      \ --retries=0 web/tests/e2e/routes.browser-contract.spec.ts --grep '\\[RF-BUG-002\\\
       ] Search'\n    timeout_seconds: 300\n  expect:\n    outcome: red\n    exit_codes:\n\
       \    - 1\n    stdout_or_stderr:\n      contains_all:\n      - literal: Search\
       \ canonical URL maps search to q\n      - literal: Search validates filters\
@@ -182768,7 +182768,7 @@ phases:
       \  - RF-BUG-002-CONTRACT\n- id: rf_bug_001_expected_red\n  run:\n    command:\n\
       \    - bash\n    - -lc\n    - npm --prefix web exec -- playwright test --config\
       \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts --grep '^\\[RF-BUG-001\\\
+      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts --grep '\\[RF-BUG-001\\\
       ].*stale detail cannot replace the selected item$'\n    timeout_seconds: 300\n\
       \  expect:\n    outcome: red\n    exit_codes:\n    - 1\n    stdout_or_stderr:\n\
       \      contains_all:\n      - literal: stale detail cannot replace the selected\
@@ -182778,7 +182778,7 @@ phases:
       \ - RF-BUG-001-CONTRACT\n- id: rf_bug_006_expected_red\n  run:\n    command:\n\
       \    - bash\n    - -lc\n    - npm --prefix web exec -- playwright test --config\
       \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\[RF-BUG-006\\\
+      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '\\[RF-BUG-006\\\
       ] route-derived title updates atomically$'\n    timeout_seconds: 300\n  expect:\n\
       \    outcome: red\n    exit_codes:\n    - 1\n    stdout_or_stderr:\n      contains_all:\n\
       \      - literal: route-derived title updates atomically\n      - literal: Expected\
@@ -182788,7 +182788,7 @@ phases:
       \  run:\n    command:\n    - bash\n    - -lc\n    - npm --prefix web exec --\
       \ playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
       \ --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep\
-      \ '^\\[RF-BUG-007\\]'\n    timeout_seconds: 300\n  expect:\n    outcome: red\n\
+      \ '\\[RF-BUG-007\\]'\n    timeout_seconds: 300\n  expect:\n    outcome: red\n\
       \    exit_codes:\n    - 1\n    stdout_or_stderr:\n      contains_all:\n    \
       \  - literal: repeated invalid add source remounts one alert\n      - literal:\
       \ Expected one newly mounted alert and retained focus\n      contains_any: []\n\
