@@ -183069,8 +183069,8 @@ phases:
       \ bash\n    - -lc\n    - \"set -e; for config in web/playwright.browser-contract.config.ts\
       \ web/playwright.runtime.config.ts; do echo PLAYWRIGHT_CONFIG=$config; npm --prefix\
       \ web exec -- playwright test --config \\\"$config\\\" --project=chromium-ci-safe\
-      \ --retries=0 --list web/tests/e2e/real-server-ui.spec.ts --grep '^ci-safe real\
-      \ server/UI boot uses the Go binary and owner-token gate$'; done\"\n    timeout_seconds:\
+      \ --retries=0 --list web/tests/e2e/real-server-ui.spec.ts --grep 'ci-safe real\
+      \ server/UI boot uses the Go binary and owner-token gate'; done\"\n    timeout_seconds:\
       \ 180\n  expect:\n    outcome: green\n    exit_codes: [0]\n    stdout_or_stderr:\n\
       \      contains_all:\n      - {literal: PLAYWRIGHT_CONFIG=web/playwright.browser-contract.config.ts}\n\
       \      - {literal: PLAYWRIGHT_CONFIG=web/playwright.runtime.config.ts}\n   \
