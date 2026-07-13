@@ -31,9 +31,30 @@ function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 }
 
+type CanonicalItemRoute = { itemId: string; kind: 'detail' | 'inspect' };
+
+function decodeCanonicalItemRoute(pathname: string): CanonicalItemRoute | null {
+  const match = /^\/api\/items\/(~[A-Za-z0-9_-]+)(\/inspect)?$/u.exec(pathname);
+  if (match === null) return null;
+  const token = match[1];
+  const payload = token.slice(1);
+  if (payload.length % 4 === 1) return null;
+
+  try {
+    const padded = payload.replace(/-/gu, '+').replace(/_/gu, '/') + '='.repeat((4 - payload.length % 4) % 4);
+    const bytes = Uint8Array.from(atob(padded), (character) => character.charCodeAt(0));
+    const itemId = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    return { itemId, kind: match[2] === undefined ? 'detail' : 'inspect' };
+  } catch {
+    return null;
+  }
+}
+
 function installSelectionAPI(options: { failBInspection?: boolean } = {}) {
   let releaseAInspection: (() => void) | undefined;
   let delayAInspection = false;
+  let reportedCanonicalItemRoutes = false;
+  const canonicalItemRouteKinds = new Set<CanonicalItemRoute['kind']>();
   const calls: string[] = [];
 
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -45,16 +66,25 @@ function installSelectionAPI(options: { failBInspection?: boolean } = {}) {
     if (url.pathname === '/api/runtime/operation') return json({ operation: { running: false, kind: null, actor_kind: null, phase: null, count: null, message: null, started_at: null, updated_at: null } });
     if (url.pathname === '/api/runtime/openrouter-models' || url.pathname === '/api/runtime/openrouter/models') return json({ models: [] });
     if (url.pathname === '/api/steer/active') return json({ rules: [] });
-    if (url.pathname === `/api/items/${itemA.id}/inspect`) {
+
+    const itemRoute = decodeCanonicalItemRoute(url.pathname);
+    if (itemRoute !== null) {
+      canonicalItemRouteKinds.add(itemRoute.kind);
+      if (!reportedCanonicalItemRoutes && canonicalItemRouteKinds.size === 2) {
+        reportedCanonicalItemRoutes = true;
+        console.info('RF-BUG-001_CANONICAL_ITEM_MOCK_PATHS=detail,inspect');
+      }
+    }
+    if (itemRoute?.kind === 'inspect' && itemRoute.itemId === itemA.id) {
       if (!delayAInspection) return json({ item_id: itemA.id, human_inspected_at: null, already_applied: false });
       return new Promise<Response>((resolve) => { releaseAInspection = () => resolve(json({ item_id: itemA.id, human_inspected_at: null, already_applied: false })); });
     }
-    if (url.pathname === `/api/items/${itemB.id}/inspect`) {
+    if (itemRoute?.kind === 'inspect' && itemRoute.itemId === itemB.id) {
       if (options.failBInspection) return json({ error: { code: 'internal', message: 'inspection marker unavailable', details: {} } }, 500);
       return json({ item_id: itemB.id, human_inspected_at: null, already_applied: false });
     }
-    if (url.pathname === `/api/items/${itemA.id}`) return json({ item: detail(itemA) });
-    if (url.pathname === `/api/items/${itemB.id}`) return json({ item: detail(itemB) });
+    if (itemRoute?.kind === 'detail' && itemRoute.itemId === itemA.id) return json({ item: detail(itemA) });
+    if (itemRoute?.kind === 'detail' && itemRoute.itemId === itemB.id) return json({ item: detail(itemB) });
     return json({ error: { code: 'not_found', message: 'not found', details: {} } }, 404);
   }));
 
