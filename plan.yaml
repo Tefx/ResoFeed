@@ -182688,8 +182688,10 @@ phases:
       \ surface. Idle Steer has no missing-URL error; invalid submit retains input/focus,\
       \ sends no mutation, remounts one current localized alert, clears on edit, and\
       \ keeps stale/transport errors distinct. Rollback reverts this acceptance pair.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ expected_red_definition\nscope:\n  allowed_paths:\n  - web/src/lib/__tests__/workbench-route.test.ts\n\
+      \nCross-domain justification: this expected-red unit binds TypeScript browser\
+      \ acceptance and Go opaque-item API acceptance under one protected rollback\
+      \ and downstream contract.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: expected_red_definition\nscope:\n  allowed_paths:\n  - web/src/lib/__tests__/workbench-route.test.ts\n\
       \  - web/tests/e2e/initial-route.browser-contract.spec.ts\n  - web/tests/e2e/routes.browser-contract.spec.ts\n\
       \  - internal/resofeed/rf_bug_item_id_api_expected_red_test.go\n  - web/src/routes/__tests__/inspector-selection.test.ts\n\
       \  - web/tests/e2e/inspector-selection.browser-contract.spec.ts\n  - web/src/routes/__tests__/steer-invalid.test.ts\n\
@@ -182780,29 +182782,29 @@ phases:
       ,\"web/tests/e2e/routes.browser-contract.spec.ts\",\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
       ,\"web/src/routes/__tests__/inspector-selection.test.ts\",\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
       ,\"web/src/routes/__tests__/steer-invalid.test.ts\",\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
-      ],\"authorized_mutation_refs\":[{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_route_unit_expected_red\"\
-      ,\"path\":\"web/src/lib/__tests__/workbench-route.test.ts\",\"purpose\":\"Define\
-      \ opaque route-token unit acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-route-unit\"\
-      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_expected_red\",\"path\"\
-      :\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"purpose\":\"Define\
-      \ EN/ZH initial-route acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-initial-route\"\
-      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_search_route_history_expected_red\"\
+      ],\"authorized_mutation_refs\":[{\"actor_id\":\"spec-verifier\",\"check_id\"\
+      :\"rf_bug_002_route_unit_expected_red\",\"path\":\"web/src/lib/__tests__/workbench-route.test.ts\"\
+      ,\"purpose\":\"Define opaque route-token unit acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-route-unit\"\
+      },{\"actor_id\":\"spec-verifier\",\"check_id\":\"rf_bug_002_expected_red\",\"\
+      path\":\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"purpose\"\
+      :\"Define EN/ZH initial-route acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-initial-route\"\
+      },{\"actor_id\":\"spec-verifier\",\"check_id\":\"rf_bug_002_search_route_history_expected_red\"\
       ,\"path\":\"web/tests/e2e/routes.browser-contract.spec.ts\",\"purpose\":\"Define\
       \ raw-query and Search history acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-search-history\"\
-      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_002_api_expected_red\",\"\
-      path\":\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\",\"purpose\"\
+      },{\"actor_id\":\"spec-verifier\",\"check_id\":\"rf_bug_002_api_expected_red\"\
+      ,\"path\":\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\",\"purpose\"\
       :\"Define five-operation opaque item API acceptance\",\"ref\":\"authority:acceptance-mutation:rf002-item-api\"\
-      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_001_expected_red\",\"path\"\
-      :\"web/src/routes/__tests__/inspector-selection.test.ts\",\"purpose\":\"Define\
-      \ focused Inspector selection and stale-response acceptance\",\"ref\":\"authority:acceptance-mutation:rf001-inspector-unit\"\
-      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_001_expected_red\",\"path\"\
-      :\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\",\"purpose\"\
-      :\"Define real-browser RF-BUG-001 acceptance\",\"ref\":\"authority:acceptance-mutation:rf001-inspector-browser\"\
-      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_007_expected_red\",\"path\"\
-      :\"web/src/routes/__tests__/steer-invalid.test.ts\",\"purpose\":\"Define focused\
-      \ Steer invalid-state accessibility acceptance\",\"ref\":\"authority:acceptance-mutation:rf007-steer-unit\"\
-      },{\"actor_id\":\"general\",\"check_id\":\"rf_bug_006_expected_red\",\"path\"\
-      :\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\",\"purpose\"\
+      },{\"actor_id\":\"spec-verifier\",\"check_id\":\"rf_bug_001_expected_red\",\"\
+      path\":\"web/src/routes/__tests__/inspector-selection.test.ts\",\"purpose\"\
+      :\"Define focused Inspector selection and stale-response acceptance\",\"ref\"\
+      :\"authority:acceptance-mutation:rf001-inspector-unit\"},{\"actor_id\":\"spec-verifier\"\
+      ,\"check_id\":\"rf_bug_001_expected_red\",\"path\":\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
+      ,\"purpose\":\"Define real-browser RF-BUG-001 acceptance\",\"ref\":\"authority:acceptance-mutation:rf001-inspector-browser\"\
+      },{\"actor_id\":\"spec-verifier\",\"check_id\":\"rf_bug_007_expected_red\",\"\
+      path\":\"web/src/routes/__tests__/steer-invalid.test.ts\",\"purpose\":\"Define\
+      \ focused Steer invalid-state accessibility acceptance\",\"ref\":\"authority:acceptance-mutation:rf007-steer-unit\"\
+      },{\"actor_id\":\"spec-verifier\",\"check_id\":\"rf_bug_006_expected_red\",\"\
+      path\":\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\",\"purpose\"\
       :\"Define title and EN/ZH Steer browser acceptance\",\"ref\":\"authority:acceptance-mutation:rf006007-browser\"\
       }],\"developer_test_globs\":[]}}\n</vectl_step_policy>"
     verification: 'Require exact route/Search collections, raw malformed-query no-request/no-history
