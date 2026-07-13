@@ -183627,26 +183627,25 @@ phases:
       \ TestRFBugCanonicalContracts}\n      - {literal: PASS}\n      contains_any:\
       \ []\n      forbids:\n      - {literal: FAIL}\n      - {literal: no tests to\
       \ run}\n      - {literal: missing required canonical fragment}\n  proves: [RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE]\n\
-      - id: rf_bug_frontend_interface_atoms_green\n  run:\n    command:\n    - bash\n\
-      \    - -lc\n    - |\n      python3 - <<'PY'\n      from pathlib import Path\n\
-      \      design = Path('docs/DESIGN.md').read_text(encoding='utf-8')\n      preview\
-      \ = Path('docs/ui-preview.html').read_text(encoding='utf-8')\n      required\
-      \ = [\n          '## RF-BUG Interface-Contract Atom Inventory',\n          'RF-BUG-001\
-      \ — Inspector selection atom',\n          'RF-BUG-002 — Route, opaque ID, and\
-      \ Search atom',\n          'RF-BUG-006 — Resolved-route title atom',\n     \
-      \     'RF-BUG-007 — Steer invalid-state atom',\n          '### Invalid Search\
-      \ visible/accessibility/recovery contract',\n          'role=\"alert\"',\n \
-      \         'aria-live=\"assertive\"',\n          'no `/api/search` request',\n\
-      \          'no history push or replace',\n          'Editing retains focus and\
-      \ entered values',\n          'corrected valid submission',\n          'bounded\
-      \ canonical `q` history state',\n      ]\n      missing = [literal for literal\
-      \ in required if literal not in design]\n      if missing:\n          raise\
-      \ SystemExit(f'missing RF-BUG interface atoms: {missing!r}')\n      if '<title>RESOFEED\
-      \ · SOURCE LEDGER</title>' not in preview:\n          raise SystemExit('missing\
-      \ exact Source Ledger preview title')\n      print('RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007')\n\
+      - id: rf_bug_frontend_interface_atoms_green\n  run:\n    command:\n    - python3\n\
+      \    - -c\n    - |\n      from pathlib import Path\n      design = Path('docs/DESIGN.md').read_text(encoding='utf-8')\n\
+      \      preview = Path('docs/ui-preview.html').read_text(encoding='utf-8')\n\
+      \      required = [\n          '## RF-BUG Interface-Contract Atom Inventory',\n\
+      \          'RF-BUG-001 — Inspector selection atom',\n          'RF-BUG-002 —\
+      \ Route, opaque ID, and Search atom',\n          'RF-BUG-006 — Resolved-route\
+      \ title atom',\n          'RF-BUG-007 — Steer invalid-state atom',\n       \
+      \   '### Invalid Search visible/accessibility/recovery contract',\n        \
+      \  'role=\"alert\"',\n          'aria-live=\"assertive\"',\n          'no `/api/search`\
+      \ request',\n          'no history push or replace',\n          'Editing retains\
+      \ focus and entered values',\n          'corrected valid submission',\n    \
+      \      'bounded canonical `q` history state',\n      ]\n      missing = [literal\
+      \ for literal in required if literal not in design]\n      if missing:\n   \
+      \       raise SystemExit(f'missing RF-BUG interface atoms: {missing!r}')\n \
+      \     if '<title>RESOFEED · SOURCE LEDGER</title>' not in preview:\n       \
+      \   raise SystemExit('missing exact Source Ledger preview title')\n      print('RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007')\n\
       \      print('RF-BUG_INVALID_SEARCH_CONTRACT=visible,alert,no-request,no-history,edit,recovery')\n\
-      \      PY\n    timeout_seconds: 120\n  expect:\n    outcome: green\n    exit_codes:\
-      \ [0]\n    stdout_or_stderr:\n      contains_all:\n      - {literal: \"RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007\"\
+      \    timeout_seconds: 120\n  expect:\n    outcome: green\n    exit_codes: [0]\n\
+      \    stdout_or_stderr:\n      contains_all:\n      - {literal: \"RF-BUG_INTERFACE_ATOMS=RF-BUG-001,RF-BUG-002,RF-BUG-006,RF-BUG-007\"\
       }\n      - {literal: \"RF-BUG_INVALID_SEARCH_CONTRACT=visible,alert,no-request,no-history,edit,recovery\"\
       }\n      contains_any: []\n      forbids:\n      - {literal: missing RF-BUG\
       \ interface atoms}\n      - {literal: missing exact Source Ledger preview title}\n\
