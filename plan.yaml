@@ -183365,7 +183365,7 @@ phases:
       \ other protected tests, configs, fixtures, retry policy, required titles, or\
       \ expected-red tokens. Rollback reverts only the appended protected cases.\n\
       \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
-      \ expected_red_definition\nscope:\n  allowed_paths:\n  - web/tests/e2e/initial-route.browser-contract.spec.ts\n\
+      \ generic\nscope:\n  allowed_paths:\n  - web/tests/e2e/initial-route.browser-contract.spec.ts\n\
       \  blocked_paths:\n  - web/src/**\n  - internal/**\n  - web/tests/e2e/routes.browser-contract.spec.ts\n\
       \  - web/src/lib/__tests__/workbench-route.test.ts\n  - web/playwright.browser-contract.config.ts\n\
       claims:\n- RF-BUG-002-INITIAL-ROUTE-ACCEPTANCE\nchecks:\n- id: rf_bug_002_initial_route_inventory_green\n\
