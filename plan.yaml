@@ -183044,7 +183044,7 @@ phases:
     agent: frontend-engineer
   - id: rf-bug-playwright-command-config-foundation
     name: Establish preliminary Playwright command configs
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-PLAYWRIGHT-CONFIG-FOUNDATION. Before protected RF-BUG acceptance is\
@@ -183101,6 +183101,16 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T07:49:05.480868+00:00'
+    done_at: '2026-07-13T07:55:53.062337+00:00'
+    evidence: Integrated commit 993e5f26 (worktree commit e9edeba35e080b3bb62b68094b6513990ecb43f3)
+      adds web/playwright.browser-contract.config.ts and web/playwright.runtime.config.ts
+      as minimal aliases plus a bounded docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md note.
+      Dispatch sha256:5114f7f53979784ca2abc64f50a970f3950a859b9565310f38fa573321e4056d
+      admitted CONFORMANT. Production worker receipt CONFORMANT, receipt sha256:fa920efbe81139e1f3af833857ee67a091edbe46c89a34dc873f027801bf8d1a.
+      Exact playwright_config_scaffold_green check reran exit 0/green and collected
+      the named existing real-server test through both config paths. Intent-Closure
+      sidecar CONFORMANT at e9edeba35e080b3bb62b68094b6513990ecb43f3 with clean worktree
+      and no scope violations.
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
