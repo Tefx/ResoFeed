@@ -183475,16 +183475,15 @@ phases:
       \  - id: rf_bug_005_browser_operations_green\n    run: {command: [bash, -lc,\
       \ \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts\
-      \ --grep '^\\\\[RF-BUG-005\\\\] CSP operations import and State export import\
-      \ download$'\"], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes:\
-      \ [0], stdout_or_stderr: {contains_all: [{literal: CSP operations import and\
-      \ State export import download}], contains_any: [{literal: passed}], forbids:\
-      \ [{literal: failed}, {literal: CSP violation}, {literal: blocked resource},\
-      \ {literal: retry}]}}\n    proves: [RF-BUG-005]\nbindings:\n  expected_red:\
-      \ {items: []}\n  closes_expected_red:\n    - {requirement_id: RF-BUG-005, source_step:\
-      \ rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red, downstream_check:\
-      \ rf_bug_005_green}\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\"\
-      :\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
+      \ --grep '\\[RF-BUG-005\\] CSP operations import and State export import download$'\"\
+      ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: CSP operations import and State export import download}],\
+      \ contains_any: [{literal: passed}], forbids: [{literal: failed}, {literal:\
+      \ CSP violation}, {literal: blocked resource}, {literal: retry}]}}\n    proves:\
+      \ [RF-BUG-005]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
+      \    - {requirement_id: RF-BUG-005, source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ downstream_check: rf_bug_005_green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
       ,\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
       :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
