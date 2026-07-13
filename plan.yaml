@@ -183593,7 +183593,7 @@ phases:
       worktree.
   - id: rf-bug-frontend-doc-design-remediation
     name: Close frontend RF-BUG documentation and preview contracts
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-FRONTEND-DOC-DESIGN-CLOSURE. Synchronize only `docs/DESIGN.md` and\
@@ -183670,8 +183670,6 @@ phases:
     - repair-route-search-and-opaque-item-ids
     - repair-inspector-selection-and-routing
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-13T11:53:19.249078+00:00'
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
