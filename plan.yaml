@@ -182854,7 +182854,7 @@ phases:
     claimed_at: '2026-07-13T08:36:24.326520+00:00'
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-004-008-CONTRACT. Define protected State-import confirm/cancel/focus\
@@ -182931,6 +182931,14 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T08:36:24.326295+00:00'
+    done_at: '2026-07-13T09:06:26.449803+00:00'
+    evidence: Integrated commit ae509ed3 (worktree b5bc058cef529418ccd5b34958e642b3f4c5fe8e)
+      adds the authorized Source Ledger/State render, browser, runtime, delete, and
+      five screenshot baseline artifacts. Dispatch sha256:b88e35b0e5b6a9be207ffb53b157c913db77a8108e9555033d1841d71bca363a
+      and production receipt sha256:caa6bdd99bade69bc3cef2273bae9c1199ca8b18b8656356abc30bd055fba7b5
+      admitted CONFORMANT. All three exact corrected checks reran exit 1/red with
+      State confirm, responsive 320x800, and independent-operation fingerprints. Sidecar
+      CONFORMANT at b5bc058cef529418ccd5b34958e642b3f4c5fe8e, clean worktree.
   - id: rf-bug-prompting-v22-expected-red
     name: Lock Prompting v2.2 acceptance
     status: done
