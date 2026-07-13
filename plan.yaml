@@ -183445,7 +183445,7 @@ phases:
     - embed-ui-assets-in-single-binary
     - enforce-opml-import-only-surface
     - apply-outer-security-middleware-and-csp
-    agent: software-architect
+    agent: spec-verifier
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger Operations and Prompting v2.2
   status: locked
