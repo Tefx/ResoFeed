@@ -183272,7 +183272,7 @@ phases:
     agent: gate-reviewer
   - id: repair-route-search-and-opaque-item-ids
     name: Repair route, Search history, and opaque item IDs
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-002. Resolve the requested URL before async hydration; validate Search\
@@ -183342,8 +183342,6 @@ phases:
     depends_on:
     - rf-bug-002-initial-route-acceptance-remediation
     agent: general
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-13T09:52:13.045465+00:00'
   - id: rf-bug-002-initial-route-acceptance-remediation
     name: Remediate RF-BUG-002 initial-route acceptance coverage
     status: done
