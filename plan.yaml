@@ -183429,7 +183429,7 @@ phases:
       Sidecar CONFORMANT at 06281c28634c96dd7dab0078273727496c692eae, clean worktree.
   - id: rf-bug-002-route-token-acceptance-remediation
     name: Remediate RF-BUG-002 route-token unit coverage
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-002-ROUTE-TOKEN-UNIT-ACCEPTANCE. Append the smallest protected acceptance-only\
@@ -183486,6 +183486,14 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T10:01:18.897934+00:00'
+    done_at: '2026-07-13T10:06:18.196732+00:00'
+    evidence: Integrated commit 1c4e44dc (worktree f23c2cd7e16dde852b2e23362c02004f483bd99b)
+      changes only protected workbench-route.test.ts to nine canonical cases. Dispatch
+      sha256:5a2ed60bb8376b89b1cb1eb93303212aabe3dd0be4002deecf9c3b39290e7157 and
+      receipt sha256:26373b55c4de6e4b0c8026037171bbd920970fc32b1227cdf4747bf6f7d8aed1
+      admitted CONFORMANT. Exact Vitest check reran exit 1/red with required nine-case
+      literal and existing product-gap fingerprint. Sidecar CONFORMANT at f23c2cd7e16dde852b2e23362c02004f483bd99b,
+      clean worktree.
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
