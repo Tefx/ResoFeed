@@ -183473,7 +183473,7 @@ phases:
       \  - id: rf_bug_005_browser_operations_green\n    run: {command: [bash, -lc,\
       \ \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts\
-      \ --grep '\\[RF-BUG-005\\] CSP operations import and State export import download$'\"\
+      \ --grep 'RF-BUG-005.*CSP operations import and State export import download$'\"\
       ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
       \ {contains_all: [{literal: CSP operations import and State export import download}],\
       \ contains_any: [{literal: passed}], forbids: [{literal: failed}, {literal:\
