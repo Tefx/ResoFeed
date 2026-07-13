@@ -183754,7 +183754,7 @@ phases:
     - docs/BUG_REPORT_2026-07-11.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
-    agent: general
+    agent: frontend-engineer
   - id: rf-bug-010-reproducibility-artifact-proof
     name: Prove E2E reproducibility, cleanup, and retained artifacts
     status: pending
