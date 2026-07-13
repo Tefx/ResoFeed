@@ -183064,15 +183064,15 @@ phases:
       \  - web/playwright.browser-contract.config.ts\n  - web/playwright.runtime.config.ts\n\
       \  - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n  blocked_paths:\n  - web/playwright.config.ts\n\
       \  - web/package.json\n  - web/tests/**\n  - web/src/**\n  - internal/**\n \
-      \ ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/, .pi/, .test-artifacts/]\n\
-      claims: [RF-BUG-PLAYWRIGHT-CONFIG-FOUNDATION]\nchecks:\n- id: playwright_config_scaffold_green\n\
-      \  run:\n    command:\n    - bash\n    - -lc\n    - \"set -e; for config in\
-      \ web/playwright.browser-contract.config.ts web/playwright.runtime.config.ts;\
-      \ do echo PLAYWRIGHT_CONFIG=$config; npm --prefix web exec -- playwright test\
-      \ --config \\\"$config\\\" --project=chromium-ci-safe --retries=0 --list web/tests/e2e/real-server-ui.spec.ts\
-      \ --grep '^ci-safe real server/UI boot uses the Go binary and owner-token gate$';\
-      \ done\"\n    timeout_seconds: 180\n  expect:\n    outcome: green\n    exit_codes:\
-      \ [0]\n    stdout_or_stderr:\n      contains_all:\n      - {literal: PLAYWRIGHT_CONFIG=web/playwright.browser-contract.config.ts}\n\
+      \ ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-PLAYWRIGHT-CONFIG-FOUNDATION]\n\
+      checks:\n- id: playwright_config_scaffold_green\n  run:\n    command:\n    -\
+      \ bash\n    - -lc\n    - \"set -e; for config in web/playwright.browser-contract.config.ts\
+      \ web/playwright.runtime.config.ts; do echo PLAYWRIGHT_CONFIG=$config; npm --prefix\
+      \ web exec -- playwright test --config \\\"$config\\\" --project=chromium-ci-safe\
+      \ --retries=0 --list web/tests/e2e/real-server-ui.spec.ts --grep '^ci-safe real\
+      \ server/UI boot uses the Go binary and owner-token gate$'; done\"\n    timeout_seconds:\
+      \ 180\n  expect:\n    outcome: green\n    exit_codes: [0]\n    stdout_or_stderr:\n\
+      \      contains_all:\n      - {literal: PLAYWRIGHT_CONFIG=web/playwright.browser-contract.config.ts}\n\
       \      - {literal: PLAYWRIGHT_CONFIG=web/playwright.runtime.config.ts}\n   \
       \   - {literal: ci-safe real server/UI boot uses the Go binary and owner-token\
       \ gate}\n      contains_any:\n      - {literal: \"Total: 1 test in 1 file\"\
