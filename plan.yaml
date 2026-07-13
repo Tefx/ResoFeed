@@ -182916,7 +182916,7 @@ phases:
     - docs/DESIGN.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
-    - rf-bug-canonical-contract-sync
+    - rf-bug-playwright-command-config-foundation
     agent: frontend-engineer
   - id: rf-bug-prompting-v22-expected-red
     name: Lock Prompting v2.2 acceptance
