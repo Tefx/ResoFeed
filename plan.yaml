@@ -183280,6 +183280,7 @@ phases:
     depends_on:
     - repair-route-search-and-opaque-item-ids
     - repair-inspector-selection-and-routing
+    - rf-bug-frontend-doc-design-remediation
     agent: gate-reviewer
   - id: repair-route-search-and-opaque-item-ids
     name: Repair route, Search history, and opaque item IDs
