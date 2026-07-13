@@ -182854,7 +182854,7 @@ phases:
     claimed_at: '2026-07-13T07:56:14.603855+00:00'
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-004-008-CONTRACT. Define protected State-import confirm/cancel/focus\
@@ -182930,8 +182930,6 @@ phases:
     depends_on:
     - rf-bug-playwright-command-config-foundation
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-13T07:56:14.603605+00:00'
   - id: rf-bug-prompting-v22-expected-red
     name: Lock Prompting v2.2 acceptance
     status: done
