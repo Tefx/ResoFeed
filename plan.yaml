@@ -183277,11 +183277,13 @@ phases:
       \ The retired route is auth-first: unauthenticated 401, authenticated 404. State\
       \ validation completes before one replacement transaction; failure leaves prior\
       \ portable state. Rollback never restores OPML export, merge, sync, history,\
-      \ or portable receipts. Do not expose secrets.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope: {allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_impl_test.go,\
-      \ internal/resofeed/mcp.go, web/src/lib/api-client.ts, web/src/lib/api-client.test.ts,\
-      \ web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
+      \ or portable receipts. Do not expose secrets.\n\nCross-domain justification:\
+      \ this indivisible unit removes the surface across Go HTTP/MCP, TypeScript/Svelte\
+      \ UI, and active documentation under one rollback and acceptance boundary.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope: {allowed_paths: [internal/resofeed/http.go,\
+      \ internal/resofeed/http_impl_test.go, internal/resofeed/mcp.go, web/src/lib/api-client.ts,\
+      \ web/src/lib/api-client.test.ts, web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
       \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PRD.md, docs/USAGE.md, docs/CONTAINER.md,\
       \ docs/PROMPTING_SYSTEM.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, README.md,\
       \ docs/ui-preview.html], blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
