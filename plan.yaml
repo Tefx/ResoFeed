@@ -183170,7 +183170,7 @@ phases:
       - id: rf_bug_001_green\n  run:\n    command:\n    - bash\n    - -lc\n    - npm\
       \ --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/inspector-selection.browser-contract.spec.ts\
-      \ --grep '^\\[RF-BUG-001\\]'\n    timeout_seconds: 600\n  expect:\n    outcome:\
+      \ --grep '\\[RF-BUG-001\\]'\n    timeout_seconds: 600\n  expect:\n    outcome:\
       \ green\n    exit_codes:\n    - 0\n    stdout_or_stderr:\n      contains_all:\n\
       \      - literal: stale detail cannot replace the selected item\n      contains_any:\n\
       \      - literal: passed\n      forbids:\n      - literal: failed\n      - literal:\
@@ -183178,7 +183178,7 @@ phases:
       \  - RF-BUG-001\n- id: rf_bug_006_green\n  run:\n    command:\n    - bash\n\
       \    - -lc\n    - npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\
-      \ --grep '^\\[RF-BUG-006\\]'\n    timeout_seconds: 300\n  expect:\n    outcome:\
+      \ --grep '\\[RF-BUG-006\\]'\n    timeout_seconds: 300\n  expect:\n    outcome:\
       \ green\n    exit_codes:\n    - 0\n    stdout_or_stderr:\n      contains_all:\n\
       \      - literal: route-derived title updates atomically\n      contains_any:\n\
       \      - literal: passed\n      forbids:\n      - literal: failed\n      - literal:\
@@ -183186,7 +183186,7 @@ phases:
       \  - RF-BUG-006\n  - RF-BUG-006-007\n- id: rf_bug_007_green\n  run:\n    command:\n\
       \    - bash\n    - -lc\n    - npm --prefix web exec -- playwright test --config\
       \ web/playwright.browser-contract.config.ts --project=chromium-ci-safe --retries=0\
-      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '^\\[RF-BUG-007\\\
+      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts --grep '\\[RF-BUG-007\\\
       ]'\n    timeout_seconds: 300\n  expect:\n    outcome: green\n    exit_codes:\n\
       \    - 0\n    stdout_or_stderr:\n      contains_all:\n      - literal: '[RF-BUG-007][en]\
       \ repeated invalid add source remounts one alert'\n      - literal: '[RF-BUG-007][zh]\
