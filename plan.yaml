@@ -182544,14 +182544,16 @@ phases:
       \ bytes/ranges; normalize CRLF and remaining CR to LF only for CSP hashing.\
       \ Failure must reach the named assertion, never collection/compile/startup/auth/timeout.\
       \ Rollback reverts this protected set. No secrets, external UI registry, response-writer\
-      \ state machine, or custom protocol.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: expected_red_definition\nscope: {allowed_paths:\
-      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, web/tests/e2e/csp-operations.browser-contract.spec.ts],\
-      \ blocked_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
-      \ internal/resofeed/doctor.go, internal/resofeed/webui/**, web/src/**, docs/**]}\n\
-      claims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT, RF-BUG-005-CONTRACT, RF-BUG-003-005-CONTRACT]\n\
-      checks:\n  - id: rf_bug_003_expected_red\n    run: {command: [go, test, -v,\
-      \ ./internal/resofeed, -run, '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
+      \ state machine, or custom protocol.\n\nCross-domain justification: this expected-red\
+      \ unit binds Go runtime acceptance and Chromium TypeScript acceptance under\
+      \ one protected rollback and downstream contract.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: expected_red_definition\n\
+      scope: {allowed_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ web/tests/e2e/csp-operations.browser-contract.spec.ts], blocked_paths: [internal/resofeed/http.go,\
+      \ internal/resofeed/http_security.go, internal/resofeed/doctor.go, internal/resofeed/webui/**,\
+      \ web/src/**, docs/**]}\nclaims: [RF-BUG-003-CONTRACT, RF-BUG-004-CONTRACT,\
+      \ RF-BUG-005-CONTRACT, RF-BUG-003-005-CONTRACT]\nchecks:\n  - id: rf_bug_003_expected_red\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$',\
       \ -count=1], timeout_seconds: 300}\n    expect: {outcome: red, exit_codes: [1],\
       \ stdout_or_stderr: {contains_all: [{literal: RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete},\
       \ {literal: RF-BUG-003_CSP_CRLF_NORMALIZED=chromium}, {literal: expected listener\
@@ -182603,10 +182605,10 @@ phases:
       AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-runtime-contract\"\
       ,\"path\":\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ,\"purpose\":\"Define atomic RF-BUG-003/004/005 Go acceptance\",\"check_id\"\
-      :\"rf_bug_003_expected_red\",\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf005-csp-browser\"\
+      :\"rf_bug_003_expected_red\",\"actor_id\":\"spec-verifier\"},{\"ref\":\"authority:acceptance-mutation:rf005-csp-browser\"\
       ,\"path\":\"web/tests/e2e/csp-operations.browser-contract.spec.ts\",\"purpose\"\
       :\"Define real-Chromium CSP operation acceptance\",\"check_id\":\"rf_bug_005_browser_operations_expected_red\"\
-      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
+      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
     verification: Run all four checks independently; require corrected script/CRLF
       fixtures, auth-first OPML, exact 13 HTTP subtests, one Chromium CSP operation,
       and no product/docs diff.
