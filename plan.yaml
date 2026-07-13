@@ -183341,6 +183341,7 @@ phases:
       trips, 30 API subtests, and no protected acceptance diff.
     depends_on:
     - rf-bug-002-initial-route-acceptance-remediation
+    - rf-bug-002-route-token-acceptance-remediation
     agent: general
   - id: rf-bug-002-initial-route-acceptance-remediation
     name: Remediate RF-BUG-002 initial-route acceptance coverage
