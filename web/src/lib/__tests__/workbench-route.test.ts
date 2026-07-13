@@ -18,16 +18,23 @@ async function loadWorkbenchRoute(): Promise<WorkbenchRouteModule> {
 
 describe('RF-BUG-002 opaque item IDs', () => {
   it('uses ~ plus unpadded RFC4648 base64url and round-trips every UTF-8 byte', async () => {
-    const route = await loadWorkbenchRoute();
     const itemIDs = [
       'item/segment',
       'item%percent',
       '项目/百分号%',
       'item?query#fragment',
       'item+plus space',
-      '~already-token-like_-.'
+      '~already-token-like_-.',
+      'ordinary-ascii-123',
+      'emoji-😀',
+      'cafe\u0301'
     ];
 
+    expect(itemIDs).toHaveLength(9);
+    expect(new Set(itemIDs).size).toBe(9);
+    console.info('canonical ~base64url round-trip cases=9');
+
+    const route = await loadWorkbenchRoute();
     for (const itemID of itemIDs) {
       const expected = `~${Buffer.from(itemID, 'utf8').toString('base64url')}`;
       const token = route.encodeItemRouteToken(itemID);
