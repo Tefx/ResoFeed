@@ -2531,18 +2531,18 @@ curl -i -X POST http://127.0.0.1:8080/api/items/item_01/reingest \
 ```
 
 ## RF-BUG Canonical Runtime Contract
-
 The following requirements are active product contracts:
 
 - `cmd/resofeed` validates and embeds the production UI before binding; the built binary serves root, generated assets, and valid deep links independently of the process working directory. `/doctor` adds only `ui_assets=ready` and `ui_asset_source=embedded` for packaged-asset readiness.
 - Go applies one effective `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, and `X-Frame-Options: DENY` value to static, API, MCP, authorization-error, not-found, and internal-error responses. Reverse proxies pass these application-owned values unchanged.
-- Initial route resolution controls the first visible surface and document title before token hydration or shell API work. Functional titles are `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor`; processing language does not translate them. Opaque item IDs round-trip unchanged.
+- Initial route resolution controls the first visible surface and document title before token hydration or shell API work. Functional titles are `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor`; processing language does not translate them.
+- Browser item routes and all five item HTTP operations (`detail`, `inspect`, `resonance`, `delivery`, and `reingest`) carry opaque item IDs as `~` plus unpadded RFC4648 base64url of the UTF-8 bytes. Go rejects malformed, padded, non-canonical, or invalid-UTF-8 tokens before item lookup; decoded IDs round-trip byte-identically and are never parsed as path syntax.
+- Search uses canonical `/?q=...&source=...&from=...&to=...&resonated=...&limit=...` URLs. The browser applies the same documented bounds and calendar validation before API or history mutation, stores only bounded ephemeral route state, and re-executes lexical search from the URL on cold load, refresh, Back, and Forward. This state is not a saved search, reading history, or portable state.
 - Feed and Search selection immediately render a readable Inspector preview. Detail and inspection-marker requests complete independently, and responses for a prior selection cannot replace the current selection. Pending or failed enhancement requests preserve the selected item, direct route, URL, content, and focus behavior.
 - Idle Steer exposes no missing-URL error. Only a matching invalid submission creates one localized accessible error; it retains input and focus, sends no mutation, clears on edit, and stays distinct from stale-preview or transport failures.
 - Source Ledger keeps separately labelled Source List and Portable State groups. It exposes OPML import, JSON State export/import, global ingest, per-source fetch, source information, status/diagnostics, and delete confirmation/cancel. It exposes no OPML output capability, second URL field, hierarchy, settings, sync, or activity history.
 - Every canonical ingest and reprocess transform identifies and enforces Prompting System v2.2 (`resofeed.summarize.v2.2`). OpenRouter remains a runtime JSON transformer; Go validates output and owns atomic item/FTS persistence. Request-only prompts, model choices, provider data, and credentials remain non-durable.
 - Comprehensive Playwright acceptance launches the real binary and uses real product APIs. Mutating cases receive case-local SQLite state and clean browser contexts; bounded reuse is read-only, cleanup residue fails the case, and product API interception cannot establish comprehensive behavior.
-
 ## 11. Open Questions
 
 None blocking.

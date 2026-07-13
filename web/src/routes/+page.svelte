@@ -4,6 +4,7 @@
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import { formatCurrentOperationStatus, formatOperationConflictStatus, idleOperation, normalizeCurrentOperationInfo } from '$lib/current-operation';
+  import { itemRoutePath, normalizeSearchRequestParams, resolveWorkbenchRoute, searchQueryString, type WorkbenchSurface } from '$lib/workbench-route';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
   import FirstUseEmptyState from './components/FirstUseEmptyState.svelte';
   import Feed from './components/Feed.svelte';
@@ -14,7 +15,7 @@
   type OwnerTokenPromptState = 'empty' | 'focused' | 'submitting' | 'accepted' | 'rejected';
   type FirstUseState = 'no-sources' | 'sources-added-no-items' | 'feed-temporarily-empty';
   type ApiLoadState = 'idle' | 'loading' | 'ready' | 'error';
-  type Surface = 'feed' | 'inspector' | 'ledger' | 'search' | 'doctor';
+  type Surface = WorkbenchSurface;
   type ReprocessState = 'idle' | 'confirming' | 'running' | 'complete' | 'conflict' | 'failed';
   type ContextualOperationState =
     | { kind: 'idle' }
@@ -44,6 +45,10 @@
   const feedAutoRefreshMs = 30_000;
   const activeOperationPollMs = 800;
   const idleOperationPollMs = 5000;
+  const browserRouteResolved = typeof window !== 'undefined';
+  const initialRoute = browserRouteResolved
+    ? resolveWorkbenchRoute(window.location.pathname, window.location.search, window.history.state)
+    : resolveWorkbenchRoute('/');
 
   let ownerToken = $state('');
   let tokenHydrated = $state(false);
@@ -56,7 +61,7 @@
   let feedHasMore = $state(false);
   let feedLoadingMore = $state(false);
   let sources = $state<Source[]>([]);
-  let selectedItemId = $state<string | null>(null);
+  let selectedItemId = $state<string | null>(initialRoute.itemId);
   let selectedItemPreview = $state<ItemSummary | null>(null);
   let selectedItemDetail = $state<ItemDetail | null>(null);
   let inspectorState = $state<ApiLoadState>('idle');
@@ -64,11 +69,12 @@
   let inspectorFocusRequestId = $state(0);
   let inspectorActivated = $state(false);
   let steerCommand = $state('');
-  let searchSeedQuery = $state('');
+  let searchRouteParams = $state<SearchRequestParams | null>(initialRoute.searchParams);
+  let searchRouteError = $state<string | null>(initialRoute.searchError);
   let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
   let undoStatus = $state('');
   let agentSteeringRules = $state<SteerRule[]>([]);
-  let currentSurface = $state<Surface>('feed');
+  let currentSurface = $state<Surface>(initialRoute.surface);
   let isNarrow = $state(false);
   let surfaceMenuOpen = $state(false);
   let processingLanguage = $state<ProcessingLanguageInfo>({ code: 'en', label: 'English' });
@@ -103,6 +109,7 @@
   let itemDetailRequestSequence = 0;
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
+  const documentTitle = $derived(browserRouteResolved ? `RESOFEED · ${{ feed: 'TODAY', inspector: 'INSPECTOR', ledger: 'SOURCE LEDGER', search: 'SEARCH', doctor: '/doctor' }[currentSurface]}` : 'RESOFEED');
   const ownerTokenRejected = $derived(promptState === 'rejected');
   const firstUseState = $derived<FirstUseState>(
     sources.length === 0
@@ -153,24 +160,8 @@
   const inspectorScrollLabel = $derived(browserLegacyEnglishA11y ? 'INSPECTOR independent scroll' : shellChrome.inspectorScroll);
   const backTodayLabel = $derived(browserLegacyEnglishA11y ? 'back to TODAY' : shellChrome.backToday);
 
-  function surfaceForPath(pathname: string, search = '', state: unknown = null): Surface {
-    if (typeof state === 'object' && state !== null && 'surface' in state && (state as { surface?: unknown }).surface === 'search') return 'search';
-    if (new URLSearchParams(search).has('search')) return 'search';
-    if (pathname === '/doctor') return 'doctor';
-    if (pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources') return 'ledger';
-    if (pathname.startsWith('/items/')) return 'inspector';
-    return 'feed';
-  }
-
   function itemIdForPath(pathname: string): string | null {
-    if (!pathname.startsWith('/items/')) return null;
-    const encoded = pathname.slice('/items/'.length).split('/')[0];
-    if (!encoded) return null;
-    try {
-      return decodeURIComponent(encoded);
-    } catch {
-      return encoded;
-    }
+    return resolveWorkbenchRoute(pathname).itemId;
   }
 
   function canonicalPathForSurface(surface: Surface): string | null {
@@ -181,24 +172,31 @@
   }
 
   function replaceSurfaceFromLocation(state: unknown = window.history.state): void {
-    const routeSurface = surfaceForPath(window.location.pathname, window.location.search, state);
-    if (routeSurface === 'search') {
-      const queryFromUrl = new URLSearchParams(window.location.search).get('search');
-      if (queryFromUrl !== null) searchSeedQuery = queryFromUrl;
+    const route = resolveWorkbenchRoute(window.location.pathname, window.location.search, state);
+    if (route.surface === 'search') {
+      searchRouteParams = route.searchParams ?? {};
+      searchRouteError = route.searchError;
       if (typeof state === 'object' && state !== null && 'searchScrollY' in state && typeof (state as { searchScrollY?: unknown }).searchScrollY === 'number') {
         preservedSearchWindowScrollY = (state as { searchScrollY: number }).searchScrollY;
       }
+    } else {
+      searchRouteError = null;
     }
-    if (routeSurface !== currentSurface) currentSurface = routeSurface;
-    if (routeSurface === 'search') void restoreSearchScrollPosition();
+    if (route.surface === 'inspector' && route.itemId) {
+      selectedItemId = route.itemId;
+      setSelectedItemPreview(items.find((item) => item.id === route.itemId) ?? null);
+      if (hasOwnerToken && loadState === 'ready') void loadItemDetail(route.itemId);
+    }
+    if (route.surface !== currentSurface) currentSurface = route.surface;
+    if (route.surface === 'search') void restoreSearchScrollPosition();
   }
 
-  function syncSearchHistory(scrollY = preservedSearchWindowScrollY): void {
-    const params = new URLSearchParams(window.location.search);
-    if (searchSeedQuery) params.set('search', searchSeedQuery);
-    const nextUrl = `/${params.toString() ? `?${params.toString()}` : ''}`;
-    const priorState = typeof window.history.state === 'object' && window.history.state !== null ? window.history.state : {};
-    window.history.replaceState({ ...priorState, surface: 'search', searchQuery: searchSeedQuery, searchScrollY: scrollY }, '', nextUrl);
+  function syncSearchHistory(params: SearchRequestParams, scrollY = preservedSearchWindowScrollY, mode: 'push' | 'replace' = 'replace'): void {
+    const query = searchQueryString(params);
+    const nextUrl = `/${query ? `?${query}` : ''}`;
+    const state = { surface: 'search', searchQuery: params.q ?? '', searchScrollY: scrollY };
+    if (mode === 'push') window.history.pushState(state, '', nextUrl);
+    else window.history.replaceState(state, '', nextUrl);
   }
 
   async function restoreSearchScrollPosition(): Promise<void> {
@@ -295,7 +293,8 @@
   }
 
   function resetSearchSurfaceState(): void {
-    searchSeedQuery = '';
+    searchRouteParams = null;
+    searchRouteError = null;
     steerCommand = '';
     preservedSearchWindowScrollY = 0;
     if (steerFeedback.kind === 'receipt' && steerFeedback.route === 'search') steerFeedback = { kind: 'idle' };
@@ -778,8 +777,9 @@
     currentSurface = 'inspector';
     inspectorFocusRequestId += 1;
     if (detailPaneElement) detailPaneElement.scrollTop = 0;
-    if (isNarrow && window.location.pathname !== `/items/${encodeURIComponent(item.id)}`) {
-      window.history.pushState({}, '', `/items/${encodeURIComponent(item.id)}`);
+    const routePath = itemRoutePath(item.id);
+    if (isNarrow && window.location.pathname !== routePath) {
+      window.history.pushState({}, '', routePath);
     }
     try {
       await apiClient().inspect(item.id);
@@ -787,7 +787,7 @@
       // Inspection marking is provenance-only; selecting an item must keep navigation usable even if the marker write is unavailable.
     }
     await loadItemDetail(item.id);
-    if (isNarrow && window.location.pathname !== `/items/${encodeURIComponent(item.id)}`) return;
+    if (isNarrow && window.location.pathname !== routePath) return;
     currentSurface = 'inspector';
     await restoreFeedScrollPosition();
   }
@@ -795,8 +795,8 @@
   async function selectSearchItem(item: ItemSummary): Promise<void> {
     preservedSearchWindowScrollY = window.scrollY;
     if (isNarrow) {
-      syncSearchHistory(preservedSearchWindowScrollY);
-      window.history.pushState({}, '', `/items/${encodeURIComponent(item.id)}`);
+      if (searchRouteParams) syncSearchHistory(searchRouteParams, preservedSearchWindowScrollY);
+      window.history.pushState({}, '', itemRoutePath(item.id));
       await selectItem(item);
       return;
     }
@@ -990,11 +990,17 @@
       }
       if (/^(search|find)\s+/i.test(command)) {
         shouldRefocusSteer = false;
-        searchSeedQuery = command.replace(/^(search|find)\s+/i, '');
+        const normalized = normalizeSearchRequestParams({ q: command.replace(/^(search|find)\s+/i, '') });
+        if (normalized.params === null) {
+          steerFeedback = { kind: 'error', text: normalized.error };
+          return;
+        }
+        searchRouteParams = normalized.params;
+        searchRouteError = null;
         clearSelectedInspectorContext();
         preservedSearchWindowScrollY = 0;
         showSurface('search', false);
-        syncSearchHistory(0);
+        syncSearchHistory(normalized.params, 0, 'push');
         steerCommand = '';
         steerFeedback = {
           kind: 'receipt',
@@ -1129,7 +1135,10 @@
   }
 
   async function searchItems(params: SearchRequestParams) {
-    return apiClient().search(params);
+    const normalized = normalizeSearchRequestParams(params);
+    if (normalized.params === null) throw new Error(normalized.error);
+    syncSearchHistory(normalized.params);
+    return apiClient().search(normalized.params);
   }
 
   async function handleSearchResults(items: ItemSummary[], state: 'ready' | 'error'): Promise<void> {
@@ -1206,8 +1215,7 @@
     const media = window.matchMedia('(max-width: 1079px)');
     const updateMedia = () => {
       isNarrow = media.matches;
-        if (!media.matches && currentSurface === 'inspector') currentSurface = 'feed';
-        if (!media.matches && currentSurface === 'feed' && items.length > 0 && !selectedItemId) reconcileSelectedFeedItem(items);
+      if (!media.matches && currentSurface === 'feed' && items.length > 0 && !selectedItemId) reconcileSelectedFeedItem(items);
       };
     updateMedia();
     applySplitScrollContainment();
@@ -1249,8 +1257,12 @@
   });
 </script>
 
+<svelte:head>
+  <title>{documentTitle}</title>
+</svelte:head>
+
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions: app shell owns the DESIGN.md global Escape contract while preserving child text-entry ownership. -->
-<main bind:this={shellElement} class="contract-shell resofeed-shell" data-surface={currentSurface} aria-label="RESOFEED" onkeydown={handleGlobalEscape}>
+<main bind:this={shellElement} class="contract-shell resofeed-shell" data-surface={browserRouteResolved ? currentSurface : undefined} aria-label="RESOFEED" onkeydown={handleGlobalEscape}>
   {#if !tokenHydrated}
     <p class="visually-hidden" role="status" aria-live="polite">loading owner token</p>
   {:else if !hasOwnerToken}
@@ -1404,7 +1416,7 @@
         {#if !feedPaneInactive || currentSurface === 'inspector'}
           <p id="feed-heading" class="visually-hidden" tabindex="-1">TODAY feed</p>
           {#if currentSurface === 'search' && !isNarrow}
-            <SearchRetrieval items={items} query={searchSeedQuery} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} autoSelectFirstResult={true} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+            <SearchRetrieval items={items} routeParams={searchRouteParams} routeError={searchRouteError} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} autoSelectFirstResult={true} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
           {:else if apiError && !ownerTokenRejected}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {:else if items.length === 0}
@@ -1463,7 +1475,7 @@
         <button class="back-command" type="button" onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
       {/if}
       {#if isNarrow}
-        <SearchRetrieval items={items} query={searchSeedQuery} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={true} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+        <SearchRetrieval items={items} routeParams={searchRouteParams} routeError={searchRouteError} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} compactFilters={true} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
       {/if}
     </section>
     {#if steerFeedback.kind === 'doctor'}

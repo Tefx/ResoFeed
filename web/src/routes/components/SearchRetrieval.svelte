@@ -6,6 +6,8 @@
   interface Props {
     items: ItemSummary[];
     query?: string;
+    routeParams?: SearchRequestParams | null;
+    routeError?: string | null;
     onSearch: (params: SearchRequestParams) => Promise<SearchResponse>;
     onSelect?: (item: ItemSummary) => Promise<void> | void;
     onResultsSettled?: (items: ItemSummary[], state: 'ready' | 'error') => Promise<void> | void;
@@ -18,7 +20,7 @@
     sources?: Source[];
   }
 
-  let { items, query = '', onSearch, onSelect, onResultsSettled, onResonanceToggle, selectedItemId = null, autoSelectFirstResult = false, suppressStatusRole = false, compactFilters = false, language = 'en', sources = [] }: Props = $props();
+  let { items, query = '', routeParams = null, routeError = null, onSearch, onSelect, onResultsSettled, onResonanceToggle, selectedItemId = null, autoSelectFirstResult = false, suppressStatusRole = false, compactFilters = false, language = 'en', sources = [] }: Props = $props();
   let searchQuery = $state('');
   let source = $state('');
   let from = $state('');
@@ -27,8 +29,9 @@
   let limit = $state(50);
   let results = $state<ItemSummary[]>([]);
   let statusText = $state('');
+  let resultState = $state<'idle' | 'loading' | 'ready' | 'error'>('idle');
   let pendingResonanceId = $state<string | null>(null);
-  let lastHandledSeedQuery = '';
+  let lastHandledRouteKey = '';
   let lastAutoSelectedResultKey = '';
   let userSelectedResultKey = '';
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
@@ -95,27 +98,40 @@
   }
 
   $effect(() => {
-    if (!query) {
+    const effectiveRouteParams = routeParams ?? (query ? { q: query } : null);
+    const routeKey = JSON.stringify({ effectiveRouteParams, routeError });
+    if (routeKey === lastHandledRouteKey) return;
+    lastHandledRouteKey = routeKey;
+    if (effectiveRouteParams === null) {
       results = [];
       statusText = chrome.search.resultCount(0);
-      lastHandledSeedQuery = '';
+      resultState = 'idle';
       return;
     }
-    searchQuery = query;
-    if (query !== lastHandledSeedQuery) {
-      lastHandledSeedQuery = query;
-      results = items;
-      statusText = chrome.search.resultCount(items.length);
-      void submitSearch(false);
+    searchQuery = effectiveRouteParams.q ?? '';
+    source = effectiveRouteParams.source ?? '';
+    from = effectiveRouteParams.from ?? '';
+    to = effectiveRouteParams.to ?? '';
+    resonated = effectiveRouteParams.resonated ?? false;
+    limit = effectiveRouteParams.limit ?? 50;
+    results = items;
+    if (routeError) {
+      statusText = routeError;
+      resultState = 'error';
+      void onResultsSettled?.([], 'error');
+      return;
     }
+    statusText = chrome.search.resultCount(items.length);
+    void submitSearch(false);
   });
 
   async function submitSearch(showLoading = true): Promise<void> {
     if (showLoading) statusText = chrome.search.searching;
+    resultState = 'loading';
     const resultKey = JSON.stringify({ searchQuery, source, from, to, resonated, limit });
     try {
       const response = await onSearch({
-        q: searchQuery || undefined,
+        q: searchQuery,
         source: source || undefined,
         from: from || undefined,
         to: to || undefined,
@@ -124,6 +140,7 @@
       });
       results = response.items;
       statusText = chrome.search.resultCount(response.items.length);
+      resultState = 'ready';
       await onResultsSettled?.(response.items, 'ready');
       if (autoSelectFirstResult && response.items.length > 0 && resultKey !== lastAutoSelectedResultKey && resultKey !== userSelectedResultKey) {
         lastAutoSelectedResultKey = resultKey;
@@ -133,6 +150,7 @@
       results = [];
       const message = error instanceof Error ? error.message : 'err: search failed';
       statusText = /err:\s*internal/i.test(message) ? chrome.search.resultCount(0) : message;
+      resultState = 'error';
       await onResultsSettled?.([], 'error');
     }
   }
@@ -200,7 +218,7 @@
       </div>
     </details>
   </form>
-  <p id="search-status" role={suppressStatusRole ? undefined : 'status'} aria-live="polite" class="contract-muted">{statusText || chrome.search.resultCount(results.length)}</p>
+  <p id="search-status" role={resultState === 'error' ? 'alert' : suppressStatusRole ? undefined : 'status'} aria-live={resultState === 'error' ? 'assertive' : 'polite'} class="contract-muted">{statusText || chrome.search.resultCount(results.length)}</p>
   <div class="contract-search-results-region" role="region" aria-label={searchChrome.resultsRegion}>
     <div class="contract-search-results-list" role="list" aria-label={searchChrome.resultsList}>
       {#each results as item, index (item.id)}

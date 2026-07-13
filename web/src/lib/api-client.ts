@@ -38,20 +38,14 @@ import type {
 } from '$lib/api-contract';
 import { processingLanguageRuntimeContract } from '$lib/api-contract';
 import { normalizeCurrentOperationInfo } from '$lib/current-operation';
+import { itemRoutePath, type SearchRequestParams } from '$lib/workbench-route';
+
+export type { SearchRequestParams } from '$lib/workbench-route';
 
 export interface ResoFeedApiClientOptions {
   ownerToken: string;
   baseUrl?: string;
   fetcher?: typeof fetch;
-}
-
-export interface SearchRequestParams {
-  q?: string;
-  source?: string;
-  from?: string;
-  to?: string;
-  resonated?: boolean;
-  limit?: number;
 }
 
 export interface TodayFeedRequestParams {
@@ -230,11 +224,11 @@ export class ResoFeedApiClient {
   }
 
   async item(id: OpaqueId): Promise<ItemDetailResponse> {
-    return this.request<ItemDetailResponse>(`/api/items/${encodeURIComponent(id)}`);
+    return this.request<ItemDetailResponse>(`/api${itemRoutePath(id)}`);
   }
 
   async inspect(id: OpaqueId, request?: Partial<InspectRequest>): Promise<InspectResponse> {
-    return this.request<InspectResponse>(`/api/items/${encodeURIComponent(id)}/inspect`, {
+    return this.request<InspectResponse>(`/api${itemRoutePath(id)}/inspect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -253,7 +247,7 @@ export class ResoFeedApiClient {
     const promptFields = compatibilityRequest && Object.prototype.hasOwnProperty.call(compatibilityRequest, 'extra_prompt')
       ? { extra_prompt: extraPrompt.length > 0 ? extraPrompt : null }
       : { prompt: prompt.length > 0 ? prompt : null };
-    return this.request<ItemReingestResponse>(`/api/items/${encodeURIComponent(id)}/reingest`, {
+    return this.request<ItemReingestResponse>(`/api${itemRoutePath(id)}/reingest`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -267,7 +261,7 @@ export class ResoFeedApiClient {
   }
 
   async resonance(id: OpaqueId, resonated: boolean, request?: Partial<ResonanceRequest>): Promise<ResonanceResponse> {
-    return this.request<ResonanceResponse>(`/api/items/${encodeURIComponent(id)}/resonance`, {
+    return this.request<ResonanceResponse>(`/api${itemRoutePath(id)}/resonance`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

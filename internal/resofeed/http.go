@@ -533,6 +533,17 @@ func writeGuardConflict(w http.ResponseWriter, details operationGuardDetails) {
 func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 	trimmed := strings.TrimPrefix(r.URL.Path, "/api/items/")
 	parts := strings.Split(trimmed, "/")
+	if len(parts) <= 2 {
+		itemID, ok := decodeItemRouteToken(parts[0])
+		if !ok {
+			if strings.HasPrefix(parts[0], "~") {
+				writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": parts[0]})
+				return
+			}
+			itemID = parts[0]
+		}
+		parts[0] = itemID
+	}
 	if len(parts) == 1 && r.Method == http.MethodGet {
 		itemID := parts[0]
 		detail, err := ReadItemDetail(r.Context(), h.cfg.DB, itemID)
@@ -570,7 +581,7 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 		if !ok || !validateMutationFields(w, req.MutationRequestFields) {
 			return
 		}
-		response, err := ReingestItem(r.Context(), h.cfg.DB, h.cfg.LLM, parts[0], req)
+		response, err := reingestOpaqueItem(r.Context(), h.cfg.DB, h.cfg.LLM, parts[0], req)
 		if err != nil {
 			if details, ok := guardConflictDetails(err); ok {
 				writeGuardConflict(w, details)
