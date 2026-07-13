@@ -182521,7 +182521,7 @@ phases:
       - No unresolved residuals.'
 - id: rf-bug-20260712-contract-lock
   name: RF-BUG-001–010 Contract Lock and Protected Acceptance
-  status: in_progress
+  status: done
   gate: Current canonical contracts are synchronized; every RF-BUG-001–010 assertion
     is independently collected and intentionally red for its named product gap; expected-red
     bindings are reciprocal; product/runtime paths are unchanged; reference-aware
@@ -182695,7 +182695,7 @@ phases:
       and remains untracked.
   - id: rf-bug-route-search-token-expected-red
     name: Lock combined frontend expected-red acceptance
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
       \ source outcome `rf-bug-route-search-token-expected-red`:\nOutcome: RF-BUG-002-CONTRACT.\
@@ -182852,6 +182852,15 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T08:36:24.326520+00:00'
+    done_at: '2026-07-13T09:06:41.281121+00:00'
+    evidence: Integrated commit 613cdc44 (worktree 60ea9f2c30b4992012c7509ed42fef6cfaf92461)
+      preserves and completes the eight authorized combined browser/render/Go acceptance
+      files. Dispatch sha256:3c7dcb7beb407312c266b8985ea6f9f3b98c577f90f5a293f2acf8a681eb65c2
+      and production receipt sha256:ad0524617944a9929c83a8a79bb5242fe476438f5bfa0d7d19b4ffb6005e72be
+      admitted CONFORMANT. All seven exact corrected checks reran exit 1/red with
+      RF-BUG-001/002/006/007 assertion fingerprints, including 30 opaque API subtests
+      and route/Search contracts. Sidecar CONFORMANT at 60ea9f2c30b4992012c7509ed42fef6cfaf92461,
+      clean worktree.
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
     status: done
@@ -183143,7 +183152,7 @@ phases:
       and no scope violations.
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
-  status: locked
+  status: pending
   gate: RF-BUG-001/002/006/007 protected acceptance is green with reciprocal red closure,
     exact EN/ZH route/Search identities, byte-identical item IDs, stale-response rejection,
     route-correct titles, accessible Steer invalid lifecycle, and no protected or
