@@ -182695,7 +182695,7 @@ phases:
       and remains untracked.
   - id: rf-bug-route-search-token-expected-red
     name: Lock combined frontend expected-red acceptance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
       \ source outcome `rf-bug-route-search-token-expected-red`:\nOutcome: RF-BUG-002-CONTRACT.\
@@ -182850,9 +182850,11 @@ phases:
     depends_on:
     - rf-bug-playwright-command-config-foundation
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T08:36:24.326520+00:00'
   - id: rf-bug-ledger-state-expected-red
     name: Lock Source Ledger and State-import acceptance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-004-008-CONTRACT. Define protected State-import confirm/cancel/focus\
@@ -182927,6 +182929,8 @@ phases:
     depends_on:
     - rf-bug-playwright-command-config-foundation
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T08:36:24.326295+00:00'
   - id: rf-bug-prompting-v22-expected-red
     name: Lock Prompting v2.2 acceptance
     status: done
@@ -182990,7 +182994,7 @@ phases:
       authorized acceptance path; no unresolved obligations.
   - id: rf-bug-e2e-isolation-artifact-expected-red
     name: Lock E2E isolation and failure-artifact acceptance
-    status: pending
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-010-CONTRACT. Define protected real-runtime isolation and one intentional\
@@ -183050,6 +183054,16 @@ phases:
     depends_on:
     - rf-bug-playwright-command-config-foundation
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T08:36:24.325748+00:00'
+    done_at: '2026-07-13T09:06:15.059789+00:00'
+    evidence: Integrated commit 92e56df0 (worktree 65294d56e03491e5f320551d01d110b331367299)
+      adds the four authorized RF-BUG-010 acceptance/artifact files. Dispatch sha256:f219113ef77aebd72efdc1d71207113feb45025b75e5793d8fc86d8ade0fc3db
+      and production receipt sha256:935f94bcd0aa93a29b041f8bf17d1353fcad65b74ad1c4d86c0be6b41cbb1835
+      admitted CONFORMANT. Both exact corrected Playwright checks reran exit 1/red
+      with isolation and ordered artifact fingerprints, no collection/startup/auth
+      failure. Sidecar CONFORMANT at 65294d56e03491e5f320551d01d110b331367299, clean
+      worktree.
   - id: rf-bug-playwright-command-config-foundation
     name: Establish preliminary Playwright command configs
     status: done
