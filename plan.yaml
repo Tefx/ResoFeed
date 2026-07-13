@@ -182618,7 +182618,7 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     depends_on:
-    - rf-bug-canonical-contract-sync
+    - rf-bug-playwright-command-config-foundation
     agent: general
   - id: rf-bug-canonical-contract-sync
     name: Synchronize RF-BUG canonical contracts
