@@ -183794,7 +183794,7 @@ phases:
       claims:\n- RF-BUG-010-HARNESS\n- RF-BUG-010-LANE-MIGRATION\nchecks:\n- id: rf_bug_010_green\n\
       \  run:\n    command:\n    - bash\n    - -lc\n    - npm --prefix web exec --\
       \ playwright test --config web/playwright.browser-contract.config.ts --project=chromium-ci-safe\
-      \ --retries=0 web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep '^\\\
+      \ --retries=0 web/tests/e2e/bugfix-ledger-e2e.expected-red.spec.ts --grep '\\\
       [RF-BUG-010\\]'\n    timeout_seconds: 600\n  expect:\n    outcome: green\n \
       \   exit_codes:\n    - 0\n    stdout_or_stderr:\n      contains_all:\n     \
       \ - literal: mutating cases own isolated state and cleanup\n      contains_any:\n\
@@ -183804,7 +183804,7 @@ phases:
       \    command:\n    - bash\n    - -lc\n    - npm --prefix web exec -- playwright\
       \ test --config web/playwright.artifact-proof.config.ts --project=chromium-ci-safe\
       \ --retries=0 --reporter=line,json,html web/tests/e2e/harness-artifact.intentional-failure.spec.ts\
-      \ --grep '^\\[RF-BUG-010\\] intentional failure retains complete artifacts$';\
+      \ --grep '\\[RF-BUG-010\\] intentional failure retains complete artifacts$';\
       \ test $? -eq 1\n    timeout_seconds: 600\n  expect:\n    outcome: green\n \
       \   exit_codes:\n    - 0\n    stdout_or_stderr:\n      contains_all:\n     \
       \ - literal: RF-BUG-010_SETUP=ready\n      - literal: RF-BUG-010_ASSERTION_REACHED=ready\n\
