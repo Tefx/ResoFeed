@@ -183040,7 +183040,7 @@ phases:
     - docs/BUG_REPORT_2026-07-11.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
-    - rf-bug-canonical-contract-sync
+    - rf-bug-playwright-command-config-foundation
     agent: frontend-engineer
   - id: rf-bug-playwright-command-config-foundation
     name: Establish preliminary Playwright command configs
