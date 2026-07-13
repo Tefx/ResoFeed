@@ -183508,7 +183508,7 @@ phases:
       clean worktree.
   - id: rf-bug-001-inspector-mock-route-remediation
     name: Remediate Inspector canonical item-path mocks
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-001-INSPECTOR-MOCK-COMPATIBILITY. Update only `web/src/routes/__tests__/inspector-selection.test.ts`\
@@ -183571,6 +183571,15 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T10:55:25.188999+00:00'
+    done_at: '2026-07-13T11:08:37.517308+00:00'
+    evidence: Integrated commit 863dc710 (worktree 0377bd0351b3411f06490d9f67902744a1dd59bf)
+      changes only protected inspector-selection.test.ts mock path decoding. Dispatch
+      sha256:3759104031cc0638005fd7111e3824e51fecaab3952715e4ef98a44415ae6034 and
+      receipt sha256:86936096f35cca8b75ac8f541d7740bbfec765b903dd10e6290c07f24f269837
+      admitted CONFORMANT. Focused Vitest reran exit 1/red with canonical detail/inspect
+      diagnostic and preserved readable-detail behavior fingerprint, no 404/setup
+      errors. Sidecar CONFORMANT at 0377bd0351b3411f06490d9f67902744a1dd59bf, clean
+      worktree.
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
