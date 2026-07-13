@@ -183272,7 +183272,7 @@ phases:
     agent: gate-reviewer
   - id: repair-route-search-and-opaque-item-ids
     name: Repair route, Search history, and opaque item IDs
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-002. Resolve the requested URL before async hydration; validate Search\
@@ -183345,6 +183345,15 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T10:06:29.317960+00:00'
+    done_at: '2026-07-13T10:19:24.941311+00:00'
+    evidence: Integrated commit 5eb43361 (worktree 4e7a532c732dbf0116351138c837d5d5396664c4)
+      repairs TypeScript route/Search behavior, +page wiring, Go opaque item token
+      handling, developer tests, and ARCHITECTURE/DESIGN sync within scope. Dispatch
+      sha256:04843bf2132534305e9c0c79754fed179d9bd7274465fdc6613032285c2fe395 and
+      receipt sha256:691adc793faa51087a7db27c8020bb6afdd4e188c218caf3b1e324321fd5f739
+      admitted CONFORMANT. Production reran the 100-case EN/ZH route matrix, Search
+      history suite, nine token round trips, and 30 Go API cases green. Sidecar CONFORMANT
+      at 4e7a532c732dbf0116351138c837d5d5396664c4, clean worktree.
   - id: rf-bug-002-initial-route-acceptance-remediation
     name: Remediate RF-BUG-002 initial-route acceptance coverage
     status: done
