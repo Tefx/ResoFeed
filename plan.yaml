@@ -183521,11 +183521,12 @@ phases:
       \ route kinds are matched. Preserve every RF-BUG-001 selection, readable-detail,\
       \ independent inspection failure, delayed-A/stale-response, loading-state, heading,\
       \ and alert assertion unchanged. Current integrated product evidence must reach\
-      \ the existing `Expected selected inspector item to remain current` behavior\
-      \ assertion rather than fail at 404/mock lookup. Do not edit product code, product\
-      \ routing helpers, other protected tests, fixtures, package metadata, browser\
-      \ checks, or RF-BUG-006/007 behavior. Rollback restores only the mock path matching/decoding\
-      \ and bounded diagnostic.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      \ the preserved readable-detail failure `Readable detail for RF BUG item B`\
+      \ rather than fail at 404/mock lookup; the stale-selection assertion remains\
+      \ valid when it passes. Do not edit product code, product routing helpers, other\
+      \ protected tests, fixtures, package metadata, browser checks, or RF-BUG-006/007\
+      \ behavior. Rollback restores only the mock path matching/decoding and bounded\
+      \ diagnostic.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
       profile: generic\nscope:\n  allowed_paths:\n  - web/src/routes/__tests__/inspector-selection.test.ts\n\
       \  blocked_paths:\n  - web/src/routes/+page.svelte\n  - web/src/routes/components/**\n\
       \  - web/src/lib/workbench-route.ts\n  - web/src/lib/api-client.ts\n  - web/tests/**\n\
@@ -183538,14 +183539,13 @@ phases:
       \   - {literal: keeps the current item ready when a prior inspection releases\
       \ after the next detail}\n      - {literal: keeps readable detail when inspection\
       \ provenance fails and exposes a separate diagnostic}\n      - {literal: \"\
-      RF-BUG-001_CANONICAL_ITEM_MOCK_PATHS=detail,inspect\"}\n      - {literal: Expected\
-      \ selected inspector item to remain current}\n      contains_any: []\n     \
-      \ forbids:\n      - {literal: No tests found}\n      - {literal: '404'}\n  \
-      \    - {literal: not found}\n      - {literal: TypeError}\n      - {literal:\
-      \ Cannot find package}\n  proves: [RF-BUG-001-INSPECTOR-MOCK-COMPATIBILITY]\n\
-      bindings:\n  expected_red:\n    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
-      :\"rf-bug-20260712-frontend-behavior.rf-bug-001-inspector-mock-route-remediation\"\
+      RF-BUG-001_CANONICAL_ITEM_MOCK_PATHS=detail,inspect\"}\n      - {literal: Readable\
+      \ detail for RF BUG item B}\n      contains_any: []\n      forbids:\n      -\
+      \ {literal: No tests found}\n      - {literal: '404'}\n      - {literal: not\
+      \ found}\n      - {literal: TypeError}\n      - {literal: Cannot find package}\n\
+      \  proves: [RF-BUG-001-INSPECTOR-MOCK-COMPATIBILITY]\nbindings:\n  expected_red:\n\
+      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-frontend-behavior.rf-bug-001-inspector-mock-route-remediation\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"protected_acceptance_remediation\"\
       ,\"canonical_item_route_compatibility\",\"immutable_history_gap\"],\"primary_outcome\"\
       :\"RF-BUG-001-INSPECTOR-MOCK-COMPATIBILITY\",\"rollback_class\":\"NONTRIVIAL\"\
@@ -183560,8 +183560,9 @@ phases:
       }]}}\n</vectl_step_policy>"
     verification: Require protected-test-only diff; canonical token decoding for detail
       and `/inspect` paths; exact `RF-BUG-001_CANONICAL_ITEM_MOCK_PATHS=detail,inspect`
-      reachability; focused Vitest exit 1 only at the preserved stale-selection behavior
-      assertion; no 404/not-found/product/other-test mutation.
+      reachability; focused Vitest exit 1 only at the preserved readable-detail assertion
+      `Readable detail for RF BUG item B`; stale-selection and all other behavior
+      assertions remain unchanged; no 404/not-found/product/other-test mutation.
     evidence_template: Protected test diff; canonical detail/inspect mock paths; exact
       compatibility diagnostic; focused expected-red command/exit/behavior fingerprint;
       product/package/browser diff guard.
