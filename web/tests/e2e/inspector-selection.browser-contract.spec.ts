@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer';
+import { DatabaseSync } from 'node:sqlite';
 import type { Page } from 'playwright/test';
 
 import { expect, test } from './fixtures';
@@ -128,4 +129,129 @@ test('[RF-BUG-001][desktop] stale detail cannot replace the selected item', asyn
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole('heading', { name: itemB.title }), 'Expected selected inspector item to remain current after viewport change').toBeVisible();
+});
+
+function seedRealSelectionDatabase(dbPath: string): void {
+  const database = new DatabaseSync(dbPath);
+  try {
+    database.exec('begin immediate');
+    database.prepare(`
+      insert or replace into sources (id, url, title, created_at, last_fetch_at, last_fetch_status, last_fetch_error, is_active, revision)
+      values (?, ?, ?, ?, ?, 'ok', null, 1, 1)
+    `).run(source.id, source.url, source.title, now, now);
+
+    const insertItem = database.prepare(`
+      insert or replace into items (
+        id, source_id, source_url, url, canonical_url, title, feed_excerpt, extracted_text,
+        summary, core_insight, value_tier, published_at, first_seen_at, extraction_status,
+        model_status, story_key, duplicate_of_item_id, source_item_title, localized_title,
+        key_points, content_status, extraction_source, source_evidence_text
+      ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, null, ?, ?, ?, ?, ?, ?)
+    `);
+    insertItem.run(
+      itemA.id, source.id, source.url, itemA.url, itemA.url, itemA.title, itemA.display_excerpt,
+      `Readable detail ${itemA.id} ${'A'.repeat(4_000_000)}`, itemA.summary, itemA.core_insight,
+      itemA.value_tier, itemA.published_at, itemA.first_seen_at, itemA.extraction_status,
+      itemA.model_status, itemA.title, itemA.localized_title, JSON.stringify(itemA.key_points),
+      itemA.content_status, itemA.extraction_source, `Source evidence ${itemA.id}`
+    );
+    insertItem.run(
+      itemB.id, source.id, source.url, itemB.url, itemB.url, itemB.title, itemB.display_excerpt,
+      `Readable detail ${itemB.id}`, itemB.summary, itemB.core_insight, itemB.value_tier,
+      itemB.published_at, itemB.first_seen_at, itemB.extraction_status, itemB.model_status,
+      itemB.title, itemB.localized_title, JSON.stringify(itemB.key_points), itemB.content_status,
+      itemB.extraction_source, `Source evidence ${itemB.id}`
+    );
+    database.prepare('delete from item_state where item_id in (?, ?)').run(itemA.id, itemB.id);
+    database.exec('commit');
+  } catch (error) {
+    database.exec('rollback');
+    throw error;
+  } finally {
+    database.close();
+  }
+}
+
+function inspectedAtFromDatabase(dbPath: string, itemID: string): string | null {
+  const database = new DatabaseSync(dbPath);
+  try {
+    const row = database.prepare('select human_inspected_at from item_state where item_id = ?').get(itemID) as { human_inspected_at?: string | null } | undefined;
+    return row?.human_inspected_at ?? null;
+  } finally {
+    database.close();
+  }
+}
+
+test('[RF-BUG-001] real API SQLite stale selection seam', async ({ page, runInfo, ownerToken }) => {
+  seedRealSelectionDatabase(runInfo.dbPath);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.addInitScript((token) => window.localStorage.setItem('resofeed.ownerToken', token), ownerToken);
+
+  const productRequests: string[] = [];
+  page.on('request', (candidate) => {
+    const url = new URL(candidate.url());
+    const itemID = itemIDFromPath(url.pathname);
+    if (url.pathname === '/api/feed/today') productRequests.push(`${candidate.method()} feed`);
+    if (itemID) productRequests.push(`${candidate.method()} ${itemID}${url.pathname.endsWith('/inspect') ? ' inspect' : ' detail'}`);
+  });
+
+  await page.goto(runInfo.baseURL);
+  await expect(page.getByRole('heading', { name: itemA.title })).toBeVisible();
+
+  const aDetailResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return response.request().method() === 'GET' && itemIDFromPath(url.pathname) === itemA.id && !url.pathname.endsWith('/inspect');
+  });
+  const aInspectionResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return response.request().method() === 'POST' && itemIDFromPath(url.pathname) === itemA.id && url.pathname.endsWith('/inspect');
+  });
+  const bDetailResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return response.request().method() === 'GET' && itemIDFromPath(url.pathname) === itemB.id && !url.pathname.endsWith('/inspect');
+  });
+  const bInspectionResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return response.request().method() === 'POST' && itemIDFromPath(url.pathname) === itemB.id && url.pathname.endsWith('/inspect');
+  });
+
+  await page.getByRole('button', { name: `Open Inspector for: ${itemA.title}` }).click();
+  await page.getByRole('button', { name: `Open Inspector for: ${itemB.title}` }).click();
+
+  const [aDetail, aInspection, bDetail, bInspection] = await Promise.all([
+    aDetailResponse,
+    aInspectionResponse,
+    bDetailResponse,
+    bInspectionResponse
+  ]);
+  expect([aDetail.status(), aInspection.status(), bDetail.status(), bInspection.status()]).toEqual([200, 200, 200, 200]);
+  const aInspectionBody = await aInspection.json() as { item_id: string };
+  const bInspectionBody = await bInspection.json() as { item_id: string };
+
+  const inspector = page.getByRole('complementary', { name: itemB.title });
+  await expect(inspector.getByRole('heading', { name: itemB.title })).toBeVisible();
+  await expect(inspector.getByText(itemB.summary)).toBeVisible();
+  await expect(inspector.getByText(itemA.summary)).toHaveCount(0);
+  await expect(page.locator('.contract-feed-item', { hasText: itemB.title })).toHaveAttribute('aria-current', 'true');
+
+  expect({
+    aInspectionItem: aInspectionBody.item_id,
+    bInspectionItem: bInspectionBody.item_id,
+    aInspectedAt: inspectedAtFromDatabase(runInfo.dbPath, itemA.id),
+    bInspectedAt: inspectedAtFromDatabase(runInfo.dbPath, itemB.id),
+    selectedTitle: await inspector.getByRole('heading').first().textContent(),
+    observedRealSeam: productRequests.includes(`GET ${itemA.id} detail`)
+      && productRequests.includes(`POST ${itemA.id} inspect`)
+      && productRequests.includes(`GET ${itemB.id} detail`)
+      && productRequests.includes(`POST ${itemB.id} inspect`)
+  }, 'real API and SQLite preserve selected-item/detail/inspection ownership after stale completion').toMatchObject({
+    aInspectionItem: itemA.id,
+    bInspectionItem: itemB.id,
+    aInspectedAt: expect.any(String),
+    bInspectedAt: expect.any(String),
+    selectedTitle: itemB.title,
+    observedRealSeam: true
+  });
+
+  console.log('RF-BUG-001_REAL_API_SQLITE_SEAM=ready');
 });

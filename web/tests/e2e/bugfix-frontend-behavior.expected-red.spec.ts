@@ -99,3 +99,80 @@ for (const language of ['en', 'zh'] as const) {
     expect(mutationRequests).toEqual([]);
   });
 }
+
+test('[RF-BUG-006] initial HTML title is route-correct before hydration', async ({ page }) => {
+  const routes = [
+    { path: '/', title: 'RESOFEED · TODAY' },
+    { path: '/source-ledger', title: 'RESOFEED · SOURCE LEDGER' },
+    { path: '/?q=initial%20title', title: 'RESOFEED · SEARCH' },
+    { path: '/items/~aXRlbV9pbml0aWFsX3RpdGxl', title: 'RESOFEED · INSPECTOR' },
+    { path: '/doctor', title: 'RESOFEED · /doctor' }
+  ] as const;
+
+  await page.route('**/*', async (route) => {
+    if (route.request().resourceType() === 'script') {
+      await route.abort();
+      return;
+    }
+    await route.continue();
+  });
+
+  for (const route of routes) {
+    await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+    expect.soft(
+      await page.title(),
+      `RF-BUG-006_INITIAL_HTML_TITLE_ASSERTION route=${route.path}`
+    ).toBe(route.title);
+  }
+});
+
+for (const language of ['en', 'zh'] as const) {
+  test(`[RF-BUG-007][${language}] idle and invalid alert contract`, async ({ page, request, runInfo, ownerToken }) => {
+    await setLanguage(request, runInfo.baseURL, ownerToken, language);
+    await installToken(page, ownerToken);
+    const mutationRequests: string[] = [];
+    page.on('request', (candidate) => {
+      const url = new URL(candidate.url());
+      if (candidate.method() === 'POST' && url.pathname === '/api/steer') mutationRequests.push(candidate.url());
+    });
+
+    await page.goto('/');
+    await waitForShell(page);
+    const steer = page.locator('#steer-input');
+    const localizedError = language === 'zh' ? /需要 URL/u : /URL required/i;
+
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    expect.soft(
+      await page.getByText(localizedError).count(),
+      `RF-BUG-007_STEER_LOCALE_ASSERTION language=${language} idle validation must not exist, including hidden text`
+    ).toBe(0);
+    await expect(steer).not.toHaveAccessibleDescription(localizedError);
+
+    await steer.fill('add source');
+    expect.soft(
+      await page.getByText(localizedError).count(),
+      `RF-BUG-007_STEER_LOCALE_ASSERTION language=${language} unsubmitted validation must not exist, including hidden text`
+    ).toBe(0);
+    await expect(page.getByRole('alert')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'apply' }).click();
+    const alert = page.getByRole('alert');
+    await expect(alert).toHaveCount(1);
+    await expect(alert, `RF-BUG-007_STEER_LOCALE_ASSERTION language=${language} current invalid alert`).toHaveText(localizedError);
+    expect.soft(
+      await page.getByText(localizedError).count(),
+      `RF-BUG-007_STEER_LOCALE_ASSERTION language=${language} one current validation message`
+    ).toBe(1);
+    await expect(steer).toBeFocused();
+    expect(mutationRequests).toEqual([]);
+
+    await steer.fill('add source edited');
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    expect.soft(
+      await page.getByText(localizedError).count(),
+      `RF-BUG-007_STEER_LOCALE_ASSERTION language=${language} edited validation must be removed, including hidden text`
+    ).toBe(0);
+    await expect(steer).toBeFocused();
+    expect(mutationRequests).toEqual([]);
+  });
+}
