@@ -183266,21 +183266,52 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal bounded Full Gate for frontend behavior. Repository mutation is absent
-      because the gate reuses RF-BUG-001, RF-BUG-002, RF-BUG-006, and RF-BUG-007 checks.
-      Require exact red/green binding identity, EN/ZH cold/refresh/history repetition,
-      Search invalid no-request/no-history behavior, opaque browser/HTTP round trips,
-      stale-response rejection, focus/Escape, route-correct titles, and Steer accessibility.
-      Protected acceptance files must be unchanged. Any missing title, retry, skip,
-      mutation, unrelated failure, path-authority conflict, or contract/policy failure
-      blocks downstream work.'
-    verification: All frontend checks are green with exact collection/run identity;
-      reciprocal expected-red closures and protected paths are intact; Vectl validation/check-refs
-      and phase contract/policy admission pass.
+      Terminal bounded Full Gate for frontend behavior after visible remediation.
+      Repository mutation is absent. Re-run every RF-BUG-001/002/006/007 protected
+      green command, including 100 route repetitions, Search canonical/history plus
+      generation/recovery, nine route-token cases, 30 HTTP operations, canonical HTTP
+      rejection and HTTP/MCP re-ingest parity, route-correct pre-hydration title,
+      real API/SQLite Inspector stale-selection proof without product API interception,
+      and EN/ZH Steer idle/alert behavior. Any missing title, retry, skip, mutation,
+      stale ownership, raw HTTP item acceptance, parity mismatch, localization/accessibility
+      mismatch, path-authority conflict, or contract/policy failure blocks downstream
+      work.
+
+
+      Full-suite topology rule for GATE-008: `go test ./...` need not exit zero while
+      later phases remain locked. Admit only the exact completed contract-lock expected-red
+      outcomes by rerunning their exact commands and requiring exit 1 with unchanged
+      fingerprints: RF-BUG-003 `RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete`,
+      `RF-BUG-003_CSP_CRLF_NORMALIZED=chromium`, and `expected listener to remain
+      unbound`; RF-BUG-004 `legacy_export_auth_precedence` and `expected unauthenticated
+      401 and authenticated 404`; RF-BUG-005 `RF-BUG-005_EXACT_SUBTEST_SET=13` and
+      `expected byte-exact canonical CSP`; RF-BUG-009 `RF-BUG-009_EXACT_SUBTEST_SET=16`
+      and `expected one generation plus at most one semantic repair`. These admitted
+      failures must map only to `TestRFBUG003EmbeddedUIContract`/`TestRFBUG003DoctorRedactionContract`,
+      `TestRFBUG004OPMLImportOnlyContract`, `TestRFBUG005SecurityHeadersCSPStreamingCancellationContract`,
+      and `TestRFBUG009PromptingV22Contract`. Any other failing package/test, changed
+      fingerprint, collection/compile/setup failure, or premature green that breaks
+      expected-red ownership closes the gate. Do not rewrite completed history or
+      demand future-phase product green.
+
+
+      After deterministic checks close, obtain a fresh independent software-architect
+      assessment and retry the UI/UX reviewer once for the prior transient provider
+      429; provider unavailability after the bounded retry remains an explicit gate
+      blocker, not a fabricated pass.'
+    verification: All current RF-BUG-001/002/006/007 checks and new runtime/parity/real-seam
+      checks are green with exact collection/run identity; protected paths and reciprocal
+      Go expected-red closure are intact. `go test ./...` has no failures beyond exact
+      admitted RF-BUG-003/004/005/009 expected-red tests and fingerprints, each exact
+      future-phase command remains exit 1 for its declared product gap, and no infra/compile/collection
+      failure is admitted. Vectl validation/check-refs, phase contract/policy admission,
+      fresh architecture assessment, and one bounded UI/UX reviewer rerun pass.
     depends_on:
     - repair-route-search-and-opaque-item-ids
     - repair-inspector-selection-and-routing
     - rf-bug-frontend-doc-design-remediation
+    - rf-bug-frontend-runtime-remediation
+    - rf-bug-go-token-parity-remediation
     agent: gate-reviewer
   - id: repair-route-search-and-opaque-item-ids
     name: Repair route, Search history, and opaque item IDs
