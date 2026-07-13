@@ -182630,27 +182630,30 @@ phases:
       \ isolation. Preserve the authority report and repair plan verbatim. Failure\
       \ leaves the prior documents together; rollback reverts this document/test set.\
       \ Never add sync, merge, activity history, secret material, private helper layouts,\
-      \ fixture bytes, or evidence schemas.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n \
-      \   - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n    - docs/PRD.md\n    - docs/USAGE.md\n\
-      \    - docs/CONTAINER.md\n    - docs/PROMPTING_SYSTEM.md\n    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n\
-      \    - README.md\n    - docs/ui-preview.html\n    - tests/rf_bug_canonical_contract_test.go\n\
-      \  blocked_paths:\n    - docs/BUG_REPORT_2026-07-11.md\n    - docs/BUG_FIX_PLAN_2026-07-12.md\n\
-      \    - internal/**\n    - web/src/**\n    - web/tests/**\nclaims:\n  - RF-BUG-CANONICAL-CONTRACTS\n\
-      checks:\n  - id: rf_bug_canonical_contracts_green\n    run:\n      command:\
-      \ [go, test, -v, ./tests, -run, ^TestRFBugCanonicalContracts$, -count=1]\n \
-      \     timeout_seconds: 180\n    expect:\n      outcome: green\n      exit_codes:\
-      \ [0]\n      stdout_or_stderr:\n        contains_all:\n          - {literal:\
-      \ RF_BUG_CANONICAL_DOCUMENTS=9}\n          - {literal: OPML_EXCLUSIONS=2}\n\
-      \        contains_any:\n          - {literal: PASS}\n        forbids:\n    \
-      \      - {literal: FAIL}\n          - {literal: no tests to run}\n    proves:\n\
-      \      - RF-BUG-CANONICAL-CONTRACTS\nbindings:\n  expected_red:\n    items:\
-      \ []\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-contract-lock.rf-bug-canonical-contract-sync\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_contract_documentation\"],\"\
-      primary_outcome\":\"RF-BUG-CANONICAL-CONTRACTS\",\"rollback_class\":\"NONTRIVIAL\"\
-      ,\"test_authority\":{\"developer_test_globs\":[\"tests/rf_bug_canonical_contract_test.go\"\
-      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      \ fixture bytes, or evidence schemas.\n\nCross-domain justification: this indivisible\
+      \ unit spans product documentation, the HTML preview, and its Go contract test\
+      \ under one canonical rollback and acceptance boundary.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths:\n\
+      \    - docs/ARCHITECTURE.md\n    - docs/DESIGN.md\n    - docs/PRD.md\n    -\
+      \ docs/USAGE.md\n    - docs/CONTAINER.md\n    - docs/PROMPTING_SYSTEM.md\n \
+      \   - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md\n    - README.md\n    - docs/ui-preview.html\n\
+      \    - tests/rf_bug_canonical_contract_test.go\n  blocked_paths:\n    - docs/BUG_REPORT_2026-07-11.md\n\
+      \    - docs/BUG_FIX_PLAN_2026-07-12.md\n    - internal/**\n    - web/src/**\n\
+      \    - web/tests/**\nclaims:\n  - RF-BUG-CANONICAL-CONTRACTS\nchecks:\n  - id:\
+      \ rf_bug_canonical_contracts_green\n    run:\n      command: [go, test, -v,\
+      \ ./tests, -run, ^TestRFBugCanonicalContracts$, -count=1]\n      timeout_seconds:\
+      \ 180\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all:\n          - {literal: RF_BUG_CANONICAL_DOCUMENTS=9}\n\
+      \          - {literal: OPML_EXCLUSIONS=2}\n        contains_any:\n         \
+      \ - {literal: PASS}\n        forbids:\n          - {literal: FAIL}\n       \
+      \   - {literal: no tests to run}\n    proves:\n      - RF-BUG-CANONICAL-CONTRACTS\n\
+      bindings:\n  expected_red:\n    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v1\",\"step_id\"\
+      :\"rf-bug-20260712-contract-lock.rf-bug-canonical-contract-sync\",\"risk_tier\"\
+      :\"R2\",\"risk_reasons\":[\"public_contract_documentation\"],\"primary_outcome\"\
+      :\"RF-BUG-CANONICAL-CONTRACTS\",\"rollback_class\":\"NONTRIVIAL\",\"test_authority\"\
+      :{\"developer_test_globs\":[\"tests/rf_bug_canonical_contract_test.go\"],\"\
+      acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
     verification: Run the canonical-contract test and fail-closed nine-document OPML
       scan with exactly two protected exclusions; require both authority files unchanged
