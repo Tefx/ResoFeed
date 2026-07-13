@@ -182934,7 +182934,8 @@ phases:
       :\"AUTHORIZED\",\"authorized_mutation_refs\":[{\"ref\":\"authority:acceptance-mutation:rf009-prompting\"\
       ,\"path\":\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\",\"\
       purpose\":\"Define exact Prompting v2.2 transform and persistence acceptance\"\
-      ,\"check_id\":\"rf_bug_009_expected_red\",\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
+      ,\"check_id\":\"rf_bug_009_expected_red\",\"actor_id\":\"spec-verifier\"}]}}\n\
+      </vectl_step_policy>"
     verification: Collect and run the exact 16-subtest protected contract; require
       the bounded-repair assertion red and no secret output.
     refs:
@@ -182944,7 +182945,7 @@ phases:
     - docs/ARCHITECTURE.md
     depends_on:
     - rf-bug-canonical-contract-sync
-    agent: general
+    agent: golang-developer
   - id: rf-bug-e2e-isolation-artifact-expected-red
     name: Lock E2E isolation and failure-artifact acceptance
     status: pending
