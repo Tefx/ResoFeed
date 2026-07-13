@@ -61,6 +61,10 @@ npm --prefix web run test:e2e
 
 The Playwright config must be responsible for building or reusing the real binary, launching the real server, setting the base URL from the bound server, writing all artifacts under a test-artifact directory, and cleaning up the temporary SQLite DB unless preservation is explicitly requested for failed-run evidence.
 
+### Preliminary Collection Config Aliases
+
+`web/playwright.browser-contract.config.ts` and `web/playwright.runtime.config.ts` are preliminary collection scaffolds. Each alias re-exports `web/playwright.config.ts` unchanged, preserving the project-native `chromium-ci-safe` project, global setup and teardown, artifact policy, runtime environment, retry policy, and single-binary launch boundary. They add no runtime, fixtures, helpers, package scripts, route interception, or evidence schema. Full per-case isolation, lifecycle enforcement, and retained-failure evolution remain owned by `rf-bug-010-harness-foundation`.
+
 ## Deterministic CI-Safe Matrix
 These cases run with zero retries and without live LLM credentials; the child environment explicitly clears `OPENROUTER_KEY`.
 
