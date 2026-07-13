@@ -183972,19 +183972,21 @@ phases:
       \ Preserve the repair plan, canonical implementation docs, protected acceptance,\
       \ audits, and completed history. Rollback reverts the report/test closure pair.\
       \ Never add a registry, generator, receipt schema, duplicate phase, secret,\
-      \ or raw runtime credential.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      profile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md, tests/rf_bug_closure_contract_test.go]\n\
-      \  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ internal/**, web/**, docs/audits/**]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n\
-      \  - id: defect_report_closure_green\n    run: {command: [go, test, -v, ./tests,\
-      \ -run, ^TestRFBugClosureContract$, -count=1], timeout_seconds: 180}\n    expect:\
-      \ {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal:\
-      \ TestRFBugClosureContract/RF-BUG-001}, {literal: TestRFBugClosureContract/RF-BUG-010},\
-      \ {literal: RF_BUG_CLOSURE_REQUIREMENTS=10}], contains_any: [], forbids: [{literal:\
-      \ FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-001-010-CLOSURE]\n\
-      \  - id: closure_active_sources_green\n    run: {command: [bash, -lc, \"go test\
-      \ -v ./tests -run '^(TestRFBugCanonicalContracts/OPMLActiveScan|TestRFBugClosureContract/ActivePromptingNames)$'\
+      \ or raw runtime credential.\n\nCross-domain justification: this indivisible\
+      \ closure unit binds the defect report and its Go contract test under one rollback\
+      \ and terminal evidence boundary.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md,\
+      \ tests/rf_bug_closure_contract_test.go]\n  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md,\
+      \ docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, internal/**, web/**,\
+      \ docs/audits/**]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n  - id: defect_report_closure_green\n\
+      \    run: {command: [go, test, -v, ./tests, -run, ^TestRFBugClosureContract$,\
+      \ -count=1], timeout_seconds: 180}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestRFBugClosureContract/RF-BUG-001},\
+      \ {literal: TestRFBugClosureContract/RF-BUG-010}, {literal: RF_BUG_CLOSURE_REQUIREMENTS=10}],\
+      \ contains_any: [], forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n\
+      \    proves: [RF-BUG-001-010-CLOSURE]\n  - id: closure_active_sources_green\n\
+      \    run: {command: [bash, -lc, \"go test -v ./tests -run '^(TestRFBugCanonicalContracts/OPMLActiveScan|TestRFBugClosureContract/ActivePromptingNames)$'\
       \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
       \ [0], stdout_or_stderr: {contains_all: [{literal: OPML_ACTIVE_DOCUMENTS=9},\
       \ {literal: OPML_EXCLUSIONS=2}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0}],\
