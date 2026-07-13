@@ -183929,7 +183929,7 @@ phases:
     - local-full-verification-matrix
     - fresh-docker-runtime-proof
     - tailnet-caddy-runtime-proof
-    agent: software-architect
+    agent: spec-verifier
   - id: independent-runtime-ui-verification
     name: Perform fresh black-box RF-BUG runtime and UI verification
     status: pending
