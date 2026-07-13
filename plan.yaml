@@ -182969,7 +182969,7 @@ phases:
     agent: golang-developer
   - id: rf-bug-e2e-isolation-artifact-expected-red
     name: Lock E2E isolation and failure-artifact acceptance
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-010-CONTRACT. Define protected real-runtime isolation and one intentional\
@@ -183030,8 +183030,6 @@ phases:
     depends_on:
     - rf-bug-canonical-contract-sync
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-13T06:57:19.539878+00:00'
 - id: rf-bug-20260712-frontend-behavior
   name: RF-BUG Frontend Selection, Opaque Routing, Titles, and Accessibility
   status: locked
