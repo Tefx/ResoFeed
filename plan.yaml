@@ -183166,7 +183166,7 @@ phases:
   steps:
   - id: repair-inspector-selection-and-routing
     name: Repair Inspector selection, routing, titles, and Steer accessibility
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
       \ source outcome `repair-inspector-selection-and-routing`:\nOutcome: RF-BUG-001.\
@@ -183250,6 +183250,14 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T11:09:30.371220+00:00'
+    done_at: '2026-07-13T11:22:35.733175+00:00'
+    evidence: Integrated commit 520168a2 (worktree 80cacf63e0ac93b56d533ccb6c38adf0911a3a9e)
+      repairs Inspector selection/race behavior, route-derived titles, Steer invalid
+      alerts, DESIGN and preview sync. Dispatch sha256:f193f7b4fa78a5b67b4174bb04701f6bf143ee2b6b0a5a9f7ac9f025c40d9180
+      and receipt sha256:ca29c8adf297eda5a02d9225a3daa5dc148956be83d05c4a7a814cdaa043f285
+      admitted CONFORMANT. All RF-BUG-001/006/007 browser suites reran green with
+      zero retries/skips/mutations. Sidecar CONFORMANT at 80cacf63e0ac93b56d533ccb6c38adf0911a3a9e,
+      clean worktree.
   - id: rf-bug-frontend-behavior-full-gate
     name: RF-BUG frontend-behavior phase Full Gate
     status: pending
