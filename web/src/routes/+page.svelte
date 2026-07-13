@@ -4,7 +4,7 @@
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import { formatCurrentOperationStatus, formatOperationConflictStatus, idleOperation, normalizeCurrentOperationInfo } from '$lib/current-operation';
-  import { itemRoutePath, normalizeSearchRequestParams, resolveWorkbenchRoute, searchQueryString, type WorkbenchSurface } from '$lib/workbench-route';
+  import { itemRoutePath, normalizeSearchRequestParams, resolveWorkbenchRoute, searchQueryString, workbenchDocumentTitle, type WorkbenchSurface } from '$lib/workbench-route';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
   import FirstUseEmptyState from './components/FirstUseEmptyState.svelte';
   import Feed from './components/Feed.svelte';
@@ -21,13 +21,14 @@
     | { kind: 'idle' }
     | { kind: 'running'; operation: CurrentOperationInfo }
     | { kind: 'blocked'; text: string; operation: CurrentOperationInfo | null };
+  type SteerErrorReason = 'invalid-source' | 'preview-unavailable' | 'request';
   type SteerFeedback =
     | { kind: 'idle' }
     | { kind: 'submitting' }
     | { kind: 'receipt'; text: string; undo?: SteerUndoTarget; route?: SteerRouteEchoKind }
     | { kind: 'doctor'; text: string }
-    | { kind: 'error'; text: string };
-  type SteerRouteEchoKind = 'idle' | 'add-source' | 'search' | 'doctor' | 'steer-rule' | 'invalid';
+    | { kind: 'error'; text: string; reason: SteerErrorReason; attemptId: number };
+  type SteerRouteEchoKind = 'idle' | 'add-source' | 'search' | 'doctor' | 'steer-rule' | 'invalid' | 'preview-unavailable';
   type SteerPreviewState = 'idle' | 'previewing' | 'ready' | 'error';
   type SteerUndoTarget = { targetKind: SteerUndoRequest['target_kind']; targetId: string };
 
@@ -66,6 +67,7 @@
   let selectedItemDetail = $state<ItemDetail | null>(null);
   let inspectorState = $state<ApiLoadState>('idle');
   let inspectorError = $state<string | null>(null);
+  let inspectionMarkerError = $state<string | null>(null);
   let inspectorFocusRequestId = $state(0);
   let inspectorActivated = $state(false);
   let steerCommand = $state('');
@@ -107,9 +109,11 @@
   let openRouterModels = $state<OpenRouterModelOption[]>([]);
   let openRouterModelListState = $state<'loading' | 'available' | 'unavailable'>('unavailable');
   let itemDetailRequestSequence = 0;
+  let inspectionMarkerRequestSequence = 0;
+  let steerErrorAttemptSequence = 0;
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
-  const documentTitle = $derived(browserRouteResolved ? `RESOFEED · ${{ feed: 'TODAY', inspector: 'INSPECTOR', ledger: 'SOURCE LEDGER', search: 'SEARCH', doctor: '/doctor' }[currentSurface]}` : 'RESOFEED');
+  const documentTitle = $derived(browserRouteResolved ? workbenchDocumentTitle(currentSurface) : 'RESOFEED');
   const ownerTokenRejected = $derived(promptState === 'rejected');
   const firstUseState = $derived<FirstUseState>(
     sources.length === 0
@@ -159,6 +163,14 @@
   const todayScrollLabel = $derived(browserLegacyEnglishA11y ? 'TODAY surface independent scroll' : shellChrome.todayScroll);
   const inspectorScrollLabel = $derived(browserLegacyEnglishA11y ? 'INSPECTOR independent scroll' : shellChrome.inspectorScroll);
   const backTodayLabel = $derived(browserLegacyEnglishA11y ? 'back to TODAY' : shellChrome.backToday);
+  const steerErrorText = $derived(steerFeedback.kind === 'error'
+    ? steerFeedback.reason === 'invalid-source'
+      ? (processingLanguage.code === 'zh' ? '需要 URL' : 'URL required')
+      : steerFeedback.reason === 'preview-unavailable'
+        ? (processingLanguage.code === 'zh' ? 'err: 预览不可用' : 'err: preview unavailable')
+        : steerFeedback.text
+    : '');
+  const steerErrorRenderKey = $derived(steerFeedback.kind === 'error' ? `${steerFeedback.attemptId}:${processingLanguage.code}` : 'idle');
 
   function itemIdForPath(pathname: string): string | null {
     return resolveWorkbenchRoute(pathname).itemId;
@@ -301,6 +313,10 @@
   }
 
   function setSelectedItemPreview(item: ItemSummary | null): void {
+    if (item?.id !== selectedItemPreview?.id) {
+      inspectionMarkerError = null;
+      inspectionMarkerRequestSequence += 1;
+    }
     selectedItemPreview = item;
     if (item === null || selectedItemDetail?.id !== item.id) selectedItemDetail = null;
   }
@@ -311,7 +327,20 @@
     selectedItemDetail = null;
     inspectorState = 'idle';
     inspectorError = null;
+    inspectionMarkerError = null;
     itemDetailRequestSequence += 1;
+    inspectionMarkerRequestSequence += 1;
+  }
+
+  async function markItemInspected(itemId: string): Promise<void> {
+    const requestSequence = ++inspectionMarkerRequestSequence;
+    inspectionMarkerError = null;
+    try {
+      await apiClient().inspect(itemId);
+    } catch (error) {
+      if (requestSequence !== inspectionMarkerRequestSequence || itemId !== selectedItemId) return;
+      inspectionMarkerError = formatRawApiError(error, 'err: inspection marker unavailable');
+    }
   }
 
   function reconcileSelectedFeedItem(feedItems: ItemSummary[]): void {
@@ -434,7 +463,14 @@
     }
 
     if (previewState === 'error' && previewCommand === command) {
-      return routeEchoForLocalCommand(command);
+      return {
+        kind: 'preview-unavailable',
+        label: processingLanguage.code === 'zh' ? '[预览不可用]' : '[PREVIEW UNAVAILABLE]',
+        detail: processingLanguage.code === 'zh' ? 'err: 预览不可用' : 'err: preview unavailable',
+        live: 'assertive',
+        marker: '!',
+        writeAction: false
+      };
     }
 
     return routeEchoForLocalCommand(command);
@@ -781,11 +817,7 @@
     if (isNarrow && window.location.pathname !== routePath) {
       window.history.pushState({}, '', routePath);
     }
-    try {
-      await apiClient().inspect(item.id);
-    } catch {
-      // Inspection marking is provenance-only; selecting an item must keep navigation usable even if the marker write is unavailable.
-    }
+    void markItemInspected(item.id);
     await loadItemDetail(item.id);
     if (isNarrow && window.location.pathname !== routePath) return;
     currentSurface = 'inspector';
@@ -806,11 +838,7 @@
     setSelectedItemPreview(item);
     inspectorFocusRequestId += 1;
     if (detailPaneElement) detailPaneElement.scrollTop = 0;
-    try {
-      await apiClient().inspect(item.id);
-    } catch {
-      // Inspection marking is provenance-only; search selection must keep navigation usable even if the marker write is unavailable.
-    }
+    void markItemInspected(item.id);
     await loadItemDetail(item.id);
     currentSurface = 'search';
     await tick();
@@ -957,6 +985,16 @@
     void tick().then(() => steerInput?.focus());
   }
 
+  function setSteerError(reason: SteerErrorReason, text = ''): void {
+    steerErrorAttemptSequence += 1;
+    steerFeedback = { kind: 'error', text, reason, attemptId: steerErrorAttemptSequence };
+  }
+
+  function clearSubmittedSteerErrorOnEdit(): void {
+    routePreviewAnnounces = true;
+    if (steerFeedback.kind === 'error' && steerFeedback.reason !== 'request') steerFeedback = { kind: 'idle' };
+  }
+
   async function submitSteer(): Promise<void> {
     const command = steerCommand.trim();
     if (!command || steerFeedback.kind === 'submitting') return;
@@ -964,8 +1002,8 @@
     routePreviewAnnounces = false;
 
     const routeEcho = steerRouteEcho;
-    if (routeEcho.kind === 'invalid' && routeEcho.detail !== 'err: preview unavailable') {
-      steerFeedback = { kind: 'error', text: 'err: url required' };
+    if (routeEcho.kind === 'invalid' || routeEcho.kind === 'preview-unavailable') {
+      setSteerError(routeEcho.kind === 'invalid' ? 'invalid-source' : 'preview-unavailable');
       await tick();
       steerInput?.focus();
       return;
@@ -992,7 +1030,7 @@
         shouldRefocusSteer = false;
         const normalized = normalizeSearchRequestParams({ q: command.replace(/^(search|find)\s+/i, '') });
         if (normalized.params === null) {
-          steerFeedback = { kind: 'error', text: normalized.error };
+          setSteerError('request', normalized.error);
           return;
         }
         searchRouteParams = normalized.params;
@@ -1033,7 +1071,7 @@
         undo
       };
     } catch (error) {
-      steerFeedback = { kind: 'error', text: formatSteerError(error) };
+      setSteerError('request', formatSteerError(error));
     } finally {
       await tick();
       if (shouldRefocusSteer) steerInput?.focus();
@@ -1284,7 +1322,7 @@
           autocomplete="off"
           aria-describedby="steer-route-preview-status steer-route-preview-input-desc"
           disabled={steerFeedback.kind === 'submitting'}
-          oninput={() => { routePreviewAnnounces = true; }}
+          oninput={clearSubmittedSteerErrorOnEdit}
           onkeydown={(event) => {
             if (event.key === 'Escape') {
               event.preventDefault();
@@ -1400,7 +1438,9 @@
         {/if}
       </div>
     {:else if steerFeedback.kind === 'error'}
-      <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{steerFeedback.text}</p>
+      {#key steerErrorRenderKey}
+        <p class="contract-feedback-error shell-status" role="alert" aria-live="assertive">{steerErrorText}</p>
+      {/key}
     {:else if steerFeedback.kind === 'submitting'}
       <p class="contract-muted shell-status visually-hidden" role="status">{shellChrome.applyingStatus}</p>
     {/if}
@@ -1435,7 +1475,7 @@
         {/if}
         {#if inspectorItem}
           <section class="inspector-stable-landmark" role="complementary" aria-label="INSPECTOR">
-            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} onEscape={() => { if (isNarrow) showSurface('feed'); else focusFeedFromDesktopInspector(); }} showReingest={inspectorActivated} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
+            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} inspectionMarkerError={inspectionMarkerError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} onEscape={() => { if (isNarrow) showSurface('feed'); else focusFeedFromDesktopInspector(); }} showReingest={inspectorActivated} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
           </section>
         {:else}
           <p class="contract-label inspector-empty-placeholder">INSPECTOR</p>

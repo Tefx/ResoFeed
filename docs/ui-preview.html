@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RESOFEED · SOURCE LEDGER</title>
+  <title>RESOFEED · SEARCH</title>
   <style>
     :root {
       --primary: #24231e;
@@ -257,6 +257,40 @@
 
     .search-contract-query {
       color: var(--text);
+    }
+
+    .rf-bug-contract-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
+      gap: 16px 32px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .rf-bug-contract-grid strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .invalid-steer-preview {
+      display: grid;
+      gap: 4px;
+    }
+
+    .invalid-steer-preview input {
+      min-height: 44px;
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--text);
+      font: 14px/20px var(--chrome);
+      padding: 8px 12px;
+    }
+
+    .invalid-steer-preview [role="alert"] {
+      color: var(--danger);
     }
 
     .desktop {
@@ -1091,10 +1125,19 @@
           <span class="utility-menu__note">来源标识保持不变。</span>
         </div>
       </div>
+      <div class="rf-bug-contract-grid" aria-label="RF-BUG route, selection, and Steer accessibility contract preview">
+        <p><strong>FUNCTIONAL TITLES</strong><br><span translate="no">RESOFEED · TODAY · SOURCE LEDGER · SEARCH · INSPECTOR · /doctor</span><br>标题随已解析路由原子更新，处理语言不翻译功能标记。</p>
+        <label class="invalid-steer-preview" for="invalid-steer-command">
+          <strong>INVALID ADD SOURCE · ONE CURRENT ALERT</strong>
+          <input id="invalid-steer-command" type="text" value="add source" aria-describedby="invalid-steer-alert" readonly />
+          <span id="invalid-steer-alert" role="alert">需要 URL</span>
+          <span>保留输入和焦点 · 不发送 mutation · 编辑即清除</span>
+        </label>
+      </div>
       <div class="search-contract-strip" aria-label="Search selection contract preview">
-        <span>搜索 · <span class="search-contract-query">q: 重处理失败</span> · 3 条结果 · 选中项打开 INSPECTOR</span>
-        <span aria-hidden="true">搜索由上方 Steer 表单提交</span>
-        <span>桌面保留列表、查询和滚动位置</span>
+        <span>搜索 · <span class="search-contract-query">q: 重处理失败</span> · 3 条结果 · 选中项立即打开可读 INSPECTOR 预览</span>
+        <span aria-hidden="true">详情与检查标记独立更新</span>
+        <span>桌面保留列表、查询和滚动位置；迟到响应不替换当前项</span>
       </div>
       <div class="desktop">
         <section class="feed" aria-label="搜索结果预览（独立可滚动馈送，不显示要点）" tabindex="0">

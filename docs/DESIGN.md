@@ -793,22 +793,22 @@ States: no token, no sources, sources added but no items, feed temporarily empty
 Keyboard and accessibility: the first actionable control remains Steer or OPML import; explanatory text is static and not focusable unless it is an action.
 
 ### Steer Input
-
 Purpose: lightweight intent entry for natural-language correction, RSS URL subscription, `/doctor`, and source commands.
 
 Anatomy: prompt marker (`>`), text field, submit affordance only when text exists. States:
 
-- default: placeholder `Steer or paste RSS URL...`;
+- default: placeholder `Steer or paste RSS URL...`; idle/default exposes no missing-URL description, live error, or hidden validation text;
 - focused: 2px focus outline;
 - submitting: disable duplicate submit, keep dimensions fixed, show terse `...` or `applying` text;
 - applied: one-line receipt near input, e.g. `applied: less celebrity coverage`;
 - rejected/unknown: raw string, e.g. `err: could not apply`;
+- invalid add-source: submit through the non-mutating preview classification, keep the command and input focus, send no `/api/steer` mutation, and expose exactly one localized `URL required` / `需要 URL` alert. Every repeated invalid submit and processing-language change remounts the current alert so assistive technology receives one fresh announcement; editing the command removes it immediately;
+- preview unavailable: use a transport-specific `err: preview unavailable` / `err: 预览不可用` state. It must not inherit the missing-URL description or submit a mutation;
 - disabled: only when the app cannot accept local input.
 
 No chat transcript, no multi-turn clarification, no rule builder. Receipt text should be concise and reversible where product state allows: `undo` may appear as a text action but must not open a management panel.
 
-Keyboard and accessibility: `Tab` reaches the Steer field first, `Enter` submits, `Escape` clears only unsent text. Applied/rejected receipts use `aria-live="polite"`; raw errors use `aria-live="assertive"` only when the command failed.
-
+Keyboard and accessibility: `Tab` reaches the Steer field first, `Enter` submits, `Escape` clears only unsent text. Applied/rejected receipts use `aria-live="polite"`; raw errors use `aria-live="assertive"` only when the command failed. Invalid attempts replace the prior alert node rather than accumulating alerts or mutating the existing node in place.
 ### Steering Receipt
 Purpose: expose the minimum product-required steering transparency without creating a rule-management UI.
 
@@ -928,11 +928,13 @@ Attempt failure labels are [SHARP] and are reused by Frontmatter and the re-inge
 States: empty/no-selection (minimal placeholder indicating no item is selected), loading raw detail, OK model-backed active-language content, latest re-ingest attempt failed while preserved content remains visible, RSS-excerpt Text evidence, unavailable original, grouped-story sources, externally surfaced receipt, and item re-ingest states listed below. OK/model-backed states do not need a second visible availability line; fallback/model-failure states keep exactly one useful processing line.
 
 #### Initial selection and stable transitions
-
 On desktop TODAY, if feed items exist and no explicit item route is active, the first feed item MUST be selected automatically after owner-token hydration and feed load complete. The right Inspector pane should only be empty when there are no feed items, the owner token is not accepted, or the app is still loading.
 
-Switching from one selected item to another MUST NOT collapse, blank, or visibly tear down the Inspector layout. Keep the previous Inspector structure mounted until the new item detail is ready, then replace content in place. A terse low-chrome loading line is acceptable, but it must not shift the title/frontmatter/body geometry or flash a blank pane.
+Switching from one selected item to another MUST NOT collapse, blank, or visibly tear down the Inspector layout. Set the selected summary preview synchronously, keep the Inspector structure mounted, and replace content in place only when the matching detail response arrives. A terse low-chrome loading line is acceptable, but it must not shift the title/frontmatter/body geometry or flash a blank pane.
 
+Detail retrieval and inspection-marker recording are independently versioned request channels. Starting or completing marker recording must never delay detail retrieval. A stale detail or marker response for item A must not alter item B's preview, loading state, error state, focus, URL, or content. Detail failure leaves the selected summary preview readable with its own diagnostic; marker failure leaves detail/preview content readable and exposes a separate low-chrome alert.
+
+Selection is ephemeral browser state. Preserve the current selected ID and readable preview across desktop/narrow viewport changes, direct-route pending/failure/success, Back, focus return, and Escape. Do not persist selection or create reading history, a modal detail system, or a second detail route model.
 #### Desktop split alignment
 On desktop split view, the Inspector reading group (title, Frontmatter, reading sections, points, and item-scoped controls) belongs to the right pane, not to a floating inner scroll surface. These elements MUST share one coherent horizontal measure and a consistent left edge inside that measure.
 

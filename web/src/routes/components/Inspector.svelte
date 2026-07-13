@@ -22,6 +22,7 @@
     sources?: Source[];
     loading?: boolean;
     error?: string | null;
+    inspectionMarkerError?: string | null;
     focusHeading?: boolean;
     focusRequestId?: number;
     onResonanceToggle?: (item: ItemSummary, resonated: boolean) => Promise<void> | void;
@@ -33,7 +34,7 @@
     landmarkLabel?: string | null;
   }
 
-  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, onEscape, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable', landmarkLabel = null }: Props = $props();
+  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, inspectionMarkerError = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, onEscape, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable', landmarkLabel = null }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let reingestModel = $state('default');
@@ -211,8 +212,7 @@
   }
 
   function isPlaceholderSummary(text: string): boolean {
-    const words = text.match(/\b[\p{L}\p{N}'-]+\b/gu) ?? [];
-    return words.length > 0 && words.length <= 4 && /\bsummary\b/i.test(text);
+    return /^(?:summary|summary unavailable|summary not available|no summary available)$/iu.test(text.trim());
   }
 
   function isNonArticleDiagnosticText(text: string): boolean {
@@ -322,6 +322,7 @@
   }
 
   function detailText(value: InspectableItem): string | null {
+    if ('extracted_text' in value) return readableText(value.extracted_text) ?? sourceEvidenceText(value);
     return sourceEvidenceText(value);
   }
 
@@ -801,9 +802,13 @@
   {#if loading}
     <p class="contract-muted inspector-transition-status" role="status">{localizedChrome('loading', '加载中')}</p>
   {/if}
+  {#if inspectionMarkerError}
+    <p class="contract-feedback-error inspector-inspection-marker-error" role="alert">{inspectionMarkerError}</p>
+  {/if}
   {#if error}
-    <p class="contract-feedback-error" role="alert">{error}</p>
-  {:else if item}
+    <p class="contract-feedback-error inspector-detail-error" role="alert">{error}</p>
+  {/if}
+  {#if item}
     <div class="inspector-header-row">
       <p class="visually-hidden inspector-provenance" aria-label={`${localizedChrome('Provenance', '来源')}${language === 'zh' ? '：' : ': '}${provenanceDisclosure(item)}`}>
         <span aria-label={`Source: ${sourceA11yName(item.source_title)}`} translate={sourceTitleTranslate}>{item.source_title}</span> · <span aria-label={`${localizedChrome('Extraction', '提取')}${language === 'zh' ? '：' : ': '}${localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}`}>{localizedChrome(extractionLabel(item.extraction_status), extractionLabelZh(item.extraction_status))}</span>{item.value_tier ? ` · ${qualityValueLabel(item)}` : ''}
@@ -921,7 +926,7 @@
       {#if isFallbackEvidenceState(item) && evidenceText}
         <details class="inspector-text-section inspector-source-evidence-section" aria-label={localizedChrome('Text evidence', '文本证据')}>
           <summary class="inspector-section-label">{textEvidenceLabel}</summary>
-          <p class="inspector-source-evidence">{evidenceText}</p>
+          <p class="inspector-source-evidence">{detailText(item)}</p>
         </details>
       {:else if evidenceText}
         <details class="inspector-text-section inspector-reading-section inspector-source-text-section" aria-label={localizedChrome('Text evidence', '文本证据')}>

@@ -1,5 +1,17 @@
 export type WorkbenchSurface = 'feed' | 'inspector' | 'ledger' | 'search' | 'doctor';
 
+const workbenchSurfaceTitles: Record<WorkbenchSurface, string> = {
+  feed: 'TODAY',
+  inspector: 'INSPECTOR',
+  ledger: 'SOURCE LEDGER',
+  search: 'SEARCH',
+  doctor: '/doctor'
+};
+
+export function workbenchDocumentTitle(surface: WorkbenchSurface): string {
+  return `RESOFEED · ${workbenchSurfaceTitles[surface]}`;
+}
+
 export interface SearchRequestParams {
   q?: string;
   source?: string;
