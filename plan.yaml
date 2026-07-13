@@ -183712,7 +183712,7 @@ phases:
       cb14c644fe854d81d6acaa419d22f2f009eab3c9, clean worktree.
   - id: rf-bug-frontend-runtime-acceptance-remediation
     name: Lock frontend runtime race and real-seam acceptance
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-FRONTEND-RUNTIME-ACCEPTANCE. Append protected acceptance for the second\
@@ -183816,6 +183816,11 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-13T12:33:24.376858+00:00'
+    done_at: '2026-07-13T12:58:53.188792+00:00'
+    evidence: Integrated fe27ce5d (worktree 4e36b2a9). Initial title/Steer and Search
+      generation/recovery expected-red checks matched all fingerprints; real API/SQLite
+      seam inventory listed exactly one test. Receipt CONFORMANT sha256:249594acbf86c0daa0518a8d32d8231f499ec654d8a7db0ae217e7bcb6e52273
+      with three purpose-bound spec-verifier authorizations. Clean sidecar CONFORMANT.
   - id: rf-bug-go-token-parity-acceptance-remediation
     name: Lock canonical HTTP rejection and HTTP/MCP parity acceptance
     status: done
