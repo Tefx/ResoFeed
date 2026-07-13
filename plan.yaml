@@ -184112,4 +184112,4 @@ phases:
       publication and deployment remain blocked.
     depends_on:
     - local-full-verification-matrix
-    agent: software-architect
+    agent: spec-verifier
