@@ -183135,16 +183135,18 @@ phases:
       \ Back, and Forward; and encode opaque item IDs as `~` plus unpadded RFC4648\
       \ base64url across browser and all five item HTTP operations. Rollback reverts\
       \ route/token/API/docs together. Never add saved searches, custom URL parsers/codecs,\
-      \ persistent navigation state, semantic search, or secret logging.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
-      scope: {allowed_paths: [web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
-      \ web/src/routes/components/SearchRetrieval.svelte, internal/resofeed/item_route_token.go,\
-      \ internal/resofeed/item_route_token_test.go, internal/resofeed/http.go, docs/ARCHITECTURE.md,\
-      \ docs/DESIGN.md], blocked_paths: [web/src/lib/__tests__/workbench-route.test.ts,\
-      \ web/tests/e2e/initial-route.browser-contract.spec.ts, web/tests/e2e/routes.browser-contract.spec.ts,\
-      \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go]}\nclaims: [RF-BUG-002]\n\
-      checks:\n  - id: rf_bug_002_green\n    run: {command: [bash, -lc, \"npm --prefix\
-      \ web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ persistent navigation state, semantic search, or secret logging.\n\nCross-domain\
+      \ justification: this indivisible unit spans TypeScript route and Search behavior\
+      \ plus Go opaque-item API behavior under one rollback and acceptance boundary.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
+      \ implementation_closes_expected_red\nscope: {allowed_paths: [web/src/lib/workbench-route.ts,\
+      \ web/src/lib/api-client.ts, web/src/routes/components/SearchRetrieval.svelte,\
+      \ internal/resofeed/item_route_token.go, internal/resofeed/item_route_token_test.go,\
+      \ internal/resofeed/http.go, docs/ARCHITECTURE.md, docs/DESIGN.md], blocked_paths:\
+      \ [web/src/lib/__tests__/workbench-route.test.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
+      \ web/tests/e2e/routes.browser-contract.spec.ts, internal/resofeed/rf_bug_item_id_api_expected_red_test.go]}\n\
+      claims: [RF-BUG-002]\nchecks:\n  - id: rf_bug_002_green\n    run: {command:\
+      \ [bash, -lc, \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
       \ --project=chromium-ci-safe --retries=0 --repeat-each=10 web/tests/e2e/initial-route.browser-contract.spec.ts\
       \ --grep '^\\\\[RF-BUG-002\\\\]'\"], timeout_seconds: 1500}\n    expect: {outcome:\
       \ green, exit_codes: [0], stdout_or_stderr: {contains_all: [{literal: TODAY\
