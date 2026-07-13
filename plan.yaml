@@ -183429,7 +183429,7 @@ phases:
       Sidecar CONFORMANT at 06281c28634c96dd7dab0078273727496c692eae, clean worktree.
   - id: rf-bug-002-route-token-acceptance-remediation
     name: Remediate RF-BUG-002 route-token unit coverage
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-002-ROUTE-TOKEN-UNIT-ACCEPTANCE. Append the smallest protected acceptance-only\
@@ -183484,6 +183484,8 @@ phases:
     depends_on:
     - rf-bug-002-initial-route-acceptance-remediation
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T10:01:18.897934+00:00'
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
   status: locked
