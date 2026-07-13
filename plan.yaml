@@ -183166,7 +183166,7 @@ phases:
   steps:
   - id: repair-inspector-selection-and-routing
     name: Repair Inspector selection, routing, titles, and Steer accessibility
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
       \ source outcome `repair-inspector-selection-and-routing`:\nOutcome: RF-BUG-001.\
@@ -183248,6 +183248,8 @@ phases:
     - repair-route-search-and-opaque-item-ids
     - rf-bug-001-inspector-mock-route-remediation
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-13T11:09:30.371220+00:00'
   - id: rf-bug-frontend-behavior-full-gate
     name: RF-BUG frontend-behavior phase Full Gate
     status: pending
