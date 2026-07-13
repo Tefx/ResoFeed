@@ -183285,7 +183285,7 @@ phases:
       \ plus Go opaque-item API behavior under one rollback and acceptance boundary.\n\
       \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nprofile:\
       \ implementation_closes_expected_red\nscope: {allowed_paths: [web/src/lib/workbench-route.ts,\
-      \ web/src/lib/api-client.ts, web/src/routes/components/SearchRetrieval.svelte,\
+      \ web/src/lib/api-client.ts, web/src/routes/+page.svelte, web/src/routes/components/SearchRetrieval.svelte,\
       \ internal/resofeed/item_route_token.go, internal/resofeed/item_route_token_test.go,\
       \ internal/resofeed/http.go, docs/ARCHITECTURE.md, docs/DESIGN.md], blocked_paths:\
       \ [web/src/lib/__tests__/workbench-route.test.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
