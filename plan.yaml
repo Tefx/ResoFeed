@@ -184665,7 +184665,7 @@ phases:
     skipped_reason: superseded
 - id: rf-bug-20260712-assurance-closure
   name: RF-BUG Local, OCI, Container, Tailnet, and Independent Closure
-  status: pending
+  status: done
   gate: The local matrix is exact and redacted; the verified commit is published as
     one immutable amd64/arm64 index; both containers and Tailnet/Caddy pass with rollback
     readiness; independent security and black-box reviews have no findings; RF-BUG-001–010
@@ -184815,7 +184815,7 @@ phases:
     skipped_reason: superseded
   - id: independent-runtime-ui-verification
     name: Perform fresh black-box RF-BUG runtime and UI verification
-    status: pending
+    status: skipped
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -184842,6 +184842,7 @@ phases:
     - fresh-docker-runtime-proof
     - tailnet-caddy-runtime-proof
     agent: blind-tester
+    skipped_reason: superseded
   - id: close-defect-report-with-evidence
     name: Close RF-BUG-001–010 in the defect report
     status: skipped
