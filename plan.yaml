@@ -184974,7 +184974,7 @@ phases:
     skipped_reason: superseded
   - id: deployment-operation-authorization-review
     name: Authorize OCI publication and Tailnet deployment
-    status: pending
+    status: skipped
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -184997,6 +184997,7 @@ phases:
     depends_on:
     - local-full-verification-matrix
     agent: spec-verifier
+    skipped_reason: superseded
 - id: rf-bug-assurance-v2-harness
   name: RF-BUG Assurance v2 Harness and Generic Evidence Adapter
   status: pending
