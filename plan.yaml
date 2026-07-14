@@ -184666,25 +184666,18 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal Full Gate for RF-BUG-004 State UI, RF-BUG-008 Ledger, and RF-BUG-009
-      Prompting v2.2. Independently observe real browser operations, five viewport
-      states, screenshots, grouping, overflow, keyboard/44px behavior, EN/ZH labels,
-      State cancellation/focus, and Prompting payload/repair/persistence/ingest/reprocess/re-ingest/HTTP/MCP
-      behavior. Consume the append-only v2 Prompting expected-red source; require
-      v2.1 active-name absence, failure atomicity, secret redaction, immutable acceptance,
-      and synchronized docs.
-
-
-      <vectl_gate_scope>
-
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-20260712-ledger-prompting","requirement_ids":["RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-009"],"integrated_steps":["rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics","rf-bug-20260712-ledger-prompting.repair-source-ledger-responsive-groups","rf-bug-20260712-ledger-prompting.rf-bug-v2-prompting-expected-red-binding"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
-
-      </vectl_gate_scope>'
-    verification: Full Gate semantic PASS requires both implementation branches, protected
-      checks, real rendered/runtime evidence, reciprocal RF-BUG-009 closure, exact
-      inventories, redaction, and documentation parity.
+      Terminal bounded Full Gate for Ledger and Prompting. Repository mutation is
+      absent because the gate reuses RF-BUG-004 State UI, RF-BUG-008 Ledger, and RF-BUG-009
+      Prompting predicates. Require the exact Ledger title/screenshot inventories,
+      accessibility and real-runtime operations, exact Prompting protected/parity/regression
+      identities, active v2.1 absence, atomic content preservation, docs alignment,
+      and unchanged protected artifacts. Any missing identity, retry, skip, secret
+      output, prohibited Ledger concept, stale Prompting name, or contract/policy
+      failure blocks E2E work.'
+    verification: All Ledger/State and combined Prompting checks are green; reciprocal
+      bindings, exact inventories, path authority, Vectl validation/check-refs, and
+      phase contract/policy admission pass.
     depends_on:
-    - rf-bug-v2-prompting-expected-red-binding
     - repair-source-ledger-responsive-groups
     - implement-prompting-v22-semantics
     agent: gate-reviewer
