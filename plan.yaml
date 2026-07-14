@@ -186004,8 +186004,6 @@ phases:
     - docs/CONTAINER.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
-    - rf-bug-v2-local-verification-matrix
-    - rf-bug-v2-docker-runtime-proof
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
   - id: rf-bug-v2-independent-runtime-ui
