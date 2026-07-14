@@ -183897,7 +183897,7 @@ phases:
       Protected acceptance authorization spec-verifier admitted. Clean sidecar CONFORMANT.
   - id: rf-bug-frontend-runtime-remediation
     name: Repair initial title, Search ownership, and Steer runtime semantics
-    status: pending
+    status: skipped
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-FRONTEND-RUNTIME-CLOSURE. Close GATE-001/004/006/007 and supply GATE-005\
@@ -183991,6 +183991,7 @@ phases:
     depends_on:
     - rf-bug-frontend-runtime-acceptance-remediation
     agent: frontend-engineer
+    skipped_reason: superseded
   - id: rf-bug-go-token-parity-remediation
     name: Enforce canonical HTTP item routes and shared re-ingest parity
     status: pending
