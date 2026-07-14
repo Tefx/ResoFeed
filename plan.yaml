@@ -184606,61 +184606,71 @@ phases:
     name: Implement and align Prompting v2.2 across transform paths
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver\
-      \ RF-BUG-009 Prompting v2.2 across payload, repair, persistence, ingest, reprocess,\
-      \ re-ingest, HTTP, MCP, tests, fixtures, and docs; preserve atomic failure/redaction\
-      \ and immutable acceptance.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/prompting.go, internal/resofeed/prompting_test.go,\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-009. Implement one v2.2 compiler/validator path across ingest, library\
+      \ reprocess, selected-item re-ingest, HTTP, and MCP. Use selected-model structured-output\
+      \ support without silent model substitution; allow one generation plus at most\
+      \ one semantic repair; preserve usable content and atomic item/FTS state on\
+      \ failure. Rollback reverts code, tests, fixtures, names, and docs together.\
+      \ Prompts, provider bodies, model overrides, and credentials never enter SQLite,\
+      \ State, diagnostics, or logs.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope: {allowed_paths: [internal/resofeed/prompting.go, internal/resofeed/prompting_test.go,\
       \ internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go, internal/resofeed/ingest.go,\
       \ internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go, internal/resofeed/reprocess_test.go,\
       \ internal/resofeed/reingest.go, internal/resofeed/reingest_test.go, internal/resofeed/http.go,\
       \ internal/resofeed/mcp.go, internal/resofeed/testdata/prompting_v22/**, docs/PROMPTING_SYSTEM.md,\
-      \ docs/ARCHITECTURE.md]\n  blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
-      \ web/tests/**, docs/audits/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md]\n\
-      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-009]\n\
-      checks:\n  - id: rf_bug_009_green\n    run:\n      command: [python, -c, \"\
-      import subprocess,json; ids=['TestRFBUG009PromptingV22Contract']; p=subprocess.run(['go','test','-v','./internal/resofeed','-run','^TestRFBUG009PromptingV22Contract$','-count=1'],capture_output=True,text=True);\
-      \ print(json.dumps({'schema_version':'vectl.check.evidence.v1','check_id':'rf_bug_009_green','selected_ids':ids,'executed_ids':ids,'outcome':'green'\
-      \ if p.returncode==0 else 'red','exit_code':p.returncode,'observations':list(dict.fromkeys((p.stdout+p.stderr).splitlines())),'artifacts':[]},separators=(',',':')))\"\
-      \ ]\n      timeout_seconds: 120\n    evidence:\n      mode: selected_execution\n\
-      \      path_bindings: [{path: go.mod, access: read, availability: current}]\n\
-      \      test_bindings: [{path: internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
-      \ classification: acceptance, availability: current}]\n      selection:\n  \
-      \      command: [python, -c, \"import json; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_009_green','identities':['TestRFBUG009PromptingV22Contract'],'digest':'sha256:04dae64c5752de31d5c341e8e7c296876d488aa13052140c7d96f4030ba784cb'},separators=(',',':')))\"\
-      \ ]\n        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
-      \ [TestRFBUG009PromptingV22Contract]\n        forbidden_ids: []\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: RF-BUG-009_EXACT_SUBTEST_SET=16}, {literal: single_semantic_repair_bound},\
-      \ {literal: library_reprocess_path}, {literal: mcp_path}]\n        contains_any:\
-      \ []\n        forbids: [{literal: FAIL}, {literal: no tests to run}, {literal:\
-      \ OPENROUTER_KEY=}]\n    proves: [RF-BUG-009]\nbindings:\n  expected_red: {items:\
-      \ []}\n  closes_expected_red: [{requirement_id: RF-BUG-009, source_step: rf-bug-20260712-ledger-prompting.rf-bug-v2-prompting-expected-red-binding,\
-      \ downstream_check: rf_bug_009_green}]\n</intent_closure_contract>\n\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"cross-component LLM payload persistence\
-      \ HTTP and MCP contract\"],\"primary_outcome\":\"RF-BUG-009\",\"rollback_class\"\
-      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-009\",\"\
-      atom\":\"Prompting v2.2 is used by ingest reprocess re-ingest HTTP and MCP with\
-      \ bounded repair and atomic failure\",\"modality\":\"runtime\",\"seam\":\"real\"\
-      ,\"check_id\":\"rf_bug_009_green\",\"independent_step\":\"rf-bug-20260712-ledger-prompting.rf-bug-ledger-prompting-full-gate\"\
-      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/prompting_test.go\"\
+      \ docs/ARCHITECTURE.md], blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
+      \ web/tests/**, docs/audits/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md]}\n\
+      claims: [RF-BUG-009]\nchecks:\n  - id: rf_bug_009_green\n    run: {command:\
+      \ [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG009PromptingV22Contract$,\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-009_EXACT_SUBTEST_SET=16},\
+      \ {literal: single_semantic_repair_bound}, {literal: library_reprocess_path},\
+      \ {literal: mcp_path}], contains_any: [], forbids: [{literal: FAIL}, {literal:\
+      \ no tests to run}, {literal: OPENROUTER_KEY=}]}}\n    proves: [RF-BUG-009]\n\
+      \    binding_selector: {kind: go_test_run, package: ./internal/resofeed, run:\
+      \ ^TestRFBUG009PromptingV22Contract$}\n  - id: rf_bug_009_parity_green\n   \
+      \ run: {command: [go, test, -v, ./internal/resofeed, -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$',\
+      \ -count=1], timeout_seconds: 420}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestPromptingV22Payload},\
+      \ {literal: TestPromptingV22Repair}, {literal: TestMCPV22}], contains_any: [],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}, {literal: OPENROUTER_KEY=}]}}\n\
+      \    proves: [RF-BUG-009]\n  - id: rf_bug_009_names_green\n    run: {command:\
+      \ [bash, -lc, \"set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\\
+      \\.1|(^|[^[:alnum:]_])V2\\\\.1([^[:alnum:]_]|$)' -- cmd internal/resofeed web/src\
+      \ web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md; s=$?; set -e; test\
+      \ $s -eq 1; echo PROMPTING_V21_ACTIVE_MATCHES=0\"], timeout_seconds: 240}\n\
+      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: PROMPTING_V21_ACTIVE_MATCHES=0}], contains_any: [], forbids: [{literal:\
+      \ broad exclusion}, {literal: completed plan scanned}]}}\n    proves: [RF-BUG-009]\n\
+      \  - id: rf_bug_009_regression_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence)$',\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestPromptingV22Payload},\
+      \ {literal: TestPromptingV22Validation}, {literal: TestPromptingV22Repair},\
+      \ {literal: TestPromptingV22Persistence}], contains_any: [], forbids: [{literal:\
+      \ FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-009]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {requirement_id:\
+      \ RF-BUG-009, source_step: rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red,\
+      \ downstream_check: rf_bug_009_green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-ledger-prompting.implement-prompting-v22-semantics\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"runtime_prompt_contract\",\"cross_component_behavior\"\
+      ,\"persistence_behavior\"],\"primary_outcome\":\"RF-BUG-009\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/prompting_test.go\"\
       ,\"internal/resofeed/openrouter_test.go\",\"internal/resofeed/ingest_test.go\"\
       ,\"internal/resofeed/reprocess_test.go\",\"internal/resofeed/reingest_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_009_green\"],\"acceptance_mutation\":\"\
-      FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
-    verification: Run the protected RF-BUG-009 contract plus focused payload/persistence/transport
-      tests and active-name scan; the downstream gate independently verifies real
-      ingest, reprocess, re-ingest, HTTP, MCP, failure atomicity, secret redaction,
-      and v2.1 absence.
+      FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Require exact protected 16-subtest equality, nine focused path parents,
+      four regressions, fail-closed active-name scan, atomic preservation, docs alignment,
+      no secret/prompt output, and protected acceptance unchanged.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/PROMPTING_SYSTEM.md
     - docs/ARCHITECTURE.md
-    depends_on:
-    - rf-bug-v2-prompting-expected-red-binding
     agent: golang-developer
   - id: rf-bug-ledger-prompting-full-gate
     name: RF-BUG ledger-prompting phase Full Gate
