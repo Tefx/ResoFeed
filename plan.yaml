@@ -185845,8 +185845,6 @@ phases:
     - docs/DESIGN.md
     - docs/PROMPTING_SYSTEM.md
     depends_on:
-    - rf-bug-v2-source-ledger-responsive
-    - rf-bug-v2-prompting-v22
     - rf-bug-v2-ledger-prompting-verification
     agent: gate-reviewer
 - id: rf-bug-assurance-v2-closure
