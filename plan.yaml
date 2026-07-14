@@ -185369,10 +185369,10 @@ phases:
       \ internal/resofeed/http_static_test.go, classification: developer, availability:\
       \ produced_by_step}\n      selection:\n        command:\n          - python3\n\
       \          - -c\n          - >-\n            import hashlib,json; ids=['RF-BUG-003\
-      \ binary arbitrary cwd','RF-BUG-003 Doctor redaction','RF-BUG-003 embedded UI\
+      \ Doctor redaction','RF-BUG-003 binary arbitrary cwd','RF-BUG-003 embedded UI\
       \ contract']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_embed_ui_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 3}\n        required_ids:\
-      \ ['RF-BUG-003 binary arbitrary cwd', 'RF-BUG-003 Doctor redaction', 'RF-BUG-003\
+      \ ['RF-BUG-003 Doctor redaction', 'RF-BUG-003 binary arbitrary cwd', 'RF-BUG-003\
       \ embedded UI contract']\n        forbidden_ids: []\n    expect:\n      outcome:\
       \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
       \ [{literal: RF-BUG-003_EXACT_SUBTEST_SET=23}, {literal: RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete},\
