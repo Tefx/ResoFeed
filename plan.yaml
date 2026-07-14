@@ -185327,8 +185327,6 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     depends_on:
-    - rf-bug-v2-frontend-runtime-integration
-    - rf-bug-v2-go-token-parity-integration
     - rf-bug-v2-frontend-runtime-verification
     agent: gate-reviewer
 - id: rf-bug-assurance-v2-runtime
