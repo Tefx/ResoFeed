@@ -184781,7 +184781,7 @@ phases:
     skipped_reason: superseded
   - id: formal-security-review
     name: Review HTTP, CSP, secrets, and state boundaries independently
-    status: pending
+    status: skipped
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -184812,6 +184812,7 @@ phases:
     - fresh-docker-runtime-proof
     - tailnet-caddy-runtime-proof
     agent: spec-verifier
+    skipped_reason: superseded
   - id: independent-runtime-ui-verification
     name: Perform fresh black-box RF-BUG runtime and UI verification
     status: pending
