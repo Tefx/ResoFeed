@@ -184328,51 +184328,55 @@ phases:
     name: Apply outer HTTP security headers and embedded-content CSP
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver\
-      \ RF-BUG-005 via one outer Go middleware owning exact headers/CSP while preserving\
-      \ streaming, cancellation, auth, errors, and redaction; protected acceptance\
-      \ is immutable.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_security.go,\
-      \ internal/resofeed/http_security_test.go, internal/resofeed/webui/**, docs/ARCHITECTURE.md,\
-      \ docs/CONTAINER.md]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
-      \ web/tests/e2e/csp-operations.browser-contract.spec.ts, deploy/**, web/src/**]\n\
-      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-005]\n\
-      checks:\n  - id: rf_bug_005_green\n    run:\n      command: [python, -c, \"\
-      import subprocess,json; ids=['TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'];\
-      \ p=subprocess.run(['go','test','-v','./internal/resofeed','-run','^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$','-count=1'],capture_output=True,text=True);\
-      \ print(json.dumps({'schema_version':'vectl.check.evidence.v1','check_id':'rf_bug_005_green','selected_ids':ids,'executed_ids':ids,'outcome':'green'\
-      \ if p.returncode==0 else 'red','exit_code':p.returncode,'observations':list(dict.fromkeys((p.stdout+p.stderr).splitlines())),'artifacts':[]},separators=(',',':')))\"\
-      \ ]\n      timeout_seconds: 120\n    evidence:\n      mode: selected_execution\n\
-      \      path_bindings: [{path: go.mod, access: read, availability: current}]\n\
-      \      test_bindings: [{path: internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
-      \ classification: acceptance, availability: current}]\n      selection:\n  \
-      \      command: [python, -c, \"import json; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_005_green','identities':['TestRFBUG005SecurityHeadersCSPStreamingCancellationContract'],'digest':'sha256:d58dd9c83591d930be9b7ec8f7498322bd33997d25345b0b791d471efbe9ffc8'},separators=(',',':')))\"\
-      \ ]\n        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
-      \ [TestRFBUG005SecurityHeadersCSPStreamingCancellationContract]\n        forbidden_ids:\
-      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13}, {literal:\
-      \ csp_exact_executable_hashes}, {literal: multi_flush_streaming}, {literal:\
-      \ request_cancellation}]\n        contains_any: []\n        forbids: [{literal:\
-      \ unsafe-inline}, {literal: FAIL}, {literal: no tests to run}]\n    proves:\
-      \ [RF-BUG-005]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\
-      \ [{requirement_id: RF-BUG-005, source_step: rf-bug-20260712-runtime-boundaries.rf-bug-v2-runtime-expected-red-bindings,\
-      \ downstream_check: rf_bug_005_green}]\n</intent_closure_contract>\n\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
-      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"HTTP security headers CSP authentication\
-      \ error and streaming boundary\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
-      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-005\",\"\
-      atom\":\"outer middleware applies exact headers without weakening CSP streaming\
-      \ cancellation or auth\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\"\
-      :\"rf_bug_005_green\",\"independent_step\":\"rf-bug-20260712-runtime-boundaries.rf-bug-runtime-security-architecture-review\"\
-      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-005. A small outer Go middleware sets one effective CSP, `nosniff`,\
+      \ `no-referrer`, and `DENY` before the complete mux. Derive CSP once before\
+      \ bind from every executable inline body. Preserve streaming flushes and request\
+      \ cancellation; do not buffer or add writer state. Chromium must boot and complete\
+      \ OPML import plus JSON State export/import/download without CSP violations.\
+      \ Rollback reverts middleware/CSP/docs together and blocks release rather than\
+      \ weakening policy. Never use unsafe-inline, duplicate header owners, or secret-bearing\
+      \ evidence.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      profile: implementation_closes_expected_red\nscope: {allowed_paths: [internal/resofeed/http.go,\
+      \ internal/resofeed/http_security.go, internal/resofeed/http_security_test.go,\
+      \ internal/resofeed/webui/**, docs/ARCHITECTURE.md, docs/CONTAINER.md], blocked_paths:\
+      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, web/tests/e2e/csp-operations.browser-contract.spec.ts,\
+      \ deploy/**, web/src/**]}\nclaims: [RF-BUG-005]\nchecks:\n  - id: rf_bug_005_green\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$,\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13},\
+      \ {literal: csp_exact_executable_hashes}, {literal: multi_flush_streaming},\
+      \ {literal: request_cancellation}], contains_any: [], forbids: [{literal: unsafe-inline},\
+      \ {literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-005]\n\
+      \    binding_selector: {kind: go_test_run, package: ./internal/resofeed, run:\
+      \ ^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$}\n  - id: rf_bug_005_local_stream_green\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, '^(TestSecurityHeaders|TestSecurityStreamingCancellation|TestCSP)$',\
+      \ -count=1], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestSecurityHeaders}, {literal:\
+      \ TestSecurityStreamingCancellation}, {literal: TestCSP}], contains_any: [],\
+      \ forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-005]\n\
+      \  - id: rf_bug_005_browser_operations_green\n    run: {command: [bash, -lc,\
+      \ \"npm --prefix web exec -- playwright test --config web/playwright.browser-contract.config.ts\
+      \ --project=chromium-ci-safe --retries=0 web/tests/e2e/csp-operations.browser-contract.spec.ts\
+      \ --grep 'RF-BUG-005.*CSP operations import and State export import download$'\"\
+      ], timeout_seconds: 600}\n    expect: {outcome: green, exit_codes: [0], stdout_or_stderr:\
+      \ {contains_all: [{literal: CSP operations import and State export import download}],\
+      \ contains_any: [{literal: passed}], forbids: [{literal: failed}, {literal:\
+      \ CSP violation}, {literal: blocked resource}, {literal: retry}]}}\n    proves:\
+      \ [RF-BUG-005]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
+      \    - {requirement_id: RF-BUG-005, source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ downstream_check: rf_bug_005_green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
+      ,\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
-      ],\"acceptance_check_ids\":[\"rf_bug_005_green\"],\"acceptance_mutation\":\"\
-      FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
-    verification: Run the exact protected RF-BUG-005 check and focused middleware
-      tests; the explicit downstream security/architecture review verifies authorization
-      and rollback, then the gate exercises real HTML, API, MCP, unauthorized, error,
-      streaming, and cancellation seams.
+      ,\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_005_green\",\"rf_bug_005_browser_operations_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Require exact 13 protected subtests, local header/streaming/cancellation
+      tests, one retry-free Chromium operation, unique headers, corrected CSP hashes,
+      no acceptance diff, and adjudicated security review.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
