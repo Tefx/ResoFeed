@@ -184192,7 +184192,7 @@ phases:
     agent: general
   - id: apply-outer-security-middleware-and-csp
     name: Apply outer HTTP security headers and embedded-content CSP
-    status: pending
+    status: skipped
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-005. A small outer Go middleware sets one effective CSP, `nosniff`,\
@@ -184251,6 +184251,7 @@ phases:
     depends_on:
     - enforce-opml-import-only-surface
     agent: golang-developer
+    skipped_reason: superseded
   - id: rf-bug-runtime-boundaries-full-gate
     name: RF-BUG runtime-boundaries phase Full Gate
     status: pending
