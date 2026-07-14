@@ -185000,3 +185000,11 @@ phases:
   depends_on:
   - rf-bug-20260712-frontend-behavior
   - rf-bug-assurance-v2-harness
+- id: rf-bug-assurance-v2-runtime
+  name: RF-BUG Assurance v2 Runtime Boundaries
+  status: locked
+  gate: Embedded UI, Doctor, auth-first OPML import-only state, HTTP security headers/CSP,
+    streaming/cancellation, independent runtime proof, and R3 rollback review pass
+    under v2.
+  depends_on:
+  - rf-bug-assurance-v2-frontend
