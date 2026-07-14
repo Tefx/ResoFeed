@@ -184214,57 +184214,59 @@ phases:
     name: Embed validated UI and preserve safe Doctor diagnostics
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver\
-      \ RF-BUG-003 embedded UI, SPA fallback, Doctor redaction, arbitrary-cwd/container\
-      \ behavior, tests, and synchronized docs; protected acceptance is immutable.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
-      \ intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [internal/resofeed/webui/**, internal/resofeed/http_static.go,\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-003. Stage the production Svelte build into package-local `embed.FS`,\
+      \ validate required bootstrap references and inline executable bodies before\
+      \ listener bind, and serve root/assets/valid SPA routes independently of cwd.\
+      \ Doctor adds only safe ready/embedded lines and redacts configured secrets\
+      \ and line-breaking input. The final image needs only `/app/resofeed` and writable\
+      \ `/data`. Invalid bootstrap fails before bind. Rollback reverts embed/static/Doctor/build/container\
+      \ docs together. Never add an external UI root, Node runtime, asset registry,\
+      \ persisted asset metadata, or secret output.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nprofile: implementation_closes_expected_red\n\
+      scope: {allowed_paths: [internal/resofeed/webui/**, internal/resofeed/http_static.go,\
       \ internal/resofeed/http.go, internal/resofeed/doctor.go, internal/resofeed/doctor_test.go,\
       \ internal/resofeed/http_static_test.go, scripts/build-resofeed.sh, Dockerfile,\
-      \ docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
-      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, web/src/**,\
-      \ web/tests/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\n\
-      claims: [RF-BUG-003]\nchecks:\n  - id: rf_bug_003_green\n    run:\n      command:\
-      \ [python, -c, \"import subprocess,json; ids=['TestRFBUG003EmbeddedUIContract'];\
-      \ p=subprocess.run(['go','test','-v','./internal/resofeed','-run','^TestRFBUG003EmbeddedUIContract$','-count=1'],capture_output=True,text=True);\
-      \ print(json.dumps({'schema_version':'vectl.check.evidence.v1','check_id':'rf_bug_003_green','selected_ids':ids,'executed_ids':ids,'outcome':'green'\
-      \ if p.returncode==0 else 'red','exit_code':p.returncode,'observations':list(dict.fromkeys((p.stdout+p.stderr).splitlines())),'artifacts':[]},separators=(',',':')))\"\
-      \ ]\n      timeout_seconds: 120\n    evidence:\n      mode: selected_execution\n\
-      \      path_bindings: [{path: go.mod, access: read, availability: current}]\n\
-      \      test_bindings: [{path: internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
-      \ classification: acceptance, availability: current}]\n      selection:\n  \
-      \      command: [python, -c, \"import json; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_003_green','identities':['TestRFBUG003EmbeddedUIContract'],'digest':'sha256:2d45b81770f86b5732f4daa49eeabc8a556a2340d15da291ace2852944c0e727'},separators=(',',':')))\"\
-      \ ]\n        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
-      \ [TestRFBUG003EmbeddedUIContract]\n        forbidden_ids: []\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: RF-BUG-003_EXACT_SUBTEST_SET=23}, {literal: RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete},\
-      \ {literal: RF-BUG-003_CSP_CRLF_NORMALIZED=chromium}]\n        contains_any:\
-      \ []\n        forbids: [{literal: FAIL}, {literal: no tests to run}]\n    proves:\
-      \ [RF-BUG-003]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\
-      \ [{requirement_id: RF-BUG-003, source_step: rf-bug-20260712-runtime-boundaries.rf-bug-v2-runtime-expected-red-bindings,\
-      \ downstream_check: rf_bug_003_green}]\n</intent_closure_contract>\n\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"single-binary runtime and container\
-      \ asset boundary\"],\"primary_outcome\":\"RF-BUG-003\",\"rollback_class\":\"\
-      NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-003\",\"atom\"\
-      :\"embedded UI and Doctor work from the real binary at arbitrary cwd\",\"modality\"\
-      :\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_003_green\",\"independent_step\"\
-      :\"rf-bug-20260712-runtime-boundaries.rf-bug-runtime-boundaries-full-gate\"\
-      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_static_test.go\"\
-      ,\"internal/resofeed/doctor_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      \ docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md], blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ web/src/**, web/tests/**]}\nclaims: [RF-BUG-003]\nchecks:\n  - id: rf_bug_003_green\n\
+      \    run: {command: [go, test, -v, ./internal/resofeed, -run, ^TestRFBUG003EmbeddedUIContract$,\
+      \ -count=1], timeout_seconds: 300}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: RF-BUG-003_EXACT_SUBTEST_SET=23},\
+      \ {literal: RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete}, {literal:\
+      \ RF-BUG-003_CSP_CRLF_NORMALIZED=chromium}], contains_any: [], forbids: [{literal:\
+      \ FAIL}, {literal: no tests to run}]}}\n    proves: [RF-BUG-003]\n    binding_selector:\
+      \ {kind: go_test_run, package: ./internal/resofeed, run: ^TestRFBUG003EmbeddedUIContract$}\n\
+      \  - id: rf_bug_003_doctor_green\n    run: {command: [go, test, -v, ./internal/resofeed,\
+      \ -run, ^TestRFBUG003DoctorRedactionContract$, -count=1], timeout_seconds: 300}\n\
+      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: TestRFBUG003DoctorRedactionContract}], contains_any: [{literal:\
+      \ PASS}], forbids: [{literal: FAIL}, {literal: OPENROUTER_KEY=}]}}\n    proves:\
+      \ [RF-BUG-003]\n  - id: rf_bug_003_local_binary_green\n    run: {command: [bash,\
+      \ -lc, \"bash scripts/build-resofeed.sh && test -x bin/resofeed && root=$PWD;\
+      \ for d in . /tmp /; do (cd \\\"$d\\\" && \\\"$root/bin/resofeed\\\" --help\
+      \ >/dev/null); done; echo RF_BUG_003_BINARY_PROBES=3\"], timeout_seconds: 600}\n\
+      \    expect: {outcome: green, exit_codes: [0], stdout_or_stderr: {contains_all:\
+      \ [{literal: RF_BUG_003_BINARY_PROBES=3}], contains_any: [], forbids: [{literal:\
+      \ FAIL}, {literal: node required}]}}\n    proves: [RF-BUG-003]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red:\n    - {requirement_id:\
+      \ RF-BUG-003, source_step: rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red,\
+      \ downstream_check: rf_bug_003_green}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"runtime_static_asset_security_boundary\"\
+      ,\"doctor_secret_redaction\",\"pre_bind_failure\"],\"primary_outcome\":\"RF-BUG-003\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"test_authority\":{\"developer_test_globs\"\
+      :[\"internal/resofeed/doctor_test.go\",\"internal/resofeed/http_static_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_003_green\"],\"acceptance_mutation\":\"\
-      FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
-    verification: Run the exact RF-BUG-003 protected check locally; the downstream
-      runtime-boundaries gate independently exercises the real binary, arbitrary cwd,
-      Doctor, container, and embedded asset seam.
+      FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Require exact protected RF-BUG-003 identity, corrected browser script/CRLF
+      behavior, invalid-bootstrap no-bind, three cwd probes, Doctor redaction, binary-only
+      image contract, and adjudicated security review.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
-    depends_on:
-    - rf-bug-v2-runtime-expected-red-bindings
     agent: golang-developer
   - id: enforce-opml-import-only-surface
     name: Enforce auth-first OPML import-only boundary
