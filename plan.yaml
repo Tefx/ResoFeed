@@ -185861,3 +185861,286 @@ phases:
     authority-hash, and rollback predicates pass under one canonical v2 gate scope.
   depends_on:
   - rf-bug-assurance-v2-ledger-prompting
+  steps:
+  - id: rf-bug-v2-local-verification-matrix
+    name: Run v2 authoritative local RF-BUG evidence matrix
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Run the current Section 7 local matrix through the v2 generic selection/evidence
+      adapter. Require package-relative frontend check/render list-run identity for
+      named files; focused/full Go tests, vet, build; protected browser/runtime contracts;
+      RF-BUG-002 ten-title EN/ZH set repeated to 100 retry-free executions; Inspector/routes/State/accessibility;
+      Chromium CSP operations; runtime; smoke under 120 seconds; old/replacement E2E
+      identity; exact nine-active-document OPML scan with two exclusions; reused one-clean-root
+      three-run and intentional-failure evidence; redaction; current authority hashes;
+      and no repository diff. OCI, containers, Tailnet, and live OpenRouter remain
+      outside this step.'
+    verification: Exact frontend and Go selected/executed identities, RF-BUG-002 100
+      runs, nine-doc OPML scan, smoke under 120 seconds, clean-root reproducibility/artifacts,
+      redaction, and no repository diff pass.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - web/package.json
+    - go.mod
+    agent: integration-verifier
+  - id: rf-bug-v2-deployment-authorization-review
+    name: Authorize v2 OCI publication and Tailnet deployment
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Pre-operation read-only authorization review. Before registry publication or
+      Tailnet/Caddy deployment, verify current explicit human authorization for both
+      operations; exact `docker.io/tefx/resofeed`; exact maintained Tailnet/Caddy
+      target; repository-scoped registry credentials and existing runtime secret-injection
+      authority; verified commit and immutable tag/digest procedure; orphan-digest
+      recovery; prior-digest rollback and readiness recovery; and prohibition on printing
+      `.env`, tokens, provider keys, or credentials. Missing or stale authority returns
+      BLOCKED and permits no external mutation.'
+    verification: Current explicit human authorization, exact docker.io/tefx/resofeed
+      and Tailnet target, scoped credential/runtime-secret authority, immutable identity,
+      and executable rollback/recovery are proven before external state change.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    depends_on:
+    - rf-bug-v2-local-verification-matrix
+    agent: spec-verifier
+  - id: rf-bug-v2-publish-immutable-oci
+    name: Publish authorized immutable amd64 and arm64 OCI image
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: runtime_state_only
+
+
+      After current explicit authorization, build and publish one immutable linux/amd64
+      and linux/arm64 image to `docker.io/tefx/resofeed` from the locally verified
+      commit. Record the OCI index digest and both platform manifest digests as exact
+      downstream inputs; `latest` is optional and never the immutable identity. Never
+      print secrets. Missing authority or credentials performs no push and returns
+      BLOCKED. Recovery deletes an authorized temporary tag or records the orphan
+      digest; incomplete platforms or digest mismatch block downstream work.'
+    verification: Authorized publication targets only docker.io/tefx/resofeed, binds
+      verified commit/tag to OCI index plus amd64/arm64 digests, redacts output, and
+      records rollback/orphan recovery.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    depends_on:
+    - rf-bug-v2-deployment-authorization-review
+    agent: integration-verifier
+  - id: rf-bug-v2-docker-runtime-proof
+    name: Verify immutable OCI image on both platforms
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: runtime_state_only
+
+
+      Consume the recorded OCI index and amd64/arm64 digests, reject incomplete or
+      mismatched chains, and run the container contract against that exact immutable
+      identity on both platforms. Prove `/app/resofeed`, writable persistent `/data`,
+      non-root runtime, arbitrary cwd, embedded UI without external UI tree/Node runtime,
+      redacted Doctor lines, import-only OPML, JSON State backup/restore, four headers,
+      CSP, and A-to-B persistence. Recovery removes ephemeral containers/volumes and
+      blocks deployment on any platform or digest failure.'
+    verification: The exact immutable digest passes amd64 and arm64 container probes
+      for non-root binary-only runtime, writable /data, arbitrary cwd, embedded UI/Doctor,
+      state, headers/CSP, persistence, and cleanup.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    depends_on:
+    - rf-bug-v2-publish-immutable-oci
+    agent: integration-verifier
+  - id: rf-bug-v2-tailnet-caddy-proof
+    name: Deploy authorized digest and verify Tailnet/Caddy runtime
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: runtime_state_only
+
+
+      Use the maintained Tailnet deployment skill only after explicit authorization,
+      without reading or printing `.env`. Deploy the exact verified immutable digest,
+      preserve the prior digest, and verify direct/public equality for all four Go-owned
+      headers on HTML, JSON, MCP, unauthorized, and error responses; Caddy adds or
+      replaces none. Prove browser boot without CSP violations, embedded assets, direct
+      Ledger/item routes, titles, token accept/reject, import-only OPML, and JSON
+      State. Recovery rolls back to the prior digest and verifies readiness.'
+    verification: The maintained Tailnet skill deploys the exact authorized digest;
+      direct/public headers match, Caddy owns none, browser/CSP/routes/tokens/state
+      pass, and prior-digest rollback readiness is proven without secret output.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - deploy/resofeed-caddy/caddy/Caddyfile
+    depends_on:
+    - rf-bug-v2-docker-runtime-proof
+    - rf-bug-v2-deployment-authorization-review
+    agent: integration-verifier
+  - id: rf-bug-v2-formal-security-review
+    name: Review v2 release security and recovery boundaries
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Independently review the completed local, immutable-image, dual-platform container,
+      and Tailnet evidence for RF-BUG-003/004/005/010. Cover embed.FS traversal/fallback,
+      no external UI root, four outer headers, embedded CSP without unsafe-inline,
+      streaming/cancellation, Owner Token, import-only OPML and atomic minimal State,
+      case-local E2E state and cleanup, live-provider opt-in, secret redaction, exact
+      deployed digest, authorization, and rollback. Findings route to modifying owners
+      and block closure.'
+    verification: Fresh review finds no unresolved embed traversal, CSP/header, streaming/cancellation,
+      token, OPML/state, E2E cleanup, secret, digest, deployment, or rollback defect.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - AGENTS.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    depends_on:
+    - rf-bug-v2-local-verification-matrix
+    - rf-bug-v2-docker-runtime-proof
+    - rf-bug-v2-tailnet-caddy-proof
+    agent: spec-verifier
+  - id: rf-bug-v2-independent-runtime-ui
+    name: Perform fresh v2 black-box RF-BUG runtime and UI verification
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Fresh black-box verification uses only public interfaces, docs, protected acceptance,
+      the built binary, immutable image, and deployed Tailnet UI. Cover RF-BUG-001–010:
+      Inspector pending/failure/stale selection; opaque routes/history; titles; EN/ZH
+      Steer alerts; embedded UI/Doctor; import-only OPML/State; headers/CSP/streaming/cancellation;
+      Source Ledger controls/states at five viewports with grouping, overflow, keyboard
+      and 44px evidence; Prompting v2.2; and E2E isolation/cleanup. Any inaccessible
+      required surface or unresolved vulnerability blocks closure.'
+    verification: Fresh public-surface proof covers RF-BUG-001–010 on built binary,
+      immutable image, and deployed Tailnet UI with five viewport screenshots and
+      no unresolved finding.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/DESIGN.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    depends_on:
+    - rf-bug-v2-local-verification-matrix
+    - rf-bug-v2-docker-runtime-proof
+    - rf-bug-v2-tailnet-caddy-proof
+    agent: blind-tester
+  - id: rf-bug-v2-close-defect-report
+    name: Close RF-BUG-001–010 report with v2 evidence
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
+      \ for `close-defect-report-with-evidence`. Cross-domain justification: this\
+      \ indivisible closure unit binds the consolidated defect report and its Go closure\
+      \ contract under one rollback and terminal evidence boundary. Before mutation,\
+      \ require defect report SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`\
+      \ and repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`.\
+      \ After independent security and black-box verification, update only the report\
+      \ and bounded closure test with observed RF-BUG-001–010 evidence, then record\
+      \ `post_closure_report_sha256=<64 lowercase hex>` and `closure_commit=<40 lowercase\
+      \ hex>` for the terminal gate. Preserve the repair plan, canonical docs, protected\
+      \ acceptance, audits, and completed history. Rollback reverts the report/test\
+      \ pair. Registries, generators, receipt schemas, duplicate phases, secrets,\
+      \ and raw credentials remain forbidden.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md, tests/rf_bug_closure_contract_test.go]\n\
+      \  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ internal/**, web/**, docs/audits/**]\n  ignored_runtime_paths: [.git/, .vectl/,\
+      \ .agent/, .venv/]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n  - id: rf_bug_v2_defect_report_closure_green\n\
+      \    run: {command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-closure-report,\
+      \ rf_bug_v2_defect_report_closure_green], timeout_seconds: 600}\n    evidence:\n\
+      \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: produced_by_step}\n        - {path: go.mod,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ tests/rf_bug_closure_contract_test.go, classification: developer, availability:\
+      \ current}\n      selection:\n        command:\n          - python3\n      \
+      \    - -c\n          - >-\n            import hashlib,json; ids=['RF-BUG-001-010\
+      \ active source scans','RF-BUG-001-010 closure contract']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_defect_report_closure_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 2}\n        required_ids:\
+      \ ['RF-BUG-001-010 active source scans', 'RF-BUG-001-010 closure contract']\n\
+      \        forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: RF_BUG_CLOSURE_REQUIREMENTS=10},\
+      \ {literal: OPML_ACTIVE_DOCUMENTS=9}, {literal: OPML_EXCLUSIONS=2}, {literal:\
+      \ PROMPTING_V21_ACTIVE_MATCHES=0}]\n        contains_any: []\n        forbids:\
+      \ [{literal: broad exclusion}, {literal: no tests to run}]\n    proves: [RF-BUG-001-010-CLOSURE]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report\",\"risk_tier\"\
+      :\"R0\",\"risk_reasons\":[\"documentation_closure\",\"bounded_closure_test\"\
+      ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
+      ,\"observation_ledger\":[],\"test_authority\":{\"developer_test_globs\":[\"\
+      tests/rf_bug_closure_contract_test.go\"],\"acceptance_test_paths\":[],\"acceptance_check_ids\"\
+      :[],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n\
+      </vectl_step_policy>"
+    verification: Pre-closure authority hashes match; exact ten closure subtests and
+      active scans pass; post_closure_report_sha256 and closure_commit are recorded;
+      only report/test pair changes.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/PROMPTING_SYSTEM.md
+    depends_on:
+    - rf-bug-v2-formal-security-review
+    - rf-bug-v2-independent-runtime-ui
+    agent: general
+  - id: rf-bug-v2-assurance-closure-gate
+    name: RF-BUG Assurance v2 release Full Gate
+    status: pending
+    description: 'step_type: gate
+
+      repo_change_policy: no_repo_change
+
+
+      Replacement for `rf-bug-assurance-closure-full-gate`. Require v2 local matrix,
+      current deployment authorization, immutable two-platform OCI publication, both-platform
+      container proof, Tailnet/Caddy proof, formal security review, independent black-box
+      verification, and defect-report closure. Immediately before closure require
+      Vectl validate/check-refs, repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
+      authority-reference commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty
+      active claims, current operation authorization, and no unresolved finding. Bind
+      `post_closure_report_sha256` and `closure_commit` from the replacement closure
+      step and require current report hash and HEAD equality. Skipped legacy nodes
+      are never admission inputs; no future expected-red item is admitted.
+
+
+      <vectl_gate_scope>
+
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+
+      </vectl_gate_scope>'
+    verification: Full Gate covers every local/deployment/security/black-box/closure
+      branch with canonical public IDs, current hashes and HEAD bindings, empty active
+      claims, rollback readiness, and no out-of-scope blocker.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/CONTAINER.md
+    depends_on:
+    - rf-bug-v2-close-defect-report
+    agent: gate-reviewer
