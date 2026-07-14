@@ -184259,7 +184259,7 @@ phases:
     skipped_reason: superseded
   - id: rf-bug-runtime-boundaries-full-gate
     name: RF-BUG runtime-boundaries phase Full Gate
-    status: pending
+    status: skipped
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -184284,6 +184284,7 @@ phases:
     - apply-outer-security-middleware-and-csp
     - rf-bug-runtime-security-architecture-review
     agent: gate-reviewer
+    skipped_reason: superseded
   - id: rf-bug-runtime-security-architecture-review
     name: Review runtime security boundaries and rollback
     status: pending
