@@ -186030,8 +186030,6 @@ phases:
     - docs/DESIGN.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
-    - rf-bug-v2-local-verification-matrix
-    - rf-bug-v2-docker-runtime-proof
     - rf-bug-v2-tailnet-caddy-proof
     agent: blind-tester
   - id: rf-bug-v2-close-defect-report
