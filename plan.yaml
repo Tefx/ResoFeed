@@ -185008,3 +185008,10 @@ phases:
     under v2.
   depends_on:
   - rf-bug-assurance-v2-frontend
+- id: rf-bug-assurance-v2-ledger-prompting
+  name: RF-BUG Assurance v2 Ledger and Prompting
+  status: locked
+  gate: Responsive Source Ledger/State operations and Prompting v2.2 paths pass protected
+    identities and independent real browser/runtime proof under v2.
+  depends_on:
+  - rf-bug-assurance-v2-runtime
