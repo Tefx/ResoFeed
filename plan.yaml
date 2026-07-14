@@ -184749,7 +184749,7 @@ phases:
     skipped_reason: superseded
   - id: tailnet-caddy-runtime-proof
     name: Deploy immutable image and verify Tailnet/Caddy
-    status: pending
+    status: skipped
     description: 'step_type: verification
 
       repo_change_policy: runtime_state_only
@@ -184778,6 +184778,7 @@ phases:
     - fresh-docker-runtime-proof
     - deployment-operation-authorization-review
     agent: integration-verifier
+    skipped_reason: superseded
   - id: formal-security-review
     name: Review HTTP, CSP, secrets, and state boundaries independently
     status: pending
