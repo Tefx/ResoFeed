@@ -185752,7 +185752,7 @@ phases:
       \ classification: acceptance, availability: current}\n        - {path: internal/resofeed/prompting_test.go,\
       \ classification: developer, availability: produced_by_step}\n        - {path:\
       \ internal/resofeed/ingest_test.go, classification: developer, availability:\
-      \ current}\n        - {path: internal/resofeed/reprocess_test.go, classification:\
+      \ produced_by_step}\n        - {path: internal/resofeed/reprocess_test.go, classification:\
       \ developer, availability: current}\n      selection:\n        command:\n  \
       \        - python3\n          - -c\n          - >-\n            import hashlib,json;\
       \ ids=['RF-BUG-009 active v2.1 absence','RF-BUG-009 exact 16 subtests','RF-BUG-009\
