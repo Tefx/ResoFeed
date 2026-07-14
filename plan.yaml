@@ -185563,8 +185563,6 @@ phases:
     - Dockerfile
     - go.mod
     depends_on:
-    - rf-bug-v2-embed-ui-assets
-    - rf-bug-v2-opml-import-only
     - rf-bug-v2-http-security-csp
     agent: integration-verifier
   - id: rf-bug-v2-runtime-security-review
