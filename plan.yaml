@@ -185012,47 +185012,50 @@ phases:
     name: Close RF-BUG-001–010 in the defect report
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAfter\
-      \ all independent security and public-runtime evidence passes, close RF-BUG-001–010\
-      \ in the consolidated report and add the bounded Go closure contract under one\
-      \ rollback. Before mutation require report SHA-256 017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27\
-      \ and repair-plan SHA-256 185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464.\
-      \ Record redacted per-defect evidence, post_closure_report_sha256, and closure_commit;\
-      \ never alter canonical plan/spec/protected acceptance or secrets. General owns\
-      \ this indivisible documentation-plus-Go-contract closure because neither surface\
-      \ can close independently.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
-      \ [docs/BUG_REPORT_2026-07-11.md, tests/rf_bug_closure_contract_test.go]\n \
-      \ blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ internal/**, web/**, docs/audits/**]\n  ignored_runtime_paths: [.git/, .vectl/,\
-      \ .agent/, .venv/]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n  - id: defect_report_closure_green\n\
-      \    run:\n      command: [go, test, -v, ./tests, -run, '^TestRFBugClosureContract$',\
-      \ -count=1]\n      timeout_seconds: 120\n    evidence:\n      mode: command_outcome\n\
-      \      path_bindings:\n        - {path: go.mod, access: read, availability:\
-      \ current}\n      test_bindings:\n        - {path: tests/rf_bug_closure_contract_test.go,\
-      \ classification: developer, availability: produced_by_step}\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: TestRFBugClosureContract/RF-BUG-001}, {literal:\
-      \ TestRFBugClosureContract/RF-BUG-010}, {literal: RF_BUG_CLOSURE_REQUIREMENTS=10}]\n\
-      \        contains_any: []\n        forbids: [{literal: FAIL}, {literal: no tests\
-      \ to run}]\n    proves: [RF-BUG-001-010-CLOSURE]\nbindings:\n  expected_red:\n\
-      \    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-20260712-assurance-closure.close-defect-report-with-evidence\"\
-      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"governance closure artifact consumed\
-      \ by terminal release admission\"],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\"\
-      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
-      :\"RF-BUG-001-010-CLOSURE\",\"atom\":\"defect report closes ten requirements\
-      \ with redacted evidence and immutable identity fields\",\"modality\":\"static\"\
-      ,\"seam\":\"static\",\"check_id\":\"defect_report_closure_green\",\"independent_step\"\
-      :\"rf-bug-20260712-assurance-closure.rf-bug-assurance-closure-full-gate\"}],\"\
-      test_authority\":{\"developer_test_globs\":[\"tests/rf_bug_closure_contract_test.go\"\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
+      \ RF-BUG-001-010-CLOSURE. Before any authorized update, verify the defect report\
+      \ pre-closure SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`\
+      \ and repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`.\
+      \ After independent security and black-box verification, update only the consolidated\
+      \ defect report and bounded closure test with observed evidence for each RF-BUG-001–010.\
+      \ After the update, record explicit evidence fields `post_closure_report_sha256=<64\
+      \ lowercase hex>` and `closure_commit=<40 lowercase hex>` for the terminal gate.\
+      \ Preserve the repair plan, canonical implementation docs, protected acceptance,\
+      \ audits, and completed history. Rollback reverts the report/test closure pair.\
+      \ Never add a registry, generator, receipt schema, duplicate phase, secret,\
+      \ or raw runtime credential.\n\nCross-domain justification: this indivisible\
+      \ closure unit binds the defect report and its Go contract test under one rollback\
+      \ and terminal evidence boundary.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nprofile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md,\
+      \ tests/rf_bug_closure_contract_test.go]\n  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md,\
+      \ docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, internal/**, web/**,\
+      \ docs/audits/**]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n  - id: defect_report_closure_green\n\
+      \    run: {command: [go, test, -v, ./tests, -run, ^TestRFBugClosureContract$,\
+      \ -count=1], timeout_seconds: 180}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: TestRFBugClosureContract/RF-BUG-001},\
+      \ {literal: TestRFBugClosureContract/RF-BUG-010}, {literal: RF_BUG_CLOSURE_REQUIREMENTS=10}],\
+      \ contains_any: [], forbids: [{literal: FAIL}, {literal: no tests to run}]}}\n\
+      \    proves: [RF-BUG-001-010-CLOSURE]\n  - id: closure_active_sources_green\n\
+      \    run: {command: [bash, -lc, \"go test -v ./tests -run '^(TestRFBugCanonicalContracts/OPMLActiveScan|TestRFBugClosureContract/ActivePromptingNames)$'\
+      \ -count=1\"], timeout_seconds: 240}\n    expect: {outcome: green, exit_codes:\
+      \ [0], stdout_or_stderr: {contains_all: [{literal: OPML_ACTIVE_DOCUMENTS=9},\
+      \ {literal: OPML_EXCLUSIONS=2}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0}],\
+      \ contains_any: [], forbids: [{literal: FAIL}, {literal: broad exclusion}]}}\n\
+      \    proves: [RF-BUG-001-010-CLOSURE]\nbindings:\n  expected_red: {items: []}\n\
+      \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v1\",\"step_id\":\"rf-bug-20260712-assurance-closure.close-defect-report-with-evidence\"\
+      ,\"risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_closure\",\"bounded_closure_test\"\
+      ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
+      ,\"test_authority\":{\"developer_test_globs\":[\"tests/rf_bug_closure_contract_test.go\"\
       ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
-    verification: Run the produced closure contract and active-source/name checks;
-      the final gate independently validates the two pre-hashes, post-closure report
-      hash, closure commit identity, ten evidence rows, redaction, and unchanged canonical/protected
-      artifacts.
+      :\"FORBIDDEN\",\"authorized_mutation_refs\":[]}}\n</vectl_step_policy>"
+    verification: Before mutation require defect-report SHA-256 017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27
+      and repair-plan SHA-256 185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464.
+      After the authorized update require ten exact closure subtests, the final nine-document/two-exclusion
+      OPML scan, active Prompting scan, explicit post_closure_report_sha256 and closure_commit
+      evidence fields, independent review evidence, and no diff outside the report/closure-test
+      pair.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
