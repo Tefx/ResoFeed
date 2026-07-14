@@ -185339,6 +185339,301 @@ phases:
     under v2.
   depends_on:
   - rf-bug-assurance-v2-frontend
+  steps:
+  - id: rf-bug-v2-embed-ui-assets
+    name: Embed validated UI and preserve safe Doctor diagnostics under v2
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
+      \ for `embed-ui-assets-in-single-binary`. Stage the production Svelte build\
+      \ into package-local `embed.FS`, validate bootstrap references and inline executable\
+      \ bodies before bind, serve root/assets/valid SPA routes independently of cwd,\
+      \ and add only safe redacted Doctor ready/embedded lines. The final image contains\
+      \ `/app/resofeed` plus writable `/data`; invalid bootstrap fails before listener\
+      \ bind. Rollback reverts embed/static/Doctor/build/container docs together.\
+      \ External UI roots, Node runtime in the image, asset registries, persisted\
+      \ asset metadata, and secret output remain forbidden.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [internal/resofeed/webui/**, internal/resofeed/http_static.go,\
+      \ internal/resofeed/http.go, internal/resofeed/doctor.go, internal/resofeed/doctor_test.go,\
+      \ internal/resofeed/http_static_test.go, scripts/build-resofeed.sh, Dockerfile,\
+      \ docs/ARCHITECTURE.md, docs/CONTAINER.md, docs/USAGE.md]\n  blocked_paths:\
+      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, web/src/**,\
+      \ web/tests/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\n\
+      claims: [RF-BUG-003]\nchecks:\n  - id: rf_bug_v2_embed_ui_green\n    run: {command:\
+      \ [node, scripts/vectl-check.mjs, run, rf-bug-v2-embed-ui, rf_bug_v2_embed_ui_green],\
+      \ timeout_seconds: 1200}\n    evidence:\n      mode: selected_execution\n  \
+      \    path_bindings:\n        - {path: scripts/vectl-check.mjs, access: execute,\
+      \ availability: produced_by_step}\n        - {path: go.mod, access: read, availability:\
+      \ current}\n      test_bindings:\n        - {path: internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ classification: acceptance, availability: current}\n        - {path: internal/resofeed/doctor_test.go,\
+      \ classification: developer, availability: current}\n        - {path: internal/resofeed/http_static_test.go,\
+      \ classification: developer, availability: current}\n      selection:\n    \
+      \    command:\n          - python3\n          - -c\n          - >-\n       \
+      \     import hashlib,json; ids=['RF-BUG-003 binary arbitrary cwd','RF-BUG-003\
+      \ Doctor redaction','RF-BUG-003 embedded UI contract']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_embed_ui_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 3}\n        required_ids:\
+      \ ['RF-BUG-003 binary arbitrary cwd', 'RF-BUG-003 Doctor redaction', 'RF-BUG-003\
+      \ embedded UI contract']\n        forbidden_ids: []\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: RF-BUG-003_EXACT_SUBTEST_SET=23}, {literal: RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete},\
+      \ {literal: RF-BUG-003_CSP_CRLF_NORMALIZED=chromium}, {literal: RF_BUG_003_BINARY_PROBES=3}]\n\
+      \        contains_any: []\n        forbids: [{literal: OPENROUTER_KEY=}, {literal:\
+      \ node required}, {literal: no tests to run}]\n    proves: [RF-BUG-003]\nbindings:\
+      \ {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-runtime.rf-bug-v2-embed-ui-assets\",\"risk_tier\":\"\
+      R3\",\"risk_reasons\":[\"runtime_static_asset_security_boundary\",\"doctor_secret_redaction\"\
+      ,\"pre_bind_failure\"],\"primary_outcome\":\"RF-BUG-003\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-003\",\"\
+      atom\":\"cwd-independent embedded UI, pre-bind validation, and redacted Doctor\
+      \ runtime\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_embed_ui_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-boundaries-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/doctor_test.go\"\
+      ,\"internal/resofeed/http_static_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_embed_ui_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: Exact embedded UI/Doctor identities, arbitrary-cwd binary probes,
+      pre-bind failure, redaction, and binary-only container contract pass; protected
+      acceptance remains unchanged.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go
+    agent: golang-developer
+  - id: rf-bug-v2-opml-import-only
+    name: Enforce auth-first OPML import-only surface under v2
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
+      \ for `enforce-opml-import-only-surface`. Cross-domain justification: one indivisible\
+      \ rollback removes OPML export from Go HTTP/MCP, TypeScript/Svelte UI, and active\
+      \ documentation while preserving authenticated import and atomic minimal JSON\
+      \ State backup/restore. The retired route remains auth-first: unauthenticated\
+      \ 401 and authenticated 404. State validation precedes one replacement transaction\
+      \ and failure preserves prior portable state. Rollback never restores OPML export,\
+      \ merge, sync, history, or portable receipts. Secrets remain redacted.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_impl_test.go,\
+      \ internal/resofeed/mcp.go, web/src/lib/api-client.ts, web/src/lib/api-client.test.ts,\
+      \ web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PRD.md, docs/USAGE.md, docs/CONTAINER.md,\
+      \ docs/PROMPTING_SYSTEM.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, README.md,\
+      \ docs/ui-preview.html]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ internal/resofeed/state.go, web/tests/**, docs/audits/**]\n  ignored_runtime_paths:\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-004]\nchecks:\n  - id:\
+      \ rf_bug_v2_opml_import_only_green\n    run: {command: [node, scripts/vectl-check.mjs,\
+      \ run, rf-bug-v2-opml, rf_bug_v2_opml_import_only_green], timeout_seconds: 900}\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: produced_by_step}\n\
+      \        - {path: go.mod, access: read, availability: current}\n      test_bindings:\n\
+      \        - {path: internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ classification: acceptance, availability: current}\n        - {path: internal/resofeed/http_impl_test.go,\
+      \ classification: developer, availability: current}\n        - {path: web/src/lib/api-client.test.ts,\
+      \ classification: developer, availability: current}\n      selection:\n    \
+      \    command:\n          - python3\n          - -c\n          - >-\n       \
+      \     import hashlib,json; ids=['RF-BUG-004 active document scan','RF-BUG-004\
+      \ auth-first import-only contract']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_opml_import_only_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 2}\n        required_ids:\
+      \ ['RF-BUG-004 active document scan', 'RF-BUG-004 auth-first import-only contract']\n\
+      \        forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: legacy_export_auth_precedence},\
+      \ {literal: import_and_JSON_State_remain_green}, {literal: OPML_ACTIVE_DOCUMENTS=9},\
+      \ {literal: OPML_EXCLUSIONS=2}]\n        contains_any: []\n        forbids:\
+      \ [{literal: broad exclusion}, {literal: no tests to run}]\n    proves: [RF-BUG-004]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-runtime.rf-bug-v2-opml-import-only\",\"risk_tier\":\"\
+      R2\",\"risk_reasons\":[\"public_api_removal\",\"auth_precedence\",\"cross_component_state_contract\"\
+      ],\"primary_outcome\":\"RF-BUG-004\",\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\"\
+      :[{\"requirement_id\":\"RF-BUG-004\",\"atom\":\"auth-first import-only OPML\
+      \ and atomic minimal JSON State across HTTP, MCP, UI, and docs\",\"modality\"\
+      :\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_opml_import_only_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-boundaries-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_impl_test.go\"\
+      ,\"web/src/lib/api-client.test.ts\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_opml_import_only_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: Protected 401/404 OPML acceptance, import and JSON State regressions,
+      atomic failure behavior, exact active-document scan, UI/docs parity, and protected-path
+      immutability pass.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - AGENTS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go
+    depends_on:
+    - rf-bug-v2-embed-ui-assets
+    agent: general
+  - id: rf-bug-v2-http-security-csp
+    name: Apply outer HTTP security middleware and embedded CSP under v2
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
+      \ for `apply-outer-security-middleware-and-csp`. Apply one small outer Go middleware\
+      \ before the complete mux, with one effective CSP derived before bind from every\
+      \ executable inline body, `nosniff`, `no-referrer`, and `DENY`. Preserve streaming\
+      \ flushes and cancellation without buffering or staged writer state. Chromium\
+      \ must boot and complete OPML import plus JSON State export/import/download\
+      \ without CSP violations. Rollback reverts middleware, CSP, tests, and docs\
+      \ together and blocks release rather than weakening policy. `unsafe-inline`,\
+      \ duplicate header owners, and secret-bearing evidence remain forbidden.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [internal/resofeed/http.go,\
+      \ internal/resofeed/http_security.go, internal/resofeed/http_security_test.go,\
+      \ internal/resofeed/webui/**, docs/ARCHITECTURE.md, docs/CONTAINER.md]\n  blocked_paths:\
+      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, web/tests/e2e/csp-operations.browser-contract.spec.ts,\
+      \ deploy/**, web/src/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
+      \ .venv/]\nclaims: [RF-BUG-005]\nchecks:\n  - id: rf_bug_v2_http_security_green\n\
+      \    run: {command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-http-security,\
+      \ rf_bug_v2_http_security_green], timeout_seconds: 1200}\n    evidence:\n  \
+      \    mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: produced_by_step}\n        - {path: go.mod,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, classification:\
+      \ acceptance, availability: current}\n        - {path: web/tests/e2e/csp-operations.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n        - {path: internal/resofeed/http_security_test.go,\
+      \ classification: developer, availability: produced_by_step}\n      selection:\n\
+      \        command:\n          - python3\n          - -c\n          - >-\n   \
+      \         import hashlib,json; ids=['RF-BUG-005 Chromium CSP operations','RF-BUG-005\
+      \ exact security contract','RF-BUG-005 local streaming cancellation']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_http_security_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 3}\n        required_ids:\
+      \ ['RF-BUG-005 Chromium CSP operations', 'RF-BUG-005 exact security contract',\
+      \ 'RF-BUG-005 local streaming cancellation']\n        forbidden_ids: []\n  \
+      \  expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: RF-BUG-005_EXACT_SUBTEST_SET=13}, {literal:\
+      \ csp_exact_executable_hashes}, {literal: multi_flush_streaming}, {literal:\
+      \ request_cancellation}, {literal: CSP operations import and State export import\
+      \ download}]\n        contains_any: []\n        forbids: [{literal: unsafe-inline},\
+      \ {literal: CSP violation}, {literal: retry}, {literal: no tests to run}]\n\
+      \    proves: [RF-BUG-005]\nbindings: {expected_red: {items: []}, closes_expected_red:\
+      \ []}\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\"\
+      :\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-runtime.rf-bug-v2-http-security-csp\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"security_boundary\",\"content_security_policy\"\
+      ,\"streaming_cancellation\"],\"primary_outcome\":\"RF-BUG-005\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-005\",\"\
+      atom\":\"one outer header/CSP owner covers real HTTP and browser operations\
+      \ without breaking streaming or cancellation\",\"modality\":\"runtime\",\"seam\"\
+      :\"real\",\"check_id\":\"rf_bug_v2_http_security_green\",\"independent_step\"\
+      :\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-boundaries-verification\"}],\"\
+      test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_security_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
+      ,\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_v2_http_security_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"\
+      acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: Exact 13 protected subtests, unique headers/CSP, local streaming/cancellation
+      tests, one retry-free Chromium import/export/import/download operation, redaction,
+      and protected-path immutability pass.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go
+    - web/tests/e2e/csp-operations.browser-contract.spec.ts
+    depends_on:
+    - rf-bug-v2-opml-import-only
+    agent: golang-developer
+  - id: rf-bug-v2-runtime-boundaries-verification
+    name: Independently verify embedded, state, HTTP, and browser runtime seams
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Independently exercise RF-BUG-003/004/005 on the integrated real binary and
+      browser. Prove package-local embedded UI and arbitrary-cwd launch, invalid-bootstrap
+      no-bind, safe Doctor output, unauthenticated 401/authenticated 404 retired OPML
+      export, authenticated import and atomic minimal JSON State, exactly one Go-owned
+      security header set across static/API/MCP/auth/not-found/error responses, exact
+      embedded CSP, multi-flush streaming, cancellation, and retry-free Chromium operations.
+      Mock substitution at any claimed HTTP, persistence, process, or browser seam
+      blocks completion.'
+    verification: Launch the real binary from arbitrary cwd; prove pre-bind failure,
+      Doctor redaction, auth-first OPML removal, atomic State, headers/CSP across
+      routes/errors, streaming/cancellation, and Chromium operations.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - go.mod
+    depends_on:
+    - rf-bug-v2-embed-ui-assets
+    - rf-bug-v2-opml-import-only
+    - rf-bug-v2-http-security-csp
+    agent: integration-verifier
+  - id: rf-bug-v2-runtime-security-review
+    name: Review v2 runtime security authorization and rollback
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Explicit R3 review for the embedded UI and HTTP security implementations after
+      independent runtime evidence. Verify CSP derivation before bind from protected
+      executable-body requirements; middleware ordering covers static, API, MCP, auth,
+      not-found, and internal-error responses exactly once; Doctor/evidence redact
+      secrets; invalid bootstrap remains unbound; streaming and cancellation remain
+      intact; OPML is auth-first import-only; and rollback restores the prior embedded
+      binary and middleware/CSP state without weakening headers or exposing an external
+      UI tree. Any authorization, ordering, redaction, pre-bind, state, or recovery
+      gap blocks the gate.'
+    verification: Read-only R3 review confirms pre-bind/CSP authority, middleware
+      order, secret redaction, streaming/cancellation, auth-first state boundary,
+      and executable rollback with no unresolved finding.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - AGENTS.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    depends_on:
+    - rf-bug-v2-runtime-boundaries-verification
+    agent: spec-verifier
+  - id: rf-bug-v2-runtime-boundaries-gate
+    name: RF-BUG Assurance v2 runtime-boundaries Full Gate
+    status: pending
+    description: 'step_type: gate
+
+      repo_change_policy: no_repo_change
+
+
+      Replacement for `rf-bug-runtime-boundaries-full-gate`. Admit the three v2 modifying
+      branches only with independent real-seam runtime evidence and explicit R3 security/rollback
+      review. Require embedded/pre-bind/arbitrary-cwd behavior, Doctor redaction,
+      auth-first import-only OPML and atomic minimal State, exact active-document
+      scan, one Go-owned header/CSP layer, streaming/cancellation, Chromium operations,
+      docs parity, protected acceptance, and no unresolved finding. Skipped legacy
+      nodes are never admission inputs; RF-BUG-009 remains the only admitted future
+      expected-red scope.
+
+
+      <vectl_gate_scope>
+
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-runtime","requirement_ids":["RF-BUG-003","RF-BUG-004","RF-BUG-005"],"integrated_steps":["rf-bug-assurance-v2-runtime.rf-bug-v2-embed-ui-assets","rf-bug-assurance-v2-runtime.rf-bug-v2-http-security-csp","rf-bug-assurance-v2-runtime.rf-bug-v2-opml-import-only","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-boundaries-verification","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-security-review"],"admitted_future_expected_red":["rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red#RF-BUG-009"],"forbid_out_of_scope_blockers":true}
+
+      </vectl_gate_scope>'
+    verification: Full Gate covers exact RF-BUG-003/004/005 requirements, all modifying/verification/review
+      branches, future RF-BUG-009 admission only, protected acceptance, rollback,
+      and canonical public integrated IDs.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    depends_on:
+    - rf-bug-v2-embed-ui-assets
+    - rf-bug-v2-opml-import-only
+    - rf-bug-v2-http-security-csp
+    - rf-bug-v2-runtime-boundaries-verification
+    - rf-bug-v2-runtime-security-review
+    agent: gate-reviewer
 - id: rf-bug-assurance-v2-ledger-prompting
   name: RF-BUG Assurance v2 Ledger and Prompting
   status: locked
