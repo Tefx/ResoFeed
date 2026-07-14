@@ -184828,7 +184828,7 @@ phases:
     agent: blind-tester
   - id: close-defect-report-with-evidence
     name: Close RF-BUG-001–010 in the defect report
-    status: pending
+    status: skipped
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nOutcome:\
       \ RF-BUG-001-010-CLOSURE. Before any authorized update, verify the defect report\
@@ -184884,6 +184884,7 @@ phases:
     - formal-security-review
     - independent-runtime-ui-verification
     agent: general
+    skipped_reason: superseded
   - id: publish-immutable-two-platform-oci-image
     name: Publish immutable amd64 and arm64 OCI image
     status: pending
