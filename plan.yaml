@@ -185629,10 +185629,6 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     depends_on:
-    - rf-bug-v2-embed-ui-assets
-    - rf-bug-v2-opml-import-only
-    - rf-bug-v2-http-security-csp
-    - rf-bug-v2-runtime-boundaries-verification
     - rf-bug-v2-runtime-security-review
     agent: gate-reviewer
 - id: rf-bug-assurance-v2-ledger-prompting
