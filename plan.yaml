@@ -185015,3 +185015,10 @@ phases:
     identities and independent real browser/runtime proof under v2.
   depends_on:
   - rf-bug-assurance-v2-runtime
+- id: rf-bug-assurance-v2-closure
+  name: RF-BUG Assurance v2 Release and Defect Closure
+  status: locked
+  gate: Local, OCI, dual-platform container, Tailnet/Caddy, security, black-box, defect-report,
+    authority-hash, and rollback predicates pass under one canonical v2 gate scope.
+  depends_on:
+  - rf-bug-assurance-v2-ledger-prompting
