@@ -186076,8 +186076,8 @@ phases:
       \ access: execute, availability: produced_by_step}\n        - {path: go.mod,\
       \ access: read, availability: current}\n      test_bindings:\n        - {path:\
       \ tests/rf_bug_closure_contract_test.go, classification: developer, availability:\
-      \ current}\n      selection:\n        command:\n          - python3\n      \
-      \    - -c\n          - >-\n            import hashlib,json; ids=['RF-BUG-001-010\
+      \ produced_by_step}\n      selection:\n        command:\n          - python3\n\
+      \          - -c\n          - >-\n            import hashlib,json; ids=['RF-BUG-001-010\
       \ active source scans','RF-BUG-001-010 closure contract']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_defect_report_closure_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 2}\n        required_ids:\
       \ ['RF-BUG-001-010 active source scans', 'RF-BUG-001-010 closure contract']\n\
