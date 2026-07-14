@@ -184991,3 +184991,12 @@ phases:
   gate: RF-BUG-010 isolated real-runtime harness, native old/replacement identity,
     generic selection/evidence envelopes, cleanup, and retained artifact proof are
     green.
+- id: rf-bug-assurance-v2-frontend
+  name: RF-BUG Assurance v2 Frontend and Token-Parity Integration
+  status: locked
+  gate: Preserved frontend and Go dirty outputs are integrated only after old claim
+    disposition, then independently proven across real browser, HTTP, MCP, and SQLite
+    seams under v2.
+  depends_on:
+  - rf-bug-20260712-frontend-behavior
+  - rf-bug-assurance-v2-harness
