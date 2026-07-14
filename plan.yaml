@@ -184710,13 +184710,16 @@ phases:
 - id: rf-bug-20260712-e2e-isolation
   name: RF-BUG Real-Runtime E2E Isolation and Migration
   status: locked
-  gate: RF-BUG-010 harness isolation, cleanup, deterministic collection, retained
-    artifacts, redaction, and independent runtime proof pass.
-  context: After supported lifecycle disposition completes the preserved active frontend
-    phase, migrate the RF-BUG-010 harness and independent reproducibility proof as
-    a parallel v2 branch.
+  gate: RF-BUG-010 protected acceptance is green; the harness owns case-local mutable
+    state and cleanup; legacy/replacement behavior identity is reviewed; smoke is
+    under 120 seconds; three clean retry-free runs match; intentional failure retains
+    complete redacted standard evidence; no protected diff or residue remains.
+  context: Build the isolated real-runtime harness first, migrate legacy behavior
+    only after native old/replacement identity proof, then run independent no-repo-change
+    reproducibility and retained-artifact proof. Product reset APIs, route interception,
+    custom evidence schemas, and broad test authority remain forbidden.
   depends_on:
-  - rf-bug-20260712-frontend-behavior
+  - rf-bug-20260712-ledger-prompting
   steps:
   - id: rf-bug-010-harness-foundation
     name: Build isolated Playwright harness and migrate legacy lanes
