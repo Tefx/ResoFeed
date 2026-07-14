@@ -184681,7 +184681,7 @@ phases:
   steps:
   - id: local-full-verification-matrix
     name: Run authoritative bounded local RF-BUG evidence matrix
-    status: pending
+    status: skipped
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -184713,6 +184713,7 @@ phases:
     - web/package.json
     - go.mod
     agent: integration-verifier
+    skipped_reason: superseded
   - id: fresh-docker-runtime-proof
     name: Verify the published image on both platforms
     status: pending
