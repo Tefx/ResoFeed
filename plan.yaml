@@ -184312,7 +184312,7 @@ phases:
     agent: spec-verifier
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger Operations and Prompting v2.2
-  status: locked
+  status: done
   gate: RF-BUG-004/008 Ledger and State-import acceptance is green at five viewports
     with exact title/screenshot inventories and real-runtime operations; RF-BUG-009
     exact semantics, transport parity, atomic preservation, active naming, and docs
@@ -184472,7 +184472,7 @@ phases:
     skipped_reason: superseded
   - id: rf-bug-ledger-prompting-full-gate
     name: RF-BUG ledger-prompting phase Full Gate
-    status: pending
+    status: skipped
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -184493,9 +184493,10 @@ phases:
     - repair-source-ledger-responsive-groups
     - implement-prompting-v22-semantics
     agent: gate-reviewer
+    skipped_reason: superseded
 - id: rf-bug-20260712-e2e-isolation
   name: RF-BUG Real-Runtime E2E Isolation and Migration
-  status: locked
+  status: pending
   gate: RF-BUG-010 protected acceptance is green; the harness owns case-local mutable
     state and cleanup; legacy/replacement behavior identity is reviewed; smoke is
     under 120 seconds; three clean retry-free runs match; intentional failure retains
