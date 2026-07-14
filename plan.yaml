@@ -185979,7 +185979,6 @@ phases:
     - deploy/resofeed-caddy/caddy/Caddyfile
     depends_on:
     - rf-bug-v2-docker-runtime-proof
-    - rf-bug-v2-deployment-authorization-review
     agent: integration-verifier
   - id: rf-bug-v2-formal-security-review
     name: Review v2 release security and recovery boundaries
