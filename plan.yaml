@@ -184985,3 +184985,9 @@ phases:
     depends_on:
     - local-full-verification-matrix
     agent: spec-verifier
+- id: rf-bug-assurance-v2-harness
+  name: RF-BUG Assurance v2 Harness and Generic Evidence Adapter
+  status: pending
+  gate: RF-BUG-010 isolated real-runtime harness, native old/replacement identity,
+    generic selection/evidence envelopes, cleanup, and retained artifact proof are
+    green.
