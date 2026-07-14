@@ -184389,26 +184389,20 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal Full Gate for RF-BUG-003/004/005. Independently exercise the real binary
-      from arbitrary cwd, embedded UI and Doctor, import-only OPML plus JSON state
-      backup/restore, and exact outer security headers/CSP across HTML, API, MCP,
-      unauthorized, error, streaming, cancellation, and browser operations. Consume
-      the append-only v2 expected-red source and explicit security/architecture rollback
-      review. Fail on external UI dependency, OPML export, unsafe CSP, duplicate/missing
-      headers, buffering, cancellation loss, auth drift, secret output, protected
-      mutation, or contract failure.
-
-
-      <vectl_gate_scope>
-
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-20260712-runtime-boundaries","requirement_ids":["RF-BUG-003","RF-BUG-004","RF-BUG-005"],"integrated_steps":["rf-bug-20260712-runtime-boundaries.apply-outer-security-middleware-and-csp","rf-bug-20260712-runtime-boundaries.embed-ui-assets-in-single-binary","rf-bug-20260712-runtime-boundaries.enforce-opml-import-only-surface","rf-bug-20260712-runtime-boundaries.rf-bug-runtime-security-architecture-review","rf-bug-20260712-runtime-boundaries.rf-bug-v2-runtime-expected-red-bindings"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
-
-      </vectl_gate_scope>'
-    verification: Full Gate semantic PASS requires all three protected checks, real
-      runtime/browser evidence, reciprocal expected-red closure, immutable acceptance,
-      and independent R3 authorization/rollback review.
+      Terminal bounded Full Gate for runtime boundaries. Repository mutation is absent
+      because the gate consumes RF-BUG-003/004/005 predicates and the explicit independent
+      security/architecture review. Require embedded pre-bind and arbitrary-cwd behavior,
+      safe Doctor output, auth-first import-only OPML and atomic minimal State, exact
+      nine-document/two-exclusion scan, one effective Go-owned header set, corrected
+      CSP, streaming/cancellation, Chromium operations, secret redaction, and verified
+      rollback. Protected acceptance must be unchanged. Any unresolved review finding,
+      secret exposure, external UI dependency, OPML export, unsafe CSP, duplicate
+      header, buffering, collection mismatch, or contract/policy failure blocks downstream
+      work.'
+    verification: All runtime checks are green with exact protected identities; reciprocal
+      bindings, docs parity, path authority, Vectl validation/check-refs, and phase
+      contract/policy admission pass.
     depends_on:
-    - rf-bug-v2-runtime-expected-red-bindings
     - embed-ui-assets-in-single-binary
     - enforce-opml-import-only-surface
     - apply-outer-security-middleware-and-csp
