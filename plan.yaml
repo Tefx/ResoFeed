@@ -184506,7 +184506,7 @@ phases:
   steps:
   - id: rf-bug-010-harness-foundation
     name: Build isolated Playwright harness and migrate legacy lanes
-    status: pending
+    status: skipped
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v1]\n\nPreserved\
       \ source outcome `rf-bug-010-harness-foundation`:\nOutcome: RF-BUG-010-HARNESS.\
@@ -184624,6 +184624,7 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
     agent: frontend-engineer
+    skipped_reason: superseded
   - id: rf-bug-010-reproducibility-artifact-proof
     name: Prove E2E reproducibility, cleanup, and retained artifacts
     status: pending
