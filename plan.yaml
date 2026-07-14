@@ -184716,7 +184716,7 @@ phases:
     skipped_reason: superseded
   - id: fresh-docker-runtime-proof
     name: Verify the published image on both platforms
-    status: pending
+    status: skipped
     description: 'step_type: verification
 
       repo_change_policy: runtime_state_only
@@ -184746,6 +184746,7 @@ phases:
     depends_on:
     - publish-immutable-two-platform-oci-image
     agent: integration-verifier
+    skipped_reason: superseded
   - id: tailnet-caddy-runtime-proof
     name: Deploy immutable image and verify Tailnet/Caddy
     status: pending
