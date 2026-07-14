@@ -184929,7 +184929,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-assurance-closure-full-gate
     name: RF-BUG assurance-closure phase Full Gate
-    status: pending
+    status: skipped
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -184963,6 +184963,7 @@ phases:
     - independent-runtime-ui-verification
     - close-defect-report-with-evidence
     agent: gate-reviewer
+    skipped_reason: superseded
   - id: deployment-operation-authorization-review
     name: Authorize OCI publication and Tailnet deployment
     status: pending
