@@ -185104,25 +185104,24 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Terminal integrated Full Gate for RF-BUG-001–010 after local, immutable OCI,
-      two-platform container, Tailnet/Caddy, security, black-box UI, authorization,
-      rollback, and report-closure branches. Admit only exact deployed digest identity,
-      redacted evidence, preserved single-binary/SQLite/owner-token/state boundaries,
-      no protected mutation, and closure report identity fields. Current external
-      publication/deployment authorization is evaluated only by the declared pre-operation
-      review; missing or stale authority blocks those operations without creating
-      an out-of-scope migration defect.
-
-
-      <vectl_gate_scope>
-
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-20260712-assurance-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010-HARNESS","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-20260712-assurance-closure.close-defect-report-with-evidence","rf-bug-20260712-assurance-closure.deployment-operation-authorization-review","rf-bug-20260712-assurance-closure.formal-security-review","rf-bug-20260712-assurance-closure.fresh-docker-runtime-proof","rf-bug-20260712-assurance-closure.independent-runtime-ui-verification","rf-bug-20260712-assurance-closure.local-full-verification-matrix","rf-bug-20260712-assurance-closure.publish-immutable-two-platform-oci-image","rf-bug-20260712-assurance-closure.tailnet-caddy-runtime-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
-
-      </vectl_gate_scope>'
-    verification: Full Gate semantic PASS requires exhaustive positive coverage for
-      every declared requirement, all integrated step receipts, exact OCI/platform/deployed
-      digests, rollback evidence, report hashes/commit, zero orphan requirements,
-      and no out-of-scope blocker.
+      Terminal bounded Full Gate for RF-BUG assurance closure. Repository mutation
+      is absent because the gate consumes the local matrix, pre-operation deployment
+      authorization, immutable OCI publication, both-platform container proof, Tailnet/Caddy
+      deployment, post-runtime security review, independent black-box verification,
+      and defect-report closure. Immediately before closure require `vectl validate
+      --check-refs`, current strategy authority `docs/BUG_FIX_PLAN_2026-07-12.md`
+      SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
+      authority-reference commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty
+      active claims, current explicit operation authorization, and no unresolved finding.
+      Bind `post_closure_report_sha256` and `closure_commit` from `close-defect-report-with-evidence`,
+      then require the current defect-report SHA-256 and current HEAD to equal those
+      values. Any later plan mutation requires this gate to rerun.'
+    verification: Every local, OCI, container, Tailnet, security, black-box, and closure
+      predicate passes in dependency order. Confirm the predecessor verified the pre-closure
+      report hash, then bind its exact post_closure_report_sha256 and closure_commit
+      outputs and require the current report hash and HEAD to match. Retain the immutable
+      repair-plan hash and authority-reference commit checks; require Vectl validation/check-refs,
+      phase contract/policy admission, and empty active claims.
     depends_on:
     - local-full-verification-matrix
     - deployment-operation-authorization-review
