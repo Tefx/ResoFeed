@@ -184900,7 +184900,7 @@ phases:
     skipped_reason: superseded
   - id: publish-immutable-two-platform-oci-image
     name: Publish immutable amd64 and arm64 OCI image
-    status: pending
+    status: skipped
     description: 'step_type: verification
 
       repo_change_policy: runtime_state_only
@@ -184935,6 +184935,7 @@ phases:
     - local-full-verification-matrix
     - deployment-operation-authorization-review
     agent: integration-verifier
+    skipped_reason: superseded
   - id: rf-bug-assurance-closure-full-gate
     name: RF-BUG assurance-closure phase Full Gate
     status: skipped
