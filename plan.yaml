@@ -184065,7 +184065,7 @@ phases:
     skipped_reason: superseded
 - id: rf-bug-20260712-runtime-boundaries
   name: RF-BUG Embedded UI, Doctor, OPML, and HTTP Security
-  status: pending
+  status: done
   gate: 'RF-BUG-003/004/005 protected acceptance is green: one cwd-independent embedded
     binary fails closed before bind, Doctor remains redacted, OPML is auth-first import-only
     with atomic minimal JSON State, nine active documents are clean, and one Go-owned
@@ -184287,7 +184287,7 @@ phases:
     skipped_reason: superseded
   - id: rf-bug-runtime-security-architecture-review
     name: Review runtime security boundaries and rollback
-    status: pending
+    status: skipped
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -184311,6 +184311,7 @@ phases:
     - enforce-opml-import-only-surface
     - apply-outer-security-middleware-and-csp
     agent: spec-verifier
+    skipped_reason: superseded
 - id: rf-bug-20260712-ledger-prompting
   name: RF-BUG Source Ledger Operations and Prompting v2.2
   status: done
