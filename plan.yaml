@@ -186157,3 +186157,497 @@ phases:
     readiness, and one integrated Full Gate.
   depends_on:
   - rf-bug-assurance-v2-closure
+  steps:
+  - id: item-deep-links-expected-red-contracts
+    name: Freeze Item Deep-Link Expected-Red Contracts
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
+      \ ITEM-DEEP-LINK-CONTRACT. Define one protected expected-red contract unit for\
+      \ the frozen browser application codec/history/authentication contract and the\
+      \ separate HTTP/MCP/duplicate/PublicURL contract. The cross-domain `general`\
+      \ owner is justified because the three protected acceptance files and the project-native\
+      \ adapter registration form one indivisible contract lock consumed by both specialist\
+      \ implementations; splitting would duplicate check identity and acceptance authority.\
+      \ Create tests only; do not implement product behavior or mutate the frozen\
+      \ docs. Fail at the named contract fingerprints, never collection, compile,\
+      \ web-server startup, authentication setup, timeout, or missing-test infrastructure.\
+      \ Rollback reverts the adapter registration and three protected tests together.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
+      \ [scripts/vectl-check.mjs, internal/resofeed/item_deep_links_expected_red_test.go,\
+      \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, web/tests/e2e/item-deep-links.browser-contract.spec.ts]\n\
+      \  blocked_paths: [docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ internal/resofeed/item_route_token.go, internal/resofeed/http.go, internal/resofeed/http_static.go,\
+      \ internal/resofeed/search.go, internal/resofeed/types.go, internal/resofeed/mcp.go,\
+      \ cmd/resofeed/main.go, web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
+      \ web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte, README.md,\
+      \ docs/USAGE.md, docs/CONTAINER.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
+      \ .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND,\
+      \ ITEM-DEEP-LINK-FRONTEND]\nchecks:\n  - id: item_deep_links_expected_red\n\
+      \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-contract,\
+      \ item_deep_links_expected_red], timeout_seconds: 1800}\n    evidence:\n   \
+      \   mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: produced_by_step}\n        - {path: go.mod,\
+      \ access: read, availability: current}\n        - {path: web/package.json, access:\
+      \ read, availability: current}\n      test_bindings:\n        - {path: internal/resofeed/item_deep_links_expected_red_test.go,\
+      \ classification: acceptance, availability: produced_by_step}\n        - {path:\
+      \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, classification:\
+      \ acceptance, availability: produced_by_step}\n        - {path: web/tests/e2e/item-deep-links.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: produced_by_step}\n      selection:\n\
+      \        command:\n          - python3\n          - -c\n          - >-\n   \
+      \         import hashlib,json; ids=['ITEM-DEEP-LINK app codec and API domain\
+      \ separation','ITEM-DEEP-LINK duplicate read envelope and MCP app_url','ITEM-DEEP-LINK\
+      \ browser history auth error read-only lifecycle']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_expected_red','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 3}\n        required_ids:\
+      \ ['ITEM-DEEP-LINK app codec and API domain separation', 'ITEM-DEEP-LINK duplicate\
+      \ read envelope and MCP app_url', 'ITEM-DEEP-LINK browser history auth error\
+      \ read-only lifecycle']\n        forbidden_ids: []\n    expect:\n      outcome:\
+      \ red\n      exit_codes: [1]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: IDL-APP-CODEC-GAP}, {literal: IDL-BACKEND-READ-PROJECTION-GAP},\
+      \ {literal: IDL-BROWSER-LIFECYCLE-GAP}]\n        contains_any: []\n        forbids:\
+      \ [{literal: No tests found}, {literal: ERROR collecting}, {literal: compile\
+      \ error}, {literal: webServer failed}, {literal: timeout}, {literal: setup failed}]\n\
+      \    proves: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND, ITEM-DEEP-LINK-FRONTEND]\n\
+      bindings:\n  expected_red:\n    items:\n      - {requirement_id: ITEM-DEEP-LINK-BACKEND,\
+      \ fingerprint: IDL-BACKEND-READ-PROJECTION-GAP, source_check: item_deep_links_expected_red,\
+      \ selection_ids: ['ITEM-DEEP-LINK duplicate read envelope and MCP app_url'],\
+      \ downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp,\
+      \ downstream_check: item_deep_links_backend_green, owner_policy: {mode: single}}\n\
+      \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-FRONTEND-APP-HISTORY-GAP,\
+      \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
+      \ app codec and API domain separation', 'ITEM-DEEP-LINK browser history auth\
+      \ error read-only lifecycle'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser,\
+      \ downstream_check: item_deep_links_frontend_green, owner_policy: {mode: single}}\n\
+      \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"protected_acceptance_definition\"\
+      ,\"public_browser_http_mcp_contract\",\"cross_domain_contract_lock\"],\"primary_outcome\"\
+      :\"ITEM-DEEP-LINK-CONTRACT\",\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\"\
+      :[{\"requirement_id\":\"ITEM-DEEP-LINK-CONTRACT\",\"atom\":\"protected expected-red\
+      \ identities cover the frozen browser and backend deep-link contract without\
+      \ infrastructure false-reds\",\"modality\":\"test_contract\",\"seam\":\"static\"\
+      ,\"check_id\":\"item_deep_links_expected_red\",\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-final-gate\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.mjs\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/item_deep_links_expected_red_test.go\"\
+      ,\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\",\"web/tests/e2e/item-deep-links.browser-contract.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"item_deep_links_expected_red\"],\"acceptance_mutation\"\
+      :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:item-deep-links-go-contract\"\
+      ,\"path\":\"internal/resofeed/item_deep_links_expected_red_test.go\",\"purpose\"\
+      :\"Freeze the accepted HTTP, MCP, duplicate-resolution, PublicURL, and read-only\
+      \ item deep-link contract\",\"check_id\":\"item_deep_links_expected_red\",\"\
+      actor_id\":\"software-architect\"},{\"ref\":\"authority:acceptance-mutation:item-deep-links-route-contract\"\
+      ,\"path\":\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\",\"\
+      purpose\":\"Freeze the accepted browser application codec, parser, history-state,\
+      \ and API-domain separation contract\",\"check_id\":\"item_deep_links_expected_red\"\
+      ,\"actor_id\":\"software-architect\"},{\"ref\":\"authority:acceptance-mutation:item-deep-links-browser-contract\"\
+      ,\"path\":\"web/tests/e2e/item-deep-links.browser-contract.spec.ts\",\"purpose\"\
+      :\"Freeze the accepted real-browser authentication, navigation, error, focus,\
+      \ scroll, and read-only lifecycle contract\",\"check_id\":\"item_deep_links_expected_red\"\
+      ,\"actor_id\":\"software-architect\"}]}}\n</vectl_step_policy>"
+    verification: The adapter selects exactly three frozen contract identities; the
+      new Go, TypeScript, and real-browser acceptance files fail only with IDL-APP-CODEC-GAP,
+      IDL-BACKEND-READ-PROJECTION-GAP, and IDL-BROWSER-LIFECYCLE-GAP while product/runtime/frozen-doc
+      paths remain unchanged.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - internal/resofeed/rf_bug_item_id_api_expected_red_test.go
+    - web/tests/e2e/initial-route.browser-contract.spec.ts
+    - web/tests/e2e/routes.browser-contract.spec.ts
+    agent: general
+  - id: item-deep-links-backend-api-mcp
+    name: Implement Backend, HTTP API, MCP, and PublicURL Deep-Link Semantics
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
+      \ ITEM-DEEP-LINK-BACKEND. Implement the Go application/read boundary after the\
+      \ protected contract lock: visibly canonical `~{unpadded RFC4648 base64url(item_id)}`\
+      \ tokens reject raw, padded, malformed, noncanonical, or invalid-UTF-8 input\
+      \ before lookup for every item HTTP operation; static `/items/` dispatch uses\
+      \ the escaped request path before cleaning; ordinary, resolved-direct-duplicate,\
+      \ and broken-target reads return the exact four-field ItemReadResult matrix;\
+      \ the returned item ID is the sole effective mutation target; GET/read paths\
+      \ mutate no inspection, delivery, resonance, item_state, or FTS row. Add required\
+      \ MCP item-level `app_url` projections derived only from the validated effective\
+      \ PublicURL, including explicit/derived origin normalization and startup rejection\
+      \ before bind. Keep browser application paths separate from API token helpers,\
+      \ preserve storage-level direct reads, never persist or log app_url or credentials,\
+      \ and synchronize API/MCP/PublicURL usage documentation without changing the\
+      \ frozen references. Rollback reverts this Go/test/usage unit and restores the\
+      \ prior API/MCP projection atomically.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [internal/resofeed/item_route_token.go,\
+      \ internal/resofeed/item_route_token_test.go, internal/resofeed/types.go, internal/resofeed/search.go,\
+      \ internal/resofeed/http.go, internal/resofeed/http_static.go, internal/resofeed/mcp.go,\
+      \ internal/resofeed/http_impl_test.go, internal/resofeed/item_deep_links_test.go,\
+      \ cmd/resofeed/main.go, cmd/resofeed/item_deep_links_test.go, docs/USAGE.md,\
+      \ docs/CONTAINER.md]\n  blocked_paths: [docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
+      \ docs/DESIGN.md, internal/resofeed/item_deep_links_expected_red_test.go, web/**,\
+      \ README.md, deploy/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
+      \ .venv/]\nclaims: [ITEM-DEEP-LINK-BACKEND]\nchecks:\n  - id: item_deep_links_backend_green\n\
+      \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-backend,\
+      \ item_deep_links_backend_green], timeout_seconds: 1800}\n    evidence:\n  \
+      \    mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: produced_by_step}\n        - {path: go.mod,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ internal/resofeed/item_deep_links_expected_red_test.go, classification: acceptance,\
+      \ availability: produced_by_step}\n        - {path: internal/resofeed/item_route_token_test.go,\
+      \ classification: developer, availability: current}\n        - {path: internal/resofeed/http_impl_test.go,\
+      \ classification: developer, availability: current}\n        - {path: internal/resofeed/item_deep_links_test.go,\
+      \ classification: developer, availability: produced_by_step}\n        - {path:\
+      \ cmd/resofeed/item_deep_links_test.go, classification: developer, availability:\
+      \ produced_by_step}\n      selection:\n        command:\n          - python3\n\
+      \          - -c\n          - >-\n            import hashlib,json; ids=['ITEM-DEEP-LINK\
+      \ duplicate read envelope and MCP app_url']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_backend_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
+      \ ['ITEM-DEEP-LINK duplicate read envelope and MCP app_url']\n        forbidden_ids:\
+      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: ITEM_DEEP_LINK_HTTP_CANONICAL=complete}, {literal:\
+      \ ITEM_DEEP_LINK_STATIC_DISPATCH=complete}, {literal: ITEM_DEEP_LINK_DUPLICATE_RESULT=complete},\
+      \ {literal: ITEM_DEEP_LINK_MCP_APP_URL=complete}, {literal: ITEM_DEEP_LINK_PUBLIC_URL=complete},\
+      \ {literal: ITEM_DEEP_LINK_READ_ONLY=complete}]\n        contains_any: []\n\
+      \        forbids: [{literal: raw item route accepted}, {literal: noncanonical\
+      \ token accepted}, {literal: app_url persisted}, {literal: unexpected state\
+      \ mutation}, {literal: no tests to run}]\n    proves: [ITEM-DEEP-LINK-BACKEND]\n\
+      bindings:\n  expected_red: {items: []}\n  closes_expected_red:\n    - {requirement_id:\
+      \ ITEM-DEEP-LINK-BACKEND, source_step: item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts,\
+      \ downstream_check: item_deep_links_backend_green}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp\",\"\
+      risk_tier\":\"R2\",\"risk_reasons\":[\"public_http_contract\",\"mcp_projection_contract\"\
+      ,\"startup_origin_validation\",\"duplicate_resolution_and_mutation_target\"\
+      ,\"read_only_persistence_boundary\"],\"primary_outcome\":\"ITEM-DEEP-LINK-BACKEND\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"ITEM-DEEP-LINK-BACKEND\",\"atom\":\"real Go server, SQLite, HTTP, and MCP\
+      \ seams preserve canonical tokens, duplicate authority, PublicURL app_url, and\
+      \ read-only state\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\"\
+      :\"item_deep_links_backend_green\",\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/item_route_token_test.go\"\
+      ,\"internal/resofeed/http_impl_test.go\",\"internal/resofeed/item_deep_links_test.go\"\
+      ,\"cmd/resofeed/item_deep_links_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/item_deep_links_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"item_deep_links_backend_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The generic adapter executes the protected Go contract plus developer
+      suites through real server/SQLite/MCP seams and emits all six ITEM_DEEP_LINK_*
+      completion markers; frozen docs and protected acceptance remain byte-unchanged.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - internal/resofeed/item_route_token.go
+    - internal/resofeed/item_route_token_test.go
+    - internal/resofeed/types.go
+    - internal/resofeed/search.go
+    - internal/resofeed/http.go
+    - internal/resofeed/mcp.go
+    - cmd/resofeed/main.go
+    - docs/CONTAINER.md
+    depends_on:
+    - item-deep-links-expected-red-contracts
+    agent: golang-developer
+  - id: item-deep-links-frontend-browser
+    name: Implement Browser Routes, Inspector Lifecycle, History, and Accessibility
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
+      \ ITEM-DEEP-LINK-FRONTEND. Implement the frozen browser contract on top of the\
+      \ admitted backend envelope. `workbench-route.ts` owns canonical `/items/{percent-encoded\
+      \ raw item_id}`, dot sentinels, leading-`!`/`~` collision rules, legacy `~base64url`\
+      \ parsing plus replaceState canonicalization, canonical Search URL/history validation,\
+      \ and itemAppPath/itemAppUrl. `api-client.ts` keeps the independent canonical\
+      \ API token path. `+page.svelte` owns route-first Inspector identity, stored-token\
+      \ cold load, 401 recovery, retry generations, deliberate-at-most-once inspection,\
+      \ Back/Forward, route-aware Close, external-entry replacement fallback, Search/Feed\
+      \ re-retrieval, bounded history state, clamped scroll, deterministic selection/focus\
+      \ restoration, and stale-generation exclusion. `Inspector.svelte` remains the\
+      \ sole detail renderer with exact localized invalid/not-found/temporary/duplicate/broken-target\
+      \ states, relation line, copy link, effective mutation target, loading status,\
+      \ alert semantics, and route-aware return labels. Cold load, refresh, recovery,\
+      \ retry, Back/Forward, and automatic selection remain read-only. Synchronize\
+      \ user-facing README behavior while keeping the frozen docs and protected acceptance\
+      \ unchanged. Rollback reverts the frontend/tests/README unit without coupling\
+      \ browser and API codecs.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
+      \ web/src/lib/api-client.test.ts, web/src/lib/__tests__/workbench-route.test.ts,\
+      \ web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte, web/src/routes/components/__tests__/item-deep-links.test.ts,\
+      \ README.md]\n  blocked_paths: [docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
+      \ docs/DESIGN.md, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
+      \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, internal/**, cmd/**,\
+      \ scripts/vectl-check.mjs, docs/USAGE.md, docs/CONTAINER.md, deploy/**]\n  ignored_runtime_paths:\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-FRONTEND]\nchecks:\n\
+      \  - id: item_deep_links_frontend_green\n    run: {command: [node, scripts/vectl-check.mjs,\
+      \ run, item-deep-links-frontend, item_deep_links_frontend_green], timeout_seconds:\
+      \ 1800}\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
+      \        - {path: scripts/vectl-check.mjs, access: execute, availability: produced_by_step}\n\
+      \        - {path: web/package.json, access: read, availability: current}\n \
+      \     test_bindings:\n        - {path: web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
+      \ classification: acceptance, availability: produced_by_step}\n        - {path:\
+      \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, classification: acceptance,\
+      \ availability: produced_by_step}\n        - {path: web/src/lib/api-client.test.ts,\
+      \ classification: developer, availability: current}\n        - {path: web/src/lib/__tests__/workbench-route.test.ts,\
+      \ classification: developer, availability: produced_by_step}\n        - {path:\
+      \ web/src/routes/components/__tests__/item-deep-links.test.ts, classification:\
+      \ developer, availability: produced_by_step}\n      selection:\n        command:\n\
+      \          - python3\n          - -c\n          - >-\n            import hashlib,json;\
+      \ ids=['ITEM-DEEP-LINK app codec and API domain separation','ITEM-DEEP-LINK\
+      \ browser history auth error read-only lifecycle']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_frontend_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 2}\n        required_ids:\
+      \ ['ITEM-DEEP-LINK app codec and API domain separation', 'ITEM-DEEP-LINK browser\
+      \ history auth error read-only lifecycle']\n        forbidden_ids: []\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: ITEM_DEEP_LINK_APP_CODEC=complete}, {literal:\
+      \ ITEM_DEEP_LINK_API_DOMAIN_SEPARATION=complete}, {literal: ITEM_DEEP_LINK_HISTORY=complete},\
+      \ {literal: ITEM_DEEP_LINK_AUTH_RECOVERY=complete}, {literal: ITEM_DEEP_LINK_ERRORS=complete},\
+      \ {literal: ITEM_DEEP_LINK_MUTATION_TARGET=complete}, {literal: ITEM_DEEP_LINK_BROWSER_MATRIX=complete}]\n\
+      \        contains_any: []\n        forbids: [{literal: page.route}, {literal:\
+      \ wrong first surface}, {literal: duplicate inspection write}, {literal: stale\
+      \ navigation applied}, {literal: No tests found}, {literal: skipped}]\n    proves:\
+      \ [ITEM-DEEP-LINK-FRONTEND]\nbindings:\n  expected_red: {items: []}\n  closes_expected_red:\n\
+      \    - {requirement_id: ITEM-DEEP-LINK-FRONTEND, source_step: item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts,\
+      \ downstream_check: item_deep_links_frontend_green}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser\",\"\
+      risk_tier\":\"R2\",\"risk_reasons\":[\"public_browser_route\",\"history_and_auth_state_machine\"\
+      ,\"accessibility_focus_scroll\",\"cross_component_api_wiring\"],\"primary_outcome\"\
+      :\"ITEM-DEEP-LINK-FRONTEND\",\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\"\
+      :[{\"requirement_id\":\"ITEM-DEEP-LINK-FRONTEND\",\"atom\":\"real browser routes\
+      \ preserve Inspector-first identity, auth recovery, history, error labels, focus,\
+      \ scroll, origin, read-only lifecycle, and effective mutation targets\",\"modality\"\
+      :\"rendered_runtime\",\"seam\":\"real\",\"check_id\":\"item_deep_links_frontend_green\"\
+      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-external-client-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"web/src/lib/api-client.test.ts\"\
+      ,\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/components/__tests__/item-deep-links.test.ts\"\
+      ],\"acceptance_test_paths\":[\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\"\
+      ,\"web/tests/e2e/item-deep-links.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"item_deep_links_frontend_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
+      ,\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The generic adapter runs pure codec/component/API-client checks
+      and the isolated real-binary Playwright matrix for desktop and narrow layouts;
+      all seven ITEM_DEEP_LINK_* browser markers pass with zero route interception,
+      skipped cases, duplicate writes, stale navigation, or frozen/protected-file
+      mutation.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - web/src/lib/workbench-route.ts
+    - web/src/lib/api-client.ts
+    - web/src/lib/api-client.test.ts
+    - web/src/routes/+page.svelte
+    - web/src/routes/components/Inspector.svelte
+    - README.md
+    depends_on:
+    - item-deep-links-backend-api-mcp
+    agent: frontend-engineer
+  - id: item-deep-links-local-integration-verification
+    name: Independently Verify Local HTTP, MCP, SQLite, and Browser Integration
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Run a fresh Full Audit against the integrated head using the real `cmd/resofeed`
+      binary, real SQLite, HTTP routing, Streamable HTTP MCP, and isolated Chromium
+      lanes. Prove canonical browser and API codecs remain separate; escaped `/items/`
+      dispatch precedes cleaning; raw malformed percent receives server-level 400;
+      canonical, legacy, dispatchable-invalid, dot-sentinel, encoded slash/dot, and
+      Unicode IDs reach the correct boundary without redirect or asset substitution;
+      all item operations reject noncanonical API tokens before lookup; duplicate/broken/ordinary
+      ItemReadResult fields and effective mutation targets are exact; read lifecycle
+      traces change no inspected/delivered/resonated state; all three MCP projections
+      expose credential-free nonpersisted app_url from explicit and derived PublicURL;
+      startup rejects excluded addr/PublicURL forms before bind. Exercise at least
+      one high-risk invalid path and record exact commands, process liveness, selected/executed
+      identities, network traces, and SQLite before/after evidence. Do not modify
+      repository files.'
+    verification: Fresh L2/L3 evidence proves the complete local backend/browser integration
+      on real seams, including malformed-percent server handling, no normalization
+      drift, exact relation envelopes, effective mutation targets, PublicURL/app_url,
+      and zero read-lifecycle state mutation.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - go.mod
+    - web/package.json
+    - docs/CONTAINER.md
+    depends_on:
+    - item-deep-links-frontend-browser
+    agent: integration-verifier
+  - id: item-deep-links-deployment-authorization-review
+    name: Review Immutable Publication and Tailnet Deployment Authority
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Perform an R3 read-only review before external mutation. Verify that current
+      orchestration authority covers publishing the integrated commit as an immutable
+      multi-architecture image only under `docker.io/tefx/resofeed` and deploying
+      that exact digest through the maintained `resofeed-caddy` stack on `tefx-mbp-personal`
+      to `https://resofeed.tefx.one`; verify explicit `--public-url https://resofeed.tefx.one`,
+      bounded registry/Tailnet credentials, no runtime-secret output, prior-digest
+      rollback, partial-publication orphan recovery, database backup/restore readiness,
+      target/source/commit identity, and evidence topology. Fail closed on missing
+      authority, credential/account expansion, unsafe rollback, source drift, target
+      drift, material unplanned cost, or incomplete local integration. Do not request
+      renewed consent when accepted orchestration authority already covers the declared
+      operations.'
+    verification: The review binds the exact integrated commit, docker.io/tefx/resofeed
+      publication, tefx-mbp-personal resofeed-caddy deployment, production PublicURL,
+      credential bounds, rollback/recovery, and local evidence with no unresolved
+      R3 finding.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - deploy/resofeed-caddy/caddy/Caddyfile
+    depends_on:
+    - item-deep-links-local-integration-verification
+    agent: spec-verifier
+  - id: item-deep-links-publish-immutable-oci
+    name: Publish the Integrated Deep-Link Image by Immutable Digest
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: runtime_state_only
+
+
+      External operation: build and publish the reviewed integrated commit as one
+      multi-architecture OCI image under the existing `docker.io/tefx/resofeed` repository,
+      recording the immutable OCI index plus amd64 and arm64 digests and binding them
+      to the reviewed commit/tag. Use only existing bounded registry credentials;
+      do not print runtime secrets, owner tokens, OpenRouter keys, or credential-bearing
+      URLs. Stop on source/commit drift, partial unknown outcome, unexpected repository/account,
+      or digest mismatch. Recovery records any partial-publish orphan and leaves the
+      previously deployed digest unchanged; rollback is the previously verified immutable
+      digest. This step changes registry runtime state only and does not edit the
+      repository or deploy Tailnet.'
+    verification: The exact reviewed commit is represented by one immutable docker.io/tefx/resofeed
+      OCI index with verified amd64/arm64 digests, redacted evidence, and explicit
+      orphan/rollback records; repository and Tailnet state remain unchanged.
+    refs:
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    depends_on:
+    - item-deep-links-deployment-authorization-review
+    agent: integration-verifier
+  - id: item-deep-links-tailnet-runtime-proof
+    name: Deploy the Immutable Digest and Prove Tailnet/Caddy Runtime Semantics
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: runtime_state_only
+
+
+      External operation: use the maintained ResoFeed Tailnet deployment path to deploy
+      only the reviewed immutable digest through the existing `resofeed-caddy` stack
+      on `tefx-mbp-personal`, with effective `--public-url https://resofeed.tefx.one`.
+      Preserve the prior database and digest for rollback; stop on target, source,
+      digest, execution-context, credential, Caddy-ownership, health, or postcondition
+      drift. After deployment, exercise the real Caddy/Tailnet route with raw item
+      ID `~slash/%?hash#雪`, canonical dot sentinels, one dispatchable invalid route,
+      and raw `/items/%ZZ`; prove no proxy/address normalization, SPA/static dispatch
+      correctness, byte-identical authenticated API lookup, exact MCP app_url, explicit-versus-derived
+      PublicURL separation, read-only state traces, and direct/public security-header
+      parity. Unknown partial outcomes stop before further mutation. Roll back to
+      the prior verified digest and database on failed health or contract probes.
+      Do not edit repository files.'
+    verification: The exact immutable digest is healthy at https://resofeed.tefx.one
+      and passes production Caddy/Tailnet codec, static dispatch, authenticated API,
+      MCP app_url, malformed-percent, header, and read-only-state probes with prior-digest/database
+      rollback ready.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - deploy/resofeed-caddy/caddy/Caddyfile
+    depends_on:
+    - item-deep-links-publish-immutable-oci
+    agent: integration-verifier
+  - id: item-deep-links-external-client-verification
+    name: Independently Verify Browser and External-Client Deep-Link Behavior
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Launch and inspect the deployed web surface without repository mutation. Cover
+      Safari and Chrome plus the required available Telegram iOS, Telegram Android,
+      Telegram Desktop, email-client link opening, and Codex-or-equivalent MCP app_url
+      consumer evidence. On desktop and narrow/mobile, prove canonical cold load/refresh,
+      legacy replaceState, route-owned Inspector first surface/title before token
+      hydration, missing/rejected/later-401 token recovery, invalid/not-found/network/500/503
+      states and exact localized labels, Retry, Feed/Search open-Close-Back-Forward,
+      canonical Search URL re-retrieval, changed-corpus and changed-Feed restoration,
+      clamped scroll, focus/origin fallback, external-entry Close replacement with
+      later Back not reopening, native Back behavior, distinct narrow Escape semantics,
+      rapid A-to-B stale-response exclusion, duplicate/broken/ordinary effective mutation
+      targets, and network traces with no read-lifecycle inspect/delivery/resonance
+      writes. Capture meaningful rendered content, accessibility state, interactions,
+      console/network failures, and exact client/environment gaps; any required unavailable
+      client is blocking rather than silently substituted.'
+    verification: Fresh client-runtime evidence covers every required browser/client
+      environment and frozen navigation/auth/error/accessibility matrix against the
+      deployed production target, with credential-free URLs, exact focus/scroll/history
+      behavior, and no read-lifecycle writes.
+    refs:
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/CONTAINER.md
+    depends_on:
+    - item-deep-links-tailnet-runtime-proof
+    agent: client-runtime-verifier
+  - id: item-deep-links-final-gate
+    name: Admit the Integrated Item Deep-Link Release
+    status: pending
+    description: 'step_type: gate
+
+      repo_change_policy: no_repo_change
+
+
+      Run one Full Gate for the distinct integrated outcome: the frozen deep-link
+      contract is protected, implemented, independently observed locally and in deployed
+      clients, and released by immutable digest without weakening RF-BUG Assurance
+      v2 history. Re-run structural/contract gates, consume the local integration,
+      R3 authorization, OCI, Tailnet, and external-client receipts, obtain independent
+      architecture and design conformance assessments required by the gate-reviewer
+      role, verify frozen-reference immutability, documentation/test parity, exact
+      expected-red reciprocal closure, no orphan requirement, no hidden browser/API
+      codec coupling, no persisted app_url, no read-lifecycle state writes, and executable
+      rollback/recovery. Block only on the declared scope.
+
+
+      <vectl_gate_scope>
+
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"item-summary-deep-links-assurance-v2","requirement_ids":["ITEM-DEEP-LINK-CONTRACT","ITEM-DEEP-LINK-BACKEND","ITEM-DEEP-LINK-FRONTEND","ITEM-DEEP-LINK-LOCAL-INTEGRATION","ITEM-DEEP-LINK-OCI","ITEM-DEEP-LINK-TAILNET","ITEM-DEEP-LINK-EXTERNAL-CLIENTS"],"integrated_steps":["item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts","item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp","item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser","item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification","item-summary-deep-links-assurance-v2.item-deep-links-deployment-authorization-review","item-summary-deep-links-assurance-v2.item-deep-links-publish-immutable-oci","item-summary-deep-links-assurance-v2.item-deep-links-tailnet-runtime-proof","item-summary-deep-links-assurance-v2.item-deep-links-external-client-verification"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+
+      </vectl_gate_scope>'
+    verification: Full Gate proves every declared requirement with direct contract,
+      real-seam, deployed-runtime, rendered-client, immutable-release, rollback, architecture,
+      design, and documentation evidence; zero orphan requirements, out-of-scope blockers,
+      frozen-doc mutations, or unresolved findings remain.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/CONTAINER.md
+    depends_on:
+    - item-deep-links-external-client-verification
+    agent: gate-reviewer
