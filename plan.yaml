@@ -186204,23 +186204,19 @@ phases:
       \ history auth error read-only lifecycle', 'ITEM-DEEP-LINK duplicate read envelope\
       \ and MCP app_url']\n        forbidden_ids: []\n    expect:\n      outcome:\
       \ red\n      exit_codes: [1]\n      stdout_or_stderr:\n        contains_all:\
-      \ [{literal: IDL-APP-CODEC-GAP}, {literal: IDL-BACKEND-READ-PROJECTION-GAP},\
-      \ {literal: IDL-BROWSER-LIFECYCLE-GAP}]\n        contains_any: []\n        forbids:\
-      \ [{literal: No tests found}, {literal: ERROR collecting}, {literal: compile\
-      \ error}, {literal: webServer failed}, {literal: timeout}, {literal: setup failed}]\n\
-      \    proves: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND, ITEM-DEEP-LINK-FRONTEND]\n\
-      bindings:\n  expected_red:\n    items:\n      - {requirement_id: ITEM-DEEP-LINK-BACKEND,\
-      \ fingerprint: IDL-BACKEND-READ-PROJECTION-GAP, source_check: item_deep_links_expected_red,\
-      \ selection_ids: ['ITEM-DEEP-LINK duplicate read envelope and MCP app_url'],\
-      \ downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp,\
+      \ [{literal: IDL-BACKEND-READ-PROJECTION-GAP}, {literal: IDL-FRONTEND-APP-HISTORY-GAP}]\n\
+      \        contains_any: []\n        forbids: [{literal: No tests found}, {literal:\
+      \ ERROR collecting}, {literal: compile error}, {literal: webServer failed},\
+      \ {literal: timeout}, {literal: setup failed}]\n    proves: [ITEM-DEEP-LINK-CONTRACT,\
+      \ ITEM-DEEP-LINK-BACKEND, ITEM-DEEP-LINK-FRONTEND]\nbindings:\n  expected_red:\n\
+      \    items:\n      - {requirement_id: ITEM-DEEP-LINK-BACKEND, fingerprint: IDL-BACKEND-READ-PROJECTION-GAP,\
+      \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
+      \ duplicate read envelope and MCP app_url'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp,\
       \ downstream_check: item_deep_links_backend_green, owner_policy: {mode: single}}\n\
-      \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-APP-CODEC-GAP,\
+      \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-FRONTEND-APP-HISTORY-GAP,\
       \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
-      \ app codec and API domain separation'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser,\
-      \ downstream_check: item_deep_links_frontend_green, owner_policy: {mode: single}}\n\
-      \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-BROWSER-LIFECYCLE-GAP,\
-      \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
-      \ browser history auth error read-only lifecycle'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser,\
+      \ app codec and API domain separation', 'ITEM-DEEP-LINK browser history auth\
+      \ error read-only lifecycle'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser,\
       \ downstream_check: item_deep_links_frontend_green, owner_policy: {mode: single}}\n\
       \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts\"\
@@ -186249,9 +186245,9 @@ phases:
       \ scroll, and read-only lifecycle contract\",\"check_id\":\"item_deep_links_expected_red\"\
       ,\"actor_id\":\"software-architect\"}]}}\n</vectl_step_policy>"
     verification: The adapter selects exactly three frozen contract identities; the
-      new Go, TypeScript, and real-browser acceptance files fail only with IDL-APP-CODEC-GAP,
-      IDL-BACKEND-READ-PROJECTION-GAP, and IDL-BROWSER-LIFECYCLE-GAP while product/runtime/frozen-doc
-      paths remain unchanged.
+      new Go, TypeScript, and real-browser acceptance files fail only with IDL-BACKEND-READ-PROJECTION-GAP
+      and IDL-FRONTEND-APP-HISTORY-GAP while product/runtime/frozen-doc paths remain
+      unchanged.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
