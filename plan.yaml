@@ -186197,12 +186197,12 @@ phases:
       \ classification: acceptance, availability: produced_by_step}\n      selection:\n\
       \        command:\n          - python3\n          - -c\n          - >-\n   \
       \         import hashlib,json; ids=['ITEM-DEEP-LINK app codec and API domain\
-      \ separation','ITEM-DEEP-LINK duplicate read envelope and MCP app_url','ITEM-DEEP-LINK\
-      \ browser history auth error read-only lifecycle']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_expected_red','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \ separation','ITEM-DEEP-LINK browser history auth error read-only lifecycle','ITEM-DEEP-LINK\
+      \ duplicate read envelope and MCP app_url']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_expected_red','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 3}\n        required_ids:\
-      \ ['ITEM-DEEP-LINK app codec and API domain separation', 'ITEM-DEEP-LINK duplicate\
-      \ read envelope and MCP app_url', 'ITEM-DEEP-LINK browser history auth error\
-      \ read-only lifecycle']\n        forbidden_ids: []\n    expect:\n      outcome:\
+      \ ['ITEM-DEEP-LINK app codec and API domain separation', 'ITEM-DEEP-LINK browser\
+      \ history auth error read-only lifecycle', 'ITEM-DEEP-LINK duplicate read envelope\
+      \ and MCP app_url']\n        forbidden_ids: []\n    expect:\n      outcome:\
       \ red\n      exit_codes: [1]\n      stdout_or_stderr:\n        contains_all:\
       \ [{literal: IDL-APP-CODEC-GAP}, {literal: IDL-BACKEND-READ-PROJECTION-GAP},\
       \ {literal: IDL-BROWSER-LIFECYCLE-GAP}]\n        contains_any: []\n        forbids:\
