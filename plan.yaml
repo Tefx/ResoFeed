@@ -186148,3 +186148,12 @@ phases:
     depends_on:
     - rf-bug-v2-close-defect-report
     agent: gate-reviewer
+- id: item-summary-deep-links-assurance-v2
+  name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
+  status: locked
+  gate: The frozen item deep-link contract is implemented across browser, HTTP, MCP,
+    SQLite, real browser history/authentication, immutable OCI, Tailnet/Caddy, and
+    external-client surfaces with read-only navigation, exact canonical codecs, rollback
+    readiness, and one integrated Full Gate.
+  depends_on:
+  - rf-bug-assurance-v2-closure
