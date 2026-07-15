@@ -186214,10 +186214,13 @@ phases:
       \ selection_ids: ['ITEM-DEEP-LINK duplicate read envelope and MCP app_url'],\
       \ downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp,\
       \ downstream_check: item_deep_links_backend_green, owner_policy: {mode: single}}\n\
-      \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-FRONTEND-APP-HISTORY-GAP,\
+      \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-APP-CODEC-GAP,\
       \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
-      \ app codec and API domain separation', 'ITEM-DEEP-LINK browser history auth\
-      \ error read-only lifecycle'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser,\
+      \ app codec and API domain separation'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser,\
+      \ downstream_check: item_deep_links_frontend_green, owner_policy: {mode: single}}\n\
+      \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-BROWSER-LIFECYCLE-GAP,\
+      \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
+      \ browser history auth error read-only lifecycle'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser,\
       \ downstream_check: item_deep_links_frontend_green, owner_policy: {mode: single}}\n\
       \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts\"\
