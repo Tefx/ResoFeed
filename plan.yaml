@@ -188932,7 +188932,7 @@ phases:
       strictness. Receipt sha256:3350820648c3272fdc0cb9eb331fbc6dcdd426c6eff9ad025d32edf9efc420bf.
   - id: rf-bug-v2-adapter-runtime-isolation-remediation
     name: Repair replacement-lane runtime isolation and foundation smoke sequencing
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for integration-verifier FAIL receipt `sha256:9c028197f325979a7998c8d6ce8b0bbbc54c2140871688957e8ed0b9bf5c6a52`\
@@ -189066,6 +189066,15 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T23:20:56.687421+00:00'
+    done_at: '2026-07-16T23:41:55.251300+00:00'
+    evidence: 'Integrated commit 021adb8ba670a21c55223cc16ff31c6c4aa4eee6 from isolated
+      worktree. Worker receipt sha256:8857c2c5c7d2b917887b5ab1030da23cdbda0b093c8d4c10eee2feca5105372f;
+      dispatch sha256:1c90fade08e50620588fc6c39cc1827e3416e932d8d6e6a041f25d24c75e275b.
+      Production intent-closure `--validate-worker-receipt` reran the selected-execution
+      profile and returned CONFORMANT. Profile proved foundation smoke green, five
+      isolated replacement files with 29 selected/29 executed, old-three parity, zero
+      retry/skip, clean cleanup, and protected acceptance unchanged. Synchronized
+      docs: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md and docs/USAGE.md.'
   - id: rf-bug-v2-adapter-runtime-isolation-verification
     name: Independently verify adapter runtime isolation remediation
     status: pending
