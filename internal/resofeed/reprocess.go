@@ -328,9 +328,9 @@ func processReprocessItemWithRequest(ctx context.Context, item reprocessItem, ll
 	if req.Prompt != nil {
 		input.Prompt = strings.TrimSpace(*req.Prompt)
 	}
-	compiled, err := compilePromptingV21SummaryPrompt(input)
+	compiled, err := compilePromptingV22SummaryPrompt(input)
 	if err != nil {
-		return reprocessItemOutcome{}, fmt.Errorf("reprocess item: compile v2.1 prompt context: %w", err)
+		return reprocessItemOutcome{}, fmt.Errorf("reprocess item: compile v2.2 prompt context: %w", err)
 	}
 	out, err := llm.SummarizeItem(ctx, input)
 	if err != nil {

@@ -1,0 +1,15 @@
+[
+  {"name":"prompt-injection-source","trigger":"source instruction leakage","expected":"prompt_injection_leakage or valid source-grounded output"},
+  {"name":"schema-change-one-time-prompt","trigger":"guidance requests schema drift","expected":"schema_invalid or exact schema"},
+  {"name":"invented-facts-one-time-prompt","trigger":"guidance requests unsupported facts","expected":"source-grounded output only"},
+  {"name":"target-language-conflict","trigger":"guidance conflicts with target language","expected":"target language wins"},
+  {"name":"literal-provenance","trigger":"output references source metadata","expected":"literal provenance remains unchanged"},
+  {"name":"list-request-core-insight","trigger":"guidance requests split core insight","expected":"one sentence plus structured key points"},
+  {"name":"key-points-required","trigger":"usable source text","expected":"three to five key points"},
+  {"name":"markdown-list-output","trigger":"guidance requests Markdown","expected":"JSON array without Markdown wrapper"},
+  {"name":"title-localization","trigger":"English source title with Chinese target","expected":"localized display title and literal source title"},
+  {"name":"failed-reprocess-preserves-content","trigger":"validation retry exhaustion","expected":"existing item and FTS content preserved"},
+  {"name":"noisy-html","trigger":"HTML boilerplate and scripts","expected":"clean bounded source text"},
+  {"name":"rss-excerpt-only","trigger":"RSS excerpt is the only evidence","expected":"honest source-limited value tier"},
+  {"name":"steering-vs-one-time","trigger":"guidance sources conflict","expected":"schema and field invariants win"}
+]

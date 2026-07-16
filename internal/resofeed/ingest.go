@@ -1277,7 +1277,7 @@ func buildItemWithActiveSteeringAndSemaphore(ctx context.Context, source Source,
 		sanitizeReadableItem(&item)
 		return item, nil
 	}
-	compiled, compileErr := compilePromptingV21SummaryPrompt(OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableTextSource: availableTextSource, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
+	compiled, compileErr := compilePromptingV22SummaryPrompt(OpenRouterSummaryInput{ItemID: item.ID, Title: item.SourceItemTitle, SourceTitle: item.SourceTitle, URL: item.URL, AvailableTextSource: availableTextSource, AvailableText: available, TargetLanguage: targetLanguage, ActiveSteeringRules: activeSteeringRules})
 	if compileErr != nil {
 		item.ModelStatus = modelStatusDecodeError
 		item.ContentStatus = modelStatusDecodeError

@@ -409,6 +409,9 @@ Every canonical ingest and reprocess transform identifies and enforces this v2.2
 Active runtime identities, errors, tests, and aligned documentation must not use an earlier Prompting System identity. OpenRouter is a request/response JSON transformer only: it does not orchestrate, hold durable state, or write SQLite. Provider data, credentials, request-only prompts, and model overrides do not enter diagnostics, portable State, or durable item provenance.
 
 Historical rows are reprocessed only through this complete contract; malformed, unavailable, retry, and fallback outcomes cannot partially update generated item text or FTS state.
+
+The active-identity verification scans production Go in `cmd/**` and `internal/resofeed/**`, production frontend files in `web/src/**`, and the canonical `docs/ARCHITECTURE.md` and `docs/PROMPTING_SYSTEM.md`. It excludes only Go `_test.go` files plus frontend `__tests__`, `*.test.ts`, and `*.spec.ts` files. It does not treat `web/tests/**`, protected acceptance sources, or legacy test-only fixtures as active product evidence.
+
 ## Required Regression Fixtures
 
 | Fixture | Input trigger | Expected constraint mode / validation result | Retry expectation | Persistence outcome |

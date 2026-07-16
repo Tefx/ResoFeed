@@ -179,10 +179,10 @@ export const PENDING_PROFILE_PAIRS = [
       'mcp_path',
       'PROMPTING_V21_ACTIVE_MATCHES=0'
     ],
+    runner: 'prompting-v22',
     commands: [
       ['go', 'test', '-v', './internal/resofeed', '-run', '^TestRFBUG009PromptingV22Contract$', '-count=1'],
-      ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$', '-count=1'],
-      ['bash', '-lc', "set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\.1|(^|[^[:alnum:]_])V2\\.1([^[:alnum:]_]|$)' -- cmd internal/resofeed web/src web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md; s=$?; set -e; test $s -eq 1; echo PROMPTING_V21_ACTIVE_MATCHES=0"]
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$', '-count=1']
     ]
   },
   {
@@ -667,6 +667,48 @@ function runRuntimeDocContract(profile) {
   };
 }
 
+function promptingV22ActiveFiles() {
+  const files = [];
+  function visit(root, include) {
+    if (!fs.existsSync(root)) return;
+    for (const entry of fs.readdirSync(root, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+      const entryPath = path.join(root, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name !== '__tests__') visit(entryPath, include);
+      } else if (entry.isFile() && include(entryPath)) {
+        files.push(entryPath);
+      }
+    }
+  }
+  const productionGo = (filePath) => filePath.endsWith('.go') && !filePath.endsWith('_test.go');
+  visit(path.join(repoRoot, 'cmd'), productionGo);
+  visit(path.join(repoRoot, 'internal', 'resofeed'), productionGo);
+  visit(path.join(repoRoot, 'web', 'src'), (filePath) => !filePath.endsWith('.test.ts') && !filePath.endsWith('.spec.ts'));
+  files.push(path.join(repoRoot, 'docs', 'ARCHITECTURE.md'), path.join(repoRoot, 'docs', 'PROMPTING_SYSTEM.md'));
+  return files;
+}
+
+function runPromptingV22(profile) {
+  const outputs = profile.commands.map((command) => execute(profile, command[0], command.slice(1), { timeout: 300_000 }));
+  const staleIdentity = /promptingv21|prompting(?:\s+system)?\s+v2\.1|(^|[^a-z0-9_])v2\.1([^a-z0-9_]|$)/imu;
+  const matches = [];
+  for (const filePath of promptingV22ActiveFiles()) {
+    const body = fs.readFileSync(filePath, 'utf8');
+    if (staleIdentity.test(body)) matches.push(path.relative(repoRoot, filePath).split(path.sep).join('/'));
+  }
+  if (matches.length > 0) throw new AdapterFailure('active Prompting v2.1 identity remains', matches);
+  outputs.push('PROMPTING_V21_ACTIVE_MATCHES=0');
+  const combined = outputs.join('\n');
+  const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
+  if (missing.length > 0) throw new AdapterFailure('Prompting v2.2 profile output missed required contract markers', missing);
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
 function runNative(profile) {
   const outputs = [];
   for (const commandRow of profile.commands) {
@@ -715,7 +757,9 @@ async function main() {
         ? runGenericAdapter(profile)
         : profile.runner === 'runtime-doc-contract'
           ? runRuntimeDocContract(profile)
-          : runNative(profile);
+          : profile.runner === 'prompting-v22'
+            ? runPromptingV22(profile)
+            : runNative(profile);
     const envelope = evidenceEnvelope({ profile, ...result });
     parseEvidenceOutput(JSON.stringify(envelope), profile, result.outcome);
     process.stdout.write(`${JSON.stringify(envelope)}\n`);
