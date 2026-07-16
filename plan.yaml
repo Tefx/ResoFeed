@@ -188817,7 +188817,7 @@ phases:
       remained strict. Receipt sha256:cf13ede10a1cecae032926bfd68e8c881d4e85e72342c71da9a165cfb37c3dd7.
   - id: rf-bug-v2-token-parity-harness-remediation
     name: Repair RF-BUG-002 token-parity adapter E2E fixture boundary
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for valid independent semantic FAIL receipt `sha256:d26c2fd5fe9c0f69c14d8fae72008f6f72676ef3faed2612a5eb4fce99f2c946`\
@@ -188908,6 +188908,11 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T22:36:46.690898+00:00'
+    done_at: '2026-07-16T22:43:12.500930+00:00'
+    evidence: Integrated f08c004f1e6aad56e1800633f63a7e40f1c733b7. Token-parity adapter
+      emitted exact two-ID green evidence with 30 API subtests and HTTP/MCP/FTS parity
+      under exact E2E keys, while nested outbound harness proved untagged production
+      strictness. Receipt sha256:3350820648c3272fdc0cb9eb331fbc6dcdd426c6eff9ad025d32edf9efc420bf.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
