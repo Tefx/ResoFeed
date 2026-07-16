@@ -156,34 +156,58 @@ test.describe('RF-BUG-008 real-runtime Source Ledger operations', () => {
     await seedSources(request, runInfo.baseURL, runInfo.dbPath, ownerToken, [conflictSource]);
     await openLedger(page, runInfo.baseURL, ownerToken, 1);
 
-    const externalFetch = request.post(`${runInfo.baseURL}/api/sources/${conflictSource.id}/fetch`, {
-      headers: { Authorization: `Bearer ${ownerToken}` }
+    let cleanupConflictRequestStart = () => {};
+    const conflictRequestStarted = new Promise<void>((resolve, reject) => {
+      feedServer.on('request', onConflictRequestStart);
+      const timeout = setTimeout(() => {
+        cleanupConflictRequestStart();
+        reject(new Error('timed out waiting for /conflict.xml request start'));
+      }, 10_000);
+      cleanupConflictRequestStart = () => {
+        clearTimeout(timeout);
+        feedServer.off('request', onConflictRequestStart);
+      };
+      function onConflictRequestStart(request: import('node:http').IncomingMessage) {
+        if (request.url === '/conflict.xml') {
+          cleanupConflictRequestStart();
+          resolve();
+        }
+      }
     });
-    const runningOperation = async () => {
-      const response = await request.get(`${runInfo.baseURL}/api/runtime/operation`, {
+
+    try {
+      const externalFetch = request.post(`${runInfo.baseURL}/api/sources/${conflictSource.id}/fetch`, {
         headers: { Authorization: `Bearer ${ownerToken}` }
       });
-      const body: { operation: { kind: string | null; actor_kind: string | null; phase: string | null } } = await response.json();
-      return {
-        kind: body.operation.kind,
-        actor_kind: body.operation.actor_kind,
-        phase: body.operation.phase
+      await conflictRequestStarted;
+      const runningOperation = async () => {
+        const response = await request.get(`${runInfo.baseURL}/api/runtime/operation`, {
+          headers: { Authorization: `Bearer ${ownerToken}` }
+        });
+        const body: { operation: { kind: string | null; actor_kind: string | null; phase: string | null } } = await response.json();
+        return {
+          kind: body.operation.kind,
+          actor_kind: body.operation.actor_kind,
+          phase: body.operation.phase
+        };
       };
-    };
-    await expect.poll(runningOperation, { timeout: 10_000 }).toEqual({
-      kind: 'source_fetch',
-      actor_kind: 'human',
-      phase: 'fetching_source'
-    });
-    await row(page, conflictSource.id).locator('.bracket-action--fetch').click();
+      await expect.poll(runningOperation, { timeout: 10_000 }).toEqual({
+        kind: 'source_fetch',
+        actor_kind: 'human',
+        phase: 'fetching_source'
+      });
+      await row(page, conflictSource.id).locator('.bracket-action--fetch').click();
 
-    const status = row(page, conflictSource.id).locator('.source-ledger__status');
-    await expect(status).toContainText(/^err:/);
-    await expect(status).toContainText('op: source_fetch');
-    await expect(status).toContainText('actor:human');
-    await expect(status).toContainText('phase:');
-    await expect(status).toHaveAttribute('aria-live', 'assertive');
-    expect((await externalFetch).status()).toBe(200);
+      const status = row(page, conflictSource.id).locator('.source-ledger__status');
+      await expect(status).toContainText(/^err:/);
+      await expect(status).toContainText('op: source_fetch');
+      await expect(status).toContainText('actor:human');
+      await expect(status).toContainText('phase:');
+      await expect(status).toHaveAttribute('aria-live', 'assertive');
+      expect((await externalFetch).status()).toBe(200);
+    } finally {
+      cleanupConflictRequestStart();
+    }
   });
 
   test('[RF-BUG-008] source info disclosure', async ({ page, request, runInfo, ownerToken }) => {
