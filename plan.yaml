@@ -185005,7 +185005,7 @@ phases:
     skipped_reason: superseded
 - id: rf-bug-assurance-v2-harness
   name: RF-BUG Assurance v2 Harness and Generic Evidence Adapter
-  status: in_progress
+  status: done
   gate: RF-BUG-010 harness foundation passes project-native generic selection/evidence
     envelopes, case-local real-binary lifecycle, native old-three/replacement-five
     discovery identity, cleanup, redaction, and retained artifact proof without prematurely
@@ -185146,7 +185146,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-harness-runtime-verification
     name: Independently verify v2 harness foundation reproducibility and artifacts
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -185178,9 +185178,39 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T07:57:48.186516+00:00'
+    done_at: '2026-07-16T08:11:56.380780+00:00'
+    evidence: 'Artifact:
+
+      - Immutable verification target: 9c659543dec4e92a164e054b86703c6058c21fd1
+
+      - Integrated implementation: 2528cefde2ebbb26758e8573bdd7e99df0f66bd7
+
+
+      Verification:
+
+      - Product-neutral real-binary Chromium smoke -> PASS in 5 seconds
+
+      - Three sequential retry-free foundation runs -> PASS with identical selected/executed
+      identities
+
+      - Intentional-failure artifact order, cleanup, redaction, lane discovery, and
+      clean diff -> PASS
+
+      - Semantic receipt validator -> CONFORMANT
+
+      - Semantic receipt: sha256:21ef7d480a9fb9733eb640acfe77c241fc5074031921b14e7af57d3d6314855c
+
+      - Worker receipt dependency: sha256:95020bc9df565eb113566361f863d5cc3965b6dbe90dcaaf64d4469f3c7f83da
+
+
+      Spec link:
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
 - id: rf-bug-assurance-v2-frontend
   name: RF-BUG Assurance v2 Frontend and Token-Parity Integration
-  status: locked
+  status: pending
   gate: Preserved frontend and Go dirty outputs are integrated only after old claim
     disposition, then independently proven across real browser, HTTP, MCP, and SQLite
     seams under v2.
