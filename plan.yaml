@@ -187578,7 +187578,7 @@ phases:
   - id: rf-bug-v2-e2e-loopback-fixture-boundary
     name: Restore E2E-only loopback fixture boundary without weakening outbound SSRF
       policy
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for valid rejected Source Ledger receipt `sha256:f70684d7180e1fd2865fc3f01f9e388cc2f6818b7b126d4d756c9d78f86a2e01`.\
@@ -187663,6 +187663,8 @@ phases:
     - rf-bug-v2-item-http-token-contract-lock
     - rf-bug-v2-source-ledger-ingest-locator-contract-lock
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T17:23:09.523809+00:00'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
