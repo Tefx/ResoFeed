@@ -34,6 +34,7 @@
   let lastHandledRouteKey = '';
   let lastAutoSelectedResultKey = '';
   let userSelectedResultKey = '';
+  let searchRequestGeneration = 0;
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const chrome = $derived(itemAnatomyChrome(language));
   const searchChrome = $derived(language === 'zh'
@@ -84,6 +85,7 @@
       resonate: (item: ItemSummary) => item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`
     });
   const activeSources = $derived(sources.filter((candidate) => candidate.is_active));
+  const selectedSourceIsActive = $derived(source === '' || activeSources.some((candidate) => candidate.id === source));
 
   function sourceProvenanceLabel(item: ItemSummary): string {
     const source = chrome.search.sourceAria(item.source_title);
@@ -102,6 +104,7 @@
     const routeKey = JSON.stringify({ effectiveRouteParams, routeError });
     if (routeKey === lastHandledRouteKey) return;
     lastHandledRouteKey = routeKey;
+    searchRequestGeneration += 1;
     if (effectiveRouteParams === null) {
       results = [];
       statusText = chrome.search.resultCount(0);
@@ -116,6 +119,7 @@
     limit = effectiveRouteParams.limit ?? 50;
     results = items;
     if (routeError) {
+      results = [];
       statusText = routeError;
       resultState = 'error';
       void onResultsSettled?.([], 'error');
@@ -126,6 +130,7 @@
   });
 
   async function submitSearch(showLoading = true): Promise<void> {
+    const generation = ++searchRequestGeneration;
     if (showLoading) statusText = chrome.search.searching;
     resultState = 'loading';
     const resultKey = JSON.stringify({ searchQuery, source, from, to, resonated, limit });
@@ -138,21 +143,31 @@
         resonated: resonated ? true : undefined,
         limit
       });
+      if (generation !== searchRequestGeneration) return;
       results = response.items;
       statusText = chrome.search.resultCount(response.items.length);
       resultState = 'ready';
       await onResultsSettled?.(response.items, 'ready');
+      if (generation !== searchRequestGeneration) return;
       if (autoSelectFirstResult && response.items.length > 0 && resultKey !== lastAutoSelectedResultKey && resultKey !== userSelectedResultKey) {
         lastAutoSelectedResultKey = resultKey;
         await onSelect?.(response.items[0]);
       }
     } catch (error) {
+      if (generation !== searchRequestGeneration) return;
       results = [];
       const message = error instanceof Error ? error.message : 'err: search failed';
       statusText = /err:\s*internal/i.test(message) ? chrome.search.resultCount(0) : message;
       resultState = 'error';
       await onResultsSettled?.([], 'error');
     }
+  }
+
+  function clearSearchErrorOnEdit(): void {
+    if (resultState !== 'error') return;
+    searchRequestGeneration += 1;
+    statusText = '';
+    resultState = 'idle';
   }
 
   async function openInspector(item: ItemSummary): Promise<void> {
@@ -175,7 +190,7 @@
   <form class="contract-search-form" aria-label={searchChrome.filters} onsubmit={(event) => { event.preventDefault(); void submitSearch(); }}>
     <div class="search-primary-row">
       <label for="search-query">{searchChrome.query}</label>
-      <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" />
+      <input id="search-query" bind:value={searchQuery} aria-describedby="search-status" oninput={clearSearchErrorOnEdit} />
       <button type="submit" class="bracket-action" aria-label={searchChrome.submitAria}>{searchChrome.submit}</button>
     </div>
     <details class="search-secondary-filters" data-compact-filters={compactFilters ? 'true' : 'false'}>
@@ -186,6 +201,9 @@
           {#if activeSources.length > 0}
             <select id="search-source" name="source" bind:value={source} aria-label={searchChrome.sourceInput}>
               <option value="">{searchChrome.allSources}</option>
+              {#if !selectedSourceIsActive}
+                <option value={source} translate="no">{source}</option>
+              {/if}
               {#each activeSources as activeSource (activeSource.id)}
                 <option value={activeSource.id}>{activeSource.title}</option>
               {/each}

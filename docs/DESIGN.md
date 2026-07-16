@@ -1208,7 +1208,7 @@ The disclosure summary is [SHARP] text-sized chrome with a touch-safe hit target
 
 Filter component types are [SHARP]:
 
-- `Source` uses a low-chrome native select populated from active sources, with an all-sources empty option. Do not use a free-text source field when the active source list is available; source identity is selected, not typed.
+- `Source` uses a low-chrome native select populated from active sources, with an all-sources empty option. Do not use a free-text source field when the active source list is available; source identity is selected, not typed. If canonical route state names a source absent from the currently loaded active-source list, preserve that literal source ID as the current select option until the user changes it.
 - `Start date` and `End date` use plain text inputs with `YYYY-MM-DD` placeholders. Do not use native `type="date"` controls because the browser/OS calendar popup is visually uncontrolled and clashes with the dark archival workbench.
 - `Resonated` / `已标星` is one flex-aligned checkbox label. The checkbox and label text must share a visual baseline/center and remain a single 44px-minimum hit target.
 - `Result limit` remains a low-chrome select. It belongs after the semantic filters, not between date endpoints.
@@ -1246,7 +1246,7 @@ Route resolution precedes token hydration and chooses the correct EN/ZH Today, S
 ### Invalid Search visible/accessibility/recovery contract
 The Search surface and entered filter/query values remain visible throughout an invalid route or submit state. Exactly one localized current error uses `role="alert"` with `aria-live="assertive"`; it replaces any prior Search validation alert rather than accumulating duplicate live regions. An invalid route or submission sends no `/api/search` request and performs no history push or replace.
 
-Editing retains focus and entered values, sends no request, performs no history write, and leaves the current alert visible until the user submits corrected input. A corrected valid submission replaces the alert with the ordinary loading/status lifecycle, issues exactly one lexical Search request, and writes only bounded canonical `q` history state plus documented valid lexical filters.
+Editing retains focus and entered values, clears the stale validation alert immediately, sends no request, and performs no history write. A corrected valid submission enters the ordinary loading/status lifecycle, issues exactly one lexical Search request, and writes only bounded canonical `q` history state plus documented valid lexical filters.
 ### RF-BUG-006 — Resolved-route title atom
 The resolved route surface and its document title commit atomically before hydration or asynchronous work can paint. Cold load, refresh, direct Inspector navigation, Search, Today, Source Ledger, `/doctor`, Back, and Forward expose no intermediate title from another route. Functional titles remain the exact invariant English tokens `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor` in both processing languages.
 

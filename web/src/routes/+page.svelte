@@ -144,7 +144,8 @@
   const reprocessCancelLabel = $derived(processingLanguage.code === 'zh' ? '[取消]' : '[CANCEL]');
   const reprocessRunningLabel = $derived(processingLanguage.code === 'zh' ? '[重处理中...]' : '[REPROCESSING...]');
   const steerRouteEcho = $derived(routeEchoForCommand(steerCommand, steerPreview, steerPreviewCommand, steerPreviewState));
-  const routePreviewText = $derived(steerRouteEcho.kind === 'idle' ? '' : `${steerRouteEcho.marker} ${steerRouteEcho.label}${steerRouteEcho.detail ? ` ${steerRouteEcho.detail}` : ''}`);
+  const steerRoutePreviewDetail = $derived(steerRouteEcho.kind === 'invalid' ? '' : steerRouteEcho.detail);
+  const routePreviewText = $derived(steerRouteEcho.kind === 'idle' ? '' : `${steerRouteEcho.marker} ${steerRouteEcho.label}${steerRoutePreviewDetail ? ` ${steerRoutePreviewDetail}` : ''}`);
   const routePreviewDescription = $derived(steerRouteEcho.kind === 'idle' ? (processingLanguage.code === 'zh' ? '导向路由预览' : 'Steer route preview') : `${processingLanguage.code === 'zh' ? '导向路由预览' : 'Steer route preview'}: ${routePreviewText}`);
   const receiptUndoTarget = $derived(steerFeedback.kind === 'receipt' ? steerFeedback.undo : undefined);
   const contextualOperationStatusText = $derived(formatContextualOperation(contextualOperation));
@@ -1402,15 +1403,14 @@
         role={routePreviewAnnounces ? 'status' : undefined}
         aria-label={shellChrome.routePreview}
         aria-live={steerRouteEcho.live}
-        aria-describedby={steerRouteEcho.kind === 'invalid' ? 'steer-route-preview-detail' : undefined}
         data-route-kind={steerRouteEcho.kind}
         data-live={steerRouteEcho.live}
       >
         {#if steerRouteEcho.kind !== 'idle'}
           <span class="steer-route-preview__marker" aria-hidden="true">{steerRouteEcho.marker}</span>
           <span class="steer-route-preview__label">{steerRouteEcho.label}</span>
-          {#if steerRouteEcho.detail}
-            <span class="steer-route-preview__detail">{steerRouteEcho.detail}</span>
+          {#if steerRoutePreviewDetail}
+            <span class="steer-route-preview__detail">{steerRoutePreviewDetail}</span>
           {/if}
           {#if steerRouteEcho.writeAction}
             <span class="steer-route-preview__actions">
@@ -1421,7 +1421,6 @@
         {/if}
       </section>
       <span id="steer-route-preview-input-desc" class="visually-hidden">{routePreviewDescription}</span>
-      <span id="steer-route-preview-detail" class="visually-hidden">{shellChrome.routeRequired}</span>
 
       {#if languageStatus}
         <p class:visually-hidden={!languageStatusIsError} class:contract-feedback-error={languageStatusIsError} role="status" aria-label={shellChrome.processingLanguageStatus} aria-live={languageStatusIsError ? 'assertive' : 'polite'}>{languageStatus}</p>
