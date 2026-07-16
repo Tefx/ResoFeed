@@ -185588,7 +185588,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-generic-adapter-compatibility-remediation
     name: Restore completed harness artifact-object compatibility
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ compatibility repair after completed `rf-bug-v2-generic-adapter-remediation`\
@@ -185666,6 +185666,8 @@ phases:
     depends_on:
     - rf-bug-v2-generic-adapter-remediation
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T09:06:30.804665+00:00'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
