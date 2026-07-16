@@ -187400,7 +187400,7 @@ phases:
     agent: gate-reviewer
   - id: rf-bug-v2-replacement-lanes-verification
     name: Independently close immutable replacement-five runtime lanes
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -187438,6 +187438,8 @@ phases:
     depends_on:
     - rf-bug-v2-adapter-runtime-isolation-verification
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T23:48:50.312448+00:00'
   - id: rf-bug-v2-item-http-token-contract-lock
     name: Repair protected item HTTP token acceptance contracts
     status: done
