@@ -188621,7 +188621,6 @@ phases:
       static contract output, and native Playwright five-test collection output; confirm
       no product/config/docs change and no dirty recovery worktree mutation.
     depends_on:
-    - rf-bug-v2-source-ledger-conflict-json-body-contract-lock
     - rf-bug-v2-current-operation-foreground-priority
     agent: frontend-engineer
 - id: rf-bug-assurance-v2-closure
