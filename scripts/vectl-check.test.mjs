@@ -13,6 +13,7 @@ import {
   parseEvidenceOutput,
   parseSelectionOutput,
   runPromptingHarness,
+  runTokenParityHarness,
   selectionEnvelope
 } from './vectl-check.mjs';
 
@@ -147,6 +148,108 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
     assert.deepEqual(selection.identities, identities);
     assert.equal(selection.identities.length, identities.length);
   }
+});
+
+test('RF-BUG-002 token parity harness adapter contract', () => {
+  const profile = findProfile('rf-bug-v2-go-token-parity', 'rf_bug_v2_go_token_parity_green');
+  const strict = findProfile('rf-bug-v2-prompting-harness', 'rf_bug_v2_prompting_harness_remediation_green');
+  assert.ok(profile);
+  assert.ok(strict);
+  assert.equal(profile.runner, 'token-parity');
+  assert.deepEqual(profile.identities, [
+    'RF-BUG-002 canonical HTTP MCP parity',
+    'RF-BUG-002 opaque item ID API paths 30'
+  ]);
+  assert.deepEqual(profile.commands, [{
+    argv: ['go', 'test', '-tags', 'resofeed_e2e', '-v', './internal/resofeed', '-run', '^(TestRFBUG002OpaqueItemIDAPIPaths|TestRFBUG002CanonicalHTTPMCPParity)$', '-count=1'],
+    env: { RESOFEED_E2E: '1' }
+  }]);
+  assert.equal('RESOFEED_E2E' in childEnvironment(), false, 'general child environment must remain strict');
+
+  const strictEnvelope = evidenceEnvelope({
+    profile: strict,
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...strict.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid']
+  });
+  const parityOutput = [
+    '=== RUN   TestRFBUG002OpaqueItemIDAPIPaths',
+    'RF_BUG_002_API_SUBTESTS=30',
+    '--- PASS: TestRFBUG002OpaqueItemIDAPIPaths',
+    '=== RUN   TestRFBUG002CanonicalHTTPMCPParity',
+    'RF_BUG_002_CANONICAL_HTTP_REJECTION=complete',
+    '--- PASS: TestRFBUG002CanonicalHTTPMCPParity',
+    'PASS'
+  ].join('\n');
+  const calls = [];
+  const fakeRun = (_profile, command, args, options) => {
+    calls.push({ command, args, options });
+    if (command === 'node' && args[0] === '--test') return 'RF-BUG-002 token parity harness adapter contract';
+    if (command === 'node') return `${JSON.stringify(strictEnvelope)}\n`;
+    return parityOutput;
+  };
+
+  const result = runTokenParityHarness(profile, fakeRun);
+  assert.equal(result.outcome, 'green');
+  assert.deepEqual(result.observations, [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid']);
+  assert.equal(calls.length, 3);
+  assert.deepEqual(calls[0], {
+    command: 'node',
+    args: ['--test', '--test-name-pattern=RF-BUG-002 token parity harness adapter contract', 'scripts/vectl-check.test.mjs'],
+    options: { timeout: 240_000, env: { RESOFEED_E2E: null } }
+  });
+  assert.deepEqual(calls[1], {
+    command: 'node',
+    args: ['scripts/vectl-check.mjs', 'run', 'rf-bug-v2-prompting-harness', 'rf_bug_v2_prompting_harness_remediation_green'],
+    options: { timeout: 900_000, env: { RESOFEED_E2E: null } }
+  });
+  assert.deepEqual(calls[2], {
+    command: 'go',
+    args: ['test', '-tags', 'resofeed_e2e', '-v', './internal/resofeed', '-run', '^(TestRFBUG002OpaqueItemIDAPIPaths|TestRFBUG002CanonicalHTTPMCPParity)$', '-count=1'],
+    options: { timeout: 900_000, env: { RESOFEED_E2E: '1' } }
+  });
+
+  const envelopeOutput = `${JSON.stringify(evidenceEnvelope({ profile, ...result }))}\n`;
+  assert.equal(envelopeOutput.trim().split(/\r?\n/u).length, 1, 'token parity run must emit one envelope');
+  const parsed = parseEvidenceOutput(envelopeOutput, profile, 'green');
+  assert.deepEqual(parsed.selected_ids, profile.identities);
+  assert.deepEqual(parsed.executed_ids, profile.identities);
+  assert.equal(parsed.selected_ids.length, 2);
+  assert.throws(
+    () => parseEvidenceOutput(`${envelopeOutput}${envelopeOutput}`, profile, 'green'),
+    /expected one vectl.check.evidence.v1 envelope/u
+  );
+
+  const invalidNestedRun = (_profile, command, args) => {
+    if (command === 'node' && args[0] === '--test') return 'RF-BUG-002 token parity harness adapter contract';
+    if (command === 'node') return '{"schema_version":"vectl.check.evidence.v1"}\n';
+    return parityOutput;
+  };
+  assert.throws(
+    () => runTokenParityHarness(profile, invalidNestedRun),
+    /evidence envelope did not match the requested profile/u
+  );
+
+  const missingStrictMarker = { ...strictEnvelope, observations: strictEnvelope.observations.filter((marker) => marker !== 'TestOutboundE2EFixturePolicy') };
+  const missingStrictRun = (_profile, command, args) => {
+    if (command === 'node' && args[0] === '--test') return 'RF-BUG-002 token parity harness adapter contract';
+    if (command === 'node') return `${JSON.stringify(missingStrictMarker)}\n`;
+    return parityOutput;
+  };
+  assert.throws(
+    () => runTokenParityHarness(profile, missingStrictRun),
+    /nested Prompting\/outbound strict harness evidence missed TestOutboundE2EFixturePolicy/u
+  );
+
+  const forbiddenRun = (_profile, command, args) => {
+    if (command === 'node' && args[0] === '--test') return 'RF-BUG-002 token parity harness adapter contract';
+    if (command === 'node') return `${JSON.stringify(strictEnvelope)}\n`;
+    return `${parityOutput}\nno tests to run`;
+  };
+  assert.throws(
+    () => runTokenParityHarness(profile, forbiddenRun),
+    /token parity fixture emitted forbidden marker: no tests to run/u
+  );
 });
 
 test('RF-BUG-009 prompting harness adapter contract', () => {

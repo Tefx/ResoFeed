@@ -43,9 +43,23 @@ export const PENDING_PROFILE_PAIRS = [
       'RF-BUG-002 canonical HTTP MCP parity',
       'RF-BUG-002 opaque item ID API paths 30'
     ],
-    requiredOutput: ['RF_BUG_002_CANONICAL_HTTP_REJECTION=complete', 'RF_BUG_002_API_SUBTESTS=30'],
+    requiredOutput: [
+      'RF_BUG_002_CANONICAL_HTTP_REJECTION=complete',
+      'RF_BUG_002_API_SUBTESTS=30',
+      'TestRFBUG002OpaqueItemIDAPIPaths',
+      'TestRFBUG002CanonicalHTTPMCPParity',
+      'TestOutboundE2EFixturePolicy',
+      'TestOutboundHTTPURLPolicyRejectsUnsafeDestinations',
+      'TestFetchPathsRejectLoopbackBeforeRequest',
+      'TestPlaywrightFixtureContract',
+      'PASS'
+    ],
+    runner: 'token-parity',
     commands: [
-      ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestRFBUG002OpaqueItemIDAPIPaths|TestRFBUG002CanonicalHTTPMCPParity)$', '-count=1']
+      {
+        argv: ['go', 'test', '-tags', 'resofeed_e2e', '-v', './internal/resofeed', '-run', '^(TestRFBUG002OpaqueItemIDAPIPaths|TestRFBUG002CanonicalHTTPMCPParity)$', '-count=1'],
+        env: { RESOFEED_E2E: '1' }
+      }
     ]
   },
   {
@@ -742,6 +756,52 @@ function runPromptingV22(profile) {
   };
 }
 
+export function runTokenParityHarness(profile, run = execute) {
+  const strictProfile = PROFILES.get(profileKey('rf-bug-v2-prompting-harness', 'rf_bug_v2_prompting_harness_remediation_green'));
+  if (!strictProfile) throw new AdapterFailure('Prompting/outbound strict harness profile was not registered');
+
+  const commandRow = profile.commands[0];
+  if (!commandRow || Array.isArray(commandRow)) throw new AdapterFailure('token parity command missed scoped E2E configuration');
+
+  const adapterOutput = run(profile, 'node', [
+    '--test', '--test-name-pattern=RF-BUG-002 token parity harness adapter contract',
+    'scripts/vectl-check.test.mjs'
+  ], { timeout: 240_000, env: { RESOFEED_E2E: null } });
+  if (!adapterOutput.includes('RF-BUG-002 token parity harness adapter contract')) {
+    throw new AdapterFailure('token parity focused adapter contract did not execute');
+  }
+
+  const strictOutput = run(profile, 'node', [
+    'scripts/vectl-check.mjs', 'run', strictProfile.suite, strictProfile.checkID
+  ], { timeout: 900_000, env: { RESOFEED_E2E: null } });
+  const strictEvidence = parseEvidenceOutput(strictOutput, strictProfile, 'green');
+  for (const marker of strictProfile.requiredOutput) {
+    if (!strictEvidence.observations.includes(marker)) {
+      throw new AdapterFailure(`nested Prompting/outbound strict harness evidence missed ${marker}`);
+    }
+  }
+
+  const parityOutput = run(profile, commandRow.argv[0], commandRow.argv.slice(1), {
+    timeout: 900_000,
+    env: commandRow.env
+  });
+  for (const forbidden of ['raw item route accepted', 'HTTP MCP reingest mismatch', 'no tests to run', 'skipped', 'retry']) {
+    if (parityOutput.toLowerCase().includes(forbidden.toLowerCase())) {
+      throw new AdapterFailure(`token parity fixture emitted forbidden marker: ${forbidden}`);
+    }
+  }
+
+  const combined = [...strictEvidence.observations, parityOutput].join('\n');
+  const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
+  if (missing.length > 0) throw new AdapterFailure('token parity harness output missed required contract markers', missing);
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
 export function runPromptingHarness(profile, run = execute) {
   const promptingProfile = PROFILES.get(profileKey('rf-bug-v2-prompting', 'rf_bug_v2_prompting_green'));
   if (!promptingProfile) throw new AdapterFailure('Prompting v2.2 profile was not registered');
@@ -843,9 +903,11 @@ async function main() {
           ? runRuntimeDocContract(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
-            : profile.runner === 'prompting-harness'
-              ? runPromptingHarness(profile)
-              : runNative(profile);
+            : profile.runner === 'token-parity'
+              ? runTokenParityHarness(profile)
+              : profile.runner === 'prompting-harness'
+                ? runPromptingHarness(profile)
+                : runNative(profile);
     const envelope = evidenceEnvelope({ profile, ...result });
     parseEvidenceOutput(JSON.stringify(envelope), profile, result.outcome);
     process.stdout.write(`${JSON.stringify(envelope)}\n`);
