@@ -1257,6 +1257,33 @@ ResoFeed intentionally excludes:
 - Ensure mutating MCP calls include stable idempotency keys.
 - Silent evaluation alone should not mark the item inspected.
 
+## Browser E2E Verification
+Install the web dependencies and run the deterministic isolated lanes:
+
+```bash
+npm --prefix web ci
+npm --prefix web run test:e2e:smoke
+npm --prefix web run test:e2e:runtime
+npm --prefix web run test:e2e:ci-safe
+```
+
+The smoke and runtime lanes build and launch the real `cmd/resofeed` binary. Each case owns its SQLite database, loopback port, process, clean Playwright context, redacted runtime/browser diagnostics, and cleanup record. The runtime starts in its case-local artifact directory with an allow-listed environment, so ambient provider credentials and a repository-local `.env` do not enter deterministic runs. Teardown residue fails the case. Deterministic lanes use one worker and zero retries.
+
+Harness maintainers can run the foundation evidence adapter directly:
+
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-harness-foundation rf_bug_v2_harness_foundation_green
+```
+
+That command verifies the generic evidence envelope, intentional-failure standard artifacts, isolated lifecycle cleanup, and native old-three/replacement-five lane discovery. Discovery does not execute the product-semantic replacement lane; downstream repair and runtime-verification work owns those executions.
+
+Live OpenRouter verification is separate and opt-in:
+
+```bash
+OPENROUTER_KEY="$OPENROUTER_KEY" npm --prefix web run test:e2e:live
+```
+
+Do not pass OpenRouter keys by CLI flag or retain them in test artifacts. See `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md` for artifact, redaction, and lane-migration boundaries.
 ## Related Documents
 
 - Product requirements: [`docs/PRD.md`](PRD.md)

@@ -11,7 +11,11 @@
     "lint": "npm run check",
     "test": "npm run check && npm run test:render",
     "test:render": "vitest run",
-    "test:e2e": "playwright test --config ./playwright.config.ts"
+    "test:e2e": "playwright test --config ./playwright.config.ts",
+    "test:e2e:ci-safe": "playwright test --config ./playwright.ci-safe.config.ts --project=chromium-ci-safe --retries=0",
+    "test:e2e:smoke": "playwright test --config ./playwright.smoke.config.ts --project=chromium-ci-safe --retries=0",
+    "test:e2e:runtime": "playwright test --config ./playwright.runtime.config.ts --project=chromium-ci-safe --retries=0",
+    "test:e2e:live": "playwright test --config ./playwright.live.config.ts --project=live-openrouter --retries=0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.8",

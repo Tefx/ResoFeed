@@ -1,6 +1,6 @@
 # Playwright Comprehensive E2E Harness Contract
 
-Status: contract lock only. This document defines the launch, matrix, artifact, and live-secret boundaries for a future comprehensive Playwright harness. It does not implement product behavior, fake product states, sidecar processes, queues, sync, accounts, vector search, or new UI concepts.
+Status: implemented harness contract. The harness verifies the real `cmd/resofeed` deployable and preserves the product, storage, authentication, and runtime-secret boundaries below. It does not implement product behavior, fake comprehensive-browser states, sidecar product processes, queues, sync, accounts, vector search, or new UI concepts.
 
 ## Source Basis
 
@@ -46,25 +46,43 @@ Harness wiring may choose a concrete free port instead of `:0` if the current bi
 - captured server stdout/stderr for every run.
 
 ## Browser E2E Command Contract
-
-`web/package.json` does not currently define `test:e2e`, so the locked fallback command for the harness step is:
-
-```bash
-npm --prefix web exec playwright test -- --config web/playwright.config.ts
-```
-
-Once the harness step wires `web/playwright.config.ts`, it should add/route the preferred command:
+`web/package.json` exposes explicit lanes:
 
 ```bash
 npm --prefix web run test:e2e
+npm --prefix web run test:e2e:ci-safe
+npm --prefix web run test:e2e:smoke
+npm --prefix web run test:e2e:runtime
 ```
 
-The Playwright config must be responsible for building or reusing the real binary, launching the real server, setting the base URL from the bound server, writing all artifacts under a test-artifact directory, and cleaning up the temporary SQLite DB unless preservation is explicitly requested for failed-run evidence.
+`test:e2e:smoke` and `test:e2e:runtime` launch the real binary with test-case-local SQLite, browser state, loopback port, process, logs, and cleanup evidence. `test:e2e:ci-safe` preserves the established browser-contract collection while excluding live OpenRouter cases. All deterministic lanes run with one worker and zero retries. Reports and runtime evidence stay under `.test-artifacts/playwright/`, which is runtime output rather than portable product state.
+
+Live OpenRouter remains opt-in through `npm --prefix web run test:e2e:live` with `OPENROUTER_KEY` supplied only by the runtime environment.
+
+### Config Boundaries
+
+- `playwright.base.config.ts` defines zero-retry Chromium defaults and ordinary Playwright artifacts.
+- `playwright.config.ts` preserves the established comprehensive collection and real-binary global setup.
+- `playwright.smoke.config.ts` and `playwright.runtime.config.ts` select the case-local fixture lanes.
+- `playwright.ci-safe.config.ts` selects deterministic Chromium only.
+- `playwright.live.config.ts` selects the explicit live project only.
+- `playwright.browser-contract.config.ts` remains the browser-contract alias.
+
+The project-native `scripts/vectl-check.mjs` adapter emits `vectl.check.selection.v1` and `vectl.check.evidence.v1` envelopes. Every evidence artifact uses the central Gate's exact object shape, `{"path":"<repository-relative-file>","sha256":"sha256:<digest>"}`. The adapter recursively enumerates retained ordinary Playwright and lane-discovery files instead of submitting directory or string-path artifacts, and hashes the already-redacted files in repository state. It wraps native Go, Vitest, and Playwright commands while leaving tool-specific interpretation inside the repository.
 
 ### Preliminary Collection Config Aliases
+`web/playwright.browser-contract.config.ts` remains a compatibility alias for the established comprehensive collection. `web/playwright.runtime.config.ts` selects only the case-local `runtime.spec.ts` fixture lane. Both preserve the project-native Chromium identity, zero-retry policy, standard artifact policy, and real `cmd/resofeed` launch boundary.
 
-`web/playwright.browser-contract.config.ts` and `web/playwright.runtime.config.ts` are preliminary collection scaffolds. Each alias re-exports `web/playwright.config.ts` unchanged, preserving the project-native `chromium-ci-safe` project, global setup and teardown, artifact policy, runtime environment, retry policy, and single-binary launch boundary. They add no runtime, fixtures, helpers, package scripts, route interception, or evidence schema. Full per-case isolation, lifecycle enforcement, and retained-failure evolution remain owned by `rf-bug-010-harness-foundation`.
+The foundation does not add a product reset API, route interception, registry, queue, or second runtime. Case-local fixtures own the SQLite database, loopback port, real process, clean Playwright context, redacted runtime/browser diagnostics, and cleanup record.
+### Foundation Evidence Boundary
 
+The project-native foundation check is:
+
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-harness-foundation rf_bug_v2_harness_foundation_green
+```
+
+It emits the generic `vectl.check.selection.v1` / `vectl.check.evidence.v1` contract and proves four identities: adapter envelope, intentional-failure artifact retention, case-local lifecycle isolation, and native lane discovery. Lane discovery uses Playwright `--list` only for the legacy three-file set and replacement five-file set. The foundation check does not execute either product-semantic lane and does not claim Search, Source Ledger, State, route, or responsive behavior. Downstream implementation and independent runtime-verification phases own those semantic executions and the final list/run identity comparison.
 ## Deterministic CI-Safe Matrix
 These cases run with zero retries and without live LLM credentials; the child environment explicitly clears `OPENROUTER_KEY`.
 
@@ -81,13 +99,12 @@ These cases run with zero retries and without live LLM credentials; the child en
 11. **Intentional failure proof:** one deliberate assertion failure retains the ordinary Playwright report, trace, screenshot, video, redacted runtime/browser diagnostics, runtime identity, database location, and cleanup outcome.
 
 ## Live OpenRouter Smoke Boundary
-
-Live LLM checks are opt-in only and must be separated from deterministic CI-safe cases by a Playwright project, grep, or tag such as `@llm-live` / `@live-openrouter`.
+Live LLM checks are opt-in only and separated from deterministic CI-safe cases through the `live-openrouter` project and `@llm-live` / `@live-openrouter` tags.
 
 Locked live command:
 
 ```bash
-OPENROUTER_KEY="$OPENROUTER_KEY" npm --prefix web run test:e2e -- --grep @llm-live
+OPENROUTER_KEY="$OPENROUTER_KEY" npm --prefix web run test:e2e:live
 ```
 
 Live smoke requirements:
@@ -98,21 +115,18 @@ Live smoke requirements:
 - fail before binding or assert the documented startup error when `OPENROUTER_KEY` is empty/whitespace/invalid;
 - record only redacted evidence such as `OPENROUTER_KEY=<redacted>; source=os_env` or `source=.env`;
 - exercise the smallest live path necessary to prove OpenRouter JSON-in/JSON-out utility wiring and `/doctor` redaction.
-
 ## Required Evidence Artifacts
+Every comprehensive E2E run emits or retains the applicable ordinary evidence:
 
-Every comprehensive E2E run must emit or retain:
+- Playwright HTML and machine-readable result reports for the comprehensive collection;
+- trace, screenshot, and video for failed tests according to the active config;
+- per-case redacted server stdout/stderr, browser diagnostics, and `runtime-cleanup.txt` for isolated lanes;
+- binary path, case-local SQLite path, loopback port, process outcome, and cleanup outcome;
+- foundation lane-discovery JSON with exact native project/file/title identities for the old-three and replacement-five sets, without test execution;
+- downstream lane-migration JSON list/run reports with identical native project/file/title identities after the product-semantic repairs are available;
+- sanitized evidence with owner token, OpenRouter/Tavily keys, Authorization, Cookie, credential-bearing URL, and provider-body material removed.
 
-- Playwright HTML report and machine-readable JSON/JUnit result;
-- trace archive for failed tests and contract-critical happy paths;
-- screenshots for first-use prompt, accepted shell, Source Ledger, Inspector, search, responsive desktop/mobile, and visual invariant cases;
-- video for failed tests and interaction-heavy flows where applicable;
-- server stdout and stderr with owner token and `OPENROUTER_KEY` redacted;
-- exact SQLite DB fixture path and preservation/cleanup status;
-- sanitized environment note listing allowed variables and explicitly stating whether `OPENROUTER_KEY` was absent, redacted from OS env, or redacted from `.env`;
-- launched binary path, build command, launch command with token/secret redactions, base URL, worker id, and timestamps;
-- browser console and network summaries with authorization headers and secrets redacted.
-
+Case teardown terminates the owned process, verifies the loopback port is closed, removes SQLite/WAL/SHM files, and fails when residue remains. The runtime starts from the case-local artifact directory with an allow-listed environment, so repository `.env` fallback and ambient live-provider credentials cannot enter deterministic runs. Failed assertions still run fixture teardown and retain their ordinary Playwright artifacts.
 ## Forbidden Scope Guard
 
 The harness contract must not introduce or rely on:
