@@ -186907,11 +186907,13 @@ phases:
 - id: rf-bug-assurance-v2-ledger-prompting
   name: RF-BUG Assurance v2 Ledger and Prompting
   status: in_progress
-  gate: Responsive Source Ledger/State operations and Prompting v2.2 paths pass protected
-    identities and independent real browser/runtime proof; the immutable replacement-five
-    inventory then closes RF-BUG-010 lane migration with 29/29 green, zero retry/skip,
-    old-three selected/executed equivalence, cleanup, redaction, and unchanged protected
-    acceptance.
+  gate: Authorized RF-BUG-002 token-contract remediation first establishes canonical
+    `~` plus unpadded UTF-8 base64url protected acceptance. Responsive Source Ledger/State
+    operations and Prompting v2.2 paths then pass preserved identities and independent
+    real browser/runtime proof; the immutable replacement-five inventory closes RF-BUG-010
+    lane migration with 29/29 green, zero retry/skip, old-three selected/executed
+    equivalence, cleanup, redaction, raw item-path rejection, and protected acceptance
+    unchanged from the admitted post-remediation baseline.
   depends_on:
   - rf-bug-assurance-v2-runtime
   steps:
