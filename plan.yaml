@@ -185499,7 +185499,7 @@ phases:
       - docs/DESIGN.md'
   - id: rf-bug-v2-frontend-behavior-gate
     name: RF-BUG Assurance v2 frontend Full Gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -185539,6 +185539,8 @@ phases:
     depends_on:
     - rf-bug-v2-frontend-runtime-verification
     agent: gate-reviewer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T09:52:24.974609+00:00'
   - id: rf-bug-v2-generic-adapter-remediation
     name: Generalize v2 evidence adapter across pending consumer profiles
     status: done
