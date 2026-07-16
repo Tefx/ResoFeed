@@ -187251,25 +187251,27 @@ phases:
       asset substitution, credential exposure, current-operation priority loss, or
       a loopback allowance reachable from an untagged production binary blocks the
       gate.'
-    verification: Real binary, package-local embedded bundle, browser, SQLite, and
-      runtime proof covers all authorized contract baselines; the independent eager
-      Node/global fetch actor with exact bearer Authorization, exact application/json
-      Content-Type, exact body '{}', exact request-start/poll/click sequence, exact
-      `source_fetch` / `human` / `fetching_feed`, and Response.status 200; canonical
-      item-token use and raw-path rejection; preserved Prompting/delete/operations
-      identities and assertions; the same physical RUN INGEST control across dynamic
-      accessible-name states; five viewport Ledger/State rendering and operations;
-      accessibility/delete focus; Prompting v2.2 across all paths; atomic preservation;
-      production-only active-name scanning; and redaction without main-checkout or
-      external-asset substitution. Independently rerun `go test -race ./internal/resofeed
+    verification: First rerun `node scripts/vectl-check.mjs run rf-bug-v2-prompting
+      rf_bug_v2_prompting_green` on the integrated head after `rf-bug-v2-prompting-e2e-harness-remediation`;
+      require exact four selected/executed identities, exact sixteen protected Prompting
+      subtests, and protected acceptance unchanged. Confirm the protected loopback
+      extraction command alone compiles/tests with `-tags resofeed_e2e` and exact
+      child `RESOFEED_E2E=1`, while the other Prompting regression command remains
+      untagged/strict. Independently prove the normal untagged production build/test
+      rejects loopback even when `RESOFEED_E2E=1` is present, with tag-only and environment-only
+      cases strict, no global/CLI/general bypass, and no production SSRF relaxation.
+      Then rerun all previously declared real binary, package-local embedded bundle,
+      browser, SQLite, Source Ledger/State, current-operation race/priority, Prompting
+      parity/atomicity/redaction, fixture-boundary, and protected-baseline seams.
+      The eager independent Node/global fetch actor must retain exact bearer Authorization,
+      exact application/json Content-Type, exact body '{}', exact request-start/poll/click
+      ordering, exact `source_fetch` / `human` / `fetching_feed`, Response.status
+      200, and zero retries. Independently rerun `go test -race ./internal/resofeed
       -run '^(TestICACurrentOperationBackgroundSnapshotOwnership|TestICACurrentOperationForegroundPriorityOverBackgroundSourceLifecycle)$'
-      -count=1 -v` on the integrated head. Confirm exact `source_fetch` / `human`
-      / `fetching_source` visibility survives both rejected and concurrently acquired
-      background source work, foreground count/message ownership survives background
-      aggregate updates until release, and remaining background work then becomes
-      visible, updates, and clears normally; any race report, overwrite, early clear,
-      acceptance diff, guard-capacity/conflict regression, or persisted operation
-      ledger blocks admission.
+      -count=1 -v`; any race report, overwrite, early clear, acceptance diff, adapter
+      identity/subtest mismatch, untagged loopback allowance, guard-capacity/conflict
+      regression, persisted operation ledger, retry, skip, stale embedded assets,
+      or external substitution blocks admission.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
@@ -187280,9 +187282,12 @@ phases:
     - web/tests/e2e/source-ledger-operations.runtime.spec.ts
     - web/package.json
     - go.mod
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
     depends_on:
     - rf-bug-v2-source-ledger-responsive
     - rf-bug-v2-prompting-v22
+    - rf-bug-v2-prompting-e2e-harness-remediation
     agent: integration-verifier
   - id: rf-bug-v2-ledger-prompting-gate
     name: RF-BUG Assurance v2 ledger-prompting Full Gate
