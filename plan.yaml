@@ -189009,12 +189009,12 @@ phases:
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/routes.browser-contract.spec.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
-      \ classification: acceptance, availability: current}\n    selection:\n     \
-      \ command: [python3, -c, \"import hashlib,json; ids=['RF-BUG-010 foundation\
+      \ classification: acceptance, availability: current}\n      selection:\n   \
+      \     command: [python3, -c, \"import hashlib,json; ids=['RF-BUG-010 foundation\
       \ smoke isolation','RF-BUG-010 replacement runtime isolation']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_adapter_runtime_isolation_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\"\
-      \ ]\n      timeout_seconds: 30\n      cardinality: {exact: 2}\n      required_ids:\
+      \ ]\n        timeout_seconds: 30\n        cardinality: {exact: 2}\n        required_ids:\
       \ ['RF-BUG-010 foundation smoke isolation', 'RF-BUG-010 replacement runtime\
-      \ isolation']\n      forbidden_ids: []\n    expect:\n      outcome: green\n\
+      \ isolation']\n        forbidden_ids: []\n    expect:\n      outcome: green\n\
       \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
       \ RF-BUG-010_FOUNDATION_SMOKE=green}, {literal: RF-BUG-010_REPLACEMENT_SELECTED=29},\
       \ {literal: RF-BUG-010_REPLACEMENT_EXECUTED=29}, {literal: RF-BUG-010_REPLACEMENT_FILES_ISOLATED=5},\
