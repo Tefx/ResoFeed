@@ -188988,9 +188988,9 @@ phases:
       \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
       \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts, docs/BUG_FIX_PLAN_2026-07-12.md,\
       \ docs/BUG_REPORT_2026-07-11.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
-      \ .agent/, .venv/, .test-artifacts/]\nclaims: [RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION]\n\
-      checks:\n  - id: rf_bug_v2_adapter_runtime_isolation_green\n    run: {command:\
-      \ [node, scripts/vectl-check.mjs, run, rf-bug-v2-adapter-runtime-isolation-remediation,\
+      \ .agent/, .venv/]\nclaims: [RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION]\nchecks:\n\
+      \  - id: rf_bug_v2_adapter_runtime_isolation_green\n    run: {command: [node,\
+      \ scripts/vectl-check.mjs, run, rf-bug-v2-adapter-runtime-isolation-remediation,\
       \ rf_bug_v2_adapter_runtime_isolation_green], timeout_seconds: 1800}\n    evidence:\n\
       \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
       \ access: execute, availability: produced_by_step}\n        - {path: scripts/rf-bug-010-standard-json.mjs,\
