@@ -186529,7 +186529,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-runtime-security-review
     name: Review v2 runtime security authorization and rollback
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -186563,6 +186563,34 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T13:58:43.295955+00:00'
+    done_at: '2026-07-16T14:03:48.728247+00:00'
+    evidence: 'Artifact:
+
+      - Reviewed target: 5129e7418e0dffb57534dd686a27ca4ff5ed540d
+
+
+      Verification:
+
+      - RF-BUG-003/004/005 -> PROVEN; intent met; downstream contract unchanged
+
+      - Prior Doctor credential and residual Go OPML export blockers closed by 91e274e8
+
+      - RF-BUG-005 CSP/middleware/prebind/streaming/cancellation/Chromium proof retained
+
+      - Protected acceptance, user docs, and fail-closed rollback verified
+
+      - Semantic validator -> CONFORMANT
+
+      - Review receipt: sha256:836c2bdb68267038fe84dfa80cdab0f05d749cacad1dfad1fe4393722d267ff9
+
+
+      Spec link:
+
+      - prior rejected receipt sha256:2507973a47bad4aad91945c464aff438707f9f3de075d99d876a33c949ce72fc
+
+      - docs/ARCHITECTURE.md
+
+      - AGENTS.md'
   - id: rf-bug-v2-runtime-boundaries-gate
     name: RF-BUG Assurance v2 runtime-boundaries Full Gate
     status: pending
