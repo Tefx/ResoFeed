@@ -185835,7 +185835,7 @@ phases:
       - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md'
   - id: rf-bug-v2-architecture-route-doc-parity-remediation
     name: Correct committed HTTP/MCP item-route architecture parity
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
       \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY. On the clean detached remediation worktree\
@@ -185924,6 +185924,8 @@ phases:
     depends_on:
     - rf-bug-v2-frontend-runtime-verification
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T10:32:25.604188+00:00'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
