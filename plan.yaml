@@ -185220,7 +185220,7 @@ phases:
   steps:
   - id: rf-bug-v2-frontend-runtime-integration
     name: Integrate and re-observe preserved frontend runtime remediation
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for active `rf-bug-frontend-runtime-remediation`; this phase remains locked\
@@ -185296,6 +185296,8 @@ phases:
     - web/tests/e2e/routes.browser-contract.spec.ts
     - web/tests/e2e/inspector-selection.browser-contract.spec.ts
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T08:13:55.794180+00:00'
   - id: rf-bug-v2-go-token-parity-integration
     name: Integrate and re-observe preserved HTTP/MCP token parity remediation
     status: pending
