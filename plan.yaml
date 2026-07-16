@@ -185210,7 +185210,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
 - id: rf-bug-assurance-v2-frontend
   name: RF-BUG Assurance v2 Frontend and Token-Parity Integration
-  status: in_progress
+  status: done
   gate: The generic adapter remains independently proven; preserved frontend and token
     work remains proven across real browser, HTTP, MCP, and SQLite seams; one core/application
     delivery operation exclusively owns SQLite delivery mutation and is independently
@@ -185500,7 +185500,7 @@ phases:
       - docs/DESIGN.md'
   - id: rf-bug-v2-frontend-behavior-gate
     name: RF-BUG Assurance v2 frontend Full Gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -185561,6 +185561,36 @@ phases:
     agent: gate-reviewer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T11:57:26.424189+00:00'
+    done_at: '2026-07-16T12:14:30.029338+00:00'
+    evidence: 'Artifact:
+
+      - Full Gate target: e85d4a0fba6b6bd94b67b925cd85d28f3972c1b6
+
+
+      Verification:
+
+      - Eight scoped requirements -> 8/8 PROVEN
+
+      - Shared delivery static ownership and direct HTTP/MCP/SQLite focused runtime
+      -> PASS
+
+      - Adapter, frontend, canonical docs, protected acceptance, and user-state isolation
+      -> PASS
+
+      - Four future-red refs bounded only
+
+      - Semantic Full Gate validator -> CONFORMANT
+
+      - Gate receipt: sha256:cd0be23ba29b8f55f0f85e38555f85a146343cf66d9f559649cf048fe982c7f9
+
+
+      Spec link:
+
+      - rf-bug-assurance-v2-frontend gate scope
+
+      - docs/ARCHITECTURE.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-generic-adapter-remediation
     name: Generalize v2 evidence adapter across pending consumer profiles
     status: done
@@ -186121,7 +186151,7 @@ phases:
       - docs/ARCHITECTURE.md'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
-  status: locked
+  status: pending
   gate: Embedded UI, Doctor, auth-first OPML import-only state, HTTP security headers/CSP,
     streaming/cancellation, independent runtime proof, and R3 rollback review pass
     under v2.
