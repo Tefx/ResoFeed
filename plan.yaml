@@ -188920,6 +188920,184 @@ phases:
       emitted exact two-ID green evidence with 30 API subtests and HTTP/MCP/FTS parity
       under exact E2E keys, while nested outbound harness proved untagged production
       strictness. Receipt sha256:3350820648c3272fdc0cb9eb331fbc6dcdd426c6eff9ad025d32edf9efc420bf.
+  - id: rf-bug-v2-adapter-runtime-isolation-remediation
+    name: Repair replacement-lane runtime isolation and foundation smoke sequencing
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for integration-verifier FAIL receipt `sha256:9c028197f325979a7998c8d6ce8b0bbbc54c2140871688957e8ed0b9bf5c6a52`\
+      \ against immutable integrated HEAD `69dd89f5c040567358ca97816c0f9132a6062e07`,\
+      \ with raw evidence `/tmp/larva-agent-artifacts/integration-verifier_replacement_run.raw.log#sha256=11f525980705cc83c2c2b036227082b00858083a42c662a245f5083f5fbd1bda`.\
+      \ Repair only the project-native JavaScript/TypeScript adapter and Playwright\
+      \ harness boundary; the dominant mutable surface is the adapter/harness, so\
+      \ `frontend-engineer` owns this cohesive rollback unit. Keep the Go real-binary\
+      \ fixture contract read-only and do not change product behavior or protected\
+      \ acceptance.\n\nFirst reproduce and diagnose the foundation profile's real-binary\
+      \ smoke failure at its exact artifact-proof, smoke, and runtime invocation boundaries.\
+      \ Repair deterministic teardown and scratch/artifact cleanup between those invocations\
+      \ so a completed artifact-proof run cannot contaminate the following smoke,\
+      \ runtime, or lane-discovery process. Preserve the intentional artifact-proof\
+      \ nonzero outcome, required standard artifacts, redaction, residue failure,\
+      \ sanitized child environment, and real `cmd/resofeed` binary/SQLite/browser\
+      \ seam.\n\nExtend the project-native v2 adapter with one bounded replacement-isolation\
+      \ profile. Discover the immutable replacement-five inventory natively, then\
+      \ execute each replacement file in a separate Playwright process so every file\
+      \ receives a fresh case-local real binary, SQLite database, browser context,\
+      \ owned port/process, and cleanup boundary; if an existing file contains an\
+      \ explicitly stateful case group, preserve equivalent or stronger case-group\
+      \ isolation without editing that acceptance file. Aggregate exact selected and\
+      \ executed identity from the five native JSON reports and require exactly 29\
+      \ unique replacement tests, 29/29 green, zero retry, zero skip, and no missing/duplicate\
+      \ identity. Execute the native old-three inventory after replacement with the\
+      \ same selected/executed parity check. Retain redacted standard artifacts and\
+      \ per-invocation cleanup evidence, fail on process/port/database residue, and\
+      \ prove the protected replacement-five files remain byte-identical to the admitted\
+      \ baseline. The adapter must reject shared-runtime aggregate execution that\
+      \ allows processing-language state to leak from initial-route/routes into responsive/delete\
+      \ cases.\n\nAdd focused adapter tests for command sequencing, per-file isolation,\
+      \ selected/executed aggregation, 29-test cardinality, zero retry/skip, cleanup\
+      \ after success/failure, redaction, protected-baseline refusal, and foundation\
+      \ artifact-proof/smoke/runtime cleanup ordering. Update `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`\
+      \ and `docs/USAGE.md` synchronously with the project-native profile, isolation\
+      \ boundary, evidence envelope, artifact retention, and troubleshooting behavior.\
+      \ Do not mutate the five replacement acceptance files, old-three acceptance\
+      \ sources, product Go/Svelte code, snapshots, or canonical bug-plan/report documents.\
+      \ Rollback reverts adapter, adapter tests, harness config/fixture support, and\
+      \ documentation together.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/rf-bug-010-standard-json.mjs,\
+      \ web/playwright.base.config.ts, web/playwright.browser-contract.config.ts,\
+      \ web/playwright.ci-safe.config.ts, web/playwright.smoke.config.ts, web/playwright.runtime.config.ts,\
+      \ web/src/lib/playwright-e2e-harness-contract.ts, web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts,\
+      \ web/tests/e2e/fixtures/runtime-fixture.ts, web/tests/e2e/fixtures/test-db.ts,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, docs/USAGE.md]\n  blocked_paths:\
+      \ [cmd/**, internal/resofeed/**, web/src/routes/**, web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts,\
+      \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts, web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts,\
+      \ web/tests/e2e/inspector-selection.browser-contract.spec.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
+      \ web/tests/e2e/routes.browser-contract.spec.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
+      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
+      \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts, docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/BUG_REPORT_2026-07-11.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
+      \ .agent/, .venv/, .test-artifacts/]\nclaims: [RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION]\n\
+      checks:\n  - id: rf_bug_v2_adapter_runtime_isolation_green\n    run: {command:\
+      \ [node, scripts/vectl-check.mjs, run, rf-bug-v2-adapter-runtime-isolation-remediation,\
+      \ rf_bug_v2_adapter_runtime_isolation_green], timeout_seconds: 1800}\n    evidence:\n\
+      \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: produced_by_step}\n        - {path: scripts/rf-bug-010-standard-json.mjs,\
+      \ access: execute, availability: current}\n        - {path: web/playwright.ci-safe.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/playwright.smoke.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/playwright.runtime.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
+      \ access: read, availability: current}\n        - {path: web/tests/e2e/fixtures/test-db.ts,\
+      \ access: read, availability: current}\n        - {path: web/package.json, access:\
+      \ read, availability: current}\n        - {path: web/package-lock.json, access:\
+      \ read, availability: current}\n        - {path: go.mod, access: read, availability:\
+      \ current}\n      test_bindings:\n        - {path: scripts/vectl-check.test.mjs,\
+      \ classification: developer, availability: current}\n        - {path: web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts,\
+      \ classification: developer, availability: current}\n        - {path: web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/initial-route.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/routes.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n    selection:\n     \
+      \ command: [python3, -c, \"import hashlib,json; ids=['RF-BUG-010 foundation\
+      \ smoke isolation','RF-BUG-010 replacement runtime isolation']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_adapter_runtime_isolation_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\"\
+      \ ]\n      timeout_seconds: 30\n      cardinality: {exact: 2}\n      required_ids:\
+      \ ['RF-BUG-010 foundation smoke isolation', 'RF-BUG-010 replacement runtime\
+      \ isolation']\n      forbidden_ids: []\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ RF-BUG-010_FOUNDATION_SMOKE=green}, {literal: RF-BUG-010_REPLACEMENT_SELECTED=29},\
+      \ {literal: RF-BUG-010_REPLACEMENT_EXECUTED=29}, {literal: RF-BUG-010_REPLACEMENT_FILES_ISOLATED=5},\
+      \ {literal: RF-BUG-010_OLD_SELECTED_EXECUTED=equal}, {literal: RF-BUG-010_RETRIES=0},\
+      \ {literal: RF-BUG-010_SKIPS=0}, {literal: RF-BUG-010_CLEANUP=clean}, {literal:\
+      \ VECTL_GENERIC_EVIDENCE=valid}]\n        contains_any: []\n        forbids:\
+      \ [{literal: protected acceptance baseline changed}, {literal: leaked resource},\
+      \ {literal: secret-bearing artifact}, {literal: shared replacement runtime},\
+      \ {literal: No tests found}]\n    proves: [RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-adapter-runtime-isolation-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"real_binary_test_harness\",\"cross_process_runtime_isolation\"\
+      ,\"public_release_evidence_adapter\"],\"primary_outcome\":\"RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION\",\"atom\":\"foundation smoke sequencing\
+      \ and immutable replacement-five execution use deterministic clean real-binary\
+      \ runtime boundaries with exact selected/executed evidence\",\"modality\":\"\
+      runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_adapter_runtime_isolation_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-adapter-runtime-isolation-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ,\"web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts\",\"web/tests/e2e/fixtures/runtime-fixture.ts\"\
+      ,\"web/tests/e2e/fixtures/test-db.ts\"],\"acceptance_test_paths\":[\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"web/tests/e2e/routes.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\",\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_adapter_runtime_isolation_green\"],\"\
+      acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The project-native v2 adapter's focused tests and exact real-runtime
+      profile prove foundation artifact-proof/smoke/runtime cleanup ordering, one
+      fresh real-binary/SQLite/browser process per immutable replacement file, exact
+      aggregate 29 selected and 29 executed green identities, old-three parity, zero
+      retry/skip, cleanup/redaction/artifacts, protected acceptance unchanged, and
+      synchronized harness documentation.
+    refs:
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - docs/USAGE.md
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    - scripts/rf-bug-010-standard-json.mjs
+    - web/playwright.ci-safe.config.ts
+    - web/playwright.smoke.config.ts
+    - web/playwright.runtime.config.ts
+    - web/tests/e2e/fixtures/runtime-fixture.ts
+    - web/tests/e2e/fixtures/test-db.ts
+    - web/package.json
+    - go.mod
+    depends_on:
+    - rf-bug-v2-ledger-prompting-verification
+    agent: frontend-engineer
+  - id: rf-bug-v2-adapter-runtime-isolation-verification
+    name: Independently verify adapter runtime isolation remediation
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Independently execute the remediated project-native v2 adapter against the integrated
+      real `cmd/resofeed` binary. Reproduce the foundation artifact-proof, smoke,
+      runtime, and lane-discovery sequence and prove deterministic cleanup between
+      each invocation. Then discover and execute all five immutable replacement files
+      through separate fresh case-local real-binary/SQLite/browser processes, correlate
+      native selected and executed JSON identities to exactly 29 unique tests and
+      29/29 green, and prove zero retry/skip, no duplicate/missing identity, no cross-file
+      processing-language state inheritance, closed ports/processes, removed case-local
+      databases, redacted retained standard artifacts, and protected acceptance byte-identical
+      to the admitted baseline. Execute the native old-three inventory afterward and
+      prove selected/executed identity parity. Any mock product seam, route interception,
+      shared replacement runtime, foundation smoke failure, residue, secret-bearing
+      artifact, acceptance diff, retry, skip, or identity drift fails verification.'
+    verification: Independent L3 real-runtime evidence proves the foundation sequence
+      and replacement-five/old-three adapter profile from one integrated head, including
+      exact 29/29 replacement identity, per-file fresh runtime boundaries, cleanup/redaction/artifacts,
+      protected acceptance immutability, and zero retry/skip.
+    refs:
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - scripts/vectl-check.mjs
+    - scripts/rf-bug-010-standard-json.mjs
+    - web/playwright.ci-safe.config.ts
+    - web/playwright.smoke.config.ts
+    - web/playwright.runtime.config.ts
+    - web/tests/e2e/fixtures/runtime-fixture.ts
+    - web/tests/e2e/fixtures/test-db.ts
+    - web/tests/e2e/inspector-selection.browser-contract.spec.ts
+    - web/tests/e2e/initial-route.browser-contract.spec.ts
+    - web/tests/e2e/routes.browser-contract.spec.ts
+    - web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts
+    - web/tests/e2e/source-ledger-delete.browser-contract.spec.ts
+    - web/package.json
+    - go.mod
+    depends_on:
+    - rf-bug-v2-adapter-runtime-isolation-remediation
+    agent: integration-verifier
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
