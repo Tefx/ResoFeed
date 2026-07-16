@@ -186797,23 +186797,23 @@ phases:
       \ tests/rf_bug_canonical_contract_test.go, classification: acceptance, availability:\
       \ current}\n      selection:\n        command:\n          - python3\n      \
       \    - -c\n          - >-\n            import hashlib,json; ids=['RF-BUG-003\
-      \ canonical embedded Doctor contract','RF-BUG-004 canonical import-only State\
-      \ contract','RF-BUG-005 canonical CSP interaction contract','RF-BUG-003/004/005\
-      \ protected canonical scan']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_runtime_doc_contract_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \ canonical embedded Doctor contract','RF-BUG-003/004/005 protected canonical\
+      \ scan','RF-BUG-004 canonical import-only State contract','RF-BUG-005 canonical\
+      \ CSP interaction contract']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_runtime_doc_contract_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 4}\n        required_ids:\
-      \ ['RF-BUG-003 canonical embedded Doctor contract', 'RF-BUG-004 canonical import-only\
-      \ State contract', 'RF-BUG-005 canonical CSP interaction contract', 'RF-BUG-003/004/005\
-      \ protected canonical scan']\n        forbidden_ids: []\n    expect:\n     \
-      \ outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
-      \ [{literal: RF_BUG_RUNTIME_DOC_ARCH_CSP_FRAGMENT=complete}, {literal: RF_BUG_RUNTIME_DOC_DESIGN_ATOMS=3},\
-      \ {literal: RF_BUG_RUNTIME_DOC_DOCTOR_REDACTION=complete}, {literal: RF_BUG_RUNTIME_DOC_CSP_INTERACTIONS=complete},\
-      \ {literal: RF_BUG_CANONICAL_DOCUMENTS=9}, {literal: OPML_EXCLUSIONS=2}, {literal:\
-      \ VECTL-ADAPTER pending-profile-discovery}]\n        contains_any: []\n    \
-      \    forbids: [{literal: no tests to run}, {literal: broad exclusion}, {literal:\
-      \ unsafe-inline permitted}]\n    proves: [RF-BUG-003, RF-BUG-004, RF-BUG-005]\n\
-      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
-      :\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-doc-contract-remediation\"\
+      \ ['RF-BUG-003 canonical embedded Doctor contract', 'RF-BUG-003/004/005 protected\
+      \ canonical scan', 'RF-BUG-004 canonical import-only State contract', 'RF-BUG-005\
+      \ canonical CSP interaction contract']\n        forbidden_ids: []\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: RF_BUG_RUNTIME_DOC_ARCH_CSP_FRAGMENT=complete},\
+      \ {literal: RF_BUG_RUNTIME_DOC_DESIGN_ATOMS=3}, {literal: RF_BUG_RUNTIME_DOC_DOCTOR_REDACTION=complete},\
+      \ {literal: RF_BUG_RUNTIME_DOC_CSP_INTERACTIONS=complete}, {literal: RF_BUG_CANONICAL_DOCUMENTS=9},\
+      \ {literal: OPML_EXCLUSIONS=2}, {literal: VECTL-ADAPTER pending-profile-discovery}]\n\
+      \        contains_any: []\n        forbids: [{literal: no tests to run}, {literal:\
+      \ broad exclusion}, {literal: unsafe-inline permitted}]\n    proves: [RF-BUG-003,\
+      \ RF-BUG-004, RF-BUG-005]\nbindings: {expected_red: {items: []}, closes_expected_red:\
+      \ []}\n</intent_closure_contract>\n<vectl_step_policy>\n{\"schema_version\"\
+      :\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-doc-contract-remediation\"\
       ,\"risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_contract_repair\",\"\
       bounded_adapter_profile\"],\"primary_outcome\":\"RF-BUG-003\",\"rollback_class\"\
       :\"TRIVIAL\",\"observation_ledger\":[],\"test_authority\":{\"developer_test_globs\"\
