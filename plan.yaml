@@ -186601,7 +186601,7 @@ phases:
     agent: gate-reviewer
   - id: rf-bug-v2-runtime-review-remediation
     name: Remediate Doctor URL redaction and residual Go OPML export
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for rejected semantic receipt `sha256:2507973a47bad4aad91945c464aff438707f9f3de075d99d876a33c949ce72fc`\
@@ -186678,6 +186678,8 @@ phases:
     depends_on:
     - rf-bug-v2-runtime-boundaries-verification
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T13:49:40.010266+00:00'
 - id: rf-bug-assurance-v2-ledger-prompting
   name: RF-BUG Assurance v2 Ledger and Prompting
   status: locked
