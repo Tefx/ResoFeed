@@ -185955,6 +185955,105 @@ phases:
       - docs/ARCHITECTURE.md
 
       - Full Gate blocker ARCH-HTTP-ROUTE-DOC-PARITY'
+  - id: rf-bug-v2-delivery-shared-operation-remediation
+    name: Centralize delivery in one core application operation
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
+      \ close `GATE-DELIVERY-SHARED-OPERATION` on the rebound gate lineage after Full\
+      \ Gate FAIL `sha256:185295f111fb57ef72de87dbcdd309c854694357c9cd5046d05bd1713e2cad65`\
+      \ at target `7cd7abe3fbfae7511a7766810ee1b7bb10851063`. Move the existing delivery\
+      \ state transition into the core/application operation in `internal/resofeed/ranking.go`;\
+      \ make authenticated HTTP delivery and MCP `report_delivery` transport adapters\
+      \ call that same operation; remove the duplicate delivery SQLite mutation and\
+      \ transport-owned `MarkItemDelivered` implementation from `internal/resofeed/mcp.go`.\
+      \ Preserve canonical HTTP route-token and direct raw MCP item-ID boundaries,\
+      \ item existence/error mapping, UTC timestamp behavior, current-state-only persistence,\
+      \ actor provenance, HTTP and MCP idempotency receipts, retry/mismatched-payload\
+      \ behavior, and response envelopes. Extend developer tests in `internal/resofeed/core_blockers_test.go`\
+      \ to prove shared HTTP/MCP behavior, retries, provenance, persistence, and not-found/error\
+      \ semantics. Do not mutate protected acceptance, adapters, canonical docs, frontend,\
+      \ testdata, the main-worktree user edits in `docs/ARCHITECTURE.md` or `docs/DESIGN.md`,\
+      \ untracked `.pi/remote-pi/`, or `docs/ITEM_DEEP_LINKS.md`. Existing architecture\
+      \ docs already state the admitted shared-operation contract and remain read-only\
+      \ authority. Rollback reverts only these four Go-file changes.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [internal/resofeed/ranking.go, internal/resofeed/mcp.go,\
+      \ internal/resofeed/http.go, internal/resofeed/core_blockers_test.go]\n  blocked_paths:\
+      \ [internal/resofeed/rf_bug_item_id_api_expected_red_test.go, internal/resofeed/testdata/**,\
+      \ scripts/**, docs/**, web/**, .pi/remote-pi/**]\n  ignored_runtime_paths: [.git/,\
+      \ .vectl/, .agent/, .venv/]\nclaims: [GATE-DELIVERY-SHARED-OPERATION, RF-BUG-002,\
+      \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\nchecks:\n  - id: delivery_shared_operation_ownership\n\
+      \    run:\n      command:\n        - python3\n        - -c\n        - >-\n \
+      \         from pathlib import Path; ranking=Path('internal/resofeed/ranking.go').read_text(encoding='utf-8');\
+      \ mcp=Path('internal/resofeed/mcp.go').read_text(encoding='utf-8'); http=Path('internal/resofeed/http.go').read_text(encoding='utf-8');\
+      \ mutation='external_surfaced_at = excluded.external_surfaced_at'; assert 'func\
+      \ ReportDelivery(' in ranking, 'core ReportDelivery operation missing'; assert\
+      \ ranking.count(mutation)==1, 'delivery SQLite mutation must have one core owner';\
+      \ assert mutation not in mcp and mutation not in http, 'transport owns delivery\
+      \ SQLite mutation'; assert 'func MarkItemDelivered(' not in mcp, 'transport-owned\
+      \ MarkItemDelivered remains'; assert 'return ReportDelivery(ctx, db, input.ItemID,\
+      \ req)' in mcp, 'MCP does not call core ReportDelivery'; assert 'return ReportDelivery(r.Context(),\
+      \ h.cfg.DB, parts[0], req)' in http, 'HTTP does not call core ReportDelivery';\
+      \ print('GATE_DELIVERY_SHARED_OPERATION=core-owned,http-mcp-shared,sqlite-single')\n\
+      \      timeout_seconds: 60\n    evidence:\n      mode: command_outcome\n   \
+      \   path_bindings:\n        - {path: internal/resofeed/ranking.go, access: read,\
+      \ availability: produced_by_step}\n        - {path: internal/resofeed/mcp.go,\
+      \ access: read, availability: produced_by_step}\n        - {path: internal/resofeed/http.go,\
+      \ access: read, availability: produced_by_step}\n      test_bindings: []\n \
+      \   expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: 'GATE_DELIVERY_SHARED_OPERATION=core-owned,http-mcp-shared,sqlite-single'}]\n\
+      \        contains_any: []\n        forbids: [{literal: 'transport owns delivery\
+      \ SQLite mutation'}, {literal: 'transport-owned MarkItemDelivered remains'},\
+      \ {literal: Traceback}]\n    proves: [GATE-DELIVERY-SHARED-OPERATION]\n  - id:\
+      \ delivery_shared_operation_go_tests\n    run: {command: [go, test, -v, -count=1,\
+      \ ./internal/resofeed], timeout_seconds: 900}\n    evidence:\n      mode: command_outcome\n\
+      \      path_bindings:\n        - {path: go.mod, access: read, availability:\
+      \ current}\n        - {path: internal/resofeed/ranking.go, access: read, availability:\
+      \ produced_by_step}\n        - {path: internal/resofeed/mcp.go, access: read,\
+      \ availability: produced_by_step}\n        - {path: internal/resofeed/http.go,\
+      \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
+      \    - {path: internal/resofeed/core_blockers_test.go, classification: developer,\
+      \ availability: produced_by_step}\n        - {path: internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
+      \ classification: acceptance, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: '--- PASS: TestDeliverySharedApplicationOperationPreservesHTTPMCPParity'},\
+      \ {literal: RF_BUG_002_API_SUBTESTS=30}, {literal: PASS}]\n        contains_any:\
+      \ []\n        forbids: [{literal: '--- FAIL:'}, {literal: 'no tests to run'},\
+      \ {literal: panic}]\n    proves: [GATE-DELIVERY-SHARED-OPERATION, RF-BUG-002,\
+      \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\nbindings:\n  expected_red: {items: []}\n\
+      \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-delivery-shared-operation-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"shared_http_mcp_application_operation\"\
+      ,\"sqlite_current_state_mutation\",\"idempotency_and_provenance_contract\",\"\
+      full_gate_blocker_remediation\"],\"primary_outcome\":\"RF-BUG-002-HTTP-MCP-TOKEN-PARITY\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"GATE-DELIVERY-SHARED-OPERATION\",\"atom\":\"one core application operation\
+      \ exclusively owns the delivery SQLite state transition and both transports\
+      \ depend on it\",\"modality\":\"static\",\"seam\":\"real\",\"check_id\":\"delivery_shared_operation_ownership\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
+      },{\"requirement_id\":\"RF-BUG-002\",\"atom\":\"authenticated HTTP delivery\
+      \ and direct-ID MCP report_delivery preserve shared persistence, provenance,\
+      \ errors, and retry semantics\",\"modality\":\"runtime\",\"seam\":\"real\",\"\
+      check_id\":\"delivery_shared_operation_go_tests\",\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
+      },{\"requirement_id\":\"RF-BUG-002-HTTP-MCP-TOKEN-PARITY\",\"atom\":\"canonical\
+      \ HTTP tokens and direct raw MCP item IDs converge on the same core delivery\
+      \ operation\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"delivery_shared_operation_go_tests\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/core_blockers_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"delivery_shared_operation_go_tests\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: Only the four allowed Go files change; source ownership check proves
+      one core delivery SQLite mutation and both transports call it; full Go package
+      tests prove HTTP/MCP persistence, idempotency, provenance, not-found/error parity,
+      and protected RF-BUG-002 acceptance remains green and unchanged; dirty user
+      docs/untracked files remain untouched.
+    evidence_template: Record integrated commit, exact changed paths, both check outputs,
+      protected acceptance hash/immutability, and preserved dirty user-path status.
+    depends_on:
+    - rf-bug-v2-architecture-route-doc-parity-remediation
+    agent: golang-developer
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
