@@ -187984,7 +187984,7 @@ phases:
       collection passed. Receipt sha256:0333318d6b6a2df4219d480c2750d064ca2d6084579d8d498dc9f38b4f547b01.
   - id: rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock
     name: Repair protected Source Ledger conflict eager HTTP actor
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ protected acceptance contract-lock remediation for valid rejected receipt\
@@ -188134,6 +188134,9 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T18:59:50.537315+00:00'
+    done_at: '2026-07-16T19:03:42.941845+00:00'
+    evidence: Integrated 159feff1aae4e2a1a462bb05505e3c877f040360. Static eager independent
+      fetch/auth/order contract and five-test collection passed. Receipt sha256:c7483318d04be46b4a8cc3efcb93ab3c20c055494de6c301a24772df2e8a0220.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
