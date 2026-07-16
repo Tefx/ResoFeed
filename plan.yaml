@@ -186022,7 +186022,7 @@ phases:
       \ SQLite mutation'}, {literal: 'transport-owned MarkItemDelivered remains'},\
       \ {literal: Traceback}]\n    proves: [GATE-DELIVERY-SHARED-OPERATION]\n  - id:\
       \ delivery_shared_operation_focused_go_tests\n    run:\n      command: [go,\
-      \ test, -v, -count=1, -run, '^(TestDeliverySharedApplicationOperationPreservesHTTPMCPParity|TestHTTPDeliveryRouteValidationIdempotencyAndCoreState|TestRFBUG002OpaqueItemIDAPIPaths|TestRFBUG002CanonicalHTTPMCPParity)$',\
+      \ test, -v, -count=1, -run, '^(TestDeliverySharedApplicationOperationPreservesHTTPMCPParity|TestHTTPDeliveryRouteValidationIdempotencyAndCoreState|TestRFBUG002CanonicalHTTPMCPParity|TestRFBUG002OpaqueItemIDAPIPaths)$',\
       \ ./internal/resofeed]\n      timeout_seconds: 900\n    evidence:\n      mode:\
       \ selected_execution\n      path_bindings:\n        - {path: go.mod, access:\
       \ read, availability: current}\n        - {path: internal/resofeed/ranking.go,\
@@ -186035,16 +186035,16 @@ phases:
       \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go, classification:\
       \ acceptance, availability: current}\n      selection:\n        command:\n \
       \         - python3\n          - -c\n          - >-\n            import hashlib,json;\
-      \ ids=['TestDeliverySharedApplicationOperationPreservesHTTPMCPParity','TestHTTPDeliveryRouteValidationIdempotencyAndCoreState','TestRFBUG002OpaqueItemIDAPIPaths','TestRFBUG002CanonicalHTTPMCPParity'];\
+      \ ids=['TestDeliverySharedApplicationOperationPreservesHTTPMCPParity','TestHTTPDeliveryRouteValidationIdempotencyAndCoreState','TestRFBUG002CanonicalHTTPMCPParity','TestRFBUG002OpaqueItemIDAPIPaths'];\
       \ print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'delivery_shared_operation_focused_go_tests','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 4}\n        required_ids:\
       \ [TestDeliverySharedApplicationOperationPreservesHTTPMCPParity, TestHTTPDeliveryRouteValidationIdempotencyAndCoreState,\
-      \ TestRFBUG002OpaqueItemIDAPIPaths, TestRFBUG002CanonicalHTTPMCPParity]\n  \
+      \ TestRFBUG002CanonicalHTTPMCPParity, TestRFBUG002OpaqueItemIDAPIPaths]\n  \
       \      forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
       \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: '--- PASS:\
       \ TestDeliverySharedApplicationOperationPreservesHTTPMCPParity'}, {literal:\
       \ '--- PASS: TestHTTPDeliveryRouteValidationIdempotencyAndCoreState'}, {literal:\
-      \ '--- PASS: TestRFBUG002OpaqueItemIDAPIPaths'}, {literal: '--- PASS: TestRFBUG002CanonicalHTTPMCPParity'},\
+      \ '--- PASS: TestRFBUG002CanonicalHTTPMCPParity'}, {literal: '--- PASS: TestRFBUG002OpaqueItemIDAPIPaths'},\
       \ {literal: RF_BUG_002_CANONICAL_HTTP_REJECTION=complete}, {literal: RF_BUG_002_API_SUBTESTS=30},\
       \ {literal: PASS}]\n        contains_any: []\n        forbids: [{literal: '---\
       \ FAIL:'}, {literal: 'no tests to run'}, {literal: 'lookup called for invalid\
