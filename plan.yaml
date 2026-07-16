@@ -187446,7 +187446,7 @@ phases:
       and sha256:e6a53b983c50a97256b1ad9f3c74ccbca4a4610f874decf44290fd9f8f04105b'
   - id: rf-bug-v2-source-ledger-ingest-locator-contract-lock
     name: Repair protected RUN INGEST locator contract
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ protected acceptance contract-lock remediation for valid rejected receipt\
@@ -187552,6 +187552,8 @@ phases:
       lists the same five runtime tests without executing or weakening the protected
       product contract.
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T16:40:15.396407+00:00'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
