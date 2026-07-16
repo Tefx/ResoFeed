@@ -187825,7 +187825,7 @@ phases:
       sha256:61e5bfda14791b7c2517f14b2fb8e7a68a4c6e281152315c6559c910d918c491.
   - id: rf-bug-v2-source-ledger-conflict-request-start-contract-lock
     name: Synchronize protected Source Ledger conflict request start
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ protected acceptance contract-lock remediation for valid rejected receipt\
@@ -187961,6 +187961,8 @@ phases:
     depends_on:
     - rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T18:33:54.832602+00:00'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
