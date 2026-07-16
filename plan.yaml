@@ -188811,6 +188811,7 @@ phases:
       \ remains strict\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"\
       rf_bug_v2_prompting_harness_remediation_green\",\"independent_step\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ,\"internal/resofeed/outbound_url_test.go\",\"internal/resofeed/playwright_fixture_test.go\"\
       ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"rf_bug_v2_prompting_harness_remediation_green\"\
       ],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n\
