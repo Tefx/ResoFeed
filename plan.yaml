@@ -188295,7 +188295,7 @@ phases:
       static contract and five-test collection passed. Receipt sha256:56939a8d07d922d8c268791931054fd7b4534f18ba850a2ddcb530fd228956d0.
   - id: rf-bug-v2-current-operation-snapshot-race
     name: Repair current-operation snapshot ownership race
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ product remediation for valid rejected receipt `sha256:0379623ccfe89bd47a1549d3b2e7df8d9ddd75476819b6ad5dc14a1bb4476283`.\
@@ -188367,6 +188367,10 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T19:39:14.084307+00:00'
+    done_at: '2026-07-16T19:49:21.404807+00:00'
+    evidence: Integrated 102f37489711e6e1c01a51b1ac096b6d2e6df66b. Race-enabled focused
+      test proved a conflicting background attempt cannot overwrite/clear active source_fetch
+      snapshot and normal background lifecycle remains visible/clears. Receipt sha256:9443e42aba4c545fcf92e6e48289367ffbdb36f5f6d5e46d3fbb827ec96cde77.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
