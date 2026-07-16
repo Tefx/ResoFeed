@@ -185441,7 +185441,7 @@ phases:
     agent: gate-reviewer
   - id: rf-bug-v2-generic-adapter-remediation
     name: Generalize v2 evidence adapter across pending consumer profiles
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ repair for the shared adapter defect discovered after completed step `rf-bug-v2-harness-foundation`;\
@@ -185522,6 +185522,29 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T08:35:57.234652+00:00'
+    done_at: '2026-07-16T08:49:19.943828+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: c667be13225c80d14d984518d25e5f7901a2efea
+
+
+      Verification:
+
+      - `node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green`
+      -> green; five exact selected/executed remediation identities
+
+      - Production worker receipt validation -> CONFORMANT
+
+      - Worker receipt: sha256:273ea34532736a0643a9fb2fc5f04b1b93633c6cf29262ad92f68528db19fb21
+
+      - Dispatch: sha256:467daeae2e95d423a4446209fa16ddf176d0ad6e717a8fc2af47eb80fc3032c1
+
+
+      Spec link:
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+
+      - plan.yaml pending profile matrix'
   - id: rf-bug-v2-generic-adapter-verification
     name: Independently verify generic adapter profile and envelope coverage
     status: pending
