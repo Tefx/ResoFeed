@@ -185961,7 +185961,7 @@ phases:
       - Full Gate blocker ARCH-HTTP-ROUTE-DOC-PARITY'
   - id: rf-bug-v2-delivery-shared-operation-remediation
     name: Centralize delivery in one core application operation
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
       \ close `GATE-DELIVERY-SHARED-OPERATION` on the rebound gate lineage after Full\
@@ -186058,8 +186058,6 @@ phases:
     depends_on:
     - rf-bug-v2-architecture-route-doc-parity-remediation
     agent: golang-developer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-16T11:08:00.012244+00:00'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
