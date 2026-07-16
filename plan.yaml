@@ -187148,33 +187148,42 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Replacement for `rf-bug-ledger-prompting-full-gate`. Reconcile the v2 Source
-      Ledger/State and Prompting branches with independent real-seam evidence, then
-      admit RF-BUG-010-LANE-MIGRATION only from the downstream immutable replacement-five
-      runtime verification. Require exact old-three/replacement-five selected/executed
-      inventories, 29/29 replacement tests green, exact title/screenshot inventories,
-      five viewports, accessibility and real operations, Search route/history/generation
+      Replacement for `rf-bug-ledger-prompting-full-gate`. Reconcile the authorized
+      RF-BUG-002 token contract remediation, v2 Source Ledger/State branch, Prompting
+      branch, and independent real-seam evidence, then admit RF-BUG-010-LANE-MIGRATION
+      only from the downstream immutable replacement-five runtime verification. Require
+      canonical `~` plus unpadded UTF-8 base64url item HTTP paths, raw-path rejection,
+      preserved Prompting/delete identities and assertions, and protected acceptance
+      byte-identical to the admitted post-remediation baseline. Require exact old-three/replacement-five
+      selected/executed inventories, 29/29 replacement tests green, exact title/screenshot
+      inventories, five viewports, accessibility and real operations, Search route/history/generation
       recovery, State confirmation/cancellation, Prompting protected/parity/regression
       identities, active v2.1 absence, atomic preservation, docs alignment, secret
-      redaction, cleanup, and unchanged protected artifacts. Skipped legacy nodes
-      are never admission inputs and no future expected-red item is admitted.
+      redaction, and cleanup. Skipped legacy nodes are never admission inputs and
+      no future expected-red item is admitted.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-009","RF-BUG-010-LANE-MIGRATION"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-002-TOKEN-CONTRACT-REMEDIATION","RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-009","RF-BUG-010-LANE-MIGRATION"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-item-http-token-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers all Ledger/State/Prompting requirements plus downstream
-      immutable replacement-five execution and old-three equivalence using canonical
-      public IDs, with unchanged protected artifacts, zero retry/skip, cleanup/redaction,
-      and no future-red admission.
+    verification: Full Gate covers the authorized token contract remediation, both
+      repaired protected acceptance call sites, all Ledger/State/Prompting requirements,
+      and downstream immutable replacement-five execution plus old-three equivalence
+      using canonical public IDs, with protected acceptance unchanged from the admitted
+      post-remediation baseline, zero retry/skip, cleanup/redaction, and no future-red
+      admission.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/PROMPTING_SYSTEM.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - internal/resofeed/item_route_token.go
+    - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go
+    - web/tests/e2e/source-ledger-delete.browser-contract.spec.ts
     depends_on:
     - rf-bug-v2-replacement-lanes-verification
     agent: gate-reviewer
