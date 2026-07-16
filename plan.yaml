@@ -188637,7 +188637,7 @@ phases:
       contract and five-test collection passed. Receipt sha256:23935debb577eaedc7186f7d973b259169731c33cf2969f1cbbdf86679ba62cc.
   - id: rf-bug-v2-source-ledger-reporter-marker-remediation
     name: Repair Source Ledger adapter reporter-marker correlation
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ harness remediation for valid rejected receipt `sha256:abc59d15e516a3714dad89078d8ca818f08c5b37c7227d580fc671b1b4aa3c83`.\
@@ -188694,6 +188694,10 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T21:09:38.815763+00:00'
+    done_at: '2026-07-16T21:14:21.938257+00:00'
+    evidence: Integrated 7ced7614f899c7ec029983b815c112192559ff4a. Explicit TAP adapter
+      contract passed, proving Source Ledger Vitest uses verbose title output correlated
+      to the required marker. Receipt sha256:d10fa38a5e4ac5b4b85b424b8056a1e9a7183a8c3f0d60dd62403e4ccb5b64ba.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
