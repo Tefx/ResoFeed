@@ -187083,6 +187083,8 @@ phases:
     - docs/PROMPTING_SYSTEM.md
     - docs/ARCHITECTURE.md
     - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go
+    depends_on:
+    - rf-bug-v2-item-http-token-contract-lock
     agent: golang-developer
   - id: rf-bug-v2-ledger-prompting-verification
     name: Independently verify Ledger, State, and Prompting real seams
