@@ -189077,7 +189077,7 @@ phases:
       docs: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md and docs/USAGE.md.'
   - id: rf-bug-v2-adapter-runtime-isolation-verification
     name: Independently verify adapter runtime isolation remediation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189121,6 +189121,14 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T23:42:14.365174+00:00'
+    done_at: '2026-07-16T23:48:37.020541+00:00'
+    evidence: 'Independent integration-verifier PASS admitted by production semantic
+      Gate. Receipt sha256:196415133d2f0e1b28d2387501b8bb4b0fa5d8b371223538e13d05747ca1284d
+      against immutable target c34d04e5fa756890a8cbf8c3a083445b1d2f1eba. Exact adapter
+      profile exited 0; evidence proved foundation sequence green, replacement-five
+      29 listed/29 unique first-attempt passes across five isolated real-binary processes,
+      old-three 12/12 parity, all 11 cleanup records clean, protected baselines byte-identical,
+      and artifact redaction. Report: /tmp/larva-agent-artifacts/integration-verifier-rf-bug-v2-adapter-runtime-isolation-final-20260717T074504-61211/report.md#sha256=bcddf86d387f20bd2f3efc69d513bfd3aefe81622727e182b3c5dece12dc3101'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
