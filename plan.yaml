@@ -185553,28 +185553,35 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently exercise the integrated Node adapter as a real CLI before any
-      consumer resumes. Parse `select` output for all eleven pending suite/check pairs
-      and require each `vectl.check.selection.v1` envelope to carry the exact contract
-      check ID, required identities, cardinality, and digest. Execute the remediation
-      profile and completed `rf-bug-v2-harness-foundation` profile to validate `vectl.check.evidence.v1`,
-      selected/executed identity parity, green/red fixture parsing, and backward compatibility
-      without executing unfinished consumer product semantics. Probe unknown suite,
-      unknown check, and mismatched suite/check requests and require non-zero fail-closed
-      results before child command execution. Compare the integrated diff with the
-      declared three-path scope and protected acceptance/product paths; any consumer-scope
-      widening, protected mutation, secret output, skipped profile, retry-dependent
-      result, or wrong identity blocks both current consumers and the phase gate.'
-    verification: Record exact CLI commands and parsed envelopes for all eleven pairs,
-      the remediation and completed-harness runs, mismatch/unknown negative probes,
-      and integrated changed-path proof; pass only with exact identities, valid digests,
-      evidence parity, backward compatibility, and zero protected mutation.
+      After the append-only compatibility repair is integrated, independently exercise
+      the adapter as a real CLI on the integrated head before any consumer resumes.
+      Parse `select` output for all eleven pending suite/check pairs and require each
+      `vectl.check.selection.v1` envelope to carry the exact contract check ID, required
+      identities, cardinality, and digest. Execute the generic-adapter profile and
+      the completed `rf-bug-v2-harness-foundation` profile; require parser-supported
+      `vectl.check.evidence.v1` artifact objects, selected/executed identity parity,
+      green/red fixture parsing, the literal completed-harness `artifacts: artifactRows`
+      compatibility contract, and actual browser/runtime continuation past `TestPlaywrightFixtureContract`.
+      Probe unknown suite, unknown check, and mismatched suite/check requests and
+      require non-zero fail-closed results before child command execution. Compare
+      the integrated diff with the compatibility remediation''s three-path scope and
+      protected acceptance/product paths; any compatibility marker unsupported by
+      executed checks, consumer-scope widening, protected mutation, secret output,
+      skipped profile, retry-dependent result, or wrong identity blocks current consumers
+      and the phase gate. Record a substantive programmatic semantic receipt whose
+      commands name the actual executable and arguments used.'
+    verification: Record exact executable-plus-argument CLI commands and parsed envelopes
+      for all eleven pairs, the generic-adapter and completed-harness runs, mismatch/unknown
+      negative probes, and integrated changed-path proof; pass only when the completed
+      harness proceeds through real browser/runtime execution with valid artifact
+      objects, exact identities/digests, fail-closed negatives, and zero protected
+      mutation.
     refs:
     - plan.yaml
     - scripts/vectl-check.mjs
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     depends_on:
-    - rf-bug-v2-generic-adapter-remediation
+    - rf-bug-v2-generic-adapter-compatibility-remediation
     agent: integration-verifier
   - id: rf-bug-v2-generic-adapter-compatibility-remediation
     name: Restore completed harness artifact-object compatibility
