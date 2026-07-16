@@ -63,7 +63,7 @@ Per-control minimums:
 | Inspector link | Anchor text/name identifies original link | Enter opens/navigates | non-empty href, focus visible |
 | Source Ledger manual ingest | Header button named `[RUN INGEST]` / `[INGESTING...]` | Enter/Space/click runs ingest when enabled | disabled only while pending; status/error live region or equivalent terse feedback |
 | Source Ledger per-source fetch | Row button named `[FETCH]` / `[FETCHING...]` or `Fetch source: <name>` | Enter/Space/click fetches the row source when enabled | disabled only while that fetch is pending; row status/error updates without layout shift |
-| Source Ledger delete/details | List rows as list/listitem or equivalent; delete named `Delete source: <name>`; details named for source diagnostics | Enter/Space; confirmation for delete | focus returns next row/heading after delete; details use `aria-expanded`/native disclosure |
+| Source Ledger delete/details | List rows as list/listitem or equivalent; delete named `Delete source: <name>`; confirmation exposes `[CONFIRM DELETE]`, `[CANCEL]`, and the saved-item boundary; details named for source diagnostics | Enter/Space; Escape or `[CANCEL]` exits confirmation | confirmation preserves row bounds and focuses `[CONFIRM DELETE]`; cancel restores `[DELETE]` focus; successful delete focuses the next row/heading; details use `aria-expanded`/native disclosure |
 | OPML/import/export | Buttons/links with explicit names | Enter/Space; file input reachable | live completion/failure messages |
 | `/doctor` output | `role="log"` or labelled status/log region | N/A after command | long lines wrap; no mobile horizontal-only scroll |
 
@@ -154,6 +154,8 @@ Tests and audit checks MUST fail on these patterns unless the text appears insid
 - Any required hit target is obstructed by overlay/z-index/pointer-events/dead panel, has zero-size bounds, or is below 44 CSS px where specified for touch/action controls.
 - Hover/focus/selected/loading/error/receipt/manual-ingest states shift layout bounds, translate rows, add bounce, add shimmer/skeleton, or stack noisy shadows/glows.
 - Source Ledger manual controls create or imply folders, tags, source hierarchy, job queue, persisted pending job, retry dashboard, command history, activity ledger, sync/merge UI, portable manual-ingest receipts, settings dashboard, or second source URL paste field.
+- Source deletion skips `[CONFIRM DELETE]`, omits `[CANCEL]` or the `Future fetches stop; saved items remain.` boundary, changes row bounds while confirming, or fails to restore/move focus after cancel/success.
+- State replacement begins before `[CONFIRM IMPORT]`, or the confirm control does not expose the adjacent destructive replacement warning through its accessible description.
 - Feed or Inspector shows grouped-source disclosure for items whose backend `story_key` and `duplicate_of_item_id` are both `null`, including by stripping URL fragments from synthetic feed-entry URLs.
 - User-facing folders, tags, unread counts, mark-all-read, archive bins, settings dashboards/sliders, source hierarchy, drag ordering, pause/resume source toggles, moderation queues, or activity ledgers.
 - Mascot/cute SaaS/AI-magic copy or visuals: confetti, ghosts, apologetic empty/error copy, onboarding wizard, decorative gradients/blobs/Memphis filler, purple AI trust palette.

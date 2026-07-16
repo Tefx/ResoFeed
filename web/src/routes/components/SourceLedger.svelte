@@ -35,6 +35,7 @@
     language = 'en'
   }: Props = $props();
   let confirmingSourceId = $state<string | null>(null);
+  let deletingSourceId = $state<string | null>(null);
   let statusText = $state('');
   let globalIngestStatusText = $state('');
   let isImportingOpml = $state(false);
@@ -81,8 +82,11 @@
       fetching: '[FETCHING...]',
       fetchAria: (label: string) => `[FETCH] 抓取来源 ${label}`,
       fetchingAria: (label: string) => `[FETCHING...] 抓取来源 ${label}`,
-      confirm: '[CONFIRM]',
-      confirmAria: (label: string) => `确认删除来源：${label}`,
+      confirmDelete: '[CONFIRM DELETE]',
+      confirmDeleteAria: (label: string) => `确认删除来源 ${label}。将停止后续抓取；已保存条目保留。`,
+      cancel: '[CANCEL]',
+      deletingAction: '[DELETING...]',
+      deleteWarning: (label: string) => `删除来源“${label}”？将停止后续抓取；已保存条目保留。`,
       delete: '[DELETE]',
       deleteAria: (label: string) => `删除来源：${label}`,
       details: '来源信息',
@@ -118,8 +122,11 @@
       fetching: '[FETCHING...]',
       fetchAria: (label: string) => `[FETCH] Fetch source ${label}`,
       fetchingAria: (label: string) => `[FETCHING...] Fetch source ${label}`,
-      confirm: '[CONFIRM]',
-      confirmAria: (label: string) => `confirm delete source: ${label}`,
+      confirmDelete: '[CONFIRM DELETE]',
+      confirmDeleteAria: (label: string) => `Confirm delete source ${label}. Future fetches stop; saved items remain.`,
+      cancel: '[CANCEL]',
+      deletingAction: '[DELETING...]',
+      deleteWarning: (label: string) => `Delete source “${label}”? Future fetches stop; saved items remain.`,
       delete: '[DELETE]',
       deleteAria: (label: string) => `Delete source: ${label}`,
       details: 'source info',
@@ -278,7 +285,7 @@
   }
 
   function pendingFrame(): Promise<void> {
-    return new Promise((resolve) => window.setTimeout(resolve, 120));
+    return new Promise((resolve) => window.setTimeout(resolve, 900));
   }
 
   const runIngestDisabled = $derived(ingestActionRunning);
@@ -291,7 +298,7 @@
     if (ingestActionRunning) return Promise.resolve();
     isRunningIngest = true;
     globalIngestStatusText = '';
-    return tick().then(() => onRunIngest()).then((result) => {
+    return tick().then(() => onRunIngest()).then((result) => pendingFrame().then(() => result)).then((result) => {
       globalIngestStatusText = runIngestResultText(result);
     }).catch((error: unknown) => {
       globalIngestStatusText = ingestErrorText(error);
@@ -313,9 +320,9 @@
           ? `${chrome.lastFetch}: ${completedAt ?? chrome.complete}`
           : rawErrorText(errorMessage ?? source.last_fetch_error ?? chrome.fetchFailed)
       );
-    }).catch((error: unknown) => {
+    }).catch((error: unknown) => pendingFrame().then(() => {
       setSourceFeedback(source.id, sourceFetchErrorText(error));
-    }).finally(() => {
+    })).finally(() => {
       fetchingSourceIds = new Set([...fetchingSourceIds].filter((sourceId) => sourceId !== source.id));
     });
   }
@@ -338,16 +345,52 @@
     });
   }
 
+  function sourceRowElement(sourceId: string): HTMLElement | undefined {
+    return Array.from(document.querySelectorAll<HTMLElement>('.source-ledger__row'))
+      .find((row) => row.dataset.sourceId === sourceId);
+  }
+
+  function focusSourceAction(sourceId: string, selector: string): Promise<void> {
+    return tick().then(() => sourceRowElement(sourceId)?.querySelector<HTMLElement>(selector)?.focus());
+  }
+
+  function beginDelete(source: Source): Promise<void> {
+    confirmingSourceId = source.id;
+    deletingSourceId = null;
+    statusText = '';
+    return focusSourceAction(source.id, '.bracket-action--confirm-delete');
+  }
+
+  function cancelDelete(source: Source): Promise<void> {
+    confirmingSourceId = null;
+    deletingSourceId = null;
+    statusText = '';
+    return focusSourceAction(source.id, '.bracket-action--delete');
+  }
+
+  function handleDeleteKeydown(event: KeyboardEvent, source: Source): void {
+    if (event.key !== 'Escape' || confirmingSourceId !== source.id || deletingSourceId === source.id) return;
+    event.preventDefault();
+    event.stopPropagation();
+    void cancelDelete(source);
+  }
+
   function confirmDelete(source: Source): Promise<void> {
+    if (deletingSourceId === source.id) return Promise.resolve();
     const sourceIndex = visibleSources.findIndex((candidate) => candidate.id === source.id);
+    deletingSourceId = source.id;
     statusText = chrome.deleting(source.title);
     return Promise.resolve(onDeleteSource(source)).then(() => {
       confirmingSourceId = null;
+      deletingSourceId = null;
       deletedSourceIds = new Set([...deletedSourceIds, source.id]);
       statusText = chrome.deleted(source.title);
       return focusAfterDeletion(source.id, sourceIndex);
     }).catch((error: unknown) => {
+      confirmingSourceId = null;
+      deletingSourceId = null;
       statusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.deleteFailed);
+      return focusSourceAction(source.id, '.bracket-action--delete');
     });
   }
 
@@ -387,7 +430,7 @@
   <header class="source-ledger-head source-ledger__header source-ledger__header-actions">
     <h1 id="source-ledger-title" bind:this={ledgerHeading} class="source-ledger__title" tabindex="-1">SOURCE LEDGER</h1>
     <span role={suppressStatusRole ? undefined : 'status'} aria-live={headerOperationIsError ? 'assertive' : 'polite'} class:source-ledger__status--error={headerOperationIsError} class="source-ledger__status" title={headerOperationStatusText}>{headerOperationStatusText}</span>
-    <button type="button" class="bracket-action bracket-action--run-ingest" disabled={runIngestDisabled} onclick={() => void runIngest()}>{ingestActionRunning ? chrome.ingesting : chrome.runIngest}</button>
+    <button type="button" class="bracket-action bracket-action--run-ingest" aria-label={ingestActionRunning ? chrome.ingesting : chrome.runIngest} disabled={runIngestDisabled} onclick={() => void runIngest()}>{ingestActionRunning ? chrome.ingesting : chrome.runIngest}</button>
   </header>
   <div class="source-ledger__tools" aria-label={chrome.ledgerActions}>
     <div class="source-ledger__action-group source-ledger__action-group--source-list" role="group" aria-label={chrome.sourceListActions}>
@@ -411,21 +454,28 @@
         {@const rowHasError = rowStatusText.toLowerCase().startsWith('err:')}
         {@const rowVisibleStatus = rowVisibleStatusText(source, lastFetch, rowStatusText, rowHasError)}
         {@const rowFetching = fetchingSourceIds.has(source.id)}
-        <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id}>
+        {@const rowDeleteConfirming = confirmingSourceId === source.id}
+        {@const rowDeleting = deletingSourceId === source.id}
+        {@const deleteWarning = chrome.deleteWarning(sourceLabel)}
+        <li class="source-ledger-row source-ledger__row source-row" data-testid="source-row" data-source-id={source.id} data-delete-state={rowDeleting ? 'deleting' : rowDeleteConfirming ? 'confirming' : 'idle'}>
           <div class="source-ledger-copy source-ledger__name" title={rowGrammarForSource(source, sourceLabel, lastFetch)} translate={sourceTitleTranslate}>{sourceRowNameText(sourceLabel)}</div>
           <div class="source-ledger-url source-ledger__url" title={source.url} translate={sourceUrlTranslate}>{sourceRowUrlText(source.url)}</div>
-          <div class:source-ledger__status--error={rowHasError} class="source-ledger__status" aria-live={rowHasError ? 'assertive' : 'polite'} aria-label={rowStatusText} title={rowStatusText}>{rowVisibleStatus}</div>
+          <div class:source-ledger__status--error={rowHasError && !rowDeleteConfirming} class:source-ledger__delete-warning={rowDeleteConfirming} class="source-ledger__status" aria-live={rowHasError && !rowDeleteConfirming ? 'assertive' : 'polite'} aria-label={rowDeleteConfirming ? deleteWarning : rowStatusText} title={rowDeleteConfirming ? deleteWarning : rowStatusText}>{rowDeleteConfirming ? deleteWarning : rowVisibleStatus}</div>
           <span class="source-ledger__actions">
-            <button type="button" class="bracket-action bracket-action--fetch" aria-label={rowFetching ? chrome.fetchingAria(sourceA11yLabel(sourceLabel)) : chrome.fetchAria(sourceA11yLabel(sourceLabel))} disabled={rowFetching} onclick={() => void fetchSource(source)}>{rowFetching ? chrome.fetching : chrome.fetch}</button>
-            {#if confirmingSourceId === source.id}
-              <button type="button" class="bracket-action bracket-action--confirm" aria-label={chrome.confirmAria(sourceLabel)} onclick={() => void confirmDelete(source)}>{chrome.confirm}</button>
+            {#if rowDeleteConfirming}
+              <button type="button" class="bracket-action bracket-action--confirm bracket-action--confirm-delete" aria-label={chrome.confirmDeleteAria(sourceLabel)} aria-describedby={`source-delete-warning-${source.id}`} disabled={rowDeleting} onkeydown={(event) => handleDeleteKeydown(event, source)} onclick={() => void confirmDelete(source)}>{rowDeleting ? chrome.deletingAction : chrome.confirmDelete}</button>
+              {#if !rowDeleting}
+                <button type="button" class="bracket-action bracket-action--cancel bracket-action--cancel-delete" aria-label={chrome.cancel} onkeydown={(event) => handleDeleteKeydown(event, source)} onclick={() => void cancelDelete(source)}>{chrome.cancel}</button>
+              {/if}
+              <span id={`source-delete-warning-${source.id}`} class="visually-hidden">{deleteWarning}</span>
             {:else}
-              <button type="button" class="bracket-action bracket-action--delete" aria-label={chrome.deleteAria(sourceA11yLabel(sourceLabel))} onclick={() => (confirmingSourceId = source.id)}>{chrome.delete}</button>
+              <button type="button" class="bracket-action bracket-action--fetch" aria-label={rowFetching ? chrome.fetchingAria(sourceA11yLabel(sourceLabel)) : chrome.fetchAria(sourceA11yLabel(sourceLabel))} disabled={rowFetching} onclick={() => void fetchSource(source)}>{rowFetching ? chrome.fetching : chrome.fetch}</button>
+              <button type="button" class="bracket-action bracket-action--delete" aria-label={chrome.deleteAria(sourceA11yLabel(sourceLabel))} onclick={() => void beginDelete(source)}>{chrome.delete}</button>
+              <details class="source-diagnostic-details">
+                <summary aria-label={chrome.detailsAria(sourceA11yLabel(sourceLabel))} onkeydown={toggleDiagnosticFromKeyboard}>{chrome.details}</summary>
+                <pre>{sourceDiagnosticText(source, lastFetch)}</pre>
+              </details>
             {/if}
-            <details class="source-diagnostic-details">
-              <summary aria-label={chrome.detailsAria(sourceA11yLabel(sourceLabel))} onkeydown={toggleDiagnosticFromKeyboard}>{chrome.details}</summary>
-              <pre>{sourceDiagnosticText(source, lastFetch)}</pre>
-            </details>
           </span>
         </li>
       {/each}

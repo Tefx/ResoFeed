@@ -553,6 +553,19 @@
     };
   }
 
+  function localSourceFetchFailureOperation(failedAt: string): CurrentOperationInfo {
+    return {
+      running: false,
+      kind: 'source_fetch',
+      actor_kind: 'human',
+      phase: 'failed',
+      count: null,
+      message: 'source fetch failed',
+      started_at: failedAt,
+      updated_at: failedAt
+    };
+  }
+
   function localLibraryReprocessOperation(startedAt: string): CurrentOperationInfo {
     return {
       running: true,
@@ -1152,7 +1165,11 @@
     if (!response.ok) {
       const text = `err: ${response.body.error.message}`;
       const operation = response.body.error.details.current_operation;
-      const blockedState: ContextualOperationState = { kind: 'blocked', text, operation: normalizeCurrentOperationInfo(operation) };
+      const blockedState: ContextualOperationState = {
+        kind: 'blocked',
+        text,
+        operation: normalizeCurrentOperationInfo(operation) ?? localSourceFetchFailureOperation(new Date().toISOString())
+      };
       contextualOperation = blockedState;
       throw new Error(formatContextualOperation(blockedState));
     }

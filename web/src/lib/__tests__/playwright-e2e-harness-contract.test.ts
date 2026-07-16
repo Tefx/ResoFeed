@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import runtimeConfig from '../../../playwright.runtime.config';
 import {
   hasExactLaneFiles,
   redactHarnessEvidence,
@@ -6,6 +7,13 @@ import {
   RF_BUG_010_OLD_LANE,
   RF_BUG_010_REPLACEMENT_LANE
 } from '../playwright-e2e-harness-contract';
+
+describe('RF-BUG-008 runtime discovery contract', () => {
+  it('RF-BUG-008 runtime config admits only canonical runtime spec names at zero retries', () => {
+    expect(runtimeConfig.testMatch).toEqual(['runtime.spec.ts', '*.runtime.spec.ts']);
+    expect(runtimeConfig.retries).toBe(0);
+  });
+});
 
 describe('RF-BUG-010 harness contract', () => {
   it('pins the repaired generic selected/executed identity set', () => {

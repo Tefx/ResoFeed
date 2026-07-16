@@ -240,7 +240,7 @@ a:focus-visible,
   column-gap: var(--rf-space-row);
   row-gap: var(--rf-space-xs);
   align-items: center;
-  min-height: 44px;
+  min-height: 45px;
   border-block-start: 1px solid var(--rf-color-current-rule);
   padding-block: 0;
 }
@@ -291,6 +291,13 @@ a:focus-visible,
   max-inline-size: min(80ch, 100%);
 }
 
+.source-ledger__row > .source-ledger__delete-warning {
+  color: var(--rf-component-status-warning-text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .source-ledger__actions {
   display: flex;
   min-width: 43ch;
@@ -311,9 +318,14 @@ a:focus-visible,
 
 .source-ledger__action-group {
   display: inline-flex;
+  min-width: 0;
   flex-wrap: wrap;
   gap: var(--rf-space-sm);
   align-items: center;
+}
+
+.source-ledger__action-group > .bracket-action {
+  margin: 0;
 }
 
 .source-ledger__action-group + .source-ledger__action-group {
@@ -2200,10 +2212,17 @@ details.surface-nav button:focus-visible {
   }
 
   .source-ledger__action-group {
-    flex-wrap: nowrap;
-    gap: var(--rf-space-sm);
-    overflow-x: auto;
-    overflow-y: hidden;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: var(--rf-space-xs) var(--rf-space-sm);
+    overflow: visible;
+  }
+
+  .source-ledger__action-group + .source-ledger__action-group {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--rf-color-current-rule);
+    padding-block-start: var(--rf-space-xs);
+    padding-inline-start: 0;
   }
 
   .source-ledger-copy,
@@ -2228,6 +2247,14 @@ details.surface-nav button:focus-visible {
     overflow-wrap: anywhere;
     text-overflow: clip;
     white-space: normal;
+  }
+
+  .source-ledger__row > .source-ledger__delete-warning {
+    display: block;
+    overflow-wrap: normal;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -webkit-line-clamp: 1;
   }
 
   .source-ledger__actions {

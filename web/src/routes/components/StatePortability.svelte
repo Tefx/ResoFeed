@@ -181,7 +181,7 @@
   <input id="state-json-file" class="state-portability-file visually-hidden" bind:this={stateInput} type="file" accept="application/json,.json" aria-label={chrome.input} onchange={() => void importSelectedFile()} />
   <span id="state-import-warning" class="contract-warning state-portability-warning" hidden={!importRiskFocused && portabilityState !== 'import-confirming' && portabilityState !== 'importing' && portabilityState !== 'import-failed'}>{chrome.warning}</span>
   {#if portabilityState === 'import-confirming'}
-    <button bind:this={confirmImportButton} class="bracket-action bracket-action--confirm bracket-action--confirm-import" type="button" onkeydown={handleImportKeydown} onclick={() => void confirmImport()}>[CONFIRM IMPORT]</button>
+    <button bind:this={confirmImportButton} class="bracket-action bracket-action--confirm bracket-action--confirm-import" type="button" aria-describedby="state-import-warning" onkeydown={handleImportKeydown} onclick={() => void confirmImport()}>[CONFIRM IMPORT]</button>
     <button class="bracket-action bracket-action--cancel bracket-action--cancel-import" type="button" onkeydown={handleImportKeydown} onclick={() => resetImportIntent()}>[CANCEL]</button>
   {/if}
   {#if statusText}
