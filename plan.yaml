@@ -187231,7 +187231,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-item-http-token-contract-lock
     name: Repair protected item HTTP token acceptance contracts
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ contract-lock remediation for rejected receipts `sha256:a80fecd18baf85bc179ed9342657ee904efc1fc7ae79d37d4561d006cf7f2bc3`\
@@ -187335,6 +187335,38 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T15:43:08.186874+00:00'
+    done_at: '2026-07-16T15:48:06.044296+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 8241800477e1a0fea5725a5d97ac5258c501c2eb
+
+
+      Verification:
+
+      - Both authorized protected HTTP call sites now use `~` + unpadded UTF-8 base64url
+
+      - RF-BUG-009 16-case identity and both RF-BUG-008 delete identities/assertions
+      preserved
+
+      - Go and Playwright collection checks passed
+
+      - Runtime raw-path rejection unchanged
+
+      - Independent acceptance authorizations matched exactly
+
+      - Worker validator -> CONFORMANT
+
+      - Receipt: sha256:8715386af112ca7555fa2ecbdda0707aedefae89b36754f9613261ddd2be6adb
+
+      - Dispatch: sha256:540a48a1906e695c557b6d58f2f29ebaecb9fe9843fc897fa864a2c60edce253
+
+
+      Spec link:
+
+      - RF-BUG-002 canonical HTTP token contract
+
+      - rejected receipts sha256:a80fecd18baf85bc179ed9342657ee904efc1fc7ae79d37d4561d006cf7f2bc3
+      and sha256:e6a53b983c50a97256b1ad9f3c74ccbca4a4610f874decf44290fd9f8f04105b'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
