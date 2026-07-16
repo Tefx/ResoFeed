@@ -187269,9 +187269,10 @@ phases:
       Replacement for `rf-bug-ledger-prompting-full-gate`. Reconcile the authorized
       RF-BUG-002 token contract remediation, authorized RF-BUG-008 RUN INGEST locator
       contract remediation, all four authorized RF-BUG-008 conflict synchronization/actor/request-contract
-      remediations, E2E-only loopback fixture-boundary remediation, v2 Source Ledger/State
-      branch, Prompting branch, and independent real-seam evidence, then admit RF-BUG-010-LANE-MIGRATION
-      only from the downstream immutable replacement-five runtime verification. Require
+      remediations, E2E-only loopback fixture-boundary remediation, current-operation
+      snapshot-race remediation, v2 Source Ledger/State branch, Prompting branch,
+      and independent real-seam evidence, then admit RF-BUG-010-LANE-MIGRATION only
+      from the downstream immutable replacement-five runtime verification. Require
       canonical `~` plus unpadded UTF-8 base64url item HTTP paths and raw-path rejection.
       Require the operations acceptance baseline to assert initial `[RUN INGEST]`
       accessibility before following the same physical control across `[INGESTING...]`,
@@ -187288,6 +187289,13 @@ phases:
       / `fetching_source` state is observed before UI FETCH. Require listener/timeout
       cleanup, no leak/hang, no fixed delay or retries, preserved external `Response.status`
       property 200, preserved conflict assertions, and all five identities unchanged.
+      Require the integrated Go remediation and independent `go test -race` evidence
+      to prove a rejected background `IngestOnce` attempt cannot overwrite or clear
+      that active human source-fetch snapshot, while a normally acquired background
+      operation remains visible and clears on release. Require no acceptance mutation
+      or persisted operation ledger.
+
+
       Require the untagged production build to retain strict loopback/private outbound
       rejection regardless of `RESOFEED_E2E`, while the real-browser fixture allowance
       requires both the `resofeed_e2e` build tag and exact runtime opt-in `RESOFEED_E2E=1`,
@@ -187304,18 +187312,19 @@ phases:
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-002-TOKEN-CONTRACT-REMEDIATION","RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY","RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION","RF-BUG-009","RF-BUG-010-LANE-MIGRATION"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-e2e-loopback-fixture-boundary","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-item-http-token-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-request-start-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-json-body-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-ingest-locator-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-002-TOKEN-CONTRACT-REMEDIATION","RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION","RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY","RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION","RF-BUG-009","RF-BUG-010-LANE-MIGRATION"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-snapshot-race","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-e2e-loopback-fixture-boundary","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-item-http-token-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-request-start-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-json-body-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-ingest-locator-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
     verification: Full Gate covers every authorized protected acceptance remediation,
-      including the eager independent Node/global fetch actor with exact bearer Authorization,
+      the Go current-operation snapshot ownership repair and independent race/runtime
+      evidence, the eager independent Node/global fetch actor with exact bearer Authorization,
       exact application/json Content-Type, exact body '{}', request-start/poll/click
       ordering, Response.status 200, all five identities, and zero retries; all repaired
       protected call-site/locator/synchronization contracts; all Ledger/State/Prompting
       requirements; and downstream immutable replacement-five execution plus old-three
       equivalence using canonical public IDs, with protected acceptance unchanged
       from each admitted post-remediation baseline, zero retry/skip, cleanup/redaction,
-      and no future-red admission.
+      no persisted operation ledger, and no future-red admission.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
