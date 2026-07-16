@@ -186258,7 +186258,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-opml-import-only
     name: Enforce auth-first OPML import-only surface under v2
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for `enforce-opml-import-only-surface`. Cross-domain justification: one indivisible\
@@ -186328,6 +186328,8 @@ phases:
     depends_on:
     - rf-bug-v2-embed-ui-assets
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T12:53:27.121034+00:00'
   - id: rf-bug-v2-http-security-csp
     name: Apply outer HTTP security middleware and embedded CSP under v2
     status: pending
