@@ -186977,8 +186977,8 @@ phases:
       \ [RF-BUG-008]\n  - id: rf_bug_v2_source_ledger_green\n    run:\n      command:\n\
       \        - bash\n        - -lc\n        - >-\n          set -euo pipefail; out=\"\
       ${TMPDIR:-/tmp}/resofeed-rf-bug-v2-source-ledger-$$\"; trap 'rm -f \"$out\"\
-      ' EXIT; scripts/build-resofeed.sh \"$out\"; node scripts/vectl-check.mjs run\
-      \ rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green\n      timeout_seconds:\
+      ' EXIT; scripts/build-resofeed.sh \"$out\" >&2; node scripts/vectl-check.mjs\
+      \ run rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green\n      timeout_seconds:\
       \ 1800\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
       \        - {path: scripts/build-resofeed.sh, access: execute, availability:\
       \ current}\n        - {path: scripts/vectl-check.mjs, access: execute, availability:\
