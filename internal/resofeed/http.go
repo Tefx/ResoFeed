@@ -60,12 +60,15 @@ func NewRouter(cfg HTTPServerConfig) http.Handler {
 	mux.Handle("/api/", api)
 	mux.Handle("/mcp", NewMCPHandler(MCPConfig{DB: cfg.DB, PublicURL: cfg.PublicURL, OwnerToken: cfg.OwnerToken, OwnerTokenHash: cfg.OwnerTokenHash, LLM: cfg.LLM, OpenRouter: cfg.OpenRouter, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: cfg.FirstFetchMaxItemsSet}))
 	mux.Handle("/", staticUIHandler())
-	return mux
+	return newHTTPSecurityHandler(mux)
 }
 
 func ServeHTTPAndIngestRuntime(ctx context.Context, cfg HTTPServerConfig, runIngest func(context.Context) error) error {
 	if err := validateEmbeddedUI(); err != nil {
 		return fmt.Errorf("validate embedded UI before bind: %w", err)
+	}
+	if _, err := embeddedUIContentSecurityPolicy(); err != nil {
+		return fmt.Errorf("derive embedded UI CSP before bind: %w", err)
 	}
 	listener, err := net.Listen("tcp", cfg.Addr)
 	if err != nil {

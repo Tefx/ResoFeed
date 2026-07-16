@@ -323,7 +323,6 @@ Examples of deployment-layer choices:
 
 These are examples, not core runtime dependencies.
 ## Application-Owned Browser Security
-
 The Go binary emits one effective value for each browser security header on static, API, MCP, authorization-error, not-found, and internal-error responses:
 
 - `Content-Security-Policy`;
@@ -331,8 +330,9 @@ The Go binary emits one effective value for each browser security header on stat
 - `Referrer-Policy: no-referrer`;
 - `X-Frame-Options: DENY`.
 
-Caddy and other reverse proxies must pass these application-owned values unchanged. The policy must boot the embedded UI and preserve ordinary authenticated product operations, MCP streaming, and request cancellation. Container and browser evidence must redact owner tokens, provider keys, authorization values, cookies, provider bodies, and `.env` contents.
+Before opening the production listener, Go validates the embedded UI and derives the CSP from every executable inline script body in the embedded `index.html`. The policy uses ordered unique SHA-256 script sources and does not permit `unsafe-inline`. One outer middleware owns all four headers and forwards the original response writer and request without buffering, preserving MCP/static streaming flushes and request cancellation.
 
+Caddy and other reverse proxies must pass these application-owned values unchanged. The policy must boot the embedded UI and preserve ordinary authenticated product operations, including OPML import and JSON State export, import, and download. Container and browser evidence must redact owner tokens, provider keys, authorization values, cookies, provider bodies, and `.env` contents.
 ## Verification Checklist
 
 Before accepting the containerization work:
