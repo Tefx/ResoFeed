@@ -188932,7 +188932,7 @@ phases:
       strictness. Receipt sha256:3350820648c3272fdc0cb9eb331fbc6dcdd426c6eff9ad025d32edf9efc420bf.
   - id: rf-bug-v2-adapter-runtime-isolation-remediation
     name: Repair replacement-lane runtime isolation and foundation smoke sequencing
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for integration-verifier FAIL receipt `sha256:9c028197f325979a7998c8d6ce8b0bbbc54c2140871688957e8ed0b9bf5c6a52`\
@@ -189064,6 +189064,8 @@ phases:
     depends_on:
     - rf-bug-v2-ledger-prompting-verification
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T23:20:56.687421+00:00'
   - id: rf-bug-v2-adapter-runtime-isolation-verification
     name: Independently verify adapter runtime isolation remediation
     status: pending
