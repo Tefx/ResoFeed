@@ -187045,7 +187045,7 @@ phases:
     - web/tests/e2e/source-ledger-operations.runtime.spec.ts
     depends_on:
     - rf-bug-v2-e2e-loopback-fixture-boundary
-    - rf-bug-v2-current-operation-snapshot-race
+    - rf-bug-v2-current-operation-foreground-priority
     agent: frontend-engineer
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
