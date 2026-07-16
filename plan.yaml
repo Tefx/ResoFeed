@@ -185437,7 +185437,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-frontend-runtime-verification
     name: Independently verify frontend, HTTP, MCP, and SQLite seams
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -185468,6 +185468,35 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T09:45:10.321343+00:00'
+    done_at: '2026-07-16T09:51:59.258543+00:00'
+    evidence: 'Artifact:
+
+      - Immutable integrated target: 00444d87cdffaf5f6f3e10217056369e849140ca
+
+
+      Verification:
+
+      - Frontend real-binary/browser adapter audit -> PASS
+
+      - Go HTTP/MCP/SQLite token-parity adapter audit -> PASS
+
+      - RF-BUG-001/002/006/007, canonical HTTP rejection, raw MCP IDs, shared re-ingest
+      semantics, and 30-case contract -> PROVEN
+
+      - Protected acceptance and tracked source -> clean
+
+      - Semantic receipt validator -> CONFORMANT
+
+      - Semantic receipt: sha256:cb2973dea5f3fc7afa08316c1cfd362c3463b111b218588b89567d93cc814817
+
+
+      Spec link:
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md
+
+      - docs/ARCHITECTURE.md
+
+      - docs/DESIGN.md'
   - id: rf-bug-v2-frontend-behavior-gate
     name: RF-BUG Assurance v2 frontend Full Gate
     status: pending
