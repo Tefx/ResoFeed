@@ -186151,7 +186151,7 @@ phases:
       - docs/ARCHITECTURE.md'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
-  status: pending
+  status: in_progress
   gate: Embedded UI, Doctor, auth-first OPML import-only state, HTTP security headers/CSP,
     streaming/cancellation, independent runtime proof, and R3 rollback review pass
     under v2.
@@ -186160,7 +186160,7 @@ phases:
   steps:
   - id: rf-bug-v2-embed-ui-assets
     name: Embed validated UI and preserve safe Doctor diagnostics under v2
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for `embed-ui-assets-in-single-binary`. Stage the production Svelte build\
@@ -186222,6 +186222,8 @@ phases:
     - docs/CONTAINER.md
     - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T12:15:04.586467+00:00'
   - id: rf-bug-v2-opml-import-only
     name: Enforce auth-first OPML import-only surface under v2
     status: pending
