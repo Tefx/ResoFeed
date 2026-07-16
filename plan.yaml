@@ -186529,7 +186529,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-runtime-security-review
     name: Review v2 runtime security authorization and rollback
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -186561,6 +186561,8 @@ phases:
     depends_on:
     - rf-bug-v2-runtime-review-remediation
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T13:58:43.295955+00:00'
   - id: rf-bug-v2-runtime-boundaries-gate
     name: RF-BUG Assurance v2 runtime-boundaries Full Gate
     status: pending
