@@ -186601,7 +186601,7 @@ phases:
     agent: gate-reviewer
   - id: rf-bug-v2-runtime-review-remediation
     name: Remediate Doctor URL redaction and residual Go OPML export
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for rejected semantic receipt `sha256:2507973a47bad4aad91945c464aff438707f9f3de075d99d876a33c949ce72fc`\
@@ -186680,6 +186680,37 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T13:49:40.010266+00:00'
+    done_at: '2026-07-16T13:58:31.810400+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 91e274e861e8fefffc71060445b5dd7c8b2cdc6a
+
+
+      Verification:
+
+      - `rf_bug_v2_runtime_review_remediation_green` -> green
+
+      - Doctor failed-source URL credentials redacted
+
+      - Go OPML export symbols absent; auth-first import-only and JSON State remain
+      green
+
+      - Canonical documents 9; OPML exclusions 2; adapter self-tests passed
+
+      - Protected acceptance and docs untouched
+
+      - Production worker validator -> CONFORMANT
+
+      - Worker receipt: sha256:94c4152007f913f75362444c15ae401259fd03bb36fa8b2178bc824531125c8f
+
+      - Dispatch: sha256:5269e51fcde967e4a5bed487f744caf36eaff77e38055b2dd86c467e11267e6b
+
+
+      Spec link:
+
+      - rejected review receipt sha256:2507973a47bad4aad91945c464aff438707f9f3de075d99d876a33c949ce72fc
+
+      - AGENTS.md import-only and secret-redaction boundaries'
 - id: rf-bug-assurance-v2-ledger-prompting
   name: RF-BUG Assurance v2 Ledger and Prompting
   status: locked
