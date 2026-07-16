@@ -186258,7 +186258,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-opml-import-only
     name: Enforce auth-first OPML import-only surface under v2
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for `enforce-opml-import-only-surface`. Cross-domain justification: one indivisible\
@@ -186330,6 +186330,38 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T12:53:27.121034+00:00'
+    done_at: '2026-07-16T12:56:52.456305+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: a62fbb00dbbac6ccaa7be87f98642dfadce73e30
+
+
+      Verification:
+
+      - `rf_bug_v2_opml_import_only_green` -> green
+
+      - Retired OPML export auth precedence 401/404; import and minimal JSON State
+      remain green
+
+      - Exact immutable canonical scan `RF_BUG_CANONICAL_DOCUMENTS=9`, `OPML_EXCLUSIONS=2`
+
+      - UI/API export surface removed; adapter marker aligned; protected acceptance
+      unchanged
+
+      - Production worker validator -> CONFORMANT
+
+      - Worker receipt: sha256:22f93f74e00209adb31ab3ccfef9ecd448318dbfeefa04f1ad0daf969699cee4
+
+      - Dispatch: sha256:3c16b4cb731b56ecd8c298f7922ae365a2fd459b933facfb03bdf9d29095cb33
+
+
+      Spec link:
+
+      - AGENTS.md import-only OPML boundary
+
+      - docs/ARCHITECTURE.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-http-security-csp
     name: Apply outer HTTP security middleware and embedded CSP under v2
     status: pending
