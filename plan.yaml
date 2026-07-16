@@ -187613,7 +187613,7 @@ phases:
       \  blocked_paths: [scripts/build-resofeed.sh, web/tests/e2e/fixtures/runtime-fixture.ts,\
       \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts, web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
       \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/, .test-artifacts/]\nclaims: [RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY]\n\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY]\n\
       checks:\n  - id: rf_bug_v2_e2e_loopback_fixture_boundary_green\n    run:\n \
       \     command:\n        - bash\n        - -lc\n        - >-\n          set -euo\
       \ pipefail; out=\"${TMPDIR:-/tmp}/resofeed-e2e-boundary-prod-$$\"; trap 'rm\
