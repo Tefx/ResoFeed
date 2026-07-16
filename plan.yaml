@@ -187506,8 +187506,8 @@ phases:
       \ locator declarations mismatch}, {literal: locator assertion order mismatch},\
       \ {literal: retry boundary changed}]\n    proves: [RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION]\n\
       \  - id: rf_bug_008_ingest_locator_contract_collection\n    run:\n      command:\
-      \ [npm, --prefix, web, exec, --, playwright, test, --config, playwright.runtime.config.ts,\
-      \ tests/e2e/source-ledger-operations.runtime.spec.ts, --list]\n      timeout_seconds:\
+      \ [npm, --prefix, web, exec, --, playwright, test, --config, web/playwright.runtime.config.ts,\
+      \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, --list]\n      timeout_seconds:\
       \ 300\n    evidence:\n      mode: command_outcome\n      path_bindings:\n  \
       \      - {path: web/package.json, access: read, availability: current}\n   \
       \     - {path: web/package-lock.json, access: read, availability: current}\n\
