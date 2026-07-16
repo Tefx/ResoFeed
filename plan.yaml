@@ -188726,7 +188726,7 @@ phases:
       to the required marker. Receipt sha256:d10fa38a5e4ac5b4b85b424b8056a1e9a7183a8c3f0d60dd62403e4ccb5b64ba.
   - id: rf-bug-v2-prompting-e2e-harness-remediation
     name: Repair Prompting v2.2 protected harness E2E extraction boundary
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for valid independent semantic FAIL receipt `sha256:e822db15db70e548ad953ae75bb4ad95361b39faa1b6dfdb49ba79053e58999a`\
@@ -188828,6 +188828,11 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T22:19:58.981115+00:00'
+    done_at: '2026-07-16T22:24:30.748870+00:00'
+    evidence: Integrated 89fd28719818d089f29a0efb9bd0de58f418133b. Dedicated adapter
+      emitted exact four-ID evidence; protected 16-subtest Prompting profile passed
+      only under resofeed_e2e+RESOFEED_E2E=1, while normal build and outbound checks
+      remained strict. Receipt sha256:cf13ede10a1cecae032926bfd68e8c881d4e85e72342c71da9a165cfb37c3dd7.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
