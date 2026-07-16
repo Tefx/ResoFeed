@@ -186638,13 +186638,13 @@ phases:
       \ acceptance, availability: current}\n        - {path: tests/rf_bug_canonical_contract_test.go,\
       \ classification: acceptance, availability: current}\n      selection:\n   \
       \     command:\n          - python3\n          - -c\n          - >-\n      \
-      \      import hashlib,json; ids=['RF-BUG-003 failed-source URL credential redaction','RF-BUG-004\
-      \ Go OPML export symbol absence','RF-BUG-003/004 protected import-only regression'];\
+      \      import hashlib,json; ids=['RF-BUG-003 failed-source URL credential redaction','RF-BUG-003/004\
+      \ protected import-only regression','RF-BUG-004 Go OPML export symbol absence'];\
       \ print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_runtime_review_remediation_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 3}\n        required_ids:\
-      \ ['RF-BUG-003 failed-source URL credential redaction', 'RF-BUG-004 Go OPML\
-      \ export symbol absence', 'RF-BUG-003/004 protected import-only regression']\n\
-      \        forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
+      \ ['RF-BUG-003 failed-source URL credential redaction', 'RF-BUG-003/004 protected\
+      \ import-only regression', 'RF-BUG-004 Go OPML export symbol absence']\n   \
+      \     forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
       \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: RF_BUG_003_FAILED_SOURCE_URL_CREDENTIAL_REDACTION=complete},\
       \ {literal: RF_BUG_004_GO_OPML_EXPORT_SYMBOLS=absent}, {literal: legacy_export_auth_precedence},\
       \ {literal: import_and_JSON_State_remain_green}, {literal: RF_BUG_CANONICAL_DOCUMENTS=9},\
