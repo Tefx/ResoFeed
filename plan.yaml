@@ -186923,18 +186923,18 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nPlan-contract\
       \ repair after valid rejected receipt `sha256:4da179c1d5865fb6a4ba550dfb175b89773c9c98935cb52d76fc03551bd7ee88`.\
-      \ Execute only from a fresh clean worktree created after the admitted request-start\
-      \ synchronization repair is integrated. Preserve `/Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-source-ledger-responsive-v7`\
+      \ Execute only from a fresh clean worktree created after the admitted eager\
+      \ HTTP actor contract-lock repair is integrated. Preserve `/Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-source-ledger-responsive-v8`\
       \ and all earlier dirty recovery worktrees unchanged; do not delete, reset,\
       \ rebase, or mutate them. Selectively port only admitted partial product, generated-bundle,\
       \ and documentation changes; keep `web/tests/e2e/source-ledger-operations.runtime.spec.ts`\
-      \ byte-identical to its admitted post-request-start-repair baseline.\n\nReplacement\
-      \ for `repair-source-ledger-responsive-groups`. Keep Source List and Portable\
-      \ State separately labelled and usable at five viewports; preserve OPML import,\
-      \ JSON State export/import confirmation, ingest/fetch, local operation feedback,\
-      \ delete focus, and source info. Controls remain keyboard reachable, visibly\
-      \ focused, at least 44px, and free of document overflow. Rebuild and atomically\
-      \ stage the production Svelte output through the existing `scripts/build-resofeed.sh`\
+      \ byte-identical to its admitted post-eager-HTTP-actor-repair baseline.\n\n\
+      Replacement for `repair-source-ledger-responsive-groups`. Keep Source List and\
+      \ Portable State separately labelled and usable at five viewports; preserve\
+      \ OPML import, JSON State export/import confirmation, ingest/fetch, local operation\
+      \ feedback, delete focus, and source info. Controls remain keyboard reachable,\
+      \ visibly focused, at least 44px, and free of document overflow. Rebuild and\
+      \ atomically stage the production Svelte output through the existing `scripts/build-resofeed.sh`\
       \ path before the exact adapter check so the real-browser runtime compiles and\
       \ serves the same package-local `internal/resofeed/webui` bundle produced in\
       \ this isolated worktree. The generated embedded bundle is part of this rollback\
@@ -187034,7 +187034,8 @@ phases:
     verification: Focused developer evidence pins only `runtime.spec.ts` plus `*.runtime.spec.ts`
       at zero retries. The exact State-import, render, five-viewport responsive, operations,
       and delete adapter identities then pass with native discovery, accessibility,
-      focus, 44px targets, no overflow, and no protected acceptance diff.
+      focus, 44px targets, no overflow, and no protected acceptance diff from the
+      admitted post-eager-HTTP-actor-repair baseline.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -187044,7 +187045,7 @@ phases:
     - web/tests/e2e/source-ledger-operations.runtime.spec.ts
     depends_on:
     - rf-bug-v2-e2e-loopback-fixture-boundary
-    - rf-bug-v2-source-ledger-conflict-request-start-contract-lock
+    - rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock
     agent: frontend-engineer
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
