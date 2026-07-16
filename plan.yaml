@@ -186593,7 +186593,7 @@ phases:
       - AGENTS.md'
   - id: rf-bug-v2-runtime-boundaries-gate
     name: RF-BUG Assurance v2 runtime-boundaries Full Gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -186629,6 +186629,8 @@ phases:
     depends_on:
     - rf-bug-v2-runtime-security-review
     agent: gate-reviewer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T14:04:11.583475+00:00'
   - id: rf-bug-v2-runtime-review-remediation
     name: Remediate Doctor URL redaction and residual Go OPML export
     status: done
