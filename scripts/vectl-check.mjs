@@ -532,17 +532,19 @@ function runFoundation(profile) {
     laneMarkers.push(...discovery.split('\n').filter((line) => line.startsWith(`RF-BUG-010_${lane.label}_`)));
   }
 
+  const artifactRows = collectArtifactRows([artifactRoot, laneRoot]);
   return {
     outcome: 'green',
     exitCode: 0,
     observations: ['RF-BUG-010_SETUP=ready', 'RF-BUG-010_TEARDOWN=clean', ...laneMarkers, 'VECTL_GENERIC_EVIDENCE=valid'],
-    artifacts: collectArtifactRows([artifactRoot, laneRoot])
+    artifacts: artifactRows
   };
 }
 
 function runGenericAdapter(profile) {
   ensureNoProtectedMutation();
   execute(profile, 'node', ['--test', 'scripts/vectl-check.test.mjs'], { timeout: 240_000 });
+  execute(profile, 'go', ['test', './internal/resofeed', '-run', '^TestPlaywrightFixtureContract$', '-count=1'], { timeout: 180_000 });
   return {
     outcome: 'green',
     exitCode: 0,
@@ -553,6 +555,7 @@ function runGenericAdapter(profile) {
       'VECTL_ADAPTER_IDENTITY_PARITY=valid',
       'VECTL_ADAPTER_UNKNOWN_PAIR=refused',
       'VECTL_ADAPTER_COMPLETED_HARNESS=preserved',
+      'VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid',
       'VECTL_ADAPTER_PROTECTED_SCOPE=clean',
       'VECTL_GENERIC_EVIDENCE=valid'
     ],

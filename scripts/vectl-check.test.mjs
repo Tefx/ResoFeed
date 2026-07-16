@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -100,6 +101,12 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
     'RF-BUG-010 lane-discovery'
   ]);
 
+  const adapterSource = fs.readFileSync(adapterPath, 'utf8');
+  assert.ok(
+    adapterSource.includes('artifacts: artifactRows'),
+    'foundation evidence must retain the literal artifacts: artifactRows compatibility contract'
+  );
+
   const result = invoke('select', profile.suite, profile.checkID);
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(parseSelectionOutput(result.stdout, profile), selectionEnvelope(profile));
@@ -148,12 +155,16 @@ test('VECTL-ADAPTER run-envelope-parity', () => {
   assert.ok(greenProfile);
   assert.ok(redProfile);
 
+  const artifact = {
+    path: '.test-artifacts/playwright/results.json',
+    sha256: `sha256:${'a'.repeat(64)}`
+  };
   const green = evidenceEnvelope({
     profile: greenProfile,
     outcome: 'green',
     exitCode: 0,
     observations: ['fixture=green'],
-    artifacts: []
+    artifacts: [artifact]
   });
   const red = evidenceEnvelope({
     profile: redProfile,
@@ -165,8 +176,22 @@ test('VECTL-ADAPTER run-envelope-parity', () => {
 
   assert.deepEqual(parseEvidenceOutput(JSON.stringify(green), greenProfile, 'green'), green);
   assert.deepEqual(parseEvidenceOutput(JSON.stringify(red), redProfile, 'red'), red);
+  assert.deepEqual(green.artifacts, [artifact]);
   assert.deepEqual(green.selected_ids, green.executed_ids);
   assert.deepEqual(red.selected_ids, red.executed_ids);
+
+  for (const invalidArtifact of [
+    '.test-artifacts/playwright/results.json',
+    { path: '/tmp/results.json', sha256: artifact.sha256 },
+    { path: '../results.json', sha256: artifact.sha256 },
+    { path: artifact.path, sha256: 'sha256:invalid' }
+  ]) {
+    const invalid = { ...green, artifacts: [invalidArtifact] };
+    assert.throws(
+      () => parseEvidenceOutput(JSON.stringify(invalid), greenProfile, 'green'),
+      /invalid artifact/u
+    );
+  }
 
   const mismatched = { ...green, executed_ids: [...green.executed_ids].reverse() };
   assert.throws(
