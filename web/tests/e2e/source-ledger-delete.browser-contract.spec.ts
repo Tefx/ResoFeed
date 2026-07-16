@@ -80,7 +80,7 @@ test.describe('RF-BUG-008 Source Ledger delete browser contract', () => {
 
     await expect(deletedRow).toHaveCount(0);
     await expect(sourceRow(page, sources[1].id).locator('.bracket-action--fetch')).toBeFocused();
-    const itemResponse = await request.get(`${runInfo.baseURL}/api/items/${savedItem.item_id}`, {
+    const itemResponse = await request.get(`${runInfo.baseURL}/api/items/~${Buffer.from(savedItem.item_id, 'utf8').toString('base64url')}`, {
       headers: { Authorization: `Bearer ${ownerToken}` }
     });
     expect(itemResponse.status(), 'saved items remain readable after deleting only the source subscription').toBe(200);

@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"io"
@@ -312,7 +313,7 @@ func rfbug009HTTPPath(t *testing.T) {
 	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: rfbug009OwnerToken, LLM: llm})
 	body := `{"actor_kind":"human","actor_id":"owner","idempotency_key":"rfbug009-http","model":"openrouter/v22-http","prompt":"Emphasize persistence."}`
 	recorder := httptest.NewRecorder()
-	request := httptest.NewRequest(http.MethodPost, "/api/items/item_rfbug009_http/reingest", strings.NewReader(body))
+	request := httptest.NewRequest(http.MethodPost, "/api/items/~"+base64.RawURLEncoding.EncodeToString([]byte("item_rfbug009_http"))+"/reingest", strings.NewReader(body))
 	request.Header.Set("Authorization", "Bearer "+rfbug009OwnerToken)
 	request.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(recorder, request)
