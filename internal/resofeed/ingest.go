@@ -188,12 +188,10 @@ func RunIngestLoop(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 // IngestOnce performs one background ingestion pass over active sources. The
 // pass skips already-busy sources, drains selected idle sources through a bounded
 // in-request goroutine batch, and never leaves delayed work after the tick returns.
-func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) (retErr error) {
+func IngestOnce(ctx context.Context, db *sql.DB, cfg IngestConfig) error {
 	if backgroundIngestBlockedByGlobalOperation() {
 		return nil
 	}
-	ingestGuardState.current.start("ingest", "background", "background")
-	defer ingestGuardState.current.clearIfKind("background_ingest")
 	_, err := ingestOnceBackgroundBounded(ctx, db, cfg)
 	return err
 }
@@ -332,12 +330,20 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 		opts.completeMessage = "ingest complete"
 	}
 
-	updateCurrentOperation("loading_sources", nil, opts.loadMessage)
+	// Background snapshots are owned by individual source guards. Updates outside
+	// an acquired source guard could overwrite a concurrent human source fetch.
+	updateOutsideSourceGuard := func(phase string, count *CurrentOperationCount, message string) {
+		if opts.actorKind != "background" {
+			updateCurrentOperation(phase, count, message)
+		}
+	}
+
+	updateOutsideSourceGuard("loading_sources", nil, opts.loadMessage)
 	sources, err := loadActiveSources(ctx, db)
 	if err != nil {
 		return result, err
 	}
-	updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, opts.fetchMessage)
+	updateOutsideSourceGuard("fetching_sources", &CurrentOperationCount{Current: 0, Total: len(sources)}, opts.fetchMessage)
 
 	coordCfg := cfg.coordinatorConfig()
 	cfg = cfg.withLLMSemaphore(coordCfg)
@@ -349,11 +355,11 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 		for _, source := range sources {
 			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceBusy, Message: "global operation running"})
 		}
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, opts.completeMessage)
+		updateOutsideSourceGuard("complete", &CurrentOperationCount{Current: 0, Total: len(sources)}, opts.completeMessage)
 		return result, nil
 	}
 	if len(sources) == 0 {
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: 0, Total: 0}, opts.completeMessage)
+		updateOutsideSourceGuard("complete", &CurrentOperationCount{Current: 0, Total: 0}, opts.completeMessage)
 		return result, nil
 	}
 
@@ -368,7 +374,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 		idleSources = append(idleSources, source)
 	}
 	if len(idleSources) == 0 {
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
+		updateOutsideSourceGuard("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
 		return result, nil
 	}
 	if capacity.availableSlots <= 0 {
@@ -376,7 +382,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 			result.Errors = append(result.Errors, ManualFetchSourceError{SourceID: source.ID, Code: IngestErrorCodeSourceCapacityExhausted, Message: "source capacity exhausted"})
 			completed++
 		}
-		updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
+		updateOutsideSourceGuard("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
 		return result, nil
 	}
 
@@ -407,7 +413,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 		completed++
 		current := completed
 		resultMu.Unlock()
-		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.skipMessage)
+		updateOutsideSourceGuard("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.skipMessage)
 	}
 	recordSourceSuccess := func(source Source, sourceResult ingestSourceResult) {
 		resultMu.Lock()
@@ -418,7 +424,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 		completed++
 		current := completed
 		resultMu.Unlock()
-		updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.fetchMessage)
+		updateOutsideSourceGuard("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.fetchMessage)
 	}
 
 	for i := 0; i < parallelSlots; i++ {
@@ -476,7 +482,7 @@ sendLoop:
 
 	resultMu.Lock()
 	defer resultMu.Unlock()
-	updateCurrentOperation("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
+	updateOutsideSourceGuard("complete", &CurrentOperationCount{Current: completed, Total: len(sources)}, opts.completeMessage)
 	return result, firstErr
 }
 
