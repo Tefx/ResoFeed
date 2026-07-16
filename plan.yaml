@@ -187237,7 +187237,13 @@ phases:
       INGEST control across dynamic accessible-name states; five viewport Ledger/State
       rendering and operations; accessibility/delete focus; Prompting v2.2 across
       all paths; atomic preservation; production-only active-name scanning; and redaction
-      without main-checkout or external-asset substitution.
+      without main-checkout or external-asset substitution. For RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION,
+      independently rerun `go test -race ./internal/resofeed -run '^TestICACurrentOperationBackgroundSnapshotOwnership$'
+      -count=1 -v` on the integrated head and confirm the real runtime conflict path
+      retains exact `source_fetch` / `human` / `fetching_source` visibility through
+      a rejected background attempt, while a normally acquired background operation
+      is visible and clears on release; any race report, snapshot overwrite/early
+      clear, acceptance diff, or persisted operation ledger blocks admission.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
