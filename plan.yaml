@@ -186919,7 +186919,7 @@ phases:
   steps:
   - id: rf-bug-v2-source-ledger-responsive
     name: Repair Source Ledger and State operations under v2
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nPlan-contract\
       \ repair after valid rejected receipt `sha256:4da179c1d5865fb6a4ba550dfb175b89773c9c98935cb52d76fc03551bd7ee88`.\
@@ -187050,6 +187050,12 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T21:33:47.480851+00:00'
+    done_at: '2026-07-16T21:40:43.883580+00:00'
+    evidence: Integrated 10287b81f50f41d7034327aa73a596ba489eb9f4 (worker b5080cf291004d65a5729e583e0f822a912b1ef0).
+      Runtime config discovery passed; selected Source Ledger adapter executed all
+      five identities green across State import lifecycle, responsive rendering, real
+      operations, delete focus, and render states. Receipt sha256:83bacfb766d7ee1b3f11ffd3fcb03f8a4b35e411a44f179a425e75ac3878c74d;
+      dispatch sha256:8aec4b68810f8f5f51423f6775288dbb474733a176b9b394943abc99909fca05.
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
     status: done
