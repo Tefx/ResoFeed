@@ -186924,23 +186924,38 @@ phases:
       \ State separately labelled and usable at five viewports; preserve OPML import,\
       \ JSON State export/import confirmation, ingest/fetch, local operation feedback,\
       \ delete focus, and source info. Controls remain keyboard reachable, visibly\
-      \ focused, at least 44px, and free of document overflow. Rollback reverts Ledger/State\
-      \ components, CSS, docs, and preview together. OPML export, folders/tags, jobs,\
-      \ queues, history, sync, and activity ledgers remain forbidden.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      \ focused, at least 44px, and free of document overflow. Rebuild and atomically\
+      \ stage the production Svelte output through the existing `scripts/build-resofeed.sh`\
+      \ path before the exact adapter check so the real-browser runtime compiles and\
+      \ serves the same package-local `internal/resofeed/webui` bundle produced in\
+      \ this isolated worktree. The generated embedded bundle is part of this rollback\
+      \ unit; transient `web/build` and the temporary binary remain non-durable. Rollback\
+      \ reverts Ledger/State components, CSS, docs, preview, and the generated embedded\
+      \ bundle together. OPML export, folders/tags, jobs, queues, history, sync, and\
+      \ activity ledgers remain forbidden.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
       profile: generic\nscope:\n  allowed_paths: [web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
-      \ web/src/routes/components/StatePortability.svelte, web/src/app.css, docs/DESIGN.md,\
-      \ docs/ui-preview.html, docs/UI_REGRESSION_CONTRACT.md]\n  blocked_paths: [web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
-      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
-      \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
-      \ internal/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\n\
-      claims: [RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008]\nchecks:\n  - id:\
-      \ rf_bug_v2_source_ledger_green\n    run: {command: [node, scripts/vectl-check.mjs,\
-      \ run, rf-bug-v2-source-ledger, rf_bug_v2_source_ledger_green], timeout_seconds:\
-      \ 1800}\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
-      \        - {path: scripts/vectl-check.mjs, access: execute, availability: produced_by_step}\n\
-      \        - {path: web/package.json, access: read, availability: current}\n \
-      \     test_bindings:\n        - {path: web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
+      \ web/src/routes/components/StatePortability.svelte, web/src/app.css, internal/resofeed/webui/**,\
+      \ docs/DESIGN.md, docs/ui-preview.html, docs/UI_REGRESSION_CONTRACT.md]\n  blocked_paths:\
+      \ [web/src/routes/components/__tests__/source-ledger-responsive.test.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
+      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
+      \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/, web/build/, web/.svelte-kit/,\
+      \ web/node_modules/, .test-artifacts/]\nclaims: [RF-BUG-004-STATE-UI, RF-BUG-008,\
+      \ RF-BUG-004-008]\nchecks:\n  - id: rf_bug_v2_source_ledger_green\n    run:\n\
+      \      command:\n        - bash\n        - -lc\n        - >-\n          set\
+      \ -euo pipefail; out=\"${TMPDIR:-/tmp}/resofeed-rf-bug-v2-source-ledger-$$\"\
+      ; trap 'rm -f \"$out\"' EXIT; scripts/build-resofeed.sh \"$out\"; node scripts/vectl-check.mjs\
+      \ run rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green\n      timeout_seconds:\
+      \ 1800\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
+      \        - {path: scripts/build-resofeed.sh, access: execute, availability:\
+      \ current}\n        - {path: scripts/vectl-check.mjs, access: execute, availability:\
+      \ current}\n        - {path: web/package.json, access: read, availability: current}\n\
+      \        - {path: web/package-lock.json, access: read, availability: current}\n\
+      \        - {path: web/svelte.config.js, access: read, availability: current}\n\
+      \        - {path: web/vite.config.ts, access: read, availability: current}\n\
+      \        - {path: go.mod, access: read, availability: current}\n      test_bindings:\n\
+      \        - {path: web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
