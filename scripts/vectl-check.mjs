@@ -5,40 +5,332 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const suiteID = 'rf-bug-v2-harness-foundation';
-const canonicalCheckID = 'rf_bug_v2_harness_foundation_green';
-const identities = [
+const adapterPath = fileURLToPath(import.meta.url);
+const repoRoot = path.resolve(path.dirname(adapterPath), '..');
+
+const foundationIdentities = [
   'RF-BUG-010 adapter-envelope',
   'RF-BUG-010 artifact-contract',
   'RF-BUG-010 harness-isolation',
   'RF-BUG-010 lane-discovery'
 ];
 
-function selectionDigest(selectedIDs) {
+export const PENDING_PROFILE_PAIRS = [
+  {
+    suite: 'rf-bug-v2-frontend-runtime',
+    checkID: 'rf_bug_v2_frontend_runtime_green',
+    identities: [
+      'RF-BUG-001 real API SQLite stale selection seam',
+      'RF-BUG-002 stale Search ownership and recovery',
+      'RF-BUG-006 route-correct pre-hydration title',
+      'RF-BUG-007 EN/ZH idle and invalid alert'
+    ],
+    requiredOutput: [
+      'initial HTML title is route-correct before hydration',
+      'Search ignores stale completion and preserves latest selection',
+      'RF-BUG-001_REAL_API_SQLITE_SEAM=ready',
+      '[RF-BUG-007][zh] idle and invalid alert contract'
+    ],
+    commands: [
+      ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts', 'web/tests/e2e/routes.browser-contract.spec.ts', 'web/tests/e2e/inspector-selection.browser-contract.spec.ts']
+    ]
+  },
+  {
+    suite: 'rf-bug-v2-go-token-parity',
+    checkID: 'rf_bug_v2_go_token_parity_green',
+    identities: [
+      'RF-BUG-002 canonical HTTP MCP parity',
+      'RF-BUG-002 opaque item ID API paths 30'
+    ],
+    requiredOutput: ['RF_BUG_002_CANONICAL_HTTP_REJECTION=complete', 'RF_BUG_002_API_SUBTESTS=30'],
+    commands: [
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestRFBUG002OpaqueItemIDAPIPaths|TestRFBUG002CanonicalHTTPMCPParity)$', '-count=1']
+    ]
+  },
+  {
+    suite: 'rf-bug-v2-embed-ui',
+    checkID: 'rf_bug_v2_embed_ui_green',
+    identities: [
+      'RF-BUG-003 Doctor redaction',
+      'RF-BUG-003 binary arbitrary cwd',
+      'RF-BUG-003 embedded UI contract'
+    ],
+    requiredOutput: [
+      'RF-BUG-003_EXACT_SUBTEST_SET=23',
+      'RF-BUG-003_BROWSER_SCRIPT_CLASSIFICATION_FIXTURES=complete',
+      'RF-BUG-003_CSP_CRLF_NORMALIZED=chromium',
+      'RF_BUG_003_BINARY_PROBES=3'
+    ],
+    commands: [
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestRFBUG003EmbeddedUIContract|TestRFBUG003DoctorRedactionContract)$', '-count=1']
+    ]
+  },
+  {
+    suite: 'rf-bug-v2-opml',
+    checkID: 'rf_bug_v2_opml_import_only_green',
+    identities: ['RF-BUG-004 active document scan', 'RF-BUG-004 auth-first import-only contract'],
+    requiredOutput: ['legacy_export_auth_precedence', 'import_and_JSON_State_remain_green', 'OPML_ACTIVE_DOCUMENTS=9', 'OPML_EXCLUSIONS=2'],
+    commands: [
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^TestRFBUG004OPMLImportOnlyContract$', '-count=1'],
+      ['go', 'test', '-v', './tests', '-run', '^TestRFBugCanonicalContracts/OPMLActiveScan$', '-count=1'],
+      ['npm', '--prefix', 'web', 'run', 'test:render', '--', 'src/lib/api-client.test.ts']
+    ]
+  },
+  {
+    suite: 'rf-bug-v2-http-security',
+    checkID: 'rf_bug_v2_http_security_green',
+    identities: [
+      'RF-BUG-005 Chromium CSP operations',
+      'RF-BUG-005 exact security contract',
+      'RF-BUG-005 local streaming cancellation'
+    ],
+    requiredOutput: [
+      'RF-BUG-005_EXACT_SUBTEST_SET=13',
+      'csp_exact_executable_hashes',
+      'multi_flush_streaming',
+      'request_cancellation',
+      'CSP operations import and State export import download'
+    ],
+    commands: [
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$', '-count=1'],
+      ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/csp-operations.browser-contract.spec.ts']
+    ]
+  },
+  {
+    suite: 'rf-bug-v2-source-ledger',
+    checkID: 'rf_bug_v2_source_ledger_green',
+    identities: [
+      'RF-BUG-004 State import lifecycle',
+      'RF-BUG-008 delete focus',
+      'RF-BUG-008 five viewport responsive',
+      'RF-BUG-008 operations runtime',
+      'RF-BUG-008 render states'
+    ],
+    requiredOutput: [
+      'State import confirms before atomic replacement',
+      'Source Ledger groups and controls render',
+      '[RF-BUG-008][320x800] Source Ledger responsive contract',
+      'RUN INGEST transitions',
+      'delete success preserves saved items and moves focus'
+    ],
+    commands: [
+      ['npm', '--prefix', 'web', 'run', 'test:render', '--', 'src/routes/components/__tests__/source-ledger-responsive.test.ts'],
+      ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts', 'web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'],
+      ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.runtime.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/source-ledger-operations.runtime.spec.ts']
+    ]
+  },
+  {
+    suite: 'rf-bug-v2-prompting',
+    checkID: 'rf_bug_v2_prompting_green',
+    identities: [
+      'RF-BUG-009 active v2.1 absence',
+      'RF-BUG-009 exact 16 subtests',
+      'RF-BUG-009 focused path parity',
+      'RF-BUG-009 regression and atomic preservation'
+    ],
+    requiredOutput: [
+      'RF-BUG-009_EXACT_SUBTEST_SET=16',
+      'single_semantic_repair_bound',
+      'library_reprocess_path',
+      'mcp_path',
+      'PROMPTING_V21_ACTIVE_MATCHES=0'
+    ],
+    commands: [
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^TestRFBUG009PromptingV22Contract$', '-count=1'],
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$', '-count=1'],
+      ['bash', '-lc', "set +e; git grep -nEiI 'PROMPTING([[:space:]]+SYSTEM)?[[:space:]]+V2\\.1|(^|[^[:alnum:]_])V2\\.1([^[:alnum:]_]|$)' -- cmd internal/resofeed web/src web/tests docs/ARCHITECTURE.md docs/PROMPTING_SYSTEM.md; s=$?; set -e; test $s -eq 1; echo PROMPTING_V21_ACTIVE_MATCHES=0"]
+    ]
+  },
+  {
+    suite: 'rf-bug-v2-closure-report',
+    checkID: 'rf_bug_v2_defect_report_closure_green',
+    identities: ['RF-BUG-001-010 active source scans', 'RF-BUG-001-010 closure contract'],
+    requiredOutput: ['RF_BUG_CLOSURE_REQUIREMENTS=10', 'OPML_ACTIVE_DOCUMENTS=9', 'OPML_EXCLUSIONS=2', 'PROMPTING_V21_ACTIVE_MATCHES=0'],
+    commands: [
+      ['go', 'test', '-v', './tests', '-run', '^(TestRFBugCanonicalContracts/OPMLActiveScan|TestRFBugClosureContract)$', '-count=1']
+    ]
+  },
+  {
+    suite: 'item-deep-links-contract',
+    checkID: 'item_deep_links_expected_red',
+    identities: [
+      'ITEM-DEEP-LINK app codec and API domain separation',
+      'ITEM-DEEP-LINK browser history auth error read-only lifecycle',
+      'ITEM-DEEP-LINK duplicate read envelope and MCP app_url'
+    ],
+    expectedOutcome: 'red',
+    requiredOutput: ['IDL-BACKEND-READ-PROJECTION-GAP', 'IDL-FRONTEND-APP-HISTORY-GAP'],
+    commands: [
+      { argv: ['go', 'test', '-v', './internal/resofeed', '-run', 'ItemDeepLink', '-count=1'], expectedStatus: 1 },
+      { argv: ['npm', '--prefix', 'web', 'run', 'test:render', '--', 'src/lib/__tests__/item-deep-links.expected-red.test.ts'], expectedStatus: 1 },
+      { argv: ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/item-deep-links.browser-contract.spec.ts'], expectedStatus: 1 }
+    ]
+  },
+  {
+    suite: 'item-deep-links-backend',
+    checkID: 'item_deep_links_backend_green',
+    identities: ['ITEM-DEEP-LINK duplicate read envelope and MCP app_url'],
+    requiredOutput: [
+      'ITEM_DEEP_LINK_HTTP_CANONICAL=complete',
+      'ITEM_DEEP_LINK_STATIC_DISPATCH=complete',
+      'ITEM_DEEP_LINK_DUPLICATE_RESULT=complete',
+      'ITEM_DEEP_LINK_MCP_APP_URL=complete',
+      'ITEM_DEEP_LINK_PUBLIC_URL=complete',
+      'ITEM_DEEP_LINK_READ_ONLY=complete'
+    ],
+    commands: [
+      ['go', 'test', '-v', './internal/resofeed', './cmd/resofeed', '-run', 'ItemDeepLink|ItemRouteToken', '-count=1']
+    ]
+  },
+  {
+    suite: 'item-deep-links-frontend',
+    checkID: 'item_deep_links_frontend_green',
+    identities: [
+      'ITEM-DEEP-LINK app codec and API domain separation',
+      'ITEM-DEEP-LINK browser history auth error read-only lifecycle'
+    ],
+    requiredOutput: [
+      'ITEM_DEEP_LINK_APP_CODEC=complete',
+      'ITEM_DEEP_LINK_API_DOMAIN_SEPARATION=complete',
+      'ITEM_DEEP_LINK_HISTORY=complete',
+      'ITEM_DEEP_LINK_AUTH_RECOVERY=complete',
+      'ITEM_DEEP_LINK_ERRORS=complete',
+      'ITEM_DEEP_LINK_MUTATION_TARGET=complete',
+      'ITEM_DEEP_LINK_BROWSER_MATRIX=complete'
+    ],
+    commands: [
+      ['npm', '--prefix', 'web', 'run', 'test:render', '--', 'src/lib/__tests__/item-deep-links.expected-red.test.ts', 'src/lib/api-client.test.ts', 'src/lib/__tests__/workbench-route.test.ts', 'src/routes/components/__tests__/item-deep-links.test.ts'],
+      ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/item-deep-links.browser-contract.spec.ts']
+    ]
+  }
+];
+
+const genericAdapterIdentities = [
+  'VECTL-ADAPTER completed-harness-regression',
+  'VECTL-ADAPTER pending-profile-discovery',
+  'VECTL-ADAPTER protected-scope',
+  'VECTL-ADAPTER run-envelope-parity',
+  'VECTL-ADAPTER unknown-pair-fail-closed'
+];
+
+const profileRows = [
+  {
+    suite: 'rf-bug-v2-harness-foundation',
+    checkID: 'rf_bug_v2_harness_foundation_green',
+    identities: foundationIdentities,
+    runner: 'foundation'
+  },
+  {
+    suite: 'rf-bug-v2-generic-adapter',
+    checkID: 'rf_bug_v2_generic_adapter_green',
+    identities: genericAdapterIdentities,
+    runner: 'generic-adapter'
+  },
+  ...PENDING_PROFILE_PAIRS.map((profile) => ({
+    expectedOutcome: 'green',
+    runner: 'native',
+    ...profile
+  }))
+];
+
+function profileKey(suite, checkID) {
+  return `${suite}\u0000${checkID}`;
+}
+
+export const PROFILES = new Map(profileRows.map((profile) => {
+  const frozen = Object.freeze({
+    expectedOutcome: 'green',
+    commands: [],
+    requiredOutput: [],
+    ...profile,
+    identities: Object.freeze([...profile.identities])
+  });
+  return [profileKey(frozen.suite, frozen.checkID), frozen];
+}));
+
+export function selectionDigest(selectedIDs) {
   return `sha256:${createHash('sha256').update(JSON.stringify({ identities: selectedIDs })).digest('hex')}`;
 }
 
-function selectionEnvelope(checkID) {
+export function selectionEnvelope(profile) {
   return {
     schema_version: 'vectl.check.selection.v1',
-    check_id: checkID,
-    identities,
-    digest: selectionDigest(identities)
+    check_id: profile.checkID,
+    identities: [...profile.identities],
+    digest: selectionDigest(profile.identities)
   };
 }
 
-function evidenceEnvelope({ checkID, outcome, exitCode, observations, artifacts }) {
+export function evidenceEnvelope({ profile, outcome, exitCode, observations = [], artifacts = [] }) {
   return {
     schema_version: 'vectl.check.evidence.v1',
-    check_id: checkID,
-    selected_ids: identities,
-    executed_ids: identities,
+    check_id: profile.checkID,
+    selected_ids: [...profile.identities],
+    executed_ids: [...profile.identities],
     outcome,
     exit_code: exitCode,
     observations,
     artifacts
   };
+}
+
+function parseJSONEnvelope(output, schemaVersion) {
+  const candidates = String(output).split(/\r?\n/u).filter(Boolean).flatMap((line) => {
+    try {
+      const value = JSON.parse(line);
+      return value?.schema_version === schemaVersion ? [value] : [];
+    } catch {
+      return [];
+    }
+  });
+  if (candidates.length !== 1) throw new Error(`expected one ${schemaVersion} envelope`);
+  return candidates[0];
+}
+
+function sameIDs(actual, expected) {
+  return Array.isArray(actual) && JSON.stringify(actual) === JSON.stringify(expected);
+}
+
+export function parseSelectionOutput(output, profile) {
+  const envelope = parseJSONEnvelope(output, 'vectl.check.selection.v1');
+  if (
+    envelope.check_id !== profile.checkID
+    || !sameIDs(envelope.identities, profile.identities)
+    || envelope.digest !== selectionDigest(profile.identities)
+  ) {
+    throw new Error('selection envelope did not match the requested profile');
+  }
+  return envelope;
+}
+
+export function parseEvidenceOutput(output, profile, expectedOutcome = profile.expectedOutcome) {
+  const envelope = parseJSONEnvelope(output, 'vectl.check.evidence.v1');
+  const expectedExitCode = expectedOutcome === 'green' ? 0 : 1;
+  if (
+    envelope.check_id !== profile.checkID
+    || !sameIDs(envelope.selected_ids, profile.identities)
+    || !sameIDs(envelope.executed_ids, profile.identities)
+    || envelope.outcome !== expectedOutcome
+    || envelope.exit_code !== expectedExitCode
+    || !Array.isArray(envelope.observations)
+    || !envelope.observations.every((value) => typeof value === 'string')
+    || !Array.isArray(envelope.artifacts)
+  ) {
+    throw new Error('evidence envelope did not match the requested profile');
+  }
+  for (const artifact of envelope.artifacts) {
+    if (
+      !artifact
+      || typeof artifact.path !== 'string'
+      || path.isAbsolute(artifact.path)
+      || artifact.path === '..'
+      || artifact.path.startsWith('../')
+      || !/^sha256:[a-f0-9]{64}$/u.test(artifact.sha256)
+    ) {
+      throw new Error('evidence envelope contained an invalid artifact');
+    }
+  }
+  return envelope;
 }
 
 function redact(value) {
@@ -50,15 +342,11 @@ function redact(value) {
     .replace(/((?:OPENROUTER_KEY|TAVILY_API_KEY)\s*=\s*)[^\s]+/gu, '$1<redacted>');
 }
 
-function fail(message, observations = []) {
-  process.stdout.write(`${JSON.stringify(evidenceEnvelope({
-    checkID: canonicalCheckID,
-    outcome: 'red',
-    exitCode: 1,
-    observations: [message, ...observations].map(redact),
-    artifacts: []
-  }))}\n`);
-  process.exit(1);
+class AdapterFailure extends Error {
+  constructor(message, observations = []) {
+    super(message);
+    this.observations = observations;
+  }
 }
 
 function artifactDigest(filePath) {
@@ -75,11 +363,11 @@ function collectArtifactRows(roots) {
     }
   }
   for (const root of roots) visit(root);
-  if (files.length === 0) fail('generic evidence retained no artifact files');
+  if (files.length === 0) throw new AdapterFailure('generic evidence retained no artifact files');
   return files.map((filePath) => {
     const relativePath = path.relative(repoRoot, filePath).split(path.sep).join('/');
     if (!relativePath || relativePath === '..' || relativePath.startsWith('../')) {
-      fail('generic evidence artifact escaped the repository');
+      throw new AdapterFailure('generic evidence artifact escaped the repository');
     }
     return { path: relativePath, sha256: artifactDigest(filePath) };
   });
@@ -98,7 +386,7 @@ function childEnvironment(overrides = {}) {
   };
 }
 
-function run(command, args, options = {}) {
+function execute(profile, command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: repoRoot,
     encoding: 'utf8',
@@ -107,7 +395,7 @@ function run(command, args, options = {}) {
   });
   if (result.error || result.status !== (options.expectedStatus ?? 0)) {
     const detail = redact(`${result.error?.message ?? ''}\n${result.stdout ?? ''}\n${result.stderr ?? ''}`).slice(-6000);
-    fail(`${command} execution did not satisfy its expected process outcome`, [detail]);
+    throw new AdapterFailure(`${command} execution did not satisfy the ${profile.suite}/${profile.checkID} process outcome`, [detail]);
   }
   return `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
 }
@@ -128,33 +416,7 @@ function ensureNoProtectedMutation() {
     encoding: 'utf8',
     env: childEnvironment()
   });
-  if (changed.status !== 0 || changed.stdout.trim()) fail('protected acceptance baseline changed');
-}
-
-function assertAdapterEnvelope(checkID) {
-  const selection = selectionEnvelope(checkID);
-  if (
-    selection.schema_version !== 'vectl.check.selection.v1'
-    || selection.check_id !== canonicalCheckID
-    || selection.identities.length !== 4
-    || !selection.digest.startsWith('sha256:')
-  ) {
-    fail('generic selection envelope is invalid');
-  }
-  const evidence = evidenceEnvelope({
-    checkID,
-    outcome: 'green',
-    exitCode: 0,
-    observations: ['VECTL_GENERIC_EVIDENCE=valid'],
-    artifacts: []
-  });
-  if (
-    evidence.schema_version !== 'vectl.check.evidence.v1'
-    || JSON.stringify(evidence.selected_ids) !== JSON.stringify(selection.identities)
-    || JSON.stringify(evidence.executed_ids) !== JSON.stringify(selection.identities)
-  ) {
-    fail('generic evidence envelope is invalid');
-  }
+  if (changed.status !== 0 || changed.stdout.trim()) throw new AdapterFailure('protected acceptance baseline changed');
 }
 
 function collectAttachments(report) {
@@ -175,129 +437,191 @@ function collectAttachments(report) {
 
 function verifyArtifactProof(artifactRoot, artifactOutput) {
   for (const marker of ['RF-BUG-010_SETUP=ready', 'RF-BUG-010_ASSERTION_REACHED=ready', 'RF-BUG-010_TEARDOWN=clean']) {
-    if (!artifactOutput.includes(marker)) fail(`artifact proof did not emit ${marker}`);
+    if (!artifactOutput.includes(marker)) throw new AdapterFailure(`artifact proof did not emit ${marker}`);
   }
 
   const htmlPath = path.join(artifactRoot, 'html-report', 'index.html');
   const resultPath = path.join(artifactRoot, 'results', 'results.json');
   for (const requiredPath of [htmlPath, resultPath]) {
-    if (!fs.existsSync(requiredPath)) fail(`artifact proof did not retain ${path.relative(repoRoot, requiredPath)}`);
+    if (!fs.existsSync(requiredPath)) throw new AdapterFailure(`artifact proof did not retain ${path.relative(repoRoot, requiredPath)}`);
   }
 
   const attachments = collectAttachments(JSON.parse(fs.readFileSync(resultPath, 'utf8')));
-  const requiredNames = [
-    'screenshot',
-    'video',
-    'trace',
-    'server.stdout.log',
-    'server.stderr.log',
-    'browser-diagnostics.log',
-    'runtime-cleanup.txt'
-  ];
+  const requiredNames = ['screenshot', 'video', 'trace', 'server.stdout.log', 'server.stderr.log', 'browser-diagnostics.log', 'runtime-cleanup.txt'];
   for (const name of requiredNames) {
     const attachment = attachments.find((candidate) => candidate.name === name && candidate.path);
-    if (!attachment || !fs.existsSync(attachment.path)) fail(`artifact proof did not retain ${name}`);
+    if (!attachment || !fs.existsSync(attachment.path)) throw new AdapterFailure(`artifact proof did not retain ${name}`);
   }
 
   for (const name of ['server.stdout.log', 'server.stderr.log', 'browser-diagnostics.log', 'runtime-cleanup.txt']) {
     const attachment = attachments.find((candidate) => candidate.name === name && candidate.path);
     const raw = fs.readFileSync(attachment.path, 'utf8');
-    if (redact(raw) !== raw) fail(`artifact proof retained secret-bearing ${name}`);
+    if (redact(raw) !== raw) throw new AdapterFailure(`artifact proof retained secret-bearing ${name}`);
   }
   const cleanup = fs.readFileSync(attachments.find((candidate) => candidate.name === 'runtime-cleanup.txt').path, 'utf8');
   for (const marker of ['process=stopped', 'port=closed', 'database_residue=0', 'cleanup=clean']) {
-    if (!cleanup.includes(marker)) fail(`artifact proof cleanup did not record ${marker}`);
+    if (!cleanup.includes(marker)) throw new AdapterFailure(`artifact proof cleanup did not record ${marker}`);
   }
 }
 
-const [action, suite, checkID] = process.argv.slice(2);
-if (action === 'select') {
-  if (suite !== suiteID || checkID !== canonicalCheckID) fail('invalid selection request');
-  process.stdout.write(`${JSON.stringify(selectionEnvelope(checkID))}\n`);
-  process.exit(0);
-}
-if (action !== 'run' || suite !== suiteID || checkID !== canonicalCheckID) {
-  fail(`usage: vectl-check.mjs run ${suiteID} ${canonicalCheckID}`);
-}
+function runFoundation(profile) {
+  ensureNoProtectedMutation();
+  const artifactRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'rf-bug-010-artifact-proof');
+  const laneRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'lane-discovery');
 
-ensureNoProtectedMutation();
-assertAdapterEnvelope(checkID);
-run('go', ['test', './internal/resofeed', '-run', '^TestPlaywrightFixtureContract$', '-count=1'], { timeout: 180_000 });
-run('npm', ['--prefix', 'web', 'run', 'test:render', '--', 'src/lib/__tests__/playwright-e2e-harness-contract.test.ts'], { timeout: 180_000 });
+  execute(profile, 'go', ['test', './internal/resofeed', '-run', '^TestPlaywrightFixtureContract$', '-count=1'], { timeout: 180_000 });
+  execute(profile, 'npm', ['--prefix', 'web', 'run', 'test:render', '--', 'src/lib/__tests__/playwright-e2e-harness-contract.test.ts'], { timeout: 180_000 });
 
-const artifactRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'rf-bug-010-artifact-proof');
-fs.rmSync(artifactRoot, { recursive: true, force: true });
-fs.mkdirSync(path.join(artifactRoot, 'results'), { recursive: true });
-const artifactOutput = run('npm', [
-  '--prefix', 'web', 'exec', '--', 'playwright', 'test',
-  '--config', 'web/playwright.smoke.config.ts',
-  '--project=chromium-ci-safe', '--retries=0', '--reporter=line,json,html',
-  '--output', path.join(artifactRoot, 'test-output'),
-  'web/tests/e2e/smoke.spec.ts'
-], {
-  expectedStatus: 1,
-  timeout: 300_000,
-  env: {
-    RESOFEED_E2E_ARTIFACT_PROOF: '1',
-    PLAYWRIGHT_JSON_OUTPUT_NAME: path.join(artifactRoot, 'results', 'results.json'),
-    PLAYWRIGHT_HTML_OUTPUT_DIR: path.join(artifactRoot, 'html-report'),
-    PLAYWRIGHT_HTML_OPEN: 'never'
-  }
-});
-verifyArtifactProof(artifactRoot, artifactOutput);
-
-run('npm', ['--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.smoke.config.ts', '--project=chromium-ci-safe', '--retries=0'], { timeout: 180_000 });
-run('npm', ['--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.runtime.config.ts', '--project=chromium-ci-safe', '--retries=0'], { timeout: 240_000 });
-
-const laneRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'lane-discovery');
-fs.rmSync(laneRoot, { recursive: true, force: true });
-fs.mkdirSync(laneRoot, { recursive: true });
-const lanes = [
-  {
-    label: 'OLD',
-    files: [
-      'web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts',
-      'web/tests/e2e/mobile-inspector-token-hydration.spec.ts',
-      'web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts'
-    ]
-  },
-  {
-    label: 'REPLACEMENT',
-    files: [
-      'web/tests/e2e/inspector-selection.browser-contract.spec.ts',
-      'web/tests/e2e/initial-route.browser-contract.spec.ts',
-      'web/tests/e2e/routes.browser-contract.spec.ts',
-      'web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts',
-      'web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'
-    ]
-  }
-];
-const laneMarkers = [];
-for (const lane of lanes) {
-  const listPath = path.join(laneRoot, `${lane.label.toLowerCase()}-list.json`);
-  run('npm', [
+  fs.rmSync(artifactRoot, { recursive: true, force: true });
+  fs.mkdirSync(path.join(artifactRoot, 'results'), { recursive: true });
+  const artifactOutput = execute(profile, 'npm', [
     '--prefix', 'web', 'exec', '--', 'playwright', 'test',
-    '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe',
-    '--retries=0', '--reporter=json', '--list', ...lane.files
-  ], { timeout: 300_000, env: { PLAYWRIGHT_JSON_OUTPUT_NAME: listPath } });
-  const discovery = run('node', [
-    'scripts/rf-bug-010-standard-json.mjs', 'discover', listPath,
-    `RF-BUG-010_${lane.label}`, ...lane.files
-  ], { timeout: 30_000 });
-  laneMarkers.push(...discovery.split('\n').filter((line) => line.startsWith(`RF-BUG-010_${lane.label}_`)));
+    '--config', 'web/playwright.smoke.config.ts',
+    '--project=chromium-ci-safe', '--retries=0', '--reporter=line,json,html',
+    '--output', path.join(artifactRoot, 'test-output'),
+    'web/tests/e2e/smoke.spec.ts'
+  ], {
+    expectedStatus: 1,
+    timeout: 300_000,
+    env: {
+      RESOFEED_E2E_ARTIFACT_PROOF: '1',
+      PLAYWRIGHT_JSON_OUTPUT_NAME: path.join(artifactRoot, 'results', 'results.json'),
+      PLAYWRIGHT_HTML_OUTPUT_DIR: path.join(artifactRoot, 'html-report'),
+      PLAYWRIGHT_HTML_OPEN: 'never'
+    }
+  });
+  verifyArtifactProof(artifactRoot, artifactOutput);
+
+  execute(profile, 'npm', ['--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.smoke.config.ts', '--project=chromium-ci-safe', '--retries=0'], { timeout: 180_000 });
+  execute(profile, 'npm', ['--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.runtime.config.ts', '--project=chromium-ci-safe', '--retries=0'], { timeout: 240_000 });
+
+  fs.rmSync(laneRoot, { recursive: true, force: true });
+  fs.mkdirSync(laneRoot, { recursive: true });
+  const lanes = [
+    {
+      label: 'OLD',
+      files: [
+        'web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts',
+        'web/tests/e2e/mobile-inspector-token-hydration.spec.ts',
+        'web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts'
+      ]
+    },
+    {
+      label: 'REPLACEMENT',
+      files: [
+        'web/tests/e2e/inspector-selection.browser-contract.spec.ts',
+        'web/tests/e2e/initial-route.browser-contract.spec.ts',
+        'web/tests/e2e/routes.browser-contract.spec.ts',
+        'web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts',
+        'web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'
+      ]
+    }
+  ];
+  const laneMarkers = [];
+  for (const lane of lanes) {
+    const listPath = path.join(laneRoot, `${lane.label.toLowerCase()}-list.json`);
+    execute(profile, 'npm', [
+      '--prefix', 'web', 'exec', '--', 'playwright', 'test',
+      '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe',
+      '--retries=0', '--reporter=json', '--list', ...lane.files
+    ], { timeout: 300_000, env: { PLAYWRIGHT_JSON_OUTPUT_NAME: listPath } });
+    const discovery = execute(profile, 'node', [
+      'scripts/rf-bug-010-standard-json.mjs', 'discover', listPath,
+      `RF-BUG-010_${lane.label}`, ...lane.files
+    ], { timeout: 30_000 });
+    laneMarkers.push(...discovery.split('\n').filter((line) => line.startsWith(`RF-BUG-010_${lane.label}_`)));
+  }
+
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: ['RF-BUG-010_SETUP=ready', 'RF-BUG-010_TEARDOWN=clean', ...laneMarkers, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: collectArtifactRows([artifactRoot, laneRoot])
+  };
 }
 
-const observations = [
-  'RF-BUG-010_SETUP=ready',
-  'RF-BUG-010_TEARDOWN=clean',
-  ...laneMarkers,
-  'VECTL_GENERIC_EVIDENCE=valid'
-];
-const artifactRows = collectArtifactRows([artifactRoot, laneRoot]);
-process.stdout.write(`${JSON.stringify(evidenceEnvelope({
-  checkID,
-  outcome: 'green',
-  exitCode: 0,
-  observations,
-  artifacts: artifactRows
-}))}\n`);
+function runGenericAdapter(profile) {
+  ensureNoProtectedMutation();
+  execute(profile, 'node', ['--test', 'scripts/vectl-check.test.mjs'], { timeout: 240_000 });
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [
+      `VECTL_ADAPTER_PENDING_PROFILE_COUNT=${PENDING_PROFILE_PAIRS.length}`,
+      'VECTL_ADAPTER_SELECTION_ENVELOPES=valid',
+      'VECTL_ADAPTER_EVIDENCE_ENVELOPES=valid',
+      'VECTL_ADAPTER_IDENTITY_PARITY=valid',
+      'VECTL_ADAPTER_UNKNOWN_PAIR=refused',
+      'VECTL_ADAPTER_COMPLETED_HARNESS=preserved',
+      'VECTL_ADAPTER_PROTECTED_SCOPE=clean',
+      'VECTL_GENERIC_EVIDENCE=valid'
+    ],
+    artifacts: []
+  };
+}
+
+function runNative(profile) {
+  const outputs = [];
+  for (const commandRow of profile.commands) {
+    const command = Array.isArray(commandRow) ? commandRow : commandRow.argv;
+    outputs.push(execute(profile, command[0], command.slice(1), {
+      expectedStatus: Array.isArray(commandRow) ? 0 : commandRow.expectedStatus,
+      timeout: commandRow.timeout
+    }));
+  }
+  const combined = outputs.join('\n');
+  const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
+  if (missing.length > 0) throw new AdapterFailure('native profile output missed required contract markers', missing);
+  return {
+    outcome: profile.expectedOutcome,
+    exitCode: profile.expectedOutcome === 'green' ? 0 : 1,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
+function refuse(message) {
+  process.stderr.write(`vectl-check refused: ${message}\n`);
+  process.exitCode = 2;
+}
+
+async function main() {
+  const [action, suite, checkID] = process.argv.slice(2);
+  const profile = PROFILES.get(profileKey(suite, checkID));
+  if (!profile) {
+    refuse('unknown or mismatched suite/check pair');
+    return;
+  }
+  if (action === 'select') {
+    process.stdout.write(`${JSON.stringify(selectionEnvelope(profile))}\n`);
+    return;
+  }
+  if (action !== 'run') {
+    refuse('action must be select or run');
+    return;
+  }
+
+  try {
+    const result = profile.runner === 'foundation'
+      ? runFoundation(profile)
+      : profile.runner === 'generic-adapter'
+        ? runGenericAdapter(profile)
+        : runNative(profile);
+    const envelope = evidenceEnvelope({ profile, ...result });
+    parseEvidenceOutput(JSON.stringify(envelope), profile, result.outcome);
+    process.stdout.write(`${JSON.stringify(envelope)}\n`);
+    process.exitCode = result.exitCode;
+  } catch (error) {
+    const observations = [
+      redact(error instanceof Error ? error.message : error),
+      ...((error instanceof AdapterFailure ? error.observations : []).map(redact))
+    ];
+    const envelope = evidenceEnvelope({ profile, outcome: 'red', exitCode: 1, observations, artifacts: [] });
+    process.stdout.write(`${JSON.stringify(envelope)}\n`);
+    process.exitCode = 1;
+  }
+}
+
+if (path.resolve(process.argv[1] ?? '') === adapterPath) {
+  await main();
+}

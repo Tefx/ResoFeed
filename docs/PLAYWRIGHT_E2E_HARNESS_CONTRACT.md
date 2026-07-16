@@ -83,6 +83,27 @@ node scripts/vectl-check.mjs run rf-bug-v2-harness-foundation rf_bug_v2_harness_
 ```
 
 It emits the generic `vectl.check.selection.v1` / `vectl.check.evidence.v1` contract and proves four identities: adapter envelope, intentional-failure artifact retention, case-local lifecycle isolation, and native lane discovery. Lane discovery uses Playwright `--list` only for the legacy three-file set and replacement five-file set. The foundation check does not execute either product-semantic lane and does not claim Search, Source Ledger, State, route, or responsive behavior. Downstream implementation and independent runtime-verification phases own those semantic executions and the final list/run identity comparison.
+### Generic Adapter Profile Contract
+
+`scripts/vectl-check.mjs` dispatches by the exact `(suite, check_id)` pair. `select` emits one `vectl.check.selection.v1` envelope with the contract identities and digest. `run` invokes only that profile's native Go, Vitest, or Playwright checks and emits one `vectl.check.evidence.v1` envelope with identical `selected_ids` and `executed_ids`. Unknown suites, unknown checks, and cross-paired suite/check values exit non-zero before any native command starts. The expected-red item contract remains red with exit code 1; green profiles require exit code 0. Runtime-only provider secrets remain absent from child environments and evidence.
+
+The pending profile matrix is:
+
+| Suite | Check ID | Cardinality | Expected outcome |
+|---|---|---:|---|
+| `rf-bug-v2-frontend-runtime` | `rf_bug_v2_frontend_runtime_green` | 4 | green |
+| `rf-bug-v2-go-token-parity` | `rf_bug_v2_go_token_parity_green` | 2 | green |
+| `rf-bug-v2-embed-ui` | `rf_bug_v2_embed_ui_green` | 3 | green |
+| `rf-bug-v2-opml` | `rf_bug_v2_opml_import_only_green` | 2 | green |
+| `rf-bug-v2-http-security` | `rf_bug_v2_http_security_green` | 3 | green |
+| `rf-bug-v2-source-ledger` | `rf_bug_v2_source_ledger_green` | 5 | green |
+| `rf-bug-v2-prompting` | `rf_bug_v2_prompting_green` | 4 | green |
+| `rf-bug-v2-closure-report` | `rf_bug_v2_defect_report_closure_green` | 2 | green |
+| `item-deep-links-contract` | `item_deep_links_expected_red` | 3 | red |
+| `item-deep-links-backend` | `item_deep_links_backend_green` | 1 | green |
+| `item-deep-links-frontend` | `item_deep_links_frontend_green` | 2 | green |
+
+`node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression only. That regression validates all eleven selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, preserves the completed foundation profile, rejects mismatched pairs, and confirms that changes remain limited to the adapter, its developer test, and this contract. It does not execute unfinished consumer product semantics.
 ## Deterministic CI-Safe Matrix
 These cases run with zero retries and without live LLM credentials; the child environment explicitly clears `OPENROUTER_KEY`.
 
