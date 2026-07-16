@@ -185835,7 +185835,7 @@ phases:
       - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md'
   - id: rf-bug-v2-architecture-route-doc-parity-remediation
     name: Correct committed HTTP/MCP item-route architecture parity
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
       \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY. On the clean detached remediation worktree\
@@ -185926,6 +185926,35 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T10:32:25.604188+00:00'
+    done_at: '2026-07-16T10:44:18.686994+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 7d7d7a17b67b6781fce7ca78f3f6d4815cdf4501
+
+
+      Verification:
+
+      - `architecture_http_mcp_route_doc_parity` -> green with canonical HTTP token/direct
+      MCP/shared-operation marker
+
+      - `rf_bug_v2_go_token_parity_green` -> green with exact selected/executed identities
+      and 30 cases
+
+      - Production worker receipt validator -> CONFORMANT
+
+      - Worker receipt: sha256:f76bddad1c3a8cc70d9e15f956b607d027bc0fcad5c5c1157f24afded14a8e75
+
+      - Dispatch: sha256:8b33999c68cc7bd2b41610db0b94cd70672cb1c3af9276a851cdf93e5b323fc8
+
+      - Main user documentation edits preserved via manual conflict resolution; protected
+      paths unchanged
+
+
+      Spec link:
+
+      - docs/ARCHITECTURE.md
+
+      - Full Gate blocker ARCH-HTTP-ROUTE-DOC-PARITY'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
