@@ -187164,18 +187164,30 @@ phases:
 
 
       Independently exercise RF-BUG-002-TOKEN-CONTRACT-REMEDIATION, RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION,
-      RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008, and RF-BUG-009 against the
-      integrated real binary/browser/SQLite runtime. Confirm the authorized contract-lock
-      baseline contains only canonical `~` plus unpadded UTF-8 base64url item HTTP
-      paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go` and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`;
-      raw item paths remain rejected; the sixteen Prompting subtests, two Source Ledger
-      delete cases, assertions, and intentionally unresolved expected-red product
-      behavior remain unchanged. Confirm the authorized `web/tests/e2e/source-ledger-operations.runtime.spec.ts`
+      RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY, RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008,
+      and RF-BUG-009 against the integrated real binary/browser/SQLite runtime. Confirm
+      the authorized contract-lock baseline contains only canonical `~` plus unpadded
+      UTF-8 base64url item HTTP paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go`
+      and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`; raw item
+      paths remain rejected; the sixteen Prompting subtests, two Source Ledger delete
+      cases, assertions, and intentionally unresolved expected-red product behavior
+      remain unchanged. Confirm the authorized `web/tests/e2e/source-ledger-operations.runtime.spec.ts`
       baseline asserts initial `[RUN INGEST]` accessibility and then follows the same
       `.bracket-action--run-ingest` physical control across `[INGESTING...]`, disabled,
       and restored `[RUN INGEST]` states while preserving all five identities, assertions,
       timeout/retry boundaries, and the real runtime fixture. Verify that later implementation
       work mutates none of these three protected acceptance files.
+
+
+      Verify the exact outbound fixture boundary before Source Ledger behavior: `scripts/build-resofeed.sh`
+      remains an untagged production build whose binary rejects loopback even if `RESOFEED_E2E=1`
+      is present; `web/tests/e2e/fixtures/runtime-fixture.ts` remains the E2E authority
+      that builds `./cmd/resofeed` with `-tags resofeed_e2e` and launches it under
+      the sanitized exact opt-in `RESOFEED_E2E=1`; tag-only and environment-only cases
+      remain strict; the combined E2E-tagged/runtime-opted binary can fetch the loopback
+      RSS fixture. Confirm localhost, private, link-local, multicast, unspecified,
+      redirect, and dial protections remain unchanged, with no CLI/general environment
+      bypass or protected browser-test mutation.
 
 
       Verify that the binary serves the production Svelte assets staged under package-local
@@ -187189,8 +187201,9 @@ phases:
       redaction. The active-name assertion must treat protected and legacy test-only
       v2.1 sources as non-production while still scanning all declared production/docs
       surfaces. Mock substitution, retry, skip, any protected acceptance mutation
-      after the authorized contract remediations, stale embedded assets, or external
-      asset substitution blocks the gate.'
+      after the authorized contract remediations, stale embedded assets, external
+      asset substitution, or a loopback allowance reachable from an untagged production
+      binary blocks the gate.'
     verification: Real binary, package-local embedded bundle, browser, SQLite, and
       runtime proof covers both authorized contract baselines; canonical item-token
       use and raw-path rejection; preserved Prompting/delete/operations identities
