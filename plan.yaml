@@ -185221,7 +185221,7 @@ phases:
   steps:
   - id: rf-bug-v2-frontend-runtime-integration
     name: Integrate and re-observe preserved frontend runtime remediation
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for active `rf-bug-frontend-runtime-remediation`; this phase remains locked\
@@ -185301,6 +185301,38 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T09:29:16.329358+00:00'
+    done_at: '2026-07-16T09:44:41.120346+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 4dd05830 (worker commit 1e61ceb8906ed5d7e5f65e75bae127e728c174cf)
+
+      - Preserved source diff SHA: 226376acde3c4714fc7d16b44ce909f23d1ed579a9abc3a00081704aca033121
+
+
+      Verification:
+
+      - `node scripts/vectl-check.mjs run rf-bug-v2-frontend-runtime rf_bug_v2_frontend_runtime_green`
+      -> green
+
+      - Exact selected/executed identities cover real SQLite stale selection, Search
+      ownership/recovery, route-correct pre-hydration title, and EN/ZH idle/invalid
+      alert
+
+      - Production worker receipt validator -> CONFORMANT
+
+      - Worker receipt: sha256:f60a5af498abaa6e05847600adaa99fb2556c7d4a72cc4cde588776254d201f2
+
+      - Dispatch: sha256:88f4e467cc8967cb545f211383695999dbc8371b20444ee9467d61c609ce0216
+
+      - Protected acceptance unchanged; user docs edits were preserved through manual
+      conflict resolution
+
+
+      Spec link:
+
+      - docs/DESIGN.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-go-token-parity-integration
     name: Integrate and re-observe preserved HTTP/MCP token parity remediation
     status: done
