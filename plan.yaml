@@ -187045,7 +187045,6 @@ phases:
     - web/tests/e2e/source-ledger-operations.runtime.spec.ts
     depends_on:
     - rf-bug-v2-e2e-loopback-fixture-boundary
-    - rf-bug-v2-source-ledger-conflict-json-body-contract-lock
     - rf-bug-v2-current-operation-snapshot-race
     agent: frontend-engineer
   - id: rf-bug-v2-prompting-v22
