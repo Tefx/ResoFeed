@@ -189077,7 +189077,7 @@ phases:
       docs: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md and docs/USAGE.md.'
   - id: rf-bug-v2-adapter-runtime-isolation-verification
     name: Independently verify adapter runtime isolation remediation
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189119,6 +189119,8 @@ phases:
     depends_on:
     - rf-bug-v2-adapter-runtime-isolation-remediation
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T23:42:14.365174+00:00'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
