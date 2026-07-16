@@ -187170,14 +187170,15 @@ phases:
 
       Independently exercise RF-BUG-002-TOKEN-CONTRACT-REMEDIATION, RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION,
       RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION, RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION,
-      RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION, RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY,
-      RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008, and RF-BUG-009 against the
-      integrated real binary/browser/SQLite runtime. Confirm the authorized contract-lock
-      baseline contains only canonical `~` plus unpadded UTF-8 base64url item HTTP
-      paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go` and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`;
-      raw item paths remain rejected; the sixteen Prompting subtests, two Source Ledger
-      delete cases, assertions, and intentionally unresolved expected-red product
-      behavior remain unchanged. Confirm the authorized `web/tests/e2e/source-ledger-operations.runtime.spec.ts`
+      RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION, RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION,
+      RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY, RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008,
+      and RF-BUG-009 against the integrated real binary/browser/SQLite runtime. Confirm
+      the authorized contract-lock baseline contains only canonical `~` plus unpadded
+      UTF-8 base64url item HTTP paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go`
+      and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`; raw item
+      paths remain rejected; the sixteen Prompting subtests, two Source Ledger delete
+      cases, assertions, and intentionally unresolved expected-red product behavior
+      remain unchanged. Confirm the authorized `web/tests/e2e/source-ledger-operations.runtime.spec.ts`
       baseline asserts initial `[RUN INGEST]` accessibility and then follows the same
       `.bracket-action--run-ingest` physical control across `[INGESTING...]`, disabled,
       and restored `[RUN INGEST]` states while preserving all five identities, assertions,
@@ -187186,17 +187187,19 @@ phases:
 
       For the current-operation conflict case, confirm the admitted post-repair baseline
       attaches a bounded request listener to the existing `feedServer` before the
-      external actor, resolves only for exact `/conflict.xml`, starts an independent
-      eager Node/global `fetch` POST to the same runtime source-fetch URL with exact
-      owner-token bearer Authorization and without awaiting it, then awaits that request-start
-      signal. Confirm the external actor is not Playwright `request.post`; after request
-      start, confirm the existing authenticated bounded Playwright `request.get` poll
-      observes exact `source_fetch` / `human` / `fetching_source` before the UI FETCH
-      click. Confirm listener and timeout cleanup prevent leaks/hangs, the external
-      `Response.status` property equals 200, conflict assertions and all five identities
-      remain intact, owner credentials do not enter logs/artifacts/persistence/responses,
-      and zero retries remain. Verify that later implementation work mutates none
-      of these three protected acceptance files.
+      external actor, resolves only for exact `/conflict.xml`, and starts an independent
+      eager Node/global `fetch` POST to the same runtime source-fetch URL without
+      awaiting it. Confirm that POST carries exact `Authorization: Bearer ${ownerToken}`,
+      exact `Content-Type: application/json`, and exact body `''{}''`, matching the
+      manual-fetch JSON request contract. Confirm the external actor is not Playwright
+      `request.post`; after exact request start, confirm the existing authenticated
+      bounded Playwright `request.get` poll observes exact `source_fetch` / `human`
+      / `fetching_source` before the UI FETCH click. Confirm listener and timeout
+      cleanup prevent leaks/hangs, the external `Response.status` property equals
+      200, conflict assertions and all five identities remain intact, owner credentials
+      do not enter logs/artifacts/persistence/responses, and zero retries remain.
+      Verify that later implementation work mutates none of these three protected
+      acceptance files.
 
 
       Verify the exact outbound fixture boundary before Source Ledger behavior: `scripts/build-resofeed.sh`
@@ -187226,10 +187229,11 @@ phases:
       an untagged production binary blocks the gate.'
     verification: Real binary, package-local embedded bundle, browser, SQLite, and
       runtime proof covers all authorized contract baselines; the independent eager
-      Node/global fetch actor and exact request-start/poll/click sequence; exact bearer
-      secrecy and Response.status 200; canonical item-token use and raw-path rejection;
-      preserved Prompting/delete/operations identities and assertions; the same physical
-      RUN INGEST control across dynamic accessible-name states; five viewport Ledger/State
+      Node/global fetch actor with exact bearer Authorization, exact application/json
+      Content-Type, exact body '{}', exact request-start/poll/click sequence, and
+      Response.status 200; canonical item-token use and raw-path rejection; preserved
+      Prompting/delete/operations identities and assertions; the same physical RUN
+      INGEST control across dynamic accessible-name states; five viewport Ledger/State
       rendering and operations; accessibility/delete focus; Prompting v2.2 across
       all paths; atomic preservation; production-only active-name scanning; and redaction
       without main-checkout or external-asset substitution.
