@@ -6,6 +6,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"net/url"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -26,6 +28,8 @@ type DoctorConfig struct {
 	FirstFetchMaxItems        int
 	FirstFetchMaxItemsSet     bool
 }
+
+var doctorURLPattern = regexp.MustCompile(`(?i)https?://[^\s"'<>]+`)
 
 type openRouterRuntimeStatus interface {
 	ConfiguredModel() string
@@ -390,9 +394,9 @@ func readRSSDiagnostics(ctx context.Context, db *sql.DB) ([]string, sql.NullStri
 		}
 		if status != sourceStatusOK {
 			failures++
-			line := fmt.Sprintf("rss: source=%s status=%s url=%s", id, status, sourceURL)
+			line := fmt.Sprintf("rss: source=%s status=%s url=%s", id, status, sanitizeDoctorURL(sourceURL))
 			if rawErr.Valid && rawErr.String != "" {
-				line += " error=" + sanitizeDoctorField(rawErr.String)
+				line += " error=" + sanitizeDoctorDiagnostic(rawErr.String)
 			}
 			lines = append(lines, line)
 		}
@@ -467,6 +471,24 @@ func readItemStatusDiagnostics(ctx context.Context, db *sql.DB, label string, co
 		return []string{label + ": ok"}, nil
 	}
 	return append([]string{fmt.Sprintf("%s: failures=%d", label, len(lines))}, lines...), nil
+}
+
+func sanitizeDoctorURL(value string) string {
+	parsed, err := url.Parse(strings.TrimSpace(value))
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return "invalid"
+	}
+	parsed.User = nil
+	parsed.RawQuery = ""
+	parsed.ForceQuery = false
+	parsed.Fragment = ""
+	parsed.RawFragment = ""
+	return sanitizeDoctorField(parsed.String())
+}
+
+func sanitizeDoctorDiagnostic(value string) string {
+	value = sanitizeDoctorField(value)
+	return doctorURLPattern.ReplaceAllStringFunc(value, sanitizeDoctorURL)
 }
 
 func sanitizeDoctorField(value string) string {

@@ -37,6 +37,11 @@ const expectedPending = [
     'RF-BUG-004 active document scan',
     'RF-BUG-004 auth-first import-only contract'
   ]],
+  ['rf-bug-v2-runtime-review-remediation', 'rf_bug_v2_runtime_review_remediation_green', [
+    'RF-BUG-003 failed-source URL credential redaction',
+    'RF-BUG-003/004 protected import-only regression',
+    'RF-BUG-004 Go OPML export symbol absence'
+  ]],
   ['rf-bug-v2-http-security', 'rf_bug_v2_http_security_green', [
     'RF-BUG-005 Chromium CSP operations',
     'RF-BUG-005 exact security contract',
@@ -113,8 +118,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 11);
-  assert.equal(expectedPending.length, 11);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 12);
+  assert.equal(expectedPending.length, 12);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -133,6 +138,10 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
 test('VECTL-ADAPTER protected-scope', () => {
   const allowed = new Set([
     'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md',
+    'internal/resofeed/doctor.go',
+    'internal/resofeed/doctor_test.go',
+    'internal/resofeed/ingest.go',
+    'internal/resofeed/rf_bug_opml_import_only_test.go',
     'scripts/vectl-check.mjs',
     'scripts/vectl-check.test.mjs'
   ]);

@@ -5,6 +5,7 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestDoctorReportsEmbeddedUIWithoutSecretBearingModelLabels(t *testing.T) {
@@ -47,6 +48,39 @@ func TestDoctorReportsEmbeddedUIWithoutSecretBearingModelLabels(t *testing.T) {
 			t.Errorf("doctor output missing safe line %q", safe)
 		}
 	}
+}
+
+func TestDoctorRedactsFailedSourceURLCredentials(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	const sourceURL = "https://doctor-user:doctor-password@feeds.example.test/private/feed.xml?api_key=doctor-query-secret&cursor=doctor-cursor-secret#doctor-fragment-secret"
+	if _, err := db.ExecContext(ctx, `insert into sources (id, url, title, created_at, last_fetch_status, last_fetch_error, is_active, revision) values (?, ?, ?, ?, ?, ?, 1, 1)`,
+		"src_doctor_credentials", sourceURL, "Credential-bearing source", time.Now().UTC().Format(time.RFC3339), sourceStatusFetchError, "upstream timeout for "+sourceURL); err != nil {
+		t.Fatalf("seed failed source: %v", err)
+	}
+
+	var output bytes.Buffer
+	if err := WriteDoctor(ctx, db, &output); err != nil {
+		t.Fatalf("WriteDoctor: %v", err)
+	}
+	text := output.String()
+	const safeLine = "rss: source=src_doctor_credentials status=rss_fetch_error url=https://feeds.example.test/private/feed.xml error=upstream timeout for https://feeds.example.test/private/feed.xml"
+	if !strings.Contains(text, safeLine+"\n") {
+		t.Fatalf("doctor output missing sanitized failed-source line %q:\n%s", safeLine, text)
+	}
+	for _, forbidden := range []string{
+		"doctor-user",
+		"doctor-password",
+		"api_key",
+		"doctor-query-secret",
+		"doctor-cursor-secret",
+		"doctor-fragment-secret",
+	} {
+		if strings.Contains(text, forbidden) {
+			t.Errorf("doctor output leaked failed-source URL credential %q", forbidden)
+		}
+	}
+	t.Log("RF_BUG_003_FAILED_SOURCE_URL_CREDENTIAL_REDACTION=complete")
 }
 
 func TestDoctorPreservesSafeOpenRouterModelLabels(t *testing.T) {

@@ -77,6 +77,30 @@ export const PENDING_PROFILE_PAIRS = [
     ]
   },
   {
+    suite: 'rf-bug-v2-runtime-review-remediation',
+    checkID: 'rf_bug_v2_runtime_review_remediation_green',
+    identities: [
+      'RF-BUG-003 failed-source URL credential redaction',
+      'RF-BUG-003/004 protected import-only regression',
+      'RF-BUG-004 Go OPML export symbol absence'
+    ],
+    requiredOutput: [
+      'RF_BUG_003_FAILED_SOURCE_URL_CREDENTIAL_REDACTION=complete',
+      'RF_BUG_004_GO_OPML_EXPORT_SYMBOLS=absent',
+      'legacy_export_auth_precedence',
+      'import_and_JSON_State_remain_green',
+      'RF_BUG_CANONICAL_DOCUMENTS=9',
+      'OPML_EXCLUSIONS=2',
+      'VECTL-ADAPTER pending-profile-discovery'
+    ],
+    commands: [
+      ['node', '--test', 'scripts/vectl-check.test.mjs'],
+      ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestDoctorRedactsFailedSourceURLCredentials|TestRFBUG003DoctorRedactionContract|TestRFBUG004GoOPMLExportSymbolAbsence|TestRFBUG004OPMLImportOnlyContract)$', '-count=1'],
+      ['go', 'test', '-v', './tests', '-run', '^TestRFBugCanonicalContracts$/^(README.md|docs)$/^(CONTAINER.md|DESIGN.md|PLAYWRIGHT_E2E_HARNESS_CONTRACT.md|PRD.md|PROMPTING_SYSTEM.md|USAGE.md|ui-preview.html)?$', '-count=1'],
+      ['node', '-e', `const fs=require('node:fs'); const files=['README.md','docs/ARCHITECTURE.md','docs/CONTAINER.md','docs/DESIGN.md','docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md','docs/PRD.md','docs/PROMPTING_SYSTEM.md','docs/USAGE.md','docs/ui-preview.html']; const forbidden=['[EXPORT OPML]','### Export OPML','OPML import/export remains','OPML export/import remains','export the active Source Ledger as OPML']; for (const file of files) { const body=fs.readFileSync(file,'utf8'); for (const fragment of forbidden) { if (body.includes(fragment)) throw new Error(file+' retains prohibited OPML capability fragment '+fragment); } } const architecture=fs.readFileSync('docs/ARCHITECTURE.md','utf8'); if (!architecture.includes('GET /api/sources/export-opml') || !architecture.includes('is retired and is not a public capability')) throw new Error('architecture missing retired OPML export contract'); console.log('RF_BUG_OPML_ACTIVE_SCAN=complete');`]
+    ]
+  },
+  {
     suite: 'rf-bug-v2-http-security',
     checkID: 'rf_bug_v2_http_security_green',
     identities: [
