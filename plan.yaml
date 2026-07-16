@@ -185211,10 +185211,11 @@ phases:
 - id: rf-bug-assurance-v2-frontend
   name: RF-BUG Assurance v2 Frontend and Token-Parity Integration
   status: in_progress
-  gate: The generic adapter is integrated and independently proves exact selection/evidence
-    coverage for every pending suite/check profile before preserved frontend and Go
-    dirty outputs resume; those outputs are then independently proven across real
-    browser, HTTP, MCP, and SQLite seams under v2.
+  gate: The generic adapter remains independently proven; preserved frontend and token
+    work remains proven across real browser, HTTP, MCP, and SQLite seams; one core/application
+    delivery operation exclusively owns SQLite delivery mutation and is independently
+    exercised through both authenticated HTTP and MCP before the rebound Full Gate
+    may admit RF-BUG-001/002/006/007 and bounded future-red items.
   depends_on:
   - rf-bug-20260712-frontend-behavior
   - rf-bug-assurance-v2-harness
