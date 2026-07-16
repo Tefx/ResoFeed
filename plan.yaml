@@ -187165,6 +187165,7 @@ phases:
 
 
       Independently exercise RF-BUG-002-TOKEN-CONTRACT-REMEDIATION, RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION,
+      RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION, RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION,
       RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY, RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008,
       and RF-BUG-009 against the integrated real binary/browser/SQLite runtime. Confirm
       the authorized contract-lock baseline contains only canonical `~` plus unpadded
@@ -187176,8 +187177,17 @@ phases:
       baseline asserts initial `[RUN INGEST]` accessibility and then follows the same
       `.bracket-action--run-ingest` physical control across `[INGESTING...]`, disabled,
       and restored `[RUN INGEST]` states while preserving all five identities, assertions,
-      timeout/retry boundaries, and the real runtime fixture. Verify that later implementation
-      work mutates none of these three protected acceptance files.
+      timeout/retry boundaries, and the real runtime fixture.
+
+
+      For the current-operation conflict case, confirm the admitted post-repair baseline
+      attaches a bounded request listener to the existing `feedServer` before `externalFetch`,
+      resolves only for exact `/conflict.xml`, starts `externalFetch`, awaits that
+      request-start signal, then performs the existing authenticated bounded `/api/runtime/operation`
+      poll for exact `source_fetch` / `human` / `fetching_source` before the UI FETCH
+      click. Confirm listener and timeout cleanup prevent leaks/hangs, the external
+      200 and conflict assertions remain intact, and zero retries remain. Verify that
+      later implementation work mutates none of these three protected acceptance files.
 
 
       Verify the exact outbound fixture boundary before Source Ledger behavior: `scripts/build-resofeed.sh`
