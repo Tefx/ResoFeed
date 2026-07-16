@@ -185817,6 +185817,97 @@ phases:
       Spec link:
 
       - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md'
+  - id: rf-bug-v2-architecture-route-doc-parity-remediation
+    name: Correct committed HTTP/MCP item-route architecture parity
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
+      \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY. On the clean detached remediation worktree\
+      \ rooted in the gate target lineage, correct only committed `docs/ARCHITECTURE.md`\
+      \ so every HTTP item detail, inspect, resonance, delivery, and re-ingest route\
+      \ uses the canonical `~` plus unpadded `base64.RawURLEncoding` UTF-8 token and\
+      \ rejects raw item IDs, while MCP tools continue to accept direct raw opaque\
+      \ `item_id` values and never accept HTTP route-token syntax. State that HTTP\
+      \ token decoding and direct MCP IDs converge on the same raw opaque item-ID\
+      \ application operations. Reuse the protected RF-BUG-002 adapter check to prove\
+      \ the documented boundary matches the already integrated HTTP/MCP behavior.\
+      \ Do not copy, merge, stage, absorb, or overwrite the pre-existing main-worktree\
+      \ edits in `docs/ARCHITECTURE.md` or `docs/DESIGN.md`, the untracked `.pi/remote-pi/`,\
+      \ or `docs/ITEM_DEEP_LINKS.md`; preserve all completed runtime evidence and\
+      \ avoid unrelated reruns. Rollback reverts only this committed architecture-document\
+      \ delta.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [docs/ARCHITECTURE.md]\n  blocked_paths: [docs/DESIGN.md, docs/ITEM_DEEP_LINKS.md,\
+      \ .pi/remote-pi/**, internal/**, web/**, tests/**, scripts/**]\n  ignored_runtime_paths:\
+      \ [.git/, .vectl/, .agent/, .venv/, .pi/]\nclaims: [RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\n\
+      checks:\n  - id: architecture_http_mcp_route_doc_parity\n    run:\n      command:\n\
+      \        - python3\n        - -c\n        - >-\n          from pathlib import\
+      \ Path; import re; text=Path('docs/ARCHITECTURE.md').read_text(encoding='utf-8');\
+      \ routes=['GET /api/items/~{unpadded RFC4648 base64url(item_id)}','POST /api/items/~{unpadded\
+      \ RFC4648 base64url(item_id)}/inspect','POST /api/items/~{unpadded RFC4648 base64url(item_id)}/resonance','POST\
+      \ /api/items/~{unpadded RFC4648 base64url(item_id)}/delivery','POST /api/items/~{unpadded\
+      \ RFC4648 base64url(item_id)}/reingest']; terms=['HTTP item route token boundary:','unpadded\
+      \ `base64.RawURLEncoding`','direct raw opaque `item_id`','MCP does not accept\
+      \ or expose the HTTP `~` route-token syntax','same raw opaque item-ID application\
+      \ operation']; missing=[value for value in routes+terms if value not in text];\
+      \ incompatible=re.findall(r'/api/items/\\{(?:id|token)\\}(?:/|`|\\s)',text);\
+      \ assert not missing, f'missing canonical HTTP/MCP route documentation: {missing!r}';\
+      \ assert not incompatible, f'incompatible raw HTTP item-route placeholders:\
+      \ {incompatible!r}'; print('ARCH_HTTP_ROUTE_DOC_PARITY=canonical-http-token,direct-mcp-id,shared-operation')\n\
+      \      timeout_seconds: 60\n    evidence:\n      mode: command_outcome\n   \
+      \   path_bindings:\n        - {path: docs/ARCHITECTURE.md, access: read, availability:\
+      \ produced_by_step}\n      test_bindings: []\n    expect:\n      outcome: green\n\
+      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ 'ARCH_HTTP_ROUTE_DOC_PARITY=canonical-http-token,direct-mcp-id,shared-operation'}]\n\
+      \        contains_any: []\n        forbids: [{literal: 'missing canonical HTTP/MCP\
+      \ route documentation'}, {literal: 'incompatible raw HTTP item-route placeholders'},\
+      \ {literal: Traceback}]\n    proves: [RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\n  -\
+      \ id: rf_bug_v2_go_token_parity_green\n    run: {command: [node, scripts/vectl-check.mjs,\
+      \ run, rf-bug-v2-go-token-parity, rf_bug_v2_go_token_parity_green], timeout_seconds:\
+      \ 900}\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
+      \        - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: go.mod, access: read, availability: current}\n      test_bindings:\n\
+      \        - {path: internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
+      \ classification: acceptance, availability: current}\n        - {path: internal/resofeed/item_route_token_test.go,\
+      \ classification: developer, availability: current}\n      selection:\n    \
+      \    command:\n          - python3\n          - -c\n          - >-\n       \
+      \     import hashlib,json; ids=['RF-BUG-002 canonical HTTP MCP parity','RF-BUG-002\
+      \ opaque item ID API paths 30']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_go_token_parity_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 2}\n        required_ids:\
+      \ ['RF-BUG-002 canonical HTTP MCP parity', 'RF-BUG-002 opaque item ID API paths\
+      \ 30']\n        forbidden_ids: []\n    expect:\n      outcome: green\n     \
+      \ exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ RF_BUG_002_CANONICAL_HTTP_REJECTION=complete}, {literal: RF_BUG_002_API_SUBTESTS=30}]\n\
+      \        contains_any: []\n        forbids: [{literal: raw item route accepted},\
+      \ {literal: HTTP MCP reingest mismatch}, {literal: no tests to run}]\n    proves:\
+      \ [RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\nbindings:\n  expected_red: {items: []}\n\
+      \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-architecture-route-doc-parity-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_http_contract_documentation\"\
+      ,\"http_mcp_boundary_parity\",\"full_gate_blocker_remediation\"],\"primary_outcome\"\
+      :\"RF-BUG-002-HTTP-MCP-TOKEN-PARITY\",\"rollback_class\":\"TRIVIAL\",\"observation_ledger\"\
+      :[{\"requirement_id\":\"RF-BUG-002-HTTP-MCP-TOKEN-PARITY\",\"atom\":\"committed\
+      \ architecture exposes only canonical tokenized HTTP item routes and direct\
+      \ raw MCP item IDs\",\"modality\":\"static\",\"seam\":\"real\",\"check_id\"\
+      :\"architecture_http_mcp_route_doc_parity\",\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
+      },{\"requirement_id\":\"RF-BUG-002-HTTP-MCP-TOKEN-PARITY\",\"atom\":\"canonical\
+      \ HTTP rejection and direct MCP item-ID behavior remain aligned after the documentation-only\
+      \ delta\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_go_token_parity_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/item_route_token_test.go\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_go_token_parity_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: Only committed docs/ARCHITECTURE.md changes; exact canonical HTTP
+      token routes, direct raw MCP item_id boundary, and shared operation are documented;
+      the protected RF-BUG-002 token-parity adapter remains green; main-worktree user
+      edits and untracked files are not sourced or overwritten.
+    evidence_template: Changed path and commit; architecture parity fingerprint; RF-BUG-002
+      selected/executed identities and green markers; protected acceptance immutability;
+      clean worktree/provenance evidence.
+    depends_on:
+    - rf-bug-v2-frontend-runtime-verification
+    agent: golang-developer
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
