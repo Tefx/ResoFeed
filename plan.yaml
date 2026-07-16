@@ -185295,6 +185295,8 @@ phases:
     - web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts
     - web/tests/e2e/routes.browser-contract.spec.ts
     - web/tests/e2e/inspector-selection.browser-contract.spec.ts
+    depends_on:
+    - rf-bug-v2-generic-adapter-verification
     agent: frontend-engineer
   - id: rf-bug-v2-go-token-parity-integration
     name: Integrate and re-observe preserved HTTP/MCP token parity remediation
