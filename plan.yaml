@@ -187171,10 +187171,11 @@ phases:
       Independently exercise RF-BUG-002-TOKEN-CONTRACT-REMEDIATION, RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION,
       RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION, RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION,
       RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION, RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION,
-      RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY, RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008,
-      and RF-BUG-009 against the integrated real binary/browser/SQLite runtime. Confirm
-      the authorized contract-lock baseline contains only canonical `~` plus unpadded
-      UTF-8 base64url item HTTP paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go`
+      RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY, RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION,
+      RF-BUG-008-CURRENT-OPERATION-PRIORITY-REMEDIATION, RF-BUG-004-STATE-UI, RF-BUG-008,
+      RF-BUG-004-008, and RF-BUG-009 against the integrated real binary/browser/SQLite
+      runtime. Confirm the authorized contract-lock baseline contains only canonical
+      `~` plus unpadded UTF-8 base64url item HTTP paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go`
       and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`; raw item
       paths remain rejected; the sixteen Prompting subtests, two Source Ledger delete
       cases, assertions, and intentionally unresolved expected-red product behavior
@@ -187202,6 +187203,20 @@ phases:
       acceptance files.
 
 
+      Independently rerun both focused race-enabled current-operation tests on the
+      integrated head. The original snapshot-race test must still prove a rejected
+      background attempt cannot overwrite or clear an active foreground snapshot.
+      The priority test must deterministically hold a human source A `source_fetch`
+      / `human` / `fetching_source` snapshot while background source B acquires and
+      advances through per-source start and aggregate updates, prove the foreground
+      kind, actor, phase, count/message remain unchanged until release, then prove
+      remaining background work becomes current, accepts valid updates, and clears
+      after final release. Confirm the same priority applies by contract to active
+      agent-owned foreground operations, concurrent guard capacity and conflict outcomes
+      remain unchanged, background visibility remains available when no foreground
+      exists, acceptance files remain unchanged, and no operation state is persisted.
+
+
       Verify the exact outbound fixture boundary before Source Ledger behavior: `scripts/build-resofeed.sh`
       remains an untagged production build whose binary rejects loopback even if `RESOFEED_E2E=1`
       is present; `web/tests/e2e/fixtures/runtime-fixture.ts` remains the E2E authority
@@ -187225,8 +187240,9 @@ phases:
       v2.1 sources as non-production while still scanning all declared production/docs
       surfaces. Mock substitution, retry, skip, any protected acceptance mutation
       after the authorized contract remediations, stale embedded assets, external
-      asset substitution, credential exposure, or a loopback allowance reachable from
-      an untagged production binary blocks the gate.'
+      asset substitution, credential exposure, current-operation priority loss, or
+      a loopback allowance reachable from an untagged production binary blocks the
+      gate.'
     verification: Real binary, package-local embedded bundle, browser, SQLite, and
       runtime proof covers all authorized contract baselines; the independent eager
       Node/global fetch actor with exact bearer Authorization, exact application/json
@@ -187236,13 +187252,15 @@ phases:
       INGEST control across dynamic accessible-name states; five viewport Ledger/State
       rendering and operations; accessibility/delete focus; Prompting v2.2 across
       all paths; atomic preservation; production-only active-name scanning; and redaction
-      without main-checkout or external-asset substitution. For RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION,
-      independently rerun `go test -race ./internal/resofeed -run '^TestICACurrentOperationBackgroundSnapshotOwnership$'
-      -count=1 -v` on the integrated head and confirm the real runtime conflict path
-      retains exact `source_fetch` / `human` / `fetching_source` visibility through
-      a rejected background attempt, while a normally acquired background operation
-      is visible and clears on release; any race report, snapshot overwrite/early
-      clear, acceptance diff, or persisted operation ledger blocks admission.
+      without main-checkout or external-asset substitution. Independently rerun `go
+      test -race ./internal/resofeed -run '^(TestICACurrentOperationBackgroundSnapshotOwnership|TestICACurrentOperationForegroundPriorityOverBackgroundSourceLifecycle)$'
+      -count=1 -v` on the integrated head. Confirm exact `source_fetch` / `human`
+      / `fetching_source` visibility survives both rejected and concurrently acquired
+      background source work, foreground count/message ownership survives background
+      aggregate updates until release, and remaining background work then becomes
+      visible, updates, and clears normally; any race report, overwrite, early clear,
+      acceptance diff, guard-capacity/conflict regression, or persisted operation
+      ledger blocks admission.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
