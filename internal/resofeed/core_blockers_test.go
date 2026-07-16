@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -342,6 +344,155 @@ func TestReadItemDetailPreservesFullStatusWithoutRawSourceText(t *testing.T) {
 	}
 	if strings.TrimSpace(derefString(detail.FeedExcerpt)) != "" || strings.TrimSpace(derefString(detail.ExtractedText)) != "" {
 		t.Fatalf("detail raw source fields = feed_excerpt:%q extracted_text:%q, want empty", derefString(detail.FeedExcerpt), derefString(detail.ExtractedText))
+	}
+}
+
+func TestDeliverySharedApplicationOperationPreservesHTTPMCPParity(t *testing.T) {
+	ctx := context.Background()
+	db := newContractDB(t, ctx)
+	itemID := "delivery/shared%opaque"
+	insertSource(t, ctx, db, "src_delivery_shared", "https://delivery-shared.example/feed.xml", "Shared delivery")
+	insertRankedItem(t, ctx, db, itemID, "src_delivery_shared", "Shared delivery operation", time.Date(2026, 7, 16, 8, 0, 0, 0, time.UTC))
+
+	const ownerToken = "delivery-shared-owner-token-0123456789"
+	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: ownerToken})
+	token := "~" + base64.RawURLEncoding.EncodeToString([]byte(itemID))
+	path := "/api/items/" + token + "/delivery"
+	postDelivery := func(path string, body string) *httptest.ResponseRecorder {
+		t.Helper()
+		recorder := httptest.NewRecorder()
+		request := httptest.NewRequest(http.MethodPost, path, strings.NewReader(body))
+		request.Header.Set("Authorization", "Bearer "+ownerToken)
+		request.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(recorder, request)
+		return recorder
+	}
+	decodeDelivery := func(recorder *httptest.ResponseRecorder) DeliveryReportResult {
+		t.Helper()
+		var result DeliveryReportResult
+		if err := json.Unmarshal(recorder.Body.Bytes(), &result); err != nil {
+			t.Fatalf("decode delivery response: %v; body=%s", err, recorder.Body.String())
+		}
+		return result
+	}
+
+	httpBody := `{"actor_kind":"agent","actor_id":"shared-agent","delivered_at":"2026-07-16T09:00:00Z","idempotency_key":"delivery-http-mcp-shared"}`
+	httpFirstRecorder := postDelivery(path, httpBody)
+	if httpFirstRecorder.Code != http.StatusOK {
+		t.Fatalf("HTTP first delivery status=%d body=%s", httpFirstRecorder.Code, httpFirstRecorder.Body.String())
+	}
+	httpFirst := decodeDelivery(httpFirstRecorder)
+	wantHTTPAt := time.Date(2026, 7, 16, 9, 0, 0, 0, time.UTC)
+	if httpFirst.ItemID != itemID || httpFirst.AlreadyApplied || !httpFirst.ExternalSurfacedAt.Equal(wantHTTPAt) {
+		t.Fatalf("HTTP first delivery=%+v, want fresh canonical-token result for %q at %s", httpFirst, itemID, wantHTTPAt)
+	}
+
+	httpReplayRecorder := postDelivery(path, httpBody)
+	if httpReplayRecorder.Code != http.StatusOK {
+		t.Fatalf("HTTP replay status=%d body=%s", httpReplayRecorder.Code, httpReplayRecorder.Body.String())
+	}
+	httpReplay := decodeDelivery(httpReplayRecorder)
+	if !httpReplay.AlreadyApplied || httpReplay.ItemID != itemID || !httpReplay.ExternalSurfacedAt.Equal(wantHTTPAt) {
+		t.Fatalf("HTTP replay=%+v, want stored result with already_applied", httpReplay)
+	}
+
+	httpMismatch := postDelivery(path, `{"actor_kind":"agent","actor_id":"shared-agent","delivered_at":"2026-07-16T09:30:00Z","idempotency_key":"delivery-http-mcp-shared"}`)
+	if httpMismatch.Code != http.StatusBadRequest {
+		t.Fatalf("HTTP mismatched replay status=%d body=%s", httpMismatch.Code, httpMismatch.Body.String())
+	}
+	var httpMismatchBody ErrorBody
+	if err := json.Unmarshal(httpMismatch.Body.Bytes(), &httpMismatchBody); err != nil {
+		t.Fatalf("decode HTTP mismatch: %v", err)
+	}
+	if httpMismatchBody.Error.Details["field"] != "idempotency_key" || httpMismatchBody.Error.Details["reason"] != "request_fingerprint_mismatch" {
+		t.Fatalf("HTTP mismatch details=%#v", httpMismatchBody.Error.Details)
+	}
+
+	plusTwo := time.FixedZone("UTC+2", 2*60*60)
+	mcpReplay, err := ReportDeliveryForMCP(ctx, db, MCPReportDeliveryInput{
+		ItemID:         itemID,
+		ActorID:        "shared-agent",
+		DeliveredAt:    time.Date(2026, 7, 16, 11, 0, 0, 0, plusTwo),
+		IdempotencyKey: "delivery-http-mcp-shared",
+	})
+	if err != nil {
+		t.Fatalf("MCP cross-transport replay returned error: %v", err)
+	}
+	if !mcpReplay.AlreadyApplied || mcpReplay.ItemID != itemID || !mcpReplay.ExternalSurfacedAt.Equal(wantHTTPAt) {
+		t.Fatalf("MCP cross-transport replay=%+v, want HTTP receipt snapshot", mcpReplay)
+	}
+
+	mcpAt := time.Date(2026, 7, 16, 10, 0, 0, 0, time.UTC)
+	mcpInput := MCPReportDeliveryInput{ItemID: itemID, ActorID: "mcp-agent", DeliveredAt: mcpAt, IdempotencyKey: "delivery-mcp-fresh"}
+	mcpFirst, err := ReportDeliveryForMCP(ctx, db, mcpInput)
+	if err != nil {
+		t.Fatalf("MCP fresh delivery returned error: %v", err)
+	}
+	if mcpFirst.AlreadyApplied || mcpFirst.ItemID != itemID || !mcpFirst.ExternalSurfacedAt.Equal(mcpAt) {
+		t.Fatalf("MCP fresh delivery=%+v", mcpFirst)
+	}
+	mcpReplay, err = ReportDeliveryForMCP(ctx, db, mcpInput)
+	if err != nil {
+		t.Fatalf("MCP replay returned error: %v", err)
+	}
+	if !mcpReplay.AlreadyApplied || !mcpReplay.ExternalSurfacedAt.Equal(mcpAt) {
+		t.Fatalf("MCP replay=%+v, want stored result with already_applied", mcpReplay)
+	}
+	mcpInput.DeliveredAt = mcpAt.Add(time.Hour)
+	_, err = ReportDeliveryForMCP(ctx, db, mcpInput)
+	var mismatchField mcpFieldError
+	if !errors.As(err, &mismatchField) || mismatchField.field != "idempotency_key" || mismatchField.reason != "request_fingerprint_mismatch" {
+		t.Fatalf("MCP mismatched replay error=%v field=%q reason=%q", err, mismatchField.field, mismatchField.reason)
+	}
+
+	var storedAt, actorKind, actorID string
+	if err := db.QueryRowContext(ctx, `select external_surfaced_at, last_actor_kind, last_actor_id from item_state where item_id = ?`, itemID).Scan(&storedAt, &actorKind, &actorID); err != nil {
+		t.Fatalf("read shared delivery state: %v", err)
+	}
+	if storedAt != mcpAt.Format(time.RFC3339Nano) || actorKind != string(ActorKindAgent) || actorID != "mcp-agent" {
+		t.Fatalf("shared delivery state at=%q actor_kind=%q actor_id=%q", storedAt, actorKind, actorID)
+	}
+
+	missingID := "missing/delivery%opaque"
+	missingToken := "~" + base64.RawURLEncoding.EncodeToString([]byte(missingID))
+	httpMissing := postDelivery("/api/items/"+missingToken+"/delivery", `{"actor_kind":"agent","actor_id":"shared-agent","delivered_at":"2026-07-16T09:00:00Z","idempotency_key":"delivery-http-missing"}`)
+	if httpMissing.Code != http.StatusNotFound {
+		t.Fatalf("HTTP missing delivery status=%d body=%s", httpMissing.Code, httpMissing.Body.String())
+	}
+	var httpMissingBody ErrorBody
+	if err := json.Unmarshal(httpMissing.Body.Bytes(), &httpMissingBody); err != nil {
+		t.Fatalf("decode HTTP missing: %v", err)
+	}
+	if httpMissingBody.Error.Code != "not_found" || httpMissingBody.Error.Details["id"] != missingID {
+		t.Fatalf("HTTP missing response=%+v", httpMissingBody)
+	}
+	_, err = ReportDeliveryForMCP(ctx, db, MCPReportDeliveryInput{ItemID: missingID, ActorID: "mcp-agent", DeliveredAt: mcpAt, IdempotencyKey: "delivery-mcp-missing"})
+	var missingErr mcpNotFoundError
+	if !errors.As(err, &missingErr) || missingErr.kind != "item" || missingErr.id != missingID {
+		t.Fatalf("MCP missing delivery error=%v", err)
+	}
+
+	validRequest := DeliveryReportRequest{DeliveredAt: mcpAt, MutationRequestFields: MutationRequestFields{ActorKind: ActorKindAgent, ActorID: "mcp-agent", IdempotencyKey: "delivery-core-error"}}
+	if _, err := ReportDelivery(ctx, nil, itemID, validRequest); err == nil || !strings.Contains(err.Error(), "db is nil") {
+		t.Fatalf("core nil DB error=%v", err)
+	}
+	if _, err := ReportDelivery(ctx, db, missingID, validRequest); !errors.As(err, &missingErr) {
+		t.Fatalf("core missing item error=%v", err)
+	}
+
+	var receiptCount int
+	if err := db.QueryRowContext(ctx, `select count(*) from agent_receipts where operation = 'report_delivery'`).Scan(&receiptCount); err != nil {
+		t.Fatalf("count delivery receipts: %v", err)
+	}
+	if receiptCount != 2 {
+		t.Fatalf("delivery receipt count=%d, want only successful HTTP-shared and MCP-fresh receipts", receiptCount)
+	}
+	var durableDeliveryTables int
+	if err := db.QueryRowContext(ctx, `select count(*) from sqlite_master where type = 'table' and name like 'delivery_%'`).Scan(&durableDeliveryTables); err != nil {
+		t.Fatalf("inspect delivery persistence tables: %v", err)
+	}
+	if durableDeliveryTables != 0 {
+		t.Fatalf("durable delivery table count=%d, want current item_state only", durableDeliveryTables)
 	}
 }
 

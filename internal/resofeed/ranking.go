@@ -388,6 +388,9 @@ func ReportDelivery(ctx context.Context, db *sql.DB, itemID string, req Delivery
 	if strings.TrimSpace(itemID) == "" {
 		return DeliveryReportResult{}, errors.New("report delivery: item id is empty")
 	}
+	if err := ensureItemExists(ctx, db, itemID); err != nil {
+		return DeliveryReportResult{}, err
+	}
 	if req.DeliveredAt.IsZero() {
 		return DeliveryReportResult{}, fieldError("delivered_at")
 	}

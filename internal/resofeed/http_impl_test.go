@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
@@ -447,7 +448,8 @@ func TestHTTPDeliveryRouteValidationIdempotencyAndCoreState(t *testing.T) {
 	now := time.Date(2026, 5, 9, 12, 0, 0, 0, time.UTC)
 	seedHTTPHandlerCorpus(t, ctx, db, now)
 	router := NewRouter(HTTPServerConfig{DB: db, OwnerToken: contractOwnerToken})
-	path := "/api/items/item_http_01/delivery"
+	token := "~" + base64.RawURLEncoding.EncodeToString([]byte("item_http_01"))
+	path := "/api/items/" + token + "/delivery"
 
 	unknown := postHTTPJSON[ErrorBody](t, router, path, `{"actor_kind":"agent","actor_id":"briefing-agent","delivered_at":"2026-05-09T00:00:00Z","idempotency_key":"http-delivery-unknown","channel":"telegram"}`, http.StatusBadRequest)
 	if unknown.Error.Details["field"] != "channel" {

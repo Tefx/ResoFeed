@@ -337,7 +337,7 @@ func ReportDeliveryForMCP(ctx context.Context, db *sql.DB, input MCPReportDelive
 		ActorKind   ActorKind `json:"actor_kind"`
 		ActorID     string    `json:"actor_id"`
 	}{DeliveredAt: req.DeliveredAt, ActorKind: req.ActorKind, ActorID: req.ActorID}, &result, func() (DeliveryReportResult, error) {
-		return MarkItemDelivered(ctx, db, input.ItemID, req)
+		return ReportDelivery(ctx, db, input.ItemID, req)
 	})
 	if err != nil {
 		return DeliveryReportResult{}, err
@@ -346,34 +346,6 @@ func ReportDeliveryForMCP(ctx context.Context, db *sql.DB, input MCPReportDelive
 		result.AlreadyApplied = true
 	}
 	return result, nil
-}
-
-// MarkItemDelivered records external surfacing through the same core mutation
-// used by HTTP delivery and MCP report_delivery. It creates no channel registry,
-// queue, delivery ledger, or portable receipt.
-func MarkItemDelivered(ctx context.Context, db *sql.DB, itemID string, req DeliveryReportRequest) (DeliveryReportResult, error) {
-	if err := ensureItemExists(ctx, db, itemID); err != nil {
-		return DeliveryReportResult{}, err
-	}
-	_, err := db.ExecContext(ctx, `
-insert into item_state (item_id, is_resonated, external_surfaced_at, last_actor_kind, last_actor_id)
-values (?, 0, ?, ?, ?)
-on conflict(item_id) do update set
-  external_surfaced_at = excluded.external_surfaced_at,
-  last_actor_kind = excluded.last_actor_kind,
-  last_actor_id = excluded.last_actor_id`, itemID, req.DeliveredAt.UTC().Format(time.RFC3339Nano), string(req.ActorKind), req.ActorID)
-	if err != nil {
-		return DeliveryReportResult{}, fmt.Errorf("report delivery: %w", err)
-	}
-	var stored string
-	if err := db.QueryRowContext(ctx, `select external_surfaced_at from item_state where item_id = ?`, itemID).Scan(&stored); err != nil {
-		return DeliveryReportResult{}, fmt.Errorf("read delivery state: %w", err)
-	}
-	externalAt, err := parseDBTime(stored)
-	if err != nil {
-		return DeliveryReportResult{}, fmt.Errorf("parse delivery timestamp: %w", err)
-	}
-	return DeliveryReportResult{ItemID: itemID, ExternalSurfacedAt: externalAt, AlreadyApplied: !externalAt.Equal(req.DeliveredAt.UTC())}, nil
 }
 
 type mcpHandler struct {
