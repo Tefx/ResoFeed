@@ -186919,7 +186919,7 @@ phases:
   steps:
   - id: rf-bug-v2-source-ledger-responsive
     name: Repair Source Ledger and State operations under v2
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nPlan-contract\
       \ repair after valid rejected receipt `sha256:4da179c1d5865fb6a4ba550dfb175b89773c9c98935cb52d76fc03551bd7ee88`.\
@@ -187047,8 +187047,6 @@ phases:
     - rf-bug-v2-e2e-loopback-fixture-boundary
     - rf-bug-v2-current-operation-foreground-priority
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-16T20:13:45.968372+00:00'
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
     status: done
