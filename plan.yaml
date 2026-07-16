@@ -188792,16 +188792,14 @@ phases:
       \ environment', 'RF-BUG-009 harness exact four identities', 'RF-BUG-009 harness\
       \ production strict']\n        forbidden_ids: []\n    expect:\n      outcome:\
       \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
-      \ [{literal: '\"schema_version\":\"vectl.check.evidence.v1\"'}, {literal: '\"\
-      check_id\":\"rf_bug_v2_prompting_harness_remediation_green\"'}, {literal: RF-BUG-009_EXACT_SUBTEST_SET=16},\
-      \ {literal: PROMPTING_V21_ACTIVE_MATCHES=0}, {literal: TestOutboundE2EFixturePolicy},\
-      \ {literal: TestOutboundHTTPURLPolicyRejectsUnsafeDestinations}, {literal: TestFetchPathsRejectLoopbackBeforeRequest},\
-      \ {literal: TestPlaywrightFixtureContract}, {literal: PASS}]\n        contains_any:\
-      \ []\n        forbids: [{literal: no tests to run}, {literal: skipped}, {literal:\
-      \ retry}, {literal: OPENROUTER_KEY=}]\n    proves: [RF-BUG-009-PROMPTING-HARNESS-REMEDIATION]\n\
-      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
-      :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-e2e-harness-remediation\"\
+      \ [{literal: RF-BUG-009_EXACT_SUBTEST_SET=16}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0},\
+      \ {literal: TestOutboundE2EFixturePolicy}, {literal: TestOutboundHTTPURLPolicyRejectsUnsafeDestinations},\
+      \ {literal: TestFetchPathsRejectLoopbackBeforeRequest}, {literal: TestPlaywrightFixtureContract},\
+      \ {literal: PASS}]\n        contains_any: []\n        forbids: [{literal: no\
+      \ tests to run}, {literal: skipped}, {literal: retry}, {literal: OPENROUTER_KEY=}]\n\
+      \    proves: [RF-BUG-009-PROMPTING-HARNESS-REMEDIATION]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-e2e-harness-remediation\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"shared test infrastructure\",\"security-boundary\
       \ fixture execution\",\"cross-component acceptance dispatch\"],\"primary_outcome\"\
       :\"RF-BUG-009-PROMPTING-HARNESS-REMEDIATION\",\"rollback_class\":\"NONTRIVIAL\"\
