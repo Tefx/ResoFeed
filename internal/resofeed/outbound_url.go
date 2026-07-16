@@ -3,11 +3,11 @@ package resofeed
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"sync/atomic"
 )
@@ -81,7 +81,7 @@ func validateOutboundHTTPHost(host string, strict bool) error {
 		return fmt.Errorf("%w: localhost not allowed", errOutboundURLBlocked)
 	}
 	if ip := parseOutboundHostIP(host); ip != nil && !isPublicOutboundIP(ip) {
-		if !strict && allowUnsafeOutboundForTestFixtures() {
+		if !strict && ip.IsLoopback() && allowUnsafeOutboundForTestFixtures() {
 			return nil
 		}
 		return fmt.Errorf("%w: non-public ip not allowed", errOutboundURLBlocked)
@@ -90,7 +90,7 @@ func validateOutboundHTTPHost(host string, strict bool) error {
 }
 
 func allowUnsafeOutboundForTestFixtures() bool {
-	return !forceStrictOutboundPolicyForTests.Load() && flag.Lookup("test.v") != nil
+	return !forceStrictOutboundPolicyForTests.Load() && e2eFixtureBuildEnabled && os.Getenv("RESOFEED_E2E") == "1"
 }
 
 func normalizeOutboundHost(host string) string {
@@ -126,10 +126,6 @@ func newPublicOnlyHTTPTransport() *http.Transport {
 }
 
 func publicOnlyDialContext(ctx context.Context, network string, address string) (net.Conn, error) {
-	if allowUnsafeOutboundForTestFixtures() {
-		dialer := net.Dialer{}
-		return dialer.DialContext(ctx, network, address)
-	}
 	host, port, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, fmt.Errorf("outbound dial: split address: %w", err)
@@ -147,7 +143,7 @@ func publicOnlyDialContext(ctx context.Context, network string, address string) 
 		return nil, fmt.Errorf("outbound dial: resolve %q: no addresses", host)
 	}
 	for _, candidate := range resolved {
-		if !isPublicOutboundIP(candidate.IP) {
+		if !isPublicOutboundIP(candidate.IP) && !(candidate.IP.IsLoopback() && allowUnsafeOutboundForTestFixtures()) {
 			return nil, fmt.Errorf("outbound dial: %w: %s resolved to non-public ip %s", errOutboundURLBlocked, host, candidate.IP)
 		}
 	}

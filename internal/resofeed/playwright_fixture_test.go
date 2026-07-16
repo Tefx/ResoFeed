@@ -19,6 +19,7 @@ func TestPlaywrightFixtureContract(t *testing.T) {
 	files := map[string][]string{
 		"web/tests/e2e/fixtures/runtime-fixture.ts": {
 			"'serve'", "--owner-token", "randomBytes(32)", "cwd: database.directory",
+			"['build', '-tags', 'resofeed_e2e'", "RESOFEED_E2E: '1'",
 			"createTestDatabase(testInfo)", "captureBrowserDiagnostics(page)",
 			"RF-BUG-010_SETUP=ready", "RF-BUG-010_TEARDOWN=", "databaseResidue",
 			"database_residue=", "port=${closedPort ? 'closed' : 'open'}",

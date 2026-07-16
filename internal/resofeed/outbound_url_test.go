@@ -11,6 +11,59 @@ import (
 	"time"
 )
 
+func TestOutboundE2EFixturePolicy(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		runtime string
+		want    bool
+	}{
+		{name: "runtime opt-in absent", runtime: "", want: false},
+		{name: "runtime opt-in must be exact", runtime: "true", want: false},
+		{name: "exact two-key opt-in", runtime: "1", want: e2eFixtureBuildEnabled},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv("RESOFEED_E2E", tc.runtime)
+			for _, raw := range []string{"http://localhost/feed.xml", "http://127.0.0.1/feed.xml", "http://[::1]/feed.xml"} {
+				if got := isOutboundHTTPURL(raw); got != tc.want {
+					t.Errorf("isOutboundHTTPURL(%q) = %v, want %v", raw, got, tc.want)
+				}
+			}
+			if isOutboundHTTPURL("http://192.168.0.1/feed.xml") {
+				t.Error("E2E fixture policy allowed a non-loopback private address")
+			}
+			if isStrictOutboundHTTPURL("http://127.0.0.1/feed.xml") {
+				t.Error("strict outbound policy allowed loopback")
+			}
+		})
+	}
+
+	t.Setenv("RESOFEED_E2E", "1")
+	var hits atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		w.Header().Set("Content-Type", "application/rss+xml")
+		_, _ = fmt.Fprint(w, `<rss><channel><title>Fixture</title><item><guid>fixture-1</guid><title>Item</title><link>https://example.com/item</link></item></channel></rss>`)
+	}))
+	defer server.Close()
+
+	_, err := fetchFeed(context.Background(), server.URL)
+	if e2eFixtureBuildEnabled {
+		if err != nil {
+			t.Fatalf("tagged two-key fixture fetch failed: %v", err)
+		}
+		if hits.Load() != 1 {
+			t.Fatalf("tagged two-key fixture fetch hits = %d, want 1", hits.Load())
+		}
+		return
+	}
+	if err == nil {
+		t.Fatal("untagged build accepted loopback fixture fetch with runtime key alone")
+	}
+	if hits.Load() != 0 {
+		t.Fatalf("untagged fixture server was requested %d times", hits.Load())
+	}
+}
+
 func TestOutboundHTTPURLPolicyRejectsUnsafeDestinations(t *testing.T) {
 	strictOutboundPolicyForTest(t)
 

@@ -16,10 +16,10 @@ The harness must build and launch the real single deployable. It must not use Vi
 ### Backend Build Command
 
 ```bash
-mkdir -p ./.test-artifacts/bin && go build -o ./.test-artifacts/bin/resofeed ./cmd/resofeed
+mkdir -p ./.test-artifacts/bin && go build -tags resofeed_e2e -o ./.test-artifacts/bin/resofeed ./cmd/resofeed
 ```
 
-The harness may use a different artifact directory, but the build target remains `./cmd/resofeed`.
+The harness may use a different artifact directory, but the build target remains `./cmd/resofeed`. The `resofeed_e2e` build tag and exact runtime value `RESOFEED_E2E=1` form a two-key boundary for loopback RSS fixtures. Either key alone leaves loopback blocked. The allowance covers loopback hosts only; private, link-local, multicast, and unspecified destinations remain blocked, as do loopback destinations under strict validation. `scripts/build-resofeed.sh` remains the untagged production build path and ignores `RESOFEED_E2E` for outbound policy.
 
 ### Real Server Launch Command
 
@@ -39,7 +39,8 @@ env -i \
 
 Harness wiring may choose a concrete free port instead of `:0` if the current binary cannot report an ephemeral bound port. The required properties are:
 
-- built binary from `cmd/resofeed`;
+- built binary from `cmd/resofeed` with the `resofeed_e2e` tag;
+- exact `RESOFEED_E2E=1` runtime opt-in paired with that tagged binary;
 - isolated temporary SQLite DB fixture per worker/test run;
 - deterministic owner token supplied by flag and never persisted in committed files;
 - sanitized environment allow-list only, with no ambient `OPENROUTER_KEY` in CI-safe runs;
