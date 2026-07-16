@@ -185855,7 +185855,7 @@ phases:
       matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
       \ [docs/ARCHITECTURE.md]\n  blocked_paths: [docs/DESIGN.md, docs/ITEM_DEEP_LINKS.md,\
       \ .pi/remote-pi/**, internal/**, web/**, tests/**, scripts/**]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/, .pi/]\nclaims: [RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\n\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\n\
       checks:\n  - id: architecture_http_mcp_route_doc_parity\n    run:\n      command:\n\
       \        - python3\n        - -c\n        - >-\n          from pathlib import\
       \ Path; import re; text=Path('docs/ARCHITECTURE.md').read_text(encoding='utf-8');\
