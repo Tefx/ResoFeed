@@ -187808,6 +187808,144 @@ phases:
       polling contract and native five-test Playwright collection passed. Receipt
       sha256:aaf32910db5380eee0534cc7e17ebdc00349710a97bce25689e355d828c9451d; dispatch
       sha256:61e5bfda14791b7c2517f14b2fb8e7a68a4c6e281152315c6559c910d918c491.
+  - id: rf-bug-v2-source-ledger-conflict-request-start-contract-lock
+    name: Synchronize protected Source Ledger conflict request start
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ protected acceptance contract-lock remediation for valid rejected receipt\
+      \ `sha256:889655b1d22e317c6275eebb95d701f4bc79d8f6015a71cfab9806b260b31189`.\
+      \ Change only the synchronization inside the existing `[RF-BUG-008] current-operation\
+      \ conflict detail` case in `web/tests/e2e/source-ledger-operations.runtime.spec.ts`.\
+      \ Before starting `externalFetch`, attach a bounded Promise/request listener\
+      \ to the existing `feedServer`; resolve it only when a request whose URL is\
+      \ exactly `/conflict.xml` reaches that test server. Start `externalFetch`, await\
+      \ the request-start signal, then retain the existing authenticated bounded `/api/runtime/operation`\
+      \ poll for exact `kind: source_fetch`, `actor_kind: human`, and `phase: fetching_source`\
+      \ before the existing UI FETCH click and assertions. Ensure every success, timeout,\
+      \ and teardown path removes the listener and clears its timeout so the test\
+      \ cannot leak or hang.\n\nPreserve the case identity, external request 200 assertion,\
+      \ conflict assertions, other four test identities and bodies, real runtime fixture/seam,\
+      \ authentication, exact operation/actor/phase identities, timeout/retry boundaries,\
+      \ and every unrelated byte. Do not change product code, fixture or Playwright\
+      \ configuration, adapters, scripts, documentation, or any other test. Do not\
+      \ add retries, weaken assertions, replace the real seam, or alter runtime behavior.\n\
+      \nExecute only from a fresh clean post-polling worktree. Preserve `/Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-source-ledger-responsive-v7`\
+      \ and all earlier dirty recovery worktrees unchanged; do not delete, reset,\
+      \ rebase, or mutate them. The later Source Ledger implementation selectively\
+      \ ports only this admitted acceptance synchronization change into its own fresh\
+      \ worktree. Rollback reverts this single authorized acceptance synchronization\
+      \ edit.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [web/tests/e2e/source-ledger-operations.runtime.spec.ts]\n  blocked_paths:\
+      \ [web/src/**, internal/resofeed/**, web/tests/e2e/fixtures/**, web/playwright.runtime.config.ts,\
+      \ web/playwright.ci-safe.config.ts, web/src/lib/__tests__/**, scripts/**, docs/**]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION]\n\
+      checks:\n  - id: rf_bug_008_conflict_request_start_sync_contract_static\n  \
+      \  run:\n      command:\n        - node\n        - -e\n        - >-\n      \
+      \    const fs=require('node:fs'); const s=fs.readFileSync('web/tests/e2e/source-ledger-operations.runtime.spec.ts','utf8');\
+      \ const titles=['[RF-BUG-008] RUN INGEST transitions','[RF-BUG-008] FETCH transitions\
+      \ and independent rows','[RF-BUG-008] ingest and fetch error transitions','[RF-BUG-008]\
+      \ current-operation conflict detail','[RF-BUG-008] source info disclosure'];\
+      \ for (const title of titles) { if ((s.match(new RegExp(title.replace(/[.*+?^${}()|[\\\
+      ]\\\\]/g,'\\\\$&'),'g'))||[]).length !== 1) throw new Error('identity changed:\
+      \ '+title); } const start=s.indexOf(\"test('[RF-BUG-008] current-operation conflict\
+      \ detail'\"); const end=s.indexOf(\"test('[RF-BUG-008] source info disclosure'\"\
+      ,start); const t=s.slice(start,end); const listener=t.search(/feedServer\\.(?:on|once|addListener)\\\
+      (\\s*['\\\"]request['\\\"]/); const exactURL=t.search(/(?:request|req)\\.url\\\
+      s*===?\\s*['\\\"]\\/conflict\\.xml['\\\"]/); const external=t.indexOf('const\
+      \ externalFetch = request.post'); const awaitStart=t.search(/await\\s+[A-Za-z_$][\\\
+      w$]*(?:RequestStarted|RequestStart|Started|Start)[A-Za-z_$]*/); const poll=t.indexOf('await\
+      \ expect.poll'); const click=t.indexOf(\".locator('.bracket-action--fetch').click()\"\
+      ); if ([listener,exactURL,external,awaitStart,poll,click].some((value)=>value<0))\
+      \ throw new Error('request-start synchronization contract missing'); if (!(listener\
+      \ < exactURL && exactURL < external && external < awaitStart && awaitStart <\
+      \ poll && poll < click)) throw new Error('request-start synchronization order\
+      \ mismatch'); if (!/new Promise<\\s*void\\s*>/.test(t)) throw new Error('bounded\
+      \ request-start Promise missing'); if (!/(?:setTimeout|AbortSignal\\.timeout)\\\
+      s*\\(/.test(t)) throw new Error('request-start timeout missing'); if (!/(?:clearTimeout|AbortSignal)/.test(t)\
+      \ || !/feedServer\\.(?:off|removeListener)\\(\\s*['\\\"]request['\\\"]/.test(t))\
+      \ throw new Error('request-start cleanup missing'); if (!/request\\.get\\(`\\\
+      $\\{runInfo\\.baseURL\\}\\/api\\/runtime\\/operation`/.test(t) || !t.includes('Authorization:\
+      \ `Bearer ${ownerToken}`') || !t.includes(\"kind: 'source_fetch'\") || !t.includes(\"\
+      actor_kind: 'human'\") || !t.includes(\"phase: 'fetching_source'\")) throw new\
+      \ Error('exact authenticated operation poll changed'); if (!t.includes('expect((await\
+      \ externalFetch).status()).toBe(200)')) throw new Error('external status assertion\
+      \ changed'); for (const assertion of [\"await expect(status).toContainText(/^err:/)\"\
+      ,\"await expect(status).toContainText('op: source_fetch')\",\"await expect(status).toContainText('actor:human')\"\
+      ,\"await expect(status).toContainText('phase:')\",\"await expect(status).toHaveAttribute('aria-live',\
+      \ 'assertive')\"]) { if (!t.includes(assertion)) throw new Error('conflict assertion\
+      \ changed: '+assertion); } if (/retries\\s*:/.test(t)) throw new Error('retry\
+      \ boundary changed'); console.log('RF-BUG-008_CONFLICT_REQUEST_START=bounded_exact_feed_listener_before_external_fetch');\
+      \ console.log('RF-BUG-008_CONFLICT_SEQUENCE=external_fetch_then_request_start_then_exact_operation_poll_then_click');\
+      \ console.log('RF-BUG-008_CONFLICT_CLEANUP=listener_and_timeout_cleanup_required');\
+      \ console.log('RF-BUG-008_OPERATION_TEST_IDENTITIES=5_preserved');\n      timeout_seconds:\
+      \ 30\n    evidence:\n      mode: command_outcome\n      path_bindings:\n   \
+      \     - {path: web/package.json, access: read, availability: current}\n    \
+      \  test_bindings:\n        - {path: web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
+      \ classification: acceptance, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: RF-BUG-008_CONFLICT_REQUEST_START=bounded_exact_feed_listener_before_external_fetch},\
+      \ {literal: RF-BUG-008_CONFLICT_SEQUENCE=external_fetch_then_request_start_then_exact_operation_poll_then_click},\
+      \ {literal: RF-BUG-008_CONFLICT_CLEANUP=listener_and_timeout_cleanup_required},\
+      \ {literal: RF-BUG-008_OPERATION_TEST_IDENTITIES=5_preserved}]\n        contains_any:\
+      \ []\n        forbids: [{literal: Error}, {literal: identity changed}, {literal:\
+      \ contract missing}, {literal: order mismatch}, {literal: Promise missing},\
+      \ {literal: timeout missing}, {literal: cleanup missing}, {literal: operation\
+      \ poll changed}, {literal: assertion changed}, {literal: retry boundary changed}]\n\
+      \    proves: [RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION]\n\
+      \  - id: rf_bug_008_conflict_request_start_sync_contract_collection\n    run:\n\
+      \      command: [npm, --prefix, web, exec, --, playwright, test, --config, web/playwright.ci-safe.config.ts,\
+      \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, --list]\n      timeout_seconds:\
+      \ 300\n    evidence:\n      mode: command_outcome\n      path_bindings:\n  \
+      \      - {path: web/package.json, access: read, availability: current}\n   \
+      \     - {path: web/package-lock.json, access: read, availability: current}\n\
+      \        - {path: web/playwright.ci-safe.config.ts, access: read, availability:\
+      \ current}\n      test_bindings:\n        - {path: web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
+      \ classification: acceptance, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: '[RF-BUG-008] RUN INGEST transitions'}, {literal: '[RF-BUG-008]\
+      \ FETCH transitions and independent rows'}, {literal: '[RF-BUG-008] ingest and\
+      \ fetch error transitions'}, {literal: '[RF-BUG-008] current-operation conflict\
+      \ detail'}, {literal: '[RF-BUG-008] source info disclosure'}, {literal: 'Total:\
+      \ 5 tests'}]\n        contains_any: []\n        forbids: [{literal: No tests\
+      \ found}, {literal: setup failed}, {literal: webServer failed}]\n    proves:\
+      \ [RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-request-start-contract-lock\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"protected_acceptance_mutation\",\"\
+      real_runtime_request_start_race_synchronization_contract\"],\"primary_outcome\"\
+      :\"RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION\"\
+      ,\"atom\":\"the protected current-operation conflict case attaches a bounded\
+      \ exact /conflict.xml feedServer request-start listener before externalFetch,\
+      \ awaits request arrival before the existing authenticated exact operation poll\
+      \ and UI click, and cleans listener/timeout state without retries or assertion\
+      \ weakening\",\"modality\":\"test_contract\",\"seam\":\"static\",\"check_id\"\
+      :\"rf_bug_008_conflict_request_start_sync_contract_static\",\"independent_step\"\
+      :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
+      :[\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_008_conflict_request_start_sync_contract_static\",\"rf_bug_008_conflict_request_start_sync_contract_collection\"\
+      ],\"acceptance_mutation\":\"AUTHORIZED\",\"acceptance_authorizations\":[{\"\
+      ref\":\"authority:acceptance-mutation:rf-bug-008-conflict-request-start-sync-repair\"\
+      ,\"path\":\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\",\"purpose\"\
+      :\"Change only the current-operation conflict case by attaching a bounded exact\
+      \ /conflict.xml feedServer request-start listener before externalFetch, awaiting\
+      \ request arrival before the existing authenticated exact operation poll and\
+      \ UI click, and cleaning listener/timeout state while preserving identities,\
+      \ assertions, real runtime behavior, and zero retries\",\"check_id\":\"rf_bug_008_conflict_request_start_sync_contract_static\"\
+      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
+    verification: Static contract evidence proves a bounded feedServer request-start
+      listener for exact /conflict.xml is attached before externalFetch, externalFetch
+      starts before the request-start await, the authenticated exact runtime-operation
+      poll and existing click/assertions remain ordered afterward, cleanup/timeout
+      is present, all five test identities remain, and retries are absent. Native
+      Playwright collection lists the same five protected runtime tests without execution
+      or behavior weakening.
+    depends_on:
+    - rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock
+    agent: frontend-engineer
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
