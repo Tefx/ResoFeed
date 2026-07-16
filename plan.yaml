@@ -188144,7 +188144,7 @@ phases:
       fetch/auth/order contract and five-test collection passed. Receipt sha256:c7483318d04be46b4a8cc3efcb93ab3c20c055494de6c301a24772df2e8a0220.
   - id: rf-bug-v2-source-ledger-conflict-json-body-contract-lock
     name: Repair protected Source Ledger conflict JSON request contract
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ protected acceptance contract-lock remediation for valid rejected receipt\
@@ -188273,6 +188273,8 @@ phases:
     depends_on:
     - rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T19:20:07.381368+00:00'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
