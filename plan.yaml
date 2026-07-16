@@ -185006,9 +185006,10 @@ phases:
 - id: rf-bug-assurance-v2-harness
   name: RF-BUG Assurance v2 Harness and Generic Evidence Adapter
   status: in_progress
-  gate: RF-BUG-010 isolated real-runtime harness, native old/replacement identity,
-    generic selection/evidence envelopes, cleanup, and retained artifact proof are
-    green.
+  gate: RF-BUG-010 harness foundation passes project-native generic selection/evidence
+    envelopes, case-local real-binary lifecycle, native old-three/replacement-five
+    discovery identity, cleanup, redaction, and retained artifact proof without prematurely
+    executing product-semantic replacement lanes.
   steps:
   - id: rf-bug-v2-harness-foundation
     name: Build v2 generic evidence adapter and isolated RF-BUG harness foundation
