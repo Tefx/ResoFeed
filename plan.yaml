@@ -187010,7 +187010,7 @@ phases:
     agent: frontend-engineer
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for `implement-prompting-v22-semantics`. Implement one v2.2 compiler/validator\
@@ -187084,6 +187084,8 @@ phases:
     - docs/ARCHITECTURE.md
     - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T15:12:50.080283+00:00'
   - id: rf-bug-v2-ledger-prompting-verification
     name: Independently verify Ledger, State, and Prompting real seams
     status: pending
