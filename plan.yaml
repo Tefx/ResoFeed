@@ -187286,7 +187286,6 @@ phases:
     - scripts/vectl-check.test.mjs
     depends_on:
     - rf-bug-v2-source-ledger-responsive
-    - rf-bug-v2-prompting-v22
     - rf-bug-v2-prompting-e2e-harness-remediation
     agent: integration-verifier
   - id: rf-bug-v2-ledger-prompting-gate
