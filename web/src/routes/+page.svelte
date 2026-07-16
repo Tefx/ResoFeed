@@ -1126,10 +1126,6 @@
     return response;
   }
 
-  async function exportOpml(): Promise<string> {
-    return apiClient().exportOpml();
-  }
-
   async function runIngest(): Promise<RunIngestSuccessResponse> {
     if (contextualOperation.kind !== 'running') {
       contextualOperation = { kind: 'running', operation: localManualIngestOperation(new Date().toISOString()) };
@@ -1498,7 +1494,6 @@
         sources={sources}
         onDeleteSource={deleteSource}
         onImportOpml={importOpml}
-        onExportOpml={exportOpml}
         onRunIngest={runIngest}
         onFetchSource={fetchSource}
         onExportState={exportState}

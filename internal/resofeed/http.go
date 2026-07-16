@@ -208,6 +208,8 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch {
+	case r.Method == http.MethodGet && (r.URL.Path == "/api/sources/export-opml" || r.URL.Path == "/api/opml/export"):
+		writeAPIError(w, http.StatusNotFound, "not_found", "not found", map[string]any{"id": r.URL.Path})
 	case r.Method == http.MethodPost && r.URL.Path == ManualIngestHTTPPath:
 		if !rejectUnexpectedQuery(w, r) || !readManualFetchBody(w, r) {
 			return
@@ -247,11 +249,6 @@ func (h apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.handleSources(w, r)
-	case r.Method == http.MethodGet && r.URL.Path == "/api/sources/export-opml":
-		if !rejectUnexpectedQuery(w, r) || !rejectRequestBody(w, r) {
-			return
-		}
-		h.handleExportOPML(w, r)
 	case r.Method == http.MethodPost && r.URL.Path == "/api/sources/import-opml":
 		if !rejectUnexpectedQuery(w, r) {
 			return
@@ -904,20 +901,6 @@ func (h apiHandler) handleImportOPML(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, result)
-}
-
-func (h apiHandler) handleExportOPML(w http.ResponseWriter, r *http.Request) {
-	var buf bytes.Buffer
-	if err := ExportOPML(r.Context(), h.cfg.DB, &buf); err != nil {
-		writeInternal(w)
-		return
-	}
-	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
-	w.Header().Set("Content-Disposition", `attachment; filename="sources.opml"`)
-	w.WriteHeader(http.StatusOK)
-	if _, err := w.Write(buf.Bytes()); err != nil {
-		return
-	}
 }
 
 func (h apiHandler) handleStateExport(w http.ResponseWriter, r *http.Request) {

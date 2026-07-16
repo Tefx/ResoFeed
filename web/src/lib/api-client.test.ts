@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -120,6 +123,8 @@ describe('ResoFeed API client and rendered sinks', () => {
     expect(ledger).not.toHaveTextContent('src: Example Source');
     expect(ledger).toHaveTextContent('https://example.com/feed.xml');
     expect(ledger).toHaveTextContent(/\d{2}:\d{2}:\d{2} local/);
+    expect(within(ledger).getByRole('button', { name: '[IMPORT OPML]' })).toBeVisible();
+    expect(within(ledger).queryByRole('button', { name: '[EXPORT OPML]' })).not.toBeInTheDocument();
 
     render(Feed, { props: { items: feed.items, selectedItemId: feed.items[0]?.id, onSelect: async () => {}, onResonanceToggle: async () => {} } });
     const list = screen.getByRole('list', { name: 'Today feed items' });
@@ -176,16 +181,50 @@ describe('ResoFeed API client and rendered sinks', () => {
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
-  it('downloads OPML source-list text from the canonical frontend endpoint', async () => {
+  it('keeps all nine active documents free of OPML export capabilities', () => {
+    const activeDocuments = [
+      'README.md',
+      'docs/ARCHITECTURE.md',
+      'docs/CONTAINER.md',
+      'docs/DESIGN.md',
+      'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md',
+      'docs/PRD.md',
+      'docs/PROMPTING_SYSTEM.md',
+      'docs/USAGE.md',
+      'docs/ui-preview.html'
+    ];
+    const forbidden = [
+      '[EXPORT OPML]',
+      '### Export OPML',
+      'OPML import/export remains',
+      'OPML export/import remains',
+      'export the active Source Ledger as OPML'
+    ];
+
+    for (const path of activeDocuments) {
+      const document = readFileSync(resolve(process.cwd(), '..', path), 'utf8');
+      for (const capability of forbidden) expect(document).not.toContain(capability);
+    }
+
+    console.log(`OPML_ACTIVE_DOCUMENTS=${activeDocuments.length}`);
+  });
+
+  it('imports OPML source-list text through the retained frontend endpoint', async () => {
     const opml = '<?xml version="1.0"?><opml version="2.0"></opml>';
+    const response = { imported: 1, skipped: 0, folders_flattened: true };
     const fetcher = vi.fn<typeof fetch>(async (input, init) => {
-      expect(init?.headers).toMatchObject({ Authorization: 'Bearer owner-token-123456789012345678901234' });
-      expect(String(input)).toBe('/api/sources/export-opml');
-      return new Response(opml, { status: 200, headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
+      expect(init?.headers).toMatchObject({
+        Authorization: 'Bearer owner-token-123456789012345678901234',
+        'Content-Type': 'application/xml'
+      });
+      expect(init?.method).toBe('POST');
+      expect(init?.body).toBe(opml);
+      expect(String(input)).toBe('/api/sources/import-opml');
+      return jsonResponse(response);
     });
     const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
 
-    await expect(client.exportOpml()).resolves.toBe(opml);
+    await expect(client.importOpml(opml)).resolves.toEqual(response);
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
 

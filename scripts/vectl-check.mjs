@@ -69,7 +69,7 @@ export const PENDING_PROFILE_PAIRS = [
     suite: 'rf-bug-v2-opml',
     checkID: 'rf_bug_v2_opml_import_only_green',
     identities: ['RF-BUG-004 active document scan', 'RF-BUG-004 auth-first import-only contract'],
-    requiredOutput: ['legacy_export_auth_precedence', 'import_and_JSON_State_remain_green', 'OPML_ACTIVE_DOCUMENTS=9', 'OPML_EXCLUSIONS=2'],
+    requiredOutput: ['legacy_export_auth_precedence', 'import_and_JSON_State_remain_green', 'RF_BUG_CANONICAL_DOCUMENTS=9', 'OPML_EXCLUSIONS=2'],
     commands: [
       ['go', 'test', '-v', './internal/resofeed', '-run', '^TestRFBUG004OPMLImportOnlyContract$', '-count=1'],
       ['go', 'test', '-v', './tests', '-run', '^TestRFBugCanonicalContracts/OPMLActiveScan$', '-count=1'],

@@ -11,7 +11,6 @@
     sources: Source[];
     onDeleteSource: (source: Source) => Promise<void> | void;
     onImportOpml: (opml: string) => Promise<ImportOpmlResponse | void> | ImportOpmlResponse | void;
-    onExportOpml?: () => Promise<string | Blob> | string | Blob;
     onRunIngest?: () => Promise<RunIngestSuccessResponse>;
     onFetchSource?: (source: Source) => Promise<FetchSourceSuccessResponse>;
     onExportState: () => Promise<StateBundleV1>;
@@ -26,7 +25,6 @@
     sources,
     onDeleteSource,
     onImportOpml,
-    onExportOpml = () => Promise.resolve(''),
     onRunIngest = () => Promise.resolve({ operation: 'ingest', source_id: null, completed: true, sources_total: 0, sources_fetched: 0, items_discovered: 0, items_upserted: 0, errors: [] }),
     onFetchSource = (source: Source) => Promise.resolve({ operation: 'source_fetch', source_id: source.id, completed: true, sources_total: 1, sources_fetched: 1, items_discovered: 0, items_upserted: 0, errors: [], completed_at: source.last_fetch_at ?? undefined }),
     onExportState,
@@ -40,7 +38,6 @@
   let statusText = $state('');
   let globalIngestStatusText = $state('');
   let isImportingOpml = $state(false);
-  let isExportingOpml = $state(false);
   let isRunningIngest = $state(false);
   let fetchingSourceIds = $state<ReadonlySet<string>>(new Set());
   let sourceFeedbackById = $state<Record<string, string>>({});
@@ -68,8 +65,6 @@
       helper: 'OPML = 来源列表；State = 来源 + 规则 + 星标，导入会替换。',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
-      exportOpml: '[EXPORT OPML]',
-      exportingOpml: '[EXPORTING OPML...]',
       empty: '暂无来源。在导向栏粘贴 RSS URL。',
       lastIngest: '上次抓取',
       lastFetch: '上次抓取',
@@ -79,8 +74,6 @@
       importComplete: (count: number) => `已导入 ${count} 个来源；OPML 大纲已扁平化`,
       importCompleteFallback: '已导入来源；OPML 大纲已扁平化',
       importFailed: 'err: 导入失败',
-      exportComplete: '已导出 sources.opml',
-      exportFailed: 'err: 导出失败',
       deleting: (title: string) => `正在删除 ${title}`,
       deleted: (title: string) => `已删除 ${title}`,
       deleteFailed: 'err: 删除失败',
@@ -109,8 +102,6 @@
       helper: 'OPML = source list; State = sources + rules + stars, import replaces.',
       importOpml: '[IMPORT OPML]',
       importingOpml: '[IMPORTING OPML...]',
-      exportOpml: '[EXPORT OPML]',
-      exportingOpml: '[EXPORTING OPML...]',
       empty: 'No sources. Paste RSS URL in Steer.',
       lastIngest: 'last_ingest',
       lastFetch: 'last_fetch',
@@ -120,8 +111,6 @@
       importComplete: (count: number) => `imported ${count} sources; OPML outlines flattened`,
       importCompleteFallback: 'imported sources; OPML outlines flattened',
       importFailed: 'err: import failed',
-      exportComplete: 'exported sources.opml',
-      exportFailed: 'err: export failed',
       deleting: (title: string) => `deleting ${title}`,
       deleted: (title: string) => `deleted ${title}`,
       deleteFailed: 'err: delete failed',
@@ -349,26 +338,6 @@
     });
   }
 
-  function exportOpml(): Promise<void> {
-    if (isExportingOpml) return Promise.resolve();
-    isExportingOpml = true;
-    statusText = '';
-    return Promise.resolve(onExportOpml()).then((opml) => {
-      const blob = opml instanceof Blob ? opml : new Blob([opml], { type: 'application/xml' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = 'sources.opml';
-      anchor.click();
-      URL.revokeObjectURL(url);
-      statusText = chrome.exportComplete;
-    }).catch((error: unknown) => {
-      statusText = error instanceof Error ? rawErrorText(error.message) : rawErrorText(chrome.exportFailed);
-    }).finally(() => {
-      isExportingOpml = false;
-    });
-  }
-
   function confirmDelete(source: Source): Promise<void> {
     const sourceIndex = visibleSources.findIndex((candidate) => candidate.id === source.id);
     statusText = chrome.deleting(source.title);
@@ -424,7 +393,6 @@
     <div class="source-ledger__action-group source-ledger__action-group--source-list" role="group" aria-label={chrome.sourceListActions}>
       <span class="source-ledger__group-label">{chrome.sourceList}</span>
       <button type="button" class="bracket-action bracket-action--import-opml" aria-label={chrome.importOpml} disabled={isImportingOpml} onclick={openImportPicker}>{isImportingOpml ? chrome.importingOpml : chrome.importOpml}</button>
-      <button type="button" class="bracket-action bracket-action--export-opml" aria-label={chrome.exportOpml} disabled={isExportingOpml} onclick={() => void exportOpml()}>{isExportingOpml ? chrome.exportingOpml : chrome.exportOpml}</button>
     </div>
     <StatePortability onExportState={onExportState} onImportState={onImportState} groupLabel={chrome.portableState} groupAriaLabel={chrome.portableStateActions} language={language} />
     <span class="contract-muted source-ledger__tools-helper">{chrome.helper}</span>
