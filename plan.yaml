@@ -185505,44 +185505,43 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Rebound Full Gate after parser-admitted FAIL receipt `sha256:61ef8baea4ff4cd398ca7f54c6d5b156b2c303b50e43913f626ec1f42342228a`
-      on target `4543e9d4d10327856729410f4fce6f6fa1914372`. Reconcile the completed
-      generic-adapter remediation, its append-only completed-harness compatibility
-      repair, the rebound independent CLI/envelope verification, the two completed
-      v2 replacement branches, their completed independent real-seam verification,
-      and `rf-bug-v2-architecture-route-doc-parity-remediation` with immutable completed
-      evidence from `rf-bug-20260712-frontend-behavior.repair-route-search-and-opaque-item-ids`,
-      `rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing`,
-      and `rf-bug-20260712-frontend-behavior.rf-bug-frontend-doc-design-remediation`.
-      On the rebound integrated head, directly verify that committed `docs/ARCHITECTURE.md`
-      exposes canonical `~` unpadded RawURLEncoding tokens for every HTTP item route,
-      rejects raw HTTP IDs, assigns direct raw opaque `item_id` values only to MCP,
-      and states both transports converge on the same item-ID operations. Consume
-      the preserved frontend/browser/HTTP/MCP/SQLite semantic receipt and protected
-      RF-BUG-002 evidence; do not rerun unrelated completed work. Require exact coverage
-      of every pending adapter suite/check profile, parser-supported artifact objects,
-      selected/executed identity parity, fail-closed unknown/mismatched requests,
-      completed harness compatibility through real browser/runtime execution, preserved
-      dirty-work/child hashes, protected-path immutability, exact RF-BUG-001/002/006/007
-      behavior, and bounded future-red admission only for RF-BUG-003/004/005/009.
-      Verify the remediation did not source, overwrite, or absorb the pre-existing
+      Rebound Full Gate after parser-admitted FAIL receipt `sha256:185295f111fb57ef72de87dbcdd309c854694357c9cd5046d05bd1713e2cad65`
+      on target `7cd7abe3fbfae7511a7766810ee1b7bb10851063`. Reconcile the completed
+      generic-adapter remediation and compatibility repair, rebound independent CLI/envelope
+      verification, both completed v2 replacement branches, completed real-seam verification,
+      completed architecture-route documentation parity, and `rf-bug-v2-delivery-shared-operation-remediation`
+      with immutable completed evidence from the three named RF-BUG frontend predecessors.
+      On the new integrated head, directly inspect `internal/resofeed/ranking.go`,
+      `internal/resofeed/http.go`, and `internal/resofeed/mcp.go` to prove one core/application
+      operation exclusively owns the delivery SQLite state transition, authenticated
+      HTTP delivery and MCP `report_delivery` both call it, the duplicate/transport-owned
+      mutation is absent, and dependency direction matches committed `docs/ARCHITECTURE.md`.
+      Independently execute authenticated canonical-token HTTP delivery and direct-raw-ID
+      MCP `report_delivery` against the same real `cmd/resofeed`/SQLite item, including
+      initial mutation, idempotent retry, mismatched-payload/error, unknown-item,
+      timestamp, actor provenance, persisted-state, and response-envelope observations;
+      consume or rerun the exact protected RF-BUG-002 parity evidence and the remediation''s
+      developer check without mutating tests. Preserve canonical `~` unpadded RawURLEncoding
+      HTTP routes, raw HTTP ID rejection, direct raw MCP IDs, shared selected-item
+      re-ingest semantics, all prior frontend/browser behavior, and bounded future-red
+      admission only for RF-BUG-003/004/005/009. Require protected-path immutability
+      and verify the remediation did not source, overwrite, or absorb the pre-existing
       main-worktree edits in `docs/ARCHITECTURE.md` or `docs/DESIGN.md`, untracked
-      `.pi/remote-pi/`, or `docs/ITEM_DEEP_LINKS.md`. Skipped legacy nodes are never
-      admission inputs.
+      `.pi/remote-pi/`, or `docs/ITEM_DEEP_LINKS.md`. Do not rerun unrelated completed
+      work. Skipped legacy nodes are never admission inputs.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-frontend","requirement_ids":["RF-BUG-V2-GENERIC-ADAPTER","RF-BUG-001","RF-BUG-002","RF-BUG-002-HTTP-MCP-TOKEN-PARITY","RF-BUG-006","RF-BUG-007","RF-BUG-FRONTEND-RUNTIME-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-remediation","rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-compatibility-remediation","rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-verification","rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-go-token-parity-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-verification","rf-bug-assurance-v2-frontend.rf-bug-v2-architecture-route-doc-parity-remediation"],"admitted_future_expected_red":["rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-003","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-004","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-005","rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red#RF-BUG-009"],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-frontend","requirement_ids":["RF-BUG-V2-GENERIC-ADAPTER","RF-BUG-001","RF-BUG-002","RF-BUG-002-HTTP-MCP-TOKEN-PARITY","GATE-DELIVERY-SHARED-OPERATION","RF-BUG-006","RF-BUG-007","RF-BUG-FRONTEND-RUNTIME-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-remediation","rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-compatibility-remediation","rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-verification","rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-go-token-parity-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-verification","rf-bug-assurance-v2-frontend.rf-bug-v2-architecture-route-doc-parity-remediation","rf-bug-assurance-v2-frontend.rf-bug-v2-delivery-shared-operation-remediation"],"admitted_future_expected_red":["rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-003","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-004","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-005","rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red#RF-BUG-009"],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate proves the architecture-doc delta closes ARCH-HTTP-ROUTE-DOC-PARITY
-      on the rebound integrated head, RF-BUG-002-HTTP-MCP-TOKEN-PARITY is proven from
-      direct committed-doc inspection plus preserved/rerun exact protected parity
-      evidence, all prior scoped frontend/token requirements remain proven, main-worktree
-      user edits remain untouched, exact admitted future-red refs remain bounded,
-      canonical integrated step IDs match scope, and no out-of-scope blocker affects
-      admission.
+    verification: Full Gate proves GATE-DELIVERY-SHARED-OPERATION from direct source
+      ownership inspection plus real authenticated HTTP/MCP/SQLite mutation, retry,
+      provenance, persistence, and error observations; re-proves RF-BUG-002 and token
+      parity; preserves docs/token/frontend obligations, protected acceptance, user
+      dirty paths, exact admitted future-red bounds, and canonical integrated scope;
+      no out-of-scope blocker affects admission.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -185550,10 +185549,14 @@ phases:
     - docs/DESIGN.md
     - go.mod
     - scripts/vectl-check.mjs
+    - internal/resofeed/ranking.go
+    - internal/resofeed/http.go
+    - internal/resofeed/mcp.go
+    - internal/resofeed/core_blockers_test.go
     - internal/resofeed/item_route_token_test.go
     - internal/resofeed/rf_bug_item_id_api_expected_red_test.go
     depends_on:
-    - rf-bug-v2-architecture-route-doc-parity-remediation
+    - rf-bug-v2-delivery-shared-operation-remediation
     agent: gate-reviewer
   - id: rf-bug-v2-generic-adapter-remediation
     name: Generalize v2 evidence adapter across pending consumer profiles
