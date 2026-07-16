@@ -185550,7 +185550,7 @@ phases:
       - plan.yaml pending profile matrix'
   - id: rf-bug-v2-generic-adapter-verification
     name: Independently verify generic adapter profile and envelope coverage
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -185588,6 +185588,33 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T09:21:40.721942+00:00'
+    done_at: '2026-07-16T09:28:44.540731+00:00'
+    evidence: 'Artifact:
+
+      - Immutable verification target: 5c6a71a2f799eae5aacc6453eb98f779e07e579c
+
+
+      Verification:
+
+      - 11 exact selection envelopes and digests -> PASS
+
+      - Generic adapter + completed harness compatibility -> PASS
+
+      - Aggregate unknown/mismatch fail-closed wrapper -> PASS
+
+      - Artifact objects, identity parity, three-path scope, protected cleanliness
+      -> PASS
+
+      - Semantic receipt validator -> CONFORMANT
+
+      - Semantic receipt: sha256:159cf1868aa4d9eb40b8adb4d1996c1fdf54044575e8a14ece2531ac0d8a49f8
+
+
+      Spec link:
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+
+      - plan.yaml profile matrix'
   - id: rf-bug-v2-generic-adapter-compatibility-remediation
     name: Restore completed harness artifact-object compatibility
     status: done
