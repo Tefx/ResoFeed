@@ -186535,25 +186535,31 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Explicit R3 review for the embedded UI and HTTP security implementations after
-      independent runtime evidence. Verify CSP derivation before bind from protected
-      executable-body requirements; middleware ordering covers static, API, MCP, auth,
-      not-found, and internal-error responses exactly once; Doctor/evidence redact
-      secrets; invalid bootstrap remains unbound; streaming and cancellation remain
-      intact; OPML is auth-first import-only; and rollback restores the prior embedded
-      binary and middleware/CSP state without weakening headers or exposing an external
-      UI tree. Any authorization, ordering, redaction, pre-bind, state, or recovery
+      Explicit R3 review rebound after `rf-bug-v2-runtime-review-remediation`. Reassess
+      rejected receipt `sha256:2507973a47bad4aad91945c464aff438707f9f3de075d99d876a33c949ce72fc`
+      against the new integrated head: directly execute the remediation check and
+      confirm failed-source Doctor output cannot reveal URL userinfo or query values;
+      the Go package contains no `ExportOPML` or export-only helper surface; protected
+      acceptance, canonical active-document counts, auth-first OPML import-only behavior,
+      and atomic minimal JSON State remain intact. Retain RF-BUG-005 PASS evidence
+      by verifying CSP derivation before bind, one middleware owner across static/API/MCP/auth/not-found/internal-error
+      responses, invalid-bootstrap no-bind, streaming/cancellation, and Chromium operations.
+      Verify the remediation changed only its declared Go/tests/adapter unit, preserved
+      user-dirty docs, and has an executable rollback that cannot reopen the gate
+      or release a credential-leaking/OPML-exporting artifact. Any authorization,
+      redaction, residual symbol, protected-path, ordering, pre-bind, state, or recovery
       gap blocks the gate.'
-    verification: Read-only R3 review confirms pre-bind/CSP authority, middleware
-      order, secret redaction, streaming/cancellation, auth-first state boundary,
-      and executable rollback with no unresolved finding.
+    verification: Read-only R3 review directly observes the remediation check on the
+      integrated head, closes RF-BUG-003/004 blockers, retains RF-BUG-005 proof, confirms
+      protected/user-dirty immutability, and validates fail-closed rollback with no
+      unresolved finding.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - AGENTS.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     depends_on:
-    - rf-bug-v2-runtime-boundaries-verification
+    - rf-bug-v2-runtime-review-remediation
     agent: spec-verifier
   - id: rf-bug-v2-runtime-boundaries-gate
     name: RF-BUG Assurance v2 runtime-boundaries Full Gate
