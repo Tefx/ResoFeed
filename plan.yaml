@@ -185550,7 +185550,7 @@ phases:
       - plan.yaml pending profile matrix'
   - id: rf-bug-v2-generic-adapter-verification
     name: Independently verify generic adapter profile and envelope coverage
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -185586,8 +185586,6 @@ phases:
     depends_on:
     - rf-bug-v2-generic-adapter-compatibility-remediation
     agent: integration-verifier
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-16T09:12:14.077843+00:00'
   - id: rf-bug-v2-generic-adapter-compatibility-remediation
     name: Restore completed harness artifact-object compatibility
     status: done
