@@ -187096,9 +187096,18 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently exercise RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008, and
-      RF-BUG-009 against the integrated real binary/browser/SQLite runtime. Verify
-      that the binary serves the production Svelte assets staged under package-local
+      Independently exercise RF-BUG-002-TOKEN-CONTRACT-REMEDIATION, RF-BUG-004-STATE-UI,
+      RF-BUG-008, RF-BUG-004-008, and RF-BUG-009 against the integrated real binary/browser/SQLite
+      runtime. Confirm the authorized contract-lock baseline contains only canonical
+      `~` plus unpadded UTF-8 base64url item HTTP paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go`
+      and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`; raw item
+      paths remain rejected; the sixteen Prompting subtests, two Source Ledger delete
+      cases, assertions, and intentionally unresolved expected-red product behavior
+      remain unchanged. Verify that later implementation work does not mutate either
+      protected acceptance file.
+
+
+      Verify that the binary serves the production Svelte assets staged under package-local
       `internal/resofeed/webui` from the integrated Source Ledger branch, without
       runtime reads from `web/build`, main-checkout assets, or another worktree. Verify
       separate Ledger and State groups at five viewports, exact responsive and screenshot
@@ -187108,17 +187117,23 @@ phases:
       bound, atomic content/FTS preservation, active v2.1 absence, and secret/prompt
       redaction. The active-name assertion must treat protected and legacy test-only
       v2.1 sources as non-production while still scanning all declared production/docs
-      surfaces. Mock substitution, retry, skip, protected acceptance mutation, stale
-      embedded assets, or external asset substitution blocks the gate.'
+      surfaces. Mock substitution, retry, skip, any protected acceptance mutation
+      after the authorized token remediation, stale embedded assets, or external asset
+      substitution blocks the gate.'
     verification: Real binary, package-local embedded bundle, browser, SQLite, and
-      runtime proof covers five viewport Ledger/State rendering and operations, accessibility/delete
-      focus, Prompting v2.2 across all paths, atomic preservation, production-only
-      active-name scanning, and redaction without main-checkout or external-asset
+      runtime proof covers canonical item-token use and raw-path rejection at both
+      repaired protected acceptance call sites; preserved Prompting/delete identities
+      and assertions; five viewport Ledger/State rendering and operations; accessibility/delete
+      focus; Prompting v2.2 across all paths; atomic preservation; production-only
+      active-name scanning; and redaction without main-checkout or external-asset
       substitution.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
     - docs/PROMPTING_SYSTEM.md
+    - internal/resofeed/item_route_token.go
+    - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go
+    - web/tests/e2e/source-ledger-delete.browser-contract.spec.ts
     - web/package.json
     - go.mod
     depends_on:
