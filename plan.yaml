@@ -186160,7 +186160,7 @@ phases:
   steps:
   - id: rf-bug-v2-embed-ui-assets
     name: Embed validated UI and preserve safe Doctor diagnostics under v2
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for `embed-ui-assets-in-single-binary`. Stage the production Svelte build\
@@ -186224,6 +186224,38 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T12:15:04.586467+00:00'
+    done_at: '2026-07-16T12:29:38.975270+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: bf1ea09e21a22df32a6cee091049ac47c379b0e5
+
+
+      Verification:
+
+      - `rf_bug_v2_embed_ui_green` -> green; exact Doctor redaction, arbitrary-cwd
+      binary, embedded UI identities
+
+      - 23 exact subtests, browser script classification fixtures, Chromium CRLF CSP
+      normalization, 3 binary probes
+
+      - Protected acceptance unchanged; no secrets or Node runtime requirement
+
+      - Production worker receipt validator -> CONFORMANT
+
+      - Worker receipt: sha256:5374a2ab30452ceedd1af7f933d8362e0bc8938cf1bbe179b9d33af6d43a7d01
+
+      - Dispatch: sha256:893cd8de61f3bb1ad1eb507e8d4822f01d46286079602435d605d2f6a28dd6dd
+
+      - Main user docs edits auto-merged and preserved
+
+
+      Spec link:
+
+      - docs/ARCHITECTURE.md
+
+      - docs/CONTAINER.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-opml-import-only
     name: Enforce auth-first OPML import-only surface under v2
     status: pending
