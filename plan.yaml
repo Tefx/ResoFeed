@@ -186364,7 +186364,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-http-security-csp
     name: Apply outer HTTP security middleware and embedded CSP under v2
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for `apply-outer-security-middleware-and-csp`. Apply one small outer Go middleware\
@@ -186433,6 +186433,39 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T12:57:20.409446+00:00'
+    done_at: '2026-07-16T13:17:12.534505+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: ad90fd71d1c06defc38bd5c48c8c45151f1abb9d
+
+
+      Verification:
+
+      - `rf_bug_v2_http_security_green` -> green
+
+      - Exact 13 protected subtests; executable CSP hashes; multi-flush streaming;
+      request cancellation
+
+      - Chromium CI-safe OPML import and JSON State export/import/download -> PASS,
+      no CSP violation/retry
+
+      - Production worker validator -> CONFORMANT
+
+      - Worker receipt: sha256:5662be420a008a86d647403000470b8fc13ff0242db4d7399b792ab6bdd4ee19
+
+      - Dispatch: sha256:959fb7ee8550224f9f9e5efdb20a95dfd5225cc4b36ed77effdd14a1418bd6b2
+
+      - Main user architecture edits preserved through explicit combined conflict
+      resolution
+
+
+      Spec link:
+
+      - docs/ARCHITECTURE.md
+
+      - docs/CONTAINER.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-runtime-boundaries-verification
     name: Independently verify embedded, state, HTTP, and browser runtime seams
     status: pending
