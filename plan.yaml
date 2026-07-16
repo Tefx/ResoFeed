@@ -188400,7 +188400,7 @@ phases:
       snapshot and normal background lifecycle remains visible/clears. Receipt sha256:9443e42aba4c545fcf92e6e48289367ffbdb36f5f6d5e46d3fbb827ec96cde77.
   - id: rf-bug-v2-current-operation-foreground-priority
     name: Prioritize foreground current-operation display over background source work
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ product remediation for valid rejected receipt `sha256:9ea86963bf8494c680a103ca1d09b13e8a6aab1610e61cd03a5b72a5be14adc9`,\
@@ -188477,6 +188477,12 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T20:04:58.693221+00:00'
+    done_at: '2026-07-16T20:13:38.646462+00:00'
+    evidence: Integrated 2715eff5 (worker e01db3ba7402766ba67275ccbbdfa01ca808303d)
+      while cleanly reapplying the pre-existing user docs/ARCHITECTURE.md patch. Race-enabled
+      test proved foreground source_fetch/human/fetching_source remains current over
+      concurrent background source lifecycle and background becomes visible/clears
+      afterward. Receipt sha256:9ba85e65e45a7b22f61424b7872c6916b3114aeb43bdf14149713037101ee2be.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
