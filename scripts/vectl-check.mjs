@@ -101,6 +101,26 @@ export const PENDING_PROFILE_PAIRS = [
     ]
   },
   {
+    suite: 'rf-bug-v2-runtime-doc-contract',
+    checkID: 'rf_bug_v2_runtime_doc_contract_green',
+    identities: [
+      'RF-BUG-003 canonical embedded Doctor contract',
+      'RF-BUG-003/004/005 protected canonical scan',
+      'RF-BUG-004 canonical import-only State contract',
+      'RF-BUG-005 canonical CSP interaction contract'
+    ],
+    requiredOutput: [
+      'RF_BUG_RUNTIME_DOC_ARCH_CSP_FRAGMENT=complete',
+      'RF_BUG_RUNTIME_DOC_DESIGN_ATOMS=3',
+      'RF_BUG_RUNTIME_DOC_DOCTOR_REDACTION=complete',
+      'RF_BUG_RUNTIME_DOC_CSP_INTERACTIONS=complete',
+      'RF_BUG_CANONICAL_DOCUMENTS=9',
+      'OPML_EXCLUSIONS=2',
+      'VECTL-ADAPTER pending-profile-discovery'
+    ],
+    runner: 'runtime-doc-contract'
+  },
+  {
     suite: 'rf-bug-v2-http-security',
     checkID: 'rf_bug_v2_http_security_green',
     identities: [
@@ -443,6 +463,22 @@ function ensureNoProtectedMutation() {
   if (changed.status !== 0 || changed.stdout.trim()) throw new AdapterFailure('protected acceptance baseline changed');
 }
 
+function ensureRuntimeDocProtectedBaseline() {
+  const protectedPaths = [
+    'docs/BUG_FIX_PLAN_2026-07-12.md',
+    'docs/BUG_REPORT_2026-07-11.md',
+    'tests/rf_bug_canonical_contract_test.go'
+  ];
+  const changed = spawnSync('git', ['status', '--porcelain=v1', '--', ...protectedPaths], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: childEnvironment()
+  });
+  if (changed.status !== 0 || changed.stdout.trim()) {
+    throw new AdapterFailure('runtime documentation protected baseline changed');
+  }
+}
+
 function collectAttachments(report) {
   const attachments = [];
   function visitSuite(suite) {
@@ -587,6 +623,50 @@ function runGenericAdapter(profile) {
   };
 }
 
+function runRuntimeDocContract(profile) {
+  ensureRuntimeDocProtectedBaseline();
+
+  const architecture = fs.readFileSync(path.join(repoRoot, 'docs', 'ARCHITECTURE.md'), 'utf8');
+  const architectureFragment = 'one effective `Content-Security-Policy`';
+  if (!architecture.includes(architectureFragment)) {
+    throw new AdapterFailure(`docs/ARCHITECTURE.md missed ${architectureFragment}`);
+  }
+
+  const design = fs.readFileSync(path.join(repoRoot, 'docs', 'DESIGN.md'), 'utf8');
+  const atomHeadings = [
+    '### RF-BUG-003 — Embedded UI and Doctor readiness atom',
+    '### RF-BUG-004 — Import-only OPML and Portable State atom',
+    '### RF-BUG-005 — Go-owned CSP interaction atom'
+  ];
+  for (const heading of atomHeadings) {
+    if (design.split(heading).length !== 2) throw new AdapterFailure(`docs/DESIGN.md must contain exactly one ${heading}`);
+  }
+
+  const doctorFragment = 'redacts every configured secret, including Owner Token and OpenRouter key values, plus userinfo and query values from failed-source URLs';
+  const stateFragment = 'Minimal JSON State portability contains only active sources, active steering rules, and currently resonated items; import validates the bundle before one atomic replacement, never merges state';
+  const cspFragment = 'must complete under the Go-owned CSP without `unsafe-inline`, duplicate header ownership, blocked required resources, or CSP violations';
+  for (const fragment of [doctorFragment, stateFragment, cspFragment]) {
+    if (!design.includes(fragment)) throw new AdapterFailure(`docs/DESIGN.md missed ${fragment}`);
+  }
+
+  const adapterOutput = execute(profile, 'node', ['--test', 'scripts/vectl-check.test.mjs'], { timeout: 240_000 });
+  if (!adapterOutput.includes('VECTL-ADAPTER pending-profile-discovery')) {
+    throw new AdapterFailure('adapter self-test missed pending-profile-discovery');
+  }
+
+  const canonicalOutput = execute(profile, 'go', ['test', '-v', './tests', '-run', '^TestRFBugCanonicalContracts$', '-count=1'], { timeout: 180_000 });
+  for (const marker of ['RF_BUG_CANONICAL_DOCUMENTS=9', 'OPML_EXCLUSIONS=2']) {
+    if (!canonicalOutput.includes(marker)) throw new AdapterFailure(`protected canonical scan missed ${marker}`);
+  }
+
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
 function runNative(profile) {
   const outputs = [];
   for (const commandRow of profile.commands) {
@@ -633,7 +713,9 @@ async function main() {
       ? runFoundation(profile)
       : profile.runner === 'generic-adapter'
         ? runGenericAdapter(profile)
-        : runNative(profile);
+        : profile.runner === 'runtime-doc-contract'
+          ? runRuntimeDocContract(profile)
+          : runNative(profile);
     const envelope = evidenceEnvelope({ profile, ...result });
     parseEvidenceOutput(JSON.stringify(envelope), profile, result.outcome);
     process.stdout.write(`${JSON.stringify(envelope)}\n`);

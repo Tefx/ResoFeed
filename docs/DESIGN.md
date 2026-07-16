@@ -1236,7 +1236,6 @@ Examples: `no new items`, `err: summary unavailable`, `Text evidence: RSS excerp
 - Idle Steer has no missing-URL error. A matching invalid submission exposes one localized accessible error, retains input and focus, performs no mutation, and clears on edit. Stale preview and transport failures use distinct feedback.
 - Source Ledger keeps `SOURCE LIST` and `PORTABLE STATE` as separately labelled groups on desktop and narrow surfaces. The only source-list transfer action is `[IMPORT OPML]`; portable backup/restore uses `[EXPORT STATE]` and `[IMPORT STATE]`. Controls remain keyboard reachable, visibly focused, at least 44 by 44 CSS pixels, and free of document-level horizontal overflow.
 ## RF-BUG Interface-Contract Atom Inventory
-
 ### RF-BUG-001 — Inspector selection atom
 Selecting a Feed or Search row immediately commits that row's opaque item ID as the active selection and opens its readable summary preview without blanking the Inspector. Detail retrieval and inspection-marker recording remain independent request channels keyed to that active selection. A pending, failed, or late detail/marker response for a previous item cannot change the current preview, loading/error state, focus, URL, or content; viewport transitions, Back, and Escape preserve the current readable selection according to the Inspector contract.
 
@@ -1247,6 +1246,15 @@ Route resolution precedes token hydration and chooses the correct EN/ZH Today, S
 The Search surface and entered filter/query values remain visible throughout an invalid route or submit state. Exactly one localized current error uses `role="alert"` with `aria-live="assertive"`; it replaces any prior Search validation alert rather than accumulating duplicate live regions. An invalid route or submission sends no `/api/search` request and performs no history push or replace.
 
 Editing retains focus and entered values, clears the stale validation alert immediately, sends no request, and performs no history write. A corrected valid submission enters the ordinary loading/status lifecycle, issues exactly one lexical Search request, and writes only bounded canonical `q` history state plus documented valid lexical filters.
+
+### RF-BUG-003 — Embedded UI and Doctor readiness atom
+The production UI is validated before bind and boots from the single embedded Go binary independently of the process working directory. `/doctor` reports `ui_assets=ready` and `ui_asset_source=embedded`; its output redacts every configured secret, including Owner Token and OpenRouter key values, plus userinfo and query values from failed-source URLs, without adding provider setup or credential-display UI.
+### RF-BUG-004 — Import-only OPML and Portable State atom
+OPML is import-only source intake that flattens feed URLs and source titles into `SOURCE LIST`. Minimal JSON State portability contains only active sources, active steering rules, and currently resonated items; import validates the bundle before one atomic replacement, never merges state, and exposes no OPML output or restoration capability.
+
+### RF-BUG-005 — Go-owned CSP interaction atom
+Ordinary embedded UI interactions—including initial boot, OPML import, and JSON State export/import—must complete under the Go-owned CSP without `unsafe-inline`, duplicate header ownership, blocked required resources, or CSP violations. Caddy and other reverse proxies pass the application-owned browser security headers unchanged.
+
 ### RF-BUG-006 — Resolved-route title atom
 The resolved route surface and its document title commit atomically before hydration or asynchronous work can paint. Cold load, refresh, direct Inspector navigation, Search, Today, Source Ledger, `/doctor`, Back, and Forward expose no intermediate title from another route. Functional titles remain the exact invariant English tokens `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor` in both processing languages.
 

@@ -42,6 +42,12 @@ const expectedPending = [
     'RF-BUG-003/004 protected import-only regression',
     'RF-BUG-004 Go OPML export symbol absence'
   ]],
+  ['rf-bug-v2-runtime-doc-contract', 'rf_bug_v2_runtime_doc_contract_green', [
+    'RF-BUG-003 canonical embedded Doctor contract',
+    'RF-BUG-003/004/005 protected canonical scan',
+    'RF-BUG-004 canonical import-only State contract',
+    'RF-BUG-005 canonical CSP interaction contract'
+  ]],
   ['rf-bug-v2-http-security', 'rf_bug_v2_http_security_green', [
     'RF-BUG-005 Chromium CSP operations',
     'RF-BUG-005 exact security contract',
@@ -118,8 +124,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 12);
-  assert.equal(expectedPending.length, 12);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 13);
+  assert.equal(expectedPending.length, 13);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -135,8 +141,29 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
   }
 });
 
+test('RF-BUG runtime documentation contract profile', () => {
+  const profile = findProfile('rf-bug-v2-runtime-doc-contract', 'rf_bug_v2_runtime_doc_contract_green');
+  assert.ok(profile);
+  assert.equal(profile.runner, 'runtime-doc-contract');
+  assert.deepEqual(profile.requiredOutput, [
+    'RF_BUG_RUNTIME_DOC_ARCH_CSP_FRAGMENT=complete',
+    'RF_BUG_RUNTIME_DOC_DESIGN_ATOMS=3',
+    'RF_BUG_RUNTIME_DOC_DOCTOR_REDACTION=complete',
+    'RF_BUG_RUNTIME_DOC_CSP_INTERACTIONS=complete',
+    'RF_BUG_CANONICAL_DOCUMENTS=9',
+    'OPML_EXCLUSIONS=2',
+    'VECTL-ADAPTER pending-profile-discovery'
+  ]);
+
+  const result = invoke('select', profile.suite, profile.checkID);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(parseSelectionOutput(result.stdout, profile), selectionEnvelope(profile));
+});
+
 test('VECTL-ADAPTER protected-scope', () => {
   const allowed = new Set([
+    'docs/ARCHITECTURE.md',
+    'docs/DESIGN.md',
     'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md',
     'internal/resofeed/doctor.go',
     'internal/resofeed/doctor_test.go',
