@@ -186921,42 +186921,71 @@ phases:
     name: Repair Source Ledger and State operations under v2
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
-      \ for `repair-source-ledger-responsive-groups`. Keep Source List and Portable\
-      \ State separately labelled and usable at five viewports; preserve OPML import,\
-      \ JSON State export/import confirmation, ingest/fetch, local operation feedback,\
-      \ delete focus, and source info. Controls remain keyboard reachable, visibly\
-      \ focused, at least 44px, and free of document overflow. Rebuild and atomically\
-      \ stage the production Svelte output through the existing `scripts/build-resofeed.sh`\
-      \ path before the exact adapter check so the real-browser runtime compiles and\
-      \ serves the same package-local `internal/resofeed/webui` bundle produced in\
-      \ this isolated worktree. The generated embedded bundle is part of this rollback\
-      \ unit; transient `web/build` and the temporary binary remain non-durable. Rollback\
-      \ reverts Ledger/State components, CSS, docs, preview, and the generated embedded\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nPlan-contract\
+      \ repair after valid rejected receipt `sha256:4da179c1d5865fb6a4ba550dfb175b89773c9c98935cb52d76fc03551bd7ee88`.\
+      \ Execute only from a fresh clean post-repair worktree. Preserve `/Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-source-ledger-responsive-v3`\
+      \ and the earlier dirty recovery worktree unchanged; selectively port only admitted\
+      \ partial product, generated-bundle, and documentation changes into the fresh\
+      \ worktree.\n\nReplacement for `repair-source-ledger-responsive-groups`. Keep\
+      \ Source List and Portable State separately labelled and usable at five viewports;\
+      \ preserve OPML import, JSON State export/import confirmation, ingest/fetch,\
+      \ local operation feedback, delete focus, and source info. Controls remain keyboard\
+      \ reachable, visibly focused, at least 44px, and free of document overflow.\
+      \ Rebuild and atomically stage the production Svelte output through the existing\
+      \ `scripts/build-resofeed.sh` path before the exact adapter check so the real-browser\
+      \ runtime compiles and serves the same package-local `internal/resofeed/webui`\
+      \ bundle produced in this isolated worktree. The generated embedded bundle is\
+      \ part of this rollback unit; transient `web/build` and the temporary binary\
+      \ remain non-durable.\n\nRepair runtime Playwright discovery by changing only\
+      \ `web/playwright.runtime.config.ts` so its matcher preserves the existing `runtime.spec.ts`\
+      \ lane and admits the narrow `*.runtime.spec.ts` suffix used by `web/tests/e2e/source-ledger-operations.runtime.spec.ts`.\
+      \ Add focused developer coverage in the existing `web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts`\
+      \ that pins exactly those two matcher forms and zero retries. Keep the protected\
+      \ runtime spec filename and contents immutable. Do not broaden collection to\
+      \ unrelated E2E names or alter the base project, global setup/teardown, artifact,\
+      \ environment, worker, or retry boundaries. The exact adapter remains the acceptance\
+      \ proof that native Playwright discovers and executes the canonical runtime\
+      \ spec.\n\nRollback reverts Ledger/State components, CSS, runtime discovery\
+      \ config, focused developer coverage, docs, preview, and the generated embedded\
       \ bundle together. OPML export, folders/tags, jobs, queues, history, sync, and\
       \ activity ledgers remain forbidden.\n\n<intent_closure_contract>\nschema_version:\
       \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
       profile: generic\nscope:\n  allowed_paths: [web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
       \ web/src/routes/components/StatePortability.svelte, web/src/app.css, internal/resofeed/webui/**,\
-      \ docs/DESIGN.md, docs/ui-preview.html, docs/UI_REGRESSION_CONTRACT.md]\n  blocked_paths:\
+      \ docs/DESIGN.md, docs/ui-preview.html, docs/UI_REGRESSION_CONTRACT.md, web/playwright.runtime.config.ts,\
+      \ web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts]\n  blocked_paths:\
       \ [web/src/routes/components/__tests__/source-ledger-responsive.test.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
       \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
       \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts]\n\
       \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-004-STATE-UI,\
-      \ RF-BUG-008, RF-BUG-004-008]\nchecks:\n  - id: rf_bug_v2_source_ledger_green\n\
-      \    run:\n      command:\n        - bash\n        - -lc\n        - >-\n   \
-      \       set -euo pipefail; out=\"${TMPDIR:-/tmp}/resofeed-rf-bug-v2-source-ledger-$$\"\
-      ; trap 'rm -f \"$out\"' EXIT; scripts/build-resofeed.sh \"$out\"; node scripts/vectl-check.mjs\
-      \ run rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green\n      timeout_seconds:\
+      \ RF-BUG-008, RF-BUG-004-008]\nchecks:\n  - id: rf_bug_v2_runtime_config_discovery_green\n\
+      \    run:\n      command: [npm, --prefix, web, run, test:render, --, src/lib/__tests__/playwright-e2e-harness-contract.test.ts,\
+      \ --reporter=verbose]\n      timeout_seconds: 180\n    evidence:\n      mode:\
+      \ command_outcome\n      path_bindings:\n        - {path: web/playwright.runtime.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/package.json, access:\
+      \ read, availability: current}\n        - {path: web/package-lock.json, access:\
+      \ read, availability: current}\n        - {path: web/vite.config.ts, access:\
+      \ read, availability: current}\n      test_bindings:\n        - {path: web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts,\
+      \ classification: developer, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: RF-BUG-008 runtime config admits only canonical runtime spec names\
+      \ at zero retries}]\n        contains_any: [{literal: passed}]\n        forbids:\
+      \ [{literal: failed}, {literal: skipped}, {literal: No tests found}]\n    proves:\
+      \ [RF-BUG-008]\n  - id: rf_bug_v2_source_ledger_green\n    run:\n      command:\n\
+      \        - bash\n        - -lc\n        - >-\n          set -euo pipefail; out=\"\
+      ${TMPDIR:-/tmp}/resofeed-rf-bug-v2-source-ledger-$$\"; trap 'rm -f \"$out\"\
+      ' EXIT; scripts/build-resofeed.sh \"$out\"; node scripts/vectl-check.mjs run\
+      \ rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green\n      timeout_seconds:\
       \ 1800\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
       \        - {path: scripts/build-resofeed.sh, access: execute, availability:\
       \ current}\n        - {path: scripts/vectl-check.mjs, access: execute, availability:\
-      \ current}\n        - {path: web/package.json, access: read, availability: current}\n\
-      \        - {path: web/package-lock.json, access: read, availability: current}\n\
-      \        - {path: web/svelte.config.js, access: read, availability: current}\n\
-      \        - {path: web/vite.config.ts, access: read, availability: current}\n\
-      \        - {path: go.mod, access: read, availability: current}\n      test_bindings:\n\
-      \        - {path: web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
+      \ current}\n        - {path: web/playwright.runtime.config.ts, access: read,\
+      \ availability: current}\n        - {path: web/package.json, access: read, availability:\
+      \ current}\n        - {path: web/package-lock.json, access: read, availability:\
+      \ current}\n        - {path: web/svelte.config.js, access: read, availability:\
+      \ current}\n        - {path: web/vite.config.ts, access: read, availability:\
+      \ current}\n        - {path: go.mod, access: read, availability: current}\n\
+      \      test_bindings:\n        - {path: web/src/routes/components/__tests__/source-ledger-responsive.test.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/source-ledger-delete.browser-contract.spec.ts,\
@@ -186990,18 +187019,19 @@ phases:
       ,\"seam\":\"real\",\"check_id\":\"rf_bug_v2_source_ledger_green\",\"independent_step\"\
       :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
       },{\"requirement_id\":\"RF-BUG-008\",\"atom\":\"five-viewport Ledger rendering,\
-      \ operations, accessibility, and delete focus\",\"modality\":\"runtime\",\"\
-      seam\":\"real\",\"check_id\":\"rf_bug_v2_source_ledger_green\",\"independent_step\"\
-      :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
-      }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
-      :[\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\",\"\
-      web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\",\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"\
+      \ operations, accessibility, delete focus, and narrow runtime-spec discovery\"\
+      ,\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_source_ledger_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts\"\
+      ],\"acceptance_test_paths\":[\"web/src/routes/components/__tests__/source-ledger-responsive.test.ts\"\
+      ,\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\",\"web/tests/e2e/source-ledger-operations.runtime.spec.ts\"\
       ,\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
       :[\"rf_bug_v2_source_ledger_green\"],\"acceptance_mutation\":\"FORBIDDEN\",\"\
       acceptance_authorizations\":[]}}\n</vectl_step_policy>"
-    verification: Exact State-import, render, five-viewport responsive, operations,
-      and delete identities pass with accessibility, focus, 44px targets, no overflow,
-      and no protected acceptance diff.
+    verification: Focused developer evidence pins only `runtime.spec.ts` plus `*.runtime.spec.ts`
+      at zero retries. The exact State-import, render, five-viewport responsive, operations,
+      and delete adapter identities then pass with native discovery, accessibility,
+      focus, 44px targets, no overflow, and no protected acceptance diff.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
