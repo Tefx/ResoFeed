@@ -187481,31 +187481,38 @@ phases:
       ]\\\\]/g,'\\\\$&'),'g'))||[]).length !== 1) throw new Error('identity changed:\
       \ '+title); } const start=s.indexOf(\"test('[RF-BUG-008] RUN INGEST transitions'\"\
       ); const end=s.indexOf(\"test('[RF-BUG-008] FETCH transitions and independent\
-      \ rows'\",start); const t=s.slice(start,end); const role=\"getByRole('button',\
-      \ { name: '[RUN INGEST]' })\"; const stable=\"locator('.bracket-action--run-ingest')\"\
-      ; if ((t.split(role).length-1)!==1 || (t.split(stable).length-1)!==1 || t.indexOf(role)>t.indexOf(stable)\
-      \ || !t.includes(\"toHaveText('[INGESTING...]')\") || !t.includes('toBeDisabled()')\
-      \ || !t.includes(\"toHaveText('[RUN INGEST]', { timeout: 10_000 })\")) throw\
-      \ new Error('RUN INGEST locator contract mismatch'); if (/retries\\s*:/.test(t))\
-      \ throw new Error('retry boundary changed'); console.log('RF-BUG-008_INGEST_LOCATOR_CONTRACT=initial_role_then_stable_control');\
+      \ rows'\",start); const t=s.slice(start,end); const roleDecl=t.match(/const\\\
+      s+([A-Za-z_$][\\w$]*)\\s*=\\s*page\\.getByRole\\('button', \\{ name: '\\[RUN\
+      \ INGEST\\]' \\}\\);/); const stableDecl=t.match(/const\\s+([A-Za-z_$][\\w$]*)\\\
+      s*=\\s*page\\.locator\\('\\.bracket-action--run-ingest'\\);/); if (!roleDecl\
+      \ || !stableDecl || (t.match(/getByRole\\('button', \\{ name: '\\[RUN INGEST\\\
+      ]' \\}\\)/g)||[]).length!==1) throw new Error('RUN INGEST locator declarations\
+      \ mismatch'); const roleAssert=`expect(${roleDecl[1]}).toBeVisible()`; const\
+      \ click=`${stableDecl[1]}.click()`; const pending=`expect(${stableDecl[1]}).toHaveText('[INGESTING...]')`;\
+      \ const disabled=`expect(${stableDecl[1]}).toBeDisabled()`; const restored=`expect(${stableDecl[1]}).toHaveText('[RUN\
+      \ INGEST]', { timeout: 10_000 })`; const order=[t.indexOf(roleDecl[0]),t.indexOf(roleAssert),t.indexOf(stableDecl[0]),t.indexOf(click),t.indexOf(pending),t.indexOf(disabled),t.indexOf(restored)];\
+      \ if (order.some((value)=>value<0) || order.some((value,index)=>index>0&&value<=order[index-1]))\
+      \ throw new Error('RUN INGEST locator assertion order mismatch'); if (/retries\\\
+      s*:/.test(t)) throw new Error('retry boundary changed'); console.log('RF-BUG-008_INGEST_LOCATOR_CONTRACT=initial_role_assertion_then_stable_control');\
       \ console.log('RF-BUG-008_INGEST_TEST_IDENTITIES=5_preserved');\n      timeout_seconds:\
       \ 30\n    evidence:\n      mode: command_outcome\n      path_bindings:\n   \
       \     - {path: web/playwright.runtime.config.ts, access: read, availability:\
       \ current}\n      test_bindings:\n        - {path: web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
       \ classification: acceptance, availability: current}\n    expect:\n      outcome:\
       \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
-      \ [{literal: RF-BUG-008_INGEST_LOCATOR_CONTRACT=initial_role_then_stable_control},\
+      \ [{literal: RF-BUG-008_INGEST_LOCATOR_CONTRACT=initial_role_assertion_then_stable_control},\
       \ {literal: RF-BUG-008_INGEST_TEST_IDENTITIES=5_preserved}]\n        contains_any:\
       \ []\n        forbids: [{literal: Error}, {literal: identity changed}, {literal:\
-      \ locator contract mismatch}, {literal: retry boundary changed}]\n    proves:\
-      \ [RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION]\n  - id: rf_bug_008_ingest_locator_contract_collection\n\
-      \    run:\n      command: [npm, --prefix, web, exec, --, playwright, test, --config,\
-      \ playwright.runtime.config.ts, tests/e2e/source-ledger-operations.runtime.spec.ts,\
-      \ --list]\n      timeout_seconds: 300\n    evidence:\n      mode: command_outcome\n\
-      \      path_bindings:\n        - {path: web/package.json, access: read, availability:\
-      \ current}\n        - {path: web/package-lock.json, access: read, availability:\
-      \ current}\n        - {path: web/playwright.runtime.config.ts, access: read,\
-      \ availability: current}\n      test_bindings:\n        - {path: web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
+      \ locator declarations mismatch}, {literal: locator assertion order mismatch},\
+      \ {literal: retry boundary changed}]\n    proves: [RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION]\n\
+      \  - id: rf_bug_008_ingest_locator_contract_collection\n    run:\n      command:\
+      \ [npm, --prefix, web, exec, --, playwright, test, --config, playwright.runtime.config.ts,\
+      \ tests/e2e/source-ledger-operations.runtime.spec.ts, --list]\n      timeout_seconds:\
+      \ 300\n    evidence:\n      mode: command_outcome\n      path_bindings:\n  \
+      \      - {path: web/package.json, access: read, availability: current}\n   \
+      \     - {path: web/package-lock.json, access: read, availability: current}\n\
+      \        - {path: web/playwright.runtime.config.ts, access: read, availability:\
+      \ current}\n      test_bindings:\n        - {path: web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
       \ classification: acceptance, availability: current}\n    expect:\n      outcome:\
       \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
       \ [{literal: '[RF-BUG-008] RUN INGEST transitions'}, {literal: '[RF-BUG-008]\
