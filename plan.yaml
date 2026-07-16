@@ -187251,27 +187251,33 @@ phases:
       asset substitution, credential exposure, current-operation priority loss, or
       a loopback allowance reachable from an untagged production binary blocks the
       gate.'
-    verification: First rerun `node scripts/vectl-check.mjs run rf-bug-v2-prompting
-      rf_bug_v2_prompting_green` on the integrated head after `rf-bug-v2-prompting-e2e-harness-remediation`;
-      require exact four selected/executed identities, exact sixteen protected Prompting
-      subtests, and protected acceptance unchanged. Confirm the protected loopback
-      extraction command alone compiles/tests with `-tags resofeed_e2e` and exact
-      child `RESOFEED_E2E=1`, while the other Prompting regression command remains
-      untagged/strict. Independently prove the normal untagged production build/test
-      rejects loopback even when `RESOFEED_E2E=1` is present, with tag-only and environment-only
-      cases strict, no global/CLI/general bypass, and no production SSRF relaxation.
-      Then rerun all previously declared real binary, package-local embedded bundle,
-      browser, SQLite, Source Ledger/State, current-operation race/priority, Prompting
-      parity/atomicity/redaction, fixture-boundary, and protected-baseline seams.
-      The eager independent Node/global fetch actor must retain exact bearer Authorization,
-      exact application/json Content-Type, exact body '{}', exact request-start/poll/click
-      ordering, exact `source_fetch` / `human` / `fetching_feed`, Response.status
-      200, and zero retries. Independently rerun `go test -race ./internal/resofeed
-      -run '^(TestICACurrentOperationBackgroundSnapshotOwnership|TestICACurrentOperationForegroundPriorityOverBackgroundSourceLifecycle)$'
+    verification: 'First rerun `node scripts/vectl-check.mjs run rf-bug-v2-go-token-parity
+      rf_bug_v2_go_token_parity_green` on the integrated head after `rf-bug-v2-token-parity-harness-remediation`;
+      require one exact green evidence envelope, exact two selected/executed identities,
+      all 30 protected API subtests, canonical token/raw rejection markers, HTTP/MCP/FTS
+      parity, and protected acceptance unchanged. The adapter—not a raw untagged parity
+      invocation—must run the loopback article fixture with exact `-tags resofeed_e2e`
+      plus child `RESOFEED_E2E=1` and validate the existing Prompting/outbound strict
+      harness. Independently confirm the normal untagged production build rejects
+      loopback even when `RESOFEED_E2E=1` is present, with tag-only and environment-only
+      cases strict, no global/CLI/general bypass, no alternate key, and no production
+      SSRF relaxation.
+
+
+      Then rerun `node scripts/vectl-check.mjs run rf-bug-v2-prompting rf_bug_v2_prompting_green`
+      and all previously declared real binary, package-local embedded bundle, browser,
+      SQLite, Source Ledger/State, current-operation race/priority, Prompting parity/atomicity/redaction,
+      fixture-boundary, and protected-baseline seams. Require exact four Prompting
+      selected/executed identities, exact sixteen protected Prompting subtests, and
+      protected acceptance unchanged. The eager independent Node/global fetch actor
+      must retain exact bearer Authorization, exact application/json Content-Type,
+      exact body ''{}'', exact request-start/poll/click ordering, exact `source_fetch`
+      / `human` / `fetching_feed`, Response.status 200, and zero retries. Independently
+      rerun `go test -race ./internal/resofeed -run ''^(TestICACurrentOperationBackgroundSnapshotOwnership|TestICACurrentOperationForegroundPriorityOverBackgroundSourceLifecycle)$''
       -count=1 -v`; any race report, overwrite, early clear, acceptance diff, adapter
       identity/subtest mismatch, untagged loopback allowance, guard-capacity/conflict
       regression, persisted operation ledger, retry, skip, stale embedded assets,
-      or external substitution blocks admission.
+      or external substitution blocks admission.'
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
@@ -187286,7 +187292,7 @@ phases:
     - scripts/vectl-check.test.mjs
     depends_on:
     - rf-bug-v2-source-ledger-responsive
-    - rf-bug-v2-prompting-e2e-harness-remediation
+    - rf-bug-v2-token-parity-harness-remediation
     agent: integration-verifier
   - id: rf-bug-v2-ledger-prompting-gate
     name: RF-BUG Assurance v2 ledger-prompting Full Gate
