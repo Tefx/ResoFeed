@@ -185481,22 +185481,21 @@ phases:
       \    - {path: scripts/vectl-check.test.mjs, classification: developer, availability:\
       \ produced_by_step}\n      selection:\n        command:\n          - python3\n\
       \          - -c\n          - >-\n            import hashlib,json; ids=['VECTL-ADAPTER\
-      \ pending-profile-discovery','VECTL-ADAPTER run-envelope-parity','VECTL-ADAPTER\
-      \ unknown-pair-fail-closed','VECTL-ADAPTER completed-harness-regression','VECTL-ADAPTER\
-      \ protected-scope']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_generic_adapter_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \ completed-harness-regression','VECTL-ADAPTER pending-profile-discovery','VECTL-ADAPTER\
+      \ protected-scope','VECTL-ADAPTER run-envelope-parity','VECTL-ADAPTER unknown-pair-fail-closed'];\
+      \ print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_generic_adapter_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 5}\n        required_ids:\
-      \ ['VECTL-ADAPTER pending-profile-discovery', 'VECTL-ADAPTER run-envelope-parity',\
-      \ 'VECTL-ADAPTER unknown-pair-fail-closed', 'VECTL-ADAPTER completed-harness-regression',\
-      \ 'VECTL-ADAPTER protected-scope']\n        forbidden_ids: []\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: VECTL_ADAPTER_PENDING_PROFILE_COUNT=11}, {literal:\
-      \ VECTL_ADAPTER_SELECTION_ENVELOPES=valid}, {literal: VECTL_ADAPTER_EVIDENCE_ENVELOPES=valid},\
-      \ {literal: VECTL_ADAPTER_IDENTITY_PARITY=valid}, {literal: VECTL_ADAPTER_UNKNOWN_PAIR=refused},\
-      \ {literal: VECTL_ADAPTER_COMPLETED_HARNESS=preserved}, {literal: VECTL_ADAPTER_PROTECTED_SCOPE=clean},\
-      \ {literal: VECTL_GENERIC_EVIDENCE=valid}]\n        contains_any: []\n     \
-      \   forbids: [{literal: invalid selection request}, {literal: wrong selected\
-      \ identity}, {literal: wrong executed identity}, {literal: skipped}, {literal:\
-      \ retry}, {literal: OPENROUTER_KEY=}]\n    proves: [RF-BUG-V2-GENERIC-ADAPTER]\n\
+      \ ['VECTL-ADAPTER completed-harness-regression', 'VECTL-ADAPTER pending-profile-discovery',\
+      \ 'VECTL-ADAPTER protected-scope', 'VECTL-ADAPTER run-envelope-parity', 'VECTL-ADAPTER\
+      \ unknown-pair-fail-closed']\n        forbidden_ids: []\n    expect:\n     \
+      \ outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: VECTL_ADAPTER_PENDING_PROFILE_COUNT=11}, {literal: VECTL_ADAPTER_SELECTION_ENVELOPES=valid},\
+      \ {literal: VECTL_ADAPTER_EVIDENCE_ENVELOPES=valid}, {literal: VECTL_ADAPTER_IDENTITY_PARITY=valid},\
+      \ {literal: VECTL_ADAPTER_UNKNOWN_PAIR=refused}, {literal: VECTL_ADAPTER_COMPLETED_HARNESS=preserved},\
+      \ {literal: VECTL_ADAPTER_PROTECTED_SCOPE=clean}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n\
+      \        contains_any: []\n        forbids: [{literal: invalid selection request},\
+      \ {literal: wrong selected identity}, {literal: wrong executed identity}, {literal:\
+      \ skipped}, {literal: retry}, {literal: OPENROUTER_KEY=}]\n    proves: [RF-BUG-V2-GENERIC-ADAPTER]\n\
       bindings:\n  expected_red: {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n\
       <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
       :\"rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-remediation\",\"risk_tier\"\
