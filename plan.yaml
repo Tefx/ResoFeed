@@ -185881,6 +185881,35 @@ phases:
     depends_on:
     - rf-bug-v2-ledger-prompting-verification
     agent: gate-reviewer
+  - id: rf-bug-v2-replacement-lanes-verification
+    name: Independently close immutable replacement-five runtime lanes
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Close RF-BUG-010-LANE-MIGRATION only after the frontend, runtime-boundary, Source
+      Ledger/State, and Prompting repairs are integrated. Through the project-native
+      v2 adapter, discover and execute the immutable replacement-five files `web/tests/e2e/inspector-selection.browser-contract.spec.ts`,
+      `web/tests/e2e/initial-route.browser-contract.spec.ts`, `web/tests/e2e/routes.browser-contract.spec.ts`,
+      `web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts`, and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`
+      against the real `cmd/resofeed` binary and case-local SQLite/browser runtime.
+      Require the complete 29-test replacement inventory green with zero retry/skip,
+      then execute the native old-three inventory and prove selected/executed identity
+      equivalence, cleanup, redaction, standard artifacts, and unchanged protected
+      acceptance. Explicitly cover the previously blocked Search route/history/generation
+      recovery, Source Ledger delete behavior, State import confirmation/cancellation,
+      and responsive screenshot contracts. Any protected acceptance diff, mock product
+      seam, route interception, missing identity, behavior failure, retry, skip, residue,
+      or secret-bearing artifact blocks admission.'
+    verification: The real-binary adapter discovers and executes all immutable replacement-five
+      identities (29/29 green) and the native old-three comparison with zero retry/skip,
+      unchanged protected acceptance, case-local cleanup, retained redacted artifacts,
+      and exact Search/Ledger/State/responsive behavior evidence.
+    depends_on:
+    - rf-bug-v2-ledger-prompting-verification
+    agent: integration-verifier
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
