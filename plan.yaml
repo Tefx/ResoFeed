@@ -186815,16 +186815,22 @@ phases:
       <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
       :\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-doc-contract-remediation\"\
       ,\"risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_contract_repair\",\"\
-      bounded_adapter_profile\"],\"primary_outcome\":\"RF-BUG-003/004/005-DOC-CONTRACT\"\
-      ,\"rollback_class\":\"TRIVIAL\",\"observation_ledger\":[],\"test_authority\"\
-      :{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_test_paths\"\
-      :[\"tests/rf_bug_canonical_contract_test.go\"],\"acceptance_check_ids\":[\"\
-      rf_bug_v2_runtime_doc_contract_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
-      ,\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+      bounded_adapter_profile\"],\"primary_outcome\":\"RF-BUG-003\",\"rollback_class\"\
+      :\"TRIVIAL\",\"observation_ledger\":[],\"test_authority\":{\"developer_test_globs\"\
+      :[\"scripts/vectl-check.test.mjs\"],\"acceptance_test_paths\":[\"tests/rf_bug_canonical_contract_test.go\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_runtime_doc_contract_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: Focused selected execution proves the exact committed architecture/design
       fragments, all three RF-BUG documentation atoms, Doctor credential redaction,
       CSP-compatible embedded interactions, unchanged protected canonical acceptance,
       and adapter identity parity without executing unrelated runtime suites.
+    refs:
+    - AGENTS.md
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - tests/rf_bug_canonical_contract_test.go
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
     depends_on:
     - rf-bug-v2-runtime-security-review
     agent: general
