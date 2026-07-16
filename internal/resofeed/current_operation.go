@@ -33,22 +33,21 @@ type CurrentOperationResponse struct {
 }
 
 type currentOperationSnapshot struct {
-	mu      sync.RWMutex
-	current CurrentOperationInfo
+	mu         sync.RWMutex
+	foreground CurrentOperationInfo
+	background CurrentOperationInfo
 }
 
 func (s *currentOperationSnapshot) start(kind string, scope any, actorKind string) {
 	canonicalKind, ok := representedOperationKind(kind, scope)
 	if !ok {
-		s.clear()
 		return
 	}
 	now := time.Now().UTC()
 	canonicalActorKind := canonicalOperationActorKind(actorKind)
 	phase := "starting"
 	message := currentOperationStartMessage(canonicalKind)
-	s.mu.Lock()
-	s.current = CurrentOperationInfo{
+	operation := CurrentOperationInfo{
 		Running:   true,
 		Kind:      stringPtr(canonicalKind),
 		ActorKind: stringPtr(canonicalActorKind),
@@ -57,48 +56,88 @@ func (s *currentOperationSnapshot) start(kind string, scope any, actorKind strin
 		StartedAt: timePtr(now),
 		UpdatedAt: timePtr(now),
 	}
+	s.mu.Lock()
+	if canonicalActorKind == "background" {
+		s.background = operation
+	} else {
+		s.foreground = operation
+	}
 	s.mu.Unlock()
 }
 
 func (s *currentOperationSnapshot) update(phase string, count *CurrentOperationCount, message string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if !s.current.Running {
+	operation := &s.foreground
+	if !operation.Running {
+		operation = &s.background
+	}
+	updateCurrentOperationInfo(operation, phase, count, message)
+}
+
+func (s *currentOperationSnapshot) updateForActor(actorKind string, phase string, count *CurrentOperationCount, message string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	operation := &s.foreground
+	if canonicalOperationActorKind(actorKind) == "background" {
+		operation = &s.background
+	}
+	updateCurrentOperationInfo(operation, phase, count, message)
+}
+
+func updateCurrentOperationInfo(operation *CurrentOperationInfo, phase string, count *CurrentOperationCount, message string) {
+	if !operation.Running {
 		return
 	}
 	if phase != "" {
-		s.current.Phase = stringPtr(phase)
+		operation.Phase = stringPtr(phase)
 	}
 	if count != nil {
 		countCopy := *count
-		s.current.Count = &countCopy
+		operation.Count = &countCopy
 	}
 	if message != "" {
-		s.current.Message = stringPtr(message)
+		operation.Message = stringPtr(message)
 	}
 	now := time.Now().UTC()
-	s.current.UpdatedAt = timePtr(now)
+	operation.UpdatedAt = timePtr(now)
+}
+
+func (s *currentOperationSnapshot) releaseActor(actorKind string) {
+	s.mu.Lock()
+	if canonicalOperationActorKind(actorKind) == "background" {
+		s.background = CurrentOperationInfo{}
+	} else {
+		s.foreground = CurrentOperationInfo{}
+	}
+	s.mu.Unlock()
 }
 
 func (s *currentOperationSnapshot) clear() {
 	s.mu.Lock()
-	s.current = CurrentOperationInfo{}
+	s.foreground = CurrentOperationInfo{}
+	s.background = CurrentOperationInfo{}
 	s.mu.Unlock()
 }
 
 func (s *currentOperationSnapshot) clearIfKind(kind string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.current.Kind == nil || *s.current.Kind != kind {
-		return
+	if s.foreground.Kind != nil && *s.foreground.Kind == kind {
+		s.foreground = CurrentOperationInfo{}
 	}
-	s.current = CurrentOperationInfo{}
+	if s.background.Kind != nil && *s.background.Kind == kind {
+		s.background = CurrentOperationInfo{}
+	}
 }
 
 func (s *currentOperationSnapshot) get() CurrentOperationInfo {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return cloneCurrentOperationInfo(s.current)
+	if s.foreground.Running {
+		return cloneCurrentOperationInfo(s.foreground)
+	}
+	return cloneCurrentOperationInfo(s.background)
 }
 
 func cloneCurrentOperationInfo(info CurrentOperationInfo) CurrentOperationInfo {
@@ -134,6 +173,10 @@ func currentOperationInfo() CurrentOperationInfo {
 
 func updateCurrentOperation(phase string, count *CurrentOperationCount, message string) {
 	ingestGuardState.current.update(phase, count, message)
+}
+
+func updateCurrentOperationForActor(actorKind string, phase string, count *CurrentOperationCount, message string) {
+	ingestGuardState.current.updateForActor(actorKind, phase, count, message)
 }
 
 func representedOperationKind(kind string, scope any) (string, bool) {

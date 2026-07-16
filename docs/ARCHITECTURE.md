@@ -205,7 +205,7 @@ Out of scope:
 | Current attention state | `item_state` | Resonance state: yes; inspection/external-surface state: no | Stars are user-owned retrieval state; inspection/external-surface timestamps are operational state. |
 | Agent idempotency receipts | `agent_receipts` | No by default | Required for retry safety/provenance, not a user-facing activity ledger. |
 | Runtime metadata | `runtime_metadata` | No | Stores owner-token hash, local processing language, and optional runtime diagnostics; LLM API keys and secret-source metadata are runtime inputs and must not be stored. |
-| Current operation snapshot | process memory (`currentOperationSnapshot` behind the ingest/reprocess guard) | No | Best-effort description of the guarded operation currently running in this Go process; cleared when the guard releases. |
+| Current operation snapshot | process memory (`currentOperationSnapshot` behind the ingest/reprocess guard) | No | Best-effort description of guarded work currently running in this Go process; active human/agent work has display priority over concurrent background source work, and the snapshot clears after its final owning guard releases. |
 | Generated item content | `items` generated-content columns | No by default | Current validated localized content contract for display/search; source provenance remains separate from generated display fields. |
 | Last reprocess attempt | app-owned `last_reprocess_*` diagnostics on the affected item/result surface | No | Latest attempt outcome is operational diagnostics and must not overwrite valid current generated content after a failed attempt. |
 | Lexical index | `search_fts` | No | Derived from canonical rows. |
@@ -234,7 +234,7 @@ Coordination rules:
 - make `POST /api/ingest` and background ingest bounded in-request batches of source-scoped attempts rather than one global fetch lock; already-busy sources are skipped/reported, selected idle sources are drained through bounded workers, externally capacity-unavailable starts are skipped/reported, and no delayed work is persisted after the response/tick;
 - keep true global operations such as processing-language writes, library reprocess, short unrepresented state import/restore, and currently-global item re-ingest mutually exclusive with active source leases;
 - reject HTTP manual triggers with `409 conflict` when their requested source or global scope conflicts with an already-running operation; background ticks skip conflicting sources instead of waiting or queueing;
-- expose current operation state as in-memory `CurrentOperationInfo`/source-fetch status for contextual UI/MCP conflict explanation only; for multi-source work it may be aggregate/best-effort and is not persisted; it is cleared when the relevant operation scope finishes or releases;
+- expose current operation state as in-memory `CurrentOperationInfo`/source-fetch status for contextual UI/MCP conflict explanation only; for multi-source work it may be aggregate/best-effort and is not persisted; active human/agent work retains display ownership over concurrent background source work, remaining background work becomes visible after foreground release, and the snapshot clears after its final owning release;
 - do not persist ingest work as a queue, job table, command ledger, activity log, or portable receipt;
 - use no event bus, plugin registry, DI container, service discovery, or repository interface layer.
 

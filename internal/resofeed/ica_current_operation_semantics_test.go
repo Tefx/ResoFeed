@@ -133,6 +133,72 @@ func TestICACurrentOperationBackgroundSnapshotOwnership(t *testing.T) {
 	}
 }
 
+func TestICACurrentOperationForegroundPriorityOverBackgroundSourceLifecycle(t *testing.T) {
+	resetIngestCoordinatorForTest(t)
+	ctx := context.Background()
+	cfg := ingestCoordinatorConfig{SourceConcurrency: 2}
+
+	releaseHuman, err := tryAcquireIngestGuardWithConfig(ctx, cfg, "fetch", "src_foreground_a", string(ActorKindHuman))
+	if err != nil {
+		t.Fatalf("acquire foreground source A: %v", err)
+	}
+	updateCurrentOperation("fetching_source", &CurrentOperationCount{Current: 0, Total: 1}, "human source A fetching")
+	assertCurrentOperationSnapshotWithCount(t, "source_fetch", string(ActorKindHuman), "fetching_source", 0, 1, "human source A fetching")
+
+	backgroundAcquired := make(chan error, 1)
+	backgroundAdvanced := make(chan struct{})
+	advanceAgain := make(chan struct{})
+	backgroundAdvancedAgain := make(chan struct{})
+	releaseBackground := make(chan struct{})
+	backgroundDone := make(chan struct{})
+	go func() {
+		release, acquireErr := tryAcquireIngestGuardWithConfig(ctx, cfg, "fetch", "src_background_b", "background")
+		backgroundAcquired <- acquireErr
+		if acquireErr != nil {
+			close(backgroundDone)
+			return
+		}
+		ingestGuardState.current.start("ingest", "background", "background")
+		updateCurrentOperationForActor("background", "fetching_sources", &CurrentOperationCount{Current: 0, Total: 1}, "background source B aggregate")
+		close(backgroundAdvanced)
+		<-advanceAgain
+		updateCurrentOperationForActor("background", "finalizing_source", &CurrentOperationCount{Current: 1, Total: 1}, "background source B finalizing")
+		close(backgroundAdvancedAgain)
+		<-releaseBackground
+		release()
+		close(backgroundDone)
+	}()
+
+	if err := <-backgroundAcquired; err != nil {
+		t.Fatalf("acquire background source B: %v", err)
+	}
+	assertCurrentOperationSnapshotWithCount(t, "source_fetch", string(ActorKindHuman), "fetching_source", 0, 1, "human source A fetching")
+	<-backgroundAdvanced
+	assertCurrentOperationSnapshotWithCount(t, "source_fetch", string(ActorKindHuman), "fetching_source", 0, 1, "human source A fetching")
+
+	releaseHuman()
+	assertCurrentOperationSnapshotWithCount(t, "background_ingest", "background", "fetching_sources", 0, 1, "background source B aggregate")
+
+	close(advanceAgain)
+	<-backgroundAdvancedAgain
+	assertCurrentOperationSnapshotWithCount(t, "background_ingest", "background", "finalizing_source", 1, 1, "background source B finalizing")
+
+	close(releaseBackground)
+	<-backgroundDone
+	if operation := currentOperationInfo(); operation.Running || operation.Kind != nil {
+		t.Fatalf("current operation after final background release = %+v, want idle", operation)
+	}
+}
+
+func assertCurrentOperationSnapshotWithCount(t *testing.T, kind string, actorKind string, phase string, current int, total int, message string) {
+	t.Helper()
+	assertCurrentOperationSnapshot(t, kind, actorKind, phase, message)
+	operation := currentOperationInfo()
+	if operation.Count == nil || operation.Count.Current != current || operation.Count.Total != total {
+		t.Fatalf("current operation count = %+v, want %d/%d", operation.Count, current, total)
+	}
+}
+
 func assertCurrentOperationSnapshot(t *testing.T, kind string, actorKind string, phase string, message string) {
 	t.Helper()
 	operation := currentOperationInfo()

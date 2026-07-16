@@ -448,7 +448,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 					current := completed
 					resultMu.Unlock()
 					ingestGuardState.current.start("ingest", opts.aggregateScope, opts.actorKind)
-					updateCurrentOperation("fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.fetchMessage)
+					updateCurrentOperationForActor(opts.actorKind, "fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.fetchMessage)
 				}
 				sourceResult, sourceErr := ingestSourceWithRelease(ctx, db, cfg, source, release)
 				if sourceErr != nil {
@@ -570,8 +570,8 @@ func tryAcquireIngestGuardWithConfig(ctx context.Context, cfg ingestCoordinatorC
 	}
 	ingestGuardState.addLocked(details)
 	ingestGuardState.holder.Store(details)
-	ingestGuardState.mu.Unlock()
 	ingestGuardState.current.start(operation, scope, actorKind)
+	ingestGuardState.mu.Unlock()
 	released := false
 	return func() {
 		if released {
@@ -586,12 +586,12 @@ func tryAcquireIngestGuardWithConfig(ctx context.Context, cfg ingestCoordinatorC
 		} else {
 			ingestGuardState.holder.Store(operationGuardDetails{})
 		}
-		ingestGuardState.mu.Unlock()
-		if hasRemaining {
-			ingestGuardState.current.start(remaining.Operation, remaining.Scope, remaining.ActorKind)
-		} else {
-			ingestGuardState.current.clear()
+		replacement, hasReplacement := ingestGuardState.anyForActorLocked(actorKind)
+		ingestGuardState.current.releaseActor(actorKind)
+		if hasReplacement {
+			ingestGuardState.current.start(replacement.Operation, replacement.Scope, replacement.ActorKind)
 		}
+		ingestGuardState.mu.Unlock()
 	}, nil
 }
 
@@ -652,6 +652,19 @@ func (s *guardedOperationState) anyLocked() (operationGuardDetails, bool) {
 	}
 	for _, details := range s.activeFetches {
 		return details, true
+	}
+	return operationGuardDetails{}, false
+}
+
+func (s *guardedOperationState) anyForActorLocked(actorKind string) (operationGuardDetails, bool) {
+	wantBackground := canonicalOperationActorKind(actorKind) == "background"
+	if s.activeGlobal.Operation != "" && (canonicalOperationActorKind(s.activeGlobal.ActorKind) == "background") == wantBackground {
+		return s.activeGlobal, true
+	}
+	for _, details := range s.activeFetches {
+		if (canonicalOperationActorKind(details.ActorKind) == "background") == wantBackground {
+			return details, true
+		}
 	}
 	return operationGuardDetails{}, false
 }
