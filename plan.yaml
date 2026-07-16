@@ -185013,7 +185013,7 @@ phases:
   steps:
   - id: rf-bug-v2-harness-foundation
     name: Build v2 generic evidence adapter and isolated RF-BUG harness foundation
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nContract\
       \ repair for the preserved `rf-bug-v2-harness-foundation` worktree after receipt\
@@ -185113,6 +185113,8 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T07:40:48.859539+00:00'
   - id: rf-bug-v2-harness-runtime-verification
     name: Independently verify v2 harness foundation reproducibility and artifacts
     status: pending
