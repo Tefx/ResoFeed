@@ -186151,7 +186151,7 @@ phases:
       - docs/ARCHITECTURE.md'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
-  status: in_progress
+  status: done
   gate: Embedded UI, Doctor, auth-first OPML import-only state, HTTP security headers/CSP,
     streaming/cancellation, independent runtime proof, and R3 rollback review pass
     under v2.
@@ -186593,7 +186593,7 @@ phases:
       - AGENTS.md'
   - id: rf-bug-v2-runtime-boundaries-gate
     name: RF-BUG Assurance v2 runtime-boundaries Full Gate
-    status: claimed
+    status: done
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -186640,6 +186640,37 @@ phases:
     agent: gate-reviewer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T14:33:27.756396+00:00'
+    done_at: '2026-07-16T14:39:27.325137+00:00'
+    evidence: 'Artifact:
+
+      - Full Gate target: 3d3e5173916c9c4271854dfd7cfefb996a40476c
+
+
+      Verification:
+
+      - RF-BUG-003/004/005 -> 3/3 PROVEN
+
+      - Runtime docs contract, retained real-seam runtime gate, static boundary scan,
+      protected acceptance -> PASS
+
+      - Architecture/design blockers from prior gate closed by 89398055
+
+      - Independent runtime, security, architecture/design evidence all PASS
+
+      - RF-BUG-009 bounded future-red only; rollback fail-closed; user state untouched
+
+      - Semantic validator -> CONFORMANT
+
+      - Gate receipt: sha256:36da7237d97ae8957687a8a0a5b05b405deaf9056f55b9010c68855436061d7b
+
+
+      Spec link:
+
+      - rf-bug-assurance-v2-runtime gate scope
+
+      - docs/ARCHITECTURE.md
+
+      - docs/DESIGN.md'
   - id: rf-bug-v2-runtime-review-remediation
     name: Remediate Doctor URL redaction and residual Go OPML export
     status: done
@@ -186875,7 +186906,7 @@ phases:
       - docs/DESIGN.md'
 - id: rf-bug-assurance-v2-ledger-prompting
   name: RF-BUG Assurance v2 Ledger and Prompting
-  status: locked
+  status: pending
   gate: Responsive Source Ledger/State operations and Prompting v2.2 paths pass protected
     identities and independent real browser/runtime proof; the immutable replacement-five
     inventory then closes RF-BUG-010 lane migration with 29/29 green, zero retry/skip,
