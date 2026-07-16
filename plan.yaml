@@ -186940,11 +186940,10 @@ phases:
       \ [web/src/routes/components/__tests__/source-ledger-responsive.test.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
       \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts-snapshots/**,\
       \ web/tests/e2e/source-ledger-operations.runtime.spec.ts, web/tests/e2e/source-ledger-delete.browser-contract.spec.ts]\n\
-      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/, web/build/, web/.svelte-kit/,\
-      \ web/node_modules/, .test-artifacts/]\nclaims: [RF-BUG-004-STATE-UI, RF-BUG-008,\
-      \ RF-BUG-004-008]\nchecks:\n  - id: rf_bug_v2_source_ledger_green\n    run:\n\
-      \      command:\n        - bash\n        - -lc\n        - >-\n          set\
-      \ -euo pipefail; out=\"${TMPDIR:-/tmp}/resofeed-rf-bug-v2-source-ledger-$$\"\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-004-STATE-UI,\
+      \ RF-BUG-008, RF-BUG-004-008]\nchecks:\n  - id: rf_bug_v2_source_ledger_green\n\
+      \    run:\n      command:\n        - bash\n        - -lc\n        - >-\n   \
+      \       set -euo pipefail; out=\"${TMPDIR:-/tmp}/resofeed-rf-bug-v2-source-ledger-$$\"\
       ; trap 'rm -f \"$out\"' EXIT; scripts/build-resofeed.sh \"$out\"; node scripts/vectl-check.mjs\
       \ run rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green\n      timeout_seconds:\
       \ 1800\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
