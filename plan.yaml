@@ -187171,7 +187171,7 @@ phases:
       - RF-BUG-009'
   - id: rf-bug-v2-ledger-prompting-verification
     name: Independently verify Ledger, State, and Prompting real seams
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -187288,8 +187288,6 @@ phases:
     - rf-bug-v2-source-ledger-responsive
     - rf-bug-v2-prompting-e2e-harness-remediation
     agent: integration-verifier
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-16T22:24:41.155017+00:00'
   - id: rf-bug-v2-ledger-prompting-gate
     name: RF-BUG Assurance v2 ledger-prompting Full Gate
     status: pending
