@@ -187004,15 +187004,23 @@ phases:
       \ MCP. Use selected-model structured-output support without silent substitution;\
       \ allow one generation plus at most one semantic repair; preserve usable content\
       \ and atomic item/FTS state on failure. Rollback reverts code, tests, fixtures,\
-      \ active names, and docs together. Prompts, provider bodies, model overrides,\
-      \ and credentials never enter SQLite, State, diagnostics, or logs.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: generic\nscope:\n  allowed_paths: [internal/resofeed/prompting.go,\
-      \ internal/resofeed/prompting_test.go, internal/resofeed/openrouter.go, internal/resofeed/openrouter_test.go,\
-      \ internal/resofeed/ingest.go, internal/resofeed/ingest_test.go, internal/resofeed/reprocess.go,\
-      \ internal/resofeed/reprocess_test.go, internal/resofeed/reingest.go, internal/resofeed/reingest_test.go,\
-      \ internal/resofeed/http.go, internal/resofeed/mcp.go, internal/resofeed/testdata/prompting_v22/**,\
-      \ docs/PROMPTING_SYSTEM.md, docs/ARCHITECTURE.md]\n  blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
+      \ active names, adapter profile, and docs together. Prompts, provider bodies,\
+      \ model overrides, and credentials never enter SQLite, State, diagnostics, or\
+      \ logs. The `PROMPTING_V21_ACTIVE_MATCHES=0` adapter scan must inspect active\
+      \ production Go under `cmd/**` and `internal/resofeed/**`, production frontend\
+      \ under `web/src/**`, and canonical `docs/ARCHITECTURE.md` plus `docs/PROMPTING_SYSTEM.md`,\
+      \ while narrowly excluding only Go `_test.go` files and frontend `__tests__`,\
+      \ `*.test.ts`, and `*.spec.ts` files. It must not scan `web/tests/**`, protected\
+      \ expected-red sources, or legacy test-only v2.1 fixtures as active product\
+      \ evidence; no exclusion may omit production or canonical documentation.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [scripts/vectl-check.mjs,\
+      \ internal/resofeed/prompting.go, internal/resofeed/prompting_test.go, internal/resofeed/openrouter.go,\
+      \ internal/resofeed/openrouter_test.go, internal/resofeed/ingest.go, internal/resofeed/ingest_test.go,\
+      \ internal/resofeed/reprocess.go, internal/resofeed/reprocess_test.go, internal/resofeed/reingest.go,\
+      \ internal/resofeed/reingest_test.go, internal/resofeed/http.go, internal/resofeed/mcp.go,\
+      \ internal/resofeed/testdata/prompting_v22/**, docs/PROMPTING_SYSTEM.md, docs/ARCHITECTURE.md]\n\
+      \  blocked_paths: [internal/resofeed/rf_bug_prompting_v22_expected_red_test.go,\
       \ web/tests/**, docs/audits/**, docs/BUG_REPORT_2026-07-11.md, docs/BUG_FIX_PLAN_2026-07-12.md]\n\
       \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-009]\n\
       checks:\n  - id: rf_bug_v2_prompting_green\n    run: {command: [node, scripts/vectl-check.mjs,\
