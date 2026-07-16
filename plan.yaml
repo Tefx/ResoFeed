@@ -185210,7 +185210,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
 - id: rf-bug-assurance-v2-frontend
   name: RF-BUG Assurance v2 Frontend and Token-Parity Integration
-  status: pending
+  status: in_progress
   gate: Preserved frontend and Go dirty outputs are integrated only after old claim
     disposition, then independently proven across real browser, HTTP, MCP, and SQLite
     seams under v2.
@@ -185298,7 +185298,7 @@ phases:
     agent: frontend-engineer
   - id: rf-bug-v2-go-token-parity-integration
     name: Integrate and re-observe preserved HTTP/MCP token parity remediation
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for active `rf-bug-go-token-parity-remediation`; this phase remains locked\
@@ -185364,6 +185364,8 @@ phases:
     - internal/resofeed/reprocess.go
     - internal/resofeed/rf_bug_item_id_api_expected_red_test.go
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T08:12:51.234276+00:00'
   - id: rf-bug-v2-frontend-runtime-verification
     name: Independently verify frontend, HTTP, MCP, and SQLite seams
     status: pending
