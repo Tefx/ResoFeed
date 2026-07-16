@@ -176,7 +176,8 @@ test.describe('RF-BUG-008 real-runtime Source Ledger operations', () => {
     });
 
     try {
-      const externalFetch = request.post(`${runInfo.baseURL}/api/sources/${conflictSource.id}/fetch`, {
+      const externalFetch = fetch(`${runInfo.baseURL}/api/sources/${conflictSource.id}/fetch`, {
+        method: 'POST',
         headers: { Authorization: `Bearer ${ownerToken}` }
       });
       await conflictRequestStarted;
@@ -204,7 +205,7 @@ test.describe('RF-BUG-008 real-runtime Source Ledger operations', () => {
       await expect(status).toContainText('actor:human');
       await expect(status).toContainText('phase:');
       await expect(status).toHaveAttribute('aria-live', 'assertive');
-      expect((await externalFetch).status()).toBe(200);
+      expect((await externalFetch).status).toBe(200);
     } finally {
       cleanupConflictRequestStart();
     }
