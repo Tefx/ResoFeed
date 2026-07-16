@@ -2,22 +2,55 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-function collect(report) {
-  const identities = [];
+export function collect(report) {
+  const rawIdentities = [];
   const outcomes = [];
   function visitSuite(suite, titles = []) {
     const nextTitles = suite.title ? [...titles, suite.title] : titles;
     for (const spec of suite.specs ?? []) {
       for (const test of spec.tests ?? []) {
         const identity = `${path.basename(spec.file ?? suite.file ?? 'unknown.spec.ts')} › ${[...nextTitles, spec.title, ...(test.title ? [test.title] : [])].filter(Boolean).join(' › ')}`;
-        identities.push(identity);
+        rawIdentities.push(identity);
         for (const result of test.results ?? []) outcomes.push({ identity, status: result.status, attempt: result.retry ?? 0 });
       }
     }
     for (const child of suite.suites ?? []) visitSuite(child, nextTitles);
   }
   for (const suite of report.suites ?? []) visitSuite(suite);
-  return { identities: [...new Set(identities)].sort(), outcomes };
+  return { identities: [...new Set(rawIdentities)].sort(), rawIdentities, outcomes };
+}
+
+export function verifyIsolatedLane({ listedReport, runReports, expectedFiles, expectedCount }) {
+  const listed = collect(listedReport);
+  const executedParts = runReports.map(collect);
+  const expectedRunFiles = expectedFiles.map((file) => path.basename(file));
+  const expectedBasenames = [...new Set(expectedRunFiles)].sort();
+  if (expectedRunFiles.length !== expectedBasenames.length) throw new Error('expected lane file inventory contained a duplicate');
+  if (runReports.length !== expectedRunFiles.length) throw new Error('shared replacement runtime is forbidden');
+  if (listed.rawIdentities.length !== listed.identities.length) throw new Error('lane discovery contained duplicate identity');
+  if (listed.identities.length !== expectedCount) throw new Error(`lane discovery expected exactly ${expectedCount} identities`);
+  if (JSON.stringify(filesFor(listed.identities)) !== JSON.stringify(expectedBasenames)) throw new Error('lane discovery file inventory mismatch');
+
+  const executedIdentities = [];
+  const outcomes = [];
+  for (let index = 0; index < executedParts.length; index += 1) {
+    const part = executedParts[index];
+    const expectedFile = expectedRunFiles[index];
+    if (JSON.stringify(filesFor(part.identities)) !== JSON.stringify([expectedFile])) {
+      throw new Error(`shared replacement runtime or mismatched isolated file: ${expectedFile}`);
+    }
+    if (part.rawIdentities.length !== part.identities.length) throw new Error(`duplicate identity in isolated file: ${expectedFile}`);
+    executedIdentities.push(...part.identities);
+    outcomes.push(...part.outcomes);
+  }
+  const uniqueExecuted = [...new Set(executedIdentities)].sort();
+  if (executedIdentities.length !== uniqueExecuted.length) throw new Error('duplicate identity across isolated executions');
+  if (JSON.stringify(listed.identities) !== JSON.stringify(uniqueExecuted)) throw new Error('lane collection/execution identities differ');
+  if (outcomes.length !== uniqueExecuted.length) throw new Error('each identity must execute exactly once');
+  if (outcomes.some((entry) => entry.status === 'skipped')) throw new Error('lane execution contained a skip');
+  if (outcomes.some((entry) => entry.attempt !== 0)) throw new Error('lane execution contained a retry');
+  if (outcomes.some((entry) => entry.status !== 'passed')) throw new Error('lane execution was not green');
+  return { selected: listed.identities, executed: uniqueExecuted, outcomes };
 }
 
 function lanePrefix(value) {
@@ -39,8 +72,9 @@ function printDiscovery(prefix, discovered) {
   console.log(`${prefix}_IDENTITIES=${JSON.stringify(discovered.identities)}`);
 }
 
-const [command, firstFile, secondValue, ...rest] = process.argv.slice(2);
-if (command === 'discover') {
+function main() {
+  const [command, firstFile, secondValue, ...rest] = process.argv.slice(2);
+  if (command === 'discover') {
   const prefix = lanePrefix(secondValue);
   if (!firstFile || rest.length === 0) {
     throw new Error('usage: rf-bug-010-standard-json.mjs discover <list.json> RF-BUG-010_OLD|RF-BUG-010_REPLACEMENT <expected files...>');
@@ -53,10 +87,10 @@ if (command === 'discover') {
     throw new Error(`${prefix} native file discovery differs from the expected lane`);
   }
   printDiscovery(prefix, discovered);
-  process.exit(0);
-}
+    return;
+  }
 
-if (command === 'compare') {
+  if (command === 'compare') {
   const prefix = lanePrefix(rest[0]);
   if (!firstFile || !secondValue) {
     throw new Error('usage: rf-bug-010-standard-json.mjs compare <list.json> <run.json> RF-BUG-010_OLD|RF-BUG-010_REPLACEMENT');
@@ -68,7 +102,10 @@ if (command === 'compare') {
   if (executed.outcomes.length !== executed.identities.length) throw new Error(`${prefix} each identity must execute exactly once`);
   if (executed.outcomes.some((entry) => entry.status !== 'passed' || entry.attempt !== 0)) throw new Error(`${prefix} execution outcome was not a first-attempt pass`);
   printDiscovery(prefix, executed);
-  process.exit(0);
+    return;
+  }
+
+  throw new Error('usage: rf-bug-010-standard-json.mjs discover|compare ...');
 }
 
-throw new Error('usage: rf-bug-010-standard-json.mjs discover|compare ...');
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) main();

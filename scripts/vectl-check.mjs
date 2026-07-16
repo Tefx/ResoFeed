@@ -6,6 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { collect as collectPlaywrightReport, verifyIsolatedLane } from './rf-bug-010-standard-json.mjs';
+
 const adapterPath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(adapterPath), '..');
 
@@ -154,6 +156,25 @@ export const PENDING_PROFILE_PAIRS = [
       ['go', 'test', '-v', './internal/resofeed', '-run', '^TestRFBUG005SecurityHeadersCSPStreamingCancellationContract$', '-count=1'],
       ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/csp-operations.browser-contract.spec.ts']
     ]
+  },
+  {
+    suite: 'rf-bug-v2-adapter-runtime-isolation-remediation',
+    checkID: 'rf_bug_v2_adapter_runtime_isolation_green',
+    identities: [
+      'RF-BUG-010 foundation smoke isolation',
+      'RF-BUG-010 replacement runtime isolation'
+    ],
+    requiredOutput: [
+      'RF-BUG-010_FOUNDATION_SMOKE=green',
+      'RF-BUG-010_REPLACEMENT_SELECTED=29',
+      'RF-BUG-010_REPLACEMENT_EXECUTED=29',
+      'RF-BUG-010_REPLACEMENT_FILES_ISOLATED=5',
+      'RF-BUG-010_OLD_SELECTED_EXECUTED=equal',
+      'RF-BUG-010_RETRIES=0',
+      'RF-BUG-010_SKIPS=0',
+      'RF-BUG-010_CLEANUP=clean'
+    ],
+    runner: 'runtime-isolation'
   },
   {
     suite: 'rf-bug-v2-source-ledger',
@@ -565,9 +586,211 @@ function verifyArtifactProof(artifactRoot, artifactOutput) {
   }
 }
 
+const replacementLaneFiles = [
+  'web/tests/e2e/inspector-selection.browser-contract.spec.ts',
+  'web/tests/e2e/initial-route.browser-contract.spec.ts',
+  'web/tests/e2e/routes.browser-contract.spec.ts',
+  'web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts',
+  'web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'
+];
+
+const oldLaneFiles = [
+  'web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts',
+  'web/tests/e2e/mobile-inspector-token-hydration.spec.ts',
+  'web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts'
+];
+
+function sleep(milliseconds) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+}
+
+function processIsAlive(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function stopOwnedProcess(pid) {
+  if (!processIsAlive(pid)) return true;
+  try { process.kill(pid, 'SIGTERM'); } catch { return true; }
+  for (let attempt = 0; attempt < 50 && processIsAlive(pid); attempt += 1) sleep(100);
+  if (processIsAlive(pid)) {
+    try { process.kill(pid, 'SIGKILL'); } catch { return true; }
+    for (let attempt = 0; attempt < 20 && processIsAlive(pid); attempt += 1) sleep(100);
+  }
+  return !processIsAlive(pid);
+}
+
+function portIsClosed(port) {
+  if (!Number.isInteger(port) || port <= 0) return true;
+  const probe = String.raw`
+const net = require('node:net');
+const socket = net.createConnection({host: '127.0.0.1', port: Number(process.argv[1])});
+socket.once('connect', () => { socket.destroy(); process.exit(1); });
+socket.once('error', () => process.exit(0));
+socket.setTimeout(500, () => { socket.destroy(); process.exit(0); });`;
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    const result = spawnSync(process.execPath, ['-e', probe, String(port)], { env: childEnvironment(), encoding: 'utf8' });
+    if (result.status === 0) return true;
+    sleep(100);
+  }
+  return false;
+}
+
+function urlPort(value) {
+  try { return Number(new URL(value).port); } catch { return 0; }
+}
+
+function copyRedactedArtifact(source, destination) {
+  if (!source || !fs.existsSync(source)) return;
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.writeFileSync(destination, redact(fs.readFileSync(source, 'utf8')));
+  const body = fs.readFileSync(destination, 'utf8');
+  if (redact(body) !== body) throw new AdapterFailure(`secret-bearing artifact remained at ${path.relative(repoRoot, destination)}`);
+}
+
+function cleanupGlobalRuntime(invocationRoot) {
+  const playwrightRoot = path.join(repoRoot, '.test-artifacts', 'playwright');
+  const runInfoPath = path.join(playwrightRoot, 'run-info.json');
+  if (!fs.existsSync(runInfoPath)) throw new AdapterFailure('runtime invocation did not retain run-info.json for cleanup');
+  const info = JSON.parse(fs.readFileSync(runInfoPath, 'utf8'));
+  const processes = [info.server, info.fixtureServer, info.openRouterStub].filter(Boolean);
+  const stopped = processes.every((entry) => stopOwnedProcess(entry.pid));
+  const ports = [urlPort(info.baseURL), urlPort(info.fixtureServer?.url), urlPort(info.openRouterStub?.endpoint)].filter(Boolean);
+  const closed = ports.every(portIsClosed);
+  const databaseCandidates = ['', '-shm', '-wal'].map((suffix) => `${info.dbPath}${suffix}`);
+  for (const candidate of databaseCandidates) fs.rmSync(candidate, { force: true });
+  const residue = databaseCandidates.filter((candidate) => fs.existsSync(candidate));
+
+  for (const [name, source] of [
+    ['server.stdout.log', info.server?.stdoutPath],
+    ['server.stderr.log', info.server?.stderrPath],
+    ['fixture-server.stdout.log', info.fixtureServer?.stdoutPath],
+    ['fixture-server.stderr.log', info.fixtureServer?.stderrPath],
+    ['openrouter-stub.stdout.log', info.openRouterStub?.stdoutPath],
+    ['openrouter-stub.stderr.log', info.openRouterStub?.stderrPath],
+    ['sanitized-environment.md', info.sanitizedEnvironment?.notesPath]
+  ]) copyRedactedArtifact(source, path.join(invocationRoot, name));
+
+  const clean = stopped && closed && residue.length === 0;
+  fs.writeFileSync(path.join(invocationRoot, 'runtime-cleanup.txt'), [
+    `process=${stopped ? 'stopped' : 'active'}`,
+    `port=${closed ? 'closed' : 'open'}`,
+    `database_residue=${residue.length}`,
+    `cleanup=${clean ? 'clean' : 'residue'}`,
+    ''
+  ].join('\n'));
+  for (const transient of ['run-info.json', 'fixtures', 'server-logs', 'sanitized-environment.md', 'fixture-feed-server.mjs', 'db-fixture-preservation.txt']) {
+    fs.rmSync(path.join(playwrightRoot, transient), { recursive: true, force: true });
+  }
+  if (!clean) throw new AdapterFailure('leaked resource after Playwright invocation');
+}
+
+function withCurrentEmbeddedUI(profile, run) {
+  const embeddedUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
+  const builtUI = path.join(repoRoot, 'web', 'build');
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-adapter-webui-'));
+  const backup = path.join(scratch, 'webui');
+  execute(profile, 'npm', ['--prefix', 'web', 'run', 'build'], { timeout: 180_000 });
+  fs.cpSync(embeddedUI, backup, { recursive: true });
+  try {
+    fs.rmSync(embeddedUI, { recursive: true, force: true });
+    fs.cpSync(builtUI, embeddedUI, { recursive: true });
+    return run();
+  } finally {
+    fs.rmSync(embeddedUI, { recursive: true, force: true });
+    fs.cpSync(backup, embeddedUI, { recursive: true });
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+}
+
+function runPlaywrightFile(profile, file, reportPath, invocationRoot) {
+  let output = '';
+  let failure;
+  try {
+    output = execute(profile, 'npm', [
+      '--prefix', 'web', 'exec', '--', 'playwright', 'test',
+      '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe',
+      '--retries=0', '--reporter=line,json,html', '--output', path.join(invocationRoot, 'test-output'), file
+    ], {
+      timeout: 600_000,
+      env: {
+        PLAYWRIGHT_JSON_OUTPUT_NAME: reportPath,
+        PLAYWRIGHT_HTML_OUTPUT_DIR: path.join(invocationRoot, 'html-report'),
+        PLAYWRIGHT_HTML_OPEN: 'never'
+      }
+    });
+  } catch (error) {
+    failure = error;
+  }
+  try {
+    cleanupGlobalRuntime(invocationRoot);
+  } catch (cleanupError) {
+    failure = cleanupError;
+  }
+  if (failure) throw failure;
+  return output;
+}
+
+function discoverLane(profile, laneRoot, label, files) {
+  const listPath = path.join(laneRoot, `${label}-list.json`);
+  execute(profile, 'npm', [
+    '--prefix', 'web', 'exec', '--', 'playwright', 'test',
+    '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe',
+    '--retries=0', '--reporter=json', '--list', ...files
+  ], { timeout: 300_000, env: { PLAYWRIGHT_JSON_OUTPUT_NAME: listPath } });
+  return { listPath, report: JSON.parse(fs.readFileSync(listPath, 'utf8')) };
+}
+
+function executeIsolatedLane(profile, laneRoot, label, files, expectedCount) {
+  const discovery = discoverLane(profile, laneRoot, label, files);
+  const runReports = [];
+  files.forEach((file, index) => {
+    const invocationRoot = path.join(laneRoot, `${label}-${index + 1}-${path.basename(file, '.spec.ts')}`);
+    fs.mkdirSync(invocationRoot, { recursive: true });
+    const reportPath = path.join(invocationRoot, 'results.json');
+    runPlaywrightFile(profile, file, reportPath, invocationRoot);
+    runReports.push(JSON.parse(fs.readFileSync(reportPath, 'utf8')));
+  });
+  return verifyIsolatedLane({ listedReport: discovery.report, runReports, expectedFiles: files, expectedCount });
+}
+
+function runRuntimeIsolation(profile) {
+  ensureNoProtectedMutation();
+  execute(profile, 'node', ['--test', '--test-name-pattern=RF-BUG-010 runtime isolation adapter contract', 'scripts/vectl-check.test.mjs'], { timeout: 240_000 });
+  execute(profile, 'npm', ['--prefix', 'web', 'run', 'test:render', '--', 'src/lib/__tests__/playwright-e2e-harness-contract.test.ts'], { timeout: 180_000 });
+
+  const foundation = runFoundation(profile);
+  const laneRoot = path.join(repoRoot, '.test-artifacts', 'vectl', 'rf-bug-010-runtime-isolation');
+  fs.rmSync(laneRoot, { recursive: true, force: true });
+  fs.mkdirSync(laneRoot, { recursive: true });
+  const laneResults = withCurrentEmbeddedUI(profile, () => {
+    const replacement = executeIsolatedLane(profile, laneRoot, 'replacement', replacementLaneFiles, 29);
+    const oldDiscovery = discoverLane(profile, laneRoot, 'old', oldLaneFiles);
+    const oldCount = collectPlaywrightReport(oldDiscovery.report).identities.length;
+    const old = executeIsolatedLane(profile, laneRoot, 'old-execution', oldLaneFiles, oldCount);
+    return { replacement, old };
+  });
+  ensureNoProtectedMutation();
+
+  const artifacts = [...foundation.artifacts, ...collectArtifactRows([laneRoot])];
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts
+  };
+}
+
 function runFoundation(profile) {
   ensureNoProtectedMutation();
   const artifactRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'rf-bug-010-artifact-proof');
+  const smokeRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'smoke');
+  const runtimeRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'runtime');
   const laneRoot = path.join(repoRoot, '.test-artifacts', 'playwright', 'lane-discovery');
 
   execute(profile, 'go', ['test', './internal/resofeed', '-run', '^TestPlaywrightFixtureContract$', '-count=1'], { timeout: 180_000 });
@@ -593,30 +816,33 @@ function runFoundation(profile) {
   });
   verifyArtifactProof(artifactRoot, artifactOutput);
 
+  for (const isolatedRoot of [smokeRoot, runtimeRoot]) fs.rmSync(isolatedRoot, { recursive: true, force: true });
   execute(profile, 'npm', ['--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.smoke.config.ts', '--project=chromium-ci-safe', '--retries=0'], { timeout: 180_000 });
   execute(profile, 'npm', ['--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.runtime.config.ts', '--project=chromium-ci-safe', '--retries=0'], { timeout: 240_000 });
+  for (const isolatedRoot of [smokeRoot, runtimeRoot]) {
+    const cleanupFiles = [];
+    const visit = (currentPath) => {
+      for (const entry of fs.readdirSync(currentPath, { withFileTypes: true })) {
+        const entryPath = path.join(currentPath, entry.name);
+        if (entry.isDirectory()) visit(entryPath);
+        else if (entry.name === 'runtime-cleanup.txt') cleanupFiles.push(entryPath);
+      }
+    };
+    visit(isolatedRoot);
+    if (cleanupFiles.length === 0) throw new AdapterFailure(`foundation lifecycle missed cleanup evidence in ${path.relative(repoRoot, isolatedRoot)}`);
+    for (const cleanupFile of cleanupFiles) {
+      const cleanup = fs.readFileSync(cleanupFile, 'utf8');
+      for (const marker of ['process=stopped', 'port=closed', 'database_residue=0', 'cleanup=clean']) {
+        if (!cleanup.includes(marker)) throw new AdapterFailure(`foundation lifecycle cleanup missed ${marker}`);
+      }
+    }
+  }
 
   fs.rmSync(laneRoot, { recursive: true, force: true });
   fs.mkdirSync(laneRoot, { recursive: true });
   const lanes = [
-    {
-      label: 'OLD',
-      files: [
-        'web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts',
-        'web/tests/e2e/mobile-inspector-token-hydration.spec.ts',
-        'web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts'
-      ]
-    },
-    {
-      label: 'REPLACEMENT',
-      files: [
-        'web/tests/e2e/inspector-selection.browser-contract.spec.ts',
-        'web/tests/e2e/initial-route.browser-contract.spec.ts',
-        'web/tests/e2e/routes.browser-contract.spec.ts',
-        'web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts',
-        'web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'
-      ]
-    }
+    { label: 'OLD', files: oldLaneFiles },
+    { label: 'REPLACEMENT', files: replacementLaneFiles }
   ];
   const laneMarkers = [];
   for (const lane of lanes) {
@@ -633,7 +859,7 @@ function runFoundation(profile) {
     laneMarkers.push(...discovery.split('\n').filter((line) => line.startsWith(`RF-BUG-010_${lane.label}_`)));
   }
 
-  const artifactRows = collectArtifactRows([artifactRoot, laneRoot]);
+  const artifactRows = collectArtifactRows([artifactRoot, smokeRoot, runtimeRoot, laneRoot]);
   return {
     outcome: 'green',
     exitCode: 0,
@@ -901,6 +1127,8 @@ async function main() {
         ? runGenericAdapter(profile)
         : profile.runner === 'runtime-doc-contract'
           ? runRuntimeDocContract(profile)
+          : profile.runner === 'runtime-isolation'
+            ? runRuntimeIsolation(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'

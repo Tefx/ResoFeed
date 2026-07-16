@@ -107,6 +107,19 @@ The pending profile matrix is:
 `node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all eleven selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifact objects, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms that changes remain limited to the adapter, its developer test, and this contract. The profile emits `VECTL_ADAPTER_COMPLETED_HARNESS=preserved` and `VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid` only after both developer checks pass. It does not execute unfinished consumer product semantics.
 
 The `rf-bug-v2-source-ledger` profile binds the required `Source Ledger groups and controls render` output marker to its Vitest `test:render` command. That command includes exactly one `--reporter=verbose` argument so Vitest emits the full test title for deterministic marker validation. Neither Source Ledger Playwright command carries the verbose Vitest reporter argument; their existing `--reporter=line` contracts remain unchanged.
+### RF-BUG-010 Replacement Runtime Isolation Remediation
+
+The bounded project-native remediation profile is:
+
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-adapter-runtime-isolation-remediation rf_bug_v2_adapter_runtime_isolation_green
+```
+
+Its `vectl.check.selection.v1` envelope contains exactly `RF-BUG-010 foundation smoke isolation` and `RF-BUG-010 replacement runtime isolation`. The run preserves the intentional foundation artifact-proof failure and its HTML, JSON, trace, screenshot, video, redacted server/browser logs, and clean teardown record. It then removes only the smoke/runtime scratch roots before launching the ordinary smoke and runtime processes, preventing the intentional-failure output or generated runtime state from contaminating a later invocation.
+
+The profile discovers the immutable replacement-five inventory with Playwright `--list`, then starts one Playwright process per file. Each process receives a freshly built real `cmd/resofeed` binary containing the current web build, a fresh SQLite database, browser context, owned loopback ports/processes, sanitized environment, and post-run cleanup boundary. The adapter aggregates the five native JSON reports and requires exactly 29 unique selected identities, the same 29 executed once, all passing on attempt zero, with no skip, retry, duplicate, or missing identity. A shared aggregate replacement process is rejected because runtime processing-language and State mutations could leak across `initial-route`/`routes`, responsive, and delete cases.
+
+After replacement passes, the adapter discovers and executes the legacy three-file inventory with the same native selected/executed identity parity check. Every invocation retains its JSON/HTML report, redacted server and stub logs, sanitized environment note, and `runtime-cleanup.txt`; process, port, or SQLite/WAL/SHM residue fails the profile. The replacement-five and old-three acceptance sources must remain byte-identical to `HEAD`. Adapter and fixture cleanup runs on both success and failure, and the temporary embedded-web build is restored before evidence is emitted.
 ### Prompting v2.2 Loopback Harness Remediation
 
 The dedicated pair `rf-bug-v2-prompting-harness` / `rf_bug_v2_prompting_harness_remediation_green` owns the Prompting loopback extraction boundary. It selects and executes exactly these four identities, in order: `RF-BUG-009 harness exact 16 subtests`, `RF-BUG-009 harness exact argv and environment`, `RF-BUG-009 harness exact four identities`, and `RF-BUG-009 harness production strict`.

@@ -43,6 +43,13 @@ export const RF_BUG_010_IDENTITIES = [
   'RF-BUG-010 lane-discovery'
 ] as const;
 
+export const RF_BUG_010_RUNTIME_ISOLATION_IDENTITIES = [
+  'RF-BUG-010 foundation smoke isolation',
+  'RF-BUG-010 replacement runtime isolation'
+] as const;
+
+export const RF_BUG_010_REPLACEMENT_TEST_COUNT = 29;
+
 export const RF_BUG_010_OLD_LANE = [
   'search-click-inspector-contract.expected-red.spec.ts',
   'mobile-inspector-token-hydration.spec.ts',

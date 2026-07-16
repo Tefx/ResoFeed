@@ -16,6 +16,7 @@ import {
   runTokenParityHarness,
   selectionEnvelope
 } from './vectl-check.mjs';
+import { verifyIsolatedLane } from './rf-bug-010-standard-json.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const adapterPath = path.join(repoRoot, 'scripts', 'vectl-check.mjs');
@@ -55,6 +56,10 @@ const expectedPending = [
     'RF-BUG-005 Chromium CSP operations',
     'RF-BUG-005 exact security contract',
     'RF-BUG-005 local streaming cancellation'
+  ]],
+  ['rf-bug-v2-adapter-runtime-isolation-remediation', 'rf_bug_v2_adapter_runtime_isolation_green', [
+    'RF-BUG-010 foundation smoke isolation',
+    'RF-BUG-010 replacement runtime isolation'
   ]],
   ['rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green', [
     'RF-BUG-004 State import lifecycle',
@@ -133,8 +138,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 14);
-  assert.equal(expectedPending.length, 14);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 15);
+  assert.equal(expectedPending.length, 15);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -148,6 +153,78 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
     assert.deepEqual(selection.identities, identities);
     assert.equal(selection.identities.length, identities.length);
   }
+});
+
+test('RF-BUG-010 runtime isolation adapter contract', () => {
+  const profile = findProfile('rf-bug-v2-adapter-runtime-isolation-remediation', 'rf_bug_v2_adapter_runtime_isolation_green');
+  assert.ok(profile);
+  assert.equal(profile.runner, 'runtime-isolation');
+  assert.deepEqual(profile.identities, [
+    'RF-BUG-010 foundation smoke isolation',
+    'RF-BUG-010 replacement runtime isolation'
+  ]);
+
+  const files = [
+    'web/tests/e2e/inspector-selection.browser-contract.spec.ts',
+    'web/tests/e2e/initial-route.browser-contract.spec.ts',
+    'web/tests/e2e/routes.browser-contract.spec.ts',
+    'web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts',
+    'web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'
+  ];
+  const counts = [2, 12, 6, 7, 2];
+  const rows = files.flatMap((file, fileIndex) => Array.from({ length: counts[fileIndex] }, (_, testIndex) => ({
+    file,
+    title: `isolated case ${fileIndex + 1}.${testIndex + 1}`
+  })));
+  const report = (selectedRows, result = null) => ({
+    suites: selectedRows.map((row) => ({
+      specs: [{
+        file: row.file,
+        title: row.title,
+        tests: [{ results: result ? [{ status: result.status, retry: result.retry }] : [] }]
+      }]
+    }))
+  });
+  const listedReport = report(rows);
+  const runReports = files.map((file) => report(rows.filter((row) => row.file === file), { status: 'passed', retry: 0 }));
+  const verified = verifyIsolatedLane({ listedReport, runReports, expectedFiles: files, expectedCount: 29 });
+  assert.equal(verified.selected.length, 29);
+  assert.deepEqual(verified.selected, verified.executed);
+  assert.equal(verified.outcomes.length, 29);
+
+  assert.throws(
+    () => verifyIsolatedLane({ listedReport, runReports: [report(rows, { status: 'passed', retry: 0 })], expectedFiles: files, expectedCount: 29 }),
+    /shared replacement runtime/u
+  );
+  assert.throws(
+    () => verifyIsolatedLane({ listedReport: report(rows.slice(0, -1)), runReports, expectedFiles: files, expectedCount: 29 }),
+    /expected exactly 29/u
+  );
+  const skippedReports = [...runReports];
+  skippedReports[0] = report(rows.filter((row) => row.file === files[0]), { status: 'skipped', retry: 0 });
+  assert.throws(
+    () => verifyIsolatedLane({ listedReport, runReports: skippedReports, expectedFiles: files, expectedCount: 29 }),
+    /contained a skip/u
+  );
+  const retriedReports = [...runReports];
+  retriedReports[0] = report(rows.filter((row) => row.file === files[0]), { status: 'passed', retry: 1 });
+  assert.throws(
+    () => verifyIsolatedLane({ listedReport, runReports: retriedReports, expectedFiles: files, expectedCount: 29 }),
+    /contained a retry/u
+  );
+
+  const adapterSource = fs.readFileSync(adapterPath, 'utf8');
+  const foundationIndex = adapterSource.indexOf('const foundation = runFoundation(profile)');
+  const replacementIndex = adapterSource.indexOf("executeIsolatedLane(profile, laneRoot, 'replacement'");
+  const oldIndex = adapterSource.indexOf("executeIsolatedLane(profile, laneRoot, 'old-execution'");
+  assert.ok(foundationIndex > 0 && foundationIndex < replacementIndex && replacementIndex < oldIndex, 'foundation, replacement, and old lane sequencing must remain ordered');
+  const invocationStart = adapterSource.indexOf('function runPlaywrightFile');
+  const cleanupIndex = adapterSource.indexOf('cleanupGlobalRuntime(invocationRoot)', invocationStart);
+  const rethrowIndex = adapterSource.indexOf('if (failure) throw failure', invocationStart);
+  assert.ok(invocationStart > 0 && cleanupIndex > invocationStart && cleanupIndex < rethrowIndex, 'Playwright failure must still reach runtime cleanup before rethrow');
+  assert.match(adapterSource, /copyRedactedArtifact/u);
+  assert.equal((adapterSource.match(/ensureNoProtectedMutation\(\);/gu) ?? []).length >= 4, true);
+  assert.match(adapterSource, /for \(const isolatedRoot of \[smokeRoot, runtimeRoot\]\) fs\.rmSync/u);
 });
 
 test('RF-BUG-002 token parity harness adapter contract', () => {
@@ -365,12 +442,23 @@ test('VECTL-ADAPTER protected-scope', () => {
     'docs/ARCHITECTURE.md',
     'docs/DESIGN.md',
     'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md',
+    'docs/USAGE.md',
     'internal/resofeed/doctor.go',
     'internal/resofeed/doctor_test.go',
     'internal/resofeed/ingest.go',
     'internal/resofeed/rf_bug_opml_import_only_test.go',
+    'scripts/rf-bug-010-standard-json.mjs',
     'scripts/vectl-check.mjs',
-    'scripts/vectl-check.test.mjs'
+    'scripts/vectl-check.test.mjs',
+    'web/src/lib/playwright-e2e-harness-contract.ts',
+    'web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts',
+    'web/tests/e2e/fixtures/runtime-fixture.ts',
+    'web/tests/e2e/fixtures/test-db.ts',
+    'web/playwright.base.config.ts',
+    'web/playwright.browser-contract.config.ts',
+    'web/playwright.ci-safe.config.ts',
+    'web/playwright.smoke.config.ts',
+    'web/playwright.runtime.config.ts'
   ]);
   const result = spawnSync('git', ['status', '--porcelain=v1', '-z'], {
     cwd: repoRoot,

@@ -5,7 +5,9 @@ import {
   redactHarnessEvidence,
   RF_BUG_010_IDENTITIES,
   RF_BUG_010_OLD_LANE,
-  RF_BUG_010_REPLACEMENT_LANE
+  RF_BUG_010_REPLACEMENT_LANE,
+  RF_BUG_010_REPLACEMENT_TEST_COUNT,
+  RF_BUG_010_RUNTIME_ISOLATION_IDENTITIES
 } from '../playwright-e2e-harness-contract';
 
 describe('RF-BUG-008 runtime discovery contract', () => {
@@ -31,7 +33,12 @@ describe('RF-BUG-010 harness contract', () => {
     expect(hasExactLaneFiles([...RF_BUG_010_REPLACEMENT_LANE], RF_BUG_010_REPLACEMENT_LANE)).toBe(true);
     expect(RF_BUG_010_OLD_LANE).toHaveLength(3);
     expect(RF_BUG_010_REPLACEMENT_LANE).toHaveLength(5);
-    expect(hasExactLaneFiles([...RF_BUG_010_OLD_LANE, 'extra.spec.ts'], RF_BUG_010_OLD_LANE)).toBe(false);
+    expect(RF_BUG_010_REPLACEMENT_TEST_COUNT).toBe(29);
+    expect(RF_BUG_010_RUNTIME_ISOLATION_IDENTITIES).toEqual([
+      'RF-BUG-010 foundation smoke isolation',
+      'RF-BUG-010 replacement runtime isolation'
+    ]);
+    expect(hasExactLaneFiles([...RF_BUG_010_REPLACEMENT_LANE, 'extra.spec.ts'], RF_BUG_010_REPLACEMENT_LANE)).toBe(false);
   });
 
   it('redacts credentials from runtime, browser, and URL evidence', () => {

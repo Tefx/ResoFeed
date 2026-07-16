@@ -1267,7 +1267,7 @@ npm --prefix web run test:e2e:runtime
 npm --prefix web run test:e2e:ci-safe
 ```
 
-The smoke and runtime lanes build and launch the real `cmd/resofeed` binary. Each case owns its SQLite database, loopback port, process, clean Playwright context, redacted runtime/browser diagnostics, and cleanup record. The runtime starts in its case-local artifact directory with an allow-listed environment, so ambient provider credentials and a repository-local `.env` do not enter deterministic runs. Teardown residue fails the case. Deterministic lanes use one worker and zero retries.
+The smoke and runtime lanes build and launch the real `cmd/resofeed` binary with the current web build embedded. Each case owns its SQLite database, loopback port, process, clean Playwright context, redacted runtime/browser diagnostics, and cleanup record. The runtime starts in its case-local artifact directory with an allow-listed environment, so ambient provider credentials and a repository-local `.env` do not enter deterministic runs. Teardown residue fails the case. Deterministic lanes use one worker and zero retries.
 
 Harness maintainers can run the foundation evidence adapter directly:
 
@@ -1275,7 +1275,17 @@ Harness maintainers can run the foundation evidence adapter directly:
 node scripts/vectl-check.mjs run rf-bug-v2-harness-foundation rf_bug_v2_harness_foundation_green
 ```
 
-That command verifies the generic evidence envelope, intentional-failure standard artifacts, isolated lifecycle cleanup, and native old-three/replacement-five lane discovery. Discovery does not execute the product-semantic replacement lane; downstream repair and runtime-verification work owns those executions.
+That command verifies the generic evidence envelope, intentional-failure standard artifacts, isolated lifecycle cleanup, and native old-three/replacement-five lane discovery. Discovery does not execute the product-semantic replacement lane.
+
+Run the bounded replacement-isolation profile when verifying the repaired replacement lane:
+
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-adapter-runtime-isolation-remediation rf_bug_v2_adapter_runtime_isolation_green
+```
+
+The profile runs foundation artifact-proof, ordinary smoke, and runtime in clean sequence, then executes each immutable replacement file in its own Playwright process. It requires 29 selected and 29 first-attempt passing replacement identities, five isolated file processes, old-three selected/executed parity, zero retries/skips, redacted JSON/HTML and runtime logs, and clean process/port/SQLite teardown. Reports are retained below `.test-artifacts/playwright/` and `.test-artifacts/vectl/rf-bug-010-runtime-isolation/`.
+
+If the command reports `shared replacement runtime`, use the project-native command unchanged; do not combine the replacement files into one Playwright process. A `leaked resource` or cleanup failure identifies the invocation in its `runtime-cleanup.txt`; stop the recorded process, confirm its loopback ports are closed, and remove only that invocation's SQLite/WAL/SHM scratch files before retrying. A `secret-bearing artifact` failure requires deleting the affected artifact and fixing the redaction source before rerun. Do not weaken protected acceptance files or bypass the profile's exact 29-test cardinality.
 
 Live OpenRouter verification is separate and opt-in:
 

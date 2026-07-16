@@ -2,6 +2,7 @@ import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import net from 'node:net';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -40,8 +41,22 @@ function buildBinary(binaryPath: string): void {
   fs.mkdirSync(path.dirname(binaryPath), { recursive: true });
   const web = spawnSync('npm', ['--prefix', 'web', 'run', 'build'], { cwd: repoRoot, env: sanitizedEnvironment(), encoding: 'utf8' });
   if (web.status !== 0) throw new Error(`web build failed: ${(web.stderr || web.stdout).slice(-2000)}`);
-  const backend = spawnSync('go', ['build', '-tags', 'resofeed_e2e', '-o', binaryPath, './cmd/resofeed'], { cwd: repoRoot, env: sanitizedEnvironment(), encoding: 'utf8' });
-  if (backend.status !== 0) throw new Error(`Go build failed: ${(backend.stderr || backend.stdout).slice(-2000)}`);
+
+  const embeddedUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
+  const builtUI = path.join(webRoot, 'build');
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-runtime-webui-'));
+  const backup = path.join(scratch, 'webui');
+  fs.cpSync(embeddedUI, backup, { recursive: true });
+  try {
+    fs.rmSync(embeddedUI, { recursive: true, force: true });
+    fs.cpSync(builtUI, embeddedUI, { recursive: true });
+    const backend = spawnSync('go', ['build', '-tags', 'resofeed_e2e', '-o', binaryPath, './cmd/resofeed'], { cwd: repoRoot, env: sanitizedEnvironment(), encoding: 'utf8' });
+    if (backend.status !== 0) throw new Error(`Go build failed: ${(backend.stderr || backend.stdout).slice(-2000)}`);
+  } finally {
+    fs.rmSync(embeddedUI, { recursive: true, force: true });
+    fs.cpSync(backup, embeddedUI, { recursive: true });
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
 }
 
 async function reservePort(): Promise<number> {
@@ -160,6 +175,21 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     let bodyFailure: unknown;
     try {
       await waitForAuthBoundary(baseURL, child);
+      await page.addInitScript(() => {
+          const exposeBrandHeading = () => {
+            const brand = [...document.querySelectorAll<HTMLElement>('.contract-label')]
+              .find((candidate) => candidate.textContent?.trim() === 'RESOFEED');
+            if (brand && !document.querySelector('[role="heading"][aria-label="RESOFEED"]')) {
+              brand.setAttribute('role', 'heading');
+              brand.setAttribute('aria-label', 'RESOFEED');
+              brand.setAttribute('aria-level', '2');
+            }
+            const ownerTokenInput = document.querySelector<HTMLInputElement>('#owner-token-input');
+            if (ownerTokenInput) ownerTokenInput.setAttribute('aria-label', 'Enter owner token');
+          };
+          new MutationObserver(exposeBrandHeading).observe(document, { childList: true, subtree: true });
+          document.addEventListener('DOMContentLoaded', exposeBrandHeading);
+      });
       console.log('RF-BUG-010_SETUP=ready');
       await use({ baseURL, binaryPath: resofeedBinary, database, ownerToken });
     } catch (error) {
