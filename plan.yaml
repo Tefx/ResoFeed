@@ -185113,25 +185113,30 @@ phases:
     - web/package.json
     agent: frontend-engineer
   - id: rf-bug-v2-harness-runtime-verification
-    name: Independently verify v2 harness reproducibility and artifacts
+    name: Independently verify v2 harness foundation reproducibility and artifacts
     status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
 
 
-      Independently observe RF-BUG-010-HARNESS and RF-BUG-010-LANE-MIGRATION through
-      the real binary and native Playwright project/file/title identities. Validate
-      `vectl.check.selection.v1` discovery and `vectl.check.evidence.v1` execution
-      envelopes against the adapter without modifying repository files. Require smoke
-      under 120 seconds; three identical positive retry-free runs from one clean artifact
-      root; complete standard screenshot/trace/video/log/runtime evidence; SETUP before
+      Independently observe RF-BUG-010-HARNESS through the real binary and project-native
+      adapter. Validate `vectl.check.selection.v1` discovery and `vectl.check.evidence.v1`
+      execution envelopes without modifying repository files. Require a product-neutral
+      smoke under 120 seconds; three identical retry-free foundation runs from one
+      clean artifact root; native old-three/replacement-five list/discovery identity;
+      complete standard screenshot/trace/video/log/runtime evidence; SETUP before
       ASSERTION_REACHED before TEARDOWN for one intentional failure; cleanup, redaction,
-      and no product-route interception or repository diff. This terminal verification
-      supplies the phase outcome directly, so no receipt-only gate is added.'
-    verification: Run one clean-root smoke under 120 seconds, three retry-free native
-      list/run pairs, the intentional failure lifecycle, adapter envelope validation,
-      cleanup/redaction, and repository-diff checks.
+      and no product-route interception or repository diff. Do not execute or require
+      green Search, Source Ledger, State, or responsive replacement-lane behavior
+      here. The downstream `rf-bug-v2-replacement-lanes-verification` step owns full
+      immutable replacement-five runtime execution after the product repairs. This
+      terminal verification supplies the harness-foundation phase outcome directly,
+      so no receipt-only gate is added.'
+    verification: Run one clean-root product-neutral smoke under 120 seconds, three
+      retry-free foundation runs, protected native lane list/discovery, the intentional-failure
+      lifecycle, adapter envelope validation, cleanup/redaction, and repository-diff
+      checks without executing the product-semantic replacement suite.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
