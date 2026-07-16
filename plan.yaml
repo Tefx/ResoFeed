@@ -186266,15 +186266,18 @@ phases:
       \ documentation while preserving authenticated import and atomic minimal JSON\
       \ State backup/restore. The retired route remains auth-first: unauthenticated\
       \ 401 and authenticated 404. State validation precedes one replacement transaction\
-      \ and failure preserves prior portable state. Rollback never restores OPML export,\
-      \ merge, sync, history, or portable receipts. Secrets remain redacted.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: generic\nscope:\n  allowed_paths: [internal/resofeed/http.go, internal/resofeed/http_impl_test.go,\
-      \ internal/resofeed/mcp.go, web/src/lib/api-client.ts, web/src/lib/api-client.test.ts,\
-      \ web/src/routes/+page.svelte, web/src/routes/components/SourceLedger.svelte,\
-      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PRD.md, docs/USAGE.md, docs/CONTAINER.md,\
-      \ docs/PROMPTING_SYSTEM.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, README.md,\
-      \ docs/ui-preview.html]\n  blocked_paths: [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ and failure preserves prior portable state. The generic adapter must consume\
+      \ the protected canonical scan's exact immutable output `RF_BUG_CANONICAL_DOCUMENTS=9`\
+      \ and `OPML_EXCLUSIONS=2`; it must not rewrite protected acceptance. Rollback\
+      \ never restores OPML export, merge, sync, history, or portable receipts. Secrets\
+      \ remain redacted.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [internal/resofeed/http.go, internal/resofeed/http_impl_test.go, internal/resofeed/mcp.go,\
+      \ web/src/lib/api-client.ts, web/src/lib/api-client.test.ts, web/src/routes/+page.svelte,\
+      \ web/src/routes/components/SourceLedger.svelte, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/PRD.md, docs/USAGE.md, docs/CONTAINER.md, docs/PROMPTING_SYSTEM.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ README.md, docs/ui-preview.html, scripts/vectl-check.mjs]\n  blocked_paths:\
+      \ [internal/resofeed/rf_bug_runtime_contract_expected_red_test.go, tests/rf_bug_canonical_contract_test.go,\
       \ internal/resofeed/state.go, web/tests/**, docs/audits/**]\n  ignored_runtime_paths:\
       \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-004]\nchecks:\n  - id:\
       \ rf_bug_v2_opml_import_only_green\n    run: {command: [node, scripts/vectl-check.mjs,\
@@ -186283,6 +186286,7 @@ phases:
       \   - {path: scripts/vectl-check.mjs, access: execute, availability: produced_by_step}\n\
       \        - {path: go.mod, access: read, availability: current}\n      test_bindings:\n\
       \        - {path: internal/resofeed/rf_bug_runtime_contract_expected_red_test.go,\
+      \ classification: acceptance, availability: current}\n        - {path: tests/rf_bug_canonical_contract_test.go,\
       \ classification: acceptance, availability: current}\n        - {path: internal/resofeed/http_impl_test.go,\
       \ classification: developer, availability: current}\n        - {path: web/src/lib/api-client.test.ts,\
       \ classification: developer, availability: current}\n      selection:\n    \
@@ -186293,7 +186297,7 @@ phases:
       \ ['RF-BUG-004 active document scan', 'RF-BUG-004 auth-first import-only contract']\n\
       \        forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
       \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: legacy_export_auth_precedence},\
-      \ {literal: import_and_JSON_State_remain_green}, {literal: OPML_ACTIVE_DOCUMENTS=9},\
+      \ {literal: import_and_JSON_State_remain_green}, {literal: RF_BUG_CANONICAL_DOCUMENTS=9},\
       \ {literal: OPML_EXCLUSIONS=2}]\n        contains_any: []\n        forbids:\
       \ [{literal: broad exclusion}, {literal: no tests to run}]\n    proves: [RF-BUG-004]\n\
       bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
@@ -186307,11 +186311,13 @@ phases:
       ,\"independent_step\":\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-boundaries-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/http_impl_test.go\"\
       ,\"web/src/lib/api-client.test.ts\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_runtime_contract_expected_red_test.go\"\
-      ],\"acceptance_check_ids\":[\"rf_bug_v2_opml_import_only_green\"],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+      ,\"tests/rf_bug_canonical_contract_test.go\"],\"acceptance_check_ids\":[\"rf_bug_v2_opml_import_only_green\"\
+      ],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n\
+      </vectl_step_policy>"
     verification: Protected 401/404 OPML acceptance, import and JSON State regressions,
-      atomic failure behavior, exact active-document scan, UI/docs parity, and protected-path
-      immutability pass.
+      atomic failure behavior, exact immutable `RF_BUG_CANONICAL_DOCUMENTS=9` and
+      `OPML_EXCLUSIONS=2` canonical scan output, UI/docs parity, adapter alignment,
+      and protected-path immutability pass.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
