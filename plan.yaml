@@ -187559,6 +187559,94 @@ phases:
       and ci-safe Playwright collection passed with all five identities. Independent
       acceptance authorization matched. Receipt sha256:3e2ba794b7449c3fa3e238ed6a11da6f4484fea5095b006c2b0c089df1b87fc5;
       dispatch sha256:4593c698c96aea44437d47235bda9608de4e4b01df7b1c6bceda25ade27d1ae7.
+  - id: rf-bug-v2-e2e-loopback-fixture-boundary
+    name: Restore E2E-only loopback fixture boundary without weakening outbound SSRF
+      policy
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for valid rejected Source Ledger receipt `sha256:f70684d7180e1fd2865fc3f01f9e388cc2f6818b7b126d4d756c9d78f86a2e01`.\
+      \ Execute only in a fresh clean post-remediation worktree. Preserve the dirty\
+      \ v5 Source Ledger worktree and every earlier recovery worktree unchanged; selectively\
+      \ port admitted work only after this remediation is integrated.\n\nKeep the\
+      \ production outbound URL and dial SSRF boundary strict: normal builds must\
+      \ reject loopback, localhost, private, link-local, multicast, and unspecified\
+      \ destinations even when `RESOFEED_E2E=1` is present. Add the smallest build-tag-separated\
+      \ Go fixture policy using the existing `resofeed_e2e` tag so loopback fixture\
+      \ URLs are permitted only when the binary was compiled with that tag and launched\
+      \ with exact runtime opt-in `RESOFEED_E2E=1`. The tag alone and environment\
+      \ alone must each remain insufficient. Do not add a CLI flag, general environment\
+      \ bypass, public API, alternate key, wildcard private-network allowance, or\
+      \ production transport relaxation. Preserve strict outbound unit checks and\
+      \ redirect/dial validation.\n\nKeep `scripts/build-resofeed.sh` as the normal\
+      \ untagged production build path. Keep `web/tests/e2e/fixtures/runtime-fixture.ts`\
+      \ as the exact E2E binary/runtime authority: it builds `./cmd/resofeed` with\
+      \ `-tags resofeed_e2e`, launches that binary with sanitized `RESOFEED_E2E=1`,\
+      \ and remains the only real-browser route to the loopback fixture allowance.\
+      \ Add focused Go tests proving untagged default false despite the environment,\
+      \ tagged default false without the environment, tagged explicit true only for\
+      \ loopback fixture use, and unchanged strict rejection. Update the Playwright\
+      \ E2E harness contract to document this two-key build/runtime boundary. Protected\
+      \ browser acceptance files remain immutable.\n\nRollback removes the E2E-tagged\
+      \ fixture policy and its focused tests/docs together, restoring the prior strict\
+      \ production implementation without touching protected browser tests or dirty\
+      \ recovery worktrees.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [internal/resofeed/outbound_url.go, internal/resofeed/outbound_url*.go, internal/resofeed/outbound_url_test.go,\
+      \ internal/resofeed/playwright_fixture_test.go, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n\
+      \  blocked_paths: [scripts/build-resofeed.sh, web/tests/e2e/fixtures/runtime-fixture.ts,\
+      \ web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts, web/tests/e2e/source-ledger-operations.runtime.spec.ts,\
+      \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts]\n  ignored_runtime_paths:\
+      \ [.git/, .vectl/, .agent/, .venv/, .test-artifacts/]\nclaims: [RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY]\n\
+      checks:\n  - id: rf_bug_v2_e2e_loopback_fixture_boundary_green\n    run:\n \
+      \     command:\n        - bash\n        - -lc\n        - >-\n          set -euo\
+      \ pipefail; out=\"${TMPDIR:-/tmp}/resofeed-e2e-boundary-prod-$$\"; trap 'rm\
+      \ -f \"$out\"' EXIT; RESOFEED_E2E=1 scripts/build-resofeed.sh \"$out\"; env\
+      \ -u RESOFEED_E2E go test -v ./internal/resofeed -run '^(TestOutboundE2EFixturePolicy|TestOutboundHTTPURLPolicyRejectsUnsafeDestinations|TestFetchPathsRejectLoopbackBeforeRequest|TestPlaywrightFixtureContract)$'\
+      \ -count=1; RESOFEED_E2E=1 go test -v -tags resofeed_e2e ./internal/resofeed\
+      \ -run '^(TestOutboundE2EFixturePolicy|TestOutboundHTTPURLPolicyRejectsUnsafeDestinations|TestFetchPathsRejectLoopbackBeforeRequest|TestPlaywrightFixtureContract)$'\
+      \ -count=1\n      timeout_seconds: 900\n    evidence:\n      mode: command_outcome\n\
+      \      path_bindings:\n        - {path: scripts/build-resofeed.sh, access: execute,\
+      \ availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
+      \ access: read, availability: current}\n        - {path: internal/resofeed/outbound_url.go,\
+      \ access: read, availability: current}\n        - {path: internal/resofeed/playwright_fixture_test.go,\
+      \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n        - {path: go.mod, access: read,\
+      \ availability: current}\n      test_bindings:\n        - {path: internal/resofeed/outbound_url_test.go,\
+      \ classification: developer, availability: current}\n        - {path: internal/resofeed/playwright_fixture_test.go,\
+      \ classification: developer, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: TestOutboundE2EFixturePolicy}, {literal: TestOutboundHTTPURLPolicyRejectsUnsafeDestinations},\
+      \ {literal: TestFetchPathsRejectLoopbackBeforeRequest}, {literal: TestPlaywrightFixtureContract},\
+      \ {literal: PASS}]\n        contains_any: []\n        forbids: [{literal: FAIL},\
+      \ {literal: skipped}, {literal: No tests to run}]\n    proves: [RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-e2e-loopback-fixture-boundary\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"test-only runtime network boundary\"\
+      ,\"cross-component build-tag and runtime fixture contract\",\"production SSRF\
+      \ invariant preservation\"],\"primary_outcome\":\"RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY\",\"atom\":\"real Source Ledger\
+      \ E2E binary reaches loopback RSS fixtures only under the resofeed_e2e build\
+      \ tag plus RESOFEED_E2E=1 while normal production builds retain strict outbound\
+      \ rejection\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_e2e_loopback_fixture_boundary_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/outbound_url_test.go\"\
+      ,\"internal/resofeed/playwright_fixture_test.go\"],\"acceptance_test_paths\"\
+      :[],\"acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\"\
+      :[]}}\n</vectl_step_policy>"
+    verification: The normal build script produces an untagged binary that remains
+      strict even with `RESOFEED_E2E=1`; focused untagged/tagged Go runs prove the
+      two-key tag-plus-runtime opt-in, unchanged strict URL/fetch rejection, and exact
+      runtime-fixture wiring before the downstream real Source Ledger browser verification.
+    evidence_template: Commands and excerpts for the normal production build, untagged/tagged
+      focused Go checks, exact fixture contract, protected-test diff guard, and any
+      remaining gap.
+    depends_on:
+    - rf-bug-v2-item-http-token-contract-lock
+    - rf-bug-v2-source-ledger-ingest-locator-contract-lock
+    agent: golang-developer
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
