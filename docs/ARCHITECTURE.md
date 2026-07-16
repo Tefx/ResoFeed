@@ -1866,6 +1866,14 @@ OpenRouter model-list route rules:
 - the endpoint is read-only and creates no receipts, jobs, queues, history rows, model caches in SQLite, or portable state;
 - the endpoint must never expose OpenRouter API keys, secret source, `.env` paths, raw provider JSON, provider account metadata, or pricing/configuration dashboards.
 
+HTTP item route token boundary:
+
+- every detail, inspect, resonance, delivery, and re-ingest route under `/api/items/` requires one canonical item token segment: `~` followed by the unpadded `base64.RawURLEncoding` of the opaque item ID's UTF-8 bytes;
+- the server decodes the token only when the payload is valid unpadded RawURL base64, the decoded bytes are valid UTF-8, and re-encoding those exact bytes reproduces the supplied segment;
+- raw item IDs, padded or malformed base64, noncanonical trailing bits, invalid UTF-8, and extra path segments return the ordinary `404 not_found` shape before item lookup or mutation-body processing;
+- owner-token authorization remains the first HTTP boundary, so unauthorized requests still return `401 unauthorized` before route-token validation;
+- successful decoding passes the opaque item ID bytes unchanged into the shared application operation.
+
 `ItemReingestRequest`:
 
 | Field | Type | Required | Nullable | Notes |
@@ -1914,7 +1922,7 @@ Extra prompt validation rules:
 | `reingest` | `ItemReingestResult` | Yes | No | Result summary for the selected item. |
 | `already_applied` | boolean | Yes | No | Idempotency replay marker. |
 
-`POST /api/items/{id}/reingest` request body example:
+`POST /api/items/{token}/reingest` request body example:
 
 ```json
 {
@@ -1952,7 +1960,7 @@ Default-model request example:
 
 Rules:
 
-- path `id` is required and must identify an existing item;
+- path `token` is required, must satisfy the canonical HTTP item route-token boundary above, and must decode to an existing opaque item ID;
 - request body must be a JSON object with required mutation fields and optional `model`, canonical `prompt`, and compatibility `extra_prompt` only;
 - JSON body payload is limited to `100 KB`; field-level limits above also apply;
 - `language` and any other unknown fields are rejected; selected-item re-ingest uses the persisted runtime processing language and has no per-call language override;
@@ -1990,7 +1998,7 @@ Endpoint additions:
 |---|---|---:|---|
 | `GET /api/runtime/openrouter-models` | none; no query params | `200` | `OpenRouterModelsResponse` |
 | `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
-| `POST /api/items/{id}/reingest` | `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if any source-scoped ingest/fetch attempt or global-exclusive operation is already running |
+| `POST /api/items/{token}/reingest` | Canonical HTTP item route token plus `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if any source-scoped ingest/fetch attempt or global-exclusive operation is already running |
 
 ## 7. MCP Surface
 
@@ -2175,10 +2183,10 @@ Rules:
 
 - `list_openrouter_models` is an authenticated, read-only parity operation and must create no receipts, durable cache, provider registry, or portable state;
 - current MCP `list_openrouter_models` runtime behavior uses the same OpenRouter model-list function as HTTP after request-time secret resolution, returns `{ "models": [] }` when no key is resolved, and redacts provider errors;
-- `reingest_item` requires owner-token authority, `item_id`, `actor_id`, and `idempotency_key`;
+- `reingest_item` requires owner-token authority, a direct raw opaque `item_id`, `actor_id`, and `idempotency_key`; MCP does not accept or expose the HTTP `~` route-token syntax;
 - `model`, canonical `prompt`, and compatibility `extra_prompt` are optional implemented MCP parity fields with the same validation, alias, idempotency fingerprint, and non-persistence rules as HTTP selected-item re-ingest;
 - `reingest_item` uses the current persisted processing language and does not accept a per-call language override;
-- `reingest_item` must call the same application operation as HTTP item re-ingest;
+- HTTP decodes its canonical route token first, then HTTP and MCP call the same raw opaque item-ID application operation with identical guard ownership, receipt target/fingerprint, persistence, result identity, and error mapping;
 - guarded-operation conflicts return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` when available;
 - same-key idempotency replay/mismatch/active-run semantics match `POST /api/items/{id}/reingest`;
 - MCP responses and errors must not echo prompt text from either prompt field, raw provider payloads, OpenRouter API keys, secret source metadata, `.env` paths, or owner tokens.

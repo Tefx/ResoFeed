@@ -45,11 +45,10 @@ func ReprocessLibrary(ctx context.Context, db *sql.DB, llm LLMClient, req Reproc
 	return response, nil
 }
 
-// ReingestItem is a contract-only declaration for the Inspector selected-item
-// re-ingest operation. The future implementation must re-fetch/reprocess exactly
-// one item in the current processing language, refresh that item's FTS row, use
-// idempotency receipts, and share the same guard/current-operation semantics as
-// ingest/fetch/library reprocess without creating durable jobs or history.
+// ReingestItem is the shared selected-item operation used by HTTP after
+// canonical route-token decoding and by MCP with its direct opaque item ID.
+// Both transports therefore share validation, guard ownership, idempotency,
+// persistence, result identity, and error semantics.
 func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string, req ItemReingestRequest) (ItemReingestResponse, error) {
 	if err := ctx.Err(); err != nil {
 		return ItemReingestResponse{}, fmt.Errorf("reingest item: %w", err)
@@ -57,8 +56,7 @@ func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string,
 	if db == nil {
 		return ItemReingestResponse{}, errors.New("reingest item: db required")
 	}
-	itemID = strings.TrimSpace(itemID)
-	if itemID == "" || strings.Contains(itemID, "/") {
+	if itemID == "" {
 		return ItemReingestResponse{}, fieldError("item_id")
 	}
 	if err := validateItemReingestRequest(req); err != nil {
@@ -87,8 +85,8 @@ func ReingestItem(ctx context.Context, db *sql.DB, llm LLMClient, itemID string,
 	return response, retErr
 }
 
-// ReingestItemForMCP maps the MCP contract shape onto the shared selected-item
-// re-ingest declaration. It is intentionally a thin parity boundary.
+// ReingestItemForMCP maps the MCP contract shape and direct raw opaque item ID
+// onto the shared selected-item operation. Route-token syntax remains HTTP-only.
 func ReingestItemForMCP(ctx context.Context, db *sql.DB, llm LLMClient, input MCPReingestItemInput) (ItemReingestResponse, error) {
 	req, err := itemReingestRequestFromInputs(MutationRequestFields{ActorKind: ActorKindAgent, ActorID: input.ActorID, IdempotencyKey: input.IdempotencyKey}, input.Model, input.Prompt, input.ExtraPrompt)
 	if err != nil {

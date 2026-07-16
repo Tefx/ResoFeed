@@ -24,9 +24,24 @@ func TestItemRouteTokenRoundTrip(t *testing.T) {
 }
 
 func TestItemRouteTokenRejectsNonCanonicalInput(t *testing.T) {
-	for _, token := range []string{"", "plain-id", "~", "~a===", "~***", "~ww", "~wyg"} {
-		if got, ok := decodeItemRouteToken(token); ok {
-			t.Errorf("decodeItemRouteToken(%q) = %q, true; want rejection", token, got)
-		}
+	tokens := []struct {
+		name  string
+		token string
+	}{
+		{name: "empty", token: ""},
+		{name: "raw item ID", token: "plain-id"},
+		{name: "empty payload", token: "~"},
+		{name: "padded", token: "~aXRlbQ=="},
+		{name: "malformed", token: "~***"},
+		{name: "invalid UTF-8", token: "~_w"},
+		{name: "truncated UTF-8", token: "~ww"},
+		{name: "noncanonical trailing", token: "~wyg"},
+	}
+	for _, tc := range tokens {
+		t.Run(tc.name, func(t *testing.T) {
+			if got, ok := decodeItemRouteToken(tc.token); ok {
+				t.Errorf("decodeItemRouteToken(%q) = %q, true; want rejection", tc.token, got)
+			}
+		})
 	}
 }
