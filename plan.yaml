@@ -186599,35 +186599,44 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Replacement for `rf-bug-runtime-boundaries-full-gate`, preserved as the single
-      terminal runtime gate after append-only remediation. Admit the three original
-      v2 modifying branches plus `rf-bug-v2-runtime-review-remediation` only with
-      independent real-seam runtime evidence and the rebound explicit R3 security/rollback
-      review. Require embedded/pre-bind/arbitrary-cwd behavior; failed-source Doctor
-      URL userinfo/query redaction; no residual Go OPML export symbol; auth-first
-      import-only OPML and atomic minimal State; exact active-document scan; one Go-owned
-      header/CSP layer; streaming/cancellation; Chromium operations; docs and user-dirty-path
-      immutability; protected acceptance; and no unresolved finding. Skipped legacy
-      nodes are never admission inputs; RF-BUG-009 remains the only admitted future
-      expected-red scope.
+      Rebound Full Gate for rejected receipt `sha256:e5c1cf9318d0f18956b4c275b0c6f97f7c10d59cb7d6e325b77da587181cda04`
+      after the single append-only documentation-contract remediation. Admit the three
+      original v2 modifying branches, `rf-bug-v2-runtime-review-remediation`, and
+      `rf-bug-v2-runtime-doc-contract-remediation` only when the focused documentation
+      check proves the committed canonical fragments from a clean integrated head
+      and the previously valid real-seam runtime/security evidence remains target-consistent.
+      Require embedded/pre-bind/arbitrary-cwd behavior; failed-source Doctor URL userinfo/query
+      redaction; explicit DESIGN RF-BUG-003/004/005 atoms; no residual Go OPML export
+      symbol; auth-first import-only OPML and atomic minimal State; exact active-document
+      scan; one Go-owned header/CSP layer; CSP-compatible embedded interactions; streaming/cancellation;
+      Chromium operations; protected authority and acceptance immutability; preservation
+      of the declared user-dirty/untracked paths by integration; and no unresolved
+      in-scope finding. Do not rerun unrelated runtime work whose valid evidence is
+      unchanged; fail closed if target drift invalidates retained evidence. Skipped
+      legacy nodes are never admission inputs; RF-BUG-009 remains the only admitted
+      future expected-red scope.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-runtime","requirement_ids":["RF-BUG-003","RF-BUG-004","RF-BUG-005"],"integrated_steps":["rf-bug-assurance-v2-runtime.rf-bug-v2-embed-ui-assets","rf-bug-assurance-v2-runtime.rf-bug-v2-http-security-csp","rf-bug-assurance-v2-runtime.rf-bug-v2-opml-import-only","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-boundaries-verification","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-review-remediation","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-security-review"],"admitted_future_expected_red":["rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red#RF-BUG-009"],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-runtime","requirement_ids":["RF-BUG-003","RF-BUG-004","RF-BUG-005"],"integrated_steps":["rf-bug-assurance-v2-runtime.rf-bug-v2-embed-ui-assets","rf-bug-assurance-v2-runtime.rf-bug-v2-http-security-csp","rf-bug-assurance-v2-runtime.rf-bug-v2-opml-import-only","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-boundaries-verification","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-review-remediation","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-security-review","rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-doc-contract-remediation"],"admitted_future_expected_red":["rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red#RF-BUG-009"],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers exact RF-BUG-003/004/005 requirements, all original
-      and remediation modifying/verification/review branches, future RF-BUG-009 admission
-      only, protected and user-dirty immutability, safe rollback, and canonical public
-      integrated IDs.
+    verification: Full Gate consumes the focused documentation selected-execution
+      result and retained target-consistent runtime/security evidence, covers exact
+      RF-BUG-003/004/005 requirements and all integrated branches, admits only future
+      RF-BUG-009, verifies protected/user-state preservation and safe rollback, and
+      emits one canonical gate verdict.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
     - docs/CONTAINER.md
+    - tests/rf_bug_canonical_contract_test.go
+    - scripts/vectl-check.mjs
     depends_on:
-    - rf-bug-v2-runtime-security-review
+    - rf-bug-v2-runtime-doc-contract-remediation
     agent: gate-reviewer
   - id: rf-bug-v2-runtime-review-remediation
     name: Remediate Doctor URL redaction and residual Go OPML export
