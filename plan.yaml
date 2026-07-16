@@ -188706,6 +188706,98 @@ phases:
     evidence: Integrated 7ced7614f899c7ec029983b815c112192559ff4a. Explicit TAP adapter
       contract passed, proving Source Ledger Vitest uses verbose title output correlated
       to the required marker. Receipt sha256:d10fa38a5e4ac5b4b85b424b8056a1e9a7183a8c3f0d60dd62403e4ccb5b64ba.
+  - id: rf-bug-v2-prompting-e2e-harness-remediation
+    name: Repair Prompting v2.2 protected harness E2E extraction boundary
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for valid independent semantic FAIL receipt `sha256:e822db15db70e548ad953ae75bb4ad95361b39faa1b6dfdb49ba79053e58999a`\
+      \ (`command:prompting-v22-001`). Preserve completed Prompting v2.2 and E2E-boundary\
+      \ definitions/evidence, dirty worktrees, production source, and protected acceptance\
+      \ unchanged.\n\nRepair only the project-native evidence adapter, its focused\
+      \ Node regression coverage, and the harness contract documentation so the `rf-bug-v2-prompting`\
+      \ / `rf_bug_v2_prompting_green` protected `TestRFBUG009PromptingV22Contract`\
+      \ command compiles and runs with `-tags resofeed_e2e` and exact child environment\
+      \ `RESOFEED_E2E=1`. Scope both keys to that loopback-fixture acceptance command.\
+      \ Keep the other Prompting regression command untagged and strict unless current\
+      \ fixture evidence proves that exact command also needs loopback; do not create\
+      \ a global adapter environment bypass. Preserve the profile's exact four selected/executed\
+      \ identities and exact sixteen protected subtests.\n\nFocused adapter tests\
+      \ must prove the exact protected-command argv/environment contract, the untagged\
+      \ regression command contract, four-identity selected/executed parity, and fail-closed\
+      \ absence of a general loopback bypass. Local checks must rerun the Prompting\
+      \ profile and the established outbound fixture-boundary proof, including a normal\
+      \ untagged production build/test that remains strict even when `RESOFEED_E2E=1`\
+      \ is present. No production SSRF relaxation, protected acceptance mutation,\
+      \ CLI bypass, alternate environment key, wildcard private-network allowance,\
+      \ secret exposure, retry, or skip is allowed. Rollback reverts the adapter,\
+      \ focused test, and harness documentation together.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n  blocked_paths: [internal/resofeed/**,\
+      \ web/src/**, web/tests/**, scripts/build-resofeed.sh, docs/ARCHITECTURE.md,\
+      \ docs/DESIGN.md, docs/PROMPTING_SYSTEM.md, docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/BUG_REPORT_2026-07-11.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
+      \ .agent/, .venv/]\nclaims: [RF-BUG-009-PROMPTING-HARNESS-REMEDIATION]\nchecks:\n\
+      \  - id: rf_bug_v2_prompting_harness_remediation_green\n    run:\n      command:\n\
+      \        - bash\n        - -lc\n        - >-\n          set -euo pipefail; node\
+      \ --test scripts/vectl-check.test.mjs; node scripts/vectl-check.mjs run rf-bug-v2-prompting\
+      \ rf_bug_v2_prompting_green; out=\"${TMPDIR:-/tmp}/resofeed-prompting-harness-prod-$$\"\
+      ; trap 'rm -f \"$out\"' EXIT; RESOFEED_E2E=1 scripts/build-resofeed.sh \"$out\"\
+      ; env -u RESOFEED_E2E go test -v ./internal/resofeed -run '^(TestOutboundE2EFixturePolicy|TestOutboundHTTPURLPolicyRejectsUnsafeDestinations|TestFetchPathsRejectLoopbackBeforeRequest|TestPlaywrightFixtureContract)$'\
+      \ -count=1; RESOFEED_E2E=1 go test -v -tags resofeed_e2e ./internal/resofeed\
+      \ -run '^(TestOutboundE2EFixturePolicy|TestOutboundHTTPURLPolicyRejectsUnsafeDestinations|TestFetchPathsRejectLoopbackBeforeRequest|TestPlaywrightFixtureContract)$'\
+      \ -count=1\n      timeout_seconds: 1500\n    evidence:\n      mode: selected_execution\n\
+      \      path_bindings:\n        - {path: scripts/vectl-check.mjs, access: execute,\
+      \ availability: produced_by_step}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: produced_by_step}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: produced_by_step}\n        - {path: scripts/build-resofeed.sh,\
+      \ access: execute, availability: current}\n        - {path: go.mod, access:\
+      \ read, availability: current}\n      test_bindings:\n        - {path: scripts/vectl-check.test.mjs,\
+      \ classification: developer, availability: produced_by_step}\n        - {path:\
+      \ internal/resofeed/rf_bug_prompting_v22_expected_red_test.go, classification:\
+      \ acceptance, availability: current}\n        - {path: internal/resofeed/outbound_url_test.go,\
+      \ classification: developer, availability: current}\n        - {path: internal/resofeed/playwright_fixture_test.go,\
+      \ classification: developer, availability: current}\n      selection:\n    \
+      \    command:\n          - python3\n          - -c\n          - >-\n       \
+      \     import hashlib,json; ids=['RF-BUG-009 harness exact argv and environment','RF-BUG-009\
+      \ harness exact four identities','RF-BUG-009 harness exact 16 subtests','RF-BUG-009\
+      \ harness production strict']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_prompting_harness_remediation_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 4}\n        required_ids:\
+      \ ['RF-BUG-009 harness exact argv and environment', 'RF-BUG-009 harness exact\
+      \ four identities', 'RF-BUG-009 harness exact 16 subtests', 'RF-BUG-009 harness\
+      \ production strict']\n        forbidden_ids: []\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: RF-BUG-009_EXACT_SUBTEST_SET=16}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0},\
+      \ {literal: TestOutboundE2EFixturePolicy}, {literal: TestOutboundHTTPURLPolicyRejectsUnsafeDestinations},\
+      \ {literal: TestFetchPathsRejectLoopbackBeforeRequest}, {literal: TestPlaywrightFixtureContract},\
+      \ {literal: PASS}]\n        contains_any: []\n        forbids: [{literal: no\
+      \ tests to run}, {literal: skipped}, {literal: retry}, {literal: OPENROUTER_KEY=}]\n\
+      \    proves: [RF-BUG-009-PROMPTING-HARNESS-REMEDIATION]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-e2e-harness-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"shared test infrastructure\",\"security-boundary\
+      \ fixture execution\",\"cross-component acceptance dispatch\"],\"primary_outcome\"\
+      :\"RF-BUG-009-PROMPTING-HARNESS-REMEDIATION\",\"rollback_class\":\"NONTRIVIAL\"\
+      ,\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-009-PROMPTING-HARNESS-REMEDIATION\"\
+      ,\"atom\":\"the protected Prompting v2.2 loopback extraction test runs only\
+      \ with the E2E build tag plus exact runtime opt-in while untagged production\
+      \ remains strict\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"\
+      rf_bug_v2_prompting_harness_remediation_green\",\"independent_step\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_prompting_v22_expected_red_test.go\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_prompting_harness_remediation_green\"\
+      ],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n\
+      </vectl_step_policy>"
+    verification: The focused adapter contract, Prompting profile, exact four selected/executed
+      identities, exact sixteen protected subtests, and established tagged/untagged
+      outbound-boundary checks pass; the protected command alone receives `-tags resofeed_e2e`
+      plus exact `RESOFEED_E2E=1`, the regression command and production build remain
+      untagged/strict, and protected acceptance and production code remain unchanged.
+    depends_on:
+    - rf-bug-v2-prompting-v22
+    - rf-bug-v2-e2e-loopback-fixture-boundary
+    agent: frontend-engineer
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
