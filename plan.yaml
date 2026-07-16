@@ -187041,6 +187041,7 @@ phases:
     - web/tests/e2e/source-ledger-operations.runtime.spec.ts
     depends_on:
     - rf-bug-v2-item-http-token-contract-lock
+    - rf-bug-v2-source-ledger-ingest-locator-contract-lock
     agent: frontend-engineer
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
