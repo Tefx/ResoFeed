@@ -186741,6 +186741,84 @@ phases:
       - rejected review receipt sha256:2507973a47bad4aad91945c464aff438707f9f3de075d99d876a33c949ce72fc
 
       - AGENTS.md import-only and secret-redaction boundaries'
+  - id: rf-bug-v2-runtime-doc-contract-remediation
+    name: Repair committed RF-BUG runtime documentation contracts
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for the documentation-only blockers in rejected Full Gate receipt\
+      \ `sha256:e5c1cf9318d0f18956b4c275b0c6f97f7c10d59cb7d6e325b77da587181cda04`\
+      \ at target `e916ef0ab31eca7b78d5015dab27a40f4d146f2f`. Cross-domain justification:\
+      \ the canonical architecture and interaction documents form one indivisible\
+      \ RF-BUG-003/004/005 contract consumed by one protected scan and one rebound\
+      \ gate. From a clean isolated checkout of that target, update only the committed\
+      \ `docs/ARCHITECTURE.md` and `docs/DESIGN.md` contracts plus the focused generic\
+      \ adapter profile/self-test needed to prove their exact fragments. Do not read,\
+      \ copy, overwrite, stage, or absorb the main worktree's pre-existing modifications\
+      \ to those documents or its untracked `.pi/remote-pi/` and `docs/ITEM_DEEP_LINKS.md`;\
+      \ integration owns preserving and reconciling that user state separately.\n\n\
+      Require `docs/ARCHITECTURE.md` to contain the protected canonical fragment `one\
+      \ effective `Content-Security-Policy``. In `docs/DESIGN.md`, preserve the existing\
+      \ design grammar while adding explicit RF-BUG-003, RF-BUG-004, and RF-BUG-005\
+      \ interaction atoms: embedded UI and Doctor readiness; Doctor redaction of configured\
+      \ secrets plus failed-source URL userinfo/query values; OPML import-only intake\
+      \ with minimal atomic JSON State portability; and ordinary embedded UI interactions\
+      \ booting and completing under the Go-owned CSP without `unsafe-inline`, duplicate\
+      \ header ownership, blocked required resources, or CSP violations. Register\
+      \ one focused adapter profile that statically checks those exact committed fragments,\
+      \ runs the unchanged protected canonical document test, and emits only bounded\
+      \ contract markers. Preserve `docs/BUG_FIX_PLAN_2026-07-12.md`, `docs/BUG_REPORT_2026-07-11.md`,\
+      \ `tests/rf_bug_canonical_contract_test.go`, all runtime code/tests, all other\
+      \ docs, and all user-dirty/untracked paths. Do not rerun or alter unrelated\
+      \ runtime work. Rollback atomically reverts this documentation/profile unit\
+      \ and leaves the gate closed.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/BUG_REPORT_2026-07-11.md, tests/rf_bug_canonical_contract_test.go, internal/**,\
+      \ cmd/**, web/**, deploy/**, docs/ITEM_DEEP_LINKS.md, .pi/**]\n  ignored_runtime_paths:\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-003, RF-BUG-004, RF-BUG-005]\n\
+      checks:\n  - id: rf_bug_v2_runtime_doc_contract_green\n    run: {command: [node,\
+      \ scripts/vectl-check.mjs, run, rf-bug-v2-runtime-doc-contract, rf_bug_v2_runtime_doc_contract_green],\
+      \ timeout_seconds: 180}\n    evidence:\n      mode: selected_execution\n   \
+      \   path_bindings:\n        - {path: scripts/vectl-check.mjs, access: execute,\
+      \ availability: produced_by_step}\n        - {path: go.mod, access: read, availability:\
+      \ current}\n      test_bindings:\n        - {path: scripts/vectl-check.test.mjs,\
+      \ classification: developer, availability: produced_by_step}\n        - {path:\
+      \ tests/rf_bug_canonical_contract_test.go, classification: acceptance, availability:\
+      \ current}\n      selection:\n        command:\n          - python3\n      \
+      \    - -c\n          - >-\n            import hashlib,json; ids=['RF-BUG-003\
+      \ canonical embedded Doctor contract','RF-BUG-004 canonical import-only State\
+      \ contract','RF-BUG-005 canonical CSP interaction contract','RF-BUG-003/004/005\
+      \ protected canonical scan']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_runtime_doc_contract_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 4}\n        required_ids:\
+      \ ['RF-BUG-003 canonical embedded Doctor contract', 'RF-BUG-004 canonical import-only\
+      \ State contract', 'RF-BUG-005 canonical CSP interaction contract', 'RF-BUG-003/004/005\
+      \ protected canonical scan']\n        forbidden_ids: []\n    expect:\n     \
+      \ outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: RF_BUG_RUNTIME_DOC_ARCH_CSP_FRAGMENT=complete}, {literal: RF_BUG_RUNTIME_DOC_DESIGN_ATOMS=3},\
+      \ {literal: RF_BUG_RUNTIME_DOC_DOCTOR_REDACTION=complete}, {literal: RF_BUG_RUNTIME_DOC_CSP_INTERACTIONS=complete},\
+      \ {literal: RF_BUG_CANONICAL_DOCUMENTS=9}, {literal: OPML_EXCLUSIONS=2}, {literal:\
+      \ VECTL-ADAPTER pending-profile-discovery}]\n        contains_any: []\n    \
+      \    forbids: [{literal: no tests to run}, {literal: broad exclusion}, {literal:\
+      \ unsafe-inline permitted}]\n    proves: [RF-BUG-003, RF-BUG-004, RF-BUG-005]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-runtime.rf-bug-v2-runtime-doc-contract-remediation\"\
+      ,\"risk_tier\":\"R0\",\"risk_reasons\":[\"documentation_contract_repair\",\"\
+      bounded_adapter_profile\"],\"primary_outcome\":\"RF-BUG-003/004/005-DOC-CONTRACT\"\
+      ,\"rollback_class\":\"TRIVIAL\",\"observation_ledger\":[],\"test_authority\"\
+      :{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_test_paths\"\
+      :[\"tests/rf_bug_canonical_contract_test.go\"],\"acceptance_check_ids\":[\"\
+      rf_bug_v2_runtime_doc_contract_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
+      ,\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: Focused selected execution proves the exact committed architecture/design
+      fragments, all three RF-BUG documentation atoms, Doctor credential redaction,
+      CSP-compatible embedded interactions, unchanged protected canonical acceptance,
+      and adapter identity parity without executing unrelated runtime suites.
+    depends_on:
+    - rf-bug-v2-runtime-security-review
+    agent: general
 - id: rf-bug-assurance-v2-ledger-prompting
   name: RF-BUG Assurance v2 Ledger and Prompting
   status: locked
