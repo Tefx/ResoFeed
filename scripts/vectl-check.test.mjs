@@ -8,9 +8,11 @@ import { fileURLToPath } from 'node:url';
 import {
   PENDING_PROFILE_PAIRS,
   PROFILES,
+  childEnvironment,
   evidenceEnvelope,
   parseEvidenceOutput,
   parseSelectionOutput,
+  runPromptingHarness,
   selectionEnvelope
 } from './vectl-check.mjs';
 
@@ -65,6 +67,12 @@ const expectedPending = [
     'RF-BUG-009 exact 16 subtests',
     'RF-BUG-009 focused path parity',
     'RF-BUG-009 regression and atomic preservation'
+  ]],
+  ['rf-bug-v2-prompting-harness', 'rf_bug_v2_prompting_harness_remediation_green', [
+    'RF-BUG-009 harness exact 16 subtests',
+    'RF-BUG-009 harness exact argv and environment',
+    'RF-BUG-009 harness exact four identities',
+    'RF-BUG-009 harness production strict'
   ]],
   ['rf-bug-v2-closure-report', 'rf_bug_v2_defect_report_closure_green', [
     'RF-BUG-001-010 active source scans',
@@ -124,8 +132,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 13);
-  assert.equal(expectedPending.length, 13);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 14);
+  assert.equal(expectedPending.length, 14);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -139,6 +147,71 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
     assert.deepEqual(selection.identities, identities);
     assert.equal(selection.identities.length, identities.length);
   }
+});
+
+test('RF-BUG-009 prompting harness adapter contract', () => {
+  const profile = findProfile('rf-bug-v2-prompting-harness', 'rf_bug_v2_prompting_harness_remediation_green');
+  const prompting = findProfile('rf-bug-v2-prompting', 'rf_bug_v2_prompting_green');
+  assert.ok(profile);
+  assert.ok(prompting);
+  assert.equal(profile.identities.length, 4);
+  assert.deepEqual(evidenceEnvelope({ profile, outcome: 'green', exitCode: 0 }).selected_ids, profile.identities);
+  assert.deepEqual(evidenceEnvelope({ profile, outcome: 'green', exitCode: 0 }).executed_ids, profile.identities);
+
+  assert.deepEqual(prompting.commands[0], {
+    argv: ['go', 'test', '-tags', 'resofeed_e2e', '-v', './internal/resofeed', '-run', '^TestRFBUG009PromptingV22Contract$', '-count=1'],
+    env: { RESOFEED_E2E: '1' }
+  });
+  assert.equal(Array.isArray(prompting.commands[1]), true);
+  assert.equal(prompting.commands[1].includes('-tags'), false);
+  assert.equal('RESOFEED_E2E' in childEnvironment(), false, 'general child environment must remain strict');
+  assert.equal(childEnvironment({ RESOFEED_E2E: '1' }).RESOFEED_E2E, '1');
+
+  const calls = [];
+  const promptingEnvelope = evidenceEnvelope({
+    profile: prompting,
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...prompting.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid']
+  });
+  const markers = [
+    'TestOutboundE2EFixturePolicy',
+    'TestOutboundHTTPURLPolicyRejectsUnsafeDestinations',
+    'TestFetchPathsRejectLoopbackBeforeRequest',
+    'TestPlaywrightFixtureContract',
+    'PASS'
+  ].join('\n');
+  const fakeRun = (_profile, command, args, options) => {
+    calls.push({ command, args, options });
+    if (command === 'node' && args[0] === '--test') return 'RF-BUG-009 prompting harness adapter contract\nPASS';
+    if (command === 'node') return `${JSON.stringify(promptingEnvelope)}\n`;
+    if (command === 'scripts/build-resofeed.sh') return 'production build complete';
+    return markers;
+  };
+
+  const result = runPromptingHarness(profile, fakeRun);
+  assert.equal(result.outcome, 'green');
+  assert.deepEqual(result.observations, [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid']);
+  assert.equal(calls.length, 5);
+  assert.deepEqual(calls[0].args, ['--test', '--test-name-pattern=RF-BUG-009 prompting harness adapter contract', 'scripts/vectl-check.test.mjs']);
+  assert.deepEqual(calls[1].args, ['scripts/vectl-check.mjs', 'run', 'rf-bug-v2-prompting', 'rf_bug_v2_prompting_green']);
+  assert.equal(calls[2].command, 'scripts/build-resofeed.sh');
+  assert.equal(calls[2].args.length, 1);
+  assert.equal(path.basename(calls[2].args[0]), 'resofeed');
+  assert.deepEqual(calls[2].options, { timeout: 600_000, env: { RESOFEED_E2E: '1' } });
+  assert.equal(calls[3].args.includes('-tags'), false);
+  assert.deepEqual(calls[3].options.env, { RESOFEED_E2E: null });
+  assert.deepEqual(calls[4].args.slice(0, 4), ['test', '-tags', 'resofeed_e2e', '-v']);
+  assert.deepEqual(calls[4].options.env, { RESOFEED_E2E: '1' });
+
+  const invalidNestedRun = (_profile, command, args) => {
+    if (command === 'node' && args[0] !== '--test') return '{"schema_version":"vectl.check.evidence.v1"}\n';
+    return markers;
+  };
+  assert.throws(
+    () => runPromptingHarness(profile, invalidNestedRun),
+    /evidence envelope did not match the requested profile/u
+  );
 });
 
 test('VECTL-ADAPTER Source Ledger reporter-marker correlation', () => {

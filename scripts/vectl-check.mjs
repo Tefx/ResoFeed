@@ -2,6 +2,7 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -181,9 +182,32 @@ export const PENDING_PROFILE_PAIRS = [
     ],
     runner: 'prompting-v22',
     commands: [
-      ['go', 'test', '-v', './internal/resofeed', '-run', '^TestRFBUG009PromptingV22Contract$', '-count=1'],
+      {
+        argv: ['go', 'test', '-tags', 'resofeed_e2e', '-v', './internal/resofeed', '-run', '^TestRFBUG009PromptingV22Contract$', '-count=1'],
+        env: { RESOFEED_E2E: '1' }
+      },
       ['go', 'test', '-v', './internal/resofeed', '-run', '^(TestPromptingV22Payload|TestPromptingV22Validation|TestPromptingV22Repair|TestPromptingV22Persistence|TestIngestV22|TestReprocessV22|TestReingestV22|TestHTTPV22|TestMCPV22)$', '-count=1']
     ]
+  },
+  {
+    suite: 'rf-bug-v2-prompting-harness',
+    checkID: 'rf_bug_v2_prompting_harness_remediation_green',
+    identities: [
+      'RF-BUG-009 harness exact 16 subtests',
+      'RF-BUG-009 harness exact argv and environment',
+      'RF-BUG-009 harness exact four identities',
+      'RF-BUG-009 harness production strict'
+    ],
+    requiredOutput: [
+      'RF-BUG-009_EXACT_SUBTEST_SET=16',
+      'PROMPTING_V21_ACTIVE_MATCHES=0',
+      'TestOutboundE2EFixturePolicy',
+      'TestOutboundHTTPURLPolicyRejectsUnsafeDestinations',
+      'TestFetchPathsRejectLoopbackBeforeRequest',
+      'TestPlaywrightFixtureContract',
+      'PASS'
+    ],
+    runner: 'prompting-harness'
   },
   {
     suite: 'rf-bug-v2-closure-report',
@@ -417,17 +441,20 @@ function collectArtifactRows(roots) {
   });
 }
 
-function childEnvironment(overrides = {}) {
-  return {
+export function childEnvironment(overrides = {}) {
+  const environment = {
     PATH: process.env.PATH ?? '',
     HOME: process.env.HOME ?? '',
     TMPDIR: process.env.TMPDIR ?? '/tmp',
     CI: '1',
     NO_COLOR: '1',
-    RESOFEED_E2E: '1',
-    RESOFEED_E2E_LIVE_OPENROUTER: '',
-    ...overrides
+    RESOFEED_E2E_LIVE_OPENROUTER: ''
   };
+  for (const [name, value] of Object.entries(overrides)) {
+    if (value === null || value === undefined) delete environment[name];
+    else environment[name] = value;
+  }
+  return environment;
 }
 
 function execute(profile, command, args, options = {}) {
@@ -689,7 +716,13 @@ function promptingV22ActiveFiles() {
 }
 
 function runPromptingV22(profile) {
-  const outputs = profile.commands.map((command) => execute(profile, command[0], command.slice(1), { timeout: 300_000 }));
+  const outputs = profile.commands.map((commandRow) => {
+    const command = Array.isArray(commandRow) ? commandRow : commandRow.argv;
+    return execute(profile, command[0], command.slice(1), {
+      timeout: 300_000,
+      env: Array.isArray(commandRow) ? { RESOFEED_E2E: null } : commandRow.env
+    });
+  });
   const staleIdentity = /promptingv21|prompting(?:\s+system)?\s+v2\.1|(^|[^a-z0-9_])v2\.1([^a-z0-9_]|$)/imu;
   const matches = [];
   for (const filePath of promptingV22ActiveFiles()) {
@@ -701,6 +734,57 @@ function runPromptingV22(profile) {
   const combined = outputs.join('\n');
   const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
   if (missing.length > 0) throw new AdapterFailure('Prompting v2.2 profile output missed required contract markers', missing);
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
+export function runPromptingHarness(profile, run = execute) {
+  const promptingProfile = PROFILES.get(profileKey('rf-bug-v2-prompting', 'rf_bug_v2_prompting_green'));
+  if (!promptingProfile) throw new AdapterFailure('Prompting v2.2 profile was not registered');
+
+  const fixtureTests = '^(TestOutboundE2EFixturePolicy|TestOutboundHTTPURLPolicyRejectsUnsafeDestinations|TestFetchPathsRejectLoopbackBeforeRequest|TestPlaywrightFixtureContract)$';
+  const adapterOutput = run(profile, 'node', [
+    '--test', '--test-name-pattern=RF-BUG-009 prompting harness adapter contract',
+    'scripts/vectl-check.test.mjs'
+  ], { timeout: 240_000, env: { RESOFEED_E2E: null } });
+  const promptingOutput = run(profile, 'node', [
+    'scripts/vectl-check.mjs', 'run', promptingProfile.suite, promptingProfile.checkID
+  ], { timeout: 900_000, env: { RESOFEED_E2E: null } });
+  const promptingEvidence = parseEvidenceOutput(promptingOutput, promptingProfile, 'green');
+  for (const marker of promptingProfile.requiredOutput) {
+    if (!promptingEvidence.observations.includes(marker)) {
+      throw new AdapterFailure(`nested Prompting evidence missed ${marker}`);
+    }
+  }
+
+  const buildScratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-prompting-harness-'));
+  const webUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
+  const webUIBackup = path.join(buildScratch, 'webui');
+  fs.cpSync(webUI, webUIBackup, { recursive: true });
+  try {
+    run(profile, 'scripts/build-resofeed.sh', [path.join(buildScratch, 'resofeed')], {
+      timeout: 600_000,
+      env: { RESOFEED_E2E: '1' }
+    });
+  } finally {
+    fs.rmSync(webUI, { recursive: true, force: true });
+    fs.cpSync(webUIBackup, webUI, { recursive: true });
+    fs.rmSync(buildScratch, { recursive: true, force: true });
+  }
+  const strictOutput = run(profile, 'go', [
+    'test', '-v', './internal/resofeed', '-run', fixtureTests, '-count=1'
+  ], { timeout: 300_000, env: { RESOFEED_E2E: null } });
+  const taggedOutput = run(profile, 'go', [
+    'test', '-tags', 'resofeed_e2e', '-v', './internal/resofeed', '-run', fixtureTests, '-count=1'
+  ], { timeout: 300_000, env: { RESOFEED_E2E: '1' } });
+
+  const combined = [adapterOutput, ...promptingEvidence.observations, strictOutput, taggedOutput].join('\n');
+  const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
+  if (missing.length > 0) throw new AdapterFailure('Prompting harness output missed required contract markers', missing);
   return {
     outcome: 'green',
     exitCode: 0,
@@ -759,7 +843,9 @@ async function main() {
           ? runRuntimeDocContract(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
-            : runNative(profile);
+            : profile.runner === 'prompting-harness'
+              ? runPromptingHarness(profile)
+              : runNative(profile);
     const envelope = evidenceEnvelope({ profile, ...result });
     parseEvidenceOutput(JSON.stringify(envelope), profile, result.outcome);
     process.stdout.write(`${JSON.stringify(envelope)}\n`);
