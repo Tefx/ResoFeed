@@ -159,7 +159,22 @@ test.describe('RF-BUG-008 real-runtime Source Ledger operations', () => {
     const externalFetch = request.post(`${runInfo.baseURL}/api/sources/${conflictSource.id}/fetch`, {
       headers: { Authorization: `Bearer ${ownerToken}` }
     });
-    await page.waitForTimeout(150);
+    const runningOperation = async () => {
+      const response = await request.get(`${runInfo.baseURL}/api/runtime/operation`, {
+        headers: { Authorization: `Bearer ${ownerToken}` }
+      });
+      const body: { operation: { kind: string | null; actor_kind: string | null; phase: string | null } } = await response.json();
+      return {
+        kind: body.operation.kind,
+        actor_kind: body.operation.actor_kind,
+        phase: body.operation.phase
+      };
+    };
+    await expect.poll(runningOperation, { timeout: 10_000 }).toEqual({
+      kind: 'source_fetch',
+      actor_kind: 'human',
+      phase: 'fetching_source'
+    });
     await row(page, conflictSource.id).locator('.bracket-action--fetch').click();
 
     const status = row(page, conflictSource.id).locator('.source-ledger__status');
