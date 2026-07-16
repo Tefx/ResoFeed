@@ -408,7 +408,7 @@ architecture_basis:
       - UI component libraries unless DESIGN.md changes explicitly
     operations:
       - GET /api/runtime/openrouter-models lists selectable OpenRouter model ids as { models: [{ id, name }] } without persisting them; GET /api/runtime/openrouter/models remains a compatibility path.
-      - POST /api/items/{id}/reingest reprocesses exactly one selected item with optional request-scoped model and prompt.
+      - POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest reprocesses exactly one selected item with optional request-scoped model and prompt.
       - MCP parity exposes equivalent agent-accessible product operations only if the HTTP operation is exposed to humans and the runtime DTO/config wiring has been verified for that operation.
     item_reingest_response_shape: "{ already_applied: boolean, reingest: { item_id, status, language, item_updated, fts_updated, error, item: ItemDetail|null } } is canonical across HTTP, MCP, and frontend tests."
     stable_openrouter_summary_schema: "OpenRouter output for the v2.2 content contract is localized_title, summary, core_insight, key_points, value_tier, and model_status; source_item_title is app/source-owned provenance, not model output. docs/PROMPTING_SYSTEM.md is canonical for prompt/schema details."
@@ -481,7 +481,7 @@ architecture_basis:
         rationale: conflicts must expose the same process-local operation fact across HTTP, MCP, and UI.
       - name: ItemDetail
         owner_module: internal/resofeed/types.go and frontend API contract mirror
-        consumers: [GET /api/items/{id}, item re-ingest response, MCP read_item, Inspector]
+        consumers: [GET /api/items/~{unpadded RFC4648 base64url(item_id)}, item re-ingest response, MCP read_item, Inspector]
         rationale: successful item re-ingest refreshes the current item through the existing detail contract.
     shared_protocols:
       - name: OpenRouterModelListing
@@ -1627,10 +1627,10 @@ Endpoint contracts:
 | Method/path | Request | Success | Response |
 |---|---|---:|---|
 | `GET /api/feed/today` | optional query params listed in the feed/today query rules | `200` | `{ "items": [ItemSummary] }` |
-| `GET /api/items/{id}` | path `id` | `200` | `{ "item": ItemDetail }` including `extraction_source`, source-backed `source_evidence_text`, generated `extracted_text`, and provenance |
-| `POST /api/items/{id}/inspect` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "human_inspected_at": "...", "already_applied": false }` |
-| `POST /api/items/{id}/resonance` | JSON `{ "resonated": true, "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "is_resonated": true, "already_applied": false }` |
-| `POST /api/items/{id}/delivery` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "external_surfaced_at": "...", "already_applied": false }` |
+| `GET /api/items/~{unpadded RFC4648 base64url(item_id)}` | canonical route token | `200` | `{ "item": ItemDetail }` including `extraction_source`, source-backed `source_evidence_text`, generated `extracted_text`, and provenance |
+| `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/inspect` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "human_inspected_at": "...", "already_applied": false }` |
+| `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/resonance` | JSON `{ "resonated": true, "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "is_resonated": true, "already_applied": false }` |
+| `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/delivery` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "external_surfaced_at": "...", "already_applied": false }` |
 | `POST /api/steer/preview` | JSON `{ "command": "...", "actor_kind": "human"|"agent", "actor_id": "owner" }`; no `idempotency_key`; `command` max `4000` bytes | `200` | `{ "preview": { "route_kind": "policy"|"source"|"search"|"doctor"|"invariant_conflict"|"unknown", "interpreted_as": "...", "will_mutate": false, "changed_rules": [SteerRule], "message": "..." } }`; read-only classification, no receipts or state writes |
 | `POST /api/steer` | JSON `{ "command": "...", "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }`; `command` max `4000` bytes | `200` | `{ "receipt": { "interpreted_as": "...", "changed_rules": [SteerRule], "message": "..." } }` |
 | `POST /api/steer/undo` | JSON `{ "target_kind": "steer_rule"|"source", "target_id": "...", "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `SteerUndoResult`; target-specific undo only, no global undo stack or command history |
@@ -1648,7 +1648,7 @@ Endpoint contracts:
 
 `GET /api/sources/export-opml` is retired and is not a public capability. The protected `/api/*` authentication boundary still applies before route resolution; with valid Owner Token authentication, the retired path follows the ordinary not-found behavior.
 
-`POST /api/items/{id}/delivery` contract:
+`POST /api/items/~{unpadded RFC4648 base64url(item_id)}/delivery` contract:
 
 - marks that an authorized human or agent surfaced the item outside the ResoFeed UI by setting `item_state.external_surfaced_at` to the required RFC3339 `delivered_at` value;
 - requires owner-token authorization like every `/api/*` route; `actor_id` is provenance/idempotency metadata only and is not an authorization lookup key;
@@ -1828,11 +1828,11 @@ Endpoint additions:
 | `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
 | `PUT /api/runtime/language` | JSON `{ "language": "en"|"zh", "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "language": ProcessingLanguageInfo, "already_applied": boolean }` |
 | `POST /api/runtime/reprocess-library` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ... }`; no query params | `200` | `{ "reprocess": ReprocessLibraryResult, "already_applied": boolean }`; returns `409 conflict` if any source-scoped ingest/fetch attempt or global-exclusive operation is already running |
-| `POST /api/items/{id}/reingest` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ..., "model": null|string, "prompt": null|string }`; no query params | `200` | `{ "already_applied": boolean, "reingest": ItemReingestResult }`; returns `409 conflict` if a guarded operation is already running |
+| `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest` | JSON `{ "actor_kind": ..., "actor_id": ..., "idempotency_key": ..., "model": null|string, "prompt": null|string }`; no query params | `200` | `{ "already_applied": boolean, "reingest": ItemReingestResult }`; returns `409 conflict` if a guarded operation is already running |
 
 Canonical item response language rule:
 
-- `GET /api/feed/today`, `GET /api/items/{id}`, and `GET /api/search` return the stored item text as-is;
+- `GET /api/feed/today`, `GET /api/items/~{unpadded RFC4648 base64url(item_id)}`, and `GET /api/search` return the stored item text as-is;
 - callers must not infer that every historical item matches the current processing language unless it was processed after the latest language change or explicit reprocess;
 - source identifier fields remain exact provenance values and are not localized.
 
@@ -1922,7 +1922,7 @@ Extra prompt validation rules:
 | `reingest` | `ItemReingestResult` | Yes | No | Result summary for the selected item. |
 | `already_applied` | boolean | Yes | No | Idempotency replay marker. |
 
-`POST /api/items/{token}/reingest` request body example:
+`POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest` request body example:
 
 ```json
 {
@@ -1998,7 +1998,7 @@ Endpoint additions:
 |---|---|---:|---|
 | `GET /api/runtime/openrouter-models` | none; no query params | `200` | `OpenRouterModelsResponse` |
 | `GET /api/runtime/openrouter/models` | compatibility route; none; no query params | `200` | identical semantics and response shape to `GET /api/runtime/openrouter-models` |
-| `POST /api/items/{token}/reingest` | Canonical HTTP item route token plus `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if any source-scoped ingest/fetch attempt or global-exclusive operation is already running |
+| `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest` | Canonical HTTP item route token plus `ItemReingestRequest`; no query params; see `ItemReingestRequest` above for compatibility `extra_prompt` alias | `200` | `ItemReingestResponse`; returns `409 conflict` if any source-scoped ingest/fetch attempt or global-exclusive operation is already running |
 
 ## 7. MCP Surface
 
@@ -2036,13 +2036,13 @@ Tools:
 |---|---|---|---|---|
 | `list_candidate_items` | `{ "limit": 20 }`, default `20`, max `50` | `{ "items": [ItemSummary] }` | No | feed candidate query |
 | `search_items` | `{ "query": "sqlite", "source": null, "from": null, "to": null, "resonated": null, "limit": 20 }` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` | No | `GET /api/search` |
-| `read_item` | `{ "item_id": "item_01" }` | `{ "item": ItemDetail }` | No | `GET /api/items/{id}` |
-| `mark_inspected` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "human_inspected_at": "...", "already_applied": false }` | Yes | `POST /api/items/{id}/inspect` |
-| `resonate_item` | `{ "item_id": "item_01", "resonated": true, "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "is_resonated": true, "already_applied": false }` | Yes | `POST /api/items/{id}/resonance` |
+| `read_item` | `{ "item_id": "item_01" }` | `{ "item": ItemDetail }` | No | `GET /api/items/~{unpadded RFC4648 base64url(item_id)}` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
+| `mark_inspected` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "human_inspected_at": "...", "already_applied": false }` | Yes | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/inspect` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
+| `resonate_item` | `{ "item_id": "item_01", "resonated": true, "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "is_resonated": true, "already_applied": false }` | Yes | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/resonance` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
 | `preview_steer` | `{ "command": "find sqlite", "actor_id": "agent-name" }`; no `idempotency_key` | `{ "preview": SteerPreview }` | No | `POST /api/steer/preview` |
 | `steer` | `{ "command": "Push more technical documents.", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "receipt": { "interpreted_as": "...", "changed_rules": [SteerRule], "message": "..." } }` | Yes | `POST /api/steer` |
 | `undo_steer` | `{ "target_kind": "steer_rule"|"source", "target_id": "...", "actor_id": "agent-name", "idempotency_key": "..." }` | `SteerUndoResult` | Yes | `POST /api/steer/undo` |
-| `report_delivery` | `{ "item_id": "item_01", "actor_id": "agent-name", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `{ "item_id": "item_01", "external_surfaced_at": "...", "already_applied": false }` | Yes | `POST /api/items/{id}/delivery` |
+| `report_delivery` | `{ "item_id": "item_01", "actor_id": "agent-name", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `{ "item_id": "item_01", "external_surfaced_at": "...", "already_applied": false }` | Yes | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/delivery` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
 
 MCP schema rules:
 
@@ -2057,7 +2057,7 @@ MCP schema rules:
 - `item_id` is a required non-empty string for item-specific tools;
 - `command` max length is `4000` bytes;
 - `limit` defaults and maximums are fixed by the tool table.
-- `report_delivery` reuses the `POST /api/items/{id}/delivery` JSON response contract and idempotency semantics; MCP supplies `actor_id`, `delivered_at`, and `idempotency_key`, while owner-token authorization remains the only authorization boundary.
+- `report_delivery` reuses the `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/delivery` JSON response contract and idempotency semantics; MCP supplies a direct raw opaque `item_id`, `actor_id`, `delivered_at`, and `idempotency_key`, while owner-token authorization remains the only authorization boundary.
 
 Tool required fields:
 
@@ -2177,7 +2177,7 @@ Additional tools:
 | Tool | Input schema | Output schema | Mutation? | Equivalent operation |
 |---|---|---|---|---|
 | `list_openrouter_models` | `{}` | `OpenRouterModelsResponse` | No | Provider-backed parity with `GET /api/runtime/openrouter-models`; missing runtime key returns `{ "models": [] }` |
-| `reingest_item` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "...", "model": null, "prompt": null, "extra_prompt": null }` | `ItemReingestResponse` | Yes | `POST /api/items/{id}/reingest` |
+| `reingest_item` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "...", "model": null, "prompt": null, "extra_prompt": null }` | `ItemReingestResponse` | Yes | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
 
 Rules:
 
@@ -2188,7 +2188,7 @@ Rules:
 - `reingest_item` uses the current persisted processing language and does not accept a per-call language override;
 - HTTP decodes its canonical route token first, then HTTP and MCP call the same raw opaque item-ID application operation with identical guard ownership, receipt target/fingerprint, persistence, result identity, and error mapping;
 - guarded-operation conflicts return a JSON-RPC error whose `data.error.code` is `conflict` and whose `data.error.details` matches the HTTP conflict detail shape, including `current_operation: CurrentOperationInfo` when available;
-- same-key idempotency replay/mismatch/active-run semantics match `POST /api/items/{id}/reingest`;
+- same-key idempotency replay/mismatch/active-run semantics match `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest`;
 - MCP responses and errors must not echo prompt text from either prompt field, raw provider payloads, OpenRouter API keys, secret source metadata, `.env` paths, or owner tokens.
 
 Tool required fields:
@@ -2241,7 +2241,7 @@ Inspector item re-ingest frontend responsibilities:
 
 - expose item re-ingest only inside the currently selected Inspector, not global chrome, Source Ledger, or a settings/dashboard surface;
 - load OpenRouter model choices through the typed API client from canonical `GET /api/runtime/openrouter-models` (with `GET /api/runtime/openrouter/models` as compatibility) and keep default-model re-ingest available when model listing is unavailable;
-- send optional model and canonical one-time `prompt` only in the `POST /api/items/{id}/reingest` request body, while accepting `extra_prompt` only as a compatibility alias;
+- send optional model and canonical one-time `prompt` only in the `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest` request body, while accepting `extra_prompt` only as a compatibility alias;
 - clear temporary model/prompt UI state on cancel, completion, item change, or Inspector close;
 - never persist model/prompt values to local storage, state export/import, item metadata, source settings, or runtime defaults;
 - refresh the current item detail from the item re-ingest response and update any visible feed/search row for that item without creating history;
@@ -2512,7 +2512,7 @@ curl -i -X POST http://127.0.0.1:8080/api/ingest \
 
 - canonical `GET /api/runtime/openrouter-models` and compatibility `GET /api/runtime/openrouter/models` require owner-token authorization, reject query parameters, return OpenRouter model-list response data, and never leak API keys, secret source metadata, `.env` paths, raw provider JSON, or provider account configuration;
 - model-list provider failure produces a safe unavailable state that still allows default-model re-ingest in the Inspector;
-- `POST /api/items/{id}/reingest` requires owner-token authorization, strict JSON body validation, `actor_kind`, `actor_id`, and `idempotency_key`;
+- `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest` requires owner-token authorization, strict JSON body validation, `actor_kind`, `actor_id`, and `idempotency_key`;
 - item re-ingest processes exactly one selected item and does not fetch/process other source items or library rows;
 - optional `model`, canonical `prompt`, and compatibility `extra_prompt` affect only the single request and are not persisted in SQLite, local storage, exported state, item metadata, source settings, runtime defaults, `/doctor`, logs, or user-visible history;
 - extra prompt is subordinate to the fixed JSON/provenance/target-language contract and cannot cause source identifiers to be translated or rewritten;
