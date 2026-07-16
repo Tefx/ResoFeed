@@ -187322,12 +187322,12 @@ phases:
       purpose\":\"Replace only the stale raw Prompting HTTP re-ingest item path with\
       \ the canonical tilde-prefixed unpadded UTF-8 base64url token while preserving\
       \ all sixteen RF-BUG-009 cases and assertions\",\"check_id\":\"rf_bug_002_token_contract_static\"\
-      ,\"actor_id\":\"spec-verifier\"},{\"ref\":\"authority:acceptance-mutation:rf-bug-002-ledger-delete-http-token-repair\"\
+      ,\"actor_id\":\"general\"},{\"ref\":\"authority:acceptance-mutation:rf-bug-002-ledger-delete-http-token-repair\"\
       ,\"path\":\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\",\"\
       purpose\":\"Replace only the stale raw saved-item GET path with the canonical\
       \ tilde-prefixed unpadded UTF-8 base64url token while preserving both RF-BUG-008\
       \ delete cases and assertions\",\"check_id\":\"rf_bug_002_token_contract_static\"\
-      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
+      ,\"actor_id\":\"general\"}]}}\n</vectl_step_policy>"
     verification: Canonical token grammar is present in both authorized protected
       tests; raw item paths are absent; the RF-BUG-009 16-subtest identity, both RF-BUG-008
       delete identities, and saved-item assertion remain intact; Go and Playwright
