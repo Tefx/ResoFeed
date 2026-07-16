@@ -187426,7 +187426,7 @@ phases:
     - web/package.json
     - go.mod
     depends_on:
-    - rf-bug-v2-ledger-prompting-verification
+    - rf-bug-v2-adapter-runtime-isolation-verification
     agent: integration-verifier
   - id: rf-bug-v2-item-http-token-contract-lock
     name: Repair protected item HTTP token acceptance contracts
