@@ -187046,6 +187046,7 @@ phases:
     depends_on:
     - rf-bug-v2-e2e-loopback-fixture-boundary
     - rf-bug-v2-source-ledger-conflict-phase-contract-lock
+    - rf-bug-v2-source-ledger-reporter-marker-remediation
     agent: frontend-engineer
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
