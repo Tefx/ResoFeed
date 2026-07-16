@@ -100,7 +100,9 @@ test.describe('RF-BUG-008 real-runtime Source Ledger operations', () => {
     await seedSources(request, runInfo.baseURL, runInfo.dbPath, ownerToken);
     await openLedger(page, runInfo.baseURL, ownerToken, 2);
 
-    const runIngest = page.getByRole('button', { name: '[RUN INGEST]' });
+    const namedRunIngest = page.getByRole('button', { name: '[RUN INGEST]' });
+    await expect(namedRunIngest).toBeVisible();
+    const runIngest = page.locator('.bracket-action--run-ingest');
     await runIngest.click();
     await expect(runIngest).toHaveText('[INGESTING...]');
     await expect(runIngest).toBeDisabled();
