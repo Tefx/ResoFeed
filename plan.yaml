@@ -185013,7 +185013,7 @@ phases:
   steps:
   - id: rf-bug-v2-harness-foundation
     name: Build v2 generic evidence adapter and isolated RF-BUG harness foundation
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nContract\
       \ repair for the preserved `rf-bug-v2-harness-foundation` worktree after receipt\
@@ -185115,6 +185115,35 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T07:40:48.859539+00:00'
+    done_at: '2026-07-16T07:57:16.565862+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 2528cefde2ebbb26758e8573bdd7e99df0f66bd7
+
+      - Preserved worker commit: a24665faba80fd2baca9fde52aba22ec16854314
+
+
+      Verification:
+
+      - `python "$ASSURANCE_GATE" --plan plan.yaml --step rf-bug-v2-harness-foundation
+      --worktree /Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-harness-foundation-v2
+      --base ffc7597f081b69104bffca7439230f157ff9dd7e --validate-worker-receipt ...`
+      -> CONFORMANT
+
+      - `node scripts/vectl-check.mjs run rf-bug-v2-harness-foundation rf_bug_v2_harness_foundation_green`
+      -> green; exact selected/executed IDs: adapter-envelope, artifact-contract,
+      harness-isolation, lane-discovery
+
+      - Worker receipt: sha256:95020bc9df565eb113566361f863d5cc3965b6dbe90dcaaf64d4469f3c7f83da
+
+      - Dispatch: sha256:dca4ddfaee6e2411df4aa7ee32cbb533a464d952915d3b1c78a0e8c1c6b726d7
+
+
+      Spec link:
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-harness-runtime-verification
     name: Independently verify v2 harness foundation reproducibility and artifacts
     status: pending
