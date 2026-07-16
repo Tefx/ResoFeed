@@ -185961,7 +185961,7 @@ phases:
       - Full Gate blocker ARCH-HTTP-ROUTE-DOC-PARITY'
   - id: rf-bug-v2-delivery-shared-operation-remediation
     name: Centralize delivery in one core application operation
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
       \ close `GATE-DELIVERY-SHARED-OPERATION` on the rebound gate lineage after Full\
@@ -186087,6 +186087,36 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T11:50:39.693742+00:00'
+    done_at: '2026-07-16T11:57:00.599544+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 0777d25d7db69a04941719b65d53b0339cb47622
+
+      - Worker commit: d85d9e01aa38229d98737fb318647824a8157e4e
+
+
+      Verification:
+
+      - Static ownership: one core ReportDelivery mutation; HTTP/MCP both call it
+      -> green
+
+      - Focused four-test Go selector -> green, all four PASS, canonical rejection
+      marker, 30-case marker
+
+      - Protected acceptance unchanged
+
+      - Production worker receipt validator -> CONFORMANT
+
+      - Worker receipt: sha256:0867784ebf1dc521e19212bbfdee2715d467d25865866274d99e7ecee5a3166e
+
+      - Dispatch: sha256:4fb4e40acd6b7842d92760b9d896dd597b868848106bf43f28d8f815beb473b5
+
+
+      Spec link:
+
+      - Gate blocker GATE-DELIVERY-SHARED-OPERATION
+
+      - docs/ARCHITECTURE.md'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
