@@ -185407,24 +185407,29 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Replacement for `rf-bug-frontend-behavior-full-gate`. Reconcile the two v2 replacement
-      branches and their independent real-seam verification with immutable completed
+      Replacement for `rf-bug-frontend-behavior-full-gate`. Reconcile the generic
+      adapter remediation, its independent CLI/envelope verification, the two v2 replacement
+      branches, and their independent real-seam verification with immutable completed
       evidence from `rf-bug-20260712-frontend-behavior.repair-route-search-and-opaque-item-ids`,
       `rf-bug-20260712-frontend-behavior.repair-inspector-selection-and-routing`,
       and `rf-bug-20260712-frontend-behavior.rf-bug-frontend-doc-design-remediation`.
-      Require preserved dirty-work/child hashes, protected-path immutability, exact
-      RF-BUG-001/002/006/007 behavior, and bounded future-red admission only for RF-BUG-003/004/005/009.
-      Skipped legacy nodes are never admission inputs.
+      Require exact coverage of every pending adapter suite/check profile, selected/executed
+      identity parity, fail-closed unknown/mismatched requests, completed harness
+      compatibility, preserved dirty-work/child hashes, protected-path immutability,
+      exact RF-BUG-001/002/006/007 behavior, and bounded future-red admission only
+      for RF-BUG-003/004/005/009. Skipped legacy nodes are never admission inputs.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-frontend","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-002-HTTP-MCP-TOKEN-PARITY","RF-BUG-006","RF-BUG-007","RF-BUG-FRONTEND-RUNTIME-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-go-token-parity-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-verification"],"admitted_future_expected_red":["rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-003","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-004","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-005","rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red#RF-BUG-009"],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-frontend","requirement_ids":["RF-BUG-V2-GENERIC-ADAPTER","RF-BUG-001","RF-BUG-002","RF-BUG-002-HTTP-MCP-TOKEN-PARITY","RF-BUG-006","RF-BUG-007","RF-BUG-FRONTEND-RUNTIME-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-remediation","rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-verification","rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-go-token-parity-integration","rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-runtime-verification"],"admitted_future_expected_red":["rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-003","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-004","rf-bug-20260712-contract-lock.runtime-assets-opml-security-expected-red#RF-BUG-005","rf-bug-20260712-contract-lock.rf-bug-prompting-v22-expected-red#RF-BUG-009"],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate proves all scoped frontend/token requirements, preserved
-      dirty provenance, immutable protected acceptance, exact admitted future-red
-      refs, canonical integrated step IDs, and no out-of-scope blocker.
+    verification: Full Gate proves generic adapter coverage and exact parser-supported
+      identities before both current consumers, then proves all scoped frontend/token
+      requirements, preserved dirty provenance, immutable protected acceptance, exact
+      admitted future-red refs, canonical integrated step IDs, and no out-of-scope
+      blocker.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
