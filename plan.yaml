@@ -185303,7 +185303,7 @@ phases:
     claimed_at: '2026-07-16T09:29:16.329358+00:00'
   - id: rf-bug-v2-go-token-parity-integration
     name: Integrate and re-observe preserved HTTP/MCP token parity remediation
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for active `rf-bug-go-token-parity-remediation`; this phase remains locked\
@@ -185373,6 +185373,36 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T09:29:27.625793+00:00'
+    done_at: '2026-07-16T09:44:25.914091+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 5b3675e3 (worker commit 022fa9fc2bdbde08493c6d144020399af09b2d5e)
+
+      - Preserved source diff SHA: cfc933f6c62b88391b118b37cf4e19434a26a36dc665fedfc60704656ed7525b
+
+
+      Verification:
+
+      - `node scripts/vectl-check.mjs run rf-bug-v2-go-token-parity rf_bug_v2_go_token_parity_green`
+      -> green
+
+      - Exact selected/executed: canonical HTTP MCP parity; opaque item ID API paths
+      30
+
+      - Production worker receipt validator -> CONFORMANT
+
+      - Worker receipt: sha256:4dd46b7673a4a9cf7539576ee96ad94d3400d329b311f18b6b01d120ca23b44f
+
+      - Dispatch: sha256:64d5055438a487028497272f46e84fe0eed5d3263755c746777ea496170e7abe
+
+      - Protected acceptance unchanged; generated binary cleaned
+
+
+      Spec link:
+
+      - docs/ARCHITECTURE.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-frontend-runtime-verification
     name: Independently verify frontend, HTTP, MCP, and SQLite seams
     status: pending
