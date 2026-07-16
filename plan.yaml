@@ -187016,7 +187016,7 @@ phases:
     claimed_at: '2026-07-16T15:48:29.723452+00:00'
   - id: rf-bug-v2-prompting-v22
     name: Implement and align Prompting v2.2 under v2 assurance
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for `implement-prompting-v22-semantics`. Implement one v2.2 compiler/validator\
@@ -187094,6 +187094,39 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T15:48:18.675533+00:00'
+    done_at: '2026-07-16T15:57:26.678559+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: b8ba8678c9aa2ca75b7a3cbf912641376e89c21d
+
+
+      Verification:
+
+      - `rf_bug_v2_prompting_green` -> green
+
+      - Exact 16-subtest contract, one semantic repair bound, ingest/reprocess/re-ingest/HTTP/MCP
+      parity
+
+      - Active production/docs scan: PROMPTING_V21_ACTIVE_MATCHES=0
+
+      - Atomic content/FTS preservation and secret/prompt non-durability verified
+
+      - Protected acceptance unchanged after canonical token contract lock
+
+      - Worker validator -> CONFORMANT
+
+      - Receipt: sha256:d2f428d0a66ff42e34b2bf16c91de7cd662660dcbad9717c419fb2688e5d83a4
+
+      - Dispatch: sha256:a97f4da801f263e9e60a919d2f3b8e6da0c92eb6d04f6a36039c6b6f826fa029
+
+
+      Spec link:
+
+      - docs/PROMPTING_SYSTEM.md
+
+      - docs/ARCHITECTURE.md
+
+      - RF-BUG-009'
   - id: rf-bug-v2-ledger-prompting-verification
     name: Independently verify Ledger, State, and Prompting real seams
     status: pending
