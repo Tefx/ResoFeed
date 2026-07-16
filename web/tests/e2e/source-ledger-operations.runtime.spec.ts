@@ -196,7 +196,7 @@ test.describe('RF-BUG-008 real-runtime Source Ledger operations', () => {
       await expect.poll(runningOperation, { timeout: 10_000 }).toEqual({
         kind: 'source_fetch',
         actor_kind: 'human',
-        phase: 'fetching_source'
+        phase: 'fetching_feed'
       });
       await row(page, conflictSource.id).locator('.bracket-action--fetch').click();
 
