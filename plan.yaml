@@ -186468,7 +186468,7 @@ phases:
       - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-runtime-boundaries-verification
     name: Independently verify embedded, state, HTTP, and browser runtime seams
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -186496,6 +186496,37 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T13:17:35.663590+00:00'
+    done_at: '2026-07-16T13:29:01.415797+00:00'
+    evidence: 'Artifact:
+
+      - Integrated target: 699343e7f60c0545c6f5bf601e3f9673d824109c
+
+
+      Verification:
+
+      - RF-BUG-003/004/005 -> 3/3 PROVEN across real binary, SQLite, HTTP, process,
+      and Chromium seams
+
+      - Arbitrary-cwd embedded launch and pre-bind validation; Doctor redaction
+
+      - OPML 401/404 and atomic State failure preservation
+
+      - Exact CSP/security headers, streaming/cancellation, retry-free Chromium operations
+
+      - Worktree clean; protected acceptance and user state untouched
+
+      - Semantic receipt validator -> CONFORMANT
+
+      - Receipt: sha256:abb4ee02bbcd68b862539aa7cab4922b4e17274187708b8dd36ec4dbda46c3cb
+
+
+      Spec link:
+
+      - docs/ARCHITECTURE.md
+
+      - docs/CONTAINER.md
+
+      - docs/BUG_FIX_PLAN_2026-07-12.md'
   - id: rf-bug-v2-runtime-security-review
     name: Review v2 runtime security authorization and rollback
     status: pending
