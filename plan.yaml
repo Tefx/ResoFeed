@@ -185365,6 +185365,8 @@ phases:
     - internal/resofeed/mcp.go
     - internal/resofeed/reprocess.go
     - internal/resofeed/rf_bug_item_id_api_expected_red_test.go
+    depends_on:
+    - rf-bug-v2-generic-adapter-verification
     agent: golang-developer
   - id: rf-bug-v2-frontend-runtime-verification
     name: Independently verify frontend, HTTP, MCP, and SQLite seams
