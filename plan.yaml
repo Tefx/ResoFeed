@@ -188131,6 +188131,7 @@ phases:
       static contract output, and five-test native Playwright collection output.
     depends_on:
     - rf-bug-v2-source-ledger-conflict-request-start-contract-lock
+    agent: frontend-engineer
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
