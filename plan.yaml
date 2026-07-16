@@ -185588,7 +185588,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-generic-adapter-compatibility-remediation
     name: Restore completed harness artifact-object compatibility
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ compatibility repair after completed `rf-bug-v2-generic-adapter-remediation`\
@@ -185668,6 +185668,29 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T09:06:30.804665+00:00'
+    done_at: '2026-07-16T09:11:59.325068+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: 604f88830753bcfc647e2498fedb693e6145394b
+
+
+      Verification:
+
+      - Generic adapter profile -> green with exact five selected/executed identities
+
+      - Immutable Go fixture contract and artifact-object compatibility marker ->
+      passed
+
+      - Production worker receipt validator -> CONFORMANT
+
+      - Worker receipt: sha256:5e284ce8b05798d5edf9dfa875c8bdbd121e620fd8a1ff9012b1e38f343ecf71
+
+      - Dispatch: sha256:296522d3367cab6d890fef3c8461a760be0948fffc8be3f73c4fb415d5b25dd4
+
+
+      Spec link:
+
+      - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md'
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
