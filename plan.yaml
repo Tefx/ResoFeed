@@ -188278,6 +188278,78 @@ phases:
     done_at: '2026-07-16T19:23:53.397487+00:00'
     evidence: Integrated 4dea2d782d1a6f6e80531d8c81565428ad193a21. Exact JSON headers/body
       static contract and five-test collection passed. Receipt sha256:56939a8d07d922d8c268791931054fd7b4534f18ba850a2ddcb530fd228956d0.
+  - id: rf-bug-v2-current-operation-snapshot-race
+    name: Repair current-operation snapshot ownership race
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ product remediation for valid rejected receipt `sha256:0379623ccfe89bd47a1549d3b2e7df8d9ddd75476819b6ad5dc14a1bb4476283`.\
+      \ Execute from a fresh clean worktree and preserve `/Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-source-ledger-responsive-v10`\
+      \ plus every dirty v10/all recovery worktree unchanged; do not delete, reset,\
+      \ rebase, clean, or mutate them.\n\nRepair the current-operation snapshot ownership\
+      \ race in `IngestOnce`: a background attempt must not start, overwrite, or clear\
+      \ a `background_ingest` snapshot before `ingestOnceBackgroundBounded` successfully\
+      \ acquires the coordinator guard. Only the operation that successfully acquires\
+      \ the guard owns snapshot start/update/clear lifecycle. When a background attempt\
+      \ conflicts with an active `source_fetch`, the existing human `source_fetch`\
+      \ / `fetching_source` snapshot remains unchanged until its guard releases. Preserve\
+      \ normal acquired background-ingest visibility and clearing, existing guard/conflict\
+      \ behavior, process-local best-effort status, and the prohibition on a persisted\
+      \ operation ledger.\n\nAdd focused deterministic Go coverage in the existing\
+      \ current-operation semantics test file. The test must hold an acquired human\
+      \ `source_fetch` guard with a `fetching_source` snapshot, invoke a conflicting\
+      \ background `IngestOnce` attempt, prove the source-fetch kind, actor, phase,\
+      \ and message remain visible until release, then prove a normally acquired background\
+      \ attempt reports `background_ingest` / `background` while owned and clears\
+      \ after release. Keep acceptance tests immutable. Update canonical architecture/design\
+      \ wording only if its current lifecycle statement would otherwise become false;\
+      \ do not add history, jobs, queues, receipts, or persisted operation state.\
+      \ Rollback reverts the Go lifecycle fix, focused developer test, and any strictly\
+      \ necessary canonical wording together.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [internal/resofeed/ingest.go, internal/resofeed/ica_current_operation_semantics_test.go,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md]\n  blocked_paths: [web/tests/e2e/**,\
+      \ internal/resofeed/*expected_red_test.go, internal/resofeed/webui/**, web/src/**,\
+      \ plan.yaml]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims:\
+      \ [RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION]\nchecks:\n  - id:\
+      \ rf_bug_v2_current_operation_snapshot_race_green\n    run:\n      command:\
+      \ [go, test, -race, ./internal/resofeed, -run, '^TestICACurrentOperationBackgroundSnapshotOwnership$',\
+      \ -count=1, -v]\n      timeout_seconds: 300\n    evidence:\n      mode: command_outcome\n\
+      \      path_bindings:\n        - {path: go.mod, access: read, availability:\
+      \ current}\n        - {path: go.sum, access: read, availability: current}\n\
+      \        - {path: internal/resofeed/ingest.go, access: read, availability: current}\n\
+      \      test_bindings:\n        - {path: internal/resofeed/ica_current_operation_semantics_test.go,\
+      \ classification: developer, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: TestICACurrentOperationBackgroundSnapshotOwnership}, {literal:\
+      \ PASS}]\n        contains_any: [{literal: ok}]\n        forbids: [{literal:\
+      \ FAIL}, {literal: DATA RACE}, {literal: no tests to run}]\n    proves: [RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-snapshot-race\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"public_runtime_operation_visibility\"\
+      ,\"concurrent_guard_snapshot_lifecycle\"],\"primary_outcome\":\"RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION\",\"atom\":\"a rejected\
+      \ background ingest attempt cannot overwrite or clear an active human source_fetch\
+      \ fetching_source snapshot, while an acquired background operation remains visible\
+      \ and clears on release\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\"\
+      :\"rf_bug_v2_current_operation_snapshot_race_green\",\"independent_step\":\"\
+      rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/ica_current_operation_semantics_test.go\"\
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The exact focused `go test -race` command passes one deterministic
+      lifecycle test proving that a conflicting background `IngestOnce` attempt leaves
+      the active human source-fetch snapshot unchanged through release, and that a
+      normally acquired background operation remains visible while owned and clears
+      after release, with no acceptance mutation or persisted ledger.
+    evidence_template: Integrated commit plus exact focused `go test -race` command/exit
+      and test-name evidence; list changed files and confirm dirty v10/all worktrees
+      and acceptance tests remained untouched.
+    depends_on:
+    - rf-bug-v2-source-ledger-conflict-json-body-contract-lock
+    agent: golang-developer
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
