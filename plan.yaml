@@ -185303,7 +185303,7 @@ phases:
     claimed_at: '2026-07-16T09:29:16.329358+00:00'
   - id: rf-bug-v2-go-token-parity-integration
     name: Integrate and re-observe preserved HTTP/MCP token parity remediation
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nReplacement\
       \ for active `rf-bug-go-token-parity-remediation`; this phase remains locked\
@@ -185371,6 +185371,8 @@ phases:
     depends_on:
     - rf-bug-v2-generic-adapter-verification
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-16T09:29:27.625793+00:00'
   - id: rf-bug-v2-frontend-runtime-verification
     name: Independently verify frontend, HTTP, MCP, and SQLite seams
     status: pending
