@@ -105,6 +105,8 @@ The pending profile matrix is:
 | `item-deep-links-frontend` | `item_deep_links_frontend_green` | 2 | green |
 
 `node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all eleven selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifact objects, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms that changes remain limited to the adapter, its developer test, and this contract. The profile emits `VECTL_ADAPTER_COMPLETED_HARNESS=preserved` and `VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid` only after both developer checks pass. It does not execute unfinished consumer product semantics.
+
+The `rf-bug-v2-source-ledger` profile binds the required `Source Ledger groups and controls render` output marker to its Vitest `test:render` command. That command includes exactly one `--reporter=verbose` argument so Vitest emits the full test title for deterministic marker validation. Neither Source Ledger Playwright command carries the verbose Vitest reporter argument; their existing `--reporter=line` contracts remain unchanged.
 ## Deterministic CI-Safe Matrix
 These cases run with zero retries and without live LLM credentials; the child environment explicitly clears `OPENROUTER_KEY`.
 

@@ -158,7 +158,7 @@ export const PENDING_PROFILE_PAIRS = [
       'delete success preserves saved items and moves focus'
     ],
     commands: [
-      ['npm', '--prefix', 'web', 'run', 'test:render', '--', 'src/routes/components/__tests__/source-ledger-responsive.test.ts'],
+      ['npm', '--prefix', 'web', 'run', 'test:render', '--', '--reporter=verbose', 'src/routes/components/__tests__/source-ledger-responsive.test.ts'],
       ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts', 'web/tests/e2e/source-ledger-delete.browser-contract.spec.ts'],
       ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.runtime.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/source-ledger-operations.runtime.spec.ts']
     ]

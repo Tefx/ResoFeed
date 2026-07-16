@@ -141,6 +141,30 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
   }
 });
 
+test('VECTL-ADAPTER Source Ledger reporter-marker correlation', () => {
+  const profile = findProfile('rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green');
+  assert.ok(profile);
+
+  const requiredTitle = 'Source Ledger groups and controls render';
+  assert.ok(profile.requiredOutput.includes(requiredTitle));
+
+  const [vitestCommand, ...playwrightCommands] = profile.commands;
+  const markerCommand = profile.commands.find((command) => command.includes('--reporter=verbose'));
+  assert.equal(markerCommand, vitestCommand);
+  assert.deepEqual(markerCommand, [
+    'npm', '--prefix', 'web', 'run', 'test:render', '--', '--reporter=verbose',
+    'src/routes/components/__tests__/source-ledger-responsive.test.ts'
+  ]);
+  assert.equal(vitestCommand.filter((argument) => argument === '--reporter=verbose').length, 1);
+  assert.match(vitestCommand.at(-1), /source-ledger-responsive\.test\.ts$/u);
+
+  assert.equal(playwrightCommands.length, 2);
+  for (const command of playwrightCommands) {
+    assert.equal(command.includes('--reporter=verbose'), false);
+    assert.ok(command.includes('playwright'));
+  }
+});
+
 test('RF-BUG runtime documentation contract profile', () => {
   const profile = findProfile('rf-bug-v2-runtime-doc-contract', 'rf_bug_v2_runtime_doc_contract_green');
   assert.ok(profile);
