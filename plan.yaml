@@ -187289,8 +187289,9 @@ phases:
       contract remediation, all four authorized RF-BUG-008 conflict synchronization/actor/request-contract
       remediations, the authorized RF-BUG-008 conflict-phase contract remediation,
       E2E-only loopback fixture-boundary remediation, current-operation snapshot-race
-      remediation, current-operation foreground-priority remediation, v2 Source Ledger/State
-      branch, Prompting branch, and independent real-seam evidence, then admit RF-BUG-010-LANE-MIGRATION
+      remediation, current-operation foreground-priority remediation, Source Ledger
+      adapter reporter-marker remediation, v2 Source Ledger/State branch, Prompting
+      branch, and independent real-seam evidence, then admit RF-BUG-010-LANE-MIGRATION
       only from the downstream immutable replacement-five runtime verification. Require
       canonical `~` plus unpadded UTF-8 base64url item HTTP paths and raw-path rejection.
       Require the operations acceptance baseline to assert initial `[RUN INGEST]`
@@ -187325,7 +187326,10 @@ phases:
       Require the untagged production build to retain strict loopback/private outbound
       rejection regardless of `RESOFEED_E2E`, while the real-browser fixture allowance
       requires both the `resofeed_e2e` build tag and exact runtime opt-in `RESOFEED_E2E=1`,
-      with no CLI or general environment bypass. Require preserved Prompting/delete/operations
+      with no CLI or general environment bypass. Require the Source Ledger Vitest
+      command to use exact `--reporter=verbose` so its registered required title marker
+      is emitted and correlated to that command, with the focused adapter contract
+      green and no product or protected acceptance mutation. Require preserved Prompting/delete/operations
       identities, assertions, timeout/retry boundaries, and all three protected acceptance
       files byte-identical to their admitted post-remediation baselines. Require exact
       old-three/replacement-five selected/executed inventories, 29/29 replacement
@@ -187338,22 +187342,23 @@ phases:
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-002-TOKEN-CONTRACT-REMEDIATION","RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-PHASE-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-PRIORITY-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION","RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY","RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION","RF-BUG-009","RF-BUG-010-LANE-MIGRATION"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-priority","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-snapshot-race","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-e2e-loopback-fixture-boundary","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-item-http-token-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-request-start-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-json-body-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-phase-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-ingest-locator-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-002-TOKEN-CONTRACT-REMEDIATION","RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-PHASE-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-PRIORITY-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION","RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY","RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION","RF-BUG-009","RF-BUG-010-LANE-MIGRATION","RF-BUG-V2-SOURCE-LEDGER-REPORTER-MARKER"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-priority","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-snapshot-race","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-e2e-loopback-fixture-boundary","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-item-http-token-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-request-start-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-json-body-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-phase-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-ingest-locator-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-reporter-marker-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers every authorized protected acceptance remediation;
-      both Go current-operation ownership repairs and independent race/runtime evidence;
-      foreground priority over concurrent background per-source acquisition and aggregate
-      updates through release, followed by valid remaining-background visibility/update/clear;
-      the eager independent Node/global fetch actor with exact bearer Authorization,
-      exact application/json Content-Type, exact body '{}', exact `source_fetch` /
-      `human` / `fetching_feed`, request-start/poll/click ordering, Response.status
-      200, all five identities, and zero retries; all repaired protected call-site/locator/synchronization
-      contracts; all Ledger/State/Prompting requirements; and downstream immutable
-      replacement-five execution plus old-three equivalence using canonical public
-      IDs, with protected acceptance unchanged from each admitted post-remediation
-      baseline, unchanged guard capacity/conflicts, cleanup/redaction, no persisted
-      operation ledger, and no future-red admission.
+    verification: Full Gate covers the exact Source Ledger Vitest `--reporter=verbose`
+      and required-title correlation remediation; every authorized protected acceptance
+      remediation; both Go current-operation ownership repairs and independent race/runtime
+      evidence; foreground priority over concurrent background per-source acquisition
+      and aggregate updates through release, followed by valid remaining-background
+      visibility/update/clear; the eager independent Node/global fetch actor with
+      exact bearer Authorization, exact application/json Content-Type, exact body
+      '{}', exact `source_fetch` / `human` / `fetching_feed`, request-start/poll/click
+      ordering, Response.status 200, all five identities, and zero retries; all repaired
+      protected call-site/locator/synchronization contracts; all Ledger/State/Prompting
+      requirements; and downstream immutable replacement-five execution plus old-three
+      equivalence using canonical public IDs, with product and protected acceptance
+      unchanged from each admitted post-remediation baseline, unchanged guard capacity/conflicts,
+      cleanup/redaction, no persisted operation ledger, and no future-red admission.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
