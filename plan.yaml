@@ -187164,15 +187164,19 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently exercise RF-BUG-002-TOKEN-CONTRACT-REMEDIATION, RF-BUG-004-STATE-UI,
-      RF-BUG-008, RF-BUG-004-008, and RF-BUG-009 against the integrated real binary/browser/SQLite
-      runtime. Confirm the authorized contract-lock baseline contains only canonical
-      `~` plus unpadded UTF-8 base64url item HTTP paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go`
-      and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`; raw item
-      paths remain rejected; the sixteen Prompting subtests, two Source Ledger delete
-      cases, assertions, and intentionally unresolved expected-red product behavior
-      remain unchanged. Verify that later implementation work does not mutate either
-      protected acceptance file.
+      Independently exercise RF-BUG-002-TOKEN-CONTRACT-REMEDIATION, RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION,
+      RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008, and RF-BUG-009 against the
+      integrated real binary/browser/SQLite runtime. Confirm the authorized contract-lock
+      baseline contains only canonical `~` plus unpadded UTF-8 base64url item HTTP
+      paths in `internal/resofeed/rf_bug_prompting_v22_expected_red_test.go` and `web/tests/e2e/source-ledger-delete.browser-contract.spec.ts`;
+      raw item paths remain rejected; the sixteen Prompting subtests, two Source Ledger
+      delete cases, assertions, and intentionally unresolved expected-red product
+      behavior remain unchanged. Confirm the authorized `web/tests/e2e/source-ledger-operations.runtime.spec.ts`
+      baseline asserts initial `[RUN INGEST]` accessibility and then follows the same
+      `.bracket-action--run-ingest` physical control across `[INGESTING...]`, disabled,
+      and restored `[RUN INGEST]` states while preserving all five identities, assertions,
+      timeout/retry boundaries, and the real runtime fixture. Verify that later implementation
+      work mutates none of these three protected acceptance files.
 
 
       Verify that the binary serves the production Svelte assets staged under package-local
@@ -187186,12 +187190,13 @@ phases:
       redaction. The active-name assertion must treat protected and legacy test-only
       v2.1 sources as non-production while still scanning all declared production/docs
       surfaces. Mock substitution, retry, skip, any protected acceptance mutation
-      after the authorized token remediation, stale embedded assets, or external asset
-      substitution blocks the gate.'
+      after the authorized contract remediations, stale embedded assets, or external
+      asset substitution blocks the gate.'
     verification: Real binary, package-local embedded bundle, browser, SQLite, and
-      runtime proof covers canonical item-token use and raw-path rejection at both
-      repaired protected acceptance call sites; preserved Prompting/delete identities
-      and assertions; five viewport Ledger/State rendering and operations; accessibility/delete
+      runtime proof covers both authorized contract baselines; canonical item-token
+      use and raw-path rejection; preserved Prompting/delete/operations identities
+      and assertions; the same physical RUN INGEST control across its dynamic accessible-name
+      states; five viewport Ledger/State rendering and operations; accessibility/delete
       focus; Prompting v2.2 across all paths; atomic preservation; production-only
       active-name scanning; and redaction without main-checkout or external-asset
       substitution.
@@ -187202,6 +187207,7 @@ phases:
     - internal/resofeed/item_route_token.go
     - internal/resofeed/rf_bug_prompting_v22_expected_red_test.go
     - web/tests/e2e/source-ledger-delete.browser-contract.spec.ts
+    - web/tests/e2e/source-ledger-operations.runtime.spec.ts
     - web/package.json
     - go.mod
     depends_on:
