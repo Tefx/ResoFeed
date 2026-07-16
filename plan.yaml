@@ -187095,16 +187095,23 @@ phases:
 
       Independently exercise RF-BUG-004-STATE-UI, RF-BUG-008, RF-BUG-004-008, and
       RF-BUG-009 against the integrated real binary/browser/SQLite runtime. Verify
+      that the binary serves the production Svelte assets staged under package-local
+      `internal/resofeed/webui` from the integrated Source Ledger branch, without
+      runtime reads from `web/build`, main-checkout assets, or another worktree. Verify
       separate Ledger and State groups at five viewports, exact responsive and screenshot
       identities, keyboard/focus/44px/no-overflow behavior, ingest/fetch/delete/source-info
       operations, State import confirmation/cancellation/atomic replacement, and one
       Prompting v2.2 path across ingest/reprocess/re-ingest/HTTP/MCP with one repair
       bound, atomic content/FTS preservation, active v2.1 absence, and secret/prompt
-      redaction. Mock substitution, retry, skip, or protected acceptance mutation
-      blocks the gate.'
-    verification: Real browser and runtime proof covers five viewport Ledger/State
-      rendering and operations, accessibility/delete focus, Prompting v2.2 across
-      all paths, atomic preservation, naming, and redaction.
+      redaction. The active-name assertion must treat protected and legacy test-only
+      v2.1 sources as non-production while still scanning all declared production/docs
+      surfaces. Mock substitution, retry, skip, protected acceptance mutation, stale
+      embedded assets, or external asset substitution blocks the gate.'
+    verification: Real binary, package-local embedded bundle, browser, SQLite, and
+      runtime proof covers five viewport Ledger/State rendering and operations, accessibility/delete
+      focus, Prompting v2.2 across all paths, atomic preservation, production-only
+      active-name scanning, and redaction without main-checkout or external-asset
+      substitution.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/DESIGN.md
