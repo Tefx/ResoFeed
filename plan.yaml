@@ -185976,18 +185976,24 @@ phases:
       \ actor provenance, HTTP and MCP idempotency receipts, retry/mismatched-payload\
       \ behavior, and response envelopes. Extend developer tests in `internal/resofeed/core_blockers_test.go`\
       \ to prove shared HTTP/MCP behavior, retries, provenance, persistence, and not-found/error\
-      \ semantics. Do not mutate protected acceptance, adapters, canonical docs, frontend,\
-      \ testdata, the main-worktree user edits in `docs/ARCHITECTURE.md` or `docs/DESIGN.md`,\
-      \ untracked `.pi/remote-pi/`, or `docs/ITEM_DEEP_LINKS.md`. Existing architecture\
-      \ docs already state the admitted shared-operation contract and remain read-only\
-      \ authority. Rollback reverts only these four Go-file changes.\n\n<intent_closure_contract>\n\
+      \ semantics. Repair only the stale route fixture in pre-existing developer test\
+      \ `TestHTTPDeliveryRouteValidationIdempotencyAndCoreState` in `internal/resofeed/http_impl_test.go`:\
+      \ use the accepted canonical `~` plus unpadded RawURLEncoding HTTP item token\
+      \ so the test continues to exercise delivery-body validation, idempotency, provenance,\
+      \ and persisted state; do not weaken the authoritative ordinary-404 behavior\
+      \ for noncanonical raw HTTP item routes. Do not mutate protected acceptance,\
+      \ adapters, canonical docs, frontend, testdata, the main-worktree user edits\
+      \ in `docs/ARCHITECTURE.md` or `docs/DESIGN.md`, untracked `.pi/remote-pi/`,\
+      \ or `docs/ITEM_DEEP_LINKS.md`. Existing architecture docs already state the\
+      \ admitted shared-operation and canonical route-token contracts and remain read-only\
+      \ authority. Rollback reverts only these five Go-file changes.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
       profile: generic\nscope:\n  allowed_paths: [internal/resofeed/ranking.go, internal/resofeed/mcp.go,\
-      \ internal/resofeed/http.go, internal/resofeed/core_blockers_test.go]\n  blocked_paths:\
-      \ [internal/resofeed/rf_bug_item_id_api_expected_red_test.go, internal/resofeed/testdata/**,\
-      \ scripts/**, docs/**, web/**, .pi/remote-pi/**]\n  ignored_runtime_paths: [.git/,\
-      \ .vectl/, .agent/, .venv/]\nclaims: [GATE-DELIVERY-SHARED-OPERATION, RF-BUG-002,\
-      \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\nchecks:\n  - id: delivery_shared_operation_ownership\n\
+      \ internal/resofeed/http.go, internal/resofeed/core_blockers_test.go, internal/resofeed/http_impl_test.go]\n\
+      \  blocked_paths: [internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
+      \ internal/resofeed/testdata/**, scripts/**, docs/**, web/**, .pi/remote-pi/**]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [GATE-DELIVERY-SHARED-OPERATION,\
+      \ RF-BUG-002, RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\nchecks:\n  - id: delivery_shared_operation_ownership\n\
       \    run:\n      command:\n        - python3\n        - -c\n        - >-\n \
       \         from pathlib import Path; ranking=Path('internal/resofeed/ranking.go').read_text(encoding='utf-8');\
       \ mcp=Path('internal/resofeed/mcp.go').read_text(encoding='utf-8'); http=Path('internal/resofeed/http.go').read_text(encoding='utf-8');\
@@ -186018,10 +186024,12 @@ phases:
       \ availability: produced_by_step}\n        - {path: internal/resofeed/http.go,\
       \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
       \    - {path: internal/resofeed/core_blockers_test.go, classification: developer,\
-      \ availability: produced_by_step}\n        - {path: internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
-      \ classification: acceptance, availability: current}\n    expect:\n      outcome:\
-      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
-      \ [{literal: '--- PASS: TestDeliverySharedApplicationOperationPreservesHTTPMCPParity'},\
+      \ availability: produced_by_step}\n        - {path: internal/resofeed/http_impl_test.go,\
+      \ classification: developer, availability: produced_by_step}\n        - {path:\
+      \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go, classification:\
+      \ acceptance, availability: current}\n    expect:\n      outcome: green\n  \
+      \    exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ '--- PASS: TestDeliverySharedApplicationOperationPreservesHTTPMCPParity'},\
       \ {literal: RF_BUG_002_API_SUBTESTS=30}, {literal: PASS}]\n        contains_any:\
       \ []\n        forbids: [{literal: '--- FAIL:'}, {literal: 'no tests to run'},\
       \ {literal: panic}]\n    proves: [GATE-DELIVERY-SHARED-OPERATION, RF-BUG-002,\
@@ -186045,16 +186053,21 @@ phases:
       \ operation\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"delivery_shared_operation_go_tests\"\
       ,\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/core_blockers_test.go\"\
-      ],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
+      ,\"internal/resofeed/http_impl_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
       ],\"acceptance_check_ids\":[\"delivery_shared_operation_go_tests\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
-    verification: Only the four allowed Go files change; source ownership check proves
-      one core delivery SQLite mutation and both transports call it; full Go package
-      tests prove HTTP/MCP persistence, idempotency, provenance, not-found/error parity,
-      and protected RF-BUG-002 acceptance remains green and unchanged; dirty user
-      docs/untracked files remain untouched.
+    verification: Only the five allowed Go files change; `http_impl_test.go` changes
+      only the stale raw-route fixture to the accepted canonical item token while
+      ordinary 404 behavior for noncanonical raw HTTP routes remains protected; source
+      ownership check proves one core delivery SQLite mutation and both transports
+      call it; full Go package tests prove HTTP/MCP persistence, idempotency, provenance,
+      not-found/error parity, and protected RF-BUG-002 acceptance remains green and
+      unchanged; dirty user docs/untracked files remain untouched.
     evidence_template: Record integrated commit, exact changed paths, both check outputs,
       protected acceptance hash/immutability, and preserved dirty user-path status.
+    refs:
+    - docs/ARCHITECTURE.md
+    - internal/resofeed/http_impl_test.go
     depends_on:
     - rf-bug-v2-architecture-route-doc-parity-remediation
     agent: golang-developer
