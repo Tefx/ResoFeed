@@ -178,7 +178,8 @@ test.describe('RF-BUG-008 real-runtime Source Ledger operations', () => {
     try {
       const externalFetch = fetch(`${runInfo.baseURL}/api/sources/${conflictSource.id}/fetch`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${ownerToken}` }
+        headers: { Authorization: `Bearer ${ownerToken}`, 'Content-Type': 'application/json' },
+        body: '{}'
       });
       await conflictRequestStarted;
       const runningOperation = async () => {
