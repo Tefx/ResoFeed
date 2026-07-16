@@ -188662,17 +188662,17 @@ phases:
       \ docs/DESIGN.md, docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md]\n\
       \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-V2-SOURCE-LEDGER-REPORTER-MARKER]\n\
       checks:\n  - id: rf_bug_v2_source_ledger_reporter_marker_green\n    run:\n \
-      \     command: [node, --test, scripts/vectl-check.test.mjs]\n      timeout_seconds:\
-      \ 300\n    evidence:\n      mode: command_outcome\n      path_bindings:\n  \
-      \      - {path: scripts/vectl-check.mjs, access: read, availability: produced_by_step}\n\
-      \        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, access: read, availability:\
-      \ produced_by_step}\n      test_bindings:\n        - {path: scripts/vectl-check.test.mjs,\
-      \ classification: developer, availability: produced_by_step}\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: VECTL-ADAPTER Source Ledger reporter-marker correlation},\
-      \ {literal: '# fail 0'}]\n        contains_any: []\n        forbids: [{literal:\
-      \ reporter-marker correlation failed}, {literal: Cannot use test outside of\
-      \ the test runner}]\n    proves: [RF-BUG-V2-SOURCE-LEDGER-REPORTER-MARKER]\n\
+      \     command: [node, --test, --test-reporter=tap, scripts/vectl-check.test.mjs]\n\
+      \      timeout_seconds: 300\n    evidence:\n      mode: command_outcome\n  \
+      \    path_bindings:\n        - {path: scripts/vectl-check.mjs, access: read,\
+      \ availability: produced_by_step}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
+      \    - {path: scripts/vectl-check.test.mjs, classification: developer, availability:\
+      \ produced_by_step}\n    expect:\n      outcome: green\n      exit_codes: [0]\n\
+      \      stdout_or_stderr:\n        contains_all: [{literal: VECTL-ADAPTER Source\
+      \ Ledger reporter-marker correlation}, {literal: '# fail 0'}]\n        contains_any:\
+      \ []\n        forbids: [{literal: reporter-marker correlation failed}, {literal:\
+      \ Cannot use test outside of the test runner}]\n    proves: [RF-BUG-V2-SOURCE-LEDGER-REPORTER-MARKER]\n\
       bindings:\n  expected_red: {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n\
       <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
       :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-reporter-marker-remediation\"\
