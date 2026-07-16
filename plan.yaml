@@ -187400,7 +187400,7 @@ phases:
     agent: gate-reviewer
   - id: rf-bug-v2-replacement-lanes-verification
     name: Independently close immutable replacement-five runtime lanes
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -187440,6 +187440,14 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-16T23:48:50.312448+00:00'
+    done_at: '2026-07-16T23:55:11.329397+00:00'
+    evidence: 'Fresh integration-verifier PASS admitted by production semantic Gate.
+      Receipt sha256:1ff5d770fc291e4c46b9c042a22616bde41c6c6fea6f78ed1b6c270b62c1a4b3
+      against immutable target c2d6ffb74c0ca68d17079aa7dc28a1a9da5f6f9a. Exact project-native
+      profiles proved replacement-five 29/29 across five isolated real-binary runtimes,
+      old-three identity parity, token-parity 30 API subtests plus canonical rejection,
+      Search/Ledger/State/five responsive behaviors, zero retry/skip, clean residue/redaction,
+      and protected baselines unchanged. Report: /tmp/larva-agent-artifacts/rf-bug-v2-replacement-lanes-verification-1784245785490/integration-verifier_report.md#sha256=f89cae53baadb50250b660749dad0f24160c9ad5475da73a6f8cf5a02cc6119e#bytes=52032'
   - id: rf-bug-v2-item-http-token-contract-lock
     name: Repair protected item HTTP token acceptance contracts
     status: done
