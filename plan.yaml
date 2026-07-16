@@ -185576,6 +185576,86 @@ phases:
     depends_on:
     - rf-bug-v2-generic-adapter-remediation
     agent: integration-verifier
+  - id: rf-bug-v2-generic-adapter-compatibility-remediation
+    name: Restore completed harness artifact-object compatibility
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ compatibility repair after completed `rf-bug-v2-generic-adapter-remediation`\
+      \ integrated commit `c667be13225c80d14d984518d25e5f7901a2efea` and worker receipt\
+      \ `sha256:273ea34532736a0643a9fb2fc5f04b1b93633c6cf29262ad92f68528db19fb21`.\
+      \ Preserve completed history and restore the completed harness source contract\
+      \ required by `TestPlaywrightFixtureContract`: the foundation evidence return\
+      \ must retain the literal object-field fragment `artifacts: artifactRows`. Keep\
+      \ the table-driven eleven-profile suite/check matrix, parser-supported artifact\
+      \ objects with relative paths and SHA-256 digests, selected/executed identity\
+      \ parity, green/red evidence parsing, and fail-closed unknown or mismatched\
+      \ dispatch. Strengthen the focused Node developer coverage and generic-adapter\
+      \ profile so the literal compatibility contract and artifact-object schema are\
+      \ checked before reporting `VECTL_ADAPTER_COMPLETED_HARNESS=preserved`; synchronize\
+      \ the harness contract documentation. Do not modify the completed Go developer\
+      \ contract, protected acceptance, product code, consumer profiles, secrets,\
+      \ provider/state architecture, or the verifier worktree. Rollback reverts only\
+      \ the adapter, focused Node regression coverage, and harness documentation compatibility\
+      \ patch together.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n\
+      \  blocked_paths: [internal/resofeed/**, web/src/**, web/tests/**, web/package.json,\
+      \ web/package-lock.json, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/BUG_REPORT_2026-07-11.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
+      \ .agent/, .venv/]\nclaims: [RF-BUG-V2-GENERIC-ADAPTER]\nchecks:\n  - id: rf_bug_v2_generic_adapter_green\n\
+      \    run:\n      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-generic-adapter,\
+      \ rf_bug_v2_generic_adapter_green]\n      timeout_seconds: 300\n    evidence:\n\
+      \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: produced_by_step}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: produced_by_step}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
+      \    - {path: scripts/vectl-check.test.mjs, classification: developer, availability:\
+      \ produced_by_step}\n        - {path: internal/resofeed/playwright_fixture_test.go,\
+      \ classification: developer, availability: current}\n      selection:\n    \
+      \    command:\n          - python3\n          - -c\n          - >-\n       \
+      \     import hashlib,json; ids=['VECTL-ADAPTER completed-harness-regression','VECTL-ADAPTER\
+      \ pending-profile-discovery','VECTL-ADAPTER protected-scope','VECTL-ADAPTER\
+      \ run-envelope-parity','VECTL-ADAPTER unknown-pair-fail-closed']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_generic_adapter_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 5}\n        required_ids:\
+      \ ['VECTL-ADAPTER completed-harness-regression', 'VECTL-ADAPTER pending-profile-discovery',\
+      \ 'VECTL-ADAPTER protected-scope', 'VECTL-ADAPTER run-envelope-parity', 'VECTL-ADAPTER\
+      \ unknown-pair-fail-closed']\n        forbidden_ids: []\n    expect:\n     \
+      \ outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: VECTL_ADAPTER_PENDING_PROFILE_COUNT=11}, {literal: VECTL_ADAPTER_SELECTION_ENVELOPES=valid},\
+      \ {literal: VECTL_ADAPTER_EVIDENCE_ENVELOPES=valid}, {literal: VECTL_ADAPTER_IDENTITY_PARITY=valid},\
+      \ {literal: VECTL_ADAPTER_UNKNOWN_PAIR=refused}, {literal: VECTL_ADAPTER_COMPLETED_HARNESS=preserved},\
+      \ {literal: VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid}, {literal: VECTL_ADAPTER_PROTECTED_SCOPE=clean},\
+      \ {literal: VECTL_GENERIC_EVIDENCE=valid}]\n        contains_any: []\n     \
+      \   forbids: [{literal: missing contract fragment}, {literal: invalid artifact},\
+      \ {literal: invalid selection request}, {literal: wrong selected identity},\
+      \ {literal: wrong executed identity}, {literal: skipped}, {literal: retry},\
+      \ {literal: OPENROUTER_KEY=}]\n    proves: [RF-BUG-V2-GENERIC-ADAPTER]\nbindings:\n\
+      \  expected_red: {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-compatibility-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"shared_test_infrastructure\",\"completed_harness_backward_compatibility\"\
+      ,\"generic_evidence_artifact_contract\"],\"primary_outcome\":\"RF-BUG-V2-GENERIC-ADAPTER\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-V2-GENERIC-ADAPTER\",\"atom\":\"the table-driven eleven-profile adapter\
+      \ retains parser-supported artifact objects and the completed harness literal\
+      \ artifact-field contract while mismatch dispatch remains fail-closed\",\"modality\"\
+      :\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_generic_adapter_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-generic-adapter-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ,\"internal/resofeed/playwright_fixture_test.go\"],\"acceptance_test_paths\"\
+      :[],\"acceptance_check_ids\":[],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\"\
+      :[]}}\n</vectl_step_policy>"
+    verification: The generic-adapter profile runs focused Node coverage and the immutable
+      Go fixture contract, emits the exact five selected/executed identities plus
+      the artifact-object compatibility marker, preserves all eleven profile mappings
+      and parser-supported artifact rows, and keeps protected paths unchanged.
+    evidence_template: Integrated commit and v2 worker receipt; exact generic-adapter
+      command and five-identity evidence envelope; immutable Go compatibility test
+      result; changed-path proof limited to the three allowed paths.
+    depends_on:
+    - rf-bug-v2-generic-adapter-remediation
+    agent: frontend-engineer
 - id: rf-bug-assurance-v2-runtime
   name: RF-BUG Assurance v2 Runtime Boundaries
   status: locked
