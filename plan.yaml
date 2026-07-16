@@ -185981,15 +185981,20 @@ phases:
       \ use the accepted canonical `~` plus unpadded RawURLEncoding HTTP item token\
       \ so the test continues to exercise delivery-body validation, idempotency, provenance,\
       \ and persisted state; do not weaken the authoritative ordinary-404 behavior\
-      \ for noncanonical raw HTTP item routes. Do not mutate protected acceptance,\
-      \ adapters, canonical docs, frontend, testdata, the main-worktree user edits\
-      \ in `docs/ARCHITECTURE.md` or `docs/DESIGN.md`, untracked `.pi/remote-pi/`,\
-      \ or `docs/ITEM_DEEP_LINKS.md`. Existing architecture docs already state the\
-      \ admitted shared-operation and canonical route-token contracts and remain read-only\
-      \ authority. Rollback reverts only these five Go-file changes.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: generic\nscope:\n  allowed_paths: [internal/resofeed/ranking.go, internal/resofeed/mcp.go,\
-      \ internal/resofeed/http.go, internal/resofeed/core_blockers_test.go, internal/resofeed/http_impl_test.go]\n\
+      \ for noncanonical raw HTTP item routes. Redispatch from preserved partial worktree\
+      \ `/Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-delivery-shared-operation-remediation`\
+      \ at base `a77b234fe882e82e5fbe6968b1a9c7f24b0de3ef`; retain blocked receipt\
+      \ `sha256:677238aed53f83c00c08622ee454f00c81a0fa875730e639ecdcbe417338513c`\
+      \ as lineage evidence and do not reset or discard the passing five-file delta.\
+      \ Do not mutate protected acceptance, adapters, canonical docs, frontend, testdata,\
+      \ the main-worktree user edits in `docs/ARCHITECTURE.md` or `docs/DESIGN.md`,\
+      \ untracked `.pi/remote-pi/`, or `docs/ITEM_DEEP_LINKS.md`. Existing architecture\
+      \ docs already state the admitted shared-operation and canonical route-token\
+      \ contracts and remain read-only authority. Rollback reverts only these five\
+      \ Go-file changes.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [internal/resofeed/ranking.go, internal/resofeed/mcp.go, internal/resofeed/http.go,\
+      \ internal/resofeed/core_blockers_test.go, internal/resofeed/http_impl_test.go]\n\
       \  blocked_paths: [internal/resofeed/rf_bug_item_id_api_expected_red_test.go,\
       \ internal/resofeed/testdata/**, scripts/**, docs/**, web/**, .pi/remote-pi/**]\n\
       \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [GATE-DELIVERY-SHARED-OPERATION,\
@@ -186016,25 +186021,37 @@ phases:
       \        contains_any: []\n        forbids: [{literal: 'transport owns delivery\
       \ SQLite mutation'}, {literal: 'transport-owned MarkItemDelivered remains'},\
       \ {literal: Traceback}]\n    proves: [GATE-DELIVERY-SHARED-OPERATION]\n  - id:\
-      \ delivery_shared_operation_go_tests\n    run: {command: [go, test, -v, -count=1,\
-      \ ./internal/resofeed], timeout_seconds: 900}\n    evidence:\n      mode: command_outcome\n\
-      \      path_bindings:\n        - {path: go.mod, access: read, availability:\
-      \ current}\n        - {path: internal/resofeed/ranking.go, access: read, availability:\
-      \ produced_by_step}\n        - {path: internal/resofeed/mcp.go, access: read,\
-      \ availability: produced_by_step}\n        - {path: internal/resofeed/http.go,\
+      \ delivery_shared_operation_focused_go_tests\n    run:\n      command: [go,\
+      \ test, -v, -count=1, -run, '^(TestDeliverySharedApplicationOperationPreservesHTTPMCPParity|TestHTTPDeliveryRouteValidationIdempotencyAndCoreState|TestRFBUG002OpaqueItemIDAPIPaths|TestRFBUG002CanonicalHTTPMCPParity)$',\
+      \ ./internal/resofeed]\n      timeout_seconds: 900\n    evidence:\n      mode:\
+      \ selected_execution\n      path_bindings:\n        - {path: go.mod, access:\
+      \ read, availability: current}\n        - {path: internal/resofeed/ranking.go,\
+      \ access: read, availability: produced_by_step}\n        - {path: internal/resofeed/mcp.go,\
+      \ access: read, availability: produced_by_step}\n        - {path: internal/resofeed/http.go,\
       \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
       \    - {path: internal/resofeed/core_blockers_test.go, classification: developer,\
       \ availability: produced_by_step}\n        - {path: internal/resofeed/http_impl_test.go,\
       \ classification: developer, availability: produced_by_step}\n        - {path:\
       \ internal/resofeed/rf_bug_item_id_api_expected_red_test.go, classification:\
-      \ acceptance, availability: current}\n    expect:\n      outcome: green\n  \
-      \    exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ '--- PASS: TestDeliverySharedApplicationOperationPreservesHTTPMCPParity'},\
-      \ {literal: RF_BUG_002_API_SUBTESTS=30}, {literal: PASS}]\n        contains_any:\
-      \ []\n        forbids: [{literal: '--- FAIL:'}, {literal: 'no tests to run'},\
-      \ {literal: panic}]\n    proves: [GATE-DELIVERY-SHARED-OPERATION, RF-BUG-002,\
-      \ RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\nbindings:\n  expected_red: {items: []}\n\
-      \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      \ acceptance, availability: current}\n      selection:\n        command:\n \
+      \         - python3\n          - -c\n          - >-\n            import hashlib,json;\
+      \ ids=['TestDeliverySharedApplicationOperationPreservesHTTPMCPParity','TestHTTPDeliveryRouteValidationIdempotencyAndCoreState','TestRFBUG002OpaqueItemIDAPIPaths','TestRFBUG002CanonicalHTTPMCPParity'];\
+      \ print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'delivery_shared_operation_focused_go_tests','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 4}\n        required_ids:\
+      \ [TestDeliverySharedApplicationOperationPreservesHTTPMCPParity, TestHTTPDeliveryRouteValidationIdempotencyAndCoreState,\
+      \ TestRFBUG002OpaqueItemIDAPIPaths, TestRFBUG002CanonicalHTTPMCPParity]\n  \
+      \      forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: '--- PASS:\
+      \ TestDeliverySharedApplicationOperationPreservesHTTPMCPParity'}, {literal:\
+      \ '--- PASS: TestHTTPDeliveryRouteValidationIdempotencyAndCoreState'}, {literal:\
+      \ '--- PASS: TestRFBUG002OpaqueItemIDAPIPaths'}, {literal: '--- PASS: TestRFBUG002CanonicalHTTPMCPParity'},\
+      \ {literal: RF_BUG_002_CANONICAL_HTTP_REJECTION=complete}, {literal: RF_BUG_002_API_SUBTESTS=30},\
+      \ {literal: PASS}]\n        contains_any: []\n        forbids: [{literal: '---\
+      \ FAIL:'}, {literal: 'no tests to run'}, {literal: 'lookup called for invalid\
+      \ token'}, {literal: 'raw item route accepted'}, {literal: 'HTTP MCP reingest\
+      \ mismatch'}, {literal: panic}]\n    proves: [GATE-DELIVERY-SHARED-OPERATION,\
+      \ RF-BUG-002, RF-BUG-002-HTTP-MCP-TOKEN-PARITY]\nbindings:\n  expected_red:\
+      \ {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-delivery-shared-operation-remediation\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"shared_http_mcp_application_operation\"\
       ,\"sqlite_current_state_mutation\",\"idempotency_and_provenance_contract\",\"\
@@ -186047,22 +186064,26 @@ phases:
       },{\"requirement_id\":\"RF-BUG-002\",\"atom\":\"authenticated HTTP delivery\
       \ and direct-ID MCP report_delivery preserve shared persistence, provenance,\
       \ errors, and retry semantics\",\"modality\":\"runtime\",\"seam\":\"real\",\"\
-      check_id\":\"delivery_shared_operation_go_tests\",\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
-      },{\"requirement_id\":\"RF-BUG-002-HTTP-MCP-TOKEN-PARITY\",\"atom\":\"canonical\
-      \ HTTP tokens and direct raw MCP item IDs converge on the same core delivery\
-      \ operation\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"delivery_shared_operation_go_tests\"\
+      check_id\":\"delivery_shared_operation_focused_go_tests\",\"independent_step\"\
+      :\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"},{\"requirement_id\"\
+      :\"RF-BUG-002-HTTP-MCP-TOKEN-PARITY\",\"atom\":\"canonical HTTP tokens and direct\
+      \ raw MCP item IDs converge on the same core delivery operation\",\"modality\"\
+      :\"runtime\",\"seam\":\"real\",\"check_id\":\"delivery_shared_operation_focused_go_tests\"\
       ,\"independent_step\":\"rf-bug-assurance-v2-frontend.rf-bug-v2-frontend-behavior-gate\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/core_blockers_test.go\"\
       ,\"internal/resofeed/http_impl_test.go\"],\"acceptance_test_paths\":[\"internal/resofeed/rf_bug_item_id_api_expected_red_test.go\"\
-      ],\"acceptance_check_ids\":[\"delivery_shared_operation_go_tests\"],\"acceptance_mutation\"\
-      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+      ],\"acceptance_check_ids\":[\"delivery_shared_operation_focused_go_tests\"],\"\
+      acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: Only the five allowed Go files change; `http_impl_test.go` changes
       only the stale raw-route fixture to the accepted canonical item token while
       ordinary 404 behavior for noncanonical raw HTTP routes remains protected; source
-      ownership check proves one core delivery SQLite mutation and both transports
-      call it; full Go package tests prove HTTP/MCP persistence, idempotency, provenance,
-      not-found/error parity, and protected RF-BUG-002 acceptance remains green and
-      unchanged; dirty user docs/untracked files remain untouched.
+      ownership proves one core delivery SQLite mutation and both transports call
+      it; one exact four-test Go selector executes both owned developer tests and
+      both protected RF-BUG-002 acceptance identities with visible per-test PASS/FAIL
+      output, `RF_BUG_002_CANONICAL_HTTP_REJECTION=complete`, and `RF_BUG_002_API_SUBTESTS=30`;
+      protected acceptance remains green and unchanged; dirty user docs/untracked
+      files remain untouched; preserved worktree/base and blocked receipt remain available
+      for redispatch.
     evidence_template: Record integrated commit, exact changed paths, both check outputs,
       protected acceptance hash/immutability, and preserved dirty user-path status.
     refs:
