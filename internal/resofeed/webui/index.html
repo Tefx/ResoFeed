@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#F3F0E7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#171A18" media="(prefers-color-scheme: dark)" />
+    <link href="/_app/immutable/entry/start.CfziK7C6.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/B1-h4crn.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/s30_D_oM.js" rel="modulepreload">
+		<link href="/_app/immutable/entry/app.bngHPXx9.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/BQShkYhR.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/BE-4bD18.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/Cjvv8kFS.js" rel="modulepreload">
+		<link href="/_app/immutable/chunks/gdWFHnh6.js" rel="modulepreload">
+		<link href="/_app/immutable/nodes/0.CoPyvv3A.js" rel="modulepreload">
+		<link href="/_app/immutable/nodes/2.YOzHqy3D.js" rel="modulepreload">
+		<!--1uha8ag--><!----><title>RESOFEED</title>
+		<link href="/_app/immutable/assets/0.CNJlBTol.css" rel="stylesheet">
+    <script>
+      {
+        const { pathname, search } = window.location;
+        const searchKeys = new Set(['q', 'source', 'from', 'to', 'resonated', 'limit']);
+        const hasSearchRoute = pathname === '/' && search.slice(1).split('&').some((part) => {
+          if (!part) return false;
+          const separator = part.indexOf('=');
+          const rawKey = separator >= 0 ? part.slice(0, separator) : part;
+          try {
+            return searchKeys.has(decodeURIComponent(rawKey.replace(/\+/g, ' ')));
+          } catch {
+            return false;
+          }
+        });
+        const surfaceTitle = pathname === '/doctor'
+          ? '/doctor'
+          : pathname === '/source-ledger' || pathname === '/source' || pathname === '/sources'
+            ? 'SOURCE LEDGER'
+            : pathname.startsWith('/items/')
+              ? 'INSPECTOR'
+              : hasSearchRoute
+                ? 'SEARCH'
+                : 'TODAY';
+        document.title = `RESOFEED · ${surfaceTitle}`;
+      }
+    </script>
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div><!--[--><!--[0--><!--[--><!--[--><main class="contract-shell resofeed-shell" aria-label="RESOFEED"><!--[0--><p class="visually-hidden" role="status" aria-live="polite">loading owner token</p><!--]--></main><!--]--><!----><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_3bdaet = {
+						base: ""
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/_app/immutable/entry/start.CfziK7C6.js"),
+						import("/_app/immutable/entry/app.bngHPXx9.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2],
+							data: [null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+  </body>
+</html>

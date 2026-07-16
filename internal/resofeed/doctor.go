@@ -78,7 +78,10 @@ func ReadDoctorSnapshotWithConfig(ctx context.Context, db *sql.DB, cfg DoctorCon
 	if db == nil {
 		return DoctorSnapshot{}, fmt.Errorf("read doctor diagnostics: db required")
 	}
-	lines := []string{}
+	lines := []string{
+		"ui_assets=ready",
+		"ui_asset_source=embedded",
+	}
 	rssLines, lastFetch, err := readRSSDiagnostics(ctx, db)
 	if err != nil {
 		return DoctorSnapshot{}, err
@@ -235,10 +238,7 @@ func hasFailureDiagnostics(lines []string) bool {
 }
 
 func openRouterConfiguredModelDoctorLine(cfg DoctorConfig) string {
-	configured := strings.TrimSpace(cfg.ConfiguredOpenRouterModel)
-	if configured == "" {
-		configured = "account_default"
-	}
+	configured := safeDoctorModelLabel(cfg.ConfiguredOpenRouterModel, "account_default")
 	return "openrouter: configured_model=" + configured
 }
 
@@ -248,8 +248,39 @@ func openRouterModelDoctorLine(cfg DoctorConfig) string {
 	if resolved == "" {
 		resolved = "unknown"
 		modelResolved = "false"
+	} else {
+		resolved = safeDoctorModelLabel(resolved, "unknown")
+		if resolved == "invalid" {
+			modelResolved = "false"
+		}
 	}
 	return "openrouter: model_resolved=" + modelResolved + " resolved_model=" + resolved
+}
+
+func safeDoctorModelLabel(value, fallback string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return fallback
+	}
+	if value != "account_default" && !strings.Contains(value, "/") {
+		return "invalid"
+	}
+	for _, char := range value {
+		if char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z' || char >= '0' && char <= '9' {
+			continue
+		}
+		switch char {
+		case '.', '/', ':', '_', '-':
+			continue
+		default:
+			return "invalid"
+		}
+	}
+	lower := strings.ToLower(value)
+	if strings.Contains(lower, "openrouter_key") || strings.HasPrefix(lower, "sk-") || strings.HasPrefix(lower, "rfeed_") {
+		return "invalid"
+	}
+	return value
 }
 
 func tavilyConfiguredDoctorLine() string {

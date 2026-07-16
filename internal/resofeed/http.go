@@ -11,8 +11,6 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -65,43 +63,10 @@ func NewRouter(cfg HTTPServerConfig) http.Handler {
 	return mux
 }
 
-func staticUIHandler() http.Handler {
-	root := filepath.Join("web", "build")
-	index := filepath.Join(root, "index.html")
-	if info, err := os.Stat(index); err == nil && !info.IsDir() {
-		fileServer := http.FileServer(http.Dir(root))
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method != http.MethodGet && r.Method != http.MethodHead {
-				http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-				return
-			}
-			path := filepath.Clean(strings.TrimPrefix(r.URL.Path, "/"))
-			if path == "." {
-				path = "index.html"
-			}
-			candidate := filepath.Join(root, path)
-			if rel, err := filepath.Rel(root, candidate); err != nil || strings.HasPrefix(rel, "..") || filepath.IsAbs(rel) {
-				http.NotFound(w, r)
-				return
-			}
-			if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
-				fileServer.ServeHTTP(w, r)
-				return
-			}
-			http.ServeFile(w, r, index)
-		})
-	}
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, _ = io.WriteString(w, `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>RESOFEED</title></head><body><main><h1>RESOFEED</h1><label>Enter owner token <input type="password" autocomplete="current-password"></label><p>Paste RSS URL in Steer or import OPML.</p><p>Inspect opens the item. Star preserves durable value. Steer is optional correction.</p></main></body></html>`)
-	})
-}
-
 func ServeHTTPAndIngestRuntime(ctx context.Context, cfg HTTPServerConfig, runIngest func(context.Context) error) error {
+	if err := validateEmbeddedUI(); err != nil {
+		return fmt.Errorf("validate embedded UI before bind: %w", err)
+	}
 	listener, err := net.Listen("tcp", cfg.Addr)
 	if err != nil {
 		return fmt.Errorf("listen http runtime: %w", err)

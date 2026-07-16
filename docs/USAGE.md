@@ -24,11 +24,11 @@ ResoFeed is not an inbox-zero reader, read-it-later app, semantic chat product, 
 ### 1. Build
 
 ```bash
-npm --prefix web install
-npm --prefix web run build
-mkdir -p ./bin
-go build -o ./bin/resofeed ./cmd/resofeed
+npm --prefix web ci
+./scripts/build-resofeed.sh ./bin/resofeed
 ```
+
+The build script creates the production Svelte build, replaces `internal/resofeed/webui` with that validated output, and compiles it into the Go binary. The resulting binary serves the UI without `web/build` or a working-directory dependency.
 
 ### 2. Configure OpenRouter and optional Tavily keys safely
 

@@ -2308,12 +2308,12 @@ Implementation is architecture-conformant when:
 Runnable verification commands after implementation:
 
 ```bash
-npm --prefix web install
-npm --prefix web run build
-mkdir -p ./bin
-go build -o ./bin/resofeed ./cmd/resofeed
+npm --prefix web ci
+./scripts/build-resofeed.sh ./bin/resofeed
 go test ./...
 ```
+
+`scripts/build-resofeed.sh` stages the production Svelte output under `internal/resofeed/webui`, validates the packaged bootstrap, and embeds it into the Go binary. Runtime static serving never reads `web/build` or any process-working-directory path.
 
 First-run token generation check:
 

@@ -21,6 +21,7 @@ RUN go mod download
 
 COPY cmd ./cmd
 COPY internal ./internal
+COPY --from=web-builder /src/web/build ./internal/resofeed/webui
 
 ARG TARGETOS=linux
 ARG TARGETARCH
@@ -41,7 +42,6 @@ LABEL org.opencontainers.image.title="ResoFeed" \
 WORKDIR /app
 
 COPY --from=go-builder --chown=65532:65532 /out/resofeed /app/resofeed
-COPY --from=web-builder --chown=65532:65532 /src/web/build /app/web/build
 COPY --from=go-builder --chown=65532:65532 /out/data /data
 
 USER 65532:65532
