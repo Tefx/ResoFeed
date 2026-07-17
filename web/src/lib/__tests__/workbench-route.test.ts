@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
-import { readFileSync } from 'node:fs';
-import { compile } from 'svelte/compiler';
+import { readdirSync, readFileSync } from 'node:fs';
+import { compile, preprocess } from 'svelte/compiler';
 import { describe, expect, it } from 'vitest';
 
 type WorkbenchRouteModule = {
@@ -18,23 +18,42 @@ async function loadWorkbenchRoute(): Promise<WorkbenchRouteModule> {
   }
 }
 
-describe('RF-BUG-005 CSP-compatible route styling', () => {
-  it('keeps split-pane layout in stylesheet-owned classes without runtime inline style mutation', () => {
-    const routeSource = readFileSync(new URL('../../routes/+page.svelte', import.meta.url), 'utf8');
+describe('RF-BUG-005 active Svelte runtime CSP styling', () => {
+  it('keeps every active component and the generated announcer free of inline style mutation', async () => {
+    const routesDirectory = new URL('../../routes/', import.meta.url);
+    const componentURLs = [
+      new URL('+layout.svelte', routesDirectory),
+      new URL('+page.svelte', routesDirectory),
+      ...readdirSync(new URL('components/', routesDirectory))
+        .filter((name) => name.endsWith('.svelte'))
+        .sort()
+        .map((name) => new URL(`components/${name}`, routesDirectory))
+    ];
     const appStyles = readFileSync(new URL('../../app.css', import.meta.url), 'utf8');
-    const compiledRoute = compile(routeSource, {
-      filename: '+page.svelte',
-      generate: 'client',
-      dev: false
-    });
 
-    expect(routeSource).not.toMatch(/<[^>]+\sstyle\s*=/iu);
-    expect(routeSource).not.toMatch(/\.style(?:\.|\[|\.setProperty)/u);
+    for (const componentURL of componentURLs) {
+      const source = readFileSync(componentURL, 'utf8');
+      const compiled = compile(source, { filename: componentURL.pathname, generate: 'client', dev: false });
+      expect(source, componentURL.pathname).not.toMatch(/<[^>]+\sstyle\s*=/iu);
+      expect(source, componentURL.pathname).not.toMatch(/\.style(?:\.|\[|\.setProperty)/u);
+      expect(compiled.js.code, componentURL.pathname).not.toMatch(/(?:set_style|\.style(?:\.|\[|\.setProperty))/u);
+    }
+
+    const routeSource = readFileSync(new URL('../../routes/+page.svelte', import.meta.url), 'utf8');
     expect(routeSource).not.toContain('applySplitScrollContainment');
-    expect(compiledRoute.js.code).not.toMatch(/(?:set_style|\.style(?:\.|\[|\.setProperty))/u);
     expect(routeSource).toContain('class="feed-pane utility-surface"');
     expect(routeSource).toContain('role="region" class="detail-pane"');
 
+    const generatedRootURL = new URL('../../../.svelte-kit/generated/root.svelte', import.meta.url);
+    const generatedRoot = readFileSync(generatedRootURL, 'utf8');
+    const { cspRuntimeStyles } = await import('../csp-runtime-styles.js');
+    const transformedRoot = await preprocess(generatedRoot, cspRuntimeStyles, { filename: generatedRootURL.pathname });
+    expect(generatedRoot).toContain('<div id="svelte-announcer"');
+    expect(transformedRoot.code).toContain('<div id="svelte-announcer" aria-live="assertive" aria-atomic="true" class="visually-hidden">');
+    expect(transformedRoot.code).not.toMatch(/<div id="svelte-announcer"[^>]*\sstyle=/u);
+    expect(compile(transformedRoot.code, { filename: generatedRootURL.pathname, generate: 'client', dev: false }).js.code).not.toContain('position: absolute; left: 0; top: 0');
+
+    expect(appStyles).toMatch(/\.visually-hidden\s*\{[^}]*position:\s*absolute;[^}]*width:\s*1px;[^}]*height:\s*1px;[^}]*overflow:\s*hidden;/su);
     expect(appStyles).toMatch(/\.feed-pane\s*\{[^}]*overflow-y:\s*auto;/su);
     expect(appStyles).toMatch(/\.detail-pane\s*\{[^}]*max-height:\s*calc\(100vh - 130px\);[^}]*overflow-y:\s*auto;/su);
     expect(appStyles).toMatch(/\.detail-pane\.active-panel \.inspector-stable-landmark\s*\{[^}]*display:\s*flex;[^}]*min-height:\s*100%;[^}]*flex-direction:\s*column;/su);
