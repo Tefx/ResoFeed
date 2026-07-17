@@ -93,6 +93,10 @@ Locked field meanings:
 
 Compatibility resolution note: `docs/ARCHITECTURE.md` has been reconciled to the same display/runtime vocabulary (`background_ingest`, `manual_ingest`, `source_fetch`, `library_reprocess`, `item_reingest`) and `actor_kind` field locked here. Internal guards may still map from low-level implementation inputs, but HTTP/MCP/frontend contract surfaces must not expose the older `kind`/`scope` pair as canonical current-operation shape.
 
+#### 3.1.1 Concurrent ownership semantics
+
+Backend progress updates preserve actor ownership: background source processing writes only the background snapshot while a human or agent operation retains foreground display priority. Background capacity probes and ticks that skip every source leave no residual operation snapshot. When foreground work releases, still-active background work may become visible; idle state clears after the final owning release.
+
 ### 3.2 Frontend display semantics
 
 Canonical running display shape:

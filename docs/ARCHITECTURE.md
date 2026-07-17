@@ -238,6 +238,10 @@ Coordination rules:
 - do not persist ingest work as a queue, job table, command ledger, activity log, or portable receipt;
 - use no event bus, plugin registry, DI container, service discovery, or repository interface layer.
 
+#### 3.3.1 Current-operation actor ownership
+
+Current-operation phase/count/message updates are actor-scoped. Background source workers update only the background snapshot and cannot mutate a concurrently visible human or agent snapshot. A background source lease becomes visible only after its bounded worker starts processing; capacity-only leases and fully skipped background ticks do not create residual current-operation status. Foreground work remains visible until its own guard releases, after which active background work may become visible; the final owning release clears the snapshot.
+
 ### 3.4 Shared Types Rule
 
 Shared structs belong in `types.go` only when used across HTTP, MCP, storage, ingestion, or frontend response boundaries. Expected shared structs: `Source`, `Item`, `ItemState`, `SteerRule`, and canonical fallback/status values. Keep helper functions file-local until repeated real use justifies moving them.

@@ -133,6 +133,51 @@ func TestICACurrentOperationBackgroundSnapshotOwnership(t *testing.T) {
 	}
 }
 
+func TestICABackgroundSourceProcessingPreservesForegroundOwnership(t *testing.T) {
+	resetIngestCoordinatorForTest(t)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	db := newContractDB(t, ctx)
+
+	feedEntered := make(chan struct{})
+	allowFeed := make(chan struct{})
+	previousHTTPClient := outboundHTTPClient
+	outboundHTTPClient = &http.Client{Transport: &blockingSnapshotFeedTransport{entered: feedEntered, release: allowFeed}}
+	t.Cleanup(func() { outboundHTTPClient = previousHTTPClient })
+	insertSource(t, ctx, db, "src_background_processing", "https://snapshot.example.test/feed.xml", "Background Processing")
+
+	releaseForeground, err := tryAcquireIngestGuardWithActor(ctx, "fetch", "src_foreground_owner", string(ActorKindHuman))
+	if err != nil {
+		t.Fatalf("acquire foreground source-fetch guard: %v", err)
+	}
+	defer releaseForeground()
+	updateCurrentOperation("fetching_source", &CurrentOperationCount{Current: 0, Total: 1}, "foreground source remains visible")
+
+	backgroundDone := make(chan error, 1)
+	go func() {
+		backgroundDone <- IngestOnce(ctx, db, IngestConfig{SourceFetchTimeout: time.Second})
+	}()
+	select {
+	case <-feedEntered:
+	case err := <-backgroundDone:
+		t.Fatalf("background ingest completed before entering feed: %v", err)
+	case <-ctx.Done():
+		t.Fatalf("wait for background source processing: %v", ctx.Err())
+	}
+	assertCurrentOperationSnapshotWithCount(t, "source_fetch", string(ActorKindHuman), "fetching_source", 0, 1, "foreground source remains visible")
+
+	close(allowFeed)
+	select {
+	case err := <-backgroundDone:
+		if err != nil {
+			t.Fatalf("background ingest: %v", err)
+		}
+	case <-ctx.Done():
+		t.Fatalf("wait for background ingest completion: %v", ctx.Err())
+	}
+	assertCurrentOperationSnapshotWithCount(t, "source_fetch", string(ActorKindHuman), "fetching_source", 0, 1, "foreground source remains visible")
+}
+
 func TestICACurrentOperationForegroundPriorityOverBackgroundSourceLifecycle(t *testing.T) {
 	resetIngestCoordinatorForTest(t)
 	ctx := context.Background()

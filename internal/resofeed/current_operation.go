@@ -179,6 +179,14 @@ func updateCurrentOperationForActor(actorKind string, phase string, count *Curre
 	ingestGuardState.current.updateForActor(actorKind, phase, count, message)
 }
 
+func updateIngestCurrentOperation(actorKind string, phase string, count *CurrentOperationCount, message string) {
+	if actorKind == "" {
+		updateCurrentOperation(phase, count, message)
+		return
+	}
+	updateCurrentOperationForActor(actorKind, phase, count, message)
+}
+
 func representedOperationKind(kind string, scope any) (string, bool) {
 	switch kind {
 	case "ingest":

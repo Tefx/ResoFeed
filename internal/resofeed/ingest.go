@@ -450,7 +450,7 @@ func ingestOnceBounded(ctx context.Context, db *sql.DB, cfg IngestConfig, opts b
 					ingestGuardState.current.start("ingest", opts.aggregateScope, opts.actorKind)
 					updateCurrentOperationForActor(opts.actorKind, "fetching_sources", &CurrentOperationCount{Current: current, Total: len(sources)}, opts.fetchMessage)
 				}
-				sourceResult, sourceErr := ingestSourceWithRelease(ctx, db, cfg, source, release)
+				sourceResult, sourceErr := ingestSourceWithRelease(ctx, db, cfg, source, release, opts.actorKind)
 				if sourceErr != nil {
 					if updateErr := updateSourceFetch(ctx, db, source.ID, sourceStatusFetchError, sourceErr.Error(), ""); updateErr != nil {
 						recordFatal(updateErr)
@@ -570,7 +570,12 @@ func tryAcquireIngestGuardWithConfig(ctx context.Context, cfg ingestCoordinatorC
 	}
 	ingestGuardState.addLocked(details)
 	ingestGuardState.holder.Store(details)
-	ingestGuardState.current.start(operation, scope, actorKind)
+	// A background source lease becomes user-visible only when its bounded
+	// worker starts processing it. Capacity probes and skipped ticks must not
+	// leave an operation snapshot behind.
+	if canonicalOperationActorKind(actorKind) != "background" || operation != "fetch" {
+		ingestGuardState.current.start(operation, scope, actorKind)
+	}
 	ingestGuardState.mu.Unlock()
 	released := false
 	return func() {
@@ -823,9 +828,9 @@ func releaseGuardRecover(release func(), retErr *error, label string) {
 	}
 }
 
-func ingestSourceWithRelease(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, release func()) (ret ingestSourceResult, retErr error) {
+func ingestSourceWithRelease(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, release func(), actorKind string) (ret ingestSourceResult, retErr error) {
 	defer releaseGuardRecover(release, &retErr, "background ingest source")
-	return ingestSource(ctx, db, cfg, source)
+	return ingestSourceWithOptions(ctx, db, cfg, source, ingestSourceOptions{actorKind: actorKind})
 }
 
 func loadActiveSources(ctx context.Context, db *sql.DB) (sources []Source, retErr error) {
@@ -879,6 +884,7 @@ type ingestSourceResult struct {
 
 type ingestSourceOptions struct {
 	attemptExistingItems bool
+	actorKind            string
 }
 
 type ingestItemFailure struct {
@@ -891,7 +897,7 @@ func ingestSource(ctx context.Context, db *sql.DB, cfg IngestConfig, source Sour
 }
 
 func ingestSourceWithOptions(ctx context.Context, db *sql.DB, cfg IngestConfig, source Source, opts ingestSourceOptions) (ingestSourceResult, error) {
-	updateCurrentOperation("fetching_feed", nil, "fetching RSS source")
+	updateIngestCurrentOperation(opts.actorKind, "fetching_feed", nil, "fetching RSS source")
 	language, err := readProcessingLanguage(ctx, db)
 	if err != nil {
 		return ingestSourceResult{}, fmt.Errorf("ingest source: read processing language: %w", err)
@@ -933,7 +939,7 @@ func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, sourc
 	processed := 0
 	pending := make([]ingestItemTask, 0, len(entries))
 	for _, entry := range entries {
-		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: processed, Total: totalItems}, "processing feed items")
+		updateIngestCurrentOperation(opts.actorKind, "processing_items", &CurrentOperationCount{Current: processed, Total: totalItems}, "processing feed items")
 		itemID := ingestedItemID(source, entry)
 		exists, err := itemExists(ctx, db, itemID)
 		if err != nil {
@@ -941,7 +947,7 @@ func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, sourc
 		}
 		if exists && !opts.attemptExistingItems {
 			processed++
-			updateCurrentOperation("processing_items", &CurrentOperationCount{Current: processed, Total: totalItems}, "processed feed item")
+			updateIngestCurrentOperation(opts.actorKind, "processing_items", &CurrentOperationCount{Current: processed, Total: totalItems}, "processed feed item")
 			continue
 		}
 		pending = append(pending, ingestItemTask{entry: entry, existing: exists})
@@ -986,7 +992,7 @@ func processSourceItems(ctx context.Context, db *sql.DB, cfg IngestConfig, sourc
 		processed++
 		current := processed
 		resultMu.Unlock()
-		updateCurrentOperation("processing_items", &CurrentOperationCount{Current: current, Total: totalItems}, "processed feed item")
+		updateIngestCurrentOperation(opts.actorKind, "processing_items", &CurrentOperationCount{Current: current, Total: totalItems}, "processed feed item")
 	}
 
 	for i := 0; i < slotCount; i++ {
