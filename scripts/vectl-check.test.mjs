@@ -18,7 +18,9 @@ import {
   probeBuildIdentityRejection,
   runPromptingHarness,
   runTokenParityHarness,
+  inventoryClosureRequirements,
   selectionEnvelope,
+  validateClosureAuthorityOutputs,
   withGeneratedTreeRestoration,
   withLockedWebDependencies
 } from './vectl-check.mjs';
@@ -914,6 +916,63 @@ test('VECTL-ADAPTER Source Ledger reporter-marker correlation', () => {
   for (const command of playwrightCommands) {
     assert.equal(command.includes('--reporter=verbose'), false);
     assert.ok(command.includes('playwright'));
+  }
+});
+
+test('RF-BUG closure authority aggregation false-green guard', () => {
+  const profile = findProfile('rf-bug-v2-closure-report', 'rf_bug_v2_defect_report_closure_green');
+  assert.ok(profile);
+  assert.equal(profile.runner, 'closure-report');
+  assert.deepEqual(profile.identities, [
+    'RF-BUG-001-010 active source scans',
+    'RF-BUG-001-010 closure contract'
+  ]);
+  assert.deepEqual(profile.commands, [
+    ['go', 'test', '-v', './tests', '-run', '^TestRFBugCanonicalContracts$', '-count=1'],
+    ['npm', '--prefix', 'web', 'run', 'test:render', '--', '--reporter=verbose', 'src/lib/api-client.test.ts']
+  ]);
+
+  const goOutput = [
+    '=== RUN   TestRFBugCanonicalContracts',
+    '    rf_bug_canonical_contract_test.go:170: RF_BUG_CANONICAL_DOCUMENTS=9',
+    '    rf_bug_canonical_contract_test.go:171: OPML_EXCLUSIONS=2',
+    '--- PASS: TestRFBugCanonicalContracts (0.00s)',
+    'PASS'
+  ].join('\n');
+  const webOutput = [
+    'stdout | src/lib/api-client.test.ts > ResoFeed API client and rendered sinks > keeps all nine active documents free of OPML export capabilities',
+    'OPML_ACTIVE_DOCUMENTS=9',
+    ' ✓ src/lib/api-client.test.ts > ResoFeed API client and rendered sinks > keeps all nine active documents free of OPML export capabilities 7ms'
+  ].join('\n');
+  assert.doesNotThrow(() => validateClosureAuthorityOutputs(goOutput, webOutput));
+  assert.equal(inventoryClosureRequirements(repoRoot), 'RF_BUG_CLOSURE_REQUIREMENTS=10');
+
+  for (const invalidGo of [
+    '',
+    '[no tests to run]',
+    'RF_BUG_CANONICAL_DOCUMENTS=9\nOPML_EXCLUSIONS=2\nPASS',
+    goOutput.replace('RF_BUG_CANONICAL_DOCUMENTS=9', 'RF_BUG_CANONICAL_DOCUMENTS=8')
+  ]) {
+    assert.throws(() => validateClosureAuthorityOutputs(invalidGo, webOutput), /authority output/u);
+  }
+  for (const invalidWeb of [
+    '',
+    '[no tests to run]',
+    'OPML_ACTIVE_DOCUMENTS=9\nPASS',
+    webOutput.replace('OPML_ACTIVE_DOCUMENTS=9', 'OPML_ACTIVE_DOCUMENTS=8')
+  ]) {
+    assert.throws(() => validateClosureAuthorityOutputs(goOutput, invalidWeb), /authority output/u);
+  }
+
+  const fixtureRoot = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-closure-inventory-'));
+  try {
+    fs.mkdirSync(path.join(fixtureRoot, 'docs'));
+    const complete = Array.from({ length: 10 }, (_, index) => `## RF-BUG-${String(index + 1).padStart(3, '0')} — contract`).join('\n');
+    fs.writeFileSync(path.join(fixtureRoot, 'docs', 'BUG_REPORT_2026-07-11.md'), complete);
+    fs.writeFileSync(path.join(fixtureRoot, 'docs', 'BUG_FIX_PLAN_2026-07-12.md'), complete.replace('## RF-BUG-010 — contract', ''));
+    assert.throws(() => inventoryClosureRequirements(fixtureRoot), /exact RF-BUG-001 through RF-BUG-010 heading inventory/u);
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
   }
 });
 

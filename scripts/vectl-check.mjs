@@ -333,9 +333,19 @@ export const PENDING_PROFILE_PAIRS = [
     suite: 'rf-bug-v2-closure-report',
     checkID: 'rf_bug_v2_defect_report_closure_green',
     identities: ['RF-BUG-001-010 active source scans', 'RF-BUG-001-010 closure contract'],
-    requiredOutput: ['RF_BUG_CLOSURE_REQUIREMENTS=10', 'OPML_ACTIVE_DOCUMENTS=9', 'OPML_EXCLUSIONS=2', 'PROMPTING_V21_ACTIVE_MATCHES=0'],
+    requiredOutput: [
+      'TestRFBugCanonicalContracts',
+      'keeps all nine active documents free of OPML export capabilities',
+      'RF_BUG_CLOSURE_REQUIREMENTS=10',
+      'RF_BUG_CANONICAL_DOCUMENTS=9',
+      'OPML_ACTIVE_DOCUMENTS=9',
+      'OPML_EXCLUSIONS=2',
+      'PROMPTING_V21_ACTIVE_MATCHES=0'
+    ],
+    runner: 'closure-report',
     commands: [
-      ['go', 'test', '-v', './tests', '-run', '^(TestRFBugCanonicalContracts/OPMLActiveScan|TestRFBugClosureContract)$', '-count=1']
+      ['go', 'test', '-v', './tests', '-run', '^TestRFBugCanonicalContracts$', '-count=1'],
+      ['npm', '--prefix', 'web', 'run', 'test:render', '--', '--reporter=verbose', 'src/lib/api-client.test.ts']
     ]
   },
   {
@@ -1554,6 +1564,17 @@ function promptingV22ActiveFiles() {
   return files;
 }
 
+function scanActivePromptingV21() {
+  const staleIdentity = /promptingv21|prompting(?:\s+system)?\s+v2\.1|(^|[^a-z0-9_])v2\.1([^a-z0-9_]|$)/imu;
+  const matches = [];
+  for (const filePath of promptingV22ActiveFiles()) {
+    const body = fs.readFileSync(filePath, 'utf8');
+    if (staleIdentity.test(body)) matches.push(path.relative(repoRoot, filePath).split(path.sep).join('/'));
+  }
+  if (matches.length > 0) throw new AdapterFailure('active Prompting v2.1 identity remains', matches);
+  return 'PROMPTING_V21_ACTIVE_MATCHES=0';
+}
+
 function runPromptingV22(profile) {
   const outputs = profile.commands.map((commandRow) => {
     const command = Array.isArray(commandRow) ? commandRow : commandRow.argv;
@@ -1562,14 +1583,7 @@ function runPromptingV22(profile) {
       env: Array.isArray(commandRow) ? { RESOFEED_E2E: null } : commandRow.env
     });
   });
-  const staleIdentity = /promptingv21|prompting(?:\s+system)?\s+v2\.1|(^|[^a-z0-9_])v2\.1([^a-z0-9_]|$)/imu;
-  const matches = [];
-  for (const filePath of promptingV22ActiveFiles()) {
-    const body = fs.readFileSync(filePath, 'utf8');
-    if (staleIdentity.test(body)) matches.push(path.relative(repoRoot, filePath).split(path.sep).join('/'));
-  }
-  if (matches.length > 0) throw new AdapterFailure('active Prompting v2.1 identity remains', matches);
-  outputs.push('PROMPTING_V21_ACTIVE_MATCHES=0');
+  outputs.push(scanActivePromptingV21());
   const combined = outputs.join('\n');
   const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
   if (missing.length > 0) throw new AdapterFailure('Prompting v2.2 profile output missed required contract markers', missing);
@@ -1678,6 +1692,86 @@ export function runPromptingHarness(profile, run = execute) {
   };
 }
 
+function requireAuthorityOutput(label, output, identityPattern, markers) {
+  const body = String(output);
+  if (!body.trim()) throw new AdapterFailure(`${label} authority output was empty`);
+  if (/\[?no tests to run\]?|no tests found|\bskipped\b|\bretr(?:y|ied|ies)\b/iu.test(body)) {
+    throw new AdapterFailure(`${label} authority output reported no exact test execution`);
+  }
+  if (!identityPattern.test(body)) throw new AdapterFailure(`${label} authority output missed its exact test identity`);
+  const missing = markers.filter((marker) => !body.includes(marker));
+  if (missing.length > 0) throw new AdapterFailure(`${label} authority output missed required markers`, missing);
+}
+
+export function validateClosureAuthorityOutputs(goOutput, webOutput) {
+  requireAuthorityOutput(
+    'Go canonical contract',
+    goOutput,
+    /^=== RUN\s+TestRFBugCanonicalContracts$[\s\S]*^--- PASS: TestRFBugCanonicalContracts(?: \([^\r\n]+\))?$/mu,
+    ['RF_BUG_CANONICAL_DOCUMENTS=9', 'OPML_EXCLUSIONS=2']
+  );
+  requireAuthorityOutput(
+    'web OPML contract',
+    webOutput,
+    /^\s*✓ .* > keeps all nine active documents free of OPML export capabilities(?: \d+ms)?$/mu,
+    ['OPML_ACTIVE_DOCUMENTS=9']
+  );
+}
+
+export function inventoryClosureRequirements(root = repoRoot) {
+  const expected = Array.from({ length: 10 }, (_, index) => `RF-BUG-${String(index + 1).padStart(3, '0')}`);
+  for (const relativePath of ['docs/BUG_REPORT_2026-07-11.md', 'docs/BUG_FIX_PLAN_2026-07-12.md']) {
+    const body = fs.readFileSync(path.join(root, relativePath), 'utf8');
+    const actual = [...body.matchAll(/^#{2,3} (RF-BUG-\d{3}) — /gmu)].map((match) => match[1]);
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+      throw new AdapterFailure(`${relativePath} did not contain the exact RF-BUG-001 through RF-BUG-010 heading inventory`, actual);
+    }
+  }
+  return 'RF_BUG_CLOSURE_REQUIREMENTS=10';
+}
+
+function ensureClosureProtectedBaseline() {
+  const protectedPaths = [
+    'docs/BUG_FIX_PLAN_2026-07-12.md',
+    'docs/BUG_REPORT_2026-07-11.md',
+    'tests/rf_bug_canonical_contract_test.go',
+    'web/src/lib/api-client.test.ts'
+  ];
+  const changed = spawnSync('git', ['status', '--porcelain=v1', '--', ...protectedPaths], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: childEnvironment()
+  });
+  if (changed.status !== 0 || changed.stdout.trim()) throw new AdapterFailure('closure protected authority baseline changed');
+}
+
+export function runClosureReport(profile, run = execute) {
+  ensureClosureProtectedBaseline();
+  const focused = run(profile, 'node', [
+    '--test', '--test-name-pattern=RF-BUG closure authority aggregation false-green guard',
+    'scripts/vectl-check.test.mjs'
+  ], { timeout: 240_000 });
+  if (!focused.includes('RF-BUG closure authority aggregation false-green guard')) {
+    throw new AdapterFailure('closure focused adapter regression did not execute');
+  }
+
+  const [goCommand, webCommand] = profile.commands;
+  const goOutput = run(profile, goCommand[0], goCommand.slice(1), { timeout: 300_000 });
+  const webOutput = run(profile, webCommand[0], webCommand.slice(1), { timeout: 300_000 });
+  validateClosureAuthorityOutputs(goOutput, webOutput);
+  const authorityMarkers = [scanActivePromptingV21(), inventoryClosureRequirements()];
+  const combined = [goOutput, webOutput, ...authorityMarkers].join('\n');
+  const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
+  if (missing.length > 0) throw new AdapterFailure('closure authority aggregation missed required output', missing);
+  ensureClosureProtectedBaseline();
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
 function runNative(profile) {
   const outputs = [];
   for (const commandRow of profile.commands) {
@@ -1742,6 +1836,8 @@ async function main() {
                     ? runIdentityIntegration(profile)
                     : profile.runner === 'generated-webui-baseline'
                       ? runGeneratedWebUIBaseline(profile)
+                      : profile.runner === 'closure-report'
+                        ? runClosureReport(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'
