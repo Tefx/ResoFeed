@@ -2,11 +2,12 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-const buildIdentity = process.env.RESOFEED_SVELTE_BUILD_IDENTITY;
-if (!buildIdentity || !/^rf-[a-f0-9]{64}$/.test(buildIdentity)) {
-  throw new Error('RESOFEED_SVELTE_BUILD_IDENTITY must be a canonical build identity');
-}
+import { resolveSvelteBuildIdentity } from '../scripts/resofeed-svelte-build-identity.mjs';
+
+const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+const buildIdentity = resolveSvelteBuildIdentity(repoRoot);
 
 const commitHash = buildIdentity.slice(3, 11);
 let pkgVersion = 'unknown';

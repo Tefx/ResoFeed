@@ -104,6 +104,7 @@ The pending profile matrix is:
 | `rf-bug-v2-adapter-runtime-isolation-remediation` | `rf_bug_v2_adapter_runtime_isolation_green` | 2 | green |
 | `rf-bug-v2-canonical-e2e-embedded-ui-build-remediation` | `rf_bug_v2_canonical_e2e_embedded_ui_build_green` | 1 | green |
 | `rf-bug-v2-deterministic-svelte-build-remediation` | `rf_bug_v2_deterministic_svelte_build_green` | 1 | green |
+| `rf-bug-v2-deterministic-adapter-identity-integration-remediation` | `rf_bug_v2_deterministic_adapter_identity_integration_green` | 1 | green |
 | `rf-bug-v2-source-ledger` | `rf_bug_v2_source_ledger_green` | 5 | green |
 | `rf-bug-v2-prompting` | `rf_bug_v2_prompting_green` | 4 | green |
 | `rf-bug-v2-prompting-harness` | `rf_bug_v2_prompting_harness_remediation_green` | 4 | green |
@@ -112,7 +113,7 @@ The pending profile matrix is:
 | `item-deep-links-backend` | `item_deep_links_backend_green` | 1 | green |
 | `item-deep-links-frontend` | `item_deep_links_frontend_green` | 2 | green |
 
-`node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all seventeen selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifact objects, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms protected acceptance scope remains clean. The profile emits `VECTL_ADAPTER_COMPLETED_HARNESS=preserved` and `VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid` only after both developer checks pass. It does not execute unfinished consumer product semantics.
+`node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all eighteen selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifact objects, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms protected acceptance scope remains clean. The profile emits `VECTL_ADAPTER_COMPLETED_HARNESS=preserved` and `VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid` only after both developer checks pass. It does not execute unfinished consumer product semantics.
 
 The `rf-bug-v2-source-ledger` profile binds the required `Source Ledger groups and controls render` output marker to its Vitest `test:render` command. That command includes exactly one `--reporter=verbose` argument so Vitest emits the full test title for deterministic marker validation. Neither Source Ledger Playwright command carries the verbose Vitest reporter argument; their existing `--reporter=line` contracts remain unchanged.
 ### RF-BUG-010 Replacement Runtime Isolation Remediation
@@ -140,10 +141,13 @@ It selects and executes exactly `RF-BUG-010 canonical fresh embedded UI build`. 
 
 Rollback reverts the script, global setup, runtime fixture, adapter profile, focused tests, synchronized generated package-local assets, and this documentation together.
 ### RF-BUG-010 Deterministic Svelte Build Identity
+The native helper `scripts/resofeed-svelte-build-identity.mjs` is the only tracked-input derivation implementation. `scripts/build-resofeed.sh`, the Vite/Svelte configs, Playwright config bootstrap, and `scripts/vectl-check.mjs` all use that helper instead of maintaining parallel manifest code.
 
-The canonical script derives `RESOFEED_SVELTE_BUILD_IDENTITY` as `rf-` plus a SHA-256 digest of a UTF-8 JSON manifest. The manifest lists `scripts/build-resofeed.sh`, the Svelte/Vite/package/TypeScript configuration files, and every regular file beneath `web/src` and `web/static`. Paths use repository-relative POSIX encoding, sort by their UTF-8 bytes, and pair with SHA-256 content digests. Wall clock, PID, temporary/output paths, Git metadata, locale, host names, and ambient environment variables do not enter the identity.
+The helper derives `RESOFEED_SVELTE_BUILD_IDENTITY` as `rf-` plus a SHA-256 digest of a UTF-8 JSON manifest. The manifest lists `scripts/build-resofeed.sh`, the Svelte/Vite/package/TypeScript configuration files, and every regular file beneath `web/src` and `web/static`. Paths use repository-relative POSIX encoding, sort by their UTF-8 bytes, and pair with SHA-256 content digests. Wall clock, PID, temporary/output paths, Git metadata, locale, host names, and ambient environment variables do not enter the identity.
 
-`kit.version.name` and the short build identifier rendered through the existing commit field come only from that identity. The script rejects an ambient `RESOFEED_SVELTE_BUILD_IDENTITY`, computes the private value itself, validates the exact lowercase `rf-[a-f0-9]{64}` form, and launches npm through an allow-listed `env -i` environment. Direct Svelte/Vite builds with missing, empty, malformed, or noncanonical private input fail before package-local replacement. No CLI or user-selected version override exists.
+The canonical shell pipeline rejects any ambient `RESOFEED_SVELTE_BUILD_IDENTITY`, invokes the helper itself, validates the exact lowercase `rf-[a-f0-9]{64}` result, and launches npm through an allow-listed `env -i` environment. The adapter adds the derived value only to sanitized npm children that load Vite/Svelte configuration. Playwright base config installs the same derived value before its config graph loads. Svelte/Vite config rejects a missing trusted value or any value that differs from a fresh helper derivation. The adapter, shell pipeline, and Playwright bootstrap reject caller override attempts; none forwards an ambient value.
+
+The runtime fixture invokes `scripts/build-resofeed.sh --e2e <output>` and sets exact child `RESOFEED_E2E=1`. It does not construct `go build`, `-tags resofeed_e2e`, or duplicate the build/tag boundary. Production remains untagged, while only the canonical E2E script branch adds the tag.
 
 The deterministic remediation profile is:
 
@@ -151,7 +155,15 @@ The deterministic remediation profile is:
 node scripts/vectl-check.mjs run rf-bug-v2-deterministic-svelte-build-remediation rf_bug_v2_deterministic_svelte_build_green
 ```
 
-It proves consecutive production builds and production-to-E2E builds produce byte-identical `web/build` and `internal/resofeed/webui` trees without tracked-status changes. In an isolated disposable copy, a controlled tracked `web/src/app.html` sentinel changes the derived identity and assets, reaches both synchronized trees and the embedded binary, and remains byte-identical on repetition. Invalid private inputs and ambient override attempts leave package assets unchanged. Success and induced failure leave no `.webui-stage.*` residue, protected browser acceptance remains byte-identical, production stays untagged, and E2E alone uses `resofeed_e2e`.
+The adapter integration profile is:
+
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-deterministic-adapter-identity-integration-remediation rf_bug_v2_deterministic_adapter_identity_integration_green
+```
+
+It checks helper/shell identity parity, deterministic UTF-8 byte ordering, controlled tracked-input invalidation, missing-input and ambient-override failure, the canonical runtime-fixture boundary, Vitest config startup, and exact 29-test Playwright replacement-lane discovery without executing or modifying protected acceptance.
+
+If config startup reports that trusted derivation is missing, invoke it through `scripts/vectl-check.mjs` or the canonical build script. If it reports an override, remove `RESOFEED_SVELTE_BUILD_IDENTITY` from the caller environment; this variable is private and has no supported user override.
 ### Prompting v2.2 Loopback Harness Remediation
 
 The dedicated pair `rf-bug-v2-prompting-harness` / `rf_bug_v2_prompting_harness_remediation_green` owns the Prompting loopback extraction boundary. It selects and executes exactly these four identities, in order: `RF-BUG-009 harness exact 16 subtests`, `RF-BUG-009 harness exact argv and environment`, `RF-BUG-009 harness exact four identities`, and `RF-BUG-009 harness production strict`.

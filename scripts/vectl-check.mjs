@@ -7,6 +7,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { collect as collectPlaywrightReport, verifyIsolatedLane } from './rf-bug-010-standard-json.mjs';
+import {
+  BUILD_IDENTITY_ENV,
+  deriveSvelteBuildIdentity
+} from './resofeed-svelte-build-identity.mjs';
 
 const adapterPath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(adapterPath), '..');
@@ -207,6 +211,22 @@ export const PENDING_PROFILE_PAIRS = [
       'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged'
     ],
     runner: 'deterministic-build'
+  },
+  {
+    suite: 'rf-bug-v2-deterministic-adapter-identity-integration-remediation',
+    checkID: 'rf_bug_v2_deterministic_adapter_identity_integration_green',
+    identities: ['RF-BUG-010 deterministic adapter identity integration'],
+    requiredOutput: [
+      'RF-BUG-010_FIXTURE_CANONICAL_BUILD=green',
+      'RF-BUG-010_TRUSTED_IDENTITY=derived',
+      'RF-BUG-010_IDENTITY_ALGORITHM=single',
+      'RF-BUG-010_CONFIG_STARTUP=green',
+      'RF-BUG-010_AMBIENT_OVERRIDE=rejected',
+      'RF-BUG-010_MISSING_DERIVATION=fail_closed',
+      'RF-BUG-010_CACHE_INVALIDATION=preserved',
+      'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged'
+    ],
+    runner: 'identity-integration'
   },
   {
     suite: 'rf-bug-v2-source-ledger',
@@ -509,6 +529,9 @@ function collectArtifactRows(roots) {
 }
 
 export function childEnvironment(overrides = {}) {
+  if (Object.prototype.hasOwnProperty.call(overrides, BUILD_IDENTITY_ENV)) {
+    throw new Error(`${BUILD_IDENTITY_ENV} is controlled by the trusted derivation helper`);
+  }
   const environment = {
     PATH: process.env.PATH ?? '',
     HOME: process.env.HOME ?? '',
@@ -524,12 +547,18 @@ export function childEnvironment(overrides = {}) {
   return environment;
 }
 
+export function childEnvironmentForCommand(command, overrides = {}) {
+  const environment = childEnvironment(overrides);
+  if (command === 'npm') environment[BUILD_IDENTITY_ENV] = deriveSvelteBuildIdentity(repoRoot);
+  return environment;
+}
+
 function execute(profile, command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd ?? repoRoot,
     encoding: 'utf8',
     timeout: options.timeout ?? 900_000,
-    env: childEnvironment(options.env)
+    env: childEnvironmentForCommand(command, options.env)
   });
   if (result.error || result.status !== (options.expectedStatus ?? 0)) {
     const detail = redact(`${result.error?.message ?? ''}\n${result.stdout ?? ''}\n${result.stderr ?? ''}`).slice(-6000);
@@ -869,6 +898,7 @@ function copyBuildFixture(destination) {
     'cmd/resofeed',
     'internal/resofeed',
     'scripts/build-resofeed.sh',
+    'scripts/resofeed-svelte-build-identity.mjs',
     'web/package-lock.json',
     'web/package.json',
     'web/src',
@@ -997,6 +1027,48 @@ function runDeterministicBuild(profile) {
   }
   ensureNoProtectedMutation();
   if (trackedStatus() !== statusBefore) throw new AdapterFailure('deterministic build verification changed synchronized worktree status');
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
+function runIdentityIntegration(profile) {
+  ensureNoProtectedMutation();
+  const nodeOutput = execute(profile, 'node', [
+    '--test', '--test-name-pattern=RF-BUG-010 deterministic adapter identity integration contract',
+    'scripts/vectl-check.test.mjs'
+  ], { timeout: 240_000 });
+  if (!nodeOutput.includes('RF-BUG-010 deterministic adapter identity integration contract')) {
+    throw new AdapterFailure('deterministic adapter identity focused developer contract did not execute');
+  }
+
+  const goOutput = execute(profile, 'go', [
+    'test', '-v', './internal/resofeed', '-run', '^TestPlaywrightFixtureContract$', '-count=1'
+  ], { timeout: 180_000 });
+  if (!goOutput.includes('TestPlaywrightFixtureContract')) {
+    throw new AdapterFailure('canonical Playwright fixture developer contract did not execute');
+  }
+
+  execute(profile, 'npm', [
+    '--prefix', 'web', 'run', 'test:render', '--',
+    'src/lib/__tests__/playwright-e2e-harness-contract.test.ts'
+  ], { timeout: 180_000 });
+
+  const listPath = path.join(repoRoot, '.test-artifacts', 'playwright', 'identity-integration-list.json');
+  fs.mkdirSync(path.dirname(listPath), { recursive: true });
+  execute(profile, 'npm', [
+    '--prefix', 'web', 'exec', '--', 'playwright', 'test',
+    '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe',
+    '--retries=0', '--reporter=json', '--list', ...replacementLaneFiles
+  ], { timeout: 300_000, env: { PLAYWRIGHT_JSON_OUTPUT_NAME: listPath } });
+  const listed = collectPlaywrightReport(JSON.parse(fs.readFileSync(listPath, 'utf8')));
+  if (listed.identities.length !== 29) throw new AdapterFailure('trusted identity Playwright list startup did not select exactly 29 replacement tests');
+  fs.rmSync(listPath, { force: true });
+  ensureNoProtectedMutation();
+
   return {
     outcome: 'green',
     exitCode: 0,
@@ -1325,6 +1397,10 @@ function refuse(message) {
 
 async function main() {
   const [action, suite, checkID] = process.argv.slice(2);
+  if (Object.prototype.hasOwnProperty.call(process.env, BUILD_IDENTITY_ENV)) {
+    refuse(`${BUILD_IDENTITY_ENV} is private to trusted adapter/config startup`);
+    return;
+  }
   const profile = PROFILES.get(profileKey(suite, checkID));
   if (!profile) {
     refuse('unknown or mismatched suite/check pair');
@@ -1352,6 +1428,8 @@ async function main() {
               ? runCanonicalBuild(profile)
               : profile.runner === 'deterministic-build'
                 ? runDeterministicBuild(profile)
+                : profile.runner === 'identity-integration'
+                  ? runIdentityIntegration(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'

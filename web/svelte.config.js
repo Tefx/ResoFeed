@@ -1,10 +1,11 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { fileURLToPath } from 'node:url';
 
-const buildIdentity = process.env.RESOFEED_SVELTE_BUILD_IDENTITY;
-if (!buildIdentity || !/^rf-[a-f0-9]{64}$/.test(buildIdentity)) {
-  throw new Error('RESOFEED_SVELTE_BUILD_IDENTITY must be a canonical build identity');
-}
+import { resolveSvelteBuildIdentity } from '../scripts/resofeed-svelte-build-identity.mjs';
+
+const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+const buildIdentity = resolveSvelteBuildIdentity(repoRoot);
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

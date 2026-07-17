@@ -27,13 +27,27 @@ npm --prefix web ci
 ./scripts/build-resofeed.sh ./bin/resofeed
 ```
 
-The canonical build script derives a private Svelte identity from tracked frontend/build content: `scripts/build-resofeed.sh`, the package lock and package metadata, Svelte/Vite/TypeScript configuration, and all regular files under `web/src` and `web/static`. It sorts repository-relative paths by UTF-8 bytes and hashes a UTF-8 canonical manifest of path/content digests. Wall clock, PID, temporary/output paths, Git metadata, locale, host names, and ambient environment variables do not affect the identity.
+`scripts/resofeed-svelte-build-identity.mjs` is the single native derivation helper used by the shell build, Vite/Svelte config, Playwright config bootstrap, and the project-native evidence adapter. It hashes a canonical UTF-8 manifest of `scripts/build-resofeed.sh`, package metadata and lock data, Svelte/Vite/TypeScript configuration, and all regular files under `web/src` and `web/static`. Repository-relative POSIX paths sort by UTF-8 bytes. Wall clock, PID, temporary/output paths, Git metadata, locale, host names, and ambient environment variables do not affect the identity.
 
-The script rejects an ambient `RESOFEED_SVELTE_BUILD_IDENTITY`, computes and validates the exact lowercase `rf-<64 hex>` value itself, and gives npm only an allow-listed environment. Direct Svelte/Vite builds with missing, empty, malformed, or noncanonical private identity fail. There is no supported CLI or environment build-version override.
+`RESOFEED_SVELTE_BUILD_IDENTITY` is private. The build script rejects it in the caller environment, derives the exact lowercase `rf-<64 hex>` value itself, and gives npm only an allow-listed environment. Vite/Svelte startup requires a trusted value equal to a fresh helper derivation. Playwright config derives and installs that value before loading its config graph; `scripts/vectl-check.mjs` adds it only to sanitized npm children. Missing tracked inputs, malformed inputs, a missing trusted handoff, and caller overrides fail before config/test startup or package replacement. Remove this variable from the shell environment when troubleshooting; there is no supported CLI or environment build-version override.
 
 The resulting production output is reproducible: repeated builds from identical inputs produce byte-identical `web/build` and `internal/resofeed/webui` trees. A tracked frontend change deterministically changes the identity and versioned assets, and the changed content reaches the embedded binary. The script validates staged bootstrap and package-local references, atomically replaces `internal/resofeed/webui`, runs embedded-bootstrap validation, restores the previous package tree after copy, validation, or Go-build failure, and removes `.webui-stage.*` residue on every exit.
 
-Harness maintainers use `./scripts/build-resofeed.sh --e2e <output>`. That form adds exactly the `resofeed_e2e` Go build tag while preserving the same deterministic frontend/package pipeline. `RESOFEED_E2E=1` remains a separate runtime opt-in and never selects build tags. Both binary forms serve synchronized embedded UI without `web/build` or a working-directory dependency.
+Harness maintainers use:
+
+```bash
+./scripts/build-resofeed.sh --e2e <output>
+```
+
+The runtime fixture uses that exact script/argument pair and separately sets child `RESOFEED_E2E=1`. The fixture must not call `go build`, construct `-tags resofeed_e2e`, or duplicate the tag boundary. Production remains untagged; only the canonical `--e2e` branch adds `resofeed_e2e`. Both binary forms serve synchronized embedded UI without `web/build` or a working-directory dependency.
+
+Adapter/list/render troubleshooting and verification:
+
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-deterministic-adapter-identity-integration-remediation rf_bug_v2_deterministic_adapter_identity_integration_green
+```
+
+This profile verifies the helper/shell contract, config startup for Vitest and Playwright replacement-lane discovery, ambient-override and missing-derivation rejection, controlled tracked-input invalidation, and the immutable protected acceptance baseline.
 ### 2. Configure OpenRouter and optional Tavily keys safely
 
 ResoFeed resolves provider API keys at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing OpenRouter key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. A missing Tavily key does not prevent the server from binding; it only disables optional external source-text recovery. Live HTTP model listing is the explicit request-time OpenRouter secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.

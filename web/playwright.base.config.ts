@@ -2,9 +2,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from 'playwright/test';
 
+import { installSvelteBuildIdentity } from '../scripts/resofeed-svelte-build-identity.mjs';
+
 export const webRoot = path.dirname(fileURLToPath(import.meta.url));
 export const repoRoot = path.resolve(webRoot, '..');
 export const artifactRoot = path.join(repoRoot, '.test-artifacts', 'playwright');
+export const svelteBuildIdentity = installSvelteBuildIdentity(repoRoot);
 
 export default defineConfig({
   testDir: path.join(webRoot, 'tests', 'e2e'),

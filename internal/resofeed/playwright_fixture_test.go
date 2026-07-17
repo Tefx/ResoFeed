@@ -19,13 +19,16 @@ func TestPlaywrightFixtureContract(t *testing.T) {
 	files := map[string][]string{
 		"web/tests/e2e/fixtures/runtime-fixture.ts": {
 			"'serve'", "--owner-token", "randomBytes(32)", "cwd: database.directory",
-			"['build', '-tags', 'resofeed_e2e'", "RESOFEED_E2E: '1'",
+			"path.join(repoRoot, 'scripts', 'build-resofeed.sh')", "['--e2e', binaryPath]", "RESOFEED_E2E: '1'",
 			"createTestDatabase(testInfo)", "captureBrowserDiagnostics(page)",
 			"RF-BUG-010_SETUP=ready", "RF-BUG-010_TEARDOWN=", "databaseResidue",
 			"database_residue=", "port=${closedPort ? 'closed' : 'open'}",
 		},
 		"web/tests/e2e/fixtures/test-db.ts": {
 			"testInfo.outputPath('runtime')", "resofeed.sqlite3", "-shm", "-wal", "fs.rmSync",
+		},
+		"scripts/build-resofeed.sh": {
+			"resofeed-svelte-build-identity.mjs", "go build -trimpath -tags resofeed_e2e", "go build -trimpath -o",
 		},
 		"scripts/vectl-check.mjs": {
 			"vectl.check.selection.v1", "vectl.check.evidence.v1", "rf_bug_v2_harness_foundation_green",
@@ -52,6 +55,19 @@ func TestPlaywrightFixtureContract(t *testing.T) {
 			if strings.Contains(text, forbidden) {
 				t.Errorf("%s contains forbidden harness mechanism %q", relativePath, forbidden)
 			}
+		}
+	}
+
+	fixtureBody, err := os.ReadFile(filepath.Join(repoRoot, "web/tests/e2e/fixtures/runtime-fixture.ts"))
+	if err != nil {
+		t.Fatalf("read canonical runtime fixture: %v", err)
+	}
+	fixtureText := string(fixtureBody)
+	for _, forbidden := range []string{
+		"spawnSync('go'", "spawnSync(\"go\"", "['build', '-tags', 'resofeed_e2e'", "['-tags', 'resofeed_e2e'",
+	} {
+		if strings.Contains(fixtureText, forbidden) {
+			t.Errorf("runtime fixture duplicates canonical Go build/tag construction %q", forbidden)
 		}
 	}
 

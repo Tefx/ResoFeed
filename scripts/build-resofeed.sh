@@ -124,44 +124,7 @@ if [[ "${RESOFEED_SVELTE_BUILD_IDENTITY+x}" == "x" ]]; then
   exit 2
 fi
 
-build_identity="$(node - "${repo_root}" <<'NODE'
-const crypto = require('node:crypto');
-const fs = require('node:fs');
-const path = require('node:path');
-
-const root = path.resolve(process.argv[2]);
-const explicitFiles = [
-  'scripts/build-resofeed.sh',
-  'web/package-lock.json',
-  'web/package.json',
-  'web/svelte.config.js',
-  'web/tsconfig.json',
-  'web/vite.config.ts'
-];
-const recursiveRoots = ['web/src', 'web/static'];
-const files = [...explicitFiles];
-function visit(relativeDirectory) {
-  const absoluteDirectory = path.join(root, relativeDirectory);
-  if (!fs.existsSync(absoluteDirectory)) return;
-  for (const entry of fs.readdirSync(absoluteDirectory, { withFileTypes: true })) {
-    const relativePath = path.posix.join(relativeDirectory, entry.name);
-    if (entry.isDirectory()) visit(relativePath);
-    else if (entry.isFile()) files.push(relativePath);
-    else throw new Error(`non-regular deterministic build input: ${relativePath}`);
-  }
-}
-for (const relativeRoot of recursiveRoots) visit(relativeRoot);
-files.sort((left, right) => Buffer.compare(Buffer.from(left, 'utf8'), Buffer.from(right, 'utf8')));
-if (files.length === 0 || new Set(files).size !== files.length) throw new Error('invalid deterministic build input manifest');
-const manifest = files.map((relativePath) => {
-  const absolutePath = path.join(root, ...relativePath.split('/'));
-  if (!fs.statSync(absolutePath).isFile()) throw new Error(`missing deterministic build input: ${relativePath}`);
-  return [relativePath, crypto.createHash('sha256').update(fs.readFileSync(absolutePath)).digest('hex')];
-});
-const digest = crypto.createHash('sha256').update(JSON.stringify(manifest), 'utf8').digest('hex');
-process.stdout.write(`rf-${digest}`);
-NODE
-)"
+build_identity="$(node "${repo_root}/scripts/resofeed-svelte-build-identity.mjs" derive "${repo_root}")"
 if [[ ! "${build_identity}" =~ ^rf-[a-f0-9]{64}$ ]]; then
   printf 'canonical Svelte build identity derivation failed\n' >&2
   exit 2

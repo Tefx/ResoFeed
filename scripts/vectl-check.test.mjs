@@ -9,6 +9,7 @@ import {
   PENDING_PROFILE_PAIRS,
   PROFILES,
   childEnvironment,
+  childEnvironmentForCommand,
   evidenceEnvelope,
   parseEvidenceOutput,
   parseSelectionOutput,
@@ -17,6 +18,12 @@ import {
   selectionEnvelope
 } from './vectl-check.mjs';
 import { verifyIsolatedLane } from './rf-bug-010-standard-json.mjs';
+import {
+  BUILD_IDENTITY_ENV,
+  canonicalBuildManifest,
+  deriveSvelteBuildIdentity,
+  resolveSvelteBuildIdentity
+} from './resofeed-svelte-build-identity.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const adapterPath = path.join(repoRoot, 'scripts', 'vectl-check.mjs');
@@ -66,6 +73,9 @@ const expectedPending = [
   ]],
   ['rf-bug-v2-deterministic-svelte-build-remediation', 'rf_bug_v2_deterministic_svelte_build_green', [
     'RF-BUG-010 deterministic canonical frontend builds'
+  ]],
+  ['rf-bug-v2-deterministic-adapter-identity-integration-remediation', 'rf_bug_v2_deterministic_adapter_identity_integration_green', [
+    'RF-BUG-010 deterministic adapter identity integration'
   ]],
   ['rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green', [
     'RF-BUG-004 State import lifecycle',
@@ -144,8 +154,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 17);
-  assert.equal(expectedPending.length, 17);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 18);
+  assert.equal(expectedPending.length, 18);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -249,7 +259,7 @@ test('RF-BUG-010 canonical fresh embedded UI build', () => {
   assert.match(scriptSource, /mktemp -d "\$\{package_dir\}\/\.webui-stage\./u);
   assert.match(scriptSource, /validate_bootstrap "\$\{staged_ui\}"/u);
   assert.match(scriptSource, /RESOFEED_SVELTE_BUILD_IDENTITY/u);
-  assert.match(scriptSource, /files\.sort\(\(left, right\) => Buffer\.compare/u);
+  assert.match(scriptSource, /resofeed-svelte-build-identity\.mjs" derive/u);
   assert.match(scriptSource, /env -i/u);
   assert.match(scriptSource, /go build -trimpath -tags resofeed_e2e -o/u);
   assert.match(scriptSource, /go build -trimpath -o/u);
@@ -271,6 +281,7 @@ test('RF-BUG-010 canonical fresh embedded UI build', () => {
     fs.mkdirSync(path.join(root, 'web', 'static'), { recursive: true });
     fs.mkdirSync(path.join(root, 'internal', 'resofeed', 'webui'), { recursive: true });
     fs.copyFileSync(scriptPath, path.join(root, 'scripts', 'build-resofeed.sh'));
+    fs.copyFileSync(path.join(repoRoot, 'scripts', 'resofeed-svelte-build-identity.mjs'), path.join(root, 'scripts', 'resofeed-svelte-build-identity.mjs'));
     for (const relativePath of ['package-lock.json', 'package.json', 'svelte.config.js', 'tsconfig.json', 'vite.config.ts']) {
       fs.writeFileSync(path.join(root, 'web', relativePath), `${relativePath}\n`);
     }
@@ -397,18 +408,20 @@ test('RF-BUG-010 deterministic canonical frontend build contract', () => {
   ]);
 
   const scriptSource = fs.readFileSync(path.join(repoRoot, 'scripts', 'build-resofeed.sh'), 'utf8');
-  assert.match(scriptSource, /scripts\/build-resofeed\.sh/u);
-  assert.match(scriptSource, /web\/package-lock\.json/u);
-  assert.match(scriptSource, /recursiveRoots = \['web\/src', 'web\/static'\]/u);
-  assert.match(scriptSource, /Buffer\.compare\(Buffer\.from\(left, 'utf8'\), Buffer\.from\(right, 'utf8'\)\)/u);
-  assert.match(scriptSource, /JSON\.stringify\(manifest\), 'utf8'/u);
-  assert.match(scriptSource, /\^rf-\[a-f0-9\]\{64\}\$/u);
+  const helperSource = fs.readFileSync(path.join(repoRoot, 'scripts', 'resofeed-svelte-build-identity.mjs'), 'utf8');
+  assert.match(scriptSource, /resofeed-svelte-build-identity\.mjs" derive/u);
+  assert.match(helperSource, /scripts\/build-resofeed\.sh/u);
+  assert.match(helperSource, /web\/package-lock\.json/u);
+  assert.match(helperSource, /recursiveRoots = \['web\/src', 'web\/static'\]/u);
+  assert.match(helperSource, /Buffer\.compare\(Buffer\.from\(left, 'utf8'\), Buffer\.from\(right, 'utf8'\)\)/u);
+  assert.match(helperSource, /JSON\.stringify\(manifest\), 'utf8'/u);
+  assert.match(helperSource, /\^rf-\[a-f0-9\]\{64\}\$/u);
   assert.match(scriptSource, /env -i/u);
-  assert.doesNotMatch(scriptSource, /deterministic-clock|Date\.now|NODE_OPTIONS/u);
+  assert.doesNotMatch(`${scriptSource}\n${helperSource}`, /deterministic-clock|Date\.now|NODE_OPTIONS/u);
 
   const svelteConfig = fs.readFileSync(path.join(repoRoot, 'web', 'svelte.config.js'), 'utf8');
   assert.match(svelteConfig, /version:\s*\{\s*name: buildIdentity\s*\}/u);
-  assert.match(svelteConfig, /RESOFEED_SVELTE_BUILD_IDENTITY must be a canonical build identity/u);
+  assert.match(svelteConfig, /resolveSvelteBuildIdentity/u);
   const viteConfig = fs.readFileSync(path.join(repoRoot, 'web', 'vite.config.ts'), 'utf8');
   assert.match(viteConfig, /const commitHash = buildIdentity\.slice\(3, 11\)/u);
   assert.doesNotMatch(viteConfig, /execSync|git rev-parse|process\.env\.VITE_GIT_COMMIT/u);
@@ -420,6 +433,84 @@ test('RF-BUG-010 deterministic canonical frontend build contract', () => {
   const selected = invoke('select', profile.suite, profile.checkID);
   assert.equal(selected.status, 0, selected.stderr);
   assert.deepEqual(parseSelectionOutput(selected.stdout, profile), selectionEnvelope(profile));
+});
+
+test('RF-BUG-010 deterministic adapter identity integration contract', () => {
+  const profile = findProfile(
+    'rf-bug-v2-deterministic-adapter-identity-integration-remediation',
+    'rf_bug_v2_deterministic_adapter_identity_integration_green'
+  );
+  assert.ok(profile);
+  assert.equal(profile.runner, 'identity-integration');
+  assert.deepEqual(profile.identities, ['RF-BUG-010 deterministic adapter identity integration']);
+
+  const identity = deriveSvelteBuildIdentity(repoRoot);
+  assert.match(identity, /^rf-[a-f0-9]{64}$/u);
+  assert.equal(deriveSvelteBuildIdentity(repoRoot), identity);
+  const manifest = canonicalBuildManifest(repoRoot);
+  const paths = manifest.map(([relativePath]) => relativePath);
+  assert.deepEqual(paths, [...paths].sort((left, right) => Buffer.compare(Buffer.from(left, 'utf8'), Buffer.from(right, 'utf8'))));
+  assert.equal(paths.every((relativePath) => !relativePath.includes('\\')), true);
+
+  const helperPath = path.join(repoRoot, 'scripts', 'resofeed-svelte-build-identity.mjs');
+  const cli = spawnSync(process.execPath, [helperPath, 'derive', repoRoot], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: childEnvironment()
+  });
+  assert.equal(cli.status, 0, cli.stderr);
+  assert.equal(cli.stdout, identity);
+
+  const npmEnvironment = childEnvironmentForCommand('npm');
+  assert.equal(npmEnvironment[BUILD_IDENTITY_ENV], identity);
+  assert.equal(BUILD_IDENTITY_ENV in childEnvironmentForCommand('node'), false);
+  assert.throws(
+    () => childEnvironmentForCommand('npm', { [BUILD_IDENTITY_ENV]: 'rf-user-selected' }),
+    /controlled by the trusted derivation helper/u
+  );
+  assert.throws(
+    () => resolveSvelteBuildIdentity(repoRoot, {}),
+    /trusted derivation is missing/u
+  );
+  assert.throws(
+    () => resolveSvelteBuildIdentity(repoRoot, { [BUILD_IDENTITY_ENV]: `rf-${'0'.repeat(64)}` }),
+    /cannot override the trusted canonical derivation/u
+  );
+
+  const fixtureRoot = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-identity-contract-'));
+  try {
+    for (const relativePath of ['scripts/build-resofeed.sh', 'web/package-lock.json', 'web/package.json', 'web/svelte.config.js', 'web/tsconfig.json', 'web/vite.config.ts']) {
+      const destination = path.join(fixtureRoot, relativePath);
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.copyFileSync(path.join(repoRoot, relativePath), destination);
+    }
+    fs.cpSync(path.join(repoRoot, 'web', 'src'), path.join(fixtureRoot, 'web', 'src'), { recursive: true });
+    fs.cpSync(path.join(repoRoot, 'web', 'static'), path.join(fixtureRoot, 'web', 'static'), { recursive: true });
+    const baseline = deriveSvelteBuildIdentity(fixtureRoot);
+    const sentinelPath = path.join(fixtureRoot, 'web', 'src', 'app.html');
+    fs.appendFileSync(sentinelPath, '\n<!-- deterministic-identity-sentinel -->\n');
+    const changed = deriveSvelteBuildIdentity(fixtureRoot);
+    assert.notEqual(changed, baseline);
+    assert.equal(deriveSvelteBuildIdentity(fixtureRoot), changed);
+    fs.rmSync(path.join(fixtureRoot, 'web', 'package-lock.json'));
+    assert.throws(() => deriveSvelteBuildIdentity(fixtureRoot), /missing deterministic build input/u);
+  } finally {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+
+  const buildScript = fs.readFileSync(path.join(repoRoot, 'scripts', 'build-resofeed.sh'), 'utf8');
+  assert.match(buildScript, /resofeed-svelte-build-identity\.mjs" derive/u);
+  assert.doesNotMatch(buildScript, /const explicitFiles|createHash\('sha256'\)/u);
+  for (const configPath of ['web/svelte.config.js', 'web/vite.config.ts']) {
+    assert.match(fs.readFileSync(path.join(repoRoot, configPath), 'utf8'), /resolveSvelteBuildIdentity/u);
+  }
+  assert.match(fs.readFileSync(path.join(repoRoot, 'web/playwright.base.config.ts'), 'utf8'), /installSvelteBuildIdentity/u);
+
+  const fixtureSource = fs.readFileSync(path.join(repoRoot, 'web/tests/e2e/fixtures/runtime-fixture.ts'), 'utf8');
+  assert.match(fixtureSource, /scripts['"], ['"]build-resofeed\.sh/u);
+  assert.match(fixtureSource, /\['--e2e', binaryPath\]/u);
+  assert.match(fixtureSource, /RESOFEED_E2E: '1'/u);
+  assert.doesNotMatch(fixtureSource, /spawnSync\(\s*['"]go['"]|\['build', '-tags', 'resofeed_e2e'/u);
 });
 
 test('RF-BUG-002 token parity harness adapter contract', () => {
@@ -641,9 +732,11 @@ test('VECTL-ADAPTER protected-scope', () => {
     'internal/resofeed/doctor.go',
     'internal/resofeed/doctor_test.go',
     'internal/resofeed/ingest.go',
+    'internal/resofeed/playwright_fixture_test.go',
     'internal/resofeed/rf_bug_opml_import_only_test.go',
     'scripts/build-resofeed.sh',
     'scripts/rf-bug-010-standard-json.mjs',
+    'scripts/resofeed-svelte-build-identity.mjs',
     'scripts/vectl-check.mjs',
     'scripts/vectl-check.test.mjs',
     'web/svelte.config.js',

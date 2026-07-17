@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { svelteBuildIdentity } from '../../../playwright.base.config';
 import runtimeConfig from '../../../playwright.runtime.config';
 import {
   hasExactLaneFiles,
+  playwrightHarnessContract,
   redactHarnessEvidence,
   RF_BUG_010_IDENTITIES,
   RF_BUG_010_OLD_LANE,
@@ -18,6 +20,16 @@ describe('RF-BUG-008 runtime discovery contract', () => {
 });
 
 describe('RF-BUG-010 harness contract', () => {
+  it('installs only the trusted deterministic identity for config startup', () => {
+    expect(svelteBuildIdentity).toMatch(/^rf-[a-f0-9]{64}$/u);
+    expect(process.env.RESOFEED_SVELTE_BUILD_IDENTITY).toBe(svelteBuildIdentity);
+    expect(playwrightHarnessContract.commands.backendBuild).toContain('scripts/build-resofeed.sh --e2e');
+    expect(playwrightHarnessContract.trustedBuildIdentity).toEqual([
+      'single-native-derivation-helper', 'tracked-input-byte-order', 'sanitized-config-child-only',
+      'ambient-override-rejected', 'missing-derivation-fails-closed'
+    ]);
+  });
+
   it('pins the repaired generic selected/executed identity set', () => {
     expect(RF_BUG_010_IDENTITIES).toEqual([
       'RF-BUG-010 adapter-envelope',

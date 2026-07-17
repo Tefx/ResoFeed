@@ -13,7 +13,7 @@ export type HarnessFlowCategory =
 
 export const playwrightHarnessContract = {
   commands: {
-    backendBuild: 'mkdir -p ./.test-artifacts/bin && go build -o ./.test-artifacts/bin/resofeed ./cmd/resofeed',
+    backendBuild: 'mkdir -p ./.test-artifacts/bin && ./scripts/build-resofeed.sh --e2e ./.test-artifacts/bin/resofeed',
     realServerLaunch: './.test-artifacts/bin/resofeed serve --db "$TEST_DB" --owner-token "$RESOFEED_OWNER_TOKEN"',
     browserFallback: 'npm --prefix web exec playwright test -- --config web/playwright.config.ts',
     preferredBrowserScript: 'npm --prefix web run test:e2e',
@@ -26,6 +26,10 @@ export const playwrightHarnessContract = {
   ] as const satisfies readonly HarnessFlowCategory[],
   forbiddenScope: ['accounts', 'sync-merge-machinery', 'sidecar-workers-or-queues', 'vector-db-or-rag', 'new-product-concepts', 'committed-llm-secrets'] as const,
   runClasses: ['ci-safe', 'live-openrouter'] as const,
+  trustedBuildIdentity: [
+    'single-native-derivation-helper', 'tracked-input-byte-order', 'sanitized-config-child-only',
+    'ambient-override-rejected', 'missing-derivation-fails-closed'
+  ] as const,
   liveOpenRouterBoundary: [
     'runtime-env-or-local-env-only', 'deterministic-skip-when-openrouter-key-absent',
     'invalid-key-startup-failure-path', 'redacted-evidence-only', 'tagged-live-openrouter-separation'
