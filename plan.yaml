@@ -190202,61 +190202,72 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Run the current Section 7 RF-BUG closure matrix from a fresh clean integrated
-      head through `scripts/vectl-check.mjs`. Execute `node scripts/vectl-check.mjs
-      run rf-bug-v2-frontend-runtime rf_bug_v2_frontend_runtime_green` first and exactly
-      once, then execute each of the other 18 current `rf-bug-v2-*` green profile/check
-      pairs declared by the adapter exactly once. Require no retry, no skip, exact
-      selected/executed identity, and one green evidence envelope per profile.
+      Run the corrected Section 7 RF-BUG closure matrix from one fresh clean integrated
+      head through `scripts/vectl-check.mjs`, after the first-run SQLite, retry-free
+      streaming, and closure-selector verifications pass. Execute `rf-bug-v2-frontend-runtime/rf_bug_v2_frontend_runtime_green`
+      first and exactly once. Then execute exactly once these other 18 suite/check
+      pairs, all and only suites whose names start `rf-bug-v2-`: `rf-bug-v2-harness-foundation/rf_bug_v2_harness_foundation_green`;
+      `rf-bug-v2-generic-adapter/rf_bug_v2_generic_adapter_green`; `rf-bug-v2-go-token-parity/rf_bug_v2_go_token_parity_green`;
+      `rf-bug-v2-embed-ui/rf_bug_v2_embed_ui_green`; `rf-bug-v2-opml/rf_bug_v2_opml_import_only_green`;
+      `rf-bug-v2-runtime-review-remediation/rf_bug_v2_runtime_review_remediation_green`;
+      `rf-bug-v2-runtime-doc-contract/rf_bug_v2_runtime_doc_contract_green`; `rf-bug-v2-http-security/rf_bug_v2_http_security_green`;
+      `rf-bug-v2-adapter-runtime-isolation-remediation/rf_bug_v2_adapter_runtime_isolation_green`;
+      `rf-bug-v2-canonical-e2e-embedded-ui-build-remediation/rf_bug_v2_canonical_e2e_embedded_ui_build_green`;
+      `rf-bug-v2-deterministic-svelte-build-remediation/rf_bug_v2_deterministic_svelte_build_green`;
+      `rf-bug-v2-deterministic-adapter-identity-integration-remediation/rf_bug_v2_deterministic_adapter_identity_integration_green`;
+      `rf-bug-v2-deterministic-profile-self-restoration-remediation/rf_bug_v2_deterministic_profile_self_restoration_green`;
+      `rf-bug-v2-generated-webui-baseline-sync/rf_bug_v2_generated_webui_baseline_sync_green`;
+      `rf-bug-v2-source-ledger/rf_bug_v2_source_ledger_green`; `rf-bug-v2-prompting/rf_bug_v2_prompting_green`;
+      `rf-bug-v2-prompting-harness/rf_bug_v2_prompting_harness_remediation_green`;
+      and `rf-bug-v2-closure-report/rf_bug_v2_defect_report_closure_green`. Require
+      exact selected/executed identity, one green envelope per profile, no retry,
+      no skip, no sleep, and no alternate selector.
 
 
-      Adjudication of the failed legacy direct gate in `/tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v2_report.md#sha256=5c9281b82d19f9e68eed8362fd51299bb9e2e73bd015942efc0fc8aa0b5df2dc`:
+      Every `item-deep-links-*` profile belongs to the locked future `item-summary-deep-links-assurance-v2`
+      phase. Exclude all of them from selection and execution; their red or unimplemented
+      state is outside current admission and cannot block this matrix. The corrected
+      selection supersedes the verifier mistake recorded in `/tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v3_report.md#sha256=c65bd2bee23f0f8718b33528c7393275c6cb248fbcae6451480d35f3296ae5fc`;
+      preserve that report as failure evidence.
+
+
+      Preserve the adjudication in `/tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v2_report.md#sha256=5c9281b82d19f9e68eed8362fd51299bb9e2e73bd015942efc0fc8aa0b5df2dc`:
       raw `go test ./...` is not an RF-BUG closure selector because it admits repository-wide
-      expected-red and later-plan tests outside Section 7. The reported `TestBackendRealAPIProofThroughHTTPServer`
-      and `TestBackendReingestSuccessThroughPublicStateImportSetup` exercise superseded
-      raw item-route and loopback State-import setup rather than the canonical route-token/outbound-URL
-      policies proven by the RF-BUG token-parity and runtime profiles. `TestCCRBackendReingestRejectsNonOpenRouterLegacyOutputAndPreservesCommittedContent`
-      and `TestContentContractRedesignPromptRoutingAndSteerFusionExpectedRed` belong
-      to prior content-contract/re-ingest legacy fixture ownership and do not intersect
-      RF-BUG-001–010; current Prompting v2.2 and source-evidence behavior is instead
-      selected by the prompting and prompting-harness profiles. None of these legacy
-      failures is admitted as a current RF-BUG product defect, and no repository remediation
-      is authorized by this step. Record the complete outside-scope failing-test inventory
-      and ownership disposition; do not weaken, delete, modify, retry, or silently
-      skip any test.
+      expected-red and later-plan tests outside Section 7. Record the complete outside-scope
+      failing-test inventory and ownership disposition; do not weaken, delete, modify,
+      retry, or silently skip any test.
 
 
       After all 19 scoped profiles pass, run full repository `go vet ./...` and build
       `./cmd/resofeed` to a disposable `/tmp` binary, remove it, and prove clean tracked
-      status. The scoped profiles are the complete current RF-BUG Go test authority:
-      do not substitute repository-wide `go test ./...`, which consumes unadmitted
-      expected-red work. Preserve focused/full RF-BUG Go identity coverage, RF-BUG-002
-      ten-title EN/ZH set repeated to 100 retry-free executions, Inspector/routes/State/accessibility,
-      Chromium CSP operations, smoke under 120 seconds, old/replacement E2E identity,
-      exact nine-active-document OPML scan with two exclusions, one-clean-root three-run
-      and intentional-failure evidence, redaction, current authority hashes, and no
-      repository diff.
+      status. The scoped profiles are the complete current RF-BUG Go test authority;
+      do not substitute repository-wide `go test ./...`. Preserve focused/full RF-BUG
+      Go identity coverage, RF-BUG-002 ten-title EN/ZH set repeated to 100 retry-free
+      executions, Inspector/routes/State/accessibility, Chromium CSP operations, smoke
+      under 120 seconds, old/replacement E2E identity, exact nine-active-document
+      OPML scan with two exclusions, one-clean-root three-run and intentional-failure
+      evidence, redaction, current authority hashes, and no repository diff.
 
 
       All package-relative frontend check/render/list/run and config startup must
       occur through the adapter''s canonical trusted Svelte build-identity path. Direct
       `npm --prefix web run check` or direct Vite/Svelte config startup without trusted
       derivation is invalid evidence and must not be retried with an ambient identity
-      or any fail-open bypass. OCI, containers, Tailnet, and live OpenRouter remain
-      outside this step.'
-    verification: 'From one fresh clean integrated head: (1) the mandatory frontend-runtime
-      profile passes first and exactly once; (2) the remaining 18 current adapter-declared
-      RF-BUG profiles each pass exactly once with exact selected/executed identity,
-      no retries, no skips, and one green envelope; (3) every current Section 7 Go
-      identity is covered by those profiles while the complete repository-wide outside-scope
-      expected-red inventory and ownership disposition is recorded without mutation;
-      (4) `go vet ./...` exits 0; (5) `go build -o <disposable-/tmp-path> ./cmd/resofeed`
-      exits 0 and the binary is removed; (6) adapter-mediated package-relative frontend
-      check/render/list/run proves the trusted Svelte build identity and fail-closed
-      missing/ambient-override behavior, with no direct identity-less npm/Vite/Svelte
-      invocation; (7) RF-BUG-002 100-run, nine-document/two-exclusion OPML, runtime/smoke,
-      clean-root reproducibility, redaction, authority hashes, and final empty `git
-      status --short` all pass.'
+      or fail-open bypass. OCI, containers, Tailnet, live OpenRouter, and every item-deep-links
+      profile remain outside this step.'
+    verification: 'From one fresh clean integrated head: (1) frontend-runtime passes
+      first and exactly once; (2) the explicitly named remaining 18 `rf-bug-v2-*`
+      suite/check pairs, including harness-foundation and generic-adapter, each pass
+      exactly once with exact selected/executed identity and one green envelope; (3)
+      zero `item-deep-links-*` profile is selected or executed and none is treated
+      as a blocker; (4) no retry, skip, sleep, alternate selector, or repository mutation
+      occurs; (5) the repaired HTTP-security profile observes retry-free multi-flush/cancellation
+      and the repaired closure-report profile executes both exact Go test identities
+      without `no tests to run`; (6) all current Section 7 Go identities, the RF-BUG-002
+      100-run, nine-document/two-exclusion OPML, runtime/smoke, clean-root reproducibility,
+      redaction, and authority hashes pass; (7) `go vet ./...` and a disposable `/tmp`
+      build pass, the binary is removed, adapter-mediated trusted frontend identity
+      remains fail-closed, and final `git status --short` is empty.'
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -190267,6 +190278,8 @@ phases:
     - docs/USAGE.md
     depends_on:
     - rf-bug-v2-first-run-sqlite-verification
+    - rf-bug-v2-streaming-contract-verification
+    - rf-bug-v2-closure-selector-verification
     agent: integration-verifier
   - id: rf-bug-v2-deployment-authorization-review
     name: Authorize v2 OCI publication and Tailnet deployment
