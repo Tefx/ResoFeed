@@ -190835,7 +190835,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-closure-selector-remediation
     name: Repair RF-BUG closure adapter authority aggregation and false-green guard
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the invalid closure selector recorded in `/tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v3_report.md#sha256=c65bd2bee23f0f8718b33528c7393275c6cb248fbcae6451480d35f3296ae5fc`.\
@@ -190931,6 +190931,13 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T08:39:16.756454+00:00'
+    done_at: '2026-07-17T08:51:28.936077+00:00'
+    evidence: Production Gate admitted worker receipt sha256:576f4064a6882806a803cb9b82d6fcaf90384b497d8081d4ad383d76ae51e46b
+      under dispatch sha256:6dc465bf125c953ebe5c8863bd159e28e87d07d495b635b5ed4b34598be838bd.
+      Closure profile now aggregates exact existing Go canonical, package-relative
+      OPML, prompting scan, and protected RF-BUG-001–010 inventory authorities, with
+      focused false-green guards; protected tests/authority docs unchanged. Integrated
+      commit 7a6522f1bd7da70841b86a492ae741391fb76be3.
   - id: rf-bug-v2-closure-selector-verification
     name: Independently verify RF-BUG closure authority aggregation
     status: pending
