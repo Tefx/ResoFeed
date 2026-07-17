@@ -12,6 +12,7 @@ import {
   childEnvironment,
   childEnvironmentForCommand,
   evidenceEnvelope,
+  generatedTreesMatch,
   parseEvidenceOutput,
   parseSelectionOutput,
   probeBuildIdentityRejection,
@@ -83,6 +84,9 @@ const expectedPending = [
   ]],
   ['rf-bug-v2-deterministic-profile-self-restoration-remediation', 'rf_bug_v2_deterministic_profile_self_restoration_green', [
     'RF-BUG-010 deterministic profile negative probes and restoration'
+  ]],
+  ['rf-bug-v2-generated-webui-baseline-sync', 'rf_bug_v2_generated_webui_baseline_sync_green', [
+    'RF-BUG-010 canonical generated webui baseline equality'
   ]],
   ['rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green', [
     'RF-BUG-004 State import lifecycle',
@@ -161,8 +165,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 19);
-  assert.equal(expectedPending.length, 19);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 20);
+  assert.equal(expectedPending.length, 20);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -440,6 +444,64 @@ test('RF-BUG-010 deterministic canonical frontend build contract', () => {
   const selected = invoke('select', profile.suite, profile.checkID);
   assert.equal(selected.status, 0, selected.stderr);
   assert.deepEqual(parseSelectionOutput(selected.stdout, profile), selectionEnvelope(profile));
+});
+
+test('RF-BUG-010 generated webui baseline adapter contract', () => {
+  const profile = findProfile(
+    'rf-bug-v2-generated-webui-baseline-sync',
+    'rf_bug_v2_generated_webui_baseline_sync_green'
+  );
+  assert.ok(profile);
+  assert.equal(profile.runner, 'generated-webui-baseline');
+  assert.deepEqual(profile.identities, ['RF-BUG-010 canonical generated webui baseline equality']);
+  assert.deepEqual(profile.requiredOutput, [
+    'RF-BUG-010_DEPENDENCY_SETUP=single_locked',
+    'RF-BUG-010_PRODUCTION_BUILD=canonical',
+    'RF-BUG-010_E2E_BUILD=canonical',
+    'RF-BUG-010_WEBUI_BASELINE=exact',
+    'RF-BUG-010_TRACKED_STATUS=clean',
+    'RF-BUG-010_IDENTITY_CONFIG_PRODUCT=unchanged',
+    'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged',
+    'RF-BUG-010_STAGE_RESIDUE=0',
+    'RF-BUG-010_ONE_ENVELOPE=green'
+  ]);
+
+  const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-generated-baseline-contract-'));
+  try {
+    const build = path.join(root, 'web', 'build');
+    const webui = path.join(root, 'internal', 'resofeed', 'webui');
+    for (const tree of [build, webui]) {
+      fs.mkdirSync(path.join(tree, '_app'), { recursive: true, mode: 0o755 });
+      fs.writeFileSync(path.join(tree, 'index.html'), 'canonical\n', { mode: 0o644 });
+      fs.writeFileSync(path.join(tree, '_app', 'entry.js'), 'entry\n', { mode: 0o644 });
+    }
+    assert.equal(generatedTreesMatch(root), true);
+    fs.writeFileSync(path.join(webui, '_app', 'entry.js'), 'changed\n');
+    assert.equal(generatedTreesMatch(root), false, 'byte mismatch must fail equality');
+    fs.writeFileSync(path.join(webui, '_app', 'entry.js'), 'entry\n');
+    fs.writeFileSync(path.join(webui, 'extra.js'), 'extra\n');
+    assert.equal(generatedTreesMatch(root), false, 'extra path must fail equality');
+    fs.rmSync(path.join(webui, 'extra.js'));
+    fs.chmodSync(path.join(webui, '_app', 'entry.js'), 0o600);
+    assert.equal(generatedTreesMatch(root), false, 'mode mismatch must fail equality');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+
+  const selected = invoke('select', profile.suite, profile.checkID);
+  assert.equal(selected.status, 0, selected.stderr);
+  assert.deepEqual(parseSelectionOutput(selected.stdout, profile), selectionEnvelope(profile));
+  const envelope = evidenceEnvelope({
+    profile,
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid']
+  });
+  assert.deepEqual(parseEvidenceOutput(JSON.stringify(envelope), profile, 'green'), envelope);
+  assert.throws(
+    () => parseEvidenceOutput(`${JSON.stringify(envelope)}\n${JSON.stringify(envelope)}`, profile, 'green'),
+    /expected one vectl.check.evidence.v1 envelope/u
+  );
 });
 
 test('RF-BUG-010 deterministic profile self-restoration contract', async (context) => {

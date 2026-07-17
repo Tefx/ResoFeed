@@ -245,6 +245,23 @@ export const PENDING_PROFILE_PAIRS = [
     runner: 'deterministic-self-restoration'
   },
   {
+    suite: 'rf-bug-v2-generated-webui-baseline-sync',
+    checkID: 'rf_bug_v2_generated_webui_baseline_sync_green',
+    identities: ['RF-BUG-010 canonical generated webui baseline equality'],
+    requiredOutput: [
+      'RF-BUG-010_DEPENDENCY_SETUP=single_locked',
+      'RF-BUG-010_PRODUCTION_BUILD=canonical',
+      'RF-BUG-010_E2E_BUILD=canonical',
+      'RF-BUG-010_WEBUI_BASELINE=exact',
+      'RF-BUG-010_TRACKED_STATUS=clean',
+      'RF-BUG-010_IDENTITY_CONFIG_PRODUCT=unchanged',
+      'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged',
+      'RF-BUG-010_STAGE_RESIDUE=0',
+      'RF-BUG-010_ONE_ENVELOPE=green'
+    ],
+    runner: 'generated-webui-baseline'
+  },
+  {
     suite: 'rf-bug-v2-source-ledger',
     checkID: 'rf_bug_v2_source_ledger_green',
     identities: [
@@ -975,6 +992,20 @@ export function captureGeneratedTreeState(root) {
   };
 }
 
+export function generatedTreesMatch(root) {
+  const trees = captureGeneratedTreeState(root);
+  return JSON.stringify(trees.build) === JSON.stringify(trees.webui);
+}
+
+function captureBoundedBaseline(root, relativePaths) {
+  return relativePaths.map((relativePath) => [relativePath, capturePathState(path.join(root, relativePath))]);
+}
+
+function assertBoundedBaseline(root, baseline, message) {
+  const current = captureBoundedBaseline(root, baseline.map(([relativePath]) => relativePath));
+  if (JSON.stringify(current) !== JSON.stringify(baseline)) throw new AdapterFailure(message);
+}
+
 function stageResidue(root) {
   const packageDirectory = path.join(root, 'internal', 'resofeed');
   if (!fs.existsSync(packageDirectory)) return [];
@@ -1225,6 +1256,70 @@ function runDeterministicBuildTransaction(profile) {
     observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
     artifacts: []
   };
+}
+
+const generatedBaselineProtectedPaths = [
+  'scripts/build-resofeed.sh',
+  'scripts/resofeed-svelte-build-identity.mjs',
+  'web/package.json',
+  'web/package-lock.json',
+  'web/svelte.config.js',
+  'web/vite.config.ts',
+  'web/src',
+  'web/static',
+  ...replacementLaneFiles
+];
+
+function runGeneratedWebUIBaseline(profile) {
+  ensureNoProtectedMutation();
+  const initialStatus = trackedStatus();
+  const protectedBaseline = captureBoundedBaseline(repoRoot, generatedBaselineProtectedPaths);
+  const committedWebUI = capturePathState(path.join(repoRoot, 'internal', 'resofeed', 'webui'));
+
+  const result = withLockedWebDependencies(profile, () => withGeneratedTreeRestoration(repoRoot, () => {
+    const focusedOutput = execute(profile, 'node', [
+      '--test', '--test-name-pattern=RF-BUG-010 generated webui baseline adapter contract',
+      'scripts/vectl-check.test.mjs'
+    ], { timeout: 240_000 });
+    if (!focusedOutput.includes('RF-BUG-010 generated webui baseline adapter contract')) {
+      throw new AdapterFailure('generated webui baseline focused developer contract did not execute');
+    }
+
+    const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-generated-webui-baseline-'));
+    try {
+      execute(profile, 'scripts/build-resofeed.sh', [path.join(scratch, 'resofeed-production')], { timeout: 600_000 });
+      if (!generatedTreesMatch(repoRoot) || JSON.stringify(capturePathState(path.join(repoRoot, 'internal', 'resofeed', 'webui'))) !== JSON.stringify(committedWebUI)) {
+        throw new AdapterFailure('generated webui mismatch after canonical production build');
+      }
+
+      execute(profile, 'scripts/build-resofeed.sh', ['--e2e', path.join(scratch, 'resofeed-e2e')], { timeout: 600_000 });
+      if (!generatedTreesMatch(repoRoot) || JSON.stringify(capturePathState(path.join(repoRoot, 'internal', 'resofeed', 'webui'))) !== JSON.stringify(committedWebUI)) {
+        throw new AdapterFailure('generated webui mismatch after canonical E2E build');
+      }
+
+      runDeterministicBuild(profile);
+      if (!generatedTreesMatch(repoRoot) || JSON.stringify(capturePathState(path.join(repoRoot, 'internal', 'resofeed', 'webui'))) !== JSON.stringify(committedWebUI)) {
+        throw new AdapterFailure('generated webui mismatch after deterministic profile sequence');
+      }
+    } finally {
+      fs.rmSync(scratch, { recursive: true, force: true });
+    }
+
+    assertBoundedBaseline(repoRoot, protectedBaseline, 'identity algorithm, build config, product source, or protected acceptance baseline changed');
+    ensureNoProtectedMutation();
+    return {
+      outcome: 'green',
+      exitCode: 0,
+      observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+      artifacts: []
+    };
+  }));
+
+  if (trackedStatus() !== initialStatus) throw new AdapterFailure('dirty synchronized worktree after generated baseline restoration');
+  assertNoStageResidue(repoRoot);
+  assertBoundedBaseline(repoRoot, protectedBaseline, 'identity algorithm, build config, product source, or protected acceptance baseline changed');
+  ensureNoProtectedMutation();
+  return result;
 }
 
 function runDeterministicSelfRestoration(profile) {
@@ -1645,6 +1740,8 @@ async function main() {
                   ? runDeterministicSelfRestoration(profile)
                   : profile.runner === 'identity-integration'
                     ? runIdentityIntegration(profile)
+                    : profile.runner === 'generated-webui-baseline'
+                      ? runGeneratedWebUIBaseline(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'
