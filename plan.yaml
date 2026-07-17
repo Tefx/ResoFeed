@@ -190501,7 +190501,7 @@ phases:
       \ web/tests/e2e/fixtures/**, web/src/**, web/package.json, web/package-lock.json,\
       \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, docs/BUG_FIX_PLAN_2026-07-12.md,\
       \ docs/BUG_REPORT_2026-07-11.md, internal/resofeed/webui/**]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/, .test-artifacts/]\nclaims: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n\
       checks:\n  - id: rf_bug_001_first_run_sqlite_regression_green\n    run: {command:\
       \ [go, test, -v, ./internal/resofeed, -run, '^TestRFBUG001ConcurrentFirstRunInspectionNoSQLiteBusy$',\
       \ -count=1], timeout_seconds: 180}\n    evidence:\n      mode: command_outcome\n\
