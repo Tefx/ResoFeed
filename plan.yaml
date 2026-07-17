@@ -191469,7 +191469,7 @@ phases:
       \ scripts/vectl-check.test.mjs, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
       \ docs/DESIGN.md, internal/resofeed/item_deep_links_expected_red_test.go, web/**,\
       \ README.md, deploy/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
-      \ .venv/, .pi/]\nclaims: [ITEM-DEEP-LINK-BACKEND]\nchecks:\n  - id: item_deep_links_backend_green\n\
+      \ .venv/]\nclaims: [ITEM-DEEP-LINK-BACKEND]\nchecks:\n  - id: item_deep_links_backend_green\n\
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-backend,\
       \ item_deep_links_backend_green], timeout_seconds: 1800}\n    evidence:\n  \
       \    mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
