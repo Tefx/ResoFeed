@@ -191087,6 +191087,124 @@ phases:
       Protected Chromium acceptance and api-client remained unchanged; pre-existing
       out-of-scope typecheck diagnostic was not hidden or claimed. Integrated commit
       0b8b502cab699cc7d0e998b836f144887ebddad5; user DESIGN edits preserved.
+  - id: rf-bug-v2-frontend-csp-runtime-generated-remediation
+    name: Repair remaining Chromium inline-style origin and synchronize embedded UI
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for the failed canonical fan-in verification report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`;\
+      \ preserve that report and its dirty failed-verification worktree unchanged.\
+      \ The report proves the protected Go 13-subtest multi-flush/cancellation lane\
+      \ and the completed `+page.svelte` source fix, while real Chromium still emits\
+      \ one `style-src 'self'` “Applying inline style violates…” console error during\
+      \ the completed OPML import and State export/import/download flow and the canonical\
+      \ build leaves tracked generated `internal/resofeed/webui` drift.\n\nUse a bounded\
+      \ diagnostic against the real Chromium operation sequence to identify the exact\
+      \ remaining inline-style origin and operation timing across active `web/src/**`,\
+      \ Svelte components, and the current Svelte/Vite runtime configuration. Capture\
+      \ `ConsoleMessage.location()` or an equivalently bounded real-browser origin/timing\
+      \ trace in worker evidence; do not mutate or filter the protected acceptance\
+      \ test. Remove the diagnosed runtime inline-style source with stylesheet-owned\
+      \ classes/component CSS or a source-backed Svelte configuration mechanism while\
+      \ preserving the completed `+page.svelte` remediation, split-pane scrolling,\
+      \ responsive layout, OPML import, and State export/import/download behavior.\
+      \ Extend the focused developer regression in `web/src/lib/__tests__/workbench-route.test.ts`\
+      \ to cover the exact diagnosed source and scan/compile the active Svelte runtime\
+      \ surface sufficiently to prevent recurrence outside `+page.svelte`.\n\nDo not\
+      \ add `unsafe-inline`, style hashes, nonces, runtime DOM style mutation, HTML/Svelte\
+      \ inline-style attributes or directives, mock/intercepted seams, retries, skips,\
+      \ sleeps, console filtering, or protected-test mutation. Preserve all Go source/tests,\
+      \ including the deliberate split-write security writer already proven by the\
+      \ failed report. Do not alter package manifests, trusted build identity, adapter\
+      \ code, build scripts, or unrelated frontend behavior.\n\nAfter source/config\
+      \ remediation, run the single canonical `scripts/build-resofeed.sh` pipeline\
+      \ and synchronize the complete tracked `internal/resofeed/webui` baseline from\
+      \ canonical `web/build`. The final generated tree must be path-for-path, byte-for-byte,\
+      \ and mode-for-mode equal to `web/build`; the existing generated-baseline selected-execution\
+      \ profile must pass and restore clean tracked status with zero stage residue.\
+      \ Update `docs/DESIGN.md` for the CSP-compatible runtime styling rule and `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`\
+      \ for bounded console-origin diagnosis plus canonical generated-baseline synchronization.\
+      \ Rollback reverts the diagnosed frontend/config source, focused developer regression,\
+      \ generated embedded baseline, and synchronized docs as one release unit.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [web/src/**,\
+      \ web/svelte.config.js, web/vite.config.ts, internal/resofeed/webui/**, docs/DESIGN.md,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n  blocked_paths: [cmd/**, internal/resofeed/*.go,\
+      \ internal/resofeed/*_test.go, web/tests/e2e/**, web/package.json, web/package-lock.json,\
+      \ web/static/**, scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/build-resofeed.sh,\
+      \ scripts/resofeed-svelte-build-identity.mjs, deploy/**, docs/ARCHITECTURE.md,\
+      \ docs/CONTAINER.md, docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC]\n\
+      checks:\n  - id: rf_bug_v2_frontend_csp_component_green\n    run:\n      command:\
+      \ [npm, --prefix, web, exec, --, vitest, run, src/lib/__tests__/workbench-route.test.ts,\
+      \ --reporter=verbose]\n      timeout_seconds: 300\n    evidence:\n      mode:\
+      \ command_outcome\n      path_bindings:\n        - {path: web/package.json,\
+      \ access: read, availability: current}\n        - {path: web/svelte.config.js,\
+      \ access: read, availability: current}\n        - {path: web/vite.config.ts,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ web/src/lib/__tests__/workbench-route.test.ts, classification: developer,\
+      \ availability: produced_by_step}\n    expect:\n      outcome: green\n     \
+      \ exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ workbench-route.test.ts}, {literal: RF-BUG-005 active Svelte runtime CSP styling},\
+      \ {regex: 'Test Files\\s+1 passed \\(1\\)'}, {regex: 'Tests\\s+[1-9][0-9]* passed'}]\n\
+      \        contains_any: []\n        forbids: [{literal: No test files found},\
+      \ {literal: No tests found}, {literal: retry}, {literal: skipped}]\n    proves:\
+      \ [RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC]\n  - id: rf_bug_v2_generated_webui_baseline_sync_green\n\
+      \    run:\n      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-generated-webui-baseline-sync,\
+      \ rf_bug_v2_generated_webui_baseline_sync_green]\n      timeout_seconds: 1800\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: scripts/build-resofeed.sh, access: execute, availability:\
+      \ current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs, access:\
+      \ execute, availability: current}\n        - {path: web/package.json, access:\
+      \ read, availability: current}\n        - {path: web/package-lock.json, access:\
+      \ read, availability: current}\n        - {path: internal/resofeed/webui, access:\
+      \ read, availability: produced_by_step}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: developer, availability: current}\n\
+      \      selection:\n        command: [node, scripts/vectl-check.mjs, select,\
+      \ rf-bug-v2-generated-webui-baseline-sync, rf_bug_v2_generated_webui_baseline_sync_green]\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
+      \ ['RF-BUG-010 canonical generated webui baseline equality']\n        forbidden_ids:\
+      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: RF-BUG-010_PRODUCTION_BUILD=canonical}, {literal:\
+      \ RF-BUG-010_E2E_BUILD=canonical}, {literal: RF-BUG-010_WEBUI_BASELINE=exact},\
+      \ {literal: RF-BUG-010_TRACKED_STATUS=clean}, {literal: RF-BUG-010_STAGE_RESIDUE=0},\
+      \ {literal: VECTL_GENERIC_EVIDENCE=valid}]\n        contains_any: []\n     \
+      \   forbids: [{literal: generated webui mismatch}, {literal: dirty synchronized\
+      \ worktree}, {literal: retry}, {literal: skip}, {literal: .webui-stage. residue}]\n\
+      \    proves: [RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"real_browser_csp_runtime\",\"svelte_component_or_config_surface\"\
+      ,\"embedded_generated_frontend_baseline\"],\"primary_outcome\":\"RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC\",\"atom\":\"the exact remaining\
+      \ active Svelte runtime source no longer applies inline style during the real\
+      \ Chromium OPML and State operation sequence\",\"modality\":\"runtime\",\"seam\"\
+      :\"real\",\"check_id\":\"rf_bug_v2_frontend_csp_component_green\",\"independent_step\"\
+      :\"rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification\"},{\"\
+      requirement_id\":\"RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC\",\"atom\"\
+      :\"the embedded frontend served by the Go binary is deterministically equal\
+      \ to the canonical current-source web build and leaves tracked status clean\"\
+      ,\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_generated_webui_baseline_sync_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
+      ],\"acceptance_test_paths\":[\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_frontend_csp_component_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The focused developer regression proves the exact diagnosed active
+      Svelte source and broader runtime surface no longer encode runtime/inline style
+      mutation; the source/config diff is diagnosis-bounded; canonical production
+      synchronization makes internal/resofeed/webui deterministically equal to web/build;
+      the existing generated-baseline profile passes with clean restoration and zero
+      residue; docs describe the CSP mechanism, bounded real-browser origin diagnosis,
+      and canonical generated synchronization; Go and protected acceptance remain
+      byte-identical; and no CSP weakening, mock/interception, retry, skip, sleep,
+      console filtering, identity/build-script/adapter mutation, package change, or
+      secret output appears.
+    depends_on:
+    - rf-bug-v2-frontend-csp-inline-style-remediation
+    agent: frontend-engineer
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
