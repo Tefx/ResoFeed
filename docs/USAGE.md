@@ -22,14 +22,14 @@ ResoFeed is not an inbox-zero reader, read-it-later app, semantic chat product, 
 ## Quick Start
 
 ### 1. Build
-
 ```bash
 npm --prefix web ci
 ./scripts/build-resofeed.sh ./bin/resofeed
 ```
 
-The build script creates the production Svelte build, replaces `internal/resofeed/webui` with that validated output, and compiles it into the Go binary. The resulting binary serves the UI without `web/build` or a working-directory dependency.
+The canonical build script creates deterministic production Svelte output, validates the staged bootstrap and package-local asset references beneath `internal/resofeed`, atomically replaces `internal/resofeed/webui`, runs the embedded-bootstrap validation, and compiles the untagged `go build -trimpath` production binary. Missing, empty, invalid, or externally referenced frontend output fails before package replacement; copy, validation, and Go-build failures restore the previous packaged UI; temporary `.webui-stage.*` directories are removed on every exit.
 
+Harness maintainers use `./scripts/build-resofeed.sh --e2e <output>` for real-binary Playwright runs. That form adds exactly the `resofeed_e2e` Go build tag and otherwise uses the same frontend/package pipeline. `RESOFEED_E2E=1` remains a separate runtime opt-in and never selects build tags. The resulting binaries serve the synchronized embedded UI without `web/build` or a working-directory dependency.
 ### 2. Configure OpenRouter and optional Tavily keys safely
 
 ResoFeed resolves provider API keys at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing OpenRouter key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. A missing Tavily key does not prevent the server from binding; it only disables optional external source-text recovery. Live HTTP model listing is the explicit request-time OpenRouter secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.

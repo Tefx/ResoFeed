@@ -177,6 +177,21 @@ export const PENDING_PROFILE_PAIRS = [
     runner: 'runtime-isolation'
   },
   {
+    suite: 'rf-bug-v2-canonical-e2e-embedded-ui-build-remediation',
+    checkID: 'rf_bug_v2_canonical_e2e_embedded_ui_build_green',
+    identities: ['RF-BUG-010 canonical fresh embedded UI build'],
+    requiredOutput: [
+      'RF-BUG-010_CANONICAL_BUILD=green',
+      'RF-BUG-010_PRODUCTION_TAGS=none',
+      'RF-BUG-010_E2E_TAGS=resofeed_e2e',
+      'RF-BUG-010_PACKAGE_LOCAL_ASSETS=fresh',
+      'RF-BUG-010_STAGE_RESIDUE=0',
+      'RF-BUG-010_SYNCED_WORKTREE=clean',
+      'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged'
+    ],
+    runner: 'canonical-build'
+  },
+  {
     suite: 'rf-bug-v2-source-ledger',
     checkID: 'rf_bug_v2_source_ledger_green',
     identities: [
@@ -690,24 +705,6 @@ function cleanupGlobalRuntime(invocationRoot) {
   if (!clean) throw new AdapterFailure('leaked resource after Playwright invocation');
 }
 
-function withCurrentEmbeddedUI(profile, run) {
-  const embeddedUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
-  const builtUI = path.join(repoRoot, 'web', 'build');
-  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-adapter-webui-'));
-  const backup = path.join(scratch, 'webui');
-  execute(profile, 'npm', ['--prefix', 'web', 'run', 'build'], { timeout: 180_000 });
-  fs.cpSync(embeddedUI, backup, { recursive: true });
-  try {
-    fs.rmSync(embeddedUI, { recursive: true, force: true });
-    fs.cpSync(builtUI, embeddedUI, { recursive: true });
-    return run();
-  } finally {
-    fs.rmSync(embeddedUI, { recursive: true, force: true });
-    fs.cpSync(backup, embeddedUI, { recursive: true });
-    fs.rmSync(scratch, { recursive: true, force: true });
-  }
-}
-
 function runPlaywrightFile(profile, file, reportPath, invocationRoot) {
   let output = '';
   let failure;
@@ -768,13 +765,11 @@ function runRuntimeIsolation(profile) {
   const laneRoot = path.join(repoRoot, '.test-artifacts', 'vectl', 'rf-bug-010-runtime-isolation');
   fs.rmSync(laneRoot, { recursive: true, force: true });
   fs.mkdirSync(laneRoot, { recursive: true });
-  const laneResults = withCurrentEmbeddedUI(profile, () => {
-    const replacement = executeIsolatedLane(profile, laneRoot, 'replacement', replacementLaneFiles, 29);
-    const oldDiscovery = discoverLane(profile, laneRoot, 'old', oldLaneFiles);
-    const oldCount = collectPlaywrightReport(oldDiscovery.report).identities.length;
-    const old = executeIsolatedLane(profile, laneRoot, 'old-execution', oldLaneFiles, oldCount);
-    return { replacement, old };
-  });
+  const replacement = executeIsolatedLane(profile, laneRoot, 'replacement', replacementLaneFiles, 29);
+  const oldDiscovery = discoverLane(profile, laneRoot, 'old', oldLaneFiles);
+  const oldCount = collectPlaywrightReport(oldDiscovery.report).identities.length;
+  const old = executeIsolatedLane(profile, laneRoot, 'old-execution', oldLaneFiles, oldCount);
+  const laneResults = { replacement, old };
   ensureNoProtectedMutation();
 
   const artifacts = [...foundation.artifacts, ...collectArtifactRows([laneRoot])];
@@ -783,6 +778,70 @@ function runRuntimeIsolation(profile) {
     exitCode: 0,
     observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
     artifacts
+  };
+}
+
+function treeDigest(root) {
+  const hash = createHash('sha256');
+  const files = [];
+  function visit(currentPath) {
+    for (const entry of fs.readdirSync(currentPath, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+      const entryPath = path.join(currentPath, entry.name);
+      if (entry.isDirectory()) visit(entryPath);
+      else if (entry.isFile()) files.push(entryPath);
+    }
+  }
+  visit(root);
+  for (const filePath of files) {
+    hash.update(path.relative(root, filePath).split(path.sep).join('/'));
+    hash.update('\0');
+    hash.update(fs.readFileSync(filePath));
+    hash.update('\0');
+  }
+  return hash.digest('hex');
+}
+
+function runCanonicalBuild(profile) {
+  ensureNoProtectedMutation();
+  execute(profile, 'node', [
+    '--test', '--test-name-pattern=RF-BUG-010 canonical fresh embedded UI build',
+    'scripts/vectl-check.test.mjs'
+  ], { timeout: 240_000 });
+
+  const packageUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
+  const builtUI = path.join(repoRoot, 'web', 'build');
+  const packageDir = path.dirname(packageUI);
+  const before = treeDigest(packageUI);
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-canonical-build-'));
+  const productionBinary = path.join(scratch, 'resofeed-production');
+  const e2eBinary = path.join(scratch, 'resofeed-e2e');
+  try {
+    execute(profile, 'scripts/build-resofeed.sh', [productionBinary], { timeout: 600_000 });
+    const afterProduction = treeDigest(packageUI);
+    if (afterProduction !== before) throw new AdapterFailure('canonical production build changed synchronized package-local assets');
+    if (treeDigest(builtUI) !== afterProduction) throw new AdapterFailure('canonical production build did not package the fresh frontend output');
+
+    execute(profile, 'scripts/build-resofeed.sh', ['--e2e', e2eBinary], { timeout: 600_000 });
+    if (treeDigest(packageUI) !== afterProduction || treeDigest(builtUI) !== afterProduction) {
+      throw new AdapterFailure('canonical E2E build diverged from production frontend assets');
+    }
+
+    const productionMetadata = execute(profile, 'go', ['version', '-m', productionBinary], { timeout: 30_000 });
+    const e2eMetadata = execute(profile, 'go', ['version', '-m', e2eBinary], { timeout: 30_000 });
+    if (/(?:^|\s)-tags(?:=|\s)/mu.test(productionMetadata)) throw new AdapterFailure('production binary unexpectedly contains Go build tags');
+    if (!/(?:^|\s)-tags=resofeed_e2e(?:\s|$)/mu.test(e2eMetadata)) throw new AdapterFailure('E2E binary missed the exact resofeed_e2e Go build tag');
+
+    const residue = fs.readdirSync(packageDir).filter((name) => name.startsWith('.webui-stage.'));
+    if (residue.length > 0) throw new AdapterFailure('canonical build left package-local stage residue', residue);
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+  ensureNoProtectedMutation();
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
   };
 }
 
@@ -1129,6 +1188,8 @@ async function main() {
           ? runRuntimeDocContract(profile)
           : profile.runner === 'runtime-isolation'
             ? runRuntimeIsolation(profile)
+            : profile.runner === 'canonical-build'
+              ? runCanonicalBuild(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'

@@ -14,13 +14,16 @@ Status: implemented harness contract. The harness verifies the real `cmd/resofee
 The harness must build and launch the real single deployable. It must not use Vite preview as the system under test, a mocked API server, a sidecar worker, a queue/job process, or any additional product runtime.
 
 ### Backend Build Command
+Production and E2E real binaries use the same package-local frontend pipeline:
 
 ```bash
-mkdir -p ./.test-artifacts/bin && go build -tags resofeed_e2e -o ./.test-artifacts/bin/resofeed ./cmd/resofeed
+./scripts/build-resofeed.sh ./.test-artifacts/bin/resofeed-production
+./scripts/build-resofeed.sh --e2e ./.test-artifacts/bin/resofeed
 ```
 
-The harness may use a different artifact directory, but the build target remains `./cmd/resofeed`. The `resofeed_e2e` build tag and exact runtime value `RESOFEED_E2E=1` form a two-key boundary for loopback RSS fixtures. Either key alone leaves loopback blocked. The allowance covers loopback hosts only; private, link-local, multicast, and unspecified destinations remain blocked, as do loopback destinations under strict validation. `scripts/build-resofeed.sh` remains the untagged production build path and ignores `RESOFEED_E2E` for outbound policy.
+The script builds deterministic Svelte output, rejects missing, empty, externally referenced, or otherwise invalid bootstrap output before package replacement, copies the result into a temporary `.webui-stage.*` directory beneath `internal/resofeed`, validates that staged bootstrap and its package-local references, then replaces `internal/resofeed/webui`. It runs the embedded-bootstrap Go validation before compiling `./cmd/resofeed`, restores the prior packaged tree after validation or Go-build failure, and removes package-local stage residue on success, failure, or interruption.
 
+The production interface remains untagged `go build -trimpath`. `--e2e <output>` adds exactly `-tags resofeed_e2e`; the script never derives tags from `RESOFEED_E2E`, ambient environment, alternate keys, or generic tag arguments. Playwright still supplies exact runtime `RESOFEED_E2E=1`, so the loopback fixture allowance retains its two-key boundary. Global setup, case-local runtime fixtures, and replacement-lane executions all invoke this script rather than building web assets or swapping the embedded tree independently. The resulting binary serves the synchronized package-local UI without `web/build` or a working-directory dependency.
 ### Real Server Launch Command
 
 ```bash
@@ -85,8 +88,7 @@ node scripts/vectl-check.mjs run rf-bug-v2-harness-foundation rf_bug_v2_harness_
 
 It emits the generic `vectl.check.selection.v1` / `vectl.check.evidence.v1` contract and proves four identities: adapter envelope, intentional-failure artifact retention, case-local lifecycle isolation, and native lane discovery. Lane discovery uses Playwright `--list` only for the legacy three-file set and replacement five-file set. The foundation check does not execute either product-semantic lane and does not claim Search, Source Ledger, State, route, or responsive behavior. Downstream implementation and independent runtime-verification phases own those semantic executions and the final list/run identity comparison.
 ### Generic Adapter Profile Contract
-
-`scripts/vectl-check.mjs` dispatches by the exact `(suite, check_id)` pair. `select` emits one `vectl.check.selection.v1` envelope with the contract identities and digest. `run` invokes only that profile's native Go, Vitest, or Playwright checks and emits one `vectl.check.evidence.v1` envelope with identical `selected_ids` and `executed_ids`. Unknown suites, unknown checks, and cross-paired suite/check values exit non-zero before any native command starts. The expected-red item contract remains red with exit code 1; green profiles require exit code 0. Runtime-only provider secrets remain absent from child environments and evidence.
+`scripts/vectl-check.mjs` dispatches by the exact `(suite, check_id)` pair. `select` emits one `vectl.check.selection.v1` envelope with the contract identities and digest. `run` invokes only that profile's native Go, Vitest, Playwright, or canonical build checks and emits one `vectl.check.evidence.v1` envelope with identical `selected_ids` and `executed_ids`. Unknown suites, unknown checks, and cross-paired suite/check values exit non-zero before any native command starts. The expected-red item contract remains red with exit code 1; green profiles require exit code 0. Runtime-only provider secrets remain absent from child environments and evidence.
 
 The pending profile matrix is:
 
@@ -96,15 +98,20 @@ The pending profile matrix is:
 | `rf-bug-v2-go-token-parity` | `rf_bug_v2_go_token_parity_green` | 2 | green |
 | `rf-bug-v2-embed-ui` | `rf_bug_v2_embed_ui_green` | 3 | green |
 | `rf-bug-v2-opml` | `rf_bug_v2_opml_import_only_green` | 2 | green |
+| `rf-bug-v2-runtime-review-remediation` | `rf_bug_v2_runtime_review_remediation_green` | 3 | green |
+| `rf-bug-v2-runtime-doc-contract` | `rf_bug_v2_runtime_doc_contract_green` | 4 | green |
 | `rf-bug-v2-http-security` | `rf_bug_v2_http_security_green` | 3 | green |
+| `rf-bug-v2-adapter-runtime-isolation-remediation` | `rf_bug_v2_adapter_runtime_isolation_green` | 2 | green |
+| `rf-bug-v2-canonical-e2e-embedded-ui-build-remediation` | `rf_bug_v2_canonical_e2e_embedded_ui_build_green` | 1 | green |
 | `rf-bug-v2-source-ledger` | `rf_bug_v2_source_ledger_green` | 5 | green |
 | `rf-bug-v2-prompting` | `rf_bug_v2_prompting_green` | 4 | green |
+| `rf-bug-v2-prompting-harness` | `rf_bug_v2_prompting_harness_remediation_green` | 4 | green |
 | `rf-bug-v2-closure-report` | `rf_bug_v2_defect_report_closure_green` | 2 | green |
 | `item-deep-links-contract` | `item_deep_links_expected_red` | 3 | red |
 | `item-deep-links-backend` | `item_deep_links_backend_green` | 1 | green |
 | `item-deep-links-frontend` | `item_deep_links_frontend_green` | 2 | green |
 
-`node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all eleven selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifact objects, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms that changes remain limited to the adapter, its developer test, and this contract. The profile emits `VECTL_ADAPTER_COMPLETED_HARNESS=preserved` and `VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid` only after both developer checks pass. It does not execute unfinished consumer product semantics.
+`node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all sixteen selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifact objects, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms protected acceptance scope remains clean. The profile emits `VECTL_ADAPTER_COMPLETED_HARNESS=preserved` and `VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid` only after both developer checks pass. It does not execute unfinished consumer product semantics.
 
 The `rf-bug-v2-source-ledger` profile binds the required `Source Ledger groups and controls render` output marker to its Vitest `test:render` command. That command includes exactly one `--reporter=verbose` argument so Vitest emits the full test title for deterministic marker validation. Neither Source Ledger Playwright command carries the verbose Vitest reporter argument; their existing `--reporter=line` contracts remain unchanged.
 ### RF-BUG-010 Replacement Runtime Isolation Remediation
@@ -120,6 +127,17 @@ Its `vectl.check.selection.v1` envelope contains exactly `RF-BUG-010 foundation 
 The profile discovers the immutable replacement-five inventory with Playwright `--list`, then starts one Playwright process per file. Each process receives a freshly built real `cmd/resofeed` binary containing the current web build, a fresh SQLite database, browser context, owned loopback ports/processes, sanitized environment, and post-run cleanup boundary. The adapter aggregates the five native JSON reports and requires exactly 29 unique selected identities, the same 29 executed once, all passing on attempt zero, with no skip, retry, duplicate, or missing identity. A shared aggregate replacement process is rejected because runtime processing-language and State mutations could leak across `initial-route`/`routes`, responsive, and delete cases.
 
 After replacement passes, the adapter discovers and executes the legacy three-file inventory with the same native selected/executed identity parity check. Every invocation retains its JSON/HTML report, redacted server and stub logs, sanitized environment note, and `runtime-cleanup.txt`; process, port, or SQLite/WAL/SHM residue fails the profile. The replacement-five and old-three acceptance sources must remain byte-identical to `HEAD`. Adapter and fixture cleanup runs on both success and failure, and the temporary embedded-web build is restored before evidence is emitted.
+### RF-BUG-010 Canonical Fresh Embedded UI Build
+
+The bounded profile is:
+
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-canonical-e2e-embedded-ui-build-remediation rf_bug_v2_canonical_e2e_embedded_ui_build_green
+```
+
+It selects and executes exactly `RF-BUG-010 canonical fresh embedded UI build`. Focused developer tests exercise production and E2E argv, stale package-local replacement, staged bootstrap validation, missing/empty/invalid build rejection, failed-copy and failed-Go rollback, and stage cleanup. The runtime check builds both binary forms through `scripts/build-resofeed.sh`, verifies production has no Go tags while E2E has exactly `resofeed_e2e`, compares `web/build` with `internal/resofeed/webui`, repeats the pipeline without changing the synchronized asset tree, and confirms the protected replacement-five acceptance files remain unchanged.
+
+Rollback reverts the script, global setup, runtime fixture, adapter profile, focused tests, synchronized generated package-local assets, and this documentation together.
 ### Prompting v2.2 Loopback Harness Remediation
 
 The dedicated pair `rf-bug-v2-prompting-harness` / `rf_bug_v2_prompting_harness_remediation_green` owns the Prompting loopback extraction boundary. It selects and executes exactly these four identities, in order: `RF-BUG-009 harness exact 16 subtests`, `RF-BUG-009 harness exact argv and environment`, `RF-BUG-009 harness exact four identities`, and `RF-BUG-009 harness production strict`.

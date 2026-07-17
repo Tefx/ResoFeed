@@ -2,7 +2,6 @@ import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import net from 'node:net';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -39,24 +38,12 @@ function sanitizedEnvironment(): NodeJS.ProcessEnv {
 
 function buildBinary(binaryPath: string): void {
   fs.mkdirSync(path.dirname(binaryPath), { recursive: true });
-  const web = spawnSync('npm', ['--prefix', 'web', 'run', 'build'], { cwd: repoRoot, env: sanitizedEnvironment(), encoding: 'utf8' });
-  if (web.status !== 0) throw new Error(`web build failed: ${(web.stderr || web.stdout).slice(-2000)}`);
-
-  const embeddedUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
-  const builtUI = path.join(webRoot, 'build');
-  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-runtime-webui-'));
-  const backup = path.join(scratch, 'webui');
-  fs.cpSync(embeddedUI, backup, { recursive: true });
-  try {
-    fs.rmSync(embeddedUI, { recursive: true, force: true });
-    fs.cpSync(builtUI, embeddedUI, { recursive: true });
-    const backend = spawnSync('go', ['build', '-tags', 'resofeed_e2e', '-o', binaryPath, './cmd/resofeed'], { cwd: repoRoot, env: sanitizedEnvironment(), encoding: 'utf8' });
-    if (backend.status !== 0) throw new Error(`Go build failed: ${(backend.stderr || backend.stdout).slice(-2000)}`);
-  } finally {
-    fs.rmSync(embeddedUI, { recursive: true, force: true });
-    fs.cpSync(backup, embeddedUI, { recursive: true });
-    fs.rmSync(scratch, { recursive: true, force: true });
-  }
+  const result = spawnSync(
+    path.join(repoRoot, 'scripts', 'build-resofeed.sh'),
+    ['--e2e', binaryPath],
+    { cwd: repoRoot, env: sanitizedEnvironment(), encoding: 'utf8' }
+  );
+  if (result.status !== 0) throw new Error(`canonical E2E build failed: ${(result.stderr || result.stdout).slice(-2000)}`);
 }
 
 async function reservePort(): Promise<number> {

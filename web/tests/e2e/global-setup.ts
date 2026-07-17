@@ -260,8 +260,7 @@ export default async function globalSetup(): Promise<void> {
   fs.writeFileSync(path.join(fixturesDir, 'local-feed.xml'), fixtureFeedXml);
   fs.writeFileSync(path.join(fixturesDir, 'flattened.opml'), fixtureOpml(fixtureServer.url));
 
-  run('npm', ['--prefix', 'web', 'run', 'build'], repoRoot);
-  run('go', ['build', '-tags', 'resofeed_e2e', '-o', binaryPath, './cmd/resofeed'], repoRoot);
+  run(path.join(repoRoot, 'scripts', 'build-resofeed.sh'), ['--e2e', binaryPath], repoRoot);
 
   const port = await reservePort();
   const stubPort = await reservePort();

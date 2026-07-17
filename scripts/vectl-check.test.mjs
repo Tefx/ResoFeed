@@ -61,6 +61,9 @@ const expectedPending = [
     'RF-BUG-010 foundation smoke isolation',
     'RF-BUG-010 replacement runtime isolation'
   ]],
+  ['rf-bug-v2-canonical-e2e-embedded-ui-build-remediation', 'rf_bug_v2_canonical_e2e_embedded_ui_build_green', [
+    'RF-BUG-010 canonical fresh embedded UI build'
+  ]],
   ['rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green', [
     'RF-BUG-004 State import lifecycle',
     'RF-BUG-008 delete focus',
@@ -138,8 +141,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 15);
-  assert.equal(expectedPending.length, 15);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 16);
+  assert.equal(expectedPending.length, 16);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -225,6 +228,142 @@ test('RF-BUG-010 runtime isolation adapter contract', () => {
   assert.match(adapterSource, /copyRedactedArtifact/u);
   assert.equal((adapterSource.match(/ensureNoProtectedMutation\(\);/gu) ?? []).length >= 4, true);
   assert.match(adapterSource, /for \(const isolatedRoot of \[smokeRoot, runtimeRoot\]\) fs\.rmSync/u);
+});
+
+test('RF-BUG-010 canonical fresh embedded UI build', () => {
+  const profile = findProfile(
+    'rf-bug-v2-canonical-e2e-embedded-ui-build-remediation',
+    'rf_bug_v2_canonical_e2e_embedded_ui_build_green'
+  );
+  assert.ok(profile);
+  assert.equal(profile.runner, 'canonical-build');
+  assert.deepEqual(profile.identities, ['RF-BUG-010 canonical fresh embedded UI build']);
+
+  const scriptPath = path.join(repoRoot, 'scripts', 'build-resofeed.sh');
+  const scriptSource = fs.readFileSync(scriptPath, 'utf8');
+  assert.match(scriptSource, /e2e_build=0/u);
+  assert.match(scriptSource, /e2e_build=1/u);
+  assert.match(scriptSource, /mktemp -d "\$\{package_dir\}\/\.webui-stage\./u);
+  assert.match(scriptSource, /validate_bootstrap "\$\{staged_ui\}"/u);
+  assert.match(scriptSource, /deterministic-clock\.cjs/u);
+  assert.match(scriptSource, /NODE_OPTIONS="--require=\$\{clock_preload\}" npm --prefix web run build/u);
+  assert.match(scriptSource, /go build -trimpath -tags resofeed_e2e -o/u);
+  assert.match(scriptSource, /go build -trimpath -o/u);
+
+  for (const consumer of ['web/tests/e2e/global-setup.ts', 'web/tests/e2e/fixtures/runtime-fixture.ts']) {
+    const source = fs.readFileSync(path.join(repoRoot, consumer), 'utf8');
+    assert.match(source, /scripts['"], ['"]build-resofeed\.sh/u, `${consumer} must use the canonical build script`);
+    assert.doesNotMatch(source, /npm['"], \[['"]--prefix['"], ['"]web['"], ['"]run['"], ['"]build/u);
+    assert.doesNotMatch(source, /spawnSync\(['"]go['"], \[['"]build/u);
+  }
+  const adapterSource = fs.readFileSync(adapterPath, 'utf8');
+  assert.doesNotMatch(adapterSource, /withCurrentEmbeddedUI/u);
+  assert.match(adapterSource, /runner: 'canonical-build'/u);
+
+  function fixture() {
+    const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-build-contract-'));
+    fs.mkdirSync(path.join(root, 'scripts'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'web'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'internal', 'resofeed', 'webui'), { recursive: true });
+    fs.copyFileSync(scriptPath, path.join(root, 'scripts', 'build-resofeed.sh'));
+    fs.chmodSync(path.join(root, 'scripts', 'build-resofeed.sh'), 0o755);
+    fs.writeFileSync(path.join(root, 'internal', 'resofeed', 'webui', 'old.js'), 'old');
+    fs.writeFileSync(path.join(root, 'internal', 'resofeed', 'webui', 'index.html'), '<script src="/old.js"></script>');
+
+    const fakeBin = path.join(root, 'fake-bin');
+    fs.mkdirSync(fakeBin);
+    fs.writeFileSync(path.join(fakeBin, 'npm'), `#!/usr/bin/env bash
+set -euo pipefail
+rm -rf "$PWD/web/build"
+mkdir -p "$PWD/web/build"
+case "\${BUILD_FIXTURE:-valid}" in
+  missing) ;;
+  empty) : > "$PWD/web/build/index.html" ;;
+  invalid) printf '%s' '<script src="https://example.test/app.js"></script>' > "$PWD/web/build/index.html" ;;
+  valid)
+    printf '%s' 'fresh' > "$PWD/web/build/app.js"
+    printf '%s' '<link href="/app.js"><script type="module">import("/app.js")</script>' > "$PWD/web/build/index.html"
+    ;;
+esac
+`);
+    fs.writeFileSync(path.join(fakeBin, 'go'), `#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\\n' "$*" >> "$PWD/go-args.log"
+if [[ "$1" == "test" ]]; then
+  grep -q fresh "$PWD/internal/resofeed/webui/app.js"
+  if [[ "\${FAIL_GO:-}" == "test" ]]; then exit 31; fi
+  exit 0
+fi
+if [[ "\${FAIL_GO:-}" == "build" ]]; then exit 32; fi
+output=''
+previous=''
+for argument in "$@"; do
+  if [[ "$previous" == "-o" ]]; then output="$argument"; fi
+  previous="$argument"
+done
+mkdir -p "$(dirname "$output")"
+printf '%s' binary > "$output"
+`);
+    fs.writeFileSync(path.join(fakeBin, 'cp'), `#!/usr/bin/env bash
+if [[ "\${FAIL_COPY:-}" == "1" ]]; then exit 23; fi
+exec /bin/cp "$@"
+`);
+    for (const command of ['npm', 'go', 'cp']) fs.chmodSync(path.join(fakeBin, command), 0o755);
+    return { root, fakeBin };
+  }
+
+  function runFixture(options = {}) {
+    const current = fixture();
+    const output = path.join(current.root, 'out', 'resofeed');
+    const result = spawnSync(path.join(current.root, 'scripts', 'build-resofeed.sh'), [...(options.e2e ? ['--e2e'] : []), output], {
+      cwd: current.root,
+      encoding: 'utf8',
+      env: {
+        PATH: `${current.fakeBin}:${process.env.PATH ?? ''}`,
+        HOME: process.env.HOME ?? '',
+        TMPDIR: process.env.TMPDIR ?? '/tmp',
+        BUILD_FIXTURE: options.buildFixture ?? 'valid',
+        FAIL_COPY: options.failCopy ? '1' : '',
+        FAIL_GO: options.failGo ?? ''
+      }
+    });
+    return { ...current, output, result };
+  }
+
+  for (const e2e of [false, true]) {
+    const current = runFixture({ e2e });
+    try {
+      assert.equal(current.result.status, 0, current.result.stderr);
+      const packagedApp = path.join(current.root, 'internal', 'resofeed', 'webui', 'app.js');
+      assert.equal(fs.existsSync(packagedApp), true, `${current.result.stdout}\n${current.result.stderr}`);
+      assert.equal(fs.readFileSync(packagedApp, 'utf8'), 'fresh');
+      assert.equal(fs.existsSync(current.output), true);
+      const args = fs.readFileSync(path.join(current.root, 'go-args.log'), 'utf8');
+      if (e2e) assert.match(args, /build -trimpath -tags resofeed_e2e -o/u);
+      else assert.doesNotMatch(args, /-tags/u);
+      assert.equal(fs.readdirSync(path.join(current.root, 'internal', 'resofeed')).some((name) => name.startsWith('.webui-stage.')), false);
+    } finally {
+      fs.rmSync(current.root, { recursive: true, force: true });
+    }
+  }
+
+  for (const failure of [
+    { buildFixture: 'missing' },
+    { buildFixture: 'empty' },
+    { buildFixture: 'invalid' },
+    { failCopy: true },
+    { failGo: 'test' },
+    { failGo: 'build' }
+  ]) {
+    const current = runFixture(failure);
+    try {
+      assert.notEqual(current.result.status, 0, JSON.stringify(failure));
+      assert.equal(fs.readFileSync(path.join(current.root, 'internal', 'resofeed', 'webui', 'old.js'), 'utf8'), 'old');
+      assert.equal(fs.readdirSync(path.join(current.root, 'internal', 'resofeed')).some((name) => name.startsWith('.webui-stage.')), false);
+    } finally {
+      fs.rmSync(current.root, { recursive: true, force: true });
+    }
+  }
 });
 
 test('RF-BUG-002 token parity harness adapter contract', () => {
@@ -447,6 +586,7 @@ test('VECTL-ADAPTER protected-scope', () => {
     'internal/resofeed/doctor_test.go',
     'internal/resofeed/ingest.go',
     'internal/resofeed/rf_bug_opml_import_only_test.go',
+    'scripts/build-resofeed.sh',
     'scripts/rf-bug-010-standard-json.mjs',
     'scripts/vectl-check.mjs',
     'scripts/vectl-check.test.mjs',
@@ -454,6 +594,7 @@ test('VECTL-ADAPTER protected-scope', () => {
     'web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts',
     'web/tests/e2e/fixtures/runtime-fixture.ts',
     'web/tests/e2e/fixtures/test-db.ts',
+    'web/tests/e2e/global-setup.ts',
     'web/playwright.base.config.ts',
     'web/playwright.browser-contract.config.ts',
     'web/playwright.ci-safe.config.ts',
@@ -469,7 +610,10 @@ test('VECTL-ADAPTER protected-scope', () => {
 
   const changed = result.stdout.split('\0').filter(Boolean).map((row) => row.slice(3));
   for (const changedPath of changed) {
-    assert.ok(allowed.has(changedPath), `protected or out-of-scope path changed: ${changedPath}`);
+    assert.ok(
+      allowed.has(changedPath) || changedPath.startsWith('internal/resofeed/webui/'),
+      `protected or out-of-scope path changed: ${changedPath}`
+    );
   }
 });
 
