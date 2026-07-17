@@ -190220,6 +190220,8 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - web/package.json
     - go.mod
+    depends_on:
+    - rf-bug-v2-first-run-sqlite-verification
     agent: integration-verifier
   - id: rf-bug-v2-deployment-authorization-review
     name: Authorize v2 OCI publication and Tailnet deployment
