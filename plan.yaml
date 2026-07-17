@@ -191121,7 +191121,7 @@ phases:
       0b8b502cab699cc7d0e998b836f144887ebddad5; user DESIGN edits preserved.
   - id: rf-bug-v2-frontend-csp-runtime-generated-remediation
     name: Repair remaining Chromium inline-style origin and synchronize embedded UI
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the failed canonical fan-in verification report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`;\
@@ -191239,6 +191239,15 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T09:27:22.816374+00:00'
+    done_at: '2026-07-17T09:42:18.293761+00:00'
+    evidence: Production Gate admitted worker receipt sha256:d8d26fe78fe144072f29748a2a7b7ee3773e3aed4151038f08fbf85f39c770ec
+      under dispatch sha256:3c36637ac1cf8f63bacbb7adac29ed88bdc8e0344ea0d27be2d22a3d24103219.
+      Bounded real-browser diagnosis identified SvelteKit's generated announcer inline
+      style; a source-backed Svelte preprocessor replaces it with existing stylesheet-owned
+      visually-hidden class, focused active-runtime tests passed, and canonical generated-webui
+      baseline profile proved exact production/E2E equality with zero residue. Integrated
+      commit a9ce563a02104328617a47609938ac3bea4adcb2; protected browser acceptance/Go/build
+      scripts/manifests unchanged; user docs edits preserved.
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
