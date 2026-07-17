@@ -189251,7 +189251,7 @@ phases:
       and returned to unstaged state.
   - id: rf-bug-v2-current-operation-foreground-ownership-verification
     name: Independently verify production ingest current-operation ownership
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189287,6 +189287,8 @@ phases:
     depends_on:
     - rf-bug-v2-current-operation-foreground-ownership-remediation
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T00:21:24.609634+00:00'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
