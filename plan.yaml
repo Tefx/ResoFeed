@@ -190794,7 +190794,7 @@ phases:
       preserved.
   - id: rf-bug-v2-streaming-contract-verification
     name: Independently verify retry-free RF-BUG-005 multi-flush streaming
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190867,6 +190867,13 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T09:42:44.618574+00:00'
+    done_at: '2026-07-17T09:48:18.795930+00:00'
+    evidence: 'Fresh semantic receipt sha256:80e187341f20dbe1e1cbc791b9c84a15d7f442b69d4ee4cc838538a3902a231c
+      admitted on immutable HEAD 676fec333127ba302c637c2bf76db45645d3117c. One canonical
+      profile passed exact 3 identities: protected 13-subtest split-write/cancellation
+      contract, real Chromium OPML/State operations with zero CSP violation, and deterministic
+      generated web/build equality by path/bytes/modes. Zero stage residue and clean
+      status; prior failed report preserved.'
   - id: rf-bug-v2-closure-selector-remediation
     name: Repair RF-BUG closure adapter authority aggregation and false-green guard
     status: done
