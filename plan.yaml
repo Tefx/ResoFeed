@@ -190899,7 +190899,7 @@ phases:
     - go.mod
     agent: frontend-engineer
   - id: rf-bug-v2-closure-selector-verification
-    name: Independently verify exact RF-BUG closure selector execution
+    name: Independently verify RF-BUG closure authority aggregation
     status: pending
     description: 'step_type: verification
 
@@ -190907,24 +190907,37 @@ phases:
 
 
       On the integrated adapter remediation head, exercise the existing adapter as
-      a real CLI. Parse the exact two-identity selection envelope for `rf-bug-v2-closure-report/rf_bug_v2_defect_report_closure_green`,
-      run that profile exactly once, and prove the output names both `TestRFBugCanonicalContracts/OPMLActiveScan`
-      and `TestRFBugClosureContract` plus all required closure markers. Execute the
-      adapter''s focused regression through its declared profile/Node test authority
-      and require a non-zero fail-closed result for a deliberately empty or no-test
-      selector fixture. Do not use ad hoc product checks, retry, skip, mutate files,
-      or admit item-deep-links profiles. Record exact commands, outputs, identities,
-      diff scope, and clean status.'
-    verification: Pass only when the real adapter selects the unchanged two closure
-      identities, one canonical run executes both exact Go test identities and emits
-      all four markers, focused adapter regression proves no-test false-green rejection,
-      item-deep-links remains unexecuted and outside scope, the integrated diff is
-      limited to adapter/test/harness docs, and tracked status is clean.
+      a real CLI. Parse the unchanged exact two-identity selection envelope and digest
+      for `rf-bug-v2-closure-report/rf_bug_v2_defect_report_closure_green`, run that
+      profile exactly once, and prove it directly observes the exact top-level Go
+      identity `TestRFBugCanonicalContracts`, exact package-relative web identity
+      `keeps all nine active documents free of OPML export capabilities`, `RF_BUG_CANONICAL_DOCUMENTS=9`,
+      `OPML_ACTIVE_DOCUMENTS=9`, `OPML_EXCLUSIONS=2`, `PROMPTING_V21_ACTIVE_MATCHES=0`,
+      and `RF_BUG_CLOSURE_REQUIREMENTS=10`. Confirm the ten-requirement marker is
+      emitted only after the protected report and repair plan each inventory exactly
+      RF-BUG-001 through RF-BUG-010 and after all three current active-source authorities
+      pass. Execute the adapter''s focused regression through its declared profile/Node
+      test authority and require non-zero fail-closed results for missing identity,
+      missing marker, empty output, and `[no tests to run]` fixtures. Do not use ad
+      hoc product checks, retry, skip, mutate files, synthesize absent Go tests, or
+      admit item-deep-links profiles. Record exact commands, outputs, identities,
+      profile digest, diff scope, and clean status.'
+    verification: Pass only when the real adapter preserves the unchanged two profile
+      identities/digest, one canonical run observes both exact current test identities
+      and all seven required markers, the protected report and plan independently
+      inventory the same exact ten RF-BUG IDs, focused adapter regression proves missing/empty/no-test
+      false-green rejection, item-deep-links remains unexecuted and outside scope,
+      the integrated diff is limited to adapter/test/harness docs, and tracked status
+      is clean.
     refs:
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - tests/rf_bug_canonical_contract_test.go
+    - web/src/lib/api-client.test.ts
+    - web/package.json
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/BUG_FIX_PLAN_2026-07-12.md
     depends_on:
     - rf-bug-v2-closure-selector-remediation
     agent: integration-verifier
