@@ -189600,7 +189600,7 @@ phases:
       \ docs/USAGE.md]\n  blocked_paths: [cmd/**, internal/resofeed/*.go, internal/resofeed/*_test.go,\
       \ web/src/**, web/tests/e2e/**, docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md,\
       \ docs/ARCHITECTURE.md, docs/DESIGN.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
-      \ .agent/, .venv/, .pi/]\nclaims: [RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION]\n\
+      \ .agent/, .venv/]\nclaims: [RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION]\n\
       checks:\n  - id: rf_bug_v2_deterministic_svelte_build_green\n    run:\n    \
       \  command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-deterministic-svelte-build-remediation,\
       \ rf_bug_v2_deterministic_svelte_build_green]\n      timeout_seconds: 1800\n\
