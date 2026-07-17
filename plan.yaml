@@ -189251,7 +189251,7 @@ phases:
       and returned to unstaged state.
   - id: rf-bug-v2-current-operation-foreground-ownership-verification
     name: Independently verify production ingest current-operation ownership
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189289,6 +189289,15 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T00:21:24.609634+00:00'
+    done_at: '2026-07-17T00:27:31.460576+00:00'
+    evidence: 'Independent integration-verifier PASS admitted by semantic Gate as
+      sha256:6852d79ecc7ea343d659b79de5ef68cf12620a568140c049492dcb029e30758d against
+      immutable target aa9c4bffe53dfbdc5a6d1ae5f79e0a9029afcac6. Exact race command
+      passed both required tests without DATA RACE; focused evidence proved production
+      IngestOnce→bounded worker→ingestSourceWithRelease→ingestSourceWithOptions reachability,
+      actor-owned skipped cleanup, live foreground preservation, post-release background
+      visibility/cleanup, process-local state, unchanged guard semantics, docs sync,
+      and clean protected baseline. Report: /tmp/larva-agent-artifacts/integration-verifier-rf-bug-v2-current-operation-foreground-ownership-verification_report.md#sha256=375550c693519a912c3c8df64791704b4a0356650127d4f7946bdd8e3b0639df#bytes=7279'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
