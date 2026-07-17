@@ -190992,7 +190992,7 @@ phases:
       stayed out of scope; status clean.
   - id: rf-bug-v2-frontend-csp-inline-style-remediation
     name: Repair RF-BUG-005 frontend inline-style CSP violation
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nRepair\
       \ the separately owned Chromium CSP failure by replacing runtime inline style\
@@ -191079,6 +191079,14 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T09:04:32.841939+00:00'
+    done_at: '2026-07-17T09:08:40.401647+00:00'
+    evidence: Production Gate admitted focused frontend receipt sha256:a9734abbd7844e71c3252f49955822d4abf2157164a06cf294322413aa7d41b9
+      under dispatch sha256:4abd0d3e23fd7ef587a72d29ea0fbdf2f5de24af887fd5dde006fde898b68b9a.
+      Full-file verbose developer/compile-static suites passed all three tests with
+      zero skips, compiling +page.svelte and rejecting runtime/inline style mutation.
+      Protected Chromium acceptance and api-client remained unchanged; pre-existing
+      out-of-scope typecheck diagnostic was not hidden or claimed. Integrated commit
+      0b8b502cab699cc7d0e998b836f144887ebddad5; user DESIGN edits preserved.
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
