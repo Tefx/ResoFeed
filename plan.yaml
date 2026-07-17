@@ -189703,7 +189703,7 @@ phases:
       package-local assets and docs were synchronized.
   - id: rf-bug-v2-deterministic-adapter-identity-integration-remediation
     name: Repair deterministic adapter identity integration and fixture contract
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ integration remediation for Full Gate FAIL receipt `sha256:ecd8021c8f0311a933ee7c254559822620eac4760aa51a73f7b0d0ffda0f4133`\
@@ -189835,6 +189835,15 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T04:09:25.977623+00:00'
+    done_at: '2026-07-17T04:24:50.957508+00:00'
+    evidence: Integrated commit 4bc4501994cc9028613ed615723ec68f23a46a09. Production
+      Gate admitted worker receipt sha256:7ead41237d02b61a2aeae884d62eaa9c8d552c91b55b305069f46fe3d374bb66
+      and dispatch sha256:712a6e0748aee56c67bbf9fbac24b528f89233a8a9a4e061064ad624d970e068
+      after rerunning selected-execution. Evidence proved canonical fixture build
+      boundary, one trusted identity derivation algorithm, all config/list/render
+      startup green, ambient override rejected, missing derivation fail-closed, cache
+      invalidation preserved, protected acceptance unchanged, and valid one-envelope
+      output. Fixture developer contract, focused tests, and docs were synchronized.
   - id: rf-bug-v2-deterministic-adapter-identity-integration-verification
     name: Independently verify deterministic adapter identity integration
     status: pending
