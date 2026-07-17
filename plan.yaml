@@ -189509,6 +189509,123 @@ phases:
     depends_on:
     - rf-bug-v2-canonical-e2e-embedded-ui-build-remediation
     agent: integration-verifier
+  - id: rf-bug-v2-deterministic-svelte-build-remediation
+    name: Make canonical Svelte frontend builds reproducible
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for validated independent verification FAIL receipt `sha256:d358fdc20bed32e97aa6e837666705b575f93c0052cc84c1bd59ac34a1e1730e`\
+      \ at immutable integrated head `fc462c3a9f75398822b38d87cffd8eb175c625f4`, grounded\
+      \ in raw evidence `/tmp/larva-agent-artifacts/rf-bug-v2-canonical-e2e-embedded-ui-build-verification/immutable-canonical-builds.log#sha256=46668ae33807f64c439457586deecfddca5de78252f9fac7406bd7511273c73e`.\
+      \ Preserve that failed history and the dirty verification worktree; do not reset,\
+      \ clean, or reuse it. The dominant mutable surface is the SvelteKit/Vite build\
+      \ configuration and frontend build/evidence harness, so exact live specialist\
+      \ `frontend-engineer` owns this cohesive rollback unit.\n\nInspect the live\
+      \ SvelteKit/Vite output path and identify every time-, process-, temporary-path-,\
+      \ Git-worktree-, or ambient-environment-dependent input before changing it;\
+      \ `kit.version.name` is a grounded likely source, not an assumed sole cause.\
+      \ Make the canonical `scripts/build-resofeed.sh` production and `--e2e` frontend\
+      \ output reproducible for identical tracked frontend/build inputs. Derive SvelteKit\
+      \ app/version identity from deterministic tracked frontend/build content with\
+      \ explicit canonical ordering and encoding. It must not depend on wall clock,\
+      \ PID, temporary/stage/output path, mutable Git metadata, locale, host, or ambient\
+      \ environment. Preserve cache invalidation: a controlled change to a copied\
+      \ tracked frontend sentinel must change the derived identity and resulting assets,\
+      \ and the changed sentinel must be packaged and embedded by the canonical binary.\
+      \ Do not expose an arbitrary user-selected build-version override. If a private\
+      \ build-harness/config handoff is necessary, the canonical pipeline alone computes\
+      \ it from tracked input, rejects ambient predefinition/override, and fails closed\
+      \ on missing, empty, malformed, or noncanonical values before replacing package\
+      \ assets.\n\nReplace the current clock preload only if live investigation proves\
+      \ it redundant or insufficient; do not retain a fake-clock workaround as sole\
+      \ reproducibility evidence. Preserve the single canonical atomic package-local\
+      \ stage, bootstrap validation, rollback/cleanup, `embed.FS`, production untagged\
+      \ `go build -trimpath`, exact E2E-only `-tags resofeed_e2e`, and separate child\
+      \ runtime `RESOFEED_E2E=1` boundary. No external embed source, stale tracked\
+      \ asset substitution, production/E2E tag collapse, secret input, CLI API-key\
+      \ input, or product Go/Svelte behavior change is allowed.\n\nExtend the focused\
+      \ developer adapter/tests so isolated disposable copies prove: two consecutive\
+      \ canonical production builds produce byte-identical `web/build` and `internal/resofeed/webui`;\
+      \ a canonical production build followed by canonical E2E build produces byte-identical\
+      \ trees; each synchronized sequence leaves tracked status unchanged; one controlled\
+      \ copied tracked source sentinel changes the derived version/assets and is present\
+      \ in `web/build`, package-local assets, and the resulting binary; repeated sentinel\
+      \ builds remain deterministic; missing/empty/malformed/noncanonical private\
+      \ version input fails before package replacement; ambient/user-controlled version\
+      \ override is rejected or demonstrably cannot influence output; and success\
+      \ plus induced failure leave zero `.webui-stage.*` residue. Keep protected browser\
+      \ acceptance files byte-identical. Synchronize `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`\
+      \ and `docs/USAGE.md` with derivation inputs, fail-closed behavior, reproducibility/cache-invalidation\
+      \ guarantees, and exact production/E2E boundary. Rollback reverts build config,\
+      \ script, adapter/tests, generated package-local assets if changed, and docs\
+      \ together.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [web/svelte.config.js, web/vite.config.ts, scripts/build-resofeed.sh, scripts/vectl-check.mjs,\
+      \ scripts/vectl-check.test.mjs, internal/resofeed/webui/**, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ docs/USAGE.md]\n  blocked_paths: [cmd/**, internal/resofeed/*.go, internal/resofeed/*_test.go,\
+      \ web/src/**, web/tests/e2e/**, docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
+      \ .agent/, .venv/, .pi/]\nclaims: [RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION]\n\
+      checks:\n  - id: rf_bug_v2_deterministic_svelte_build_green\n    run:\n    \
+      \  command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-deterministic-svelte-build-remediation,\
+      \ rf_bug_v2_deterministic_svelte_build_green]\n      timeout_seconds: 1800\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: produced_by_step}\n\
+      \        - {path: scripts/build-resofeed.sh, access: execute, availability:\
+      \ produced_by_step}\n        - {path: web/svelte.config.js, access: read, availability:\
+      \ produced_by_step}\n        - {path: web/vite.config.ts, access: read, availability:\
+      \ produced_by_step}\n        - {path: web/package.json, access: read, availability:\
+      \ current}\n        - {path: web/package-lock.json, access: read, availability:\
+      \ current}\n        - {path: web/src/app.html, access: read, availability: current}\n\
+      \        - {path: go.mod, access: read, availability: current}\n      test_bindings:\n\
+      \        - {path: scripts/vectl-check.test.mjs, classification: developer, availability:\
+      \ produced_by_step}\n      selection:\n        command: [python3, -c, \"import\
+      \ hashlib,json; ids=['RF-BUG-010 deterministic canonical frontend builds'];\
+      \ print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_deterministic_svelte_build_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\"\
+      \ ]\n        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
+      \ ['RF-BUG-010 deterministic canonical frontend builds']\n        forbidden_ids:\
+      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: RF-BUG-010_REPRODUCIBLE_BUILDS=green}, {literal:\
+      \ RF-BUG-010_PRODUCTION_REPEAT=identical}, {literal: RF-BUG-010_PRODUCTION_E2E=identical},\
+      \ {literal: RF-BUG-010_SENTINEL_INVALIDATION=changed_and_embedded}, {literal:\
+      \ RF-BUG-010_VERSION_INPUT=fail_closed}, {literal: RF-BUG-010_AMBIENT_OVERRIDE=rejected},\
+      \ {literal: RF-BUG-010_SYNCED_WORKTREE=clean}, {literal: RF-BUG-010_STAGE_RESIDUE=0},\
+      \ {literal: RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n\
+      \        contains_any: []\n        forbids: [{literal: nondeterministic asset},\
+      \ {literal: arbitrary build version}, {literal: stale embedded UI}, {literal:\
+      \ protected acceptance baseline changed}, {literal: secret-bearing artifact},\
+      \ {literal: No tests found}, {literal: ERROR collecting}]\n    proves: [RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION]\n\
+      bindings:\n  expected_red:\n    items: []\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-svelte-build-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"sveltekit_production_asset_identity\"\
+      ,\"canonical_real_binary_build_pipeline\",\"package_local_embedded_asset_cache_invalidation\"\
+      ],\"primary_outcome\":\"RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION\",\"atom\":\"identical\
+      \ tracked frontend/build inputs produce byte-identical canonical production\
+      \ and E2E package-local assets while a controlled tracked source change deterministically\
+      \ invalidates versioned assets and reaches the real embedded browser runtime\"\
+      ,\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_deterministic_svelte_build_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-canonical-e2e-embedded-ui-build-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ],\"acceptance_test_paths\":[\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/initial-route.browser-contract.spec.ts\",\"web/tests/e2e/routes.browser-contract.spec.ts\"\
+      ,\"web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts\",\"web/tests/e2e/source-ledger-delete.browser-contract.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_deterministic_svelte_build_green\"],\"\
+      acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The project-native selected-execution profile must emit one valid
+      evidence envelope for RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION after
+      focused tests prove two consecutive production builds and production-to-E2E
+      builds are byte-identical across `web/build` and package-local assets with clean
+      tracked status; a controlled copied tracked source sentinel changes deterministic
+      versioned assets and reaches the binary; missing, malformed, noncanonical, or
+      ambient/user-controlled version input fails closed before replacement; exact
+      tags, package-local embedding, cleanup, documentation, and protected acceptance
+      remain intact.
+    depends_on:
+    - rf-bug-v2-canonical-e2e-embedded-ui-build-remediation
+    agent: frontend-engineer
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
