@@ -192,6 +192,19 @@ The dedicated pair `rf-bug-v2-go-token-parity` / `rf_bug_v2_go_token_parity_gree
 The dedicated runner captures the focused Node adapter regression, nests the existing `rf-bug-v2-prompting-harness` / `rf_bug_v2_prompting_harness_remediation_green` strict-harness evidence, and then executes both protected RF-BUG-002 tests together. The nested envelope must retain the untagged production-build, tag-only, environment-only, two-key loopback, outbound rejection, fetch-path rejection, Playwright fixture, and `PASS` proof. The parity child must retain all 30 API subtests, canonical `~` plus unpadded UTF-8 base64url acceptance, raw and noncanonical HTTP rejection, direct raw MCP IDs, and HTTP/MCP/FTS parity.
 
 Only the final token-parity `vectl.check.evidence.v1` envelope reaches stdout. It contains the same two selected and executed identities and the required token, subtest-count, strict-harness, test-name, and `PASS` observations. Focused regression coverage rejects malformed or incomplete nested evidence, duplicate envelopes, missing markers, `no tests to run`, skips, retries, and known parity-failure markers. Child logs, Go output, and the nested strict-harness envelope remain captured. Rollback reverts `scripts/vectl-check.mjs`, `scripts/vectl-check.test.mjs`, and this section together.
+### RF-BUG-001 First-Run SQLite Concurrency Remediation
+
+The real-runtime Inspector selection case issues the two selected items' detail and inspection-marker requests without product API interception. On a fresh case-local database, all four responses must be HTTP `200`; the large first detail read may remain active while both receipt-backed inspection writes commit. A `500 internal` response caused by `SQLITE_BUSY`, a missing `item_state` mutation, or a missing `agent_receipts` row fails the case.
+
+The file-backed runtime database enables WAL journal mode during `OpenDB`, before HTTP/MCP readiness and background ingest. This is the concurrency boundary under test. The remediation must not add Playwright retries, request retries, sleeps, skips, busy-error translation, or broad SQLite busy suppression.
+
+The focused developer regression is exactly:
+
+```bash
+go test -v ./internal/resofeed -run '^TestRFBUG001ConcurrentFirstRunInspectionNoSQLiteBusy$' -count=1
+```
+
+It holds a large first-detail read transaction open, launches two detail reads and two inspection writes against the real router, requires four `200` responses, and verifies both inspection-state rows and both idempotency receipts. The comprehensive profile remains `node scripts/vectl-check.mjs run rf-bug-v2-frontend-runtime rf_bug_v2_frontend_runtime_green`; its immutable acceptance sources retain zero-retry behavior.
 ## Deterministic CI-Safe Matrix
 These cases run with zero retries and without live LLM credentials; the child environment explicitly clears `OPENROUTER_KEY`.
 

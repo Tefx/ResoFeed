@@ -482,6 +482,15 @@ func OpenDB(ctx context.Context, path string) (*sql.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite database: %w", err)
 	}
+	var journalMode string
+	if err := db.QueryRowContext(ctx, `pragma journal_mode = wal`).Scan(&journalMode); err != nil {
+		closeErr := db.Close()
+		return nil, errors.Join(fmt.Errorf("enable sqlite WAL journal mode: %w", err), closeErr)
+	}
+	if path != ":memory:" && !strings.EqualFold(journalMode, "wal") {
+		closeErr := db.Close()
+		return nil, errors.Join(fmt.Errorf("enable sqlite WAL journal mode: got %q", journalMode), closeErr)
+	}
 	if _, err := db.ExecContext(ctx, `pragma foreign_keys = on`); err != nil {
 		closeErr := db.Close()
 		return nil, errors.Join(fmt.Errorf("enable sqlite foreign keys: %w", err), closeErr)
