@@ -190985,7 +190985,7 @@ phases:
     claimed_at: '2026-07-17T08:55:03.164344+00:00'
   - id: rf-bug-v2-frontend-csp-inline-style-remediation
     name: Repair RF-BUG-005 frontend inline-style CSP violation
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nRepair\
       \ the separately owned Chromium CSP failure by replacing runtime inline style\
@@ -191067,8 +191067,6 @@ phases:
       diagnostic and is not claimed as closed. Fresh full-profile Chromium acceptance
       belongs only to `rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification`.
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-17T08:55:03.164037+00:00'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
