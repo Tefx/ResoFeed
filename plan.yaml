@@ -191535,8 +191535,9 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
-      \ ITEM-DEEP-LINK-FRONTEND. Implement the frozen browser contract on top of the\
-      \ admitted backend envelope. `workbench-route.ts` owns canonical `/items/{percent-encoded\
+      \ ITEM-DEEP-LINK-FRONTEND. Implement the frozen browser contract directly from\
+      \ the admitted contract lock while the independent backend branch implements\
+      \ the same authoritative envelope. `workbench-route.ts` owns canonical `/items/{percent-encoded\
       \ raw item_id}`, dot sentinels, leading-`!`/`~` collision rules, legacy `~base64url`\
       \ parsing plus replaceState canonicalization, canonical Search URL/history validation,\
       \ and itemAppPath/itemAppUrl. `api-client.ts` keeps the independent canonical\
@@ -191551,38 +191552,67 @@ phases:
       \ retry, Back/Forward, and automatic selection remain read-only. Synchronize\
       \ user-facing README behavior while keeping the frozen docs and protected acceptance\
       \ unchanged. Rollback reverts the frontend/tests/README unit without coupling\
-      \ browser and API codecs.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
-      \ web/src/lib/api-client.test.ts, web/src/lib/__tests__/workbench-route.test.ts,\
+      \ browser and API codecs.\n\nWitnessed current profile: existing `scripts/vectl-check.mjs`\
+      \ suite/check `item-deep-links-frontend` / `item_deep_links_frontend_green`\
+      \ provides both `select` and `run`; current `scripts/vectl-check.test.mjs` proves\
+      \ its exact two identities. The current profile maps the application-codec identity\
+      \ to its Vitest sources and the browser history/auth identity to the Playwright\
+      \ acceptance source. Its npm commands receive only the current trusted derivation\
+      \ from `scripts/resofeed-svelte-build-identity.mjs`; Vitest loads the current\
+      \ Vite/Svelte config chain, and Playwright loads the current CI-safe/base config\
+      \ plus real-binary runtime fixture. Ambient `RESOFEED_SVELTE_BUILD_IDENTITY`\
+      \ or private environment reconstruction is forbidden.\n\nExact producer ownership:\
+      \ step `item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts`,\
+      \ check `item_deep_links_expected_red`, produces `web/src/lib/__tests__/item-deep-links.expected-red.test.ts`\
+      \ and `web/tests/e2e/item-deep-links.browser-contract.spec.ts`; this step depends\
+      \ directly on that producer. `web/src/lib/api-client.test.ts` and `web/src/lib/__tests__/workbench-route.test.ts`\
+      \ are current sources. This step `item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser`,\
+      \ check `item_deep_links_frontend_green`, produces exactly `web/src/routes/components/__tests__/item-deep-links.test.ts`;\
+      \ its `allowed_paths` and developer-test authority own it. Downstream consumer\
+      \ `item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification`\
+      \ depends directly on both this frontend branch and the backend branch. The\
+      \ already-current adapter, configs, trusted derivation, runtime fixture, and\
+      \ protected acceptance are immutable in this step.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
+      \ web/src/lib/api-client.ts, web/src/lib/api-client.test.ts, web/src/lib/__tests__/workbench-route.test.ts,\
       \ web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte, web/src/routes/components/__tests__/item-deep-links.test.ts,\
-      \ README.md]\n  blocked_paths: [docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
+      \ README.md]\n  blocked_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
+      \ scripts/resofeed-svelte-build-identity.mjs, web/vite.config.ts, web/svelte.config.js,\
+      \ web/playwright.ci-safe.config.ts, web/playwright.config.ts, web/playwright.base.config.ts,\
+      \ web/tests/e2e/fixtures/**, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
       \ docs/DESIGN.md, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
       \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, internal/**, cmd/**,\
-      \ scripts/vectl-check.mjs, docs/USAGE.md, docs/CONTAINER.md, deploy/**]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-FRONTEND]\nchecks:\n\
+      \ docs/USAGE.md, docs/CONTAINER.md, deploy/**]\n  ignored_runtime_paths: [.git/,\
+      \ .vectl/, .agent/, .venv/, .pi/]\nclaims: [ITEM-DEEP-LINK-FRONTEND]\nchecks:\n\
       \  - id: item_deep_links_frontend_green\n    run: {command: [node, scripts/vectl-check.mjs,\
       \ run, item-deep-links-frontend, item_deep_links_frontend_green], timeout_seconds:\
       \ 1800}\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
-      \        - {path: scripts/vectl-check.mjs, access: execute, availability: produced_by_step}\n\
-      \        - {path: web/package.json, access: read, availability: current}\n \
-      \     test_bindings:\n        - {path: web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
+      \        - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: scripts/vectl-check.test.mjs, access: read, availability:\
+      \ current}\n        - {path: web/package.json, access: read, availability: current}\n\
+      \        - {path: web/vite.config.ts, access: read, availability: current}\n\
+      \        - {path: web/svelte.config.js, access: read, availability: current}\n\
+      \        - {path: web/playwright.ci-safe.config.ts, access: read, availability:\
+      \ current}\n        - {path: web/playwright.config.ts, access: read, availability:\
+      \ current}\n        - {path: web/playwright.base.config.ts, access: read, availability:\
+      \ current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs, access:\
+      \ execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, classification:\
+      \ acceptance, availability: produced_by_step}\n        - {path: web/tests/e2e/item-deep-links.browser-contract.spec.ts,\
       \ classification: acceptance, availability: produced_by_step}\n        - {path:\
-      \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, classification: acceptance,\
-      \ availability: produced_by_step}\n        - {path: web/src/lib/api-client.test.ts,\
-      \ classification: developer, availability: current}\n        - {path: web/src/lib/__tests__/workbench-route.test.ts,\
-      \ classification: developer, availability: produced_by_step}\n        - {path:\
-      \ web/src/routes/components/__tests__/item-deep-links.test.ts, classification:\
-      \ developer, availability: produced_by_step}\n      selection:\n        command:\n\
-      \          - python3\n          - -c\n          - >-\n            import hashlib,json;\
-      \ ids=['ITEM-DEEP-LINK app codec and API domain separation','ITEM-DEEP-LINK\
-      \ browser history auth error read-only lifecycle']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_frontend_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
-      \        timeout_seconds: 30\n        cardinality: {exact: 2}\n        required_ids:\
-      \ ['ITEM-DEEP-LINK app codec and API domain separation', 'ITEM-DEEP-LINK browser\
-      \ history auth error read-only lifecycle']\n        forbidden_ids: []\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: ITEM_DEEP_LINK_APP_CODEC=complete}, {literal:\
-      \ ITEM_DEEP_LINK_API_DOMAIN_SEPARATION=complete}, {literal: ITEM_DEEP_LINK_HISTORY=complete},\
+      \ web/src/lib/api-client.test.ts, classification: developer, availability: current}\n\
+      \        - {path: web/src/lib/__tests__/workbench-route.test.ts, classification:\
+      \ developer, availability: current}\n        - {path: web/src/routes/components/__tests__/item-deep-links.test.ts,\
+      \ classification: developer, availability: produced_by_step}\n      selection:\n\
+      \        command: [node, scripts/vectl-check.mjs, select, item-deep-links-frontend,\
+      \ item_deep_links_frontend_green]\n        timeout_seconds: 30\n        cardinality:\
+      \ {exact: 2}\n        required_ids: ['ITEM-DEEP-LINK app codec and API domain\
+      \ separation', 'ITEM-DEEP-LINK browser history auth error read-only lifecycle']\n\
+      \        forbidden_ids: []\n    expect:\n      outcome: green\n      exit_codes:\
+      \ [0]\n      stdout_or_stderr:\n        contains_all: [{literal: ITEM_DEEP_LINK_APP_CODEC=complete},\
+      \ {literal: ITEM_DEEP_LINK_API_DOMAIN_SEPARATION=complete}, {literal: ITEM_DEEP_LINK_HISTORY=complete},\
       \ {literal: ITEM_DEEP_LINK_AUTH_RECOVERY=complete}, {literal: ITEM_DEEP_LINK_ERRORS=complete},\
       \ {literal: ITEM_DEEP_LINK_MUTATION_TARGET=complete}, {literal: ITEM_DEEP_LINK_BROWSER_MATRIX=complete}]\n\
       \        contains_any: []\n        forbids: [{literal: page.route}, {literal:\
@@ -191624,7 +191654,7 @@ phases:
     - web/src/routes/components/Inspector.svelte
     - README.md
     depends_on:
-    - item-deep-links-backend-api-mcp
+    - item-deep-links-expected-red-contracts
     agent: frontend-engineer
   - id: item-deep-links-local-integration-verification
     name: Independently Verify Local HTTP, MCP, SQLite, and Browser Integration
