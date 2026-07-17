@@ -190803,15 +190803,17 @@ phases:
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the invalid Go selector recorded in `/tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v3_report.md#sha256=c65bd2bee23f0f8718b33528c7393275c6cb248fbcae6451480d35f3296ae5fc`.\
       \ Repair only the existing `rf-bug-v2-closure-report/rf_bug_v2_defect_report_closure_green`\
-      \ adapter profile using correct Go slash-segment semantics so `TestRFBugCanonicalContracts/OPMLActiveScan`\
-      \ and `TestRFBugClosureContract` both execute and emit their required markers.\
-      \ Add focused adapter regression coverage that proves those exact test identities\
-      \ execute and that `[no tests to run]` or an otherwise empty selector can never\
-      \ produce green evidence. Synchronize the harness contract documentation. Preserve\
-      \ every current profile identity/digest and all product, protected acceptance,\
-      \ and future item-deep-links files. Do not add ad hoc verification commands,\
-      \ retry, skip, or weaken required markers. Rollback reverts the adapter, focused\
-      \ regression, and harness documentation together.\n\n<intent_closure_contract>\n\
+      \ adapter profile using correct Go slash-segment semantics so the exact requested\
+      \ `TestRFBugCanonicalContracts/OPMLActiveScan` and `TestRFBugClosureContract`\
+      \ identities execute and emit their required markers when present on the integrated\
+      \ head. Add focused adapter regression coverage that proves the exact selector\
+      \ semantics and that an absent requested identity, `[no tests to run]`, or an\
+      \ otherwise empty selector can never produce green evidence. Synchronize the\
+      \ harness contract documentation. Preserve every current profile identity/digest\
+      \ and all product, protected acceptance, canonical Go contract tests, and future\
+      \ item-deep-links files. Do not add ad hoc verification commands, retry, skip,\
+      \ synthesize a missing Go test, or weaken required markers. Rollback reverts\
+      \ the adapter, focused regression, and harness documentation together.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
       profile: generic\nscope:\n  allowed_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
       \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n  blocked_paths: [internal/**, web/**,\
@@ -190826,10 +190828,9 @@ phases:
       \ read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
       \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
       \    - {path: scripts/vectl-check.test.mjs, classification: developer, availability:\
-      \ produced_by_step}\n        - {path: tests/rf_bug_contract_test.go, classification:\
-      \ acceptance, availability: current}\n        - {path: tests/rf_bug_closure_contract_test.go,\
-      \ classification: developer, availability: current}\n      selection:\n    \
-      \    command: [node, scripts/vectl-check.mjs, select, rf-bug-v2-closure-report,\
+      \ produced_by_step}\n        - {path: tests/rf_bug_canonical_contract_test.go,\
+      \ classification: acceptance, availability: current}\n      selection:\n   \
+      \     command: [node, scripts/vectl-check.mjs, select, rf-bug-v2-closure-report,\
       \ rf_bug_v2_defect_report_closure_green]\n        timeout_seconds: 30\n    \
       \    cardinality: {exact: 2}\n        required_ids: ['RF-BUG-001-010 active\
       \ source scans', 'RF-BUG-001-010 closure contract']\n        forbidden_ids:\
@@ -190846,24 +190847,24 @@ phases:
       ,\"Go_subtest_selector_semantics\"],\"primary_outcome\":\"RF-BUG-V2-CLOSURE-SELECTOR\"\
       ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
       :\"RF-BUG-V2-CLOSURE-SELECTOR\",\"atom\":\"the closure profile executes both\
-      \ exact Go test identities and refuses no-test or empty-selector false green\
-      \ evidence\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_defect_report_closure_green\"\
-      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification\"\
+      \ exact requested Go identities and refuses absent-test, no-test, or empty-selector\
+      \ false green evidence\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\"\
+      :\"rf_bug_v2_defect_report_closure_green\",\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
-      ],\"acceptance_test_paths\":[\"tests/rf_bug_contract_test.go\"],\"acceptance_check_ids\"\
-      :[\"rf_bug_v2_defect_report_closure_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
-      ,\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+      ],\"acceptance_test_paths\":[\"tests/rf_bug_canonical_contract_test.go\"],\"\
+      acceptance_check_ids\":[\"rf_bug_v2_defect_report_closure_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: The current closure adapter profile selects its unchanged two identities,
-      executes both exact Go test identities with correct slash-segment semantics,
-      emits all four required closure markers, and refuses no-test/empty-selector
-      false greens. Focused Node regression and harness documentation pass together;
-      product, tests, protected acceptance, and item-deep-links paths remain unchanged.
+      uses correct Go slash-segment semantics, executes both exact requested Go test
+      identities when available, emits all four required closure markers, and refuses
+      absent-test/no-test/empty-selector false greens. Focused Node regression and
+      harness documentation pass together; product, Go tests, protected acceptance,
+      and item-deep-links paths remain unchanged.
     refs:
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
-    - tests/rf_bug_contract_test.go
-    - tests/rf_bug_closure_contract_test.go
+    - tests/rf_bug_canonical_contract_test.go
     - go.mod
     agent: frontend-engineer
   - id: rf-bug-v2-closure-selector-verification
