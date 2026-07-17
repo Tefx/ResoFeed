@@ -191312,39 +191312,63 @@ phases:
       \ ITEM-DEEP-LINK-CONTRACT. Define one protected expected-red contract unit for\
       \ the frozen browser application codec/history/authentication contract and the\
       \ separate HTTP/MCP/duplicate/PublicURL contract. The cross-domain `general`\
-      \ owner is justified because the three protected acceptance files and the project-native\
-      \ adapter registration form one indivisible contract lock consumed by both specialist\
-      \ implementations; splitting would duplicate check identity and acceptance authority.\
-      \ Create tests only; do not implement product behavior or mutate the frozen\
-      \ docs. Fail at the named contract fingerprints, never collection, compile,\
-      \ web-server startup, authentication setup, timeout, or missing-test infrastructure.\
-      \ Rollback reverts the adapter registration and three protected tests together.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
-      \ intent_closure.matchers.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
-      \ [scripts/vectl-check.mjs, internal/resofeed/item_deep_links_expected_red_test.go,\
+      \ owner is justified because the three protected acceptance files share one\
+      \ acceptance authority, one expected-red receipt, one rollback, and two specialist\
+      \ consumers; splitting would duplicate check identity and reciprocal ownership.\
+      \ Create tests only; do not implement product behavior, mutate the frozen docs,\
+      \ or change the already-current adapter/profile.\n\nWitnessed current profile:\
+      \ existing `scripts/vectl-check.mjs` suite/check `item-deep-links-contract`\
+      \ / `item_deep_links_expected_red` provides both `select` and `run`, and current\
+      \ `scripts/vectl-check.test.mjs` proves its exact three identities. The current\
+      \ profile maps `ITEM-DEEP-LINK duplicate read envelope and MCP app_url` to the\
+      \ Go command consuming `internal/resofeed/item_deep_links_expected_red_test.go`,\
+      \ `ITEM-DEEP-LINK app codec and API domain separation` to the Vitest command\
+      \ consuming `web/src/lib/__tests__/item-deep-links.expected-red.test.ts`, and\
+      \ `ITEM-DEEP-LINK browser history auth error read-only lifecycle` to the Playwright\
+      \ command consuming `web/tests/e2e/item-deep-links.browser-contract.spec.ts`.\
+      \ The Playwright command uses the current CI-safe/base config chain, trusted\
+      \ Svelte build-identity derivation, and real-binary runtime fixture named below;\
+      \ ambient private build identity is forbidden.\n\nExact producer ownership:\
+      \ step `item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts`,\
+      \ check `item_deep_links_expected_red`, produces exactly the three absent acceptance\
+      \ paths in `test_bindings`. This step's `allowed_paths` and acceptance authority\
+      \ own them. Consumer steps `item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp`\
+      \ and `item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser`\
+      \ each depend directly on this producer and close the reciprocal fingerprints.\
+      \ Fail only at the named contract fingerprints, never collection, compile, web-server\
+      \ startup, authentication setup, timeout, missing-test infrastructure, or trusted-environment\
+      \ derivation. Rollback reverts the three protected tests together.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: expected_red_definition\nscope:\n  allowed_paths: [internal/resofeed/item_deep_links_expected_red_test.go,\
       \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, web/tests/e2e/item-deep-links.browser-contract.spec.ts]\n\
-      \  blocked_paths: [docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ internal/resofeed/item_route_token.go, internal/resofeed/http.go, internal/resofeed/http_static.go,\
-      \ internal/resofeed/search.go, internal/resofeed/types.go, internal/resofeed/mcp.go,\
-      \ cmd/resofeed/main.go, web/src/lib/workbench-route.ts, web/src/lib/api-client.ts,\
-      \ web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte, README.md,\
-      \ docs/USAGE.md, docs/CONTAINER.md]\n  ignored_runtime_paths: [.git/, .vectl/,\
-      \ .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND,\
+      \  blocked_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/resofeed-svelte-build-identity.mjs,\
+      \ web/playwright.ci-safe.config.ts, web/playwright.config.ts, web/playwright.base.config.ts,\
+      \ web/tests/e2e/fixtures/**, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
+      \ docs/DESIGN.md, internal/resofeed/item_route_token.go, internal/resofeed/http.go,\
+      \ internal/resofeed/http_static.go, internal/resofeed/search.go, internal/resofeed/types.go,\
+      \ internal/resofeed/mcp.go, cmd/resofeed/main.go, web/src/lib/workbench-route.ts,\
+      \ web/src/lib/api-client.ts, web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte,\
+      \ README.md, docs/USAGE.md, docs/CONTAINER.md]\n  ignored_runtime_paths: [.git/,\
+      \ .vectl/, .agent/, .venv/, .pi/]\nclaims: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND,\
       \ ITEM-DEEP-LINK-FRONTEND]\nchecks:\n  - id: item_deep_links_expected_red\n\
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-contract,\
       \ item_deep_links_expected_red], timeout_seconds: 1800}\n    evidence:\n   \
       \   mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
-      \ access: execute, availability: produced_by_step}\n        - {path: go.mod,\
-      \ access: read, availability: current}\n        - {path: web/package.json, access:\
-      \ read, availability: current}\n      test_bindings:\n        - {path: internal/resofeed/item_deep_links_expected_red_test.go,\
+      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: current}\n        - {path: go.mod, access: read,\
+      \ availability: current}\n        - {path: web/package.json, access: read, availability:\
+      \ current}\n        - {path: web/playwright.ci-safe.config.ts, access: read,\
+      \ availability: current}\n        - {path: web/playwright.config.ts, access:\
+      \ read, availability: current}\n        - {path: web/playwright.base.config.ts,\
+      \ access: read, availability: current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs,\
+      \ access: execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ internal/resofeed/item_deep_links_expected_red_test.go, classification: acceptance,\
+      \ availability: produced_by_step}\n        - {path: web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
       \ classification: acceptance, availability: produced_by_step}\n        - {path:\
-      \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, classification:\
-      \ acceptance, availability: produced_by_step}\n        - {path: web/tests/e2e/item-deep-links.browser-contract.spec.ts,\
-      \ classification: acceptance, availability: produced_by_step}\n      selection:\n\
-      \        command:\n          - python3\n          - -c\n          - >-\n   \
-      \         import hashlib,json; ids=['ITEM-DEEP-LINK app codec and API domain\
-      \ separation','ITEM-DEEP-LINK browser history auth error read-only lifecycle','ITEM-DEEP-LINK\
-      \ duplicate read envelope and MCP app_url']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_expected_red','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, classification: acceptance,\
+      \ availability: produced_by_step}\n      selection:\n        command: [node,\
+      \ scripts/vectl-check.mjs, select, item-deep-links-contract, item_deep_links_expected_red]\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 3}\n        required_ids:\
       \ ['ITEM-DEEP-LINK app codec and API domain separation', 'ITEM-DEEP-LINK browser\
       \ history auth error read-only lifecycle', 'ITEM-DEEP-LINK duplicate read envelope\
@@ -191373,11 +191397,11 @@ phases:
       \ identities cover the frozen browser and backend deep-link contract without\
       \ infrastructure false-reds\",\"modality\":\"test_contract\",\"seam\":\"static\"\
       ,\"check_id\":\"item_deep_links_expected_red\",\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-final-gate\"\
-      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.mjs\"\
-      ],\"acceptance_test_paths\":[\"internal/resofeed/item_deep_links_expected_red_test.go\"\
-      ,\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\",\"web/tests/e2e/item-deep-links.browser-contract.spec.ts\"\
-      ],\"acceptance_check_ids\":[\"item_deep_links_expected_red\"],\"acceptance_mutation\"\
-      :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:item-deep-links-go-contract\"\
+      }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
+      :[\"internal/resofeed/item_deep_links_expected_red_test.go\",\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\"\
+      ,\"web/tests/e2e/item-deep-links.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
+      :[\"item_deep_links_expected_red\"],\"acceptance_mutation\":\"AUTHORIZED\",\"\
+      acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:item-deep-links-go-contract\"\
       ,\"path\":\"internal/resofeed/item_deep_links_expected_red_test.go\",\"purpose\"\
       :\"Freeze the accepted HTTP, MCP, duplicate-resolution, PublicURL, and read-only\
       \ item deep-link contract\",\"check_id\":\"item_deep_links_expected_red\",\"\
