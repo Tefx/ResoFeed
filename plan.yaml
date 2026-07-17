@@ -190792,30 +190792,48 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      After both independently owned remediation branches are integrated, execute
-      the canonical `rf-bug-v2-http-security/rf_bug_v2_http_security_green` adapter
-      profile fresh and exactly once. Inspect the real Go HTTP response-writer seam
-      and real Chromium CSP operation evidence. Require all three exact identities:
-      the protected 13-subtest security contract executes `multi_flush_streaming`
-      and `request_cancellation` with two flush-visible writes before completion and
-      one effective security-header owner; the local streaming/cancellation identity
-      remains deterministic; and Chromium boots and completes OPML import plus State
-      export/import/download without runtime inline style mutation or CSP violation.
-      Do not retry, add sleeps, substitute mock/intercepted seams, weaken CSP through
-      `unsafe-inline`, hashes, or nonces, skip operations, alter protected acceptance,
-      or modify repository files. Record the exact command, selected/executed identities,
-      process exit, decisive Go and Chromium output, both remediation changed-path
-      scopes, protected-path immutability, and clean integrated status.'
+      Preserve the failed canonical report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`
+      and its dirty failed-verification worktree unchanged. On a fresh clean integrated
+      head after the Go streaming remediation and append-only frontend/runtime/generated
+      remediation are integrated, execute the canonical `rf-bug-v2-http-security/rf_bug_v2_http_security_green`
+      adapter profile exactly once, with no warm-up or retry.
+
+
+      Inspect the real Go HTTP response-writer seam and real Chromium CSP operation
+      evidence. Require all three exact selected/executed identities. Retain the failed
+      report''s positive Go proof: the protected 13-subtest security contract executes
+      `multi_flush_streaming` and `request_cancellation`, observes two flush-visible
+      writes before completion, and confirms one effective security-header owner;
+      the local streaming/cancellation identity remains deterministic even though
+      the Go security writer deliberately splits each write. Require Chromium to boot
+      and complete OPML import plus State export/import/download with no `style-src
+      ''self''`, “Applying inline style violates…”, or other CSP console violation.
+      Use console location/operation timing only as evidence; do not filter diagnostics
+      or mutate protected acceptance.
+
+
+      After the single canonical profile exits, deterministically compare the complete
+      canonical `web/build` and tracked `internal/resofeed/webui` trees path-for-path,
+      byte-for-byte, and mode-for-mode, require zero generated staging residue, and
+      require clean tracked status. Record the exact command, HEAD, selected/executed
+      identities, process exit, decisive Go/Chromium output, console locations, operation
+      sequence, deterministic generated-tree comparison, remediation changed-path
+      scopes, protected-path immutability, and final status. Do not retry, add sleeps,
+      substitute mock/intercepted seams, weaken CSP through `unsafe-inline`, hashes,
+      or nonces, skip operations, alter protected acceptance, modify repository files,
+      hide generated drift, or emit secrets.'
     verification: Pass only when one fresh retry-free canonical adapter run emits
       green evidence for exactly `RF-BUG-005 Chromium CSP operations`, `RF-BUG-005
       exact security contract`, and `RF-BUG-005 local streaming cancellation`; the
       protected 13-subtest contract proves multi-flush and cancellation against the
-      real security-wrapped HTTP seam; Chromium proves boot, OPML import, and State
-      export/import/download without CSP violations; the Go remediation diff stays
-      within its Go/test/architecture/container-doc scope; the frontend remediation
-      diff stays within its route/developer-test/design-doc scope; protected acceptance
-      is unchanged; no unsafe-inline/hash/nonce weakening, mock/interception, retry,
-      skip, sleep, buffering/staging workaround, or secret output appears; and tracked
+      real security-wrapped HTTP seam and retains the deliberate split-write evidence;
+      Chromium proves boot, OPML import, and State export/import/download with zero
+      inline-style/CSP console violation; complete web/build and internal/resofeed/webui
+      trees are deterministically equal by path, bytes, and mode after the run; no
+      generated stage residue remains; both remediation diffs stay within declared
+      scopes; protected Go/browser acceptance is unchanged; no unsafe-inline/hash/nonce
+      weakening, mock/interception, retry, skip, sleep, diagnostic filtering, buffering
+      workaround, repository mutation, or secret output appears; and final tracked
       integrated status is clean.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
@@ -190823,15 +190841,21 @@ phases:
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - docs/DESIGN.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go
     - internal/resofeed/http_security_test.go
+    - internal/resofeed/webui
     - web/src/routes/+page.svelte
     - web/src/lib/__tests__/workbench-route.test.ts
     - web/tests/e2e/csp-operations.browser-contract.spec.ts
+    - web/package.json
+    - web/svelte.config.js
+    - web/vite.config.ts
+    - scripts/build-resofeed.sh
     - scripts/vectl-check.mjs
     depends_on:
     - rf-bug-v2-streaming-contract-remediation
-    - rf-bug-v2-frontend-csp-inline-style-remediation
+    - rf-bug-v2-frontend-csp-runtime-generated-remediation
     agent: integration-verifier
   - id: rf-bug-v2-closure-selector-remediation
     name: Repair RF-BUG closure adapter authority aggregation and false-green guard
