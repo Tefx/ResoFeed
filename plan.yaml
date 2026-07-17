@@ -190249,6 +190249,18 @@ phases:
       evidence, redaction, current authority hashes, and no repository diff.
 
 
+      The repaired closure-report profile must preserve its unchanged two selection
+      identities/digest while aggregating the actual current authorities: exact top-level
+      `TestRFBugCanonicalContracts` with `RF_BUG_CANONICAL_DOCUMENTS=9` and `OPML_EXCLUSIONS=2`;
+      package-relative `src/lib/api-client.test.ts` identity `keeps all nine active
+      documents free of OPML export capabilities` with `OPML_ACTIVE_DOCUMENTS=9`;
+      the existing active Prompting scan with `PROMPTING_V21_ACTIVE_MATCHES=0`; and
+      the exact RF-BUG-001–010 inventory in both protected report and plan before
+      `RF_BUG_CLOSURE_REQUIREMENTS=10`. Missing identities, missing markers, empty
+      output, and no-test output must fail closed; no absent Go test or subtest may
+      be synthesized.
+
+
       All package-relative frontend check/render/list/run and config startup must
       occur through the adapter''s canonical trusted Svelte build-identity path. Direct
       `npm --prefix web run check` or direct Vite/Svelte config startup without trusted
@@ -190262,12 +190274,14 @@ phases:
       zero `item-deep-links-*` profile is selected or executed and none is treated
       as a blocker; (4) no retry, skip, sleep, alternate selector, or repository mutation
       occurs; (5) the repaired HTTP-security profile observes retry-free multi-flush/cancellation
-      and the repaired closure-report profile executes both exact Go test identities
-      without `no tests to run`; (6) all current Section 7 Go identities, the RF-BUG-002
-      100-run, nine-document/two-exclusion OPML, runtime/smoke, clean-root reproducibility,
-      redaction, and authority hashes pass; (7) `go vet ./...` and a disposable `/tmp`
-      build pass, the binary is removed, adapter-mediated trusted frontend identity
-      remains fail-closed, and final `git status --short` is empty.'
+      and the repaired closure-report profile preserves its two selection identities/digest
+      while observing the exact current Go canonical and package-relative web identities,
+      all canonical/OPML/Prompting markers, and the protected exact ten-requirement
+      inventory without `no tests to run`; (6) all current Section 7 Go identities,
+      the RF-BUG-002 100-run, nine-document/two-exclusion OPML, runtime/smoke, clean-root
+      reproducibility, redaction, and authority hashes pass; (7) `go vet ./...` and
+      a disposable `/tmp` build pass, the binary is removed, adapter-mediated trusted
+      frontend identity remains fail-closed, and final `git status --short` is empty.'
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
