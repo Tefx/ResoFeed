@@ -189880,7 +189880,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-deterministic-profile-self-restoration-remediation
     name: Repair deterministic profile negative probes and worktree restoration
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for validated independent verification FAIL receipt `sha256:48362094c70fdbef3b2153252f4f45e7edcf94aaec966cd70ca0907cdf5c30ad`\
@@ -189991,6 +189991,15 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T04:40:51.142619+00:00'
+    done_at: '2026-07-17T04:57:24.595455+00:00'
+    evidence: Integrated commit aef6e73422906f94e9d0e86c57cb91af22f3eb5a. Production
+      Gate admitted worker receipt sha256:379e3b616ab2677b7e402912e574c9b22d41df7363443aaae6ec196f066e06bc
+      and dispatch sha256:5fa43fd4bc7812762984e41bf50354a0c05fa6569ff25fdc1dd61060eac47306
+      after an independent rerun from dependency-absent state. Evidence proved narrow
+      negative-test path, strict childEnvironment preservation, exact success/failure
+      restoration, zero stage residue, self-contained locked dependency bootstrap,
+      one green envelope, and protected acceptance unchanged. Focused tests and harness
+      docs were synchronized.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
