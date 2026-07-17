@@ -189810,7 +189810,7 @@ phases:
       output. Fixture developer contract, focused tests, and docs were synchronized.
   - id: rf-bug-v2-deterministic-adapter-identity-integration-verification
     name: Independently verify deterministic adapter identity integration
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189916,6 +189916,8 @@ phases:
     depends_on:
     - rf-bug-v2-generated-webui-baseline-sync
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T05:23:49.581641+00:00'
   - id: rf-bug-v2-deterministic-profile-self-restoration-remediation
     name: Repair deterministic profile negative probes and worktree restoration
     status: done
