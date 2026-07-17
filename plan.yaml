@@ -190709,7 +190709,7 @@ phases:
       history.
   - id: rf-bug-v2-streaming-contract-remediation
     name: Repair RF-BUG-005 retry-free multi-flush streaming contract
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nPreserve\
       \ the valid FAIL receipt `/tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v3_report.md#sha256=c65bd2bee23f0f8718b33528c7393275c6cb248fbcae6451480d35f3296ae5fc`\
@@ -190777,6 +190777,13 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T08:39:16.755820+00:00'
+    done_at: '2026-07-17T08:51:15.726427+00:00'
+    evidence: Production Gate admitted focused Go worker receipt sha256:23b234e04d0cff857abfa1681e0867aa11c0a085d27121f1163f2bc95065b93b
+      under dispatch sha256:57966c8a8474cf4a30a26507da942df397a30bbbe9de65c2c504e2350a41e888.
+      Protected 13-subtest streaming/cancellation contract plus deterministic developer
+      test passed without retries/sleeps or acceptance mutation. Integrated commit
+      167a644dae95253452cd9dc141283e6363667388. User docs edits remain unstaged and
+      preserved.
   - id: rf-bug-v2-streaming-contract-verification
     name: Independently verify retry-free RF-BUG-005 multi-flush streaming
     status: pending
