@@ -64,6 +64,9 @@ const expectedPending = [
   ['rf-bug-v2-canonical-e2e-embedded-ui-build-remediation', 'rf_bug_v2_canonical_e2e_embedded_ui_build_green', [
     'RF-BUG-010 canonical fresh embedded UI build'
   ]],
+  ['rf-bug-v2-deterministic-svelte-build-remediation', 'rf_bug_v2_deterministic_svelte_build_green', [
+    'RF-BUG-010 deterministic canonical frontend builds'
+  ]],
   ['rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green', [
     'RF-BUG-004 State import lifecycle',
     'RF-BUG-008 delete focus',
@@ -141,8 +144,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 16);
-  assert.equal(expectedPending.length, 16);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 17);
+  assert.equal(expectedPending.length, 17);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -245,8 +248,9 @@ test('RF-BUG-010 canonical fresh embedded UI build', () => {
   assert.match(scriptSource, /e2e_build=1/u);
   assert.match(scriptSource, /mktemp -d "\$\{package_dir\}\/\.webui-stage\./u);
   assert.match(scriptSource, /validate_bootstrap "\$\{staged_ui\}"/u);
-  assert.match(scriptSource, /deterministic-clock\.cjs/u);
-  assert.match(scriptSource, /NODE_OPTIONS="--require=\$\{clock_preload\}" npm --prefix web run build/u);
+  assert.match(scriptSource, /RESOFEED_SVELTE_BUILD_IDENTITY/u);
+  assert.match(scriptSource, /files\.sort\(\(left, right\) => Buffer\.compare/u);
+  assert.match(scriptSource, /env -i/u);
   assert.match(scriptSource, /go build -trimpath -tags resofeed_e2e -o/u);
   assert.match(scriptSource, /go build -trimpath -o/u);
 
@@ -263,9 +267,15 @@ test('RF-BUG-010 canonical fresh embedded UI build', () => {
   function fixture() {
     const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-build-contract-'));
     fs.mkdirSync(path.join(root, 'scripts'), { recursive: true });
-    fs.mkdirSync(path.join(root, 'web'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'web', 'src'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'web', 'static'), { recursive: true });
     fs.mkdirSync(path.join(root, 'internal', 'resofeed', 'webui'), { recursive: true });
     fs.copyFileSync(scriptPath, path.join(root, 'scripts', 'build-resofeed.sh'));
+    for (const relativePath of ['package-lock.json', 'package.json', 'svelte.config.js', 'tsconfig.json', 'vite.config.ts']) {
+      fs.writeFileSync(path.join(root, 'web', relativePath), `${relativePath}\n`);
+    }
+    fs.writeFileSync(path.join(root, 'web', 'src', 'app.html'), '<html></html>');
+    fs.writeFileSync(path.join(root, 'web', 'static', 'favicon.svg'), '<svg></svg>');
     fs.chmodSync(path.join(root, 'scripts', 'build-resofeed.sh'), 0o755);
     fs.writeFileSync(path.join(root, 'internal', 'resofeed', 'webui', 'old.js'), 'old');
     fs.writeFileSync(path.join(root, 'internal', 'resofeed', 'webui', 'index.html'), '<script src="/old.js"></script>');
@@ -276,7 +286,7 @@ test('RF-BUG-010 canonical fresh embedded UI build', () => {
 set -euo pipefail
 rm -rf "$PWD/web/build"
 mkdir -p "$PWD/web/build"
-case "\${BUILD_FIXTURE:-valid}" in
+case "$(cat "$PWD/build-fixture" 2>/dev/null || printf valid)" in
   missing) ;;
   empty) : > "$PWD/web/build/index.html" ;;
   invalid) printf '%s' '<script src="https://example.test/app.js"></script>' > "$PWD/web/build/index.html" ;;
@@ -315,6 +325,7 @@ exec /bin/cp "$@"
   function runFixture(options = {}) {
     const current = fixture();
     const output = path.join(current.root, 'out', 'resofeed');
+    fs.writeFileSync(path.join(current.root, 'build-fixture'), options.buildFixture ?? 'valid');
     const result = spawnSync(path.join(current.root, 'scripts', 'build-resofeed.sh'), [...(options.e2e ? ['--e2e'] : []), output], {
       cwd: current.root,
       encoding: 'utf8',
@@ -322,7 +333,6 @@ exec /bin/cp "$@"
         PATH: `${current.fakeBin}:${process.env.PATH ?? ''}`,
         HOME: process.env.HOME ?? '',
         TMPDIR: process.env.TMPDIR ?? '/tmp',
-        BUILD_FIXTURE: options.buildFixture ?? 'valid',
         FAIL_COPY: options.failCopy ? '1' : '',
         FAIL_GO: options.failGo ?? ''
       }
@@ -364,6 +374,52 @@ exec /bin/cp "$@"
       fs.rmSync(current.root, { recursive: true, force: true });
     }
   }
+});
+
+test('RF-BUG-010 deterministic canonical frontend build contract', () => {
+  const profile = findProfile(
+    'rf-bug-v2-deterministic-svelte-build-remediation',
+    'rf_bug_v2_deterministic_svelte_build_green'
+  );
+  assert.ok(profile);
+  assert.equal(profile.runner, 'deterministic-build');
+  assert.deepEqual(profile.identities, ['RF-BUG-010 deterministic canonical frontend builds']);
+  assert.deepEqual(profile.requiredOutput, [
+    'RF-BUG-010_REPRODUCIBLE_BUILDS=green',
+    'RF-BUG-010_PRODUCTION_REPEAT=identical',
+    'RF-BUG-010_PRODUCTION_E2E=identical',
+    'RF-BUG-010_SENTINEL_INVALIDATION=changed_and_embedded',
+    'RF-BUG-010_VERSION_INPUT=fail_closed',
+    'RF-BUG-010_AMBIENT_OVERRIDE=rejected',
+    'RF-BUG-010_SYNCED_WORKTREE=clean',
+    'RF-BUG-010_STAGE_RESIDUE=0',
+    'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged'
+  ]);
+
+  const scriptSource = fs.readFileSync(path.join(repoRoot, 'scripts', 'build-resofeed.sh'), 'utf8');
+  assert.match(scriptSource, /scripts\/build-resofeed\.sh/u);
+  assert.match(scriptSource, /web\/package-lock\.json/u);
+  assert.match(scriptSource, /recursiveRoots = \['web\/src', 'web\/static'\]/u);
+  assert.match(scriptSource, /Buffer\.compare\(Buffer\.from\(left, 'utf8'\), Buffer\.from\(right, 'utf8'\)\)/u);
+  assert.match(scriptSource, /JSON\.stringify\(manifest\), 'utf8'/u);
+  assert.match(scriptSource, /\^rf-\[a-f0-9\]\{64\}\$/u);
+  assert.match(scriptSource, /env -i/u);
+  assert.doesNotMatch(scriptSource, /deterministic-clock|Date\.now|NODE_OPTIONS/u);
+
+  const svelteConfig = fs.readFileSync(path.join(repoRoot, 'web', 'svelte.config.js'), 'utf8');
+  assert.match(svelteConfig, /version:\s*\{\s*name: buildIdentity\s*\}/u);
+  assert.match(svelteConfig, /RESOFEED_SVELTE_BUILD_IDENTITY must be a canonical build identity/u);
+  const viteConfig = fs.readFileSync(path.join(repoRoot, 'web', 'vite.config.ts'), 'utf8');
+  assert.match(viteConfig, /const commitHash = buildIdentity\.slice\(3, 11\)/u);
+  assert.doesNotMatch(viteConfig, /execSync|git rev-parse|process\.env\.VITE_GIT_COMMIT/u);
+
+  const adapterSource = fs.readFileSync(adapterPath, 'utf8');
+  assert.match(adapterSource, /runner: 'deterministic-build'/u);
+  assert.match(adapterSource, /tracked frontend sentinel did not reach embedded binary/u);
+  assert.match(adapterSource, /noncanonical private version input was accepted/u);
+  const selected = invoke('select', profile.suite, profile.checkID);
+  assert.equal(selected.status, 0, selected.stderr);
+  assert.deepEqual(parseSelectionOutput(selected.stdout, profile), selectionEnvelope(profile));
 });
 
 test('RF-BUG-002 token parity harness adapter contract', () => {
@@ -590,6 +646,8 @@ test('VECTL-ADAPTER protected-scope', () => {
     'scripts/rf-bug-010-standard-json.mjs',
     'scripts/vectl-check.mjs',
     'scripts/vectl-check.test.mjs',
+    'web/svelte.config.js',
+    'web/vite.config.ts',
     'web/src/lib/playwright-e2e-harness-contract.ts',
     'web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts',
     'web/tests/e2e/fixtures/runtime-fixture.ts',

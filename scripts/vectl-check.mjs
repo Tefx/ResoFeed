@@ -192,6 +192,23 @@ export const PENDING_PROFILE_PAIRS = [
     runner: 'canonical-build'
   },
   {
+    suite: 'rf-bug-v2-deterministic-svelte-build-remediation',
+    checkID: 'rf_bug_v2_deterministic_svelte_build_green',
+    identities: ['RF-BUG-010 deterministic canonical frontend builds'],
+    requiredOutput: [
+      'RF-BUG-010_REPRODUCIBLE_BUILDS=green',
+      'RF-BUG-010_PRODUCTION_REPEAT=identical',
+      'RF-BUG-010_PRODUCTION_E2E=identical',
+      'RF-BUG-010_SENTINEL_INVALIDATION=changed_and_embedded',
+      'RF-BUG-010_VERSION_INPUT=fail_closed',
+      'RF-BUG-010_AMBIENT_OVERRIDE=rejected',
+      'RF-BUG-010_SYNCED_WORKTREE=clean',
+      'RF-BUG-010_STAGE_RESIDUE=0',
+      'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged'
+    ],
+    runner: 'deterministic-build'
+  },
+  {
     suite: 'rf-bug-v2-source-ledger',
     checkID: 'rf_bug_v2_source_ledger_green',
     identities: [
@@ -509,7 +526,7 @@ export function childEnvironment(overrides = {}) {
 
 function execute(profile, command, args, options = {}) {
   const result = spawnSync(command, args, {
-    cwd: repoRoot,
+    cwd: options.cwd ?? repoRoot,
     encoding: 'utf8',
     timeout: options.timeout ?? 900_000,
     env: childEnvironment(options.env)
@@ -837,6 +854,149 @@ function runCanonicalBuild(profile) {
     fs.rmSync(scratch, { recursive: true, force: true });
   }
   ensureNoProtectedMutation();
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
+function copyBuildFixture(destination) {
+  const relativePaths = [
+    'go.mod',
+    'go.sum',
+    'cmd/resofeed',
+    'internal/resofeed',
+    'scripts/build-resofeed.sh',
+    'web/package-lock.json',
+    'web/package.json',
+    'web/src',
+    'web/static',
+    'web/svelte.config.js',
+    'web/tsconfig.json',
+    'web/vite.config.ts'
+  ];
+  for (const relativePath of relativePaths) {
+    const source = path.join(repoRoot, relativePath);
+    const target = path.join(destination, relativePath);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.cpSync(source, target, { recursive: true });
+  }
+  const sourceModules = path.join(repoRoot, 'web', 'node_modules');
+  if (!fs.existsSync(sourceModules)) throw new AdapterFailure('web/node_modules is required for deterministic build verification');
+  fs.symlinkSync(sourceModules, path.join(destination, 'web', 'node_modules'), 'dir');
+}
+
+function trackedStatus() {
+  const result = spawnSync('git', ['status', '--porcelain=v1', '-z'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: childEnvironment()
+  });
+  if (result.status !== 0) throw new AdapterFailure('could not read synchronized worktree status');
+  return result.stdout;
+}
+
+function assertNoStageResidue(root) {
+  const packageDirectory = path.join(root, 'internal', 'resofeed');
+  const residue = fs.readdirSync(packageDirectory).filter((name) => name.startsWith('.webui-stage.'));
+  if (residue.length > 0) throw new AdapterFailure('canonical build left package-local stage residue', residue);
+}
+
+function runDeterministicBuild(profile) {
+  ensureNoProtectedMutation();
+  execute(profile, 'node', [
+    '--test', '--test-name-pattern=RF-BUG-010 deterministic canonical frontend build contract',
+    'scripts/vectl-check.test.mjs'
+  ], { timeout: 240_000 });
+
+  const statusBefore = trackedStatus();
+  const packageUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
+  const builtUI = path.join(repoRoot, 'web', 'build');
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-deterministic-build-'));
+  try {
+    const productionOne = path.join(scratch, 'resofeed-production-one');
+    const productionTwo = path.join(scratch, 'resofeed-production-two');
+    const e2eBinary = path.join(scratch, 'resofeed-e2e');
+    execute(profile, 'scripts/build-resofeed.sh', [productionOne], { timeout: 600_000 });
+    const productionDigest = treeDigest(packageUI);
+    if (treeDigest(builtUI) !== productionDigest || trackedStatus() !== statusBefore) {
+      throw new AdapterFailure('first canonical production build changed synchronized tracked assets');
+    }
+    execute(profile, 'scripts/build-resofeed.sh', [productionTwo], { timeout: 600_000 });
+    if (treeDigest(packageUI) !== productionDigest || treeDigest(builtUI) !== productionDigest || trackedStatus() !== statusBefore) {
+      throw new AdapterFailure('repeated canonical production build was not byte-identical');
+    }
+    execute(profile, 'scripts/build-resofeed.sh', ['--e2e', e2eBinary], { timeout: 600_000 });
+    if (treeDigest(packageUI) !== productionDigest || treeDigest(builtUI) !== productionDigest || trackedStatus() !== statusBefore) {
+      throw new AdapterFailure('canonical production and E2E frontend trees differed');
+    }
+    const productionMetadata = execute(profile, 'go', ['version', '-m', productionOne], { timeout: 30_000 });
+    const e2eMetadata = execute(profile, 'go', ['version', '-m', e2eBinary], { timeout: 30_000 });
+    if (/(?:^|\s)-tags(?:=|\s)/mu.test(productionMetadata)) throw new AdapterFailure('production binary unexpectedly contains Go build tags');
+    if (!/(?:^|\s)-tags=resofeed_e2e(?:\s|$)/mu.test(e2eMetadata)) throw new AdapterFailure('E2E binary missed the exact resofeed_e2e Go build tag');
+    assertNoStageResidue(repoRoot);
+
+    const fixtureRoot = path.join(scratch, 'fixture');
+    fs.mkdirSync(fixtureRoot);
+    copyBuildFixture(fixtureRoot);
+    const fixtureScript = path.join(fixtureRoot, 'scripts', 'build-resofeed.sh');
+    const baselineBinary = path.join(scratch, 'fixture-baseline');
+    execute(profile, fixtureScript, [baselineBinary], { cwd: fixtureRoot, timeout: 600_000 });
+    const fixturePackage = path.join(fixtureRoot, 'internal', 'resofeed', 'webui');
+    const fixtureBuild = path.join(fixtureRoot, 'web', 'build');
+    const baselineDigest = treeDigest(fixturePackage);
+
+    const sentinel = '<meta name="resofeed-build-sentinel" content="rf-bug-010-sentinel" />';
+    const appHTML = path.join(fixtureRoot, 'web', 'src', 'app.html');
+    fs.writeFileSync(appHTML, fs.readFileSync(appHTML, 'utf8').replace('<meta charset="utf-8" />', `<meta charset="utf-8" />\n    ${sentinel}`));
+    const sentinelBinaryOne = path.join(scratch, 'fixture-sentinel-one');
+    execute(profile, fixtureScript, [sentinelBinaryOne], { cwd: fixtureRoot, timeout: 600_000 });
+    const sentinelDigest = treeDigest(fixturePackage);
+    if (sentinelDigest === baselineDigest || treeDigest(fixtureBuild) !== sentinelDigest) {
+      throw new AdapterFailure('tracked frontend sentinel did not invalidate synchronized assets');
+    }
+    for (const requiredPath of [path.join(fixtureBuild, 'index.html'), path.join(fixturePackage, 'index.html')]) {
+      if (!fs.readFileSync(requiredPath, 'utf8').includes(sentinel)) throw new AdapterFailure('tracked frontend sentinel did not reach built assets');
+    }
+    if (!fs.readFileSync(sentinelBinaryOne).includes(Buffer.from(sentinel))) {
+      throw new AdapterFailure('tracked frontend sentinel did not reach embedded binary');
+    }
+    const sentinelBinaryTwo = path.join(scratch, 'fixture-sentinel-two');
+    execute(profile, fixtureScript, [sentinelBinaryTwo], { cwd: fixtureRoot, timeout: 600_000 });
+    if (treeDigest(fixturePackage) !== sentinelDigest || treeDigest(fixtureBuild) !== sentinelDigest) {
+      throw new AdapterFailure('repeated tracked sentinel build was not deterministic');
+    }
+
+    const packageBeforeFailures = treeDigest(fixturePackage);
+    for (const value of [undefined, '', 'invalid', `rf-${'A'.repeat(64)}`, `rf-${'a'.repeat(63)}`]) {
+      const environment = childEnvironment(value === undefined ? {} : { RESOFEED_SVELTE_BUILD_IDENTITY: value });
+      const result = spawnSync('npm', ['--prefix', 'web', 'run', 'build'], {
+        cwd: fixtureRoot,
+        encoding: 'utf8',
+        timeout: 180_000,
+        env: environment
+      });
+      if (result.status === 0) throw new AdapterFailure('noncanonical private version input was accepted');
+      if (treeDigest(fixturePackage) !== packageBeforeFailures) throw new AdapterFailure('invalid private version input changed package assets');
+    }
+    const override = spawnSync(fixtureScript, [path.join(scratch, 'fixture-override')], {
+      cwd: fixtureRoot,
+      encoding: 'utf8',
+      timeout: 180_000,
+      env: childEnvironment({ RESOFEED_SVELTE_BUILD_IDENTITY: `rf-${'b'.repeat(64)}` })
+    });
+    if (override.status !== 2 || !override.stderr.includes('private to the canonical build pipeline')) {
+      throw new AdapterFailure('ambient private build identity override was not rejected');
+    }
+    if (treeDigest(fixturePackage) !== packageBeforeFailures) throw new AdapterFailure('ambient override changed package assets');
+    assertNoStageResidue(fixtureRoot);
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+  ensureNoProtectedMutation();
+  if (trackedStatus() !== statusBefore) throw new AdapterFailure('deterministic build verification changed synchronized worktree status');
   return {
     outcome: 'green',
     exitCode: 0,
@@ -1190,6 +1350,8 @@ async function main() {
             ? runRuntimeIsolation(profile)
             : profile.runner === 'canonical-build'
               ? runCanonicalBuild(profile)
+              : profile.runner === 'deterministic-build'
+                ? runDeterministicBuild(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'
