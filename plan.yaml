@@ -187303,7 +187303,7 @@ phases:
       all passed; clean integrity 9/9. Semantic receipt sha256:5a733bc17de6aa29c1e56c84a5b1a6127a37410bb0dc73cb15fcd615cfd86f10.
   - id: rf-bug-v2-ledger-prompting-gate
     name: RF-BUG Assurance v2 ledger-prompting Full Gate
-    status: pending
+    status: claimed
     description: 'step_type: gate
 
       repo_change_policy: no_repo_change
@@ -187410,6 +187410,8 @@ phases:
     - rf-bug-v2-replacement-lanes-verification
     - rf-bug-v2-current-operation-foreground-ownership-verification
     agent: gate-reviewer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T00:27:50.358787+00:00'
   - id: rf-bug-v2-replacement-lanes-verification
     name: Independently close immutable replacement-five runtime lanes
     status: done
