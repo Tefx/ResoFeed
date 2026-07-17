@@ -190583,7 +190583,7 @@ phases:
       plus untracked .pi/remote-pi/ and docs/ITEM_DEEP_LINKS.md preserved.
   - id: rf-bug-v2-first-run-sqlite-verification
     name: Independently verify RF-BUG-001 retry-free first-run closure
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190620,6 +190620,15 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T07:30:34.601308+00:00'
+    done_at: '2026-07-17T07:37:59.292932+00:00'
+    evidence: Fresh immutable Gate Support PASS admitted as semantic receipt sha256:451329b7e066f54ed34ce7acb29e02ff06aa8fdbe0bf824db00b47242cb8dedf
+      on HEAD 81532f5fc66e02d24b268ec9066f59ccbc0afa20. The sole profile invocation
+      was green with real binary/HTTP/SQLite/Chromium, four 200 statuses, durable
+      A/B timestamps, selected B, no retry/skip/interception/busy/timeout, and clean
+      teardown. Authoritative Playwright collection proved exactly 14 tests in three
+      files; focused Go WAL concurrency regression passed; docs/protected hashes matched
+      and status was clean. Prior v1/v2 setup-path failures remain immutable failure
+      history.
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
