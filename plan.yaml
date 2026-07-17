@@ -190091,10 +190091,9 @@ phases:
       \ web/src/**, web/static/**, web/svelte.config.js, web/vite.config.ts, web/package.json,\
       \ web/package-lock.json, web/tests/e2e/**, scripts/build-resofeed.sh, scripts/resofeed-svelte-build-identity.mjs,\
       \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md, docs/ARCHITECTURE.md,\
-      \ docs/DESIGN.md]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/,\
-      \ web/build/, web/node_modules/]\nclaims: [RF-BUG-010-GENERATED-WEBUI-BASELINE-SYNC]\n\
-      checks:\n  - id: rf_bug_v2_generated_webui_baseline_sync_green\n    run:\n \
-      \     command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-generated-webui-baseline-sync,\
+      \ docs/DESIGN.md]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\n\
+      claims: [RF-BUG-010-GENERATED-WEBUI-BASELINE-SYNC]\nchecks:\n  - id: rf_bug_v2_generated_webui_baseline_sync_green\n\
+      \    run:\n      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-generated-webui-baseline-sync,\
       \ rf_bug_v2_generated_webui_baseline_sync_green]\n      timeout_seconds: 1800\n\
       \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
       \   - {path: scripts/vectl-check.mjs, access: execute, availability: produced_by_step}\n\
