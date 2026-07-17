@@ -189810,7 +189810,7 @@ phases:
       output. Fixture developer contract, focused tests, and docs were synchronized.
   - id: rf-bug-v2-deterministic-adapter-identity-integration-verification
     name: Independently verify deterministic adapter identity integration
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189918,6 +189918,16 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T05:23:49.581641+00:00'
+    done_at: '2026-07-17T05:36:05.463951+00:00'
+    evidence: 'Fresh independent Gate Support PASS admitted by semantic Gate as receipt
+      sha256:943f61161639d9b6a67a049618d9b5b162cc1d1c70a74d3a8056dd7d69ec6d55 against
+      immutable target b5ab132fc3a1131e98a4672b1a2c965ea2ae7397. Exactly one npm ci
+      setup produced no tracked changes. Generated-baseline and self-restoration profiles
+      plus all five current gate profiles passed with exact identities/no retry/skip;
+      direct config/list/render/browser startup passed; trusted identity, negative
+      restoration, canonical webui equality, tag/two-key boundary, cleanup/redaction/residue,
+      protected baseline, and final clean status were proven. No docs change was required
+      for generated-byte-only synchronization. Report: /tmp/larva-agent-artifacts/integration-verifier-rf-bug-v2-v3_report.md#sha256=c5b7dbd86fd6d8f55fdf56e0478fbbc13a7b9080dcd04e9f64d426cd311e2aa4'
   - id: rf-bug-v2-deterministic-profile-self-restoration-remediation
     name: Repair deterministic profile negative probes and worktree restoration
     status: done
