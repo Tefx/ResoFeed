@@ -189852,14 +189852,34 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Fresh independent Gate Support verification from the newly integrated remediation
-      head. Do not reuse the prior Full Gate failure, completed deterministic-build
-      receipt, or partial evidence as passing proof. Do not modify repository files.
+      Fresh independent Gate Support verification from a fresh worktree at the newly
+      integrated self-restoration remediation head. Preserve validated FAIL receipt
+      `sha256:48362094c70fdbef3b2153252f4f45e7edcf94aaec966cd70ca0907cdf5c30ad`, report
+      `/tmp/larva-agent-artifacts/rf-bug-v2-deterministic-adapter-identity-integration-verification_report.md#sha256=0d483f8bd06084ead8a7621e12ffb3577614140e1c547b3183caaca1d721bd55#bytes=53243`,
+      immutable head `3f84d154723d6556d4a394e009cbf28cd35f5851`, and every dirty failed-verification
+      worktree as failure history. Do not reuse, reset, clean, or treat prior partial
+      evidence as passing proof. Do not modify repository files.
 
 
-      Record immutable head and initial/final tracked status. Run the fixture developer
-      contract directly and require it to prove canonical `scripts/build-resofeed.sh
-      --e2e`, exact child `RESOFEED_E2E=1`, and absence of direct Go build/tag duplication.
+      Record immutable head plus initial/final tracked status. Run the focused adapter
+      developer tests and directly prove: the deterministic profile''s malformed,
+      absent, noncanonical, and ambient-override probes use only the explicit narrow
+      negative-test path to the trusted helper/config rejection boundary; the production
+      `childEnvironment` still rejects all arbitrary caller/ambient `RESOFEED_SVELTE_BUILD_IDENTITY`
+      overrides before child startup; no general environment escape hatch exists;
+      and exact trusted tracked-input derivation remains shared with the canonical
+      build script.
+
+
+      Induce both a negative-probe rejection and a later deterministic-profile check
+      failure after generated-tree mutation in disposable verification contexts. Require
+      the original failure to remain observable while `web/build` and `internal/resofeed/webui`
+      are restored byte-exactly to their prior present or absent state, tracked status
+      is unchanged, and no `.webui-stage.*` residue remains. Exercise the success
+      path and require the deterministic profile to emit exactly one valid green evidence
+      envelope with exact selected/executed identity and no retry/skip.
+
+
       Then rerun all five current Full Gate profiles from the same clean integrated
       head with exact commands: token `node scripts/vectl-check.mjs run rf-bug-v2-go-token-parity
       rf_bug_v2_go_token_parity_green`; Source Ledger `node scripts/vectl-check.mjs
@@ -189873,21 +189893,27 @@ phases:
       Require one valid green evidence envelope per profile with exact selected/executed
       identity and no retry/skip. Directly observe Source Ledger config/list/render
       and real-browser startup, token and Prompting nested harness startup, and adapter-isolation
-      foundation/list/runtime startup without `RESOFEED_SVELTE_BUILD_IDENTITY` config
-      failure. Prove each child receives only the canonical tracked-input-derived
-      identity through the trusted path; ambient/user predefinition is rejected and
-      never forwarded; missing trusted derivation fails closed; the helper and build
-      script use identical canonical ordering/encoding; controlled tracked-input invalidation
-      changes identity and repeats deterministically; production/E2E byte determinism,
-      exact tag/two-key boundary, package-local embedding, cleanup/redaction, zero
-      residue, and protected acceptance remain intact. Any mock at the config/build/browser
+      foundation/list/runtime startup. Prove canonical child identity reaches only
+      the trusted path; ambient/user predefinition is rejected and never forwarded;
+      missing trusted derivation fails closed; helper and build script use identical
+      canonical ordering/encoding; controlled tracked-input invalidation changes identity
+      and repeats deterministically; production/E2E byte determinism, exact tag/two-key
+      boundary, package-local embedding, cleanup/redaction, zero residue, and protected
+      acceptance remain intact. Confirm docs reflect observable behavior and troubleshooting
+      if changed, or that the implementation receipt explicitly justifies no docs
+      change under the Dual-Update Contract. Any mock at the config/build/browser
       seam, arbitrary environment forwarding, stale literal, dirty tracked status,
-      protected mutation, failed profile, missing identity, retry, or skip fails verification.'
-    verification: PASS requires the direct fixture contract and all five exact current
-      gate profiles green from one immutable repaired head, direct real config/list/render/browser
-      startup, trusted deterministic identity equivalence and fail-closed negative
-      paths, preserved production/E2E determinism and cache invalidation, zero retry/skip/residue,
-      protected acceptance unchanged, and clean initial/final tracked status.
+      protected mutation, failed profile, missing identity, retry, skip, incomplete
+      restoration, masked primary failure, or stage residue fails verification.'
+    verification: PASS requires focused self-restoration tests plus all five exact
+      current gate profiles green from one fresh immutable repaired head; direct real
+      config/list/render/browser startup; narrow negative-test-only trusted-helper/config
+      rejection without weakening production childEnvironment; exact restoration after
+      induced negative-probe and later-check failures and after success; trusted deterministic
+      identity equivalence and fail-closed production paths; preserved production/E2E
+      determinism and cache invalidation; zero retry/skip/residue; protected acceptance
+      unchanged; Dual-Update Contract accounted for; and clean initial/final tracked
+      status.
     refs:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - docs/USAGE.md
@@ -189899,7 +189925,7 @@ phases:
     - web/vite.config.ts
     - web/tests/e2e/fixtures/runtime-fixture.ts
     depends_on:
-    - rf-bug-v2-deterministic-adapter-identity-integration-remediation
+    - rf-bug-v2-deterministic-profile-self-restoration-remediation
     agent: integration-verifier
   - id: rf-bug-v2-deterministic-profile-self-restoration-remediation
     name: Repair deterministic profile negative probes and worktree restoration
