@@ -190781,30 +190781,46 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      On the integrated remediation head, execute the canonical `rf-bug-v2-http-security/rf_bug_v2_http_security_green`
-      adapter profile exactly once and inspect the real Go HTTP response-writer seam
-      plus Chromium CSP operation evidence. Require the protected `multi_flush_streaming`
-      and `request_cancellation` subtests to execute, two flush-visible writes before
-      completion, one effective security-header owner, and no buffering/staged state.
-      Do not retry, add sleeps, substitute a mock writer for the claimed seam, weaken
-      expectations, or modify repository files. Record exact command, selected/executed
-      identities, process exit, decisive output, changed-path scope, and clean status.'
-    verification: Pass only when one retry-free canonical adapter run emits green
-      evidence for the exact three RF-BUG-005 identities, the protected 13-subtest
-      contract executes multi-flush and cancellation against the real security-wrapped
-      HTTP seam, Chromium CSP operations remain violation-free, the remediation diff
-      stays within its declared Go/test/docs scope, protected acceptance is unchanged,
-      and tracked status is clean.
+      After both independently owned remediation branches are integrated, execute
+      the canonical `rf-bug-v2-http-security/rf_bug_v2_http_security_green` adapter
+      profile fresh and exactly once. Inspect the real Go HTTP response-writer seam
+      and real Chromium CSP operation evidence. Require all three exact identities:
+      the protected 13-subtest security contract executes `multi_flush_streaming`
+      and `request_cancellation` with two flush-visible writes before completion and
+      one effective security-header owner; the local streaming/cancellation identity
+      remains deterministic; and Chromium boots and completes OPML import plus State
+      export/import/download without runtime inline style mutation or CSP violation.
+      Do not retry, add sleeps, substitute mock/intercepted seams, weaken CSP through
+      `unsafe-inline`, hashes, or nonces, skip operations, alter protected acceptance,
+      or modify repository files. Record the exact command, selected/executed identities,
+      process exit, decisive Go and Chromium output, both remediation changed-path
+      scopes, protected-path immutability, and clean integrated status.'
+    verification: Pass only when one fresh retry-free canonical adapter run emits
+      green evidence for exactly `RF-BUG-005 Chromium CSP operations`, `RF-BUG-005
+      exact security contract`, and `RF-BUG-005 local streaming cancellation`; the
+      protected 13-subtest contract proves multi-flush and cancellation against the
+      real security-wrapped HTTP seam; Chromium proves boot, OPML import, and State
+      export/import/download without CSP violations; the Go remediation diff stays
+      within its Go/test/architecture/container-doc scope; the frontend remediation
+      diff stays within its route/developer-test/design-doc scope; protected acceptance
+      is unchanged; no unsafe-inline/hash/nonce weakening, mock/interception, retry,
+      skip, sleep, buffering/staging workaround, or secret output appears; and tracked
+      integrated status is clean.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
+    - docs/DESIGN.md
     - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go
+    - internal/resofeed/http_security_test.go
+    - web/src/routes/+page.svelte
+    - web/src/lib/__tests__/workbench-route.test.ts
     - web/tests/e2e/csp-operations.browser-contract.spec.ts
     - scripts/vectl-check.mjs
     depends_on:
     - rf-bug-v2-streaming-contract-remediation
+    - rf-bug-v2-frontend-csp-inline-style-remediation
     agent: integration-verifier
   - id: rf-bug-v2-closure-selector-remediation
     name: Repair RF-BUG closure adapter authority aggregation and false-green guard
