@@ -189546,7 +189546,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-deterministic-svelte-build-remediation
     name: Make canonical Svelte frontend builds reproducible
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for validated independent verification FAIL receipt `sha256:d358fdc20bed32e97aa6e837666705b575f93c0052cc84c1bd59ac34a1e1730e`\
@@ -189663,6 +189663,15 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T03:20:58.409861+00:00'
+    done_at: '2026-07-17T03:34:30.293914+00:00'
+    evidence: Integrated commit 0f25e3c281f9eeac5946cd1ae022797518dd3de5. Production
+      Gate admitted worker receipt sha256:e8a44b14b3457de9dcd4f3434a0a6ac2e44009344950356b055e95383eba8e61
+      and dispatch sha256:2c2f757aa7760100b2d62705e844f5709720aaf539ab3d1f23d86644f48ed316
+      after rerunning the selected-execution profile. Evidence proved repeat production
+      and production→E2E builds byte-identical, controlled sentinel invalidation changed
+      and embedded, version input fail-closed, ambient override rejected, synchronized
+      worktree clean, zero stage residue, and protected acceptance unchanged. Generated
+      package-local assets and docs were synchronized.
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
