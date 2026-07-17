@@ -189755,10 +189755,10 @@ phases:
       \ web/playwright.smoke.config.ts, web/playwright.runtime.config.ts, web/src/lib/playwright-e2e-harness-contract.ts,\
       \ web/src/lib/__tests__/playwright-e2e-harness-contract.test.ts, web/tests/e2e/fixtures/runtime-fixture.ts,\
       \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, docs/USAGE.md]\n  blocked_paths:\
-      \ [cmd/**, internal/resofeed/*.go, internal/resofeed/*_test.go, web/src/routes/**,\
-      \ web/tests/e2e/*.spec.ts, web/tests/e2e/**/*.spec.ts, docs/BUG_FIX_PLAN_2026-07-12.md,\
-      \ docs/BUG_REPORT_2026-07-11.md, docs/ARCHITECTURE.md, docs/DESIGN.md]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-010-DETERMINISTIC-ADAPTER-IDENTITY-INTEGRATION-REMEDIATION]\n\
+      \ [cmd/**, web/src/routes/**, web/tests/e2e/*.spec.ts, web/tests/e2e/**/*.spec.ts,\
+      \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md, docs/ARCHITECTURE.md,\
+      \ docs/DESIGN.md]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\n\
+      claims: [RF-BUG-010-DETERMINISTIC-ADAPTER-IDENTITY-INTEGRATION-REMEDIATION]\n\
       checks:\n  - id: rf_bug_v2_deterministic_adapter_identity_integration_green\n\
       \    run:\n      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-deterministic-adapter-identity-integration-remediation,\
       \ rf_bug_v2_deterministic_adapter_identity_integration_green]\n      timeout_seconds:\
