@@ -189458,7 +189458,7 @@ phases:
       scripts/vectl-check.test.mjs, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, and docs/USAGE.md.
   - id: rf-bug-v2-canonical-e2e-embedded-ui-build-verification
     name: Independently verify fresh embedded UI in real E2E binary and browser
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189546,6 +189546,15 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T03:34:51.557917+00:00'
+    done_at: '2026-07-17T03:50:37.903320+00:00'
+    evidence: 'Fresh independent L3 PASS admitted by production semantic Gate as receipt
+      sha256:3be247d9085b7bb6b74fad99c117908c41bcbc8795cee4e5cb698a9769f6d6c6 against
+      immutable target 8f7d206083113370c4c702ad367b1bcdd0f11e64. Two production builds
+      and production→E2E were byte-identical and clean; exact build tags/two-key boundary
+      passed; controlled sentinel deterministically changed assets, reached the real
+      E2E binary and system Chrome 150.0.7871.127, while stale sentinel stayed absent;
+      global setup passed; negative inputs failed before replacement; zero residue
+      and protected baseline remained clean. Report: /tmp/larva-agent-artifacts/integration-verifier_l3_rerun_report.md#sha256=5274fcdfba2ce85d5e93b3ad082f8a9399086194454d8f1ed11b4c4e98ef5063#bytes=2303'
   - id: rf-bug-v2-deterministic-svelte-build-remediation
     name: Make canonical Svelte frontend builds reproducible
     status: done
