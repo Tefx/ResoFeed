@@ -190940,7 +190940,7 @@ phases:
       commit 7a6522f1bd7da70841b86a492ae741391fb76be3.
   - id: rf-bug-v2-closure-selector-verification
     name: Independently verify RF-BUG closure authority aggregation
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190983,6 +190983,13 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T08:55:03.164344+00:00'
+    done_at: '2026-07-17T09:00:59.632297+00:00'
+    evidence: Fresh independent semantic receipt sha256:a2284365b41b5daee3c9af0b945e3a0e32ad3f8ef499513887063422db120585
+      admitted. On immutable HEAD 93ae43c0100dd11ecb31690df1e3a13e86885a0b, exact
+      two-identity digest remained unchanged; sole profile run observed all seven
+      current authority markers; focused missing/empty/no-test guards passed with
+      zero skips; both protected documents inventoried RF-BUG-001–010; item-deep-links
+      stayed out of scope; status clean.
   - id: rf-bug-v2-frontend-csp-inline-style-remediation
     name: Repair RF-BUG-005 frontend inline-style CSP violation
     status: pending
