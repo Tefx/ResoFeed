@@ -189325,7 +189325,7 @@ phases:
       and clean protected baseline. Report: /tmp/larva-agent-artifacts/integration-verifier-rf-bug-v2-current-operation-foreground-ownership-verification_report.md#sha256=375550c693519a912c3c8df64791704b4a0356650127d4f7946bdd8e3b0639df#bytes=7279'
   - id: rf-bug-v2-canonical-e2e-embedded-ui-build-remediation
     name: Canonicalize fresh embedded UI builds for real-binary E2E
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for Full Gate FAIL receipt `sha256:f9bb4df0187ac47ae95173fa4e171e7dc9069100839eccedca25de7aa21458bc`\
@@ -189441,6 +189441,8 @@ phases:
     - web/package-lock.json
     - go.mod
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T00:45:15.002415+00:00'
   - id: rf-bug-v2-canonical-e2e-embedded-ui-build-verification
     name: Independently verify fresh embedded UI in real E2E binary and browser
     status: pending
