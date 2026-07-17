@@ -190471,6 +190471,140 @@ phases:
     depends_on:
     - rf-bug-v2-close-defect-report
     agent: gate-reviewer
+  - id: rf-bug-v2-first-run-sqlite-remediation
+    name: Repair RF-BUG-001 first-run SQLite inspection failure
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDiagnose\
+      \ the retry-free first-run RF-BUG-001 failure recorded at integrated HEAD c3b401585e5c838b8ab8b953e6409c8e1c579576:\
+      \ the real browser issued item A/B detail and inspect requests against the real\
+      \ API/SQLite seam, and the fourth response was 500 before timeout. Repair the\
+      \ underlying SQLite/API inspection concurrency or transaction defect so the\
+      \ first clean run returns [200,200,200,200], persists both human_inspected_at\
+      \ values, and retains latest selected-item ownership. Do not add retries, sleeps,\
+      \ skips, mock seams, serialized browser gestures, weakened status/timeout expectations,\
+      \ or broad SQLite-busy suppression. Add a focused deterministic Go regression\
+      \ for the diagnosed first-run concurrency failure and synchronize the SQLite\
+      \ concurrency/runtime contract in architecture and E2E harness documentation.\
+      \ Protected browser acceptance, its fixtures, package manifests, adapter selection\
+      \ identities, and unrelated product surfaces remain unchanged. Rollback reverts\
+      \ only the bounded SQLite/API implementation, focused developer regression,\
+      \ and synchronized documentation; if the root cause requires any path outside\
+      \ the declared scope, stop for plan repair rather than widening mutation.\n\n\
+      <intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [internal/resofeed/db.go,\
+      \ internal/resofeed/idempotency.go, internal/resofeed/ranking.go, internal/resofeed/http.go,\
+      \ internal/resofeed/rf_bug_inspection_concurrency_test.go, docs/ARCHITECTURE.md,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n  blocked_paths: [web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ web/tests/e2e/fixtures/**, web/src/**, web/package.json, web/package-lock.json,\
+      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/BUG_REPORT_2026-07-11.md, internal/resofeed/webui/**]\n  ignored_runtime_paths:\
+      \ [.git/, .vectl/, .agent/, .venv/, .test-artifacts/]\nclaims: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n\
+      checks:\n  - id: rf_bug_001_first_run_sqlite_regression_green\n    run: {command:\
+      \ [go, test, -v, ./internal/resofeed, -run, '^TestRFBUG001ConcurrentFirstRunInspectionNoSQLiteBusy$',\
+      \ -count=1], timeout_seconds: 180}\n    evidence:\n      mode: command_outcome\n\
+      \      path_bindings:\n        - {path: go.mod, access: read, availability:\
+      \ current}\n        - {path: internal/resofeed/db.go, access: read, availability:\
+      \ current}\n      test_bindings:\n        - {path: internal/resofeed/rf_bug_inspection_concurrency_test.go,\
+      \ classification: developer, availability: produced_by_step}\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: TestRFBUG001ConcurrentFirstRunInspectionNoSQLiteBusy},\
+      \ {literal: PASS}]\n        contains_any: []\n        forbids: [{literal: database\
+      \ is locked}, {literal: database table is locked}, {literal: no tests to run}]\n\
+      \    proves: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n  - id: rf_bug_001_first_run_browser_runtime_green\n\
+      \    run: {command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-frontend-runtime,\
+      \ rf_bug_v2_frontend_runtime_green], timeout_seconds: 1800}\n    evidence:\n\
+      \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: current}\n        - {path: web/package.json,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts, classification:\
+      \ acceptance, availability: current}\n        - {path: web/tests/e2e/routes.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n        - {path: web/tests/e2e/inspector-selection.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n      selection:\n   \
+      \     command:\n          - python3\n          - -c\n          - >-\n      \
+      \      import hashlib,json; ids=['RF-BUG-001 real API SQLite stale selection\
+      \ seam','RF-BUG-002 stale Search ownership and recovery','RF-BUG-006 route-correct\
+      \ pre-hydration title','RF-BUG-007 EN/ZH idle and invalid alert']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_001_first_run_browser_runtime_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 4}\n        required_ids:\
+      \ ['RF-BUG-001 real API SQLite stale selection seam', 'RF-BUG-002 stale Search\
+      \ ownership and recovery', 'RF-BUG-006 route-correct pre-hydration title', 'RF-BUG-007\
+      \ EN/ZH idle and invalid alert']\n        forbidden_ids: []\n    expect:\n \
+      \     outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n     \
+      \   contains_all: [{literal: RF-BUG-001_REAL_API_SQLITE_SEAM=ready}, {literal:\
+      \ 14 passed}]\n        contains_any: []\n        forbids: [{literal: retry},\
+      \ {literal: skipped}, {literal: page.route}, {literal: 500}, {literal: Test\
+      \ timeout}, {literal: No tests found}]\n    proves: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation\",\"risk_tier\"\
+      :\"R2\",\"risk_reasons\":[\"public HTTP runtime\",\"SQLite persistence concurrency\"\
+      ,\"real browser first-run contract\"],\"primary_outcome\":\"RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE\",\"atom\":\"concurrent first-run inspect\
+      \ mutations return 200 and durably persist both inspection timestamps without\
+      \ SQLite busy failures\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\"\
+      :\"rf_bug_001_first_run_browser_runtime_green\",\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/rf_bug_inspection_concurrency_test.go\"\
+      ],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
+      ,\"web/tests/e2e/routes.browser-contract.spec.ts\",\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_001_first_run_browser_runtime_green\"],\"\
+      acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: Focused Go regression passes once; then one clean retry-free adapter
+      invocation passes all 14 browser tests, emits RF-BUG-001_REAL_API_SQLITE_SEAM=ready,
+      returns four 200 responses, persists both inspection timestamps, preserves selected
+      item B, and leaves protected acceptance unchanged.
+    refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix/integration-verifier_report.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix/adapter/01-rf-bug-v2-frontend-runtime.evidence.json
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - internal/resofeed/db.go
+    - internal/resofeed/idempotency.go
+    - internal/resofeed/ranking.go
+    - internal/resofeed/http.go
+    - scripts/vectl-check.mjs
+    - web/package.json
+    - web/tests/e2e/inspector-selection.browser-contract.spec.ts
+    agent: golang-developer
+  - id: rf-bug-v2-first-run-sqlite-verification
+    name: Independently verify RF-BUG-001 retry-free first-run closure
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      From a fresh clean worktree at the integrated remediation head, run exactly
+      one retry-free `rf-bug-v2-frontend-runtime/rf_bug_v2_frontend_runtime_green`
+      adapter invocation before any warm-up or prior profile. Capture immutable adapter
+      evidence, server stderr/stdout, browser diagnostics, response statuses, SQLite
+      inspection rows, cleanup result, command, HEAD, and tracked diff. Require the
+      real binary, real HTTP routes, real SQLite database, Chromium, four statuses
+      [200,200,200,200], both durable human_inspected_at values, latest selected item
+      B, zero retries/skips/mock interception/sleeps, no timeout or SQLite busy/internal
+      error, clean teardown, and no repository mutation. Also execute the focused
+      Go regression once and confirm architecture/harness documentation describes
+      the repaired concurrency guarantee. A later successful rerun cannot replace
+      a failed first invocation.'
+    verification: Fresh immutable first-invocation runtime/browser evidence proves
+      RF-BUG-001 on the real API/SQLite seam and the focused Go regression; protected
+      acceptance hashes, clean worktree, cleanup, and no regression across the other
+      13 frontend-runtime tests are recorded.
+    refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix/integration-verifier_report.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix/adapter/01-rf-bug-v2-frontend-runtime.evidence.json
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - scripts/vectl-check.mjs
+    - web/package.json
+    - web/tests/e2e/inspector-selection.browser-contract.spec.ts
+    depends_on:
+    - rf-bug-v2-first-run-sqlite-remediation
+    agent: integration-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
