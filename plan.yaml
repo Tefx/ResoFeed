@@ -189703,7 +189703,7 @@ phases:
       package-local assets and docs were synchronized.
   - id: rf-bug-v2-deterministic-adapter-identity-integration-remediation
     name: Repair deterministic adapter identity integration and fixture contract
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ integration remediation for Full Gate FAIL receipt `sha256:ecd8021c8f0311a933ee7c254559822620eac4760aa51a73f7b0d0ffda0f4133`\
@@ -189833,6 +189833,8 @@ phases:
     depends_on:
     - rf-bug-v2-deterministic-svelte-build-remediation
     agent: frontend-engineer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T04:09:25.977623+00:00'
   - id: rf-bug-v2-deterministic-adapter-identity-integration-verification
     name: Independently verify deterministic adapter identity integration
     status: pending
