@@ -190502,26 +190502,30 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Replacement for `rf-bug-assurance-closure-full-gate`. Require v2 local matrix,
-      current deployment authorization, immutable two-platform OCI publication, both-platform
-      container proof, Tailnet/Caddy proof, formal security review, independent black-box
-      verification, and defect-report closure. Immediately before closure require
-      Vectl validate/check-refs, repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
+      Replacement for `rf-bug-assurance-closure-full-gate`. Require the corrected
+      v2 local matrix, retry-free RF-BUG-005 streaming remediation and verification,
+      exact closure-selector remediation and verification, current deployment authorization,
+      immutable two-platform OCI publication, both-platform container proof, Tailnet/Caddy
+      proof, formal security review, independent black-box verification, and defect-report
+      closure. Immediately before closure require Vectl validate/check-refs, repair-plan
+      SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
       authority-reference commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty
       active claims, current operation authorization, and no unresolved finding. Bind
       `post_closure_report_sha256` and `closure_commit` from the replacement closure
       step and require current report hash and HEAD equality. Skipped legacy nodes
-      are never admission inputs; no future expected-red item is admitted.
+      are never admission inputs; no future expected-red item, including item-deep-links,
+      is admitted.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers every local/deployment/security/black-box/closure
-      branch with canonical public IDs, current hashes and HEAD bindings, empty active
-      claims, rollback readiness, and no out-of-scope blocker.
+    verification: Full Gate covers every local remediation, corrected matrix, deployment,
+      security, black-box, and closure branch with canonical public IDs, current hashes
+      and HEAD bindings, empty active claims, rollback readiness, and no out-of-scope
+      or future item-deep-links blocker.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
