@@ -190794,7 +190794,7 @@ phases:
       preserved.
   - id: rf-bug-v2-streaming-contract-verification
     name: Independently verify retry-free RF-BUG-005 multi-flush streaming
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190865,6 +190865,8 @@ phases:
     - rf-bug-v2-streaming-contract-remediation
     - rf-bug-v2-frontend-csp-runtime-generated-remediation
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T09:42:44.618574+00:00'
   - id: rf-bug-v2-closure-selector-remediation
     name: Repair RF-BUG closure adapter authority aggregation and false-green guard
     status: done
