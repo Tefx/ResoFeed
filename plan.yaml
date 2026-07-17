@@ -191024,28 +191024,31 @@ phases:
       \ scripts/vectl-check.mjs, deploy/**, docs/ARCHITECTURE.md, docs/CONTAINER.md]\n\
       \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-005-FRONTEND-CSP-INLINE-STYLE]\n\
       checks:\n  - id: rf_bug_v2_frontend_csp_developer_green\n    run:\n      command:\
-      \ [npm, --prefix, web, exec, --, vitest, run, src/lib/__tests__/workbench-route.test.ts]\n\
-      \      timeout_seconds: 300\n    evidence:\n      mode: command_outcome\n  \
-      \    path_bindings:\n        - {path: web/package.json, access: read, availability:\
-      \ current}\n      test_bindings:\n        - {path: web/src/lib/__tests__/workbench-route.test.ts,\
-      \ classification: developer, availability: produced_by_step}\n    expect:\n\
-      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
-      \    contains_all: [{literal: workbench-route.test.ts}]\n        contains_any:\
-      \ [{literal: passed}, {literal: PASS}]\n        forbids: [{literal: No test\
-      \ files found}, {literal: retry}, {literal: skipped}]\n    proves: [RF-BUG-005-FRONTEND-CSP-INLINE-STYLE]\n\
-      \  - id: rf_bug_v2_frontend_csp_compile_static_green\n    run:\n      command:\
       \ [npm, --prefix, web, exec, --, vitest, run, src/lib/__tests__/workbench-route.test.ts,\
-      \ -t, 'RF-BUG-005 CSP-compatible route styling']\n      timeout_seconds: 300\n\
-      \    evidence:\n      mode: command_outcome\n      path_bindings:\n        -\
-      \ {path: web/package.json, access: read, availability: current}\n      test_bindings:\n\
-      \        - {path: web/src/lib/__tests__/workbench-route.test.ts, classification:\
-      \ developer, availability: produced_by_step}\n    expect:\n      outcome: green\n\
-      \      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
-      \ workbench-route.test.ts}, {literal: RF-BUG-005 CSP-compatible route styling}]\n\
-      \        contains_any: [{literal: passed}, {literal: PASS}]\n        forbids:\
-      \ [{literal: No test files found}, {literal: retry}, {literal: skipped}]\n \
-      \   proves: [RF-BUG-005-FRONTEND-CSP-INLINE-STYLE]\nbindings: {expected_red:\
-      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      \ --reporter=verbose]\n      timeout_seconds: 300\n    evidence:\n      mode:\
+      \ command_outcome\n      path_bindings:\n        - {path: web/package.json,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ web/src/lib/__tests__/workbench-route.test.ts, classification: developer,\
+      \ availability: produced_by_step}\n    expect:\n      outcome: green\n     \
+      \ exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ workbench-route.test.ts}, {literal: RF-BUG-005 CSP-compatible route styling},\
+      \ {regex: 'Test Files\\s+1 passed \\(1\\)'}, {regex: 'Tests\\s+3 passed \\(3\\\
+      )'}]\n        contains_any: []\n        forbids: [{literal: No test files found},\
+      \ {literal: No tests found}, {literal: retry}, {literal: skipped}]\n    proves:\
+      \ [RF-BUG-005-FRONTEND-CSP-INLINE-STYLE]\n  - id: rf_bug_v2_frontend_csp_compile_static_green\n\
+      \    run:\n      command: [npm, --prefix, web, exec, --, vitest, run, src/lib/__tests__/workbench-route.test.ts,\
+      \ --reporter=verbose]\n      timeout_seconds: 300\n    evidence:\n      mode:\
+      \ command_outcome\n      path_bindings:\n        - {path: web/package.json,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ web/src/lib/__tests__/workbench-route.test.ts, classification: developer,\
+      \ availability: produced_by_step}\n    expect:\n      outcome: green\n     \
+      \ exit_codes: [0]\n      stdout_or_stderr:\n        contains_all: [{literal:\
+      \ workbench-route.test.ts}, {literal: RF-BUG-005 CSP-compatible route styling},\
+      \ {regex: 'Test Files\\s+1 passed \\(1\\)'}, {regex: 'Tests\\s+3 passed \\(3\\\
+      )'}]\n        contains_any: []\n        forbids: [{literal: No test files found},\
+      \ {literal: No tests found}, {literal: retry}, {literal: skipped}]\n    proves:\
+      \ [RF-BUG-005-FRONTEND-CSP-INLINE-STYLE]\nbindings: {expected_red: {items: []},\
+      \ closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"browser_runtime_csp_contract\",\"\
       public_frontend_layout_behavior\"],\"primary_outcome\":\"RF-BUG-005-FRONTEND-CSP-INLINE-STYLE\"\
