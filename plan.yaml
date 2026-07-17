@@ -191349,7 +191349,7 @@ phases:
       \ internal/resofeed/mcp.go, cmd/resofeed/main.go, web/src/lib/workbench-route.ts,\
       \ web/src/lib/api-client.ts, web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte,\
       \ README.md, docs/USAGE.md, docs/CONTAINER.md]\n  ignored_runtime_paths: [.git/,\
-      \ .vectl/, .agent/, .venv/, .pi/]\nclaims: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND,\
+      \ .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND,\
       \ ITEM-DEEP-LINK-FRONTEND]\nchecks:\n  - id: item_deep_links_expected_red\n\
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-contract,\
       \ item_deep_links_expected_red], timeout_seconds: 1800}\n    evidence:\n   \
