@@ -189338,48 +189338,44 @@ phases:
       \ stage, embedded-bootstrap validation, and Go-binary compilation pipeline used\
       \ by global Playwright real-binary setup and adapter replacement-lane execution.\
       \ Preserve its existing production interface and untagged `go build -trimpath`\
-      \ behavior. Add one explicit shared E2E invocation contract, `scripts/build-resofeed.sh\
-      \ --e2e <output>`, whose only Go build-tag difference is exact `-tags resofeed_e2e`;\
-      \ do not infer tags from `RESOFEED_E2E`, ambient environment, alternate keys,\
-      \ or generic tag arguments. Route `web/tests/e2e/global-setup.ts`, replacement-lane\
-      \ adapter commands, and any in-scope duplicate real-binary fixture build helper\
-      \ through that canonical pipeline rather than independently building web assets\
-      \ or replacing the embedded tree.\n\nThe canonical pipeline must build deterministic\
-      \ frontend output, fail closed before package replacement when `web/build` or\
-      \ its bootstrap is missing, empty, or invalid, stage only beneath package-local\
-      \ `internal/resofeed`, atomically replace `internal/resofeed/webui`, validate\
-      \ the staged embedded bootstrap, compile the requested binary, and remove every\
-      \ temporary stage on success, failure, or interruption. It must never embed\
-      \ `web/build` externally, substitute stale tracked assets, or leave `.webui-stage.*`\
-      \ residue. With frontend sources already synchronized to tracked package-local\
-      \ assets, a production or E2E build must leave `internal/resofeed/webui` and\
-      \ the worktree clean. Preserve package-local `embed.FS`, deterministic assets,\
-      \ the exact two-key E2E outbound boundary (`resofeed_e2e` build tag plus child\
-      \ `RESOFEED_E2E=1`), normal untagged outbound rejection, owner-token/OpenRouter\
-      \ redaction, runtime-only `OPENROUTER_KEY`, and the prohibition on CLI or alternate\
-      \ API-key inputs.\n\nAdd focused build/global-setup/adapter tests in the existing\
-      \ harness test surface for production versus E2E argv, atomic stage ordering,\
-      \ stale package-local replacement, missing/empty/invalid build rejection, cleanup\
-      \ after failed copy/validation/Go build, no stage residue, synchronized-tree\
-      \ cleanliness, and all real-binary Playwright consumers using the canonical\
-      \ script. Update `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md` and `docs/USAGE.md`\
-      \ synchronously with the canonical command boundary, package-local staging,\
-      \ failure/cleanup behavior, and production-versus-E2E examples. Do not mutate\
-      \ protected replacement-five or old-three acceptance files, product Go/Svelte\
-      \ behavior, snapshots, bug-plan/report documents, or completed adapter/current-operation\
-      \ history. Rollback reverts the canonical script, harness consumers, focused\
-      \ tests, generated package-local assets if changed, and documentation together.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
-      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [scripts/build-resofeed.sh,\
-      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, web/tests/e2e/global-setup.ts,\
-      \ web/tests/e2e/fixtures/runtime-fixture.ts, internal/resofeed/webui/**, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ docs/USAGE.md]\n  blocked_paths: [cmd/**, internal/resofeed/*.go, internal/resofeed/*_test.go,\
+      \ behavior. Add the shared E2E invocation `scripts/build-resofeed.sh --e2e <output>`,\
+      \ whose only Go build-tag difference is exact `-tags resofeed_e2e`; never infer\
+      \ tags from `RESOFEED_E2E`, ambient environment, alternate keys, or generic\
+      \ tag arguments. Route `web/tests/e2e/global-setup.ts`, replacement-lane adapter\
+      \ commands, and any in-scope duplicate real-binary fixture build helper through\
+      \ that pipeline rather than independently building web assets or replacing the\
+      \ embedded tree.\n\nBuild deterministic frontend output; fail before package\
+      \ replacement when `web/build` or its bootstrap is missing, empty, or invalid;\
+      \ stage only beneath package-local `internal/resofeed`; atomically replace `internal/resofeed/webui`;\
+      \ validate the staged bootstrap; compile the requested binary; and remove every\
+      \ temporary stage on success, failure, or interruption. Never embed `web/build`\
+      \ externally, substitute stale tracked assets, or leave `.webui-stage.*` residue.\
+      \ With synchronized frontend sources and tracked package-local assets, production\
+      \ and E2E builds must leave `internal/resofeed/webui` and tracked worktree state\
+      \ clean. Preserve package-local `embed.FS`, the exact two-key E2E outbound boundary\
+      \ (`resofeed_e2e` tag plus child `RESOFEED_E2E=1`), normal untagged outbound\
+      \ rejection, redaction, runtime-only `OPENROUTER_KEY`, and no CLI or alternate\
+      \ API-key inputs.\n\nAdd focused existing-surface build/global-setup/adapter\
+      \ tests for production versus E2E argv, atomic stage ordering, stale package-local\
+      \ replacement, missing/empty/invalid build rejection, cleanup after failed copy/validation/Go\
+      \ build, no residue, synchronized-tree cleanliness, and every real-binary Playwright\
+      \ consumer using the canonical script. Update `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`\
+      \ and `docs/USAGE.md` synchronously. Do not mutate protected replacement-five\
+      \ or old-three acceptance files, product Go/Svelte behavior, snapshots, bug-plan/report\
+      \ documents, or completed adapter/current-operation history. Rollback reverts\
+      \ script, consumers, focused tests, generated package-local assets if changed,\
+      \ and docs together.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [scripts/build-resofeed.sh, scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
+      \ web/tests/e2e/global-setup.ts, web/tests/e2e/fixtures/runtime-fixture.ts,\
+      \ internal/resofeed/webui/**, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, docs/USAGE.md]\n\
+      \  blocked_paths: [cmd/**, internal/resofeed/*.go, internal/resofeed/*_test.go,\
       \ web/src/**, web/tests/e2e/inspector-selection.browser-contract.spec.ts, web/tests/e2e/initial-route.browser-contract.spec.ts,\
       \ web/tests/e2e/routes.browser-contract.spec.ts, web/tests/e2e/source-ledger-responsive.browser-contract.spec.ts,\
       \ web/tests/e2e/source-ledger-delete.browser-contract.spec.ts, web/tests/e2e/search-click-inspector-contract.expected-red.spec.ts,\
       \ web/tests/e2e/mobile-inspector-token-hydration.spec.ts, web/tests/e2e/source-ledger-navigation-regression.expected-red.spec.ts,\
       \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/, web/build/, .test-artifacts/]\nclaims: [RF-BUG-010-FRESH-EMBEDDED-UI-BUILD-REMEDIATION]\n\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-010-FRESH-EMBEDDED-UI-BUILD-REMEDIATION]\n\
       checks:\n  - id: rf_bug_v2_canonical_e2e_embedded_ui_build_green\n    run: {command:\
       \ [node, scripts/vectl-check.mjs, run, rf-bug-v2-canonical-e2e-embedded-ui-build-remediation,\
       \ rf_bug_v2_canonical_e2e_embedded_ui_build_green], timeout_seconds: 1800}\n\
