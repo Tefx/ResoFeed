@@ -190893,8 +190893,7 @@ phases:
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
-    - tests/rf_bug_contract_test.go
-    - tests/rf_bug_closure_contract_test.go
+    - tests/rf_bug_canonical_contract_test.go
     depends_on:
     - rf-bug-v2-closure-selector-remediation
     agent: integration-verifier
