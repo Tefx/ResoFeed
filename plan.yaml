@@ -191446,34 +191446,47 @@ phases:
       \ preserve storage-level direct reads, never persist or log app_url or credentials,\
       \ and synchronize API/MCP/PublicURL usage documentation without changing the\
       \ frozen references. Rollback reverts this Go/test/usage unit and restores the\
-      \ prior API/MCP projection atomically.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [internal/resofeed/item_route_token.go,\
-      \ internal/resofeed/item_route_token_test.go, internal/resofeed/types.go, internal/resofeed/search.go,\
-      \ internal/resofeed/http.go, internal/resofeed/http_static.go, internal/resofeed/mcp.go,\
-      \ internal/resofeed/http_impl_test.go, internal/resofeed/item_deep_links_test.go,\
-      \ cmd/resofeed/main.go, cmd/resofeed/item_deep_links_test.go, docs/USAGE.md,\
-      \ docs/CONTAINER.md]\n  blocked_paths: [docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
+      \ prior API/MCP projection atomically.\n\nWitnessed current profile: existing\
+      \ `scripts/vectl-check.mjs` suite/check `item-deep-links-backend` / `item_deep_links_backend_green`\
+      \ provides both `select` and `run`; current `scripts/vectl-check.test.mjs` proves\
+      \ its exact identity, and the current profile's Go command maps that identity\
+      \ to the bound internal and command-package tests. `internal/resofeed/item_route_token_test.go`\
+      \ and `internal/resofeed/http_impl_test.go` are current sources. Exact producer\
+      \ ownership: step `item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts`,\
+      \ check `item_deep_links_expected_red`, produces `internal/resofeed/item_deep_links_expected_red_test.go`,\
+      \ and this step depends directly on that producer. This step `item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp`,\
+      \ check `item_deep_links_backend_green`, produces exactly `internal/resofeed/item_deep_links_test.go`\
+      \ and `cmd/resofeed/item_deep_links_test.go`; its `allowed_paths` and developer-test\
+      \ authority own them. Downstream consumer `item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification`\
+      \ depends directly on this step. The already-current adapter/profile is immutable\
+      \ in this step.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [internal/resofeed/item_route_token.go, internal/resofeed/item_route_token_test.go,\
+      \ internal/resofeed/types.go, internal/resofeed/search.go, internal/resofeed/http.go,\
+      \ internal/resofeed/http_static.go, internal/resofeed/mcp.go, internal/resofeed/http_impl_test.go,\
+      \ internal/resofeed/item_deep_links_test.go, cmd/resofeed/main.go, cmd/resofeed/item_deep_links_test.go,\
+      \ docs/USAGE.md, docs/CONTAINER.md]\n  blocked_paths: [scripts/vectl-check.mjs,\
+      \ scripts/vectl-check.test.mjs, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
       \ docs/DESIGN.md, internal/resofeed/item_deep_links_expected_red_test.go, web/**,\
       \ README.md, deploy/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
-      \ .venv/]\nclaims: [ITEM-DEEP-LINK-BACKEND]\nchecks:\n  - id: item_deep_links_backend_green\n\
+      \ .venv/, .pi/]\nclaims: [ITEM-DEEP-LINK-BACKEND]\nchecks:\n  - id: item_deep_links_backend_green\n\
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-backend,\
       \ item_deep_links_backend_green], timeout_seconds: 1800}\n    evidence:\n  \
       \    mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
-      \ access: execute, availability: produced_by_step}\n        - {path: go.mod,\
-      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
-      \ internal/resofeed/item_deep_links_expected_red_test.go, classification: acceptance,\
-      \ availability: produced_by_step}\n        - {path: internal/resofeed/item_route_token_test.go,\
-      \ classification: developer, availability: current}\n        - {path: internal/resofeed/http_impl_test.go,\
-      \ classification: developer, availability: current}\n        - {path: internal/resofeed/item_deep_links_test.go,\
+      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: current}\n        - {path: go.mod, access: read,\
+      \ availability: current}\n      test_bindings:\n        - {path: internal/resofeed/item_deep_links_expected_red_test.go,\
+      \ classification: acceptance, availability: produced_by_step}\n        - {path:\
+      \ internal/resofeed/item_route_token_test.go, classification: developer, availability:\
+      \ current}\n        - {path: internal/resofeed/http_impl_test.go, classification:\
+      \ developer, availability: current}\n        - {path: internal/resofeed/item_deep_links_test.go,\
       \ classification: developer, availability: produced_by_step}\n        - {path:\
       \ cmd/resofeed/item_deep_links_test.go, classification: developer, availability:\
-      \ produced_by_step}\n      selection:\n        command:\n          - python3\n\
-      \          - -c\n          - >-\n            import hashlib,json; ids=['ITEM-DEEP-LINK\
-      \ duplicate read envelope and MCP app_url']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'item_deep_links_backend_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
-      \        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
-      \ ['ITEM-DEEP-LINK duplicate read envelope and MCP app_url']\n        forbidden_ids:\
-      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \ produced_by_step}\n      selection:\n        command: [node, scripts/vectl-check.mjs,\
+      \ select, item-deep-links-backend, item_deep_links_backend_green]\n        timeout_seconds:\
+      \ 30\n        cardinality: {exact: 1}\n        required_ids: ['ITEM-DEEP-LINK\
+      \ duplicate read envelope and MCP app_url']\n        forbidden_ids: []\n   \
+      \ expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
       \        contains_all: [{literal: ITEM_DEEP_LINK_HTTP_CANONICAL=complete}, {literal:\
       \ ITEM_DEEP_LINK_STATIC_DISPATCH=complete}, {literal: ITEM_DEEP_LINK_DUPLICATE_RESULT=complete},\
       \ {literal: ITEM_DEEP_LINK_MCP_APP_URL=complete}, {literal: ITEM_DEEP_LINK_PUBLIC_URL=complete},\
