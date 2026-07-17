@@ -190475,7 +190475,7 @@ phases:
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDiagnose\
       \ the retry-free first-run RF-BUG-001 failure recorded at integrated HEAD c3b401585e5c838b8ab8b953e6409c8e1c579576:\
@@ -190572,6 +190572,15 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T07:05:28.265593+00:00'
+    done_at: '2026-07-17T07:19:37.766245+00:00'
+    evidence: Admitted worker execution receipt sha256:5af10e9b9b94ceb50cd91e8a65dd4526016c2cef5ceb6703d4076eb341499f00
+      under dispatch sha256:a6cc7227ae1b5f89ec942913cbec0e910ffbdf864704fb17b3e8915431fdc140.
+      Production Gate reran focused Go concurrency regression and exact selected frontend
+      runtime green with four identities. Integrated durable commit 631e3bb05a02cf0429f40a5e68f7576d5cd6fccb.
+      Added bounded SQLite connection serialization, deterministic concurrent-inspection
+      regression, and synchronized architecture/E2E contract documentation; protected
+      acceptance unchanged. Pre-existing user edits in docs/ARCHITECTURE.md and docs/DESIGN.md
+      plus untracked .pi/remote-pi/ and docs/ITEM_DEEP_LINKS.md preserved.
   - id: rf-bug-v2-first-run-sqlite-verification
     name: Independently verify RF-BUG-001 retry-free first-run closure
     status: pending
