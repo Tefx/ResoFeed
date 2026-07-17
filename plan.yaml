@@ -191121,7 +191121,7 @@ phases:
       0b8b502cab699cc7d0e998b836f144887ebddad5; user DESIGN edits preserved.
   - id: rf-bug-v2-frontend-csp-runtime-generated-remediation
     name: Repair remaining Chromium inline-style origin and synchronize embedded UI
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the failed canonical fan-in verification report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`;\
@@ -191237,8 +191237,6 @@ phases:
     depends_on:
     - rf-bug-v2-frontend-csp-inline-style-remediation
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-17T09:23:13.838195+00:00'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
