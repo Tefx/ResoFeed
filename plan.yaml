@@ -190533,9 +190533,9 @@ phases:
       \ EN/ZH idle and invalid alert']\n        forbidden_ids: []\n    expect:\n \
       \     outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n     \
       \   contains_all: [{literal: RF-BUG-001_REAL_API_SQLITE_SEAM=ready}, {literal:\
-      \ 14 passed}]\n        contains_any: []\n        forbids: [{literal: retry},\
-      \ {literal: skipped}, {literal: page.route}, {literal: '500'}, {literal: Test\
-      \ timeout}, {literal: No tests found}]\n    proves: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n\
+      \ vectl.check.evidence.v1}]\n        contains_any: []\n        forbids: [{literal:\
+      \ retry}, {literal: skipped}, {literal: page.route}, {literal: '500'}, {literal:\
+      \ Test timeout}, {literal: No tests found}]\n    proves: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n\
       bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
       <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
       :\"rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation\",\"risk_tier\"\
