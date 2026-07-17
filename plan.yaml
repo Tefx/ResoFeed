@@ -191018,7 +191018,7 @@ phases:
       :\"rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification\"}],\"\
       test_authority\":{\"developer_test_globs\":[\"web/src/lib/__tests__/workbench-route.test.ts\"\
       ],\"acceptance_test_paths\":[\"web/tests/e2e/csp-operations.browser-contract.spec.ts\"\
-      ],\"acceptance_check_ids\":[\"rf_bug_v2_http_security_green\"],\"acceptance_mutation\"\
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_frontend_csp_developer_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: The focused frontend developer regression and Svelte check pass;
       the route contains no runtime inline style mutation; the diff is limited to
