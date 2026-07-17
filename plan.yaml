@@ -190196,7 +190196,7 @@ phases:
   steps:
   - id: rf-bug-v2-local-verification-matrix
     name: Run v2 authoritative local RF-BUG evidence matrix
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190297,6 +190297,15 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T09:48:41.538071+00:00'
+    done_at: '2026-07-17T14:57:28.222219+00:00'
+    evidence: 'Fresh v4 local matrix PASS admitted by production semantic Gate as
+      receipt sha256:a3d8bb0b5fdc43c6fbf007682c73bc3b40e25fc5aa2ab178e2491497f1430630
+      on immutable HEAD 7870f82542f48fa52ac94c5d9fc69c2a81604ed5. Frontend runtime
+      ran first; all 19 approved rf-bug-v2 profiles selected/executed exactly once
+      with green identity parity; item-deep-links stayed out of scope. Real SQLite/HTTP/Chromium,
+      CSP/streaming, 100-run titles, OPML 9+2, trusted builds/generated equality,
+      redaction, smoke cleanup, and closure authorities passed. go vet and disposable
+      build passed and cleaned up; final tracked status/diff empty. Report: /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v4_report.md#sha256=5e045749c4dfffcc7101bd27e5c0850d451108300b502689439c25abd54403f7'
   - id: rf-bug-v2-deployment-authorization-review
     name: Authorize v2 OCI publication and Tailnet deployment
     status: pending
