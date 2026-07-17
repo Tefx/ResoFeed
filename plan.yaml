@@ -189461,42 +189461,71 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently verify `RF-BUG-010-FRESH-EMBEDDED-UI-BUILD-REMEDIATION` on the
-      integrated implementation. Use the real canonical build pipeline, compiled `cmd/resofeed`
-      binary, package-local `embed.FS`, and a real browser; do not modify repository
-      files or acceptance sources and do not reuse prior gate evidence as direct proof.
+      Fresh independent L3 verification after deterministic-build remediation. Preserve
+      validated FAIL receipt `sha256:d358fdc20bed32e97aa6e837666705b575f93c0052cc84c1bd59ac34a1e1730e`,
+      immutable failed head `fc462c3a9f75398822b38d87cffd8eb175c625f4`, raw evidence
+      `/tmp/larva-agent-artifacts/rf-bug-v2-canonical-e2e-embedded-ui-build-verification/immutable-canonical-builds.log#sha256=46668ae33807f64c439457586deecfddca5de78252f9fac7406bd7511273c73e`,
+      and the dirty failed-verification worktree as historical failure evidence; do
+      not reset, delete, clean, or use that worktree for the new proof. Do not reuse
+      its partial sentinel/browser success or any prior receipt as direct passing
+      evidence.
 
 
-      From an isolated temporary copy of the integrated head outside the repository,
-      place one unique stale sentinel only in package-local `internal/resofeed/webui`,
-      place a different unique fresh sentinel in copied `web/src/app.html`, and invoke
-      the documented canonical E2E build. Prove the resulting binary and a launched
-      real browser contain the fresh sentinel and reject the stale sentinel. Exercise
-      global Playwright setup or its exact canonical build entry so this evidence
-      covers the consumer that previously compiled stale tracked UI. Confirm exact
-      `-tags resofeed_e2e` plus child `RESOFEED_E2E=1` permits only the bounded loopback
-      fixture, while an untagged production build remains strict even if the environment
-      variable is present. Inspect the temporary copy for package-local asset equality
-      with fresh `web/build`, deterministic output, missing/empty-output fail-closed
-      behavior, and zero `.webui-stage.*` residue after both success and induced failure.
+      From a new isolated temporary copy of the newly integrated remediation head,
+      inspect and record the deterministic version derivation inputs and resulting
+      identity without modifying repository or acceptance sources. Run two consecutive
+      canonical production builds and require byte-identical complete trees for both
+      `web/build` and package-local `internal/resofeed/webui`, stable asset names/content,
+      zero tracked changes, and zero `.webui-stage.*` residue. From another fresh
+      synchronized copy, run canonical production followed by canonical `--e2e` and
+      require the same byte equivalence and clean tracked status. Confirm production
+      remains untagged, E2E uses exactly `-tags resofeed_e2e`, package-local `embed.FS`
+      remains the source, and child `RESOFEED_E2E=1` is still separately required
+      for the bounded loopback fixture.
 
 
-      In the unchanged synchronized integrated worktree, invoke canonical production
-      and E2E builds without source edits and require clean `git status` for tracked
-      files, byte-equivalent fresh `web/build` and `internal/resofeed/webui`, package-local
-      embedding, no external substitution, no protected acceptance mutation, and no
-      secret/CLI/alternate-key regression. Record exact commands, environment assumptions,
-      process lifecycle, browser assertion, hashes, cleanup, and raw evidence in the
-      semantic receipt. Any mock at the build/embed/browser seam, static-only assertion,
-      stale sentinel survival, absent fresh sentinel, tag/environment collapse, dirty
-      synchronized worktree, stage residue, or protected mutation fails verification.'
-    verification: 'Pass only with L2/L3 evidence from the integrated implementation:
-      an isolated-copy stale-versus-fresh sentinel probe through the canonical `--e2e`
-      pipeline, compiled-binary and real-browser observation of the fresh sentinel,
-      stale-sentinel rejection, exact two-key loopback behavior, untagged production
-      strictness, no stage residue, and a clean original synchronized worktree after
-      canonical production/E2E builds. Static source inspection or existing replacement
-      receipts cannot substitute.'
+      In a fresh disposable copy, introduce one unique controlled sentinel only in
+      a tracked frontend input covered by the derivation. Prove its derived app/version
+      identity and versioned assets differ from the baseline, repeat the sentinel
+      build to prove deterministic equality, compile the real E2E binary, launch it,
+      and observe the sentinel in a real browser while baseline/stale sentinels are
+      absent. Use the configured Playwright browser when installed; if its cache is
+      absent, discover and reuse the already-established system Google Chrome through
+      Playwright''s executable-path support, record the resolved browser identity/version,
+      and do not download or substitute a mock browser. Exercise global Playwright
+      setup or its exact canonical build entry so the previously failing consumer
+      is covered.
+
+
+      Exercise missing, empty, malformed, and noncanonical private version-input paths
+      if such a handoff exists, plus ambient/user override attempts, and require failure
+      before package replacement with the prior package tree restored and no stage
+      residue. If implementation computes directly from tracked inputs, prove absent/invalid
+      required tracked input fails closed and ambient version-like variables cannot
+      alter output. Confirm no clock, PID, temp/output path, mutable Git metadata,
+      locale, host, or ambient environment changes the baseline output. Verify synchronized
+      docs describe the actual inputs and boundaries; protected browser acceptance
+      files, product behavior, runtime secrets, and CLI secret surface remain unchanged.
+
+
+      Record exact commands, immutable source head, environment assumptions, tree/file
+      hashes, Git status before/after, version identity, sentinel identity, binary
+      metadata, process lifecycle, browser assertion, browser source/version, negative-path
+      outcomes, cleanup, and raw evidence in a new semantic receipt. Any changed baseline
+      hash, dirty synchronized copy, stale sentinel survival, absent fresh sentinel,
+      arbitrary version override, mock at build/embed/browser seams, browser non-launch,
+      tag/environment collapse, external embed substitution, stage residue, protected
+      mutation, or reuse of prior proof fails verification.'
+    verification: 'Pass only with fresh L3 evidence from the newly integrated remediation
+      head: two consecutive canonical production builds and a production-to-E2E sequence
+      are byte-identical across complete `web/build` and package-local asset trees
+      with clean tracked status; a controlled tracked-input sentinel changes deterministic
+      version/assets, repeats identically, reaches the real embedded binary and launched
+      browser, and excludes stale/baseline sentinels; invalid/missing/noncanonical
+      or ambient-controlled version inputs fail closed; exact tags, two-key loopback
+      boundary, system-Google-Chrome fallback when Playwright cache is absent, package-local
+      embedding, zero residue, synchronized docs, and protected acceptance are directly
+      observed. Prior failed or partial evidence cannot substitute.'
     refs:
     - scripts/build-resofeed.sh
     - scripts/vectl-check.mjs
@@ -189506,8 +189535,11 @@ phases:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - docs/USAGE.md
     - internal/resofeed/webui/index.html
+    - web/svelte.config.js
+    - web/vite.config.ts
+    - scripts/vectl-check.test.mjs
     depends_on:
-    - rf-bug-v2-canonical-e2e-embedded-ui-build-remediation
+    - rf-bug-v2-deterministic-svelte-build-remediation
     agent: integration-verifier
   - id: rf-bug-v2-deterministic-svelte-build-remediation
     name: Make canonical Svelte frontend builds reproducible
