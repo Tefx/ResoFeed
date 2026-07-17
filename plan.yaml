@@ -190583,7 +190583,7 @@ phases:
       plus untracked .pi/remote-pi/ and docs/ITEM_DEEP_LINKS.md preserved.
   - id: rf-bug-v2-first-run-sqlite-verification
     name: Independently verify RF-BUG-001 retry-free first-run closure
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190618,6 +190618,8 @@ phases:
     depends_on:
     - rf-bug-v2-first-run-sqlite-remediation
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T07:24:51.043657+00:00'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
