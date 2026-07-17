@@ -189455,7 +189455,7 @@ phases:
       scripts/vectl-check.test.mjs, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, and docs/USAGE.md.
   - id: rf-bug-v2-canonical-e2e-embedded-ui-build-verification
     name: Independently verify fresh embedded UI in real E2E binary and browser
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -189509,6 +189509,8 @@ phases:
     depends_on:
     - rf-bug-v2-canonical-e2e-embedded-ui-build-remediation
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T02:59:15.491740+00:00'
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: locked
