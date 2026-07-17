@@ -190475,7 +190475,7 @@ phases:
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDiagnose\
       \ the retry-free first-run RF-BUG-001 failure recorded at integrated HEAD c3b401585e5c838b8ab8b953e6409c8e1c579576:\
@@ -190570,6 +190570,8 @@ phases:
     - web/package.json
     - web/tests/e2e/inspector-selection.browser-contract.spec.ts
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T06:32:33.946158+00:00'
   - id: rf-bug-v2-first-run-sqlite-verification
     name: Independently verify RF-BUG-001 retry-free first-run closure
     status: pending
