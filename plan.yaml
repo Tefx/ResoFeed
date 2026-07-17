@@ -189325,7 +189325,7 @@ phases:
       and clean protected baseline. Report: /tmp/larva-agent-artifacts/integration-verifier-rf-bug-v2-current-operation-foreground-ownership-verification_report.md#sha256=375550c693519a912c3c8df64791704b4a0356650127d4f7946bdd8e3b0639df#bytes=7279'
   - id: rf-bug-v2-canonical-e2e-embedded-ui-build-remediation
     name: Canonicalize fresh embedded UI builds for real-binary E2E
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for Full Gate FAIL receipt `sha256:f9bb4df0187ac47ae95173fa4e171e7dc9069100839eccedca25de7aa21458bc`\
@@ -189443,6 +189443,16 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-17T00:45:15.002415+00:00'
+    done_at: '2026-07-17T02:58:56.274405+00:00'
+    evidence: Integrated commit cbb15ca79d3b3eddd405da736d02150c656f29c9 (worker commit
+      ec6d2b5ec5cfed68db32a1cfc3b6bf4fbd79a792). Production Gate admitted worker receipt
+      sha256:60445a242d2a35e844748322d404614d6628f73be724dc21cba60e433e1f18b2 and
+      dispatch sha256:a17c7a6ef2cf96939c441013bc1d6ebe19751d92285f8d2603612db003ee4b43
+      after rerunning the selected-execution profile. Evidence proved canonical production/E2E
+      build routing, production tags none, E2E exact resofeed_e2e tag, fresh package-local
+      assets, zero stage residue, clean synchronized worktree, protected acceptance
+      unchanged, and valid one-envelope output. Tests and docs were synchronized in
+      scripts/vectl-check.test.mjs, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, and docs/USAGE.md.
   - id: rf-bug-v2-canonical-e2e-embedded-ui-build-verification
     name: Independently verify fresh embedded UI in real E2E binary and browser
     status: pending
