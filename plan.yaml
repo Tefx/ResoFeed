@@ -190983,7 +190983,7 @@ phases:
       \ docs/DESIGN.md]\n  blocked_paths: [web/tests/e2e/csp-operations.browser-contract.spec.ts,\
       \ internal/resofeed/**, internal/resofeed/webui/**, scripts/vectl-check.mjs,\
       \ deploy/**, docs/ARCHITECTURE.md, docs/CONTAINER.md]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/, web/.svelte-kit/]\nclaims: [RF-BUG-005-FRONTEND-CSP-INLINE-STYLE]\n\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-005-FRONTEND-CSP-INLINE-STYLE]\n\
       checks:\n  - id: rf_bug_v2_frontend_csp_developer_green\n    run:\n      command:\
       \ [npm, --prefix, web, exec, --, vitest, run, src/lib/__tests__/workbench-route.test.ts]\n\
       \      timeout_seconds: 300\n    evidence:\n      mode: command_outcome\n  \
