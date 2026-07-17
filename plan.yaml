@@ -191584,8 +191584,8 @@ phases:
       \ docs/DESIGN.md, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
       \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, internal/**, cmd/**,\
       \ docs/USAGE.md, docs/CONTAINER.md, deploy/**]\n  ignored_runtime_paths: [.git/,\
-      \ .vectl/, .agent/, .venv/, .pi/]\nclaims: [ITEM-DEEP-LINK-FRONTEND]\nchecks:\n\
-      \  - id: item_deep_links_frontend_green\n    run: {command: [node, scripts/vectl-check.mjs,\
+      \ .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-FRONTEND]\nchecks:\n  -\
+      \ id: item_deep_links_frontend_green\n    run: {command: [node, scripts/vectl-check.mjs,\
       \ run, item-deep-links-frontend, item_deep_links_frontend_green], timeout_seconds:\
       \ 1800}\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
       \        - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
