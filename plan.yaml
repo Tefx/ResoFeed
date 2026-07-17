@@ -191691,6 +191691,7 @@ phases:
     - web/package.json
     - docs/CONTAINER.md
     depends_on:
+    - item-deep-links-backend-api-mcp
     - item-deep-links-frontend-browser
     agent: integration-verifier
   - id: item-deep-links-deployment-authorization-review
