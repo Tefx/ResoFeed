@@ -190196,7 +190196,7 @@ phases:
   steps:
   - id: rf-bug-v2-local-verification-matrix
     name: Run v2 authoritative local RF-BUG evidence matrix
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190223,6 +190223,8 @@ phases:
     depends_on:
     - rf-bug-v2-first-run-sqlite-verification
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-17T07:38:08.857871+00:00'
   - id: rf-bug-v2-deployment-authorization-review
     name: Authorize v2 OCI publication and Tailnet deployment
     status: pending
