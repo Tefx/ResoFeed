@@ -190513,7 +190513,7 @@ phases:
       \    contains_all: [{literal: TestRFBUG001ConcurrentFirstRunInspectionNoSQLiteBusy},\
       \ {literal: PASS}]\n        contains_any: []\n        forbids: [{literal: database\
       \ is locked}, {literal: database table is locked}, {literal: no tests to run}]\n\
-      \    proves: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n  - id: rf_bug_001_first_run_browser_runtime_green\n\
+      \    proves: [RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE]\n  - id: rf_bug_v2_frontend_runtime_green\n\
       \    run: {command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-frontend-runtime,\
       \ rf_bug_v2_frontend_runtime_green], timeout_seconds: 1800}\n    evidence:\n\
       \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
@@ -190526,7 +190526,7 @@ phases:
       \     command:\n          - python3\n          - -c\n          - >-\n      \
       \      import hashlib,json; ids=['RF-BUG-001 real API SQLite stale selection\
       \ seam','RF-BUG-002 stale Search ownership and recovery','RF-BUG-006 route-correct\
-      \ pre-hydration title','RF-BUG-007 EN/ZH idle and invalid alert']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_001_first_run_browser_runtime_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
+      \ pre-hydration title','RF-BUG-007 EN/ZH idle and invalid alert']; print(json.dumps({'schema_version':'vectl.check.selection.v1','check_id':'rf_bug_v2_frontend_runtime_green','identities':ids,'digest':'sha256:'+hashlib.sha256(json.dumps({'identities':ids},sort_keys=True,separators=(',',':')).encode()).hexdigest()},separators=(',',':')))\n\
       \        timeout_seconds: 30\n        cardinality: {exact: 4}\n        required_ids:\
       \ ['RF-BUG-001 real API SQLite stale selection seam', 'RF-BUG-002 stale Search\
       \ ownership and recovery', 'RF-BUG-006 route-correct pre-hydration title', 'RF-BUG-007\
@@ -190545,12 +190545,12 @@ phases:
       :\"RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE\",\"atom\":\"concurrent first-run inspect\
       \ mutations return 200 and durably persist both inspection timestamps without\
       \ SQLite busy failures\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\"\
-      :\"rf_bug_001_first_run_browser_runtime_green\",\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification\"\
+      :\"rf_bug_v2_frontend_runtime_green\",\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"internal/resofeed/rf_bug_inspection_concurrency_test.go\"\
       ],\"acceptance_test_paths\":[\"web/tests/e2e/bugfix-frontend-behavior.expected-red.spec.ts\"\
       ,\"web/tests/e2e/routes.browser-contract.spec.ts\",\"web/tests/e2e/inspector-selection.browser-contract.spec.ts\"\
-      ],\"acceptance_check_ids\":[\"rf_bug_001_first_run_browser_runtime_green\"],\"\
-      acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+      ],\"acceptance_check_ids\":[\"rf_bug_v2_frontend_runtime_green\"],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: Focused Go regression passes once; then one clean retry-free adapter
       invocation passes all 14 browser tests, emits RF-BUG-001_REAL_API_SQLITE_SEAM=ready,
       returns four 200 responses, persists both inspection timestamps, preserves selected
