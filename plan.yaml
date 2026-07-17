@@ -189804,22 +189804,46 @@ phases:
 
 
       Fresh independent Gate Support verification from a fresh worktree at the newly
-      integrated self-restoration remediation head. Preserve validated FAIL receipt
-      `sha256:48362094c70fdbef3b2153252f4f45e7edcf94aaec966cd70ca0907cdf5c30ad`, report
-      `/tmp/larva-agent-artifacts/rf-bug-v2-deterministic-adapter-identity-integration-verification_report.md#sha256=0d483f8bd06084ead8a7621e12ffb3577614140e1c547b3183caaca1d721bd55#bytes=53243`,
-      immutable head `3f84d154723d6556d4a394e009cbf28cd35f5851`, and every dirty failed-verification
-      worktree as failure history. Do not reuse, reset, clean, or treat prior partial
-      evidence as passing proof. Do not modify repository files.
+      integrated generated-webui baseline remediation head. Preserve validated FAIL
+      receipts `sha256:48362094c70fdbef3b2153252f4f45e7edcf94aaec966cd70ca0907cdf5c30ad`
+      and `sha256:cc10e7948b3453836018a47ef8f33c7cf32adc80d4e24612905b798f21833690`,
+      reports `/tmp/larva-agent-artifacts/rf-bug-v2-deterministic-adapter-identity-integration-verification_report.md#sha256=0d483f8bd06084ead8a7621e12ffb3577614140e1c547b3183caaca1d721bd55#bytes=53243`
+      and `/tmp/larva-agent-artifacts/rf-bug-v2-deterministic-adapter-identity-integration-verification-v2/integration-verifier_report.md#sha256=d89a0a3eed1e7c3ddba593ff61bc9be5f969bfa5f46f32a6bda882ccee336a7a`,
+      immutable failed heads `3f84d154723d6556d4a394e009cbf28cd35f5851` and `86dd439084c1e504a001a363a8dabf2b35056a89`,
+      and every dirty failed-verification worktree as failure history. Do not reuse,
+      reset, clean, or treat prior partial evidence as passing proof. Do not modify
+      repository files.
 
 
-      Record immutable head plus initial/final tracked status. Run the focused adapter
-      developer tests and directly prove: the deterministic profile''s malformed,
-      absent, noncanonical, and ambient-override probes use only the explicit narrow
-      negative-test path to the trusted helper/config rejection boundary; the production
-      `childEnvironment` still rejects all arbitrary caller/ambient `RESOFEED_SVELTE_BUILD_IDENTITY`
-      overrides before child startup; no general environment escape hatch exists;
-      and exact trusted tracked-input derivation remains shared with the canonical
-      build script.
+      Record immutable head plus initial/final tracked status. A clean integrated
+      head may perform exactly one ordinary locked dependency setup with `npm --prefix
+      web ci` before the five-profile batch when dependencies are absent. This setup
+      is batch-level admissible preparation and must produce zero tracked changes.
+      Do not require or test that each historical profile independently bootstraps
+      dependencies, and do not add bootstrap logic to those profiles. Any second setup,
+      unlocked install, setup-caused tracked change, or dependency mutation fails
+      verification.
+
+
+      Run the new focused generated-webui baseline selected-execution profile and
+      directly prove its one valid green evidence envelope, exact selected/executed
+      identity, canonical production and E2E build paths, complete byte/path/mode
+      equality between canonical `web/build` and committed `internal/resofeed/webui`,
+      final restoration, clean tracked status, zero retry/skip/stage residue, protected
+      acceptance unchanged, and no identity algorithm, Svelte/Vite config, product
+      source, or acceptance mutation. Confirm the implementation receipt either records
+      the explicit no-doc-change rationale for generated-byte/internal-verification-only
+      synchronization or cites synchronized documentation for a real observable behavior/troubleshooting
+      change.
+
+
+      Run the focused adapter self-restoration developer tests and directly prove:
+      the deterministic profile''s malformed, absent, noncanonical, and ambient-override
+      probes use only the explicit narrow negative-test path to the trusted helper/config
+      rejection boundary; production `childEnvironment` still rejects all arbitrary
+      caller/ambient `RESOFEED_SVELTE_BUILD_IDENTITY` overrides before child startup;
+      no general environment escape hatch exists; and exact trusted tracked-input
+      derivation remains shared with the canonical build script.
 
 
       Induce both a negative-probe rejection and a later deterministic-profile check
@@ -189831,11 +189855,11 @@ phases:
       envelope with exact selected/executed identity and no retry/skip.
 
 
-      Then rerun all five current Full Gate profiles from the same clean integrated
-      head with exact commands: token `node scripts/vectl-check.mjs run rf-bug-v2-go-token-parity
-      rf_bug_v2_go_token_parity_green`; Source Ledger `node scripts/vectl-check.mjs
-      run rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green`; Prompting `node
-      scripts/vectl-check.mjs run rf-bug-v2-prompting rf_bug_v2_prompting_green`;
+      After the single admissible setup, rerun all five current Full Gate profiles
+      from the same clean integrated head with exact commands: token `node scripts/vectl-check.mjs
+      run rf-bug-v2-go-token-parity rf_bug_v2_go_token_parity_green`; Source Ledger
+      `node scripts/vectl-check.mjs run rf-bug-v2-source-ledger rf_bug_v2_source_ledger_green`;
+      Prompting `node scripts/vectl-check.mjs run rf-bug-v2-prompting rf_bug_v2_prompting_green`;
       adapter isolation `node scripts/vectl-check.mjs run rf-bug-v2-adapter-runtime-isolation-remediation
       rf_bug_v2_adapter_runtime_isolation_green`; deterministic build `node scripts/vectl-check.mjs
       run rf-bug-v2-deterministic-svelte-build-remediation rf_bug_v2_deterministic_svelte_build_green`.
@@ -189850,33 +189874,34 @@ phases:
       canonical ordering/encoding; controlled tracked-input invalidation changes identity
       and repeats deterministically; production/E2E byte determinism, exact tag/two-key
       boundary, package-local embedding, cleanup/redaction, zero residue, and protected
-      acceptance remain intact. Confirm docs reflect observable behavior and troubleshooting
-      if changed, or that the implementation receipt explicitly justifies no docs
-      change under the Dual-Update Contract. Any mock at the config/build/browser
-      seam, arbitrary environment forwarding, stale literal, dirty tracked status,
-      protected mutation, failed profile, missing identity, retry, skip, incomplete
-      restoration, masked primary failure, or stage residue fails verification.'
-    verification: PASS requires focused self-restoration tests plus all five exact
-      current gate profiles green from one fresh immutable repaired head; direct real
-      config/list/render/browser startup; narrow negative-test-only trusted-helper/config
-      rejection without weakening production childEnvironment; exact restoration after
-      induced negative-probe and later-check failures and after success; trusted deterministic
-      identity equivalence and fail-closed production paths; preserved production/E2E
-      determinism and cache invalidation; zero retry/skip/residue; protected acceptance
-      unchanged; Dual-Update Contract accounted for; and clean initial/final tracked
-      status.
+      acceptance remain intact. Any mock at the config/build/browser seam, arbitrary
+      environment forwarding, stale literal, dirty tracked status, protected mutation,
+      failed profile, missing identity, retry, skip, incomplete restoration, masked
+      primary failure, or stage residue fails verification.'
+    verification: PASS requires the new focused generated-baseline profile plus focused
+      self-restoration tests and all five exact current gate profiles green from one
+      fresh immutable repaired head. Exactly one clean `npm --prefix web ci` setup
+      before the five-profile batch is admissible when dependencies are absent; per-profile
+      self-bootstrap is outside scope. Direct proof must cover exact committed webui/canonical
+      build equality, clean restoration/status, real config/list/render/browser startup,
+      trusted identity and fail-closed production paths, preserved production/E2E
+      determinism, zero retry/skip/residue, protected acceptance unchanged, no identity/config/product/acceptance
+      mutation, and explicit Dual-Update Contract accounting.
     refs:
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - docs/USAGE.md
     - internal/resofeed/playwright_fixture_test.go
     - scripts/build-resofeed.sh
+    - scripts/resofeed-svelte-build-identity.mjs
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     - web/svelte.config.js
     - web/vite.config.ts
     - web/tests/e2e/fixtures/runtime-fixture.ts
+    - web/package.json
+    - web/package-lock.json
     depends_on:
-    - rf-bug-v2-deterministic-profile-self-restoration-remediation
+    - rf-bug-v2-generated-webui-baseline-sync
     agent: integration-verifier
   - id: rf-bug-v2-deterministic-profile-self-restoration-remediation
     name: Repair deterministic profile negative probes and worktree restoration
