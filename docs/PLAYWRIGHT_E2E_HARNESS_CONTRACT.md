@@ -147,6 +147,8 @@ The helper derives `RESOFEED_SVELTE_BUILD_IDENTITY` as `rf-` plus a SHA-256 dige
 
 The canonical shell pipeline rejects any ambient `RESOFEED_SVELTE_BUILD_IDENTITY`, invokes the helper itself, validates the exact lowercase `rf-[a-f0-9]{64}` result, and launches npm through an allow-listed `env -i` environment. The adapter adds the derived value only to sanitized npm children that load Vite/Svelte configuration. Playwright base config installs the same derived value before its config graph loads. Svelte/Vite config rejects a missing trusted value or any value that differs from a fresh helper derivation. The adapter, shell pipeline, and Playwright bootstrap reject caller override attempts; none forwards an ambient value.
 
+The deterministic profile uses a narrow negative-test path that invokes the trusted helper rejection boundary directly for absent, empty, malformed, noncanonical, and override inputs. This path does not accept arbitrary environment fields and does not pass through, parameterize, or weaken the production child-environment sanitizer.
+
 The runtime fixture invokes `scripts/build-resofeed.sh --e2e <output>` and sets exact child `RESOFEED_E2E=1`. It does not construct `go build`, `-tags resofeed_e2e`, or duplicate the build/tag boundary. Production remains untagged, while only the canonical E2E script branch adds the tag.
 
 The deterministic remediation profile is:
@@ -161,9 +163,19 @@ The adapter integration profile is:
 node scripts/vectl-check.mjs run rf-bug-v2-deterministic-adapter-identity-integration-remediation rf_bug_v2_deterministic_adapter_identity_integration_green
 ```
 
-It checks helper/shell identity parity, deterministic UTF-8 byte ordering, controlled tracked-input invalidation, missing-input and ambient-override failure, the canonical runtime-fixture boundary, Vitest config startup, and exact 29-test Playwright replacement-lane discovery without executing or modifying protected acceptance.
+The generated-tree restoration profile is:
 
-If config startup reports that trusted derivation is missing, invoke it through `scripts/vectl-check.mjs` or the canonical build script. If it reports an override, remove `RESOFEED_SVELTE_BUILD_IDENTITY` from the caller environment; this variable is private and has no supported user override.
+```bash
+node scripts/vectl-check.mjs run rf-bug-v2-deterministic-profile-self-restoration-remediation rf_bug_v2_deterministic_profile_self_restoration_green
+```
+
+It snapshots the exact existence, file/directory shape, bytes, and modes of `web/build` and `internal/resofeed/webui`, then restores both trees after successful checks, expected rejection, subprocess failure, thrown exception, or handled termination signal. Restoration is idempotent, removes `.webui-stage.*` residue, preserves the primary failure, and requires exact tree and tracked-status equivalence before emitting one green evidence envelope.
+
+Together the profiles check helper/shell identity parity, deterministic UTF-8 byte ordering, controlled tracked-input invalidation, missing-input and ambient-override failure, the canonical runtime-fixture boundary, Vitest config startup, and exact 29-test Playwright replacement-lane discovery without executing or modifying protected acceptance.
+
+If config startup reports that trusted derivation is missing, invoke it through `scripts/vectl-check.mjs` or the canonical build script. If it reports an override, remove `RESOFEED_SVELTE_BUILD_IDENTITY` from the caller environment; this variable is private and has no supported user override. A generated-tree restoration failure requires reconciling `web/build`, `internal/resofeed/webui`, and `.webui-stage.*` residue before retrying; do not bypass the restoration profile or reset protected acceptance.
+
+The self-restoration profile is dependency-absent safe. When `web/node_modules` is missing, it copies the locked package manifests into disposable scratch space, runs `npm ci --ignore-scripts --no-audit --no-fund` through the adapter's sanitized child environment, and exposes the resulting dependency tree through a temporary worktree symlink. The profile removes the symlink and scratch tree on completion or failure; tracked files and protected acceptance remain unchanged.
 ### Prompting v2.2 Loopback Harness Remediation
 
 The dedicated pair `rf-bug-v2-prompting-harness` / `rf_bug_v2_prompting_harness_remediation_green` owns the Prompting loopback extraction boundary. It selects and executes exactly these four identities, in order: `RF-BUG-009 harness exact 16 subtests`, `RF-BUG-009 harness exact argv and environment`, `RF-BUG-009 harness exact four identities`, and `RF-BUG-009 harness production strict`.

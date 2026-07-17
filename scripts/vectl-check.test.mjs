@@ -8,14 +8,18 @@ import { fileURLToPath } from 'node:url';
 import {
   PENDING_PROFILE_PAIRS,
   PROFILES,
+  captureGeneratedTreeState,
   childEnvironment,
   childEnvironmentForCommand,
   evidenceEnvelope,
   parseEvidenceOutput,
   parseSelectionOutput,
+  probeBuildIdentityRejection,
   runPromptingHarness,
   runTokenParityHarness,
-  selectionEnvelope
+  selectionEnvelope,
+  withGeneratedTreeRestoration,
+  withLockedWebDependencies
 } from './vectl-check.mjs';
 import { verifyIsolatedLane } from './rf-bug-010-standard-json.mjs';
 import {
@@ -76,6 +80,9 @@ const expectedPending = [
   ]],
   ['rf-bug-v2-deterministic-adapter-identity-integration-remediation', 'rf_bug_v2_deterministic_adapter_identity_integration_green', [
     'RF-BUG-010 deterministic adapter identity integration'
+  ]],
+  ['rf-bug-v2-deterministic-profile-self-restoration-remediation', 'rf_bug_v2_deterministic_profile_self_restoration_green', [
+    'RF-BUG-010 deterministic profile negative probes and restoration'
   ]],
   ['rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green', [
     'RF-BUG-004 State import lifecycle',
@@ -154,8 +161,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 18);
-  assert.equal(expectedPending.length, 18);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 19);
+  assert.equal(expectedPending.length, 19);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -433,6 +440,150 @@ test('RF-BUG-010 deterministic canonical frontend build contract', () => {
   const selected = invoke('select', profile.suite, profile.checkID);
   assert.equal(selected.status, 0, selected.stderr);
   assert.deepEqual(parseSelectionOutput(selected.stdout, profile), selectionEnvelope(profile));
+});
+
+test('RF-BUG-010 deterministic profile self-restoration contract', async (context) => {
+  const profile = findProfile(
+    'rf-bug-v2-deterministic-profile-self-restoration-remediation',
+    'rf_bug_v2_deterministic_profile_self_restoration_green'
+  );
+  assert.ok(profile);
+  assert.equal(profile.runner, 'deterministic-self-restoration');
+  assert.deepEqual(profile.identities, ['RF-BUG-010 deterministic profile negative probes and restoration']);
+  assert.throws(
+    () => childEnvironment({ [BUILD_IDENTITY_ENV]: `rf-${'1'.repeat(64)}` }),
+    /controlled by the trusted derivation helper/u
+  );
+
+  const rejection = probeBuildIdentityRejection(repoRoot, 'malformed-profile-input');
+  assert.match(rejection, /cannot override the trusted canonical derivation/u);
+
+  await context.test('dependency-absent bootstrap uses the locked manifest and leaves no worktree residue', () => {
+    const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-dependency-bootstrap-contract-'));
+    try {
+      fs.mkdirSync(path.join(root, 'web'), { recursive: true });
+      for (const name of ['package.json', 'package-lock.json']) {
+        fs.copyFileSync(path.join(repoRoot, 'web', name), path.join(root, 'web', name));
+      }
+      const calls = [];
+      const fakeRun = (_profile, command, args, options) => {
+        calls.push({ command, args, options });
+        const prefix = options.cwd;
+        fs.mkdirSync(path.join(prefix, 'node_modules'), { recursive: true });
+        fs.writeFileSync(path.join(prefix, 'node_modules', 'locked-marker'), 'locked\n');
+      };
+      const result = withLockedWebDependencies(profile, () => {
+        const dependencyPath = path.join(root, 'web', 'node_modules');
+        assert.equal(fs.lstatSync(dependencyPath).isSymbolicLink(), true);
+        assert.equal(fs.readFileSync(path.join(dependencyPath, 'locked-marker'), 'utf8'), 'locked\n');
+        return 'bootstrapped';
+      }, fakeRun, root);
+      assert.equal(result, 'bootstrapped');
+      assert.equal(fs.existsSync(path.join(root, 'web', 'node_modules')), false);
+      assert.deepEqual(calls, [{
+        command: 'npm',
+        args: ['ci', '--ignore-scripts', '--no-audit', '--no-fund'],
+        options: { cwd: calls[0].options.cwd, timeout: 600_000 }
+      }]);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  function fixture({ preexisting }) {
+    const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-restoration-contract-'));
+    fs.mkdirSync(path.join(root, 'web'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'internal', 'resofeed'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'tracked.txt'), 'tracked\n');
+    if (preexisting) {
+      fs.mkdirSync(path.join(root, 'web', 'build'), { recursive: true, mode: 0o750 });
+      fs.writeFileSync(path.join(root, 'web', 'build', 'index.html'), 'original build\n', { mode: 0o640 });
+      fs.mkdirSync(path.join(root, 'internal', 'resofeed', 'webui'), { recursive: true, mode: 0o751 });
+      fs.writeFileSync(path.join(root, 'internal', 'resofeed', 'webui', 'app.js'), 'original webui\n', { mode: 0o600 });
+    }
+    for (const args of [
+      ['init', '-q'],
+      ['add', '.'],
+      ['-c', 'user.name=ResoFeed Test', '-c', 'user.email=resofeed@example.test', 'commit', '-qm', 'fixture']
+    ]) {
+      const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+      assert.equal(result.status, 0, result.stderr);
+    }
+    const readStatus = () => {
+      const result = spawnSync('git', ['status', '--porcelain=v1', '-z'], { cwd: root, encoding: 'utf8' });
+      assert.equal(result.status, 0, result.stderr);
+      return result.stdout;
+    };
+    return { root, readStatus, before: captureGeneratedTreeState(root) };
+  }
+
+  function mutate(current) {
+    fs.mkdirSync(path.join(current.root, 'web', 'build'), { recursive: true });
+    fs.writeFileSync(path.join(current.root, 'web', 'build', 'generated.js'), 'mutated\n');
+    fs.mkdirSync(path.join(current.root, 'internal', 'resofeed', 'webui'), { recursive: true });
+    fs.writeFileSync(path.join(current.root, 'internal', 'resofeed', 'webui', 'generated.js'), 'mutated\n');
+    fs.mkdirSync(path.join(current.root, 'internal', 'resofeed', '.webui-stage.failure'));
+  }
+
+  await context.test('negative rejection preserves the primary failure and preexisting trees', () => {
+    const current = fixture({ preexisting: true });
+    try {
+      const originalFailure = new Error('negative-probe-original-failure');
+      assert.throws(() => withGeneratedTreeRestoration(current.root, () => {
+        mutate(current);
+        probeBuildIdentityRejection(repoRoot, '', () => ({ status: 1, stdout: '', stderr: 'trusted rejection' }));
+        throw originalFailure;
+      }, current.readStatus), (error) => error === originalFailure);
+      assert.deepEqual(captureGeneratedTreeState(current.root), current.before);
+      assert.equal(current.readStatus(), '');
+      assert.deepEqual(fs.readdirSync(path.join(current.root, 'internal', 'resofeed')).filter((name) => name.startsWith('.webui-stage.')), []);
+    } finally {
+      fs.rmSync(current.root, { recursive: true, force: true });
+    }
+  });
+
+  await context.test('later deterministic failure restores absent trees', () => {
+    const current = fixture({ preexisting: false });
+    try {
+      assert.throws(() => withGeneratedTreeRestoration(current.root, () => {
+        mutate(current);
+        throw new Error('later-deterministic-check-failure');
+      }, current.readStatus), /later-deterministic-check-failure/u);
+      assert.deepEqual(captureGeneratedTreeState(current.root), current.before);
+      assert.equal(current.readStatus(), '');
+      assert.deepEqual(fs.readdirSync(path.join(current.root, 'internal', 'resofeed')).filter((name) => name.startsWith('.webui-stage.')), []);
+    } finally {
+      fs.rmSync(current.root, { recursive: true, force: true });
+    }
+  });
+
+  await context.test('successful profile work restores exact trees and emits one envelope', () => {
+    const current = fixture({ preexisting: true });
+    try {
+      const result = withGeneratedTreeRestoration(current.root, () => {
+        mutate(current);
+        return 'green';
+      }, current.readStatus);
+      assert.equal(result, 'green');
+      assert.deepEqual(captureGeneratedTreeState(current.root), current.before);
+      assert.equal(current.readStatus(), '');
+    } finally {
+      fs.rmSync(current.root, { recursive: true, force: true });
+    }
+
+    const envelope = evidenceEnvelope({
+      profile,
+      outcome: 'green',
+      exitCode: 0,
+      observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid']
+    });
+    const output = `${JSON.stringify(envelope)}\n`;
+    const parsed = parseEvidenceOutput(output, profile, 'green');
+    assert.deepEqual(parsed.selected_ids, profile.identities);
+    assert.deepEqual(parsed.executed_ids, profile.identities);
+    assert.equal(output.trim().split(/\r?\n/u).length, 1);
+    assert.throws(() => parseEvidenceOutput(`${output}${output}`, profile, 'green'), /expected one vectl.check.evidence.v1 envelope/u);
+  });
 });
 
 test('RF-BUG-010 deterministic adapter identity integration contract', () => {

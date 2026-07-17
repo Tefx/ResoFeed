@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { collect as collectPlaywrightReport, verifyIsolatedLane } from './rf-bug-010-standard-json.mjs';
 import {
@@ -227,6 +227,22 @@ export const PENDING_PROFILE_PAIRS = [
       'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged'
     ],
     runner: 'identity-integration'
+  },
+  {
+    suite: 'rf-bug-v2-deterministic-profile-self-restoration-remediation',
+    checkID: 'rf_bug_v2_deterministic_profile_self_restoration_green',
+    identities: ['RF-BUG-010 deterministic profile negative probes and restoration'],
+    requiredOutput: [
+      'RF-BUG-010_NEGATIVE_TEST_PATH=narrow',
+      'RF-BUG-010_CHILD_ENVIRONMENT=preserved',
+      'RF-BUG-010_FAILURE_RESTORATION=exact',
+      'RF-BUG-010_SUCCESS_RESTORATION=exact',
+      'RF-BUG-010_LOCKED_DEPENDENCIES=bootstrapped_or_present',
+      'RF-BUG-010_STAGE_RESIDUE=0',
+      'RF-BUG-010_ONE_ENVELOPE=green',
+      'RF-BUG-010_PROTECTED_ACCEPTANCE=unchanged'
+    ],
+    runner: 'deterministic-self-restoration'
   },
   {
     suite: 'rf-bug-v2-source-ledger',
@@ -553,6 +569,43 @@ export function childEnvironmentForCommand(command, overrides = {}) {
   return environment;
 }
 
+function negativeProbeEnvironment(identityInput) {
+  const environment = {
+    PATH: process.env.PATH ?? '',
+    HOME: process.env.HOME ?? '',
+    TMPDIR: process.env.TMPDIR ?? '/tmp',
+    CI: '1',
+    NO_COLOR: '1'
+  };
+  if (identityInput !== undefined) environment[BUILD_IDENTITY_ENV] = identityInput;
+  return environment;
+}
+
+export function probeBuildIdentityRejection(root, identityInput, spawn = spawnSync) {
+  const helperURL = pathToFileURL(path.join(root, 'scripts', 'resofeed-svelte-build-identity.mjs')).href;
+  const script = "const helper = await import(process.argv[2]); helper.resolveSvelteBuildIdentity(process.argv[3], process.env);";
+  const result = spawn(process.execPath, ['--input-type=module', '-e', script, adapterPath, helperURL, root], {
+    cwd: root,
+    encoding: 'utf8',
+    env: negativeProbeEnvironment(identityInput)
+  });
+  if (result.error) throw result.error;
+  if (result.status === 0) throw new AdapterFailure('noncanonical private version input was accepted');
+  return redact(`${result.stdout ?? ''}\n${result.stderr ?? ''}`);
+}
+
+function probeCanonicalBuildOverride(root, identityInput) {
+  const result = spawnSync(path.join(root, 'scripts', 'build-resofeed.sh'), [path.join(root, 'negative-probe-output')], {
+    cwd: root,
+    encoding: 'utf8',
+    timeout: 180_000,
+    env: negativeProbeEnvironment(identityInput)
+  });
+  if (result.error || result.status !== 2 || !result.stderr.includes('private to the canonical build pipeline')) {
+    throw new AdapterFailure('ambient private build identity override was not rejected');
+  }
+}
+
 function execute(profile, command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd ?? repoRoot,
@@ -565,6 +618,55 @@ function execute(profile, command, args, options = {}) {
     throw new AdapterFailure(`${command} execution did not satisfy the ${profile.suite}/${profile.checkID} process outcome`, [detail]);
   }
   return `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+}
+
+export function withLockedWebDependencies(profile, operation, run = execute, root = repoRoot) {
+  const dependencyPath = path.join(root, 'web', 'node_modules');
+  try {
+    const existing = fs.lstatSync(dependencyPath);
+    if (!existing.isDirectory() && !existing.isSymbolicLink()) {
+      throw new AdapterFailure('web/node_modules exists but is not a dependency directory');
+    }
+    return operation();
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+  }
+
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-locked-web-dependencies-'));
+  const scratchWeb = path.join(scratch, 'web');
+  let primaryFailure;
+  let result;
+  try {
+    fs.mkdirSync(scratchWeb, { recursive: true });
+    for (const name of ['package.json', 'package-lock.json']) {
+      fs.copyFileSync(path.join(root, 'web', name), path.join(scratchWeb, name));
+    }
+    run(profile, 'npm', [
+      'ci', '--ignore-scripts', '--no-audit', '--no-fund'
+    ], { cwd: scratchWeb, timeout: 600_000 });
+    const installed = path.join(scratchWeb, 'node_modules');
+    if (!fs.existsSync(installed) || !fs.statSync(installed).isDirectory()) {
+      throw new AdapterFailure('locked web dependency bootstrap did not produce node_modules');
+    }
+    fs.symlinkSync(installed, dependencyPath, 'dir');
+    result = operation();
+  } catch (error) {
+    primaryFailure = error;
+  } finally {
+    let cleanupFailure;
+    try {
+      fs.rmSync(dependencyPath, { recursive: true, force: true });
+      fs.rmSync(scratch, { recursive: true, force: true });
+    } catch (error) {
+      cleanupFailure = error;
+    }
+    if (!primaryFailure && cleanupFailure) primaryFailure = cleanupFailure;
+    else if (primaryFailure instanceof AdapterFailure && cleanupFailure) {
+      primaryFailure.observations.push(`dependency cleanup failure: ${redact(cleanupFailure.message ?? cleanupFailure)}`);
+    }
+  }
+  if (primaryFailure) throw primaryFailure;
+  return result;
 }
 
 function ensureNoProtectedMutation() {
@@ -827,6 +929,109 @@ function runRuntimeIsolation(profile) {
   };
 }
 
+function capturePathState(targetPath) {
+  let stat;
+  try {
+    stat = fs.lstatSync(targetPath);
+  } catch (error) {
+    if (error?.code === 'ENOENT') return { kind: 'absent' };
+    throw error;
+  }
+  if (stat.isFile()) {
+    return { kind: 'file', mode: stat.mode & 0o7777, bytes: fs.readFileSync(targetPath).toString('base64') };
+  }
+  if (stat.isSymbolicLink()) return { kind: 'symlink', target: fs.readlinkSync(targetPath) };
+  if (!stat.isDirectory()) throw new AdapterFailure(`unsupported generated-tree entry: ${targetPath}`);
+  const entries = fs.readdirSync(targetPath).sort((left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right)));
+  return {
+    kind: 'directory',
+    mode: stat.mode & 0o7777,
+    entries: entries.map((name) => [name, capturePathState(path.join(targetPath, name))])
+  };
+}
+
+function restorePathState(targetPath, state) {
+  fs.rmSync(targetPath, { recursive: true, force: true });
+  if (state.kind === 'absent') return;
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  if (state.kind === 'file') {
+    fs.writeFileSync(targetPath, Buffer.from(state.bytes, 'base64'), { mode: state.mode });
+    fs.chmodSync(targetPath, state.mode);
+    return;
+  }
+  if (state.kind === 'symlink') {
+    fs.symlinkSync(state.target, targetPath);
+    return;
+  }
+  fs.mkdirSync(targetPath, { recursive: true, mode: state.mode });
+  for (const [name, child] of state.entries) restorePathState(path.join(targetPath, name), child);
+  fs.chmodSync(targetPath, state.mode);
+}
+
+export function captureGeneratedTreeState(root) {
+  return {
+    build: capturePathState(path.join(root, 'web', 'build')),
+    webui: capturePathState(path.join(root, 'internal', 'resofeed', 'webui'))
+  };
+}
+
+function stageResidue(root) {
+  const packageDirectory = path.join(root, 'internal', 'resofeed');
+  if (!fs.existsSync(packageDirectory)) return [];
+  return fs.readdirSync(packageDirectory).filter((name) => name.startsWith('.webui-stage.'));
+}
+
+export function withGeneratedTreeRestoration(root, operation, readStatus = () => trackedStatus()) {
+  const initialTrees = captureGeneratedTreeState(root);
+  const initialStatus = readStatus();
+  let cleanupComplete = false;
+  let cleanupFailure;
+  const restore = () => {
+    if (cleanupComplete) return cleanupFailure;
+    cleanupComplete = true;
+    try {
+      for (const name of stageResidue(root)) {
+        fs.rmSync(path.join(root, 'internal', 'resofeed', name), { recursive: true, force: true });
+      }
+      restorePathState(path.join(root, 'web', 'build'), initialTrees.build);
+      restorePathState(path.join(root, 'internal', 'resofeed', 'webui'), initialTrees.webui);
+      if (JSON.stringify(captureGeneratedTreeState(root)) !== JSON.stringify(initialTrees)) {
+        throw new AdapterFailure('generated frontend trees were not restored exactly');
+      }
+      if (stageResidue(root).length > 0) throw new AdapterFailure('generated frontend stage residue remained');
+      if (readStatus() !== initialStatus) throw new AdapterFailure('generated frontend restoration changed tracked status');
+    } catch (error) {
+      cleanupFailure = error;
+    }
+    return cleanupFailure;
+  };
+  const signals = [['SIGINT', 130], ['SIGTERM', 143], ['SIGHUP', 129]];
+  const handlers = signals.map(([signal, exitCode]) => {
+    const handler = () => {
+      restore();
+      process.exit(exitCode);
+    };
+    process.on(signal, handler);
+    return [signal, handler];
+  });
+  let primaryFailure;
+  let result;
+  try {
+    result = operation();
+  } catch (error) {
+    primaryFailure = error;
+  } finally {
+    for (const [signal, handler] of handlers) process.removeListener(signal, handler);
+    const restorationError = restore();
+    if (restorationError && primaryFailure instanceof AdapterFailure) {
+      primaryFailure.observations.push(`restoration failure: ${redact(restorationError.message ?? restorationError)}`);
+    }
+    if (!primaryFailure && restorationError) primaryFailure = restorationError;
+  }
+  if (primaryFailure) throw primaryFailure;
+  return result;
+}
+
 function treeDigest(root) {
   const hash = createHash('sha256');
   const files = [];
@@ -935,13 +1140,16 @@ function assertNoStageResidue(root) {
 }
 
 function runDeterministicBuild(profile) {
+  return withGeneratedTreeRestoration(repoRoot, () => runDeterministicBuildTransaction(profile));
+}
+
+function runDeterministicBuildTransaction(profile) {
   ensureNoProtectedMutation();
   execute(profile, 'node', [
     '--test', '--test-name-pattern=RF-BUG-010 deterministic canonical frontend build contract',
     'scripts/vectl-check.test.mjs'
   ], { timeout: 240_000 });
 
-  const statusBefore = trackedStatus();
   const packageUI = path.join(repoRoot, 'internal', 'resofeed', 'webui');
   const builtUI = path.join(repoRoot, 'web', 'build');
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'resofeed-deterministic-build-'));
@@ -951,15 +1159,15 @@ function runDeterministicBuild(profile) {
     const e2eBinary = path.join(scratch, 'resofeed-e2e');
     execute(profile, 'scripts/build-resofeed.sh', [productionOne], { timeout: 600_000 });
     const productionDigest = treeDigest(packageUI);
-    if (treeDigest(builtUI) !== productionDigest || trackedStatus() !== statusBefore) {
-      throw new AdapterFailure('first canonical production build changed synchronized tracked assets');
+    if (treeDigest(builtUI) !== productionDigest) {
+      throw new AdapterFailure('first canonical production build did not synchronize generated assets');
     }
     execute(profile, 'scripts/build-resofeed.sh', [productionTwo], { timeout: 600_000 });
-    if (treeDigest(packageUI) !== productionDigest || treeDigest(builtUI) !== productionDigest || trackedStatus() !== statusBefore) {
+    if (treeDigest(packageUI) !== productionDigest || treeDigest(builtUI) !== productionDigest) {
       throw new AdapterFailure('repeated canonical production build was not byte-identical');
     }
     execute(profile, 'scripts/build-resofeed.sh', ['--e2e', e2eBinary], { timeout: 600_000 });
-    if (treeDigest(packageUI) !== productionDigest || treeDigest(builtUI) !== productionDigest || trackedStatus() !== statusBefore) {
+    if (treeDigest(packageUI) !== productionDigest || treeDigest(builtUI) !== productionDigest) {
       throw new AdapterFailure('canonical production and E2E frontend trees differed');
     }
     const productionMetadata = execute(profile, 'go', ['version', '-m', productionOne], { timeout: 30_000 });
@@ -1001,38 +1209,43 @@ function runDeterministicBuild(profile) {
 
     const packageBeforeFailures = treeDigest(fixturePackage);
     for (const value of [undefined, '', 'invalid', `rf-${'A'.repeat(64)}`, `rf-${'a'.repeat(63)}`]) {
-      const environment = childEnvironment(value === undefined ? {} : { RESOFEED_SVELTE_BUILD_IDENTITY: value });
-      const result = spawnSync('npm', ['--prefix', 'web', 'run', 'build'], {
-        cwd: fixtureRoot,
-        encoding: 'utf8',
-        timeout: 180_000,
-        env: environment
-      });
-      if (result.status === 0) throw new AdapterFailure('noncanonical private version input was accepted');
+      probeBuildIdentityRejection(fixtureRoot, value);
       if (treeDigest(fixturePackage) !== packageBeforeFailures) throw new AdapterFailure('invalid private version input changed package assets');
     }
-    const override = spawnSync(fixtureScript, [path.join(scratch, 'fixture-override')], {
-      cwd: fixtureRoot,
-      encoding: 'utf8',
-      timeout: 180_000,
-      env: childEnvironment({ RESOFEED_SVELTE_BUILD_IDENTITY: `rf-${'b'.repeat(64)}` })
-    });
-    if (override.status !== 2 || !override.stderr.includes('private to the canonical build pipeline')) {
-      throw new AdapterFailure('ambient private build identity override was not rejected');
-    }
+    probeCanonicalBuildOverride(fixtureRoot, `rf-${'b'.repeat(64)}`);
     if (treeDigest(fixturePackage) !== packageBeforeFailures) throw new AdapterFailure('ambient override changed package assets');
     assertNoStageResidue(fixtureRoot);
   } finally {
     fs.rmSync(scratch, { recursive: true, force: true });
   }
   ensureNoProtectedMutation();
-  if (trackedStatus() !== statusBefore) throw new AdapterFailure('deterministic build verification changed synchronized worktree status');
   return {
     outcome: 'green',
     exitCode: 0,
     observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
     artifacts: []
   };
+}
+
+function runDeterministicSelfRestoration(profile) {
+  ensureNoProtectedMutation();
+  return withLockedWebDependencies(profile, () => {
+    const focusedOutput = execute(profile, 'node', [
+      '--test', '--test-name-pattern=RF-BUG-010 deterministic profile self-restoration contract',
+      'scripts/vectl-check.test.mjs'
+    ], { timeout: 240_000 });
+    if (!focusedOutput.includes('RF-BUG-010 deterministic profile self-restoration contract')) {
+      throw new AdapterFailure('deterministic profile self-restoration focused developer contract did not execute');
+    }
+    runDeterministicBuild(profile);
+    ensureNoProtectedMutation();
+    return {
+      outcome: 'green',
+      exitCode: 0,
+      observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+      artifacts: []
+    };
+  });
 }
 
 function runIdentityIntegration(profile) {
@@ -1428,8 +1641,10 @@ async function main() {
               ? runCanonicalBuild(profile)
               : profile.runner === 'deterministic-build'
                 ? runDeterministicBuild(profile)
-                : profile.runner === 'identity-integration'
-                  ? runIdentityIntegration(profile)
+                : profile.runner === 'deterministic-self-restoration'
+                  ? runDeterministicSelfRestoration(profile)
+                  : profile.runner === 'identity-integration'
+                    ? runIdentityIntegration(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'

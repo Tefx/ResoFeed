@@ -45,9 +45,12 @@ Adapter/list/render troubleshooting and verification:
 
 ```bash
 node scripts/vectl-check.mjs run rf-bug-v2-deterministic-adapter-identity-integration-remediation rf_bug_v2_deterministic_adapter_identity_integration_green
+node scripts/vectl-check.mjs run rf-bug-v2-deterministic-profile-self-restoration-remediation rf_bug_v2_deterministic_profile_self_restoration_green
 ```
 
-This profile verifies the helper/shell contract, config startup for Vitest and Playwright replacement-lane discovery, ambient-override and missing-derivation rejection, controlled tracked-input invalidation, and the immutable protected acceptance baseline.
+The identity-integration profile verifies the helper/shell contract, config startup for Vitest and Playwright replacement-lane discovery, ambient-override and missing-derivation rejection, controlled tracked-input invalidation, and the immutable protected acceptance baseline. The self-restoration profile runs invalid identity inputs only through the narrow trusted-helper rejection probe; production child-environment sanitization remains strict. It restores the exact prior `web/build` and `internal/resofeed/webui` state after success or failure, removes `.webui-stage.*` residue, and fails if tracked status changes.
+
+The self-restoration verification command also works in a fresh worktree before `npm --prefix web ci`. It installs the exact lockfile dependency graph in disposable scratch space under the adapter's sanitized environment, uses it only for that profile run, and removes the temporary dependency link afterward. This bootstrap does not replace the normal development dependency installation command above.
 ### 2. Configure OpenRouter and optional Tavily keys safely
 
 ResoFeed resolves provider API keys at runtime. Prefer an OS environment variable or a local `.env` file; do not paste real API keys into commands that will be saved in shell history. A missing OpenRouter key does not prevent the server from binding, but OpenRouter-backed summaries and steering translation are unavailable until a key is configured. A missing Tavily key does not prevent the server from binding; it only disables optional external source-text recovery. Live HTTP model listing is the explicit request-time OpenRouter secret-resolution exception, so it can reflect current OS environment or local `.env` configuration without persisting the secret.
