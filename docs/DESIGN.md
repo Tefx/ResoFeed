@@ -1255,6 +1255,7 @@ OPML is import-only source intake that flattens feed URLs and source titles into
 ### RF-BUG-005 — Go-owned CSP interaction atom
 Ordinary embedded UI interactions—including initial boot, OPML import, and JSON State export/import—must complete under the Go-owned CSP without `unsafe-inline`, duplicate header ownership, blocked required resources, or CSP violations. Caddy and other reverse proxies pass the application-owned browser security headers unchanged.
 
+Route layout is stylesheet-owned: Feed/Inspector scroll containment, responsive pane sizing, and Inspector fill geometry use static semantic classes compiled into the application stylesheet. Route scripts MUST NOT assign element `style` properties or call `style.setProperty`; rendered-test coverage must load the same application CSS rather than reconstructing layout through runtime inline styles.
 ### RF-BUG-006 — Resolved-route title atom
 The resolved route surface and its document title commit atomically before hydration or asynchronous work can paint. Cold load, refresh, direct Inspector navigation, Search, Today, Source Ledger, `/doctor`, Back, and Forward expose no intermediate title from another route. Functional titles remain the exact invariant English tokens `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor` in both processing languages.
 

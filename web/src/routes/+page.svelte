@@ -250,31 +250,6 @@
     return label.replace(/item re-ingest/giu, 'item reprocess');
   }
 
-  function applySplitScrollContainment(): void {
-    // DESIGN.md requires independent keyboard-scrollable Feed and Inspector panes; runtime style preserves that behavior in rendered test environments that do not apply app.css.
-    if (feedPaneElement) feedPaneElement.style.overflowY = 'auto';
-    if (detailPaneElement) {
-      const narrowRoute = window.matchMedia('(max-width: 1079px)').matches;
-      detailPaneElement.style.overflowY = 'auto';
-      detailPaneElement.style.maxHeight = narrowRoute ? 'none' : 'calc(100vh - 130px)';
-      if (narrowRoute) detailPaneElement.style.minHeight = '0';
-      const stableLandmark = detailPaneElement.querySelector<HTMLElement>('.inspector-stable-landmark');
-      if (stableLandmark) {
-        stableLandmark.style.display = 'flex';
-        stableLandmark.style.flexDirection = 'column';
-        stableLandmark.style.minHeight = '100%';
-        const inspectorSurface = stableLandmark.querySelector<HTMLElement>('.contract-inspector');
-        if (inspectorSurface) {
-          inspectorSurface.style.flex = '1 0 auto';
-          inspectorSurface.style.width = '100%';
-          inspectorSurface.style.minHeight = '100%';
-          inspectorSurface.style.maxHeight = 'none';
-          inspectorSurface.style.overflow = 'visible';
-        }
-      }
-    }
-  }
-
   async function restoreFeedScrollPosition(): Promise<void> {
     suppressFeedScrollRecording = true;
     await tick();
@@ -411,10 +386,6 @@
     preservedFeedScrollTop = feedPaneElement?.scrollTop ?? preservedFeedScrollTop;
     if (isNarrow) preservedWindowScrollY = window.scrollY;
   }
-
-  $effect(() => {
-    if (feedPaneElement || detailPaneElement) applySplitScrollContainment();
-  });
 
   let steerPreviewRequestSequence = 0;
 
@@ -810,7 +781,6 @@
       selectedItemDetail = response.item;
       inspectorState = 'ready';
       await tick();
-      applySplitScrollContainment();
       if (detailPaneElement) detailPaneElement.scrollTop = 0;
     } catch (error) {
       if (requestSequence !== itemDetailRequestSequence || itemId !== selectedItemId) return;
@@ -1270,7 +1240,6 @@
       if (!media.matches && currentSurface === 'feed' && items.length > 0 && !selectedItemId) reconcileSelectedFeedItem(items);
       };
     updateMedia();
-    applySplitScrollContainment();
     media.addEventListener('change', updateMedia);
 
     const preserveKeyboardFocusModality = (event: MouseEvent) => {
