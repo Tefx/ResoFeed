@@ -187315,10 +187315,10 @@ phases:
       and outbound-boundary remediation; Prompting v2.2 and E2E harness remediation;
       reporter-marker repair; adapter runtime isolation; production foreground ownership;
       canonical fresh embedded-UI build; deterministic Svelte build; deterministic
-      adapter-identity integration; the append-only deterministic-profile negative-probe/self-restoration
-      remediation; all downstream independent verification; and immutable replacement-five
-      runtime verification. Prior failed receipts remain failure history and cannot
-      satisfy admission.
+      adapter-identity integration; deterministic-profile negative-probe/self-restoration
+      remediation; canonical generated-webui baseline synchronization; all downstream
+      independent verification; and immutable replacement-five runtime verification.
+      Prior failed receipts remain failure history and cannot satisfy admission.
 
 
       Require canonical `~` plus unpadded UTF-8 base64url HTTP item paths, ordinary
@@ -187353,15 +187353,20 @@ phases:
       with clean tracked status. Controlled tracked-input invalidation must deterministically
       change versioned assets and reach the package-local embedded real binary/browser.
       Missing, empty, malformed, noncanonical, or ambient private identity input fails
-      closed before replacement. Require exact synchronized docs, system Chrome reuse
+      closed before replacement. Require exact synchronized docs when observable behavior/troubleshooting
+      changed, otherwise an explicit no-doc-change rationale, system Chrome reuse
       where applicable, zero stage residue, and no mock seam, external embed substitution,
       secret/CLI-key regression, or protected mutation.
 
 
-      For the append-only deterministic-profile self-restoration remediation, preserve
-      validated FAIL receipt `sha256:48362094c70fdbef3b2153252f4f45e7edcf94aaec966cd70ca0907cdf5c30ad`
-      and report `/tmp/larva-agent-artifacts/rf-bug-v2-deterministic-adapter-identity-integration-verification_report.md#sha256=0d483f8bd06084ead8a7621e12ffb3577614140e1c547b3183caaca1d721bd55#bytes=53243`.
-      Require wholly fresh verification from one clean immutable repaired head. The
+      For deterministic-profile self-restoration and generated-baseline remediation,
+      preserve validated FAIL receipts `sha256:48362094c70fdbef3b2153252f4f45e7edcf94aaec966cd70ca0907cdf5c30ad`
+      and `sha256:cc10e7948b3453836018a47ef8f33c7cf32adc80d4e24612905b798f21833690`
+      plus their reports and failed worktrees. Require wholly fresh verification from
+      one clean immutable repaired head. Exactly one ordinary locked `npm --prefix
+      web ci` setup before the five-profile batch is admissible when dependencies
+      are absent and must leave tracked state unchanged; historical profiles are not
+      required to self-bootstrap and must not gain redundant bootstrap logic. The
       deterministic profile''s invalid-input probes must reach trusted-helper/config
       rejection only through an explicit narrow negative-test path; production `childEnvironment`
       must continue rejecting arbitrary caller/ambient `RESOFEED_SVELTE_BUILD_IDENTITY`
@@ -187370,26 +187375,34 @@ phases:
       generated-tree mutation, preserve each primary failure, restore prior present/absent
       `web/build` and `internal/resofeed/webui` state byte-exactly, keep tracked status
       unchanged, and leave no `.webui-stage.*` residue. Success must also restore
-      exact state and emit one envelope green. Require all five exact token, Source
-      Ledger, Prompting, adapter-isolation, and deterministic-build profiles green
-      from that same fresh head, exact selected/executed identity, no retry/skip,
-      protected acceptance unchanged, and explicit Dual-Update Contract accounting.
+      exact state and emit one envelope green.
+
+
+      Require the focused generated-webui baseline selected-execution profile to prove
+      current committed `internal/resofeed/webui` equals canonical current-input `web/build`
+      completely by path, bytes, and mode after canonical production and E2E build
+      paths; final tracked status is clean; no identity algorithm, Svelte/Vite config,
+      product source, or protected acceptance changed; and Dual-Update Contract accounting
+      is explicit. Require all five exact token, Source Ledger, Prompting, adapter-isolation,
+      and deterministic-build profiles green from that same fresh head after the single
+      admissible setup, exact selected/executed identity, no retry/skip, protected
+      acceptance unchanged, and final clean status.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-002-TOKEN-CONTRACT-REMEDIATION","RF-BUG-002-TOKEN-PARITY-HARNESS-REMEDIATION","RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-PHASE-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-PRIORITY-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-FOREGROUND-OWNERSHIP-REMEDIATION","RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY","RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION","RF-BUG-009","RF-BUG-009-PROMPTING-HARNESS-REMEDIATION","RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION","RF-BUG-010-LANE-MIGRATION","RF-BUG-010-FRESH-EMBEDDED-UI-BUILD-REMEDIATION","RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION","RF-BUG-010-DETERMINISTIC-ADAPTER-IDENTITY-INTEGRATION-REMEDIATION","RF-BUG-V2-SOURCE-LEDGER-REPORTER-MARKER"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-adapter-runtime-isolation-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-adapter-runtime-isolation-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-canonical-e2e-embedded-ui-build-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-svelte-build-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-canonical-e2e-embedded-ui-build-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-priority","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-snapshot-race","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-ownership-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-ownership-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-e2e-loopback-fixture-boundary","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-item-http-token-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-request-start-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-json-body-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-phase-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-ingest-locator-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-e2e-harness-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-reporter-marker-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-token-parity-harness-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-adapter-identity-integration-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-profile-self-restoration-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-adapter-identity-integration-verification"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-ledger-prompting","requirement_ids":["RF-BUG-002-TOKEN-CONTRACT-REMEDIATION","RF-BUG-002-TOKEN-PARITY-HARNESS-REMEDIATION","RF-BUG-004-008","RF-BUG-004-STATE-UI","RF-BUG-008","RF-BUG-008-CONFLICT-EAGER-HTTP-ACTOR-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-JSON-BODY-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-OPERATION-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-PHASE-CONTRACT-REMEDIATION","RF-BUG-008-CONFLICT-REQUEST-START-SYNC-CONTRACT-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-PRIORITY-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-SNAPSHOT-RACE-REMEDIATION","RF-BUG-008-CURRENT-OPERATION-FOREGROUND-OWNERSHIP-REMEDIATION","RF-BUG-008-E2E-OUTBOUND-FIXTURE-BOUNDARY","RF-BUG-008-INGEST-LOCATOR-CONTRACT-REMEDIATION","RF-BUG-009","RF-BUG-009-PROMPTING-HARNESS-REMEDIATION","RF-BUG-010-ADAPTER-ISOLATION-REMEDIATION","RF-BUG-010-LANE-MIGRATION","RF-BUG-010-FRESH-EMBEDDED-UI-BUILD-REMEDIATION","RF-BUG-010-DETERMINISTIC-FRONTEND-BUILD-REMEDIATION","RF-BUG-010-DETERMINISTIC-ADAPTER-IDENTITY-INTEGRATION-REMEDIATION","RF-BUG-010-GENERATED-WEBUI-BASELINE-SYNC","RF-BUG-V2-SOURCE-LEDGER-REPORTER-MARKER"],"integrated_steps":["rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-adapter-runtime-isolation-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-adapter-runtime-isolation-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-canonical-e2e-embedded-ui-build-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-svelte-build-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-canonical-e2e-embedded-ui-build-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-priority","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-snapshot-race","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-ownership-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-current-operation-foreground-ownership-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-e2e-loopback-fixture-boundary","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-item-http-token-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-operation-sync-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-request-start-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-eager-http-actor-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-json-body-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-conflict-phase-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-ingest-locator-contract-lock","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-ledger-prompting-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-e2e-harness-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-prompting-v22","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-replacement-lanes-verification","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-reporter-marker-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-source-ledger-responsive","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-token-parity-harness-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-adapter-identity-integration-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-profile-self-restoration-remediation","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-generated-webui-baseline-sync","rf-bug-assurance-v2-ledger-prompting.rf-bug-v2-deterministic-adapter-identity-integration-verification"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
     verification: Full Gate requires every declared token, Source Ledger/State, Prompting,
       current-operation ownership, replacement-lane, outbound, canonical-build, deterministic-identity,
-      cleanup, redaction, documentation, and protected-baseline obligation. The final
-      verifier must additionally prove from one fresh immutable head that the narrow
-      negative-test path reaches trusted-helper/config rejection without weakening
-      production childEnvironment; induced negative-probe and later-check failures
-      plus success restore generated trees exactly with no residue; all five exact
-      current profiles emit one green envelope each with no retry/skip; protected
-      acceptance is unchanged; and initial/final tracked status is clean.
+      generated-baseline equality, cleanup, redaction, documentation, and protected-baseline
+      obligation. The final verifier must prove one admissible clean locked dependency
+      setup before the batch, the focused baseline profile and five exact current
+      profiles green, complete committed webui/canonical build equality, narrow negative-test
+      and strict production child-environment boundaries, exact restoration with no
+      residue, protected acceptance unchanged, no identity/config/product mutation,
+      explicit Dual-Update Contract accounting, and final clean tracked status.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
