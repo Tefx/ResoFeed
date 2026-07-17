@@ -190517,31 +190517,39 @@ phases:
 
 
       Replacement for `rf-bug-assurance-closure-full-gate`. Require the corrected
-      v2 local matrix, retry-free RF-BUG-005 streaming remediation, separately owned
-      frontend inline-style CSP remediation, their shared fresh full-profile verification,
-      exact closure-selector remediation and verification, current deployment authorization,
-      immutable two-platform OCI publication, both-platform container proof, Tailnet/Caddy
-      proof, formal security review, independent black-box verification, and defect-report
-      closure. Immediately before closure require Vectl validate/check-refs, repair-plan
-      SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
-      authority-reference commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty
-      active claims, current operation authorization, and no unresolved finding. Bind
-      `post_closure_report_sha256` and `closure_commit` from the replacement closure
-      step and require current report hash and HEAD equality. Skipped legacy nodes
-      are never admission inputs; no future expected-red item, including item-deep-links,
-      is admitted.
+      v2 local matrix, retry-free RF-BUG-005 streaming remediation, the completed
+      narrow `+page.svelte` CSP remediation, the append-only active-Svelte-origin
+      and canonical generated-baseline remediation, their shared fresh full-profile
+      verification, exact closure-selector remediation and verification, current deployment
+      authorization, immutable two-platform OCI publication, both-platform container
+      proof, Tailnet/Caddy proof, formal security review, independent black-box verification,
+      and defect-report closure. Preserve the failed fan-in report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`
+      as evidence that the Go lane passed while Chromium CSP and generated baseline
+      blocked admission; require the replacement verification to retain that Go evidence
+      and close both blockers from one fresh canonical profile.
+
+
+      Immediately before closure require Vectl validate/check-refs, repair-plan SHA-256
+      `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`, authority-reference
+      commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty active claims, current
+      operation authorization, and no unresolved finding. Bind `post_closure_report_sha256`
+      and `closure_commit` from the replacement closure step and require current report
+      hash and HEAD equality. Skipped legacy nodes are never admission inputs; no
+      future expected-red item, including item-deep-links, is admitted.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers every local remediation branch, including the separate
-      frontend CSP fix and shared fresh HTTP-security profile, corrected matrix, deployment,
-      security, black-box, and closure branch with canonical public IDs, current hashes
-      and HEAD bindings, empty active claims, rollback readiness, and no out-of-scope
-      or future item-deep-links blocker.
+    verification: Full Gate covers every local remediation branch, including the completed
+      narrow frontend CSP fix, append-only active-Svelte/generated-baseline repair,
+      one fresh shared HTTP-security profile retaining proven Go split-write/streaming
+      evidence while closing Chromium CSP and generated-drift blockers, corrected
+      matrix, deployment, security, black-box, and closure branches with canonical
+      public IDs, current hashes and HEAD bindings, empty active claims, rollback
+      readiness, and no out-of-scope or future item-deep-links blocker.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
