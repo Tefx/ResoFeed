@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -85,8 +86,55 @@ func newHTTPSecurityHandler(next http.Handler) http.Handler {
 func httpSecurityMiddleware(policy string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		setHTTPSecurityHeaders(w.Header(), policy)
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(newHTTPStreamingSecurityWriter(w), r)
 	})
+}
+
+type httpStreamingSecurityWriter struct {
+	http.ResponseWriter
+	flusher http.Flusher
+}
+
+func newHTTPStreamingSecurityWriter(w http.ResponseWriter) http.ResponseWriter {
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		return w
+	}
+	return &httpStreamingSecurityWriter{ResponseWriter: w, flusher: flusher}
+}
+
+func (w *httpStreamingSecurityWriter) Unwrap() http.ResponseWriter {
+	return w.ResponseWriter
+}
+
+func (w *httpStreamingSecurityWriter) Write(p []byte) (int, error) {
+	if len(p) < 2 {
+		return w.ResponseWriter.Write(p)
+	}
+
+	first := len(p) / 2
+	n, err := w.ResponseWriter.Write(p[:first])
+	if err != nil {
+		return n, fmt.Errorf("write first HTTP response segment: %w", err)
+	}
+	if n != first {
+		return n, fmt.Errorf("write first HTTP response segment: %w", io.ErrShortWrite)
+	}
+	w.flusher.Flush()
+
+	secondN, err := w.ResponseWriter.Write(p[first:])
+	total := n + secondN
+	if err != nil {
+		return total, fmt.Errorf("write second HTTP response segment: %w", err)
+	}
+	if secondN != len(p)-first {
+		return total, fmt.Errorf("write second HTTP response segment: %w", io.ErrShortWrite)
+	}
+	return total, nil
+}
+
+func (w *httpStreamingSecurityWriter) Flush() {
+	w.flusher.Flush()
 }
 
 func setHTTPSecurityHeaders(header http.Header, policy string) {

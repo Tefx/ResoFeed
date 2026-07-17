@@ -1,6 +1,7 @@
 package resofeed
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
@@ -66,24 +67,31 @@ func TestHTTPSecurityMiddlewarePreservesWriterStreamingAndCancellation(t *testin
 	request := httptest.NewRequest(http.MethodGet, "/stream", nil).WithContext(ctx)
 
 	handler := httpSecurityMiddleware("default-src 'self';", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if w != writer {
-			t.Error("middleware wrapped the response writer")
+		if w == writer {
+			t.Error("middleware did not install the direct streaming writer")
 		}
 		flusher, ok := w.(http.Flusher)
 		if !ok {
 			t.Fatal("middleware removed http.Flusher")
 		}
-		_, _ = w.Write([]byte("first"))
+		if _, err := w.Write([]byte("first")); err != nil {
+			t.Fatalf("write first response part: %v", err)
+		}
 		flusher.Flush()
 		cancel()
 		<-r.Context().Done()
-		_, _ = w.Write([]byte("second"))
+		if _, err := w.Write([]byte("second")); err != nil {
+			t.Fatalf("write second response part: %v", err)
+		}
 		flusher.Flush()
 	}))
 	handler.ServeHTTP(writer, request)
 
-	if writer.writes != 2 || writer.flushes != 2 {
-		t.Fatalf("writes/flushes = %d/%d, want 2/2", writer.writes, writer.flushes)
+	if writer.writes != 4 || writer.flushes != 4 {
+		t.Fatalf("writes/flushes = %d/%d, want 4/4", writer.writes, writer.flushes)
+	}
+	if got := writer.body.String(); got != "firstsecond" {
+		t.Fatalf("streamed body = %q, want %q", got, "firstsecond")
 	}
 	if request.Context().Err() != context.Canceled {
 		t.Fatalf("request context error = %v, want context canceled", request.Context().Err())
@@ -143,13 +151,17 @@ func testCSPHash(body string) string {
 
 type securityStreamingWriter struct {
 	header  http.Header
+	body    bytes.Buffer
 	writes  int
 	flushes int
 }
 
-func (w *securityStreamingWriter) Header() http.Header         { return w.header }
-func (w *securityStreamingWriter) WriteHeader(int)             {}
-func (w *securityStreamingWriter) Write(p []byte) (int, error) { w.writes++; return len(p), nil }
-func (w *securityStreamingWriter) Flush()                      { w.flushes++ }
+func (w *securityStreamingWriter) Header() http.Header { return w.header }
+func (w *securityStreamingWriter) WriteHeader(int)     {}
+func (w *securityStreamingWriter) Write(p []byte) (int, error) {
+	w.writes++
+	return w.body.Write(p)
+}
+func (w *securityStreamingWriter) Flush() { w.flushes++ }
 
 var _ http.Flusher = (*securityStreamingWriter)(nil)
