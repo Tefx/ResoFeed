@@ -190308,7 +190308,7 @@ phases:
       build passed and cleaned up; final tracked status/diff empty. Report: /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v4_report.md#sha256=5e045749c4dfffcc7101bd27e5c0850d451108300b502689439c25abd54403f7'
   - id: rf-bug-v2-deployment-authorization-review
     name: Authorize v2 OCI publication and Tailnet deployment
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -190331,6 +190331,8 @@ phases:
     depends_on:
     - rf-bug-v2-local-verification-matrix
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-18T06:57:30.187846+00:00'
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
     status: pending
