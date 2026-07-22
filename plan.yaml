@@ -191394,15 +191394,14 @@ phases:
       \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md,\
       \ deploy/resofeed-caddy/caddy/**, deploy/resofeed-caddy/stop.sh, Dockerfile,\
       \ cmd/**, internal/**, web/**, tests/**]\n  ignored_runtime_paths: [.git/, .vectl/,\
-      \ .agent/, .venv/, .pi/, node_modules/]\nclaims: [RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE]\n\
-      checks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n    run:\n\
-      \      command: [node, --test, '--test-name-pattern=immutable OCI and Tailnet\
-      \ deployment procedure', scripts/vectl-check.test.mjs]\n      timeout_seconds:\
-      \ 300\n    evidence:\n      mode: command_outcome\n      path_bindings:\n  \
-      \      - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
-      \        - {path: scripts/vectl-check.test.mjs, access: read, availability:\
-      \ current}\n        - {path: deploy/resofeed-caddy/deploy.sh, access: execute,\
-      \ availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
+      \ .agent/, .venv/]\nclaims: [RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE]\nchecks:\n\
+      \  - id: rf_bug_v2_immutable_deployment_procedure_green\n    run:\n      command:\
+      \ [node, --test, '--test-name-pattern=immutable OCI and Tailnet deployment procedure',\
+      \ scripts/vectl-check.test.mjs]\n      timeout_seconds: 300\n    evidence:\n\
+      \      mode: command_outcome\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/deploy.sh,\
+      \ access: execute, availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
       \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/.env.example,\
       \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/README.md,\
       \ access: read, availability: current}\n        - {path: .agents/skills/resofeed-tailnet-deploy/SKILL.md,\
