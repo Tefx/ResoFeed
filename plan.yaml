@@ -190358,20 +190358,33 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      After current explicit authorization, build and publish one immutable linux/amd64
-      and linux/arm64 image to `docker.io/tefx/resofeed` from the locally verified
-      commit. Record the OCI index digest and both platform manifest digests as exact
-      downstream inputs; `latest` is optional and never the immutable identity. Never
-      print secrets. Missing authority or credentials performs no push and returns
-      BLOCKED. Recovery deletes an authorized temporary tag or records the orphan
-      digest; incomplete platforms or digest mismatch block downstream work.'
+      After the pre-operation R3 authorization review, use only the repaired repository
+      procedure from the locally verified integrated commit to build and publish one
+      immutable linux/amd64 and linux/arm64 image to the sole registry target `docker.io/tefx/resofeed`.
+      Bind the verified 40-character commit to one immutable tag, then record and
+      cross-check the OCI index digest and exact linux/amd64 and linux/arm64 manifest
+      digests as downstream inputs. Reject a moved tag, incomplete platform set, source-commit
+      mismatch, digest mismatch, alternate repository, or mutable tag; `latest` is
+      never a publication, verification, deployment, or rollback identity.
+
+
+      Use only the already-authorized repository-scoped registry credential in the
+      authorized execution context and never print secrets. Do not change credentials/accounts
+      or infer broader deletion authority. Recovery may delete only an explicitly
+      authorized temporary tag; otherwise record the orphan immutable tag plus index/platform
+      digest chain for later cleanup. A partial push, unknown remote state, incomplete
+      platform chain, failed digest resolution, or unavailable recovery stops before
+      container or deployment work.'
     verification: Authorized publication targets only docker.io/tefx/resofeed, binds
-      verified commit/tag to OCI index plus amd64/arm64 digests, redacts output, and
-      records rollback/orphan recovery.
+      the verified commit and immutable tag to one OCI index plus exact amd64/arm64
+      digests, rejects mutable/mismatched identity, redacts credentials, and records
+      authorized cleanup or orphan recovery.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
     - Dockerfile
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
     depends_on:
     - rf-bug-v2-deployment-authorization-review
     agent: integration-verifier
