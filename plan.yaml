@@ -190421,19 +190421,36 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Use the maintained Tailnet deployment skill only after explicit authorization,
-      without reading or printing `.env`. Deploy the exact verified immutable digest,
-      preserve the prior digest, and verify direct/public equality for all four Go-owned
-      headers on HTML, JSON, MCP, unauthorized, and error responses; Caddy adds or
-      replaces none. Prove browser boot without CSP violations, embedded assets, direct
-      Ledger/item routes, titles, token accept/reject, import-only OPML, and JSON
-      State. Recovery rolls back to the prior digest and verifies readiness.'
-    verification: The maintained Tailnet skill deploys the exact authorized digest;
-      direct/public headers match, Caddy owns none, browser/CSP/routes/tokens/state
-      pass, and prior-digest rollback readiness is proven without secret output.
+      After exact immutable OCI publication and both-platform container proof, use
+      only the repaired maintained Tailnet procedure to deploy `docker.io/tefx/resofeed@sha256:<verified-index-digest>`
+      to the existing `resofeed-caddy` stack at `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
+      Require the reviewed operation/target authority and existing runtime-secret
+      injection; preserve the prior deployed digest, SQLite volume, and owner-token
+      state. Never read or print `.env` or secret values, substitute `latest` or another
+      tag/repository/host/stack, change credentials/accounts, reset the token, clear
+      data, or execute an undeclared operation.
+
+
+      Verify direct/public equality for all four Go-owned headers on HTML, JSON, MCP,
+      unauthorized, and error responses; Caddy adds, replaces, or weakens none. Prove
+      readiness, browser boot without CSP violations, embedded assets, direct Ledger/item
+      routes, titles, token accept/reject, import-only OPML, and JSON State. On failed
+      readiness, partial/unknown deployment state, digest mismatch, or any required
+      probe failure, stop further mutation, restore only the preserved prior digest
+      through the declared recovery path, retain the SQLite volume, and verify readiness.
+      If rollback identity or readiness recovery is unavailable, report BLOCKED without
+      an alternate target or destructive fallback.'
+    verification: The maintained procedure deploys the exact authorized docker.io/tefx/resofeed
+      index digest only to tefx-mbp-personal's existing resofeed-caddy stack; direct/public
+      headers, Caddy ownership, browser/CSP/routes/tokens/state, prior-digest rollback,
+      SQLite preservation, readiness, and secret non-disclosure are proven.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
     - deploy/resofeed-caddy/caddy/Caddyfile
     depends_on:
     - rf-bug-v2-docker-runtime-proof
