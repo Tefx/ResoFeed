@@ -191350,7 +191350,7 @@ phases:
       scripts/manifests unchanged; user docs edits preserved.
   - id: rf-bug-v2-immutable-deployment-procedure
     name: Implement immutable OCI and Tailnet deployment procedure
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nCross-domain\
       \ justification: no registered mutation specialist covers the inseparable shell/Compose,\
@@ -191449,6 +191449,8 @@ phases:
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-22T10:23:07.130328+00:00'
   - id: rf-bug-v2-immutable-deployment-procedure-verification
     name: Verify immutable deployment procedure and current target readiness
     status: pending
