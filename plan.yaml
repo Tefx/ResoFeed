@@ -192154,21 +192154,26 @@ phases:
       Execution route: `vectl-orchestrator` directly performs exactly one accepted
       runtime-state operation identified as `RF-BUG-V2-STAGE-PROCEDURE-ENDPOINT-IDENTITY-V2`.
       This node has no repository-changing worker contract. Its sole authority is
-      the fresh completed review `rf-bug-v2-replacement-staging-authorization-review`;
-      the exhausted command at commit `3f6be1c58592f86a5a352518ac747a84f0c2abdc` and
-      all prior staging authority are forbidden inputs.
+      the fresh completed `rf-bug-v2-replacement-staging-authorization-review`, which
+      must bind the newly integrated detached-head guard commit and exact source hashes.
+      The exhausted command at commit `3f6be1c58592f86a5a352518ac747a84f0c2abdc`,
+      pre-remediation procedure commit `4b2e878b050bd1820056ca729682bfd24d5a04dd`,
+      deploy-script SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`,
+      all prior staging authority, and both invalid diagnostic verifier receipts are
+      forbidden execution inputs.
 
 
       Execute from the repository root of a clean detached checkout at the exact full
-      remediation commit bound by that review. Before any remote write, require HEAD/clean/detached
-      equality, the review-bound SHA-256 values for exactly `deploy/resofeed-caddy/deploy.sh`
-      and `deploy/resofeed-caddy/compose.yml`, and a new deploy script hash distinct
-      from `e09fb2e9b25fa77cb8823ff7dd79104d28a9e40e831de74d7f973f4b238ff271`. The
-      sole invocation is the exact reviewed literal command `./deploy/resofeed-caddy/deploy.sh
-      --stage-procedure --verified-commit <review-bound full remediation commit>`.
-      Execute it once only. Do not execute the old commit command, substitute a wrapper,
-      retry, edit, add another staging/transfer/recovery command, or choose another
-      checkout.
+      remediation commit bound by that review. Before any remote write, require Orchestrator-observed
+      HEAD/clean/detached equality and the review-bound SHA-256 values for exactly
+      `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`. Also
+      require the maintained script itself to fail closed on an attached symbolic
+      ref before its first SSH/remote effect; caller or wrapper preflight cannot substitute
+      for that script-local guard. The sole invocation is the exact reviewed literal
+      command `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit
+      <review-bound full detached-guard remediation commit>`. Execute it once only.
+      Do not execute any old commit command, substitute a wrapper, retry, edit, add
+      another staging/transfer/recovery command, or choose another checkout.
 
 
       The sole target and material execution context remain the existing SSH authority
@@ -192178,20 +192183,21 @@ phases:
       credentials, enrolling/updating/removing a host key, or accepting a different
       host. The maintained invocation must authenticate the literal FQDN through strict
       host-key checking with host-key updates disabled and fail before target-local
-      `prepare` or transfer on an unknown/changed key or effective endpoint drift.
-      The remote internal hostname is unknown, must not be inferred or compared, and
-      is not an execution input.
+      `prepare` or transfer on an attached source, unknown/changed key, or effective
+      endpoint drift. The remote internal hostname is unknown, must not be inferred
+      or compared, and is not an execution input.
 
 
-      After authenticated read-only exact stack/file inspection succeeds, stage only
-      the two review-bound bytes through the maintained target-local temporary-file
-      and atomic pair-replacement sequence. Capture non-secret prior-byte hashes,
-      modes, and the content-addressed backup identity; prove both prior bytes are
-      available for restoration; require shell and Compose validation, exact installed
-      modes, and remote SHA-256 equality to both source values. Record the operation
-      ID, exact command, source commit/lineage and hashes, literal FQDN/stack/path,
-      strict host-key result without key material or local paths, prior-byte/backup
-      identities, atomic/validation markers, final remote hashes, and outcome.
+      After the script-local detached-source guard and authenticated read-only exact
+      stack/file inspection succeed, stage only the two review-bound bytes through
+      the maintained target-local temporary-file and atomic pair-replacement sequence.
+      Capture non-secret prior-byte hashes, modes, and the content-addressed backup
+      identity; prove both prior bytes are available for restoration; require shell
+      and Compose validation, exact installed modes, and remote SHA-256 equality to
+      both source values. Record the operation ID, exact command, source commit/lineage
+      and hashes, detached-source guard result, literal FQDN/stack/path, strict host-key
+      result without key material or local paths, prior-byte/backup identities, atomic/validation
+      markers, final remote hashes, and outcome.
 
 
       Capture the installed central Gate''s deterministic Git metadata hash for the
@@ -192201,14 +192207,15 @@ phases:
       is a failure and cannot be normalized away.
 
 
-      If authenticated inspection, prepare, transfer, validation, replacement, remote-hash
-      proof, or local Git equality fails after mutation begins, permit only the review-bound
-      maintained prior-byte restoration path, verify both restored remote hashes equal
-      their captured prior identities, and stop. Do not rerun staging or use an alternate
-      recovery command, host, directory, script, checkout, account, credential, trust
-      store, or transfer sequence. Unknown partial state, unavailable backup, failed
-      restoration, unverified restored hashes, host-key drift, or credential drift
-      returns BLOCKED and permits no later operation.
+      If source detachment, authenticated inspection, prepare, transfer, validation,
+      replacement, remote-hash proof, or local Git equality fails after mutation begins,
+      permit only the review-bound maintained prior-byte restoration path, verify
+      both restored remote hashes equal their captured prior identities, and stop.
+      An attached source must fail before SSH and therefore cannot enter restoration.
+      Do not rerun staging or use an alternate recovery command, host, directory,
+      script, checkout, account, credential, trust store, or transfer sequence. Unknown
+      partial state, unavailable backup, failed restoration, unverified restored hashes,
+      host-key drift, or credential drift returns BLOCKED and permits no later operation.
 
 
       Authorized cost is negligible SSH protocol overhead plus transfer of at most
@@ -192221,13 +192228,13 @@ phases:
       delete registry objects, mutate Docker/registry state, change services, clear
       or restore application data, inspect another host, or perform another command/target/path/stack
       sequence.'
-    verification: Direct lifecycle evidence binds the new operation ID, exact review-bound
-      command/commit/source hashes, strict literal-FQDN host-key and existing credential
-      boundary, exact two-file target/path, pre-write authenticated inspection, prior-byte
-      backup/restoration, atomic validation/hash postconditions, negligible cost,
-      every prohibition, and equal deterministic local Git metadata before/after.
-      Independent downstream verification re-observes authenticated endpoint identity,
-      staged-byte equality, readiness/recovery, and unchanged protected state.
+    verification: Direct lifecycle evidence binds the new operation ID and review-bound
+      detached-guard commit/source hashes; proves both caller- and script-enforced
+      clean detached identity before SSH, strict literal-FQDN host-key authentication,
+      exact two-file target/path, prior-byte recovery, atomic/hash postconditions,
+      negligible cost, every exclusion, and equal deterministic local Git metadata;
+      downstream independent verification re-observes staged-byte equality, readiness/recovery,
+      and unchanged protected state.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
