@@ -192273,7 +192273,7 @@ phases:
       and granted no publication/deployment authority. No external operation occurred.
   - id: rf-bug-v2-stage-immutable-deployment-procedure-v2
     name: Stage immutable procedure through authenticated endpoint identity v2
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -192384,6 +192384,8 @@ phases:
     depends_on:
     - rf-bug-v2-replacement-staging-authorization-review
     agent: vectl-orchestrator
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T22:52:31.711974Z'
   - id: rf-bug-v2-detached-head-staging-guard-remediation
     name: Require clean detached staging source before SSH
     status: done
