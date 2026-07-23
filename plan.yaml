@@ -192273,7 +192273,7 @@ phases:
       and granted no publication/deployment authority. No external operation occurred.
   - id: rf-bug-v2-stage-immutable-deployment-procedure-v2
     name: Stage immutable procedure through authenticated endpoint identity v2
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -192386,6 +192386,25 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T22:52:31.711974Z'
+    done_at: '2026-07-23T22:55:08.278505+00:00'
+    evidence: 'Executed exactly once from clean detached commit 1e49621c6b44ac2e55cd82f87960972d571bad64:
+      `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit 1e49621c6b44ac2e55cd82f87960972d571bad64`.
+      Exit 0. Fresh authorization receipt sha256:3add2b1e9d74a8f70e0e6005ea105209262318038dbcff6730aa1b8a08685d9e
+      bound the command, target, deploy hash sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6,
+      and compose hash sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c.
+      Remote procedure stage returned verified with exact remote hash equality and
+      backup ID sha256:97058a9435f10cb4c7a69e20bb6de89f9b77da56caa8bf05eb18729c3089fcc0;
+      prior deploy/compose hashes sha256:4e8b619115cbff6e01da67db0e08b0758fe56efdbf510e24ec055b16e919222f
+      and sha256:eeb9888c7cb8f6f7ab05bc8934eba241588021ba0a99de592e5c51665d09706c
+      remain recoverable. Installed Gate Git metadata hash was unchanged before/after
+      at sha256:13d1c2f67d2c887b5d0dd0e984cd3da3f15d1988edfdd84540eb1d1ecfce37b5;
+      source remained detached, clean, exact commit/hashes. Evidence: before file
+      sha256:46ed7a9a5699d05b18ded4f5c69ae6f30ae773f76406f2be21c5f998a656b733; sanitized
+      output sha256:5586e89d1675659477568345320c82f6c5e9a66955d204190395a48ac2fa6940;
+      after file sha256:fd12dc83b99acb12bb9fd5b89c1c7ce5d3c5f56af088bcf34c4ab1a174bcabd1.
+      No secret key names/values, publication, deployment, Docker/registry/service,
+      credential/account, host-key, data, SQLite, or runtime configuration mutation
+      occurred.'
   - id: rf-bug-v2-detached-head-staging-guard-remediation
     name: Require clean detached staging source before SSH
     status: done
