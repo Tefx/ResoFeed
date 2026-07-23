@@ -333,7 +333,16 @@ ARM64_DIGEST=sha256:<linux/arm64 manifest 64 hex>
 
 Publication fails closed unless the immutable tag and `docker.io/tefx/resofeed@${INDEX_DIGEST}` resolve to the same index, the index contains exactly the supplied two platform descriptors, and each platform image reports `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. Do not publish a moving alias.
 
-The only production Tailnet consumer is `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Its Compose input is `RESOFEED_IMAGE=docker.io/tefx/resofeed@${INDEX_DIGEST}`. The deployment procedure captures the prior repository digest, preserves `resofeed-caddy_resofeed-data`, verifies direct readiness, and restores the prior digest/readiness pair on failure. Credential rotation, data deletion, alternate targets, and registry deletion are outside deployment authority. A complete orphan index/platform chain is recorded for separately authorized cleanup.
+The only production Tailnet consumer is `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Before any deployment authorization, a separately authorized operator runs the maintained clean-checkout producer:
+
+```text
+./deploy/resofeed-caddy/deploy.sh --stage-procedure \
+  --verified-commit <caller-supplied-40-lowercase-hex>
+```
+
+It stages exactly the verified commit's `deploy.sh` and `compose.yml`, reports `PROCEDURE_DEPLOY_SHA256`, `PROCEDURE_COMPOSE_SHA256`, and a content-addressed backup identity, and performs no publication, deployment, runtime, data, credential, or secret mutation. It does not read remote `.env`. Partial replacement restores both prior procedure files. The only manual recovery interface is `./deploy/resofeed-caddy/deploy.sh --recover-procedure --backup-id sha256:<reported-backup-64-hex>`; ad hoc copy or rename commands are outside the contract.
+
+Formal deployment must bind the same full commit and both procedure SHA-256 values before runtime configuration is read. Its Compose input is `RESOFEED_IMAGE=docker.io/tefx/resofeed@${INDEX_DIGEST}`. The deployment procedure captures the prior repository digest, preserves `resofeed-caddy_resofeed-data`, verifies direct readiness, and restores the prior digest/readiness pair on failure. Credential rotation, data deletion, alternate targets, and registry deletion are outside deployment authority. A complete orphan index/platform chain is recorded for separately authorized cleanup.
 
 For local current-host testing, build and load one explicitly local tag:
 
@@ -404,6 +413,10 @@ Before accepting the containerization or immutable release procedure:
 - Publication starts from the exact caller-verified commit in a clean checkout and targets only `docker.io/tefx/resofeed`.
 - The immutable `git-<verified-commit>` tag and digest reference resolve to one supplied OCI index digest with exactly the supplied `linux/amd64` and `linux/arm64` manifest digests; both platform labels equal the verified commit.
 - No moving tag appears as publication, deployment, verification, or rollback identity.
+- `--stage-procedure` runs only from the exact clean full commit and binds only `deploy.sh` (`100755`) and `compose.yml` (`100644`) to source SHA-256 identities.
+- Procedure staging fixes the host and stack path, verifies both prior files before mutation, transfers exactly two files through target-local temporaries, and never reads remote `.env` or mutates publication, runtime, data, credential, secret, container, image, volume, Caddy, or Tailscale state.
+- Procedure replacement preserves a content-addressed prior-byte backup, uses target-local atomic renames, verifies final hashes/mode, restores both prior files after a partial failure, and exposes only `--recover-procedure --backup-id <sha256>` for deliberate recovery.
+- Formal deployment binds `PROCEDURE_DEPLOY_SHA256` and `PROCEDURE_COMPOSE_SHA256` to the same full verified commit and rejects mismatches before runtime configuration or Docker/OCI operations.
 - Tailnet deployment targets only `tefx-mbp-personal:resofeed-caddy`, uses `docker.io/tefx/resofeed@sha256:<index-digest>`, and retains `resofeed-caddy_resofeed-data`.
 - Before replacement, the procedure captures the prior repository digest and validates Compose, Caddy, Tailscale TCP/443, SQLite volume, and masked runtime-secret presence.
 - Passing readiness is root `200` plus unauthenticated `/api/doctor` `401`. Failure restores the prior digest against the same named volume and proves the same readiness pair.

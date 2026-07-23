@@ -272,7 +272,11 @@ export const PENDING_PROFILE_PAIRS = [
       'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
       'MUTABLE_LATEST=forbidden',
       'ROLLBACK=prior_digest_and_readiness',
-      'SECRETS=masked_presence_only'
+      'SECRETS=masked_presence_only',
+      'PROCEDURE_STAGE=clean_commit_two_file_atomic',
+      'PROCEDURE_IDENTITY=source_commit_and_sha256',
+      'PROCEDURE_RECOVERY=prior_bytes',
+      'PROCEDURE_SIDE_EFFECTS=none'
     ],
     runner: 'immutable-deployment'
   },
@@ -493,6 +497,18 @@ export function verifyImmutableDeploymentSources(sources) {
     'readonly OCI_REPOSITORY="docker.io/tefx/resofeed"',
     'readonly STACK_NAME="resofeed-caddy"',
     'readonly TAILNET_TARGET_HOST="tefx-mbp-personal.platy-atlas.ts.net"',
+    'readonly PROCEDURE_DEPLOY_PATH="deploy/resofeed-caddy/deploy.sh"',
+    'readonly PROCEDURE_COMPOSE_PATH="deploy/resofeed-caddy/compose.yml"',
+    '--stage-procedure',
+    '--recover-procedure',
+    'status --porcelain=v1 --untracked-files=all',
+    'PROCEDURE_SOURCE_COMMIT=',
+    'PROCEDURE_DEPLOY_SHA256=',
+    'PROCEDURE_COMPOSE_SHA256=',
+    'PROCEDURE_BACKUP_ID=',
+    'PROCEDURE_STAGE=verified',
+    'PROCEDURE_ROLLBACK=prior_bytes_restored',
+    'verify_staged_procedure_identity',
     'expected_tag="git-${VERIFIED_COMMIT}"',
     'verify_oci_descriptor "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"',
     'verify_oci_descriptor "${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"',
@@ -529,6 +545,10 @@ export function verifyImmutableDeploymentSources(sources) {
     '--platform linux/amd64,linux/arm64',
     '--label "org.opencontainers.image.revision=${VERIFIED_COMMIT}"',
     'tefx-mbp-personal.platy-atlas.ts.net',
+    '--stage-procedure',
+    '--procedure-deploy-sha256',
+    '--procedure-compose-sha256',
+    '--recover-procedure',
     '--index-digest sha256:<index-64-hex>',
     'restores the captured prior digest',
     'The script has no registry-deletion operation'
@@ -536,6 +556,10 @@ export function verifyImmutableDeploymentSources(sources) {
   requireDeploymentFragments(sources, '.agents/skills/resofeed-tailnet-deploy/SKILL.md', [
     'docker.io/tefx/resofeed',
     'tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy',
+    '--stage-procedure',
+    '--recover-procedure',
+    'PROCEDURE_DEPLOY_SHA256',
+    'PROCEDURE_COMPOSE_SHA256',
     'INDEX_DIGEST=sha256:<64 lowercase hex>',
     'preserves the prior digest and SQLite volume',
     'Do not execute registry deletion without separate explicit authorization'
@@ -545,6 +569,10 @@ export function verifyImmutableDeploymentSources(sources) {
     'INDEX_DIGEST=sha256:<OCI index 64 hex>',
     'AMD64_DIGEST=sha256:<linux/amd64 manifest 64 hex>',
     'ARM64_DIGEST=sha256:<linux/arm64 manifest 64 hex>',
+    '--stage-procedure',
+    '--recover-procedure',
+    'PROCEDURE_DEPLOY_SHA256',
+    'PROCEDURE_COMPOSE_SHA256',
     'resofeed-caddy_resofeed-data',
     'Failure restores the prior digest'
   ]);
@@ -552,6 +580,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'rf-bug-v2-immutable-deployment-procedure',
     'rf_bug_v2_immutable_deployment_procedure_green',
     'RF-BUG-V2 immutable OCI and Tailnet deployment procedure',
+    'clean-commit two-file procedure staging',
+    'target-local atomic replacement and prior-byte recovery',
     'prior-digest capture',
     'masked-presence boundary markers'
   ]);
@@ -575,13 +605,57 @@ export function verifyImmutableDeploymentSources(sources) {
     throw new AdapterFailure('immutable deployment script can print a runtime secret value');
   }
 
+  const deployScript = sources['deploy/resofeed-caddy/deploy.sh'];
+  if ((deployScript.match(/status --porcelain=v1 --untracked-files=all/gu) ?? []).length !== 2) {
+    throw new AdapterFailure('immutable deployment procedure did not preserve clean source before and after transfer');
+  }
+  const stagingStart = deployScript.indexOf('remote_procedure_helper()');
+  const stagingEnd = deployScript.indexOf('record_orphan()');
+  if (stagingStart < 0 || stagingEnd <= stagingStart) {
+    throw new AdapterFailure('immutable deployment procedure staging boundary is unavailable');
+  }
+  const stagingProcedure = deployScript.slice(stagingStart, stagingEnd);
+  for (const forbidden of [
+    'docker buildx build',
+    'docker compose pull',
+    'docker compose up',
+    'docker compose down',
+    'docker container',
+    'docker image',
+    'docker volume',
+    'tailscale ',
+    'Caddyfile',
+    '.env',
+    'load_env',
+    'write_image_chain',
+    'scp ',
+    'rsync ',
+    'docker push',
+    'docker tag'
+  ]) {
+    if (stagingProcedure.includes(forbidden)) {
+      throw new AdapterFailure(`immutable deployment procedure staging retained side effect: ${forbidden}`);
+    }
+  }
+  const deployStart = deployScript.indexOf('deploy_immutable_image()');
+  const deployEnd = deployScript.indexOf("parse_arguments \"$@\"");
+  const deployProcedure = deployScript.slice(deployStart, deployEnd);
+  if (deployProcedure.indexOf('verify_staged_procedure_identity') < 0
+      || deployProcedure.indexOf('verify_staged_procedure_identity') > deployProcedure.indexOf('load_env')) {
+    throw new AdapterFailure('immutable deployment procedure identity is not verified before runtime configuration');
+  }
+
   return [
     'OCI_REPOSITORY=docker.io/tefx/resofeed',
     'OCI_IDENTITY=index_and_platform_digests',
     'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
     'MUTABLE_LATEST=forbidden',
     'ROLLBACK=prior_digest_and_readiness',
-    'SECRETS=masked_presence_only'
+    'SECRETS=masked_presence_only',
+    'PROCEDURE_STAGE=clean_commit_two_file_atomic',
+    'PROCEDURE_IDENTITY=source_commit_and_sha256',
+    'PROCEDURE_RECOVERY=prior_bytes',
+    'PROCEDURE_SIDE_EFFECTS=none'
   ];
 }
 

@@ -124,12 +124,18 @@ The immutable deployment profile uses identity `RF-BUG-V2 immutable OCI and Tail
 - a moving image reference or optional Compose image fallback;
 - missing caller-verified commit, `git-<commit>` tag, OCI index, `linux/amd64`, or `linux/arm64` binding;
 - absent platform commit-label verification;
+- dirty or mismatched clean-commit two-file procedure staging, wrong Git modes, or a path outside the exact `deploy.sh` and `compose.yml` source pair;
+- missing procedure-only host/directory inspection, target-local atomic replacement and prior-byte recovery, source/remote SHA-256 comparison, or stable backup recovery interface;
+- deployment/runtime identity checks ordered before procedure SHA-256 verification;
+- staging that reads runtime configuration or invokes publication, deployment, stop, restart, credential, secret, data, registry, container, image, volume, Caddy, or Tailscale mutation;
 - absent prior-digest capture, SQLite-volume preservation, direct readiness, or readiness-checked rollback;
 - registry deletion without a separate authorization boundary or missing complete orphan-chain recording;
 - secret-value output, credential mutation, owner-token rotation, data clearing, or alternate-target switches;
 - drift between the deployment script, Compose/example, Tailnet skill, deployment README, container contract, and this harness contract.
 
-The profile emits one green evidence envelope only after the focused developer test passes. Its observations are exactly the repository identity, index/platform binding, Tailnet target, moving-tag refusal, prior-digest/readiness rollback, and masked-presence boundary markers. It performs no registry, SSH, Tailnet, Docker, credential, or runtime mutation.
+The focused developer test performs staging and recovery only against a temporary local fake SSH target. It verifies exact clean-source binding, two transfer streams, target-local backups, installed byte/mode identity, dirty-source refusal before SSH, pre-deploy identity rejection before Docker/runtime access, and prior-byte restoration after an injected second-file rename failure. It does not contact the Tailnet, Docker daemon, registry, or an external service.
+
+The profile emits one green evidence envelope only after the focused developer test passes. Its observations retain the repository identity, index/platform binding, Tailnet target, moving-tag refusal, prior-digest/readiness rollback, and masked-presence boundary markers, then add procedure staging, source-commit/SHA-256 identity, prior-byte recovery, and no-side-effect observations. It performs no registry, SSH, Tailnet, Docker, credential, or runtime mutation.
 
 The closure profile aggregates current authorities without synthesizing Go tests. It requires exact top-level `TestRFBugCanonicalContracts` identity and canonical markers, exact package-relative web OPML identity, the production Prompting scan, and exact RF-BUG-001 through RF-BUG-010 heading inventory in both protected defect documents. Empty output, no-test output, missing exact pass identities, skipped execution, or retry output fails closed.
 

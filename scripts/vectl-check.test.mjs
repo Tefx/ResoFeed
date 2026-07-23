@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
@@ -217,7 +218,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
   const priorIndexDigest = `sha256:${'4'.repeat(64)}`;
   const priorAMD64Digest = `sha256:${'5'.repeat(64)}`;
   const priorARM64Digest = `sha256:${'6'.repeat(64)}`;
-  const deployArguments = [
+  const ociArguments = [
     '--verified-commit', commit,
     '--immutable-tag', `git-${commit}`,
     '--index-digest', indexDigest,
@@ -230,7 +231,237 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     fs.chmodSync(filePath, 0o755);
   }
 
-  function deploymentFixture(failReplacementReadiness) {
+  function fileSHA256(filePath) {
+    return `sha256:${createHash('sha256').update(fs.readFileSync(filePath)).digest('hex')}`;
+  }
+
+  function checked(command, args, options) {
+    const result = spawnSync(command, args, { encoding: 'utf8', ...options });
+    assert.equal(result.status, 0, `${command} ${args.join(' ')}: ${result.stderr}`);
+    return result.stdout.trim();
+  }
+
+  function procedureStagingFixture({
+    failComposeReplacement = false,
+    tamperStagedCompose = false,
+    driftPriorAfterTransfer = false,
+    missingPriorCompose = false
+  } = {}) {
+    const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-procedure-stage-'));
+    const sourceRoot = path.join(root, 'source');
+    const sourceStack = path.join(sourceRoot, 'deploy', 'resofeed-caddy');
+    const remoteHome = path.join(root, 'remote-home');
+    const remoteStack = path.join(remoteHome, 'Projects', 'resofeed-caddy');
+    const fakeBin = path.join(root, 'bin');
+    fs.mkdirSync(sourceStack, { recursive: true });
+    fs.mkdirSync(remoteStack, { recursive: true });
+    fs.mkdirSync(fakeBin);
+
+    for (const name of ['deploy.sh', 'compose.yml']) {
+      fs.copyFileSync(path.join(repoRoot, 'deploy', 'resofeed-caddy', name), path.join(sourceStack, name));
+    }
+    fs.chmodSync(path.join(sourceStack, 'deploy.sh'), 0o755);
+    fs.chmodSync(path.join(sourceStack, 'compose.yml'), 0o644);
+
+    checked('git', ['init', '-q'], { cwd: sourceRoot });
+    checked('git', ['config', 'user.name', 'Procedure Fixture'], { cwd: sourceRoot });
+    checked('git', ['config', 'user.email', 'procedure@example.invalid'], { cwd: sourceRoot });
+    checked('git', ['add', 'deploy/resofeed-caddy/deploy.sh', 'deploy/resofeed-caddy/compose.yml'], { cwd: sourceRoot });
+    checked('git', ['commit', '-q', '-m', 'procedure fixture'], { cwd: sourceRoot });
+    const sourceCommit = checked('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot });
+
+    const priorDeploy = '#!/usr/bin/env bash\nset -Eeuo pipefail\nprintf "prior procedure\\n"\n';
+    const priorCompose = `${fs.readFileSync(path.join(repoRoot, 'deploy', 'resofeed-caddy', 'compose.yml'), 'utf8')}# prior procedure\n`;
+    fs.writeFileSync(path.join(remoteStack, 'deploy.sh'), priorDeploy, { mode: 0o755 });
+    if (!missingPriorCompose) {
+      fs.writeFileSync(path.join(remoteStack, 'compose.yml'), priorCompose, { mode: 0o644 });
+    }
+
+    const sshLog = path.join(root, 'ssh.log');
+    const dockerLog = path.join(root, 'docker.log');
+    const mvFailureMarker = path.join(root, 'mv-failed');
+    fs.writeFileSync(sshLog, '');
+    fs.writeFileSync(dockerLog, '');
+
+    executable(path.join(fakeBin, 'hostname'), [
+      '#!/usr/bin/env bash',
+      'printf "%s\\n" tefx-mbp-personal'
+    ]);
+    executable(path.join(fakeBin, 'docker'), [
+      '#!/usr/bin/env bash',
+      'printf "%s\\n" "$*" >> "$FAKE_DOCKER_LOG"',
+      'if [[ "$1" == "compose" ]]; then exit 0; fi',
+      'exit 1'
+    ]);
+    executable(path.join(fakeBin, 'mv'), [
+      '#!/usr/bin/env bash',
+      'if [[ "${FAKE_FAIL_COMPOSE_REPLACE:-0}" == "1" && "$*" == *".compose.yml.procedure."* && "${@: -1}" == "compose.yml" && ! -e "$FAKE_MV_FAILURE_MARKER" ]]; then',
+      '  : > "$FAKE_MV_FAILURE_MARKER"',
+      '  exit 73',
+      'fi',
+      'exec /bin/mv "$@"'
+    ]);
+    executable(path.join(fakeBin, 'ssh'), [
+      '#!/usr/bin/env bash',
+      'set -Euo pipefail',
+      'host=$1',
+      'shift',
+      '[[ "$host" == "tefx-mbp-personal.platy-atlas.ts.net" ]] || exit 70',
+      'command_text=$*',
+      'printf "%s\\n" "$command_text" >> "$FAKE_SSH_LOG"',
+      'export HOME="$FAKE_REMOTE_HOME"',
+      'export PATH="$FAKE_REMOTE_BIN:$PATH"',
+      'if [[ "$#" -eq 1 ]]; then',
+      '  bash -c "$1"',
+      '  status=$?',
+      'elif [[ "$1 $2" == "bash -s" ]]; then',
+      '  helper=$(cat)',
+      '  helper=${helper//\\/Applications\\/OrbStack.app\\/Contents\\/MacOS\\/xbin/$FAKE_REMOTE_BIN}',
+      '  printf "%s" "$helper" | "$@"',
+      '  status=$?',
+      'else',
+      '  "$@"',
+      '  status=$?',
+      'fi',
+      'if [[ "$status" -eq 0 && "$command_text" == *"cat >"* && "$command_text" == *"compose.yml"* ]]; then',
+      '  if [[ "${FAKE_TAMPER_STAGED_COMPOSE:-0}" == "1" ]]; then printf "# transfer tamper\\n" >> "$FAKE_REMOTE_STACK/$FAKE_STAGE_NAME/compose.yml"; fi',
+      '  if [[ "${FAKE_DRIFT_PRIOR_AFTER_TRANSFER:-0}" == "1" ]]; then printf "# target drift\\n" >> "$FAKE_REMOTE_STACK/compose.yml"; fi',
+      'fi',
+      'exit "$status"'
+    ]);
+
+    const environment = {
+      PATH: `${fakeBin}:${process.env.PATH ?? ''}`,
+      HOME: process.env.HOME ?? root,
+      TMPDIR: root,
+      FAKE_REMOTE_HOME: remoteHome,
+      FAKE_REMOTE_BIN: fakeBin,
+      FAKE_REMOTE_STACK: remoteStack,
+      FAKE_STAGE_NAME: `.resofeed-procedure-stage-${sourceCommit}`,
+      FAKE_SSH_LOG: sshLog,
+      FAKE_DOCKER_LOG: dockerLog,
+      FAKE_FAIL_COMPOSE_REPLACE: failComposeReplacement ? '1' : '0',
+      FAKE_TAMPER_STAGED_COMPOSE: tamperStagedCompose ? '1' : '0',
+      FAKE_DRIFT_PRIOR_AFTER_TRANSFER: driftPriorAfterTransfer ? '1' : '0',
+      FAKE_MV_FAILURE_MARKER: mvFailureMarker
+    };
+    const stageArguments = ['--stage-procedure', '--verified-commit', sourceCommit];
+    const runStage = () => spawnSync(path.join(sourceStack, 'deploy.sh'), stageArguments, {
+      cwd: sourceRoot,
+      encoding: 'utf8',
+      env: environment
+    });
+    const runRecovery = (backupID) => spawnSync(path.join(sourceStack, 'deploy.sh'), [
+      '--recover-procedure', '--backup-id', backupID
+    ], {
+      cwd: sourceRoot,
+      encoding: 'utf8',
+      env: environment
+    });
+    return {
+      root,
+      sourceRoot,
+      sourceStack,
+      remoteStack,
+      sshLog,
+      dockerLog,
+      sourceCommit,
+      priorDeploy,
+      priorCompose,
+      runStage,
+      runRecovery
+    };
+  }
+
+  const staged = procedureStagingFixture();
+  try {
+    const result = staged.runStage();
+    assert.equal(result.status, 0, `${result.stderr}\nDocker log:\n${fs.readFileSync(staged.dockerLog, 'utf8')}\nSSH log:\n${fs.readFileSync(staged.sshLog, 'utf8')}`);
+    const sourceDeploy = path.join(staged.sourceStack, 'deploy.sh');
+    const sourceCompose = path.join(staged.sourceStack, 'compose.yml');
+    assert.equal(fs.readFileSync(path.join(staged.remoteStack, 'deploy.sh'), 'utf8'), fs.readFileSync(sourceDeploy, 'utf8'));
+    assert.equal(fs.readFileSync(path.join(staged.remoteStack, 'compose.yml'), 'utf8'), fs.readFileSync(sourceCompose, 'utf8'));
+    assert.equal(fs.statSync(path.join(staged.remoteStack, 'deploy.sh')).mode & 0o777, 0o755);
+    assert.match(result.stdout, new RegExp(`PROCEDURE_SOURCE_COMMIT=${staged.sourceCommit}`, 'u'));
+    assert.match(result.stdout, new RegExp(`PROCEDURE_DEPLOY_SHA256=${fileSHA256(sourceDeploy)}`, 'u'));
+    assert.match(result.stdout, new RegExp(`PROCEDURE_COMPOSE_SHA256=${fileSHA256(sourceCompose)}`, 'u'));
+    assert.match(result.stdout, /PROCEDURE_STAGE=verified/u);
+    const backupID = result.stdout.match(/^PROCEDURE_BACKUP_ID=(sha256:[a-f0-9]{64})$/mu)?.[1];
+    assert.ok(backupID, result.stdout);
+    const backupDir = path.join(staged.remoteStack, '.resofeed-procedure-backups', backupID.slice('sha256:'.length));
+    assert.equal(fs.readFileSync(path.join(backupDir, 'deploy.sh'), 'utf8'), staged.priorDeploy);
+    assert.equal(fs.readFileSync(path.join(backupDir, 'compose.yml'), 'utf8'), staged.priorCompose);
+
+    const sshEvidence = fs.readFileSync(staged.sshLog, 'utf8');
+    assert.equal((sshEvidence.match(/cat >/gu) ?? []).length, 2);
+    assert.match(sshEvidence, /deploy\.sh/u);
+    assert.match(sshEvidence, /compose\.yml/u);
+    assert.doesNotMatch(sshEvidence, /(?:scp|rsync)/u);
+    assert.doesNotMatch(fs.readFileSync(staged.dockerLog, 'utf8'), /\b(?:pull|push|up|down|build|restart|stop)\b/u);
+
+    const beforeDirtyProbe = fs.readFileSync(staged.sshLog, 'utf8');
+    fs.writeFileSync(path.join(staged.sourceRoot, 'dirty-probe'), 'dirty\n');
+    const dirty = staged.runStage();
+    assert.equal(dirty.status, 1);
+    assert.match(dirty.stderr, /source checkout is not clean/u);
+    assert.equal(fs.readFileSync(staged.sshLog, 'utf8'), beforeDirtyProbe);
+    fs.rmSync(path.join(staged.sourceRoot, 'dirty-probe'));
+
+    const recovered = staged.runRecovery(backupID);
+    assert.equal(recovered.status, 0, recovered.stderr);
+    assert.equal(fs.readFileSync(path.join(staged.remoteStack, 'deploy.sh'), 'utf8'), staged.priorDeploy);
+    assert.equal(fs.readFileSync(path.join(staged.remoteStack, 'compose.yml'), 'utf8'), staged.priorCompose);
+    assert.match(recovered.stdout, /PROCEDURE_RECOVERY_STATUS=verified/u);
+  } finally {
+    fs.rmSync(staged.root, { recursive: true, force: true });
+  }
+
+  const partial = procedureStagingFixture({ failComposeReplacement: true });
+  try {
+    const result = partial.runStage();
+    assert.equal(result.status, 1);
+    assert.equal(fs.readFileSync(path.join(partial.remoteStack, 'deploy.sh'), 'utf8'), partial.priorDeploy);
+    assert.equal(fs.readFileSync(path.join(partial.remoteStack, 'compose.yml'), 'utf8'), partial.priorCompose);
+    assert.match(result.stderr, /PROCEDURE_ROLLBACK=prior_bytes_restored/u);
+  } finally {
+    fs.rmSync(partial.root, { recursive: true, force: true });
+  }
+
+  const tampered = procedureStagingFixture({ tamperStagedCompose: true });
+  try {
+    const result = tampered.runStage();
+    assert.equal(result.status, 1);
+    assert.equal(fs.readFileSync(path.join(tampered.remoteStack, 'deploy.sh'), 'utf8'), tampered.priorDeploy);
+    assert.equal(fs.readFileSync(path.join(tampered.remoteStack, 'compose.yml'), 'utf8'), tampered.priorCompose);
+    assert.match(result.stderr, /SHA-256 mismatch/u);
+  } finally {
+    fs.rmSync(tampered.root, { recursive: true, force: true });
+  }
+
+  const drifted = procedureStagingFixture({ driftPriorAfterTransfer: true });
+  try {
+    const result = drifted.runStage();
+    assert.equal(result.status, 1);
+    assert.equal(fs.readFileSync(path.join(drifted.remoteStack, 'deploy.sh'), 'utf8'), drifted.priorDeploy);
+    assert.match(fs.readFileSync(path.join(drifted.remoteStack, 'compose.yml'), 'utf8'), /# target drift/u);
+    assert.match(result.stderr, /drifted before replacement/u);
+    assert.equal(fs.existsSync(path.join(drifted.remoteStack, '.resofeed-procedure-transaction.lock')), false);
+  } finally {
+    fs.rmSync(drifted.root, { recursive: true, force: true });
+  }
+
+  const missingPrior = procedureStagingFixture({ missingPriorCompose: true });
+  try {
+    const result = missingPrior.runStage();
+    assert.equal(result.status, 1);
+    assert.equal(fs.readFileSync(path.join(missingPrior.remoteStack, 'deploy.sh'), 'utf8'), missingPrior.priorDeploy);
+    assert.match(result.stderr, /prior compose.yml is missing or unsafe/u);
+    assert.equal(fs.existsSync(path.join(missingPrior.remoteStack, '.resofeed-procedure-transaction.lock')), false);
+  } finally {
+    fs.rmSync(missingPrior.root, { recursive: true, force: true });
+  }
+
+  function deploymentFixture(failReplacementReadiness, invalidProcedureIdentity = false) {
     const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-immutable-deploy-'));
     const home = path.join(root, 'home');
     const stack = path.join(home, 'Projects', 'resofeed-caddy');
@@ -338,12 +569,40 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       FAKE_TARGET_IMAGE: targetImage,
       FAKE_FAIL_READINESS: failReplacementReadiness ? '1' : '0'
     };
-    const result = spawnSync(path.join(stack, 'deploy.sh'), deployArguments, {
+    const procedureDeployHash = fileSHA256(path.join(stack, 'deploy.sh'));
+    const procedureComposeHash = fileSHA256(path.join(stack, 'compose.yml'));
+    const procedureArguments = [
+      '--procedure-deploy-sha256', invalidProcedureIdentity ? `sha256:${'f'.repeat(64)}` : procedureDeployHash,
+      '--procedure-compose-sha256', procedureComposeHash
+    ];
+    const result = spawnSync(path.join(stack, 'deploy.sh'), [...ociArguments, ...procedureArguments], {
       cwd: stack,
       encoding: 'utf8',
       env: environment
     });
-    return { root, stack, envPath, statePath, dockerLog, environment, priorImage, targetImage, result };
+    return {
+      root,
+      stack,
+      envPath,
+      statePath,
+      dockerLog,
+      environment,
+      priorImage,
+      targetImage,
+      procedureDeployHash,
+      procedureComposeHash,
+      result
+    };
+  }
+
+  const identityRejected = deploymentFixture(false, true);
+  try {
+    assert.equal(identityRejected.result.status, 1);
+    assert.match(identityRejected.result.stderr, /caller-bound procedure SHA-256/u);
+    assert.equal(fs.readFileSync(identityRejected.dockerLog, 'utf8'), '');
+    assert.equal(fs.readFileSync(identityRejected.statePath, 'utf8').trim(), identityRejected.priorImage);
+  } finally {
+    fs.rmSync(identityRejected.root, { recursive: true, force: true });
   }
 
   const successful = deploymentFixture(false);
@@ -356,7 +615,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.match(successful.result.stdout, /READINESS=root_200_doctor_401/u);
     assert.doesNotMatch(fs.readFileSync(successful.dockerLog, 'utf8'), /(?:down|volume rm|--volumes)/u);
 
-    const orphan = spawnSync(path.join(successful.stack, 'deploy.sh'), ['--record-orphan', ...deployArguments], {
+    const orphan = spawnSync(path.join(successful.stack, 'deploy.sh'), ['--record-orphan', ...ociArguments], {
       cwd: successful.stack,
       encoding: 'utf8',
       env: successful.environment
@@ -401,13 +660,21 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/amd64'", "inspect_manifest_digest 'linux/386'")),
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/arm64'", "inspect_manifest_digest 'linux/arm/v7'")),
     mutation(deployPath, (body) => body.replaceAll('rollback_previous_digest', 'rollback_without_readiness')),
+    mutation(deployPath, (body) => body.replace('status --porcelain=v1 --untracked-files=all', 'status --short')),
+    mutation(deployPath, (body) => body.replace('remote_procedure_helper() {', 'remote_procedure_helper() {\n  docker compose up -d')),
+    mutation(deployPath, (body) => body.replace('  verify_staged_procedure_identity\n  require_command docker', '  require_command docker')),
+    mutation(deployPath, (body) => body.replace('PROCEDURE_ROLLBACK=prior_bytes_restored', 'PROCEDURE_ROLLBACK=unavailable')),
     mutation(deployPath, (body) => `${body}\ndocker manifest rm unauthorized\n`),
     mutation(deployPath, (body) => `${body}\nprintf '%s\\n' "$OPENROUTER_KEY"\n`),
     mutation(deployPath, (body) => `${body}\n${clearData}\n`),
     mutation(deployPath, (body) => `${body}\n${resetToken}\n`)
   ];
-  for (const invalid of negativeCases) {
-    assert.throws(() => verifyImmutableDeploymentSources(invalid), /immutable deployment/u);
+  for (const [caseIndex, invalid] of negativeCases.entries()) {
+    assert.throws(
+      () => verifyImmutableDeploymentSources(invalid),
+      /immutable deployment/u,
+      `immutable deployment negative case ${caseIndex} was accepted`
+    );
   }
 
   console.log('immutable OCI and Tailnet deployment procedure');
