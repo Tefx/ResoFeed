@@ -192146,7 +192146,7 @@ phases:
       One provider transport failure was recovered once in the same task/worktree.
   - id: rf-bug-v2-replacement-staging-authorization-review
     name: Review authenticated-endpoint replacement staging authority
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -192256,6 +192256,21 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T22:43:12.321547Z'
+    done_at: '2026-07-23T22:52:05.658072+00:00'
+    evidence: Fresh no-SSH spec-verifier review of exact clean detached commit 1e49621c6b44ac2e55cd82f87960972d571bad64
+      admitted operation RF-BUG-V2-STAGE-PROCEDURE-ENDPOINT-IDENTITY-V2 for the sole
+      future command `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit
+      1e49621c6b44ac2e55cd82f87960972d571bad64` and sole target tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy.
+      Bound deploy hash sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6
+      and compose hash sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c.
+      Production semantic receipt sha256:3add2b1e9d74a8f70e0e6005ea105209262318038dbcff6730aa1b8a08685d9e
+      is CONFORMANT; validator file sha256:1e92caa10003cf93eb376c1acb5f68b09e55577471d5430984d6b63a0e8cc07a.
+      First schema-invalid PASS occurrence and validator remain preserved as diagnostic-only
+      file hashes sha256:08a43a7f99cb001af825a165c624d22355777374bd197ee566debf766619fd9c
+      and sha256:cf6cf872a8b47aca50dc23318abec9c03838165ab78252c9769111e6f76073ca.
+      Review proved behavior-backed attached-clean pre-SSH rejection, detached full
+      matrix, literal-FQDN strict existing-key trust, rollback/cost/exclusion boundaries,
+      and granted no publication/deployment authority. No external operation occurred.
   - id: rf-bug-v2-stage-immutable-deployment-procedure-v2
     name: Stage immutable procedure through authenticated endpoint identity v2
     status: pending
