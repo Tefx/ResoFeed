@@ -192053,7 +192053,7 @@ phases:
       One provider transport failure was recovered once in the same task/worktree.
   - id: rf-bug-v2-replacement-staging-authorization-review
     name: Review authenticated-endpoint replacement staging authority
-    status: claimed
+    status: pending
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -192114,8 +192114,6 @@ phases:
     depends_on:
     - rf-bug-v2-ssh-endpoint-identity-remediation
     agent: spec-verifier
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-23T21:20:16.474202Z'
   - id: rf-bug-v2-stage-immutable-deployment-procedure-v2
     name: Stage immutable procedure through authenticated endpoint identity v2
     status: pending
