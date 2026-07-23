@@ -191465,7 +191465,7 @@ phases:
       transport failure was recovered once in exact task /Users/tefx/.pi/larva/child-sessions/2026-07-23T18-37-07-917Z_019f9044-5fcd-75c7-b583-0ab3fed8a992.jsonl.
   - id: rf-bug-v2-immutable-deployment-procedure-verification
     name: Verify immutable deployment procedure and current target readiness
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -191511,6 +191511,8 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-immutable-deployment-procedure
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T19:10:07.412906Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
