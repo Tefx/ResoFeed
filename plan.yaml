@@ -191780,91 +191780,54 @@ phases:
       validator /tmp/larva-agent-artifacts/rf-bug-v2-remote-procedure-staging-authorization-review/semantic-validator.json;
       task /Users/tefx/.pi/larva/child-sessions/2026-07-23T20-12-47-867Z_019f909b-f57b-7442-82ed-673cd702a863.jsonl.'
   - id: rf-bug-v2-stage-immutable-deployment-procedure
-    name: Stage verified immutable procedure on the exact Tailnet target
+    name: Preserve failed immutable-procedure staging incident and prohibit replay
     status: pending
-    description: 'step_type: implementation
+    description: 'step_type: review
 
-      repo_change_policy: runtime_state_only
-
-
-      Execution route: `vectl-orchestrator` directly performs this one accepted, bounded
-      runtime-state side effect. This step has no repository-changing worker contract,
-      no worker-v2 dispatch, and no worker or semantic receipt requirement. The Orchestrator
-      records ordinary lifecycle evidence only after all declared postconditions and
-      the deterministic local Git metadata equality check pass; the downstream independent
-      verification and terminal gate remain separate plan nodes.
+      repo_change_policy: no_repo_change
 
 
-      Authority and immutable source are fixed by completed review `rf-bug-v2-remote-procedure-staging-authorization-review`,
-      semantic receipt `sha256:aa09cc549b5c259d77c747d54cedd8798a5599614febcfbec18330dcfe388ca2`.
-      Execute from the repository root of a clean detached checkout at reviewed source
-      commit `3f6be1c58592f86a5a352518ac747a84f0c2abdc`, whose producer lineage includes
-      commit `029ebf724981e6119ab7c9e0ace4eadb85d975dc`. Before any remote write,
-      require `deploy/resofeed-caddy/deploy.sh` SHA-256 `e09fb2e9b25fa77cb8823ff7dd79104d28a9e40e831de74d7f973f4b238ff271`
-      and `deploy/resofeed-caddy/compose.yml` SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`.
-      The sole staging invocation is exactly `./deploy/resofeed-caddy/deploy.sh --stage-procedure
-      --verified-commit 3f6be1c58592f86a5a352518ac747a84f0c2abdc`; do not substitute,
-      wrap, edit, retry, or add another staging/transfer command.
+      This node supersedes the previously authorized runtime operation with an immutable
+      incident review. It performs no external operation. The exact staging invocation
+      `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit 3f6be1c58592f86a5a352518ac747a84f0c2abdc`
+      was executed once from the clean detached source commit and is exhausted: do
+      not execute, wrap, retry, substitute, or reuse that exact command/commit under
+      this node or any prior staging authority.
 
 
-      The sole target and material execution context are the existing SSH authority
-      to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Use only
-      that already-configured SSH credential/account boundary without reading key
-      material, printing authentication state, changing an account, creating credentials,
-      or accepting a different host or directory. Before replacement, the maintained
-      procedure must re-establish exact host, directory, and stack identity; bind
-      exactly the two target procedure files; capture a non-secret prior-byte SHA-256
-      and reviewed backup identity for each; prove both prior bytes are available
-      for restoration; and fail closed on any source, target, access, backup, or execution-context
-      drift. The authorized material-cost bound is negligible SSH protocol overhead
-      plus transfer of at most these two files, with no paid service, API, cloud-resource,
-      image-build, Docker, or registry operation; any payment, paid-service, or materially
-      larger transfer requirement returns BLOCKED before mutation.
+      Admit only local read-only evidence that the attempt failed before remote mutation.
+      Verify these exact artifacts and bytes: `/tmp/larva-agent-artifacts/rf-bug-v2-stage-immutable-deployment-procedure/before.json`
+      SHA-256 `662030f3c6791cf8924062d7cb7a4373e9cf78ff56a00d3c28c65166033d951a`;
+      `/tmp/larva-agent-artifacts/rf-bug-v2-stage-immutable-deployment-procedure/staging-output.txt`
+      SHA-256 `2e1c731f67e5489065ba65a1734acaf64f9a93b45ec0059ba89f2d6b81a0e91d`;
+      and `/tmp/larva-agent-artifacts/rf-bug-v2-stage-immutable-deployment-procedure/after.json`
+      SHA-256 `207f470451247d8fcb01cfef51585ac81b155e7d992c2f20a33d258fa95e114c`.
+      Confirm output is exactly the two FAIL lines for `target host identity drifted`
+      and read-only target inspection, with exit 1.
 
 
-      Stage only those two bytes through the reviewed maintained temporary-file and
-      atomic-replacement sequence. Require shell validation and Compose validation
-      before final acceptance, then require the remote `deploy.sh` and `compose.yml`
-      SHA-256 values to equal the exact source hashes above. Record the exact command,
-      source commit and producer lineage, source and remote hashes, target identity,
-      non-secret prior-byte/backup identities, atomic-replacement and validation markers,
-      and completion outcome. Capture the installed central Gate''s deterministic
-      Git metadata hash for the clean detached source checkout before the invocation
-      and after all staging or restoration handling; require exact equality, HEAD
-      still `3f6be1c58592f86a5a352518ac747a84f0c2abdc`, detached state, and empty
-      checkout status. Any local Git metadata or repository-byte change is a failure
-      and cannot be normalized away.
+      Review the immutable `3f6be1c58592f86a5a352518ac747a84f0c2abdc` source locally
+      and confirm `stage_procedure` calls `remote_procedure_helper inspect` before
+      target-local `prepare`, transfer, backup, replacement, or finalize, while `validate_target`
+      rejects `hostname -s` before reading prior procedure bytes. Bind the equal before/after
+      central-Gate Git metadata identity `sha256:7bf520a2b04dd5c1ce3febacc0d974eb1309cfa9064b8eff556e10a6d102b913`,
+      detached/clean HEAD equality, and exact source hashes `deploy.sh` `e09fb2e9b25fa77cb8823ff7dd79104d28a9e40e831de74d7f973f4b238ff271`
+      and `compose.yml` `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`.
 
 
-      If transfer, validation, replacement, remote-hash proof, or local Git equality
-      fails, permit only the reviewed maintained prior-byte restoration path, verify
-      both restored remote hashes equal their captured prior identities, and stop.
-      Do not rerun staging or use an alternate recovery command, host, directory,
-      script, checkout, or transfer sequence. Unknown partial state, an unavailable
-      backup, failed restoration, or unverified restored hashes returns BLOCKED and
-      permits no later operation.
-
-
-      The operation must not read or overwrite remote `.env`, Caddy configuration,
-      runtime-secret inputs, current image/digest or identity fields, containers,
-      Tailscale state, SQLite volume/data, owner-token state, credentials, accounts,
-      or secrets. It must not build, pull, push, tag, publish, deploy, restart, stop,
-      rotate credentials, create credentials, delete registry objects, mutate Docker
-      or registry state, change services, clear or restore application data, inspect
-      or print secret values, expose secret-source paths, or perform any alternate
-      command, target, repository, host, directory, stack, script, checkout commit,
-      or transfer sequence. Evidence is limited to the exact non-secret identities
-      and postcondition markers declared above.'
-    verification: Direct Orchestrator lifecycle evidence must bind the exact reviewed
-      command, source commit and producer lineage, both fixed source hashes, sole
-      SSH target, existing credential/account boundary, negligible two-file-transfer/no-paid-service
-      cost bound, prior-byte backup identities, atomic replacement, shell/Compose
-      validation, exact remote hash equality, restoration or fail-closed unknown-state
-      handling, every prohibition, and equal deterministic local Git metadata before/after.
-      Independent downstream verification must re-observe staged-byte equality and
-      prove that image, containers, services, `.env`, Caddy/Tailscale, SQLite/data,
-      owner-token, credentials/accounts, secrets, Docker/registry state, and local
-      repository bytes remained unchanged.
+      Conclude only the evidenced boundary: no target-local stage preparation, transfer,
+      backup, replacement, finalize, or restoration began; no remote procedure bytes,
+      services, data, credentials, secrets, Docker/registry state, Caddy/Tailscale
+      state, SQLite/owner-token state, local repository bytes, or Git metadata were
+      mutated. The accepted target remains exactly `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
+      the observed internal short hostname is unknown and must not be inferred. This
+      incident review grants no replacement staging, publication, deployment, credential,
+      host-key enrollment, alternate-host inspection, or other external authority.'
+    verification: Independent spec review hashes the three immutable incident artifacts,
+      confirms the exact two-line failure and pre-write call ordering from the reviewed
+      commit, proves equal local metadata/source identities, records that no remote
+      or local state changed, and marks the old command/commit and prior staging authority
+      exhausted without SSH or any external mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -191874,7 +191837,7 @@ phases:
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
     - rf-bug-v2-remote-procedure-staging-authorization-review
-    agent: vectl-orchestrator
+    agent: spec-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
