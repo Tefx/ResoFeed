@@ -191471,32 +191471,69 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      From one fresh clean integrated head after the procedure implementation and
-      authoritative local RF-BUG matrix, independently exercise the exact project-native
-      procedure and focused adapter check without repository mutation. Prove the verified
-      commit is the sole source identity; publication is limited to `docker.io/tefx/resofeed`;
-      the immutable tag resolves to one OCI index digest and exact linux/amd64 plus
-      linux/arm64 manifest digests; mutable tags are rejected; incomplete or mismatched
-      chains stop; authorized temporary-tag cleanup or orphan-digest recording is
-      explicit; and evidence contains no credential, token, provider key, `.env` value,
-      or secret-source path.
+      From one fresh clean integrated head after the repository staging remediation,
+      its independent authorization review, and the bounded remote staging operation,
+      independently execute the exact current project-native immutable-procedure profile
+      and focused developer test without repository mutation. Prove the verified integrated
+      commit is the sole source identity; the staging manifest covers exactly `deploy/resofeed-caddy/deploy.sh`
+      and `deploy/resofeed-caddy/compose.yml`; the live target''s corresponding procedure
+      bytes match both source SHA-256 identities; shell/Compose procedure validation
+      passes; prior remote procedure recovery remains evidenced; and the staging operation
+      changed no image, container, `.env`, Caddy/Tailscale state, SQLite volume, owner-token
+      state, credential/account, or secret input.
 
 
-      Perform only read-only pre-operation inspection of `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
-      through the maintained Tailnet skill. Verify the existing `resofeed-caddy` Compose/Caddy/Tailscale
-      target, repository-scoped registry credential availability, masked presence
-      of existing runtime-secret injection inputs, current deployed image/digest and
-      preserved prior-digest capture path, SQLite-volume preservation, Tailscale TCP/443
-      routing, direct readiness, unauthorized `/api/doctor` auth-boundary behavior,
-      and executable prior-digest rollback/readiness recovery. Do not pull, build,
-      push, tag, delete, deploy, restart, stop, reset tokens, clear data, change credentials/accounts,
-      print `.env`, or mutate local/remote state. Missing access, credentials, exact
-      target identity, immutable procedure evidence, current state, or recovery readiness
-      returns BLOCKED for the downstream authorization review.'
-    verification: Independent local procedure execution and read-only exact-target
-      inspection prove verified commit/digest identity, exact repository and stack,
-      scoped credential/runtime-secret readiness, prior/orphan recovery, readiness,
-      and secret-safe evidence without external mutation.
+      Independently re-prove the repository procedure''s release contract: publication
+      is limited to `docker.io/tefx/resofeed`; the immutable tag is bound to the verified
+      commit; one OCI index digest and exact linux/amd64 plus linux/arm64 manifest
+      digests are required; mutable tags and incomplete or mismatched chains are rejected;
+      temporary-tag cleanup requires separate exact authority or the orphan chain
+      is recorded; deployment is limited to the existing target; and evidence contains
+      no credential, token, provider key, `.env` value, or secret-source path.
+
+
+      Perform only read-only target inspection of `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      through the maintained Tailnet skill. Verify the existing Compose/Caddy/Tailscale
+      target, repository-scoped registry credential context, masked presence of existing
+      runtime-secret injection inputs, SQLite-volume preservation, Tailscale TCP/443
+      routing, direct root readiness `200`, unauthenticated Doctor `401`, and the
+      staged procedure''s ability to resolve the current running image to an exact
+      prior repository digest for rollback/readiness recovery. The pre-publication
+      target is not required to already run the future unpublished index digest or
+      contain the future commit/tag/index/platform identity fields; those post-publication
+      and post-deployment identities belong to `rf-bug-v2-publish-immutable-oci`,
+      `rf-bug-v2-docker-runtime-proof`, and `rf-bug-v2-tailnet-caddy-proof`. A moving
+      configured current reference may be accepted only when the staged procedure
+      resolves its actual current container image to one exact `docker.io/tefx/resofeed@sha256:<digest>`
+      prior rollback identity; unresolved, alternate-repository, or non-recoverable
+      prior state remains blocking.
+
+
+      The prior semantic evidence remains authoritative for the failed scope: receipt
+      `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-23T19-22-26-742Z-2026-07-23T19-11-50-828Z_019f9064-282c-7a73-ba92-fcbf9ad1478d.js-f1d73b54f1abcc84.txt`
+      has SHA-256 `f1d73b54f1abcc84dc66b45a4ef91f8b9ad1cf9f8f888b54eae5c7437707662c`;
+      validator `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification/semantic-validator.json`
+      has SHA-256 `7d5d30480770270d1ee4a95c7e728cd574be7f984ac00b6a534ef635e4449b99`
+      and result `REJECTED` / `FAIL` / `DISPROVEN`. Preserve its passed clean local
+      procedure checks and read-only live Compose/Caddy/Tailscale target, SQLite volume,
+      masked secret markers, repository credential context, root `200`, and unauthenticated
+      Doctor `401` observations, but re-observe every required fact from the fresh
+      integrated state. Treat its procedure-byte identity, immutable current/prior
+      identity, future identity-field ordering, and recovery findings as the exact
+      remediation scope.
+
+
+      Do not copy files, pull, build, push, tag, delete, publish, deploy, restart,
+      stop, reset tokens, clear data, change credentials/accounts, print `.env`, or
+      mutate local/remote state. Missing access, exact target identity, staged byte
+      equality, current prior-digest resolution, rollback/readiness recovery, or secret-safe
+      evidence returns BLOCKED for the downstream publication/deployment authorization
+      review.'
+    verification: Independent local selected-execution evidence and read-only exact-target
+      inspection prove source/staged procedure byte identity, staging non-mutation,
+      verified-commit release constraints, exact current prior-digest recovery, Compose/Caddy/Tailscale/SQLite/readiness
+      safety, and the correct deferral of future OCI/deployed identity to downstream
+      publication and Tailnet proof.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -191509,7 +191546,7 @@ phases:
     - scripts/vectl-check.test.mjs
     depends_on:
     - rf-bug-v2-local-verification-matrix
-    - rf-bug-v2-immutable-deployment-procedure
+    - rf-bug-v2-stage-immutable-deployment-procedure
     agent: integration-verifier
   - id: rf-bug-v2-immutable-procedure-staging-remediation
     name: Repair immutable procedure staging and pre-deploy identity order
