@@ -103,15 +103,14 @@ readonly -a TAILNET_SSH_OPTIONS=(
 
 `-F none` prevents user or system SSH configuration from turning the endpoint into an alias, proxy, account change, or `HostName` rewrite. `HostName` and `HostKeyAlias` bind the same literal FQDN. `StrictHostKeyChecking=yes` requires an already trusted key; `UpdateHostKeys=no` and the absence of enrollment commands prevent trust mutation. The default OpenSSH known-host files remain the only trust store. Unknown or changed keys fail before inspection, target-local preparation, transfer, deployment, cleanup, or recovery. The remote machine's internal hostname is unknown and irrelevant; never query or compare it as authority.
 ## Immutable procedure staging
-
-Procedure staging is a distinct, separately authorized operation that precedes deployment. Run only the maintained producer from a clean integrated checkout whose `HEAD` is the full verified commit:
+Procedure staging is a distinct, separately authorized operation that precedes deployment. Run only the maintained producer from a clean integrated checkout whose `HEAD` is attached to a branch and equals the full verified commit:
 
 ```bash
 ./deploy/resofeed-caddy/deploy.sh --stage-procedure \
   --verified-commit <40-lowercase-hex>
 ```
 
-The producer binds exactly `deploy/resofeed-caddy/deploy.sh` (`100755`) and `deploy/resofeed-caddy/compose.yml` (`100644`) to that commit and their SHA-256 identities. It has no target override: the destination remains `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Reject dirty source state, abbreviated or mismatched commits, unexpected Git modes, missing prior target files, target drift, validation errors, transfer/hash mismatch, partial replacement, or unavailable restoration.
+The producer rejects a detached `HEAD` before any SSH invocation. It binds exactly `deploy/resofeed-caddy/deploy.sh` (`100755`) and `deploy/resofeed-caddy/compose.yml` (`100644`) to that commit and their SHA-256 identities. It has no target override: the destination remains `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Reject dirty source state, abbreviated or mismatched commits, unexpected Git modes, missing prior target files, target drift, validation errors, transfer/hash mismatch, partial replacement, or unavailable restoration.
 
 The staging path performs procedure-only target inspection. It does not read `.env`, Caddy configuration, runtime-secret inputs, containers, images, volumes, Tailscale state, owner-token state, or credentials. It validates shell and Compose shape using `/dev/null` and non-secret placeholders, transfers only the two bound files through target-local temporary files, preserves a content-addressed copy and SHA-256 identity of both prior files, and uses target-local atomic renames inside one rollback transaction. On partial replacement it restores both prior files before failing.
 

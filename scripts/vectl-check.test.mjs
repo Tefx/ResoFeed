@@ -439,6 +439,27 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     fs.rmSync(staged.root, { recursive: true, force: true });
   }
 
+  const detached = procedureStagingFixture();
+  try {
+    checked('git', ['checkout', '--detach', '-q', detached.sourceCommit], { cwd: detached.sourceRoot });
+    const detachedRef = spawnSync('git', ['symbolic-ref', '-q', 'HEAD'], {
+      cwd: detached.sourceRoot,
+      encoding: 'utf8'
+    });
+    assert.equal(detachedRef.status, 1);
+    assert.equal(checked('git', ['status', '--porcelain=v1', '--untracked-files=all'], { cwd: detached.sourceRoot }), '');
+    const result = detached.runStage();
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /source HEAD must be attached to a branch/u);
+    assert.equal(fs.readFileSync(detached.sshAttemptLog, 'utf8'), '');
+    assert.equal(fs.readFileSync(detached.sshLog, 'utf8'), '');
+    assert.equal(fs.readFileSync(path.join(detached.remoteStack, 'deploy.sh'), 'utf8'), detached.priorDeploy);
+    assert.equal(fs.readFileSync(path.join(detached.remoteStack, 'compose.yml'), 'utf8'), detached.priorCompose);
+    assert.equal(fs.existsSync(path.join(detached.remoteStack, '.resofeed-procedure-transaction.lock')), false);
+  } finally {
+    fs.rmSync(detached.root, { recursive: true, force: true });
+  }
+
   const partial = procedureStagingFixture({ failComposeReplacement: true });
   try {
     const result = partial.runStage();
@@ -711,6 +732,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/arm64'", "inspect_manifest_digest 'linux/arm/v7'")),
     mutation(deployPath, (body) => body.replaceAll('rollback_previous_digest', 'rollback_without_readiness')),
     mutation(deployPath, (body) => body.replace('status --porcelain=v1 --untracked-files=all', 'status --short')),
+    mutation(deployPath, (body) => body.replace('git -C "$repo_root" symbolic-ref -q HEAD', 'true')),
     mutation(deployPath, (body) => body.replace('remote_procedure_helper() {', 'remote_procedure_helper() {\n  docker compose up -d')),
     mutation(deployPath, (body) => body.replace('StrictHostKeyChecking=yes', 'StrictHostKeyChecking=no')),
     mutation(deployPath, (body) => body.replace('HostKeyAlias=${TAILNET_TARGET_HOST}', 'HostKeyAlias=tefx-mbp-personal')),

@@ -414,7 +414,7 @@ Before accepting the containerization or immutable release procedure:
 - Publication starts from the exact caller-verified commit in a clean checkout and targets only `docker.io/tefx/resofeed`.
 - The immutable `git-<verified-commit>` tag and digest reference resolve to one supplied OCI index digest with exactly the supplied `linux/amd64` and `linux/arm64` manifest digests; both platform labels equal the verified commit.
 - No moving tag appears as publication, deployment, verification, or rollback identity.
-- `--stage-procedure` runs only from the exact clean full commit and binds only `deploy.sh` (`100755`) and `compose.yml` (`100644`) to source SHA-256 identities.
+- `--stage-procedure` runs only from the exact clean full commit on an attached branch, rejects a detached `HEAD` before any SSH attempt, and binds only `deploy.sh` (`100755`) and `compose.yml` (`100644`) to source SHA-256 identities.
 - Procedure staging fixes the host and stack path, verifies both prior files before mutation, transfers exactly two files through target-local temporaries, and never reads remote `.env` or mutates publication, runtime, data, credential, secret, container, image, volume, Caddy, or Tailscale state.
 - Procedure replacement preserves a content-addressed prior-byte backup, uses target-local atomic renames, verifies final hashes/mode, restores both prior files after a partial failure, and exposes only `--recover-procedure --backup-id <sha256>` for deliberate recovery.
 - Formal deployment binds `PROCEDURE_DEPLOY_SHA256` and `PROCEDURE_COMPOSE_SHA256` to the same full verified commit and rejects mismatches before runtime configuration or Docker/OCI operations.

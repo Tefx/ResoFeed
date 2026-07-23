@@ -107,15 +107,14 @@ readonly -a TAILNET_SSH_OPTIONS=(
 
 This binds the literal FQDN as the effective SSH HostName and host-key lookup identity. It uses only the default existing OpenSSH known-host trust and public-key credentials in noninteractive mode. Unknown or changed keys fail closed. Do not enroll/update a key, load SSH configuration aliases, rewrite the hostname, use an alternate known-host store, bypass checking, select another account, or substitute another endpoint. The remote internal short hostname is unknown and never authorizes staging, recovery, inspection, or deployment.
 ## Stage the verified procedure bytes
-
-A separately authorized staging operation must run this maintained interface from the root of one clean integrated checkout whose `HEAD` is the full verified commit:
+A separately authorized staging operation must run this maintained interface from the root of one clean integrated checkout whose `HEAD` is attached to a branch and equals the full verified commit:
 
 ```bash
 ./deploy/resofeed-caddy/deploy.sh --stage-procedure \
   --verified-commit <40-lowercase-hex>
 ```
 
-The mode rejects a dirty checkout, an abbreviated or different `HEAD`, non-blob inputs, or Git modes other than `100755` for `deploy.sh` and `100644` for `compose.yml`. It binds SHA-256 identities to exactly those two paths at that commit. Its fixed SSH target is `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`; there is no host, directory, or file override.
+The mode rejects a detached `HEAD` before any SSH invocation. It also rejects a dirty checkout, an abbreviated or different `HEAD`, non-blob inputs, or Git modes other than `100755` for `deploy.sh` and `100644` for `compose.yml`. It binds SHA-256 identities to exactly those two paths at that commit. Its fixed SSH target is `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`; there is no host, directory, or file override.
 
 Before mutation, staging verifies the host, stack directory, both prior regular files, executable mode, shell syntax, and Compose shape with `/dev/null` plus non-secret validation placeholders. It does not read remote `.env`, Caddy configuration, containers, images, volumes, Tailscale state, credentials, or runtime-secret inputs. It transfers only `deploy.sh` and `compose.yml` through a target-local transaction directory, rechecks source and remote SHA-256 identities, writes a content-addressed prior-byte backup, and installs both files with target-local atomic renames. Partial replacement restores both prior files. Missing files, target drift, transfer failure, validation failure, hash mismatch, or unavailable restoration fails closed.
 
