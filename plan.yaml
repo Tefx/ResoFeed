@@ -191511,6 +191511,234 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-immutable-deployment-procedure
     agent: integration-verifier
+  - id: rf-bug-v2-immutable-procedure-staging-remediation
+    name: Repair immutable procedure staging and pre-deploy identity order
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for the integration-verifier FAIL on `RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE`.\
+      \ Cross-domain justification: no registered mutation specialist covers the inseparable\
+      \ Bash deployment entrypoint, JavaScript evidence adapter and developer test,\
+      \ Tailnet skill, and release documentation; they form one staging interface,\
+      \ one secret boundary, one rollback unit, and one downstream runtime consumer,\
+      \ so `general` is the compatible v2 worker fallback.\n\nExtend the maintained\
+      \ immutable deployment procedure with one explicit, fail-closed pre-deploy staging\
+      \ operation for only `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.\
+      \ The stable producer interface consumed by the later authorization, staging,\
+      \ and verification steps must derive its source from one clean integrated checkout\
+      \ and bind the full verified commit plus SHA-256 identities for exactly `deploy/resofeed-caddy/deploy.sh`\
+      \ and `deploy/resofeed-caddy/compose.yml`. It must inspect the exact host/directory/stack\
+      \ before mutation, preserve a non-secret recoverable copy and identity of both\
+      \ prior remote procedure files, transfer only the two bound files through target-local\
+      \ temporary files, validate shell and Compose procedure shape without touching\
+      \ the running service, replace both files atomically as one bounded procedure\
+      \ unit, preserve required executable mode, and compare remote bytes with the\
+      \ source manifest. Any source dirtiness, target drift, missing prior file, transfer/validation/hash\
+      \ mismatch, partial replacement, or unavailable restoration must fail closed\
+      \ and restore the prior procedure bytes when restoration is safely available.\
+      \ The producer must document one maintained invocation and recovery interface;\
+      \ downstream owners may not invent alternate `scp`, `rsync`, shell-copy, or\
+      \ path sequences.\n\nThis repository step must not stage remote files or perform\
+      \ any external mutation. It must not read or overwrite remote `.env`, Caddy\
+      \ configuration, runtime-secret inputs, containers, images, Tailscale state,\
+      \ SQLite volume, or owner-token state; and it must not build, pull, push, tag,\
+      \ publish, deploy, restart, stop, rotate credentials, delete registry objects,\
+      \ or print secret values or secret-source paths. Keep `.env.example`, Compose\
+      \ content, canonical bug authority, canonical Architecture/Design, product source,\
+      \ Dockerfile, Caddyfile, stop script, dirty user files, generated assets, and\
+      \ external state unchanged.\n\nExtend the current project-native `rf-bug-v2-immutable-deployment-procedure`\
+      \ / `rf_bug_v2_immutable_deployment_procedure_green` profile and its current\
+      \ developer test to cover clean-source binding, exact two-file staging scope,\
+      \ host/directory checks, prior-byte recovery, atomic/hash validation, and rejection\
+      \ of secret/runtime/publication/deployment side effects. Keep the selected identity\
+      \ unchanged and project the existing immutable-procedure observations through\
+      \ the evidence envelope. Synchronize the maintained Tailnet skill, deployment\
+      \ README, Container guide, and harness contract in the same change. Rollback\
+      \ reverts the Bash interface, adapter/test, skill, and documentation as one\
+      \ repository unit.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [.agents/skills/resofeed-tailnet-deploy/SKILL.md, deploy/resofeed-caddy/README.md,\
+      \ deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n  blocked_paths: [.env,\
+      \ deploy/resofeed-caddy/.env.example, deploy/resofeed-caddy/compose.yml, deploy/resofeed-caddy/caddy/**,\
+      \ deploy/resofeed-caddy/stop.sh, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/BUG_REPORT_2026-07-11.md, Dockerfile, cmd/**, internal/**, web/**, tests/**]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE]\n\
+      checks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n    run:\n\
+      \      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n      timeout_seconds: 300\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: scripts/vectl-check.test.mjs, access: read, availability:\
+      \ current}\n        - {path: deploy/resofeed-caddy/deploy.sh, access: execute,\
+      \ availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/.env.example,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/README.md,\
+      \ access: read, availability: current}\n        - {path: .agents/skills/resofeed-tailnet-deploy/SKILL.md,\
+      \ access: read, availability: current}\n        - {path: docs/CONTAINER.md,\
+      \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: developer, availability: current}\n\
+      \      selection:\n        command: [node, scripts/vectl-check.mjs, select,\
+      \ rf-bug-v2-immutable-deployment-procedure, rf_bug_v2_immutable_deployment_procedure_green]\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
+      \ ['RF-BUG-V2 immutable OCI and Tailnet deployment procedure']\n        forbidden_ids:\
+      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: immutable OCI and Tailnet deployment procedure},\
+      \ {literal: 'OCI_REPOSITORY=docker.io/tefx/resofeed'}, {literal: OCI_IDENTITY=index_and_platform_digests},\
+      \ {literal: 'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy'}, {literal: MUTABLE_LATEST=forbidden},\
+      \ {literal: ROLLBACK=prior_digest_and_readiness}, {literal: SECRETS=masked_presence_only}]\n\
+      \        contains_any: []\n        forbids: [{literal: 'tefx/resofeed:latest'},\
+      \ {literal: secret-value}, {literal: no tests to run}]\n    proves: [RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"production_tailnet_procedure_staging_contract\"\
+      ,\"remote_procedure_atomicity_and_recovery\",\"runtime_secret_and_credential_boundary\"\
+      ],\"primary_outcome\":\"RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE\"\
+      ,\"atom\":\"the maintained procedure stages only the verified deploy.sh and\
+      \ compose.yml bytes to the exact existing Tailnet target with prior-byte recovery\
+      \ and without publication, deployment, runtime, data, credential, or secret\
+      \ mutation\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The current project-native immutable-procedure profile remains selected/executed-identical
+      and green while its developer test proves exact clean-source two-file staging,
+      target checks, atomic remote-byte identity, prior-byte restoration, and rejection
+      of deployment/publication/secret/runtime mutation.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/.env.example
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - rf-bug-v2-immutable-deployment-procedure
+    agent: general
+  - id: rf-bug-v2-remote-procedure-staging-authorization-review
+    name: Authorize exact Tailnet procedure staging
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      After the staging remediation is integrated and before any remote write, perform
+      a read-only R3 authorization and recovery review for one operation only: stage
+      the exact producer-bound `deploy.sh` and `compose.yml` bytes from the clean
+      integrated commit to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      through the maintained procedure. Verify current accepted-plan orchestration
+      authority names that operation and target; the full 40-character source commit
+      and both source SHA-256 identities come from the integrated remediation; SSH
+      access is limited to the existing target; target host/directory/stack identity
+      and current read-only readiness evidence remain applicable; and the operation
+      has exact preconditions, prior-byte backup identity, atomic replacement, remote
+      hash postconditions, and safe restoration on transfer, validation, or replacement
+      failure.
+
+
+      Use the immutable semantic FAIL as the remediation boundary: receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-23T19-22-26-742Z-2026-07-23T19-11-50-828Z_019f9064-282c-7a73-ba92-fcbf9ad1478d.js-f1d73b54f1abcc84.txt`
+      with SHA-256 `f1d73b54f1abcc84dc66b45a4ef91f8b9ad1cf9f8f888b54eae5c7437707662c`,
+      and validator `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification/semantic-validator.json`
+      with SHA-256 `7d5d30480770270d1ee4a95c7e728cd574be7f984ac00b6a534ef635e4449b99`.
+      Preserve its passed read-only Compose/Caddy/Tailscale, SQLite-volume, masked-secret-marker,
+      repository-credential-context, root-200, and unauthenticated-Doctor-401 facts
+      while treating procedure-byte/current-identity/recovery findings as the exact
+      failed scope requiring fresh proof.
+
+
+      This review supplies no publication or deployment authority. Confirm staging
+      cannot read or overwrite `.env`, Caddy, secrets, current image/digest, containers,
+      Tailscale state, SQLite volume, or owner-token state and cannot build, pull,
+      push, tag, publish, deploy, restart, stop, delete registry objects, change credentials/accounts,
+      or disclose secret values or paths. Plan-definition authority, acceptance-test
+      authority, masked credential presence, and the later publication/deployment
+      review cannot substitute for current staging authority. Missing authority, source
+      identity, target identity, backup/restoration readiness, or bounded postconditions
+      returns BLOCKED before any remote mutation.'
+    verification: Independent pre-operation review proves exact staging operation/target/source
+      identities, current authority, non-secret execution context, prior-byte rollback,
+      atomic/hash postconditions, and strict exclusion of publication, deployment,
+      runtime, data, credential, and secret mutation.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    depends_on:
+    - rf-bug-v2-immutable-procedure-staging-remediation
+    agent: spec-verifier
+  - id: rf-bug-v2-stage-immutable-deployment-procedure
+    name: Stage verified immutable procedure on the exact Tailnet target
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      [REQUIRES_SKILL: vectl-assurance-worker]
+
+      [VECTL_WORKER_PROTOCOL:v2]
+
+
+      Cross-domain justification: no registered external-operations specialist owns
+      the maintained ResoFeed Tailnet file-staging surface, while `integration-verifier`
+      is verification-only; `general` is the compatible v2 worker for this one pre-authorized,
+      bounded remote-state operation. After the independent staging authorization
+      review, execute only the producer-defined maintained staging operation from
+      a clean integrated checkout. Required input identity is the exact full integrated
+      commit produced after `rf-bug-v2-immutable-procedure-staging-remediation` plus
+      that procedure''s SHA-256 manifest for exactly `deploy/resofeed-caddy/deploy.sh`
+      and `deploy/resofeed-caddy/compose.yml`. The sole target and execution context
+      are existing SSH authority to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
+      do not substitute another host, directory, stack, repository, checkout, script,
+      or transfer sequence.
+
+
+      Before writing, re-establish host/directory/stack identity and the authorized
+      source/target manifest. Preserve and record a non-secret identity for both prior
+      remote procedure files, stage only the two authorized files through the maintained
+      temporary/atomic interface, validate the staged shell and Compose procedure
+      without service mutation, and require the remote hashes to equal the source
+      hashes. If transfer, validation, replacement, or hash proof fails, use only
+      the reviewed prior-byte recovery path, verify the restored hashes, and stop.
+      Unknown partial state or unavailable safe restoration returns BLOCKED without
+      retrying through an alternate path.
+
+
+      The operation must leave local repository bytes unchanged and must not read
+      or overwrite remote `.env`, Caddy configuration, runtime-secret inputs, current
+      image/digest or identity fields, containers, Tailscale state, SQLite volume,
+      or owner-token state. It must not build, pull, push, tag, publish, deploy, restart,
+      stop, rotate credentials, delete registry objects, clear data, print secrets,
+      or expose secret-source paths. Retain only the exact source commit, approved
+      source/remote procedure hashes, prior-procedure recovery identity, target identity,
+      and non-secret validation/postcondition markers in evidence. Return the unchanged
+      `vectl.worker.execution.v2` receipt; lifecycle completion remains with the Orchestrator.'
+    verification: The exact target's deploy.sh and compose.yml hashes equal the clean
+      integrated source manifest; prior procedure recovery remains available; shell/Compose
+      validation passes; and current image, containers, .env, Caddy/Tailscale, SQLite
+      volume, owner-token state, credentials, and secrets remain unchanged.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    depends_on:
+    - rf-bug-v2-remote-procedure-staging-authorization-review
+    agent: general
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
