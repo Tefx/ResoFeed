@@ -190657,58 +190657,80 @@ phases:
 
 
       Replacement for `rf-bug-assurance-closure-full-gate`. Require the corrected
-      v2 local matrix, retry-free RF-BUG-005 streaming remediation, the completed
-      narrow `+page.svelte` CSP remediation, the append-only active-Svelte-origin
-      and canonical generated-baseline remediation, their shared fresh full-profile
-      verification, exact closure-selector remediation and verification, the immutable
-      OCI/Tailnet repository procedure, the append-only staging-interface remediation,
-      independent pre-operation staging authorization, exact two-file procedure staging
-      on the sole Tailnet target, fresh independent read-only staged-byte/current-prior-digest
-      readiness evidence, current publication/deployment authorization, immutable
-      two-platform OCI publication, both-platform container proof, exact `tefx-mbp-personal`
-      `resofeed-caddy` digest deployment proof, formal security review, independent
-      black-box verification, and defect-report closure.
+      v2 local matrix, retry-free RF-BUG-005 streaming remediation, both frontend
+      CSP remediations, their shared fresh full-profile verification, exact closure-selector
+      remediation and verification, the immutable OCI/Tailnet repository procedure,
+      the completed first staging-interface remediation, the preserved failed staging
+      incident, the append-only authenticated-endpoint remediation, fresh replacement
+      staging authorization, the new exact v2 two-file staging operation, independent
+      read-only staged-byte/current-prior-digest readiness evidence, current publication/deployment
+      authorization, immutable two-platform OCI publication, both-platform container
+      proof, strict-host-key-authenticated digest deployment to the sole FQDN/stack/path,
+      formal security review, independent black-box verification, and defect-report
+      closure.
 
 
       Preserve the failed fan-in report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`
       as evidence that the Go lane passed while Chromium CSP and generated baseline
       blocked admission; require the replacement verification to retain that Go evidence
-      and close both blockers from one fresh canonical profile. Also preserve immutable-procedure
+      and close both blockers from one fresh canonical profile. Preserve immutable-procedure
       semantic receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-23T19-22-26-742Z-2026-07-23T19-11-50-828Z_019f9064-282c-7a73-ba92-fcbf9ad1478d.js-f1d73b54f1abcc84.txt#sha256=f1d73b54f1abcc84dc66b45a4ef91f8b9ad1cf9f8f888b54eae5c7437707662c`
       and semantic validator `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification/semantic-validator.json#sha256=7d5d30480770270d1ee4a95c7e728cd574be7f984ac00b6a534ef635e4449b99`
       as the definitive pre-remediation `REJECTED` / `FAIL` / `DISPROVEN` evidence.
-      The replacement chain must retain its passed clean local procedure, Compose/Caddy/Tailscale
+
+
+      Preserve the exhausted staging attempt exactly: command `./deploy/resofeed-caddy/deploy.sh
+      --stage-procedure --verified-commit 3f6be1c58592f86a5a352518ac747a84f0c2abdc`;
+      before artifact SHA-256 `662030f3c6791cf8924062d7cb7a4373e9cf78ff56a00d3c28c65166033d951a`;
+      output artifact SHA-256 `2e1c731f67e5489065ba65a1734acaf64f9a93b45ec0059ba89f2d6b81a0e91d`;
+      after artifact SHA-256 `207f470451247d8fcb01cfef51585ac81b155e7d992c2f20a33d258fa95e114c`;
+      equal before/after local Git metadata `sha256:7bf520a2b04dd5c1ce3febacc0d974eb1309cfa9064b8eff556e10a6d102b913`;
+      and the exact pre-write `target host identity drifted` failure. Require proof
+      that this command/commit and prior staging authority were never rerun, no remote
+      or local state changed, and the unknown internal hostname was never guessed
+      or substituted.
+
+
+      The replacement chain must retain all prior passed clean local procedure, Compose/Caddy/Tailscale
       target, SQLite-volume, masked-secret-marker, repository-credential-context,
-      root-`200`, and unauthenticated-Doctor-`401` observations; close its procedure-byte
-      and prior-digest recovery findings through the declared staging chain; and prove
-      the final immutable deployed identity only after publication and deployment
-      rather than before those producers run.
+      root-`200`, and unauthenticated-Doctor-`401` observations as history while re-observing
+      current facts. Require the new source commit and deploy-script hash to differ
+      from the exhausted pair, the unchanged compose source hash to remain exact,
+      and every remote operation to authenticate only the literal `tefx-mbp-personal.platy-atlas.ts.net`
+      endpoint through strict existing SSH host-key trust with host-key update/enrollment
+      disabled, no alias/effective-host rewrite, and unchanged credentials/account.
+      Require exact `~/Projects/resofeed-caddy` directory/stack identity, source/remote
+      procedure hash and mode equality, prior-byte recovery, deterministic local Git
+      metadata equality, and no hostname-short authority. Prove final immutable deployed
+      identity only after publication and deployment producers run.
 
 
       Immediately before closure require Vectl validate/check-refs, repair-plan SHA-256
       `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`, authority-reference
       commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty active claims, current
-      operation authorization for every declared external operation, exact staged
-      source/remote procedure hashes, exact verified commit/tag/index/platform and
+      operation authorization for every declared external operation, exact replacement
+      source/staged procedure hashes, exact verified commit/tag/index/platform and
       deployed-digest bindings, separate staging/publication/deployment authority,
-      prior-procedure and orphan/prior-digest recovery evidence, secret non-disclosure,
-      and no unresolved finding. Bind `post_closure_report_sha256` and `closure_commit`
-      from the replacement closure step and require current report hash and HEAD equality.
-      Skipped legacy nodes are never admission inputs; no future expected-red item,
-      including item-deep-links, is admitted.
+      prior-procedure and orphan/prior-digest recovery evidence, strict host-key and
+      credential boundaries, secret non-disclosure, and no unresolved finding. Bind
+      `post_closure_report_sha256` and `closure_commit` from the replacement closure
+      step and require current report hash and HEAD equality. Skipped legacy nodes
+      are never admission inputs; no future expected-red item, including item-deep-links,
+      is admitted.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-ssh-endpoint-identity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers every local remediation branch plus staging-interface
-      implementation, exact-target staging authorization and execution, independent
+    verification: Full Gate covers every local remediation branch plus immutable procedure
+      history, the exhausted pre-write incident, authenticated-endpoint repository
+      remediation, fresh exact replacement staging review and operation, independent
       staged-byte/prior-digest readiness proof, current publication/deployment authority,
-      exact OCI index/platform publication, dual-platform runtime, exact digest Tailnet
-      deployment, security, black-box, and closure evidence with canonical IDs, current
-      hashes/HEAD, empty claims, separate recovery boundaries, secret non-disclosure,
+      immutable OCI publication, dual-platform runtime, strict-host-key-authenticated
+      exact-FQDN digest deployment, security, black-box, and closure evidence with
+      current hashes/HEAD, empty claims, separate recovery boundaries, secret non-disclosure,
       and no out-of-scope or future item-deep-links blocker.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
