@@ -191622,7 +191622,7 @@ phases:
       transport failure was recovered once in exact task /Users/tefx/.pi/larva/child-sessions/2026-07-23T18-37-07-917Z_019f9044-5fcd-75c7-b583-0ab3fed8a992.jsonl.
   - id: rf-bug-v2-immutable-deployment-procedure-verification
     name: Verify authenticated-endpoint immutable procedure and target readiness
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -191741,6 +191741,8 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T22:56:03.443684Z'
   - id: rf-bug-v2-immutable-procedure-staging-remediation
     name: Repair immutable procedure staging and pre-deploy identity order
     status: done
