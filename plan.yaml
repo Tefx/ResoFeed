@@ -191781,7 +191781,7 @@ phases:
       task /Users/tefx/.pi/larva/child-sessions/2026-07-23T20-12-47-867Z_019f909b-f57b-7442-82ed-673cd702a863.jsonl.'
   - id: rf-bug-v2-stage-immutable-deployment-procedure
     name: Stage verified immutable procedure on the exact Tailnet target
-    status: claimed
+    status: pending
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -191840,8 +191840,6 @@ phases:
     depends_on:
     - rf-bug-v2-remote-procedure-staging-authorization-review
     agent: general
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-23T20:20:40.848066Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
