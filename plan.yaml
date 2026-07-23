@@ -191844,7 +191844,7 @@ phases:
       task /Users/tefx/.pi/larva/child-sessions/2026-07-23T20-12-47-867Z_019f909b-f57b-7442-82ed-673cd702a863.jsonl.'
   - id: rf-bug-v2-stage-immutable-deployment-procedure
     name: Preserve failed immutable-procedure staging incident and prohibit replay
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -191903,6 +191903,17 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T20:56:30.194104Z'
+    done_at: '2026-07-23T21:02:06.479892+00:00'
+    evidence: Independent spec-verifier admitted the failed staging incident as immutable
+      pre-write evidence. Three artifacts match declared hashes; exit was 1 with exactly
+      the two target-host/read-only-inspection FAIL lines; source ordering proves
+      inspect/short-hostname rejection occurs before prepare, transfer, backup, replacement,
+      finalize, restoration, or cleanup. Local checkout remained detached/clean at
+      3f6be1c58592f86a5a352518ac747a84f0c2abdc with equal central-Gate metadata sha256:7bf520a2b04dd5c1ce3febacc0d974eb1309cfa9064b8eff556e10a6d102b913
+      and unchanged source hashes. Old command/commit and prior staging authority
+      are exhausted; no new external authority granted. Semantic receipt sha256:c0bc3c4dbdefb08c5c9c83eb161bf18006cb25b851e062fcf0a7f4d93013ecac;
+      receipt /tmp/larva-agent-artifacts/rf-bug-v2-stage-immutable-deployment-procedure-incident-review/receipt.json;
+      validator /tmp/larva-agent-artifacts/rf-bug-v2-stage-immutable-deployment-procedure-incident-review/semantic-validator.json.
   - id: rf-bug-v2-ssh-endpoint-identity-remediation
     name: Replace short-hostname staging authority with authenticated SSH endpoint
       identity
