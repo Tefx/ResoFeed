@@ -191564,15 +191564,25 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      From one fresh clean integrated head after the endpoint-identity remediation,
+      From one fresh clean integrated head after `rf-bug-v2-detached-head-staging-guard-remediation`,
       its new independent authorization review, and the bounded v2 staging operation,
-      independently execute the exact current project-native immutable-procedure profile
-      and focused developer test without repository mutation. Prove the integrated
-      remediation commit is the sole source identity; the manifest covers exactly
-      `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`; the
-      new deploy script hash differs from the exhausted pre-remediation hash; and
-      the live target''s corresponding procedure bytes/modes match both review-bound
+      independently execute the exact current project-native immutable-procedure selected
+      profile and focused developer test without repository mutation. Prove the integrated
+      detached-guard remediation commit is the sole source identity; the manifest
+      covers exactly `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`;
+      the deploy script hash differs from stale pre-remediation SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`;
+      and the live target''s corresponding procedure bytes/modes match both review-bound
       source identities.
+
+
+      Require selected observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`,
+      `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, and `PROCEDURE_DETACHED_MATRIX=green`.
+      Independently prove the maintained script rejects a clean attached branch at
+      the exact verified commit before any fake SSH attempt or target mutation and
+      that a clean detached checkout at that commit passes the complete unchanged
+      fake-target happy, rollback, tamper, target-drift, missing-prior, wrong-mode,
+      and strict host-key matrix. Confirm no wrapper or caller-only preflight substitutes
+      for the guard inside `deploy.sh` before its first SSH/remote effect.
 
 
       Use only read-only SSH inspection of the exact endpoint `tefx-mbp-personal.platy-atlas.ts.net`
@@ -191616,10 +191626,16 @@ phases:
       Also preserve the exhausted staging incident artifacts: before SHA-256 `662030f3c6791cf8924062d7cb7a4373e9cf78ff56a00d3c28c65166033d951a`,
       command output SHA-256 `2e1c731f67e5489065ba65a1734acaf64f9a93b45ec0059ba89f2d6b81a0e91d`,
       and after SHA-256 `207f470451247d8fcb01cfef51585ac81b155e7d992c2f20a33d258fa95e114c`.
-      Treat the exact old command/commit as exhausted, retain all previously passed
-      read-only Compose/Caddy/Tailscale, SQLite-volume, masked-secret-marker, repository-credential-context,
-      root-200, and unauthenticated-Doctor-401 facts only as history, and re-observe
-      every required fact from the fresh integrated state.
+      Treat every old command/commit/hash and prior staging authority as exhausted
+      history, retain previously passed read-only target facts only as history, and
+      re-observe every required fact from the fresh integrated state.
+
+
+      Preserve the correction-exhausted detached-guard review artifacts `sha256:213797bdca053a49e703215d017b5f11a803cc749893c127163bd2829b89361b`,
+      `sha256:6da4b9f76c215aabd77004472fe14ac6f1ea29b744eef57e46b3107f2700b0fe`, `sha256:ba91a224bd9606523fd337b38e15bdb3f78c17e6844bc2778de7deb02f6b6280`,
+      and `sha256:74a971d105d065905d2995f669441c01ee8aabd2fdade135e2b205a03d0537d9`
+      as invalid diagnostic-only material. Neither supplies completion or rejection
+      authority.
 
 
       The pre-publication target is not required to run the future unpublished index
@@ -191629,11 +191645,12 @@ phases:
       host keys, pull, build, push, tag, delete, publish, deploy, restart, stop, reset
       tokens, clear data, change credentials/accounts, print `.env`, inspect another
       host, or mutate local/remote state.'
-    verification: Independent selected execution plus strict read-only host-key-authenticated
-      inspection of the exact FQDN/stack proves the new source/staged byte identities,
-      absence of internal-hostname authority, staging non-mutation and local Git equality,
-      exact current prior-digest/recovery readiness, Compose/Caddy/Tailscale/SQLite
-      safety, and correct deferral of future OCI/deployed identities.
+    verification: Independent selected execution proves attached-clean pre-SSH rejection
+      and detached-clean complete fake-target coverage; read-only exact-FQDN inspection
+      proves the staged two-file bytes, strict existing-host-key boundary, current
+      prior-digest/recovery readiness, unchanged protected state and local Git metadata,
+      and correct deferral of future OCI/deployed identities from the newly integrated
+      remediation inputs.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
