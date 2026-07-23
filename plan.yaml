@@ -190444,7 +190444,7 @@ phases:
     - rf-bug-v2-publish-immutable-oci
     agent: integration-verifier
   - id: rf-bug-v2-tailnet-caddy-proof
-    name: Deploy authorized digest and verify Tailnet/Caddy runtime
+    name: Deploy authorized digest and verify authenticated Tailnet/Caddy runtime
     status: pending
     description: 'step_type: verification
 
@@ -190452,13 +190452,22 @@ phases:
 
 
       After exact immutable OCI publication and both-platform container proof, use
-      only the repaired maintained Tailnet procedure to deploy `docker.io/tefx/resofeed@sha256:<verified-index-digest>`
+      only the newly staged maintained procedure to deploy `docker.io/tefx/resofeed@sha256:<verified-index-digest>`
       to the existing `resofeed-caddy` stack at `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
-      Require the reviewed operation/target authority and existing runtime-secret
-      injection; preserve the prior deployed digest, SQLite volume, and owner-token
-      state. Never read or print `.env` or secret values, substitute `latest` or another
-      tag/repository/host/stack, change credentials/accounts, reset the token, clear
-      data, or execute an undeclared operation.
+      Require the reviewed operation/target authority, exact staged remediation commit
+      and procedure hashes, and existing runtime-secret injection. Enter only through
+      the literal FQDN authenticated by strict existing SSH host-key verification
+      with host-key update/enrollment disabled, no alias or effective-host rewrite,
+      and the unchanged existing credential/account. The remote internal hostname
+      is unknown and cannot authorize or block the operation. Preserve the prior deployed
+      digest, SQLite volume, and owner-token state.
+
+
+      Never read or print `.env`, host-key material, authentication paths, or secret
+      values; substitute `latest` or another tag/repository/host/stack; change host-key
+      trust, credentials, or accounts; reset the token; clear data; inspect another
+      host; or execute an undeclared operation. Unknown/changed host key, endpoint/path/stack/source
+      drift, or unresolved prior digest stops before deployment mutation.
 
 
       Verify direct/public equality for all four Go-owned headers on HTML, JSON, MCP,
@@ -190468,12 +190477,14 @@ phases:
       readiness, partial/unknown deployment state, digest mismatch, or any required
       probe failure, stop further mutation, restore only the preserved prior digest
       through the declared recovery path, retain the SQLite volume, and verify readiness.
-      If rollback identity or readiness recovery is unavailable, report BLOCKED without
-      an alternate target or destructive fallback.'
+      If rollback identity, strict endpoint authentication, or readiness recovery
+      is unavailable, report BLOCKED without an alternate target or destructive fallback.'
     verification: The maintained procedure deploys the exact authorized docker.io/tefx/resofeed
-      index digest only to tefx-mbp-personal's existing resofeed-caddy stack; direct/public
-      headers, Caddy ownership, browser/CSP/routes/tokens/state, prior-digest rollback,
-      SQLite preservation, readiness, and secret non-disclosure are proven.
+      index digest only through strict host-key authentication of the literal FQDN
+      to the existing resofeed-caddy stack; direct/public headers, Caddy ownership,
+      browser/CSP/routes/tokens/state, prior-digest rollback, SQLite preservation,
+      readiness, unchanged credential/host-key trust, and secret non-disclosure are
+      proven.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
