@@ -192220,25 +192220,35 @@ phases:
       runtime-state operation identified as `RF-BUG-V2-STAGE-PROCEDURE-ENDPOINT-IDENTITY-V2`.
       This node has no repository-changing worker contract. Its sole authority is
       the fresh completed `rf-bug-v2-replacement-staging-authorization-review`, which
-      must bind the newly integrated detached-head guard commit and exact source hashes.
-      The exhausted command at commit `3f6be1c58592f86a5a352518ac747a84f0c2abdc`,
-      pre-remediation procedure commit `4b2e878b050bd1820056ca729682bfd24d5a04dd`,
-      deploy-script SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`,
-      all prior staging authority, and both invalid diagnostic verifier receipts are
-      forbidden execution inputs.
+      must bind the newly integrated detached-head polarity-remediation commit and
+      exact source hashes with exactly one admitted semantic requirement row and one
+      state-transition row for that operation ID. The exhausted command at commit
+      `3f6be1c58592f86a5a352518ac747a84f0c2abdc`, pre-guard procedure commit `4b2e878b050bd1820056ca729682bfd24d5a04dd`,
+      pre-guard deploy SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`,
+      inverted remediation commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`, inverted
+      deploy SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`,
+      all prior staging authority, and all rejected/invalid diagnostic verifier receipts
+      are forbidden execution inputs.
+
+
+      Preserve validator-admitted coherent `REJECTED` diagnostic evidence `sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8`,
+      receipt-file SHA-256 `f1dbd2f87c98aeb1d17f64672e70a7f49d338f8e966d0c27183ff66533904c19`,
+      and validator-file SHA-256 `7e1e4a26c9f1b01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`
+      as remediation history only. It supplies no completion or operation authority.
 
 
       Execute from the repository root of a clean detached checkout at the exact full
-      remediation commit bound by that review. Before any remote write, require Orchestrator-observed
-      HEAD/clean/detached equality and the review-bound SHA-256 values for exactly
-      `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`. Also
-      require the maintained script itself to fail closed on an attached symbolic
-      ref before its first SSH/remote effect; caller or wrapper preflight cannot substitute
-      for that script-local guard. The sole invocation is the exact reviewed literal
-      command `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit
-      <review-bound full detached-guard remediation commit>`. Execute it once only.
-      Do not execute any old commit command, substitute a wrapper, retry, edit, add
-      another staging/transfer/recovery command, or choose another checkout.
+      polarity-remediation commit bound by the fresh review. Before any remote write,
+      require Orchestrator-observed HEAD/clean/detached equality and the review-bound
+      SHA-256 values for exactly `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`.
+      Also require the maintained script itself to treat `git symbolic-ref -q HEAD`
+      success as attached and fail closed with an accurate detached-HEAD message before
+      its first SSH/remote effect; caller or wrapper preflight cannot substitute for
+      that script-local guard. The sole invocation is the exact reviewed literal command
+      `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit <review-bound
+      full polarity-remediation commit>`. Execute it once only. Do not execute any
+      old commit command, substitute a wrapper, retry, edit, add another staging/transfer/recovery
+      command, or choose another checkout.
 
 
       The sole target and material execution context remain the existing SSH authority
@@ -192260,9 +192270,9 @@ phases:
       identity; prove both prior bytes are available for restoration; require shell
       and Compose validation, exact installed modes, and remote SHA-256 equality to
       both source values. Record the operation ID, exact command, source commit/lineage
-      and hashes, detached-source guard result, literal FQDN/stack/path, strict host-key
-      result without key material or local paths, prior-byte/backup identities, atomic/validation
-      markers, final remote hashes, and outcome.
+      and hashes, correct symbolic-ref polarity result, literal FQDN/stack/path, strict
+      host-key result without key material or local paths, prior-byte/backup identities,
+      atomic/validation markers, final remote hashes, and outcome.
 
 
       Capture the installed central Gate''s deterministic Git metadata hash for the
@@ -192293,12 +192303,13 @@ phases:
       delete registry objects, mutate Docker/registry state, change services, clear
       or restore application data, inspect another host, or perform another command/target/path/stack
       sequence.'
-    verification: Direct lifecycle evidence binds the new operation ID and review-bound
-      detached-guard commit/source hashes; proves both caller- and script-enforced
-      clean detached identity before SSH, strict literal-FQDN host-key authentication,
-      exact two-file target/path, prior-byte recovery, atomic/hash postconditions,
-      negligible cost, every exclusion, and equal deterministic local Git metadata;
-      downstream independent verification re-observes staged-byte equality, readiness/recovery,
+    verification: Direct lifecycle evidence binds the one-row fresh review authority,
+      corrected polarity-remediation commit, and exact source hashes; proves both
+      caller- and script-enforced clean detached identity before SSH, attached rejection
+      on symbolic-ref success, strict literal-FQDN host-key authentication, exact
+      two-file target/path, prior-byte recovery, atomic/hash postconditions, negligible
+      cost, every exclusion, and equal deterministic local Git metadata; downstream
+      independent verification re-observes staged-byte equality, readiness/recovery,
       and unchanged protected state.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
