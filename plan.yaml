@@ -191917,7 +191917,7 @@ phases:
   - id: rf-bug-v2-ssh-endpoint-identity-remediation
     name: Replace short-hostname staging authority with authenticated SSH endpoint
       identity
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the preserved failed staging incident. Cross-domain justification:\
@@ -192038,6 +192038,8 @@ phases:
     depends_on:
     - rf-bug-v2-stage-immutable-deployment-procedure
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T21:02:34.783763Z'
   - id: rf-bug-v2-replacement-staging-authorization-review
     name: Review authenticated-endpoint replacement staging authority
     status: pending
