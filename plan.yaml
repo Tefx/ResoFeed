@@ -190472,13 +190472,15 @@ phases:
       After exact immutable OCI publication and both-platform container proof, use
       only the newly staged maintained procedure to deploy `docker.io/tefx/resofeed@sha256:<verified-index-digest>`
       to the existing `resofeed-caddy` stack at `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
-      Require the reviewed operation/target authority, exact staged remediation commit
-      and procedure hashes, and existing runtime-secret injection. Enter only through
-      the literal FQDN authenticated by strict existing SSH host-key verification
-      with host-key update/enrollment disabled, no alias or effective-host rewrite,
-      and the unchanged existing credential/account. The remote internal hostname
-      is unknown and cannot authorize or block the operation. Preserve the prior deployed
-      digest, SQLite volume, and owner-token state.
+      Require the reviewed operation/target authority, exact staged polarity-remediation
+      commit and procedure hashes, and existing runtime-secret injection. Reject the
+      stale inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5` and deploy
+      SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1` as
+      execution identities. Enter only through the literal FQDN authenticated by strict
+      existing SSH host-key verification with host-key update/enrollment disabled,
+      no alias or effective-host rewrite, and the unchanged existing credential/account.
+      The remote internal hostname is unknown and cannot authorize or block the operation.
+      Preserve the prior deployed digest, SQLite volume, and owner-token state.
 
 
       Never read or print `.env`, host-key material, authentication paths, or secret
@@ -190498,11 +190500,11 @@ phases:
       If rollback identity, strict endpoint authentication, or readiness recovery
       is unavailable, report BLOCKED without an alternate target or destructive fallback.'
     verification: The maintained procedure deploys the exact authorized docker.io/tefx/resofeed
-      index digest only through strict host-key authentication of the literal FQDN
-      to the existing resofeed-caddy stack; direct/public headers, Caddy ownership,
-      browser/CSP/routes/tokens/state, prior-digest rollback, SQLite preservation,
-      readiness, unchanged credential/host-key trust, and secret non-disclosure are
-      proven.
+      index digest from the freshly reviewed polarity-remediation identity only through
+      strict host-key authentication of the literal FQDN to the existing resofeed-caddy
+      stack; direct/public headers, Caddy ownership, browser/CSP/routes/tokens/state,
+      prior-digest rollback, SQLite preservation, readiness, unchanged credential/host-key
+      trust, and secret non-disclosure are proven.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
