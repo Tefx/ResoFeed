@@ -190314,31 +190314,51 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Pre-operation read-only R3 authorization review after the immutable procedure
-      and independent current-target verification. Verify current explicit human authority
-      for both registry publication and deployment; exact publication operation and
-      sole target `docker.io/tefx/resofeed`; exact deployment operation and sole existing
-      target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`; repository-scoped
-      registry credentials; existing masked-only `CF_API_TOKEN`, `OPENROUTER_KEY`,
-      and `TAVILY_API_KEY` runtime injection authority; locally verified commit; immutable
-      tag, OCI index digest, and exact linux/amd64 plus linux/arm64 manifest-digest
-      chain; authorized temporary-tag cleanup or orphan-digest recording; preserved
-      prior deployed digest and SQLite volume; rollback and readiness recovery; and
-      secret non-disclosure.
+      After the repository procedure, separately authorized remote staging, and fresh
+      read-only exact-target verification pass, perform the pre-operation R3 review
+      for the two remaining external operations and their distinct recovery boundaries.
 
 
-      Confirm the accepted operation, target, inputs, execution context, preconditions,
-      rollback/recovery, and evidence topology match the repaired repository procedure
-      and independent evidence. Do not treat plan-definition authority as publication/deployment
-      authority, acceptance authorization as side-effect authority, or masked credential
-      presence as permission to change credentials/accounts. Missing, stale, mismatched,
-      or broader authority returns BLOCKED and permits no build, push, tag, delete,
-      pull, deploy, restart, token reset, data clear, credential change, secret inspection,
-      mutable-`latest` substitution, alternate target, or undeclared operation.'
-    verification: Current explicit authority, exact docker.io/tefx/resofeed publication
-      and tefx-mbp-personal resofeed-caddy deployment, scoped credential/runtime-secret
-      authority, verified commit/index/platform digests, orphan recovery, prior-digest
-      rollback/readiness, and secret-safe evidence are proven before external mutation.
+      For immutable publication, verify current accepted-plan orchestration authority
+      names the exact build-and-push operation and sole registry target `docker.io/tefx/resofeed`;
+      the clean locally verified 40-character commit is the sole source; the only
+      tag is `git-<same-commit>`; repository-scoped registry credentials are available
+      without disclosure or account change; no moving alias is published; and partial
+      publication either uses separately explicit temporary-tag deletion authority
+      or records the complete orphan tag/index/platform chain. Before publication
+      the index and platform digest values do not yet exist. Bind them to the sole
+      producer `rf-bug-v2-publish-immutable-oci`, require that producer to emit one
+      exact index digest and exact linux/amd64 plus linux/arm64 manifest digests with
+      commit-label equality, and forbid fabricated or pre-authorized placeholder digest
+      values.
+
+
+      For Tailnet deployment, verify current accepted-plan orchestration authority
+      names the exact digest deployment operation and sole existing target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
+      the staged procedure bytes and fresh target-readiness evidence match the clean
+      verified commit; the deployment may consume only the exact digest chain produced
+      by `rf-bug-v2-publish-immutable-oci` and proven by `rf-bug-v2-docker-runtime-proof`;
+      existing masked-only `CF_API_TOKEN`, `OPENROUTER_KEY`, and `TAVILY_API_KEY`
+      runtime injection remains available; the current running image has one exact
+      prior repository digest captured for rollback; the SQLite volume and owner-token
+      state are preserved; and rollback restores only that prior digest followed by
+      root `200` plus unauthenticated Doctor `401` readiness.
+
+
+      Confirm each accepted operation, target, source/produced-input identity, execution
+      context, preconditions, credentials, cost boundary, rollback/recovery, and evidence
+      topology matches the maintained procedure. The completed staging authorization
+      does not authorize publication or deployment. Plan-definition authority, acceptance-test
+      authority, masked credential presence, and publication authority do not imply
+      another operation or target. Missing, stale, mismatched, broader, or materially
+      costly authority returns BLOCKED and permits no build, push, tag, delete, pull,
+      deploy, restart, token reset, data clear, credential/account change, secret
+      inspection, mutable-tag substitution, alternate target, or undeclared operation.'
+    verification: Current explicit authority separately binds immutable publication
+      to the verified commit/tag and exact docker.io/tefx/resofeed producer, and digest-only
+      deployment to the exact staged tefx-mbp-personal resofeed-caddy consumer after
+      produced index/platform proof, with scoped credentials, orphan recovery, prior-digest
+      rollback/readiness, SQLite preservation, cost bounds, and secret non-disclosure.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
