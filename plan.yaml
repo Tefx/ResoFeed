@@ -191917,7 +191917,7 @@ phases:
   - id: rf-bug-v2-ssh-endpoint-identity-remediation
     name: Replace short-hostname staging authority with authenticated SSH endpoint
       identity
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the preserved failed staging incident. Cross-domain justification:\
@@ -192040,6 +192040,17 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T21:02:34.783763Z'
+    done_at: '2026-07-23T21:19:33.210990+00:00'
+    evidence: Integrated commit 3c62a12cdae2f246f7801463e4e62f0d2464618f. Exact selected
+      execution passed for identity `RF-BUG-V2 immutable OCI and Tailnet deployment
+      procedure`, proving `RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF`; production Gate
+      receipt admission CONFORMANT. The maintained procedure now binds the literal
+      Tailnet FQDN through strict existing OpenSSH host-key trust, rejects enrollment/update/alias/HostName
+      rewrite/trust bypass, removes internal short-hostname authority, and preserves
+      exact stack/two-file staging/backup/recovery boundaries. Worker receipt sha256:9d214495aa871d850aebf4f499528496a0859d353f02f3608984d7b0a341a919;
+      dispatch sha256:ac7a378891ae40648557900ad2144cf07948320bc871db9b8d9df70da614c22a;
+      verdict /tmp/larva-agent-artifacts/rf-bug-v2-ssh-endpoint-identity-remediation/worker-receipt-verdict.json.
+      One provider transport failure was recovered once in the same task/worktree.
   - id: rf-bug-v2-replacement-staging-authorization-review
     name: Review authenticated-endpoint replacement staging authority
     status: pending
