@@ -190670,14 +190670,13 @@ phases:
       v2 local matrix, retry-free RF-BUG-005 streaming remediation, both frontend
       CSP remediations, their shared fresh full-profile verification, exact closure-selector
       remediation and verification, the immutable OCI/Tailnet repository procedure,
-      the completed first staging-interface remediation, the preserved failed staging
-      incident, the append-only authenticated-endpoint remediation, fresh replacement
-      staging authorization, the new exact v2 two-file staging operation, independent
-      read-only staged-byte/current-prior-digest readiness evidence, current publication/deployment
-      authorization, immutable two-platform OCI publication, both-platform container
-      proof, strict-host-key-authenticated digest deployment to the sole FQDN/stack/path,
-      formal security review, independent black-box verification, and defect-report
-      closure.
+      the preserved first staging-interface and failed-staging history, the newly
+      integrated detached-head source guard, fresh no-SSH replacement staging authorization,
+      the exact v2 two-file staging operation, independent read-only staged-byte/current-prior-digest
+      readiness evidence, current publication/deployment authorization, immutable
+      two-platform OCI publication, both-platform container proof, strict-host-key-authenticated
+      digest deployment to the sole FQDN/stack/path, formal security review, independent
+      black-box verification, and defect-report closure.
 
 
       Preserve the failed fan-in report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`
@@ -190686,7 +190685,7 @@ phases:
       and close both blockers from one fresh canonical profile. Preserve immutable-procedure
       semantic receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-23T19-22-26-742Z-2026-07-23T19-11-50-828Z_019f9064-282c-7a73-ba92-fcbf9ad1478d.js-f1d73b54f1abcc84.txt#sha256=f1d73b54f1abcc84dc66b45a4ef91f8b9ad1cf9f8f888b54eae5c7437707662c`
       and semantic validator `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification/semantic-validator.json#sha256=7d5d30480770270d1ee4a95c7e728cd574be7f984ac00b6a534ef635e4449b99`
-      as the definitive pre-remediation `REJECTED` / `FAIL` / `DISPROVEN` evidence.
+      as definitive pre-remediation `REJECTED` / `FAIL` / `DISPROVEN` evidence.
 
 
       Preserve the exhausted staging attempt exactly: command `./deploy/resofeed-caddy/deploy.sh
@@ -190701,18 +190700,40 @@ phases:
       or substituted.
 
 
+      Preserve detached-guard diagnostic receipt `sha256:213797bdca053a49e703215d017b5f11a803cc749893c127163bd2829b89361b`,
+      validator `sha256:6da4b9f76c215aabd77004472fe14ac6f1ea29b744eef57e46b3107f2700b0fe`,
+      corrected receipt `sha256:ba91a224bd9606523fd337b38e15bdb3f78c17e6844bc2778de7deb02f6b6280`,
+      and corrected validator `sha256:74a971d105d065905d2995f669441c01ee8aabd2fdade135e2b205a03d0537d9`
+      exactly as invalid diagnostic-only history. The first receipt used invalid `DIVERGES`
+      state-transition status; the correction repeated one requirement ID across three
+      transitions. Neither is lifecycle completion or rejection authority, and the
+      fresh review must map each caller-bound requirement ID uniquely.
+
+
       The replacement chain must retain all prior passed clean local procedure, Compose/Caddy/Tailscale
       target, SQLite-volume, masked-secret-marker, repository-credential-context,
       root-`200`, and unauthenticated-Doctor-`401` observations as history while re-observing
-      current facts. Require the new source commit and deploy-script hash to differ
-      from the exhausted pair, the unchanged compose source hash to remain exact,
-      and every remote operation to authenticate only the literal `tefx-mbp-personal.platy-atlas.ts.net`
+      current facts. Require the new integrated detached-guard remediation commit
+      and deploy-script hash to differ from stale procedure commit `4b2e878b050bd1820056ca729682bfd24d5a04dd`
+      and deploy SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`;
+      independently derive the unchanged compose source hash; and require selected
+      observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`, `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`,
+      and `PROCEDURE_DETACHED_MATRIX=green`. Prove the maintained script rejects an
+      attached clean branch before any SSH/remote effect and permits the full fake-target
+      matrix only from a clean detached checkout at the exact reviewed commit.
+
+
+      Require every remote operation to authenticate only the literal `tefx-mbp-personal.platy-atlas.ts.net`
       endpoint through strict existing SSH host-key trust with host-key update/enrollment
       disabled, no alias/effective-host rewrite, and unchanged credentials/account.
-      Require exact `~/Projects/resofeed-caddy` directory/stack identity, source/remote
-      procedure hash and mode equality, prior-byte recovery, deterministic local Git
-      metadata equality, and no hostname-short authority. Prove final immutable deployed
-      identity only after publication and deployment producers run.
+      Require exact `~/Projects/resofeed-caddy` directory/stack identity, exact two-file
+      source/remote hash and mode equality, prior-byte recovery, deterministic local
+      Git metadata equality, and no hostname-short authority. Prove final immutable
+      deployed identity only after publication and deployment producers run. The completed
+      old staging review, failed staging step, and endpoint-remediation lifecycle
+      nodes remain immutable diagnostic history outside current integrated admission;
+      only the new remediation, fresh replacement review, v2 operation, and downstream
+      fresh evidence authorize the replacement chain.
 
 
       Immediately before closure require Vectl validate/check-refs, repair-plan SHA-256
@@ -190724,24 +190745,23 @@ phases:
       prior-procedure and orphan/prior-digest recovery evidence, strict host-key and
       credential boundaries, secret non-disclosure, and no unresolved finding. Bind
       `post_closure_report_sha256` and `closure_commit` from the replacement closure
-      step and require current report hash and HEAD equality. Skipped legacy nodes
-      are never admission inputs; no future expected-red item, including item-deep-links,
-      is admitted.
+      step and require current report hash and HEAD equality. Skipped legacy nodes,
+      invalid diagnostic receipts, and stale commit/hash pairs are never admission
+      inputs; no future expected-red item, including item-deep-links, is admitted.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-ssh-endpoint-identity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers every local remediation branch plus immutable procedure
-      history, the exhausted pre-write incident, authenticated-endpoint repository
-      remediation, fresh exact replacement staging review and operation, independent
-      staged-byte/prior-digest readiness proof, current publication/deployment authority,
-      immutable OCI publication, dual-platform runtime, strict-host-key-authenticated
-      exact-FQDN digest deployment, security, black-box, and closure evidence with
-      current hashes/HEAD, empty claims, separate recovery boundaries, secret non-disclosure,
-      and no out-of-scope or future item-deep-links blocker.
+    verification: Full Gate covers the new detached-head source-guard remediation,
+      fresh no-SSH replacement staging review, exact once v2 staging, independent
+      staged-byte/readiness proof, current publication/deployment authority, immutable
+      OCI and dual-platform proof, strict-FQDN digest deployment, security/black-box/closure
+      evidence, unique semantic requirement mapping, current hashes/HEAD, separate
+      recovery boundaries, secret non-disclosure, and no out-of-scope blocker; stale
+      and invalid incident material remains diagnostic-only.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
