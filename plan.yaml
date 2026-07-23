@@ -192294,7 +192294,7 @@ phases:
     agent: vectl-orchestrator
   - id: rf-bug-v2-detached-head-staging-guard-remediation
     name: Require clean detached staging source before SSH
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the independently observed pre-SSH source-identity gap. Cross-domain\
@@ -192428,6 +192428,20 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T21:56:06.303692Z'
+    done_at: '2026-07-23T22:12:13.457841+00:00'
+    evidence: Integrated commit d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5 from isolated
+      worktree/base be965b1104787fc1cba600339f3a8f7adc440f23. Production Gate admitted
+      dispatch sha256:4d4e070fb711dc9fcc5a3121a655f21e62ffd4916040564fa231e326ccc4f133
+      and corrected worker receipt sha256:548d73eaaa181ddddd85233201471f89b5b2613a2f304ba3214e1cb5fec636ba;
+      post-commit verdict file sha256:2424c78a933234e1a4647d8e8a9590289f2a1c72f1c62385dd46d5dd27fd29f1.
+      Exact selected execution `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green` passed with attached-clean pre-SSH
+      rejection, detached-clean matrix proof, strict literal-FQDN known-key identity,
+      and no side effects. The first PASS occurrence and Gate INVALID are preserved
+      as diagnostic-only files sha256:2247b6ce06111551e0214e6d1fb0fbddd89300168b2fb150988f72b1392c1034
+      and sha256:331dd926cda379ea8ba63cafa2f0c08e7f8df7d39220c71c497cd38d1acb7395;
+      same-child correction completed the implementation before admission. No external
+      operation occurred.
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
