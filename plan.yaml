@@ -190403,13 +190403,16 @@ phases:
 
 
       After the pre-operation R3 authorization review, use only the repaired repository
-      procedure from the locally verified integrated commit to build and publish one
-      immutable linux/amd64 and linux/arm64 image to the sole registry target `docker.io/tefx/resofeed`.
-      Bind the verified 40-character commit to one immutable tag, then record and
-      cross-check the OCI index digest and exact linux/amd64 and linux/arm64 manifest
-      digests as downstream inputs. Reject a moved tag, incomplete platform set, source-commit
-      mismatch, digest mismatch, alternate repository, or mutable tag; `latest` is
-      never a publication, verification, deployment, or rollback identity.
+      procedure from the clean locally verified polarity-remediation commit bound
+      by the fresh one-row staging review and independent staged-byte verification
+      to build and publish one immutable linux/amd64 and linux/arm64 image to the
+      sole registry target `docker.io/tefx/resofeed`. Bind that verified 40-character
+      commit to one immutable tag, then record and cross-check the OCI index digest
+      and exact linux/amd64 and linux/arm64 manifest digests as downstream inputs.
+      Reject the stale inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`,
+      a moved tag, incomplete platform set, source-commit mismatch, digest mismatch,
+      alternate repository, or mutable tag; `latest` is never a publication, verification,
+      deployment, or rollback identity.
 
 
       Use only the already-authorized repository-scoped registry credential in the
@@ -190420,9 +190423,10 @@ phases:
       platform chain, failed digest resolution, or unavailable recovery stops before
       container or deployment work.'
     verification: Authorized publication targets only docker.io/tefx/resofeed, binds
-      the verified commit and immutable tag to one OCI index plus exact amd64/arm64
-      digests, rejects mutable/mismatched identity, redacts credentials, and records
-      authorized cleanup or orphan recovery.
+      the freshly reviewed polarity-remediation commit and immutable tag to one OCI
+      index plus exact amd64/arm64 digests, rejects the stale inverted identity and
+      all mutable/mismatched identity, redacts credentials, and records authorized
+      cleanup or orphan recovery.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
