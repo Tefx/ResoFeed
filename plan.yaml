@@ -190314,27 +190314,30 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      After the repository endpoint-identity remediation, separately reviewed and
-      executed v2 procedure staging, and fresh independent read-only exact-target
-      verification pass, perform the pre-operation R3 review for the two remaining
-      external operations and their distinct recovery boundaries. Preserve the exhausted
-      staging incident and require the replacement staging operation, source hashes,
-      strict host-key evidence, staged-byte equality, and local Git metadata equality
-      as immutable inputs; neither the old staging authorization nor the failed command
-      may supply current authority.
+      After the detached-head source-guard remediation, its fresh no-SSH replacement
+      staging authorization review, the exactly once v2 procedure staging operation,
+      and fresh independent read-only exact-target verification pass, perform the
+      pre-operation R3 review for the two remaining external operations and their
+      distinct recovery boundaries. Preserve every exhausted staging and invalid-review
+      artifact as diagnostic-only history. Require the newly integrated remediation
+      commit, source hashes, selected detached/attached proof, strict host-key evidence,
+      staged-byte equality, and local Git metadata equality as immutable inputs; no
+      stale commit/hash, old staging authorization, failed command, or invalid semantic
+      receipt may supply current authority.
 
 
       For immutable publication, verify current accepted-plan orchestration authority
       names the exact build-and-push operation and sole registry target `docker.io/tefx/resofeed`;
-      the clean locally verified 40-character commit is the sole source; the only
-      tag is `git-<same-commit>`; repository-scoped registry credentials are available
-      without disclosure or account change; no moving alias is published; and partial
-      publication either uses separately explicit temporary-tag deletion authority
-      or records the complete orphan tag/index/platform chain. Before publication
-      the index and platform digest values do not exist. Bind them to the sole producer
-      `rf-bug-v2-publish-immutable-oci`, require that producer to emit one exact index
-      digest and exact linux/amd64 plus linux/arm64 manifest digests with commit-label
-      equality, and forbid fabricated or pre-authorized placeholder digest values.
+      the clean locally verified 40-character detached-guard remediation commit is
+      the sole source; the only tag is `git-<same-commit>`; repository-scoped registry
+      credentials are available without disclosure or account change; no moving alias
+      is published; and partial publication either uses separately explicit temporary-tag
+      deletion authority or records the complete orphan tag/index/platform chain.
+      Before publication the index and platform digest values do not exist. Bind them
+      to the sole producer `rf-bug-v2-publish-immutable-oci`, require that producer
+      to emit one exact index digest and exact linux/amd64 plus linux/arm64 manifest
+      digests with commit-label equality, and forbid fabricated or pre-authorized
+      placeholder digest values.
 
 
       For Tailnet deployment, verify current accepted-plan orchestration authority
@@ -190343,7 +190346,8 @@ phases:
       host-key update/enrollment disabled, no alias/effective-host rewrite, and only
       the existing credential/account. The target''s internal hostname is unknown
       and cannot be an authority. Require the staged procedure bytes and fresh target-readiness
-      evidence to match the clean verified remediation commit; deployment may consume
+      evidence to match the clean verified detached-guard remediation commit and prove
+      the maintained script rejected attached source before SSH. Deployment may consume
       only the exact digest chain produced by `rf-bug-v2-publish-immutable-oci` and
       proven by `rf-bug-v2-docker-runtime-proof`; existing masked-only `CF_API_TOKEN`,
       `OPENROUTER_KEY`, and `TAVILY_API_KEY` runtime injection remains available;
@@ -190354,21 +190358,22 @@ phases:
 
 
       Confirm each accepted operation, target, source/produced-input identity, execution
-      context, host-key/credential boundary, preconditions, cost boundary, rollback/recovery,
-      and evidence topology matches the maintained procedure. Procedure-staging authority
-      does not authorize publication or deployment. Plan-definition authority, acceptance-test
-      authority, masked credential presence, publication authority, or host-key evidence
-      does not imply another operation or target. Missing, stale, mismatched, broader,
-      host-key-bypassed, or materially costly authority returns BLOCKED and permits
-      no build, push, tag, delete, pull, deploy, restart, host-key change, token reset,
-      data clear, credential/account change, secret inspection, mutable-tag substitution,
-      alternate target, or undeclared operation.'
-    verification: Current explicit authority separately binds immutable publication
-      to the verified commit/tag and exact docker.io/tefx/resofeed producer, and digest-only
-      deployment through strict host-key authentication of the exact FQDN to the staged
-      resofeed-caddy consumer after produced index/platform proof, with scoped credentials,
-      orphan recovery, prior-digest rollback/readiness, SQLite preservation, cost
-      bounds, and secret non-disclosure.
+      context, script-local detached-source guard, host-key/credential boundary, preconditions,
+      cost boundary, rollback/recovery, and evidence topology matches the maintained
+      procedure. Procedure-staging authority does not authorize publication or deployment.
+      Plan-definition authority, acceptance-test authority, masked credential presence,
+      publication authority, or host-key evidence does not imply another operation
+      or target. Missing, stale, mismatched, broader, host-key-bypassed, or materially
+      costly authority returns BLOCKED and permits no build, push, tag, delete, pull,
+      deploy, restart, host-key change, token reset, data clear, credential/account
+      change, secret inspection, mutable-tag substitution, alternate target, or undeclared
+      operation.'
+    verification: Current R3 authorization binds immutable publication and digest-only
+      deployment to the independently verified detached-guard remediation commit,
+      exact staged two-file hashes, script-local attached-source pre-SSH rejection,
+      strict literal-FQDN host-key boundary, produced OCI digest chain, rollback/readiness,
+      scoped credentials, costs, and exclusions; stale and invalid diagnostic material
+      grants no authority.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
