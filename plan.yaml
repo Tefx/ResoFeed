@@ -191712,7 +191712,7 @@ phases:
       or external operation used.
   - id: rf-bug-v2-remote-procedure-staging-authorization-review
     name: Authorize exact Tailnet procedure staging
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -191765,6 +191765,8 @@ phases:
     depends_on:
     - rf-bug-v2-immutable-procedure-staging-remediation
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T20:11:04.650192Z'
   - id: rf-bug-v2-stage-immutable-deployment-procedure
     name: Stage verified immutable procedure on the exact Tailnet target
     status: pending
