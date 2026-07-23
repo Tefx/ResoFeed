@@ -190497,28 +190497,41 @@ phases:
     - rf-bug-v2-docker-runtime-proof
     agent: integration-verifier
   - id: rf-bug-v2-formal-security-review
-    name: Review v2 release security and recovery boundaries
+    name: Review v2 release security, endpoint identity, and recovery boundaries
     status: pending
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
 
 
-      Independently review the completed local, immutable-image, dual-platform container,
-      and Tailnet evidence for RF-BUG-003/004/005/010. Cover embed.FS traversal/fallback,
+      Independently review the completed local, authenticated-endpoint procedure staging,
+      immutable-image, dual-platform container, and Tailnet evidence for RF-BUG-003/004/005/010
+      and `RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF`. Cover embed.FS traversal/fallback,
       no external UI root, four outer headers, embedded CSP without unsafe-inline,
       streaming/cancellation, Owner Token, import-only OPML and atomic minimal State,
       case-local E2E state and cleanup, live-provider opt-in, secret redaction, exact
-      deployed digest, authorization, and rollback. Findings route to modifying owners
-      and block closure.'
+      deployed digest, authorization, and rollback.
+
+
+      For the endpoint boundary, preserve the exhausted staging incident and prove
+      the replacement chain authenticates only the literal `tefx-mbp-personal.platy-atlas.ts.net`
+      SSH endpoint through existing strict host-key trust, never uses the unknown
+      internal hostname as authority, never enrolls/updates/removes host keys or changes
+      credentials/accounts, stages only the reviewed two-file hashes to `~/Projects/resofeed-caddy`,
+      keeps deterministic local Git metadata equal, and deploys only after fresh authorization.
+      Verify prior-procedure restoration and prior-digest readiness recovery remain
+      distinct, complete, and secret-safe. Findings route to modifying owners and
+      block closure.'
     verification: Fresh review finds no unresolved embed traversal, CSP/header, streaming/cancellation,
-      token, OPML/state, E2E cleanup, secret, digest, deployment, or rollback defect.
+      token, OPML/state, E2E cleanup, secret, strict SSH endpoint identity, staged-byte,
+      digest, deployment, host-key/credential, or rollback defect.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - AGENTS.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
