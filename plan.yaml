@@ -191844,7 +191844,7 @@ phases:
       task /Users/tefx/.pi/larva/child-sessions/2026-07-23T20-12-47-867Z_019f909b-f57b-7442-82ed-673cd702a863.jsonl.'
   - id: rf-bug-v2-stage-immutable-deployment-procedure
     name: Preserve failed immutable-procedure staging incident and prohibit replay
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -191901,6 +191901,8 @@ phases:
     depends_on:
     - rf-bug-v2-remote-procedure-staging-authorization-review
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T20:56:30.194104Z'
   - id: rf-bug-v2-ssh-endpoint-identity-remediation
     name: Replace short-hostname staging authority with authenticated SSH endpoint
       identity
