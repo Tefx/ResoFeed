@@ -192519,7 +192519,7 @@ phases:
       operation occurred.
   - id: rf-bug-v2-detached-head-guard-polarity-remediation
     name: Correct detached-head guard polarity and behavior proof
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ polarity remediation for the completed `rf-bug-v2-detached-head-staging-guard-remediation`;\
@@ -192653,6 +192653,8 @@ phases:
     depends_on:
     - rf-bug-v2-detached-head-staging-guard-remediation
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T22:35:20.318143Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
