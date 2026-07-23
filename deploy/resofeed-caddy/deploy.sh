@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 cd "$SCRIPT_DIR"
 umask 077
 
@@ -11,6 +11,27 @@ readonly OCI_REPOSITORY="docker.io/tefx/resofeed"
 readonly STACK_NAME="resofeed-caddy"
 readonly TAILNET_TARGET_HOST="tefx-mbp-personal.platy-atlas.ts.net"
 readonly TAILNET_STACK_PATH="Projects/${STACK_NAME}"
+readonly -a TAILNET_SSH_OPTIONS=(
+  -F none
+  -T
+  -o "HostName=${TAILNET_TARGET_HOST}"
+  -o "HostKeyAlias=${TAILNET_TARGET_HOST}"
+  -o StrictHostKeyChecking=yes
+  -o UpdateHostKeys=no
+  -o VerifyHostKeyDNS=no
+  -o CanonicalizeHostname=no
+  -o BatchMode=yes
+  -o PreferredAuthentications=publickey
+  -o PasswordAuthentication=no
+  -o KbdInteractiveAuthentication=no
+  -o NumberOfPasswordPrompts=0
+  -o AddKeysToAgent=no
+  -o ForwardAgent=no
+  -o ClearAllForwardings=yes
+  -o ControlMaster=no
+  -o ControlPath=none
+  -o RequestTTY=no
+)
 readonly PROCEDURE_DEPLOY_PATH="deploy/resofeed-caddy/deploy.sh"
 readonly PROCEDURE_COMPOSE_PATH="deploy/resofeed-caddy/compose.yml"
 readonly PROCEDURE_BACKUP_ROOT=".resofeed-procedure-backups"
@@ -219,17 +240,19 @@ require_empty_deployment_arguments() {
 }
 
 validate_target_boundary() {
+  local canonical_home authorized_stack
+  canonical_home=$(CDPATH= cd -- "$HOME" && pwd -P) \
+    || fatal "Deployment home directory identity is unavailable."
+  authorized_stack="${canonical_home}/Projects/${STACK_NAME}"
   [ "$(basename "$SCRIPT_DIR")" = "$STACK_NAME" ] || fatal "Deployment directory is not the authorized resofeed-caddy stack."
-  [ "$SCRIPT_DIR" = "${HOME}/Projects/${STACK_NAME}" ] || fatal "Deployment directory is outside the authorized Tailnet stack path."
-  [ "$(hostname -s)" = "${TAILNET_TARGET_HOST%%.*}" ] || fatal "Deployment host is outside the authorized Tailnet target."
+  [ "$SCRIPT_DIR" = "$authorized_stack" ] || fatal "Deployment directory is outside the authorized Tailnet stack path."
 }
 
 remote_procedure_helper() {
-  ssh "$TAILNET_TARGET_HOST" bash -s -- "$@" <<'REMOTE_PROCEDURE'
+  ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST" bash -s -- "$@" <<'REMOTE_PROCEDURE'
 set -Eeuo pipefail
 umask 077
 
-readonly EXPECTED_HOST="tefx-mbp-personal"
 readonly STACK_NAME="resofeed-caddy"
 readonly STACK_DIR="${HOME}/Projects/${STACK_NAME}"
 readonly BACKUP_ROOT=".resofeed-procedure-backups"
@@ -253,17 +276,21 @@ file_mode() {
 }
 
 validate_target() {
-  [ "$(hostname -s)" = "$EXPECTED_HOST" ] || fatal "target host identity drifted"
-  [ -d "$STACK_DIR" ] || fatal "target stack directory is missing"
-  cd "$STACK_DIR"
-  [ "$PWD" = "$STACK_DIR" ] || fatal "target stack directory identity drifted"
+  local canonical_home canonical_stack
+  canonical_home=$(CDPATH= cd -- "$HOME" && pwd -P) || fatal "target home identity is unavailable"
+  canonical_stack="${canonical_home}/Projects/${STACK_NAME}"
+  [ -d "$STACK_DIR" ] && [ ! -L "$STACK_DIR" ] || fatal "target stack directory is missing or unsafe"
+  cd -P "$STACK_DIR"
+  [ "$(pwd -P)" = "$canonical_stack" ] || fatal "target stack directory identity drifted"
+  [ "$PWD" = "$canonical_stack" ] || fatal "target stack home-relative path drifted"
   [ "$(basename "$PWD")" = "$STACK_NAME" ] || fatal "target stack name drifted"
 }
 
 validate_target_files() {
   [ -f deploy.sh ] && [ ! -L deploy.sh ] || fatal "prior deploy.sh is missing or unsafe"
   [ -f compose.yml ] && [ ! -L compose.yml ] || fatal "prior compose.yml is missing or unsafe"
-  [ -x deploy.sh ] || fatal "prior deploy.sh is not executable"
+  [ "$(file_mode deploy.sh)" = 755 ] || fatal "prior deploy.sh mode is not 755"
+  [ "$(file_mode compose.yml)" = 644 ] || fatal "prior compose.yml mode is not 644"
 }
 
 validate_compose_shape() {
@@ -278,7 +305,7 @@ validate_compose_shape() {
   OPENROUTER_KEY= \
   TAVILY_API_KEY= \
   COMPOSE_DISABLE_ENV_FILE=1 \
-    docker compose --project-directory "$PWD" --env-file /dev/null -f "$compose_path" config --quiet >/dev/null 2>&1 \
+    docker compose --project-directory "$PWD" --project-name "$STACK_NAME" --env-file /dev/null -f "$compose_path" config --quiet >/dev/null 2>&1 \
     || fatal "Compose procedure shape is invalid"
 }
 
@@ -548,11 +575,15 @@ transfer_procedure_file() {
   local source_path=$1
   local stage_name=$2
   local target_name=$3
-  ssh "$TAILNET_TARGET_HOST" "set -Eeuo pipefail
+  ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST" "set -Eeuo pipefail
 umask 077
-[ \"\$(hostname -s)\" = \"${TAILNET_TARGET_HOST%%.*}\" ]
-cd \"\$HOME/${TAILNET_STACK_PATH}\"
-[ \"\$PWD\" = \"\$HOME/${TAILNET_STACK_PATH}\" ]
+canonical_home=\$(CDPATH= cd -- \"\$HOME\" && pwd -P)
+canonical_stack=\"\${canonical_home}/${TAILNET_STACK_PATH}\"
+[ -d \"\$canonical_stack\" ] && [ ! -L \"\$canonical_stack\" ]
+cd \"\$canonical_stack\"
+[ \"\$(pwd -P)\" = \"\$canonical_stack\" ]
+[ \"\$PWD\" = \"\$canonical_stack\" ]
+[ \"\$(basename \"\$PWD\")\" = \"${STACK_NAME}\" ]
 [ -d \".resofeed-procedure-transaction.lock\" ] && [ ! -L \".resofeed-procedure-transaction.lock\" ]
 [ -d \"${stage_name}\" ] && [ ! -L \"${stage_name}\" ]
 [ ! -e \"${stage_name}/${target_name}\" ]

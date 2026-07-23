@@ -245,7 +245,9 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     failComposeReplacement = false,
     tamperStagedCompose = false,
     driftPriorAfterTransfer = false,
-    missingPriorCompose = false
+    missingPriorCompose = false,
+    hostKeyState = 'trusted',
+    remoteHostname = 'unknown-internal-host'
   } = {}) {
     const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-procedure-stage-'));
     const sourceRoot = path.join(root, 'source');
@@ -278,14 +280,16 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     }
 
     const sshLog = path.join(root, 'ssh.log');
+    const sshAttemptLog = path.join(root, 'ssh-attempt.log');
     const dockerLog = path.join(root, 'docker.log');
     const mvFailureMarker = path.join(root, 'mv-failed');
     fs.writeFileSync(sshLog, '');
+    fs.writeFileSync(sshAttemptLog, '');
     fs.writeFileSync(dockerLog, '');
 
     executable(path.join(fakeBin, 'hostname'), [
       '#!/usr/bin/env bash',
-      'printf "%s\\n" tefx-mbp-personal'
+      'printf "%s\\n" "$FAKE_REMOTE_HOSTNAME"'
     ]);
     executable(path.join(fakeBin, 'docker'), [
       '#!/usr/bin/env bash',
@@ -304,9 +308,21 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     executable(path.join(fakeBin, 'ssh'), [
       '#!/usr/bin/env bash',
       'set -Euo pipefail',
-      'host=$1',
+      'expected=(-F none -T -o HostName=tefx-mbp-personal.platy-atlas.ts.net -o HostKeyAlias=tefx-mbp-personal.platy-atlas.ts.net -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o VerifyHostKeyDNS=no -o CanonicalizeHostname=no -o BatchMode=yes -o PreferredAuthentications=publickey -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no -o NumberOfPasswordPrompts=0 -o AddKeysToAgent=no -o ForwardAgent=no -o ClearAllForwardings=yes -o ControlMaster=no -o ControlPath=none -o RequestTTY=no)',
+      'for expected_argument in "${expected[@]}"; do',
+      '  [[ "${1:-}" == "$expected_argument" ]] || { printf "unexpected SSH endpoint option: expected %s, got %s\\n" "$expected_argument" "${1:-<missing>}" >&2; exit 69; }',
+      '  shift',
+      'done',
+      'host=${1:-}',
       'shift',
       '[[ "$host" == "tefx-mbp-personal.platy-atlas.ts.net" ]] || exit 70',
+      'printf "%s %s\\n" "$FAKE_HOST_KEY_STATE" "$host" >> "$FAKE_SSH_ATTEMPT_LOG"',
+      'case "$FAKE_HOST_KEY_STATE" in',
+      '  trusted) ;;',
+      '  unknown) printf "Host key verification failed: no existing key for literal FQDN\\n" >&2; exit 71 ;;',
+      '  changed) printf "REMOTE HOST IDENTIFICATION HAS CHANGED for literal FQDN\\n" >&2; exit 72 ;;',
+      '  *) exit 73 ;;',
+      'esac',
       'command_text=$*',
       'printf "%s\\n" "$command_text" >> "$FAKE_SSH_LOG"',
       'export HOME="$FAKE_REMOTE_HOME"',
@@ -337,6 +353,9 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       FAKE_REMOTE_HOME: remoteHome,
       FAKE_REMOTE_BIN: fakeBin,
       FAKE_REMOTE_STACK: remoteStack,
+      FAKE_REMOTE_HOSTNAME: remoteHostname,
+      FAKE_HOST_KEY_STATE: hostKeyState,
+      FAKE_SSH_ATTEMPT_LOG: sshAttemptLog,
       FAKE_STAGE_NAME: `.resofeed-procedure-stage-${sourceCommit}`,
       FAKE_SSH_LOG: sshLog,
       FAKE_DOCKER_LOG: dockerLog,
@@ -364,6 +383,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       sourceStack,
       remoteStack,
       sshLog,
+      sshAttemptLog,
       dockerLog,
       sourceCommit,
       priorDeploy,
@@ -393,10 +413,13 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.equal(fs.readFileSync(path.join(backupDir, 'compose.yml'), 'utf8'), staged.priorCompose);
 
     const sshEvidence = fs.readFileSync(staged.sshLog, 'utf8');
+    const sshAttempts = fs.readFileSync(staged.sshAttemptLog, 'utf8').trim().split('\n');
+    assert.equal(sshAttempts.length, 5);
+    assert.ok(sshAttempts.every((line) => line === 'trusted tefx-mbp-personal.platy-atlas.ts.net'));
     assert.equal((sshEvidence.match(/cat >/gu) ?? []).length, 2);
     assert.match(sshEvidence, /deploy\.sh/u);
     assert.match(sshEvidence, /compose\.yml/u);
-    assert.doesNotMatch(sshEvidence, /(?:scp|rsync)/u);
+    assert.doesNotMatch(sshEvidence, /(?:scp|rsync|hostname -s)/u);
     assert.doesNotMatch(fs.readFileSync(staged.dockerLog, 'utf8'), /\b(?:pull|push|up|down|build|restart|stop)\b/u);
 
     const beforeDirtyProbe = fs.readFileSync(staged.sshLog, 'utf8');
@@ -459,6 +482,33 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.equal(fs.existsSync(path.join(missingPrior.remoteStack, '.resofeed-procedure-transaction.lock')), false);
   } finally {
     fs.rmSync(missingPrior.root, { recursive: true, force: true });
+  }
+
+  const wrongMode = procedureStagingFixture();
+  try {
+    fs.chmodSync(path.join(wrongMode.remoteStack, 'compose.yml'), 0o600);
+    const result = wrongMode.runStage();
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /prior compose.yml mode is not 644/u);
+    assert.equal(fs.existsSync(path.join(wrongMode.remoteStack, '.resofeed-procedure-transaction.lock')), false);
+  } finally {
+    fs.rmSync(wrongMode.root, { recursive: true, force: true });
+  }
+
+  for (const hostKeyState of ['unknown', 'changed']) {
+    const untrusted = procedureStagingFixture({ hostKeyState });
+    try {
+      const result = untrusted.runStage();
+      assert.equal(result.status, 1);
+      assert.match(result.stderr, hostKeyState === 'unknown' ? /no existing key for literal FQDN/u : /HOST IDENTIFICATION HAS CHANGED/u);
+      assert.equal(fs.readFileSync(untrusted.sshLog, 'utf8'), '');
+      assert.equal(fs.readFileSync(path.join(untrusted.remoteStack, 'deploy.sh'), 'utf8'), untrusted.priorDeploy);
+      assert.equal(fs.readFileSync(path.join(untrusted.remoteStack, 'compose.yml'), 'utf8'), untrusted.priorCompose);
+      assert.equal(fs.existsSync(path.join(untrusted.remoteStack, '.resofeed-procedure-transaction.lock')), false);
+      assert.equal(fs.readFileSync(untrusted.sshAttemptLog, 'utf8').trim(), `${hostKeyState} tefx-mbp-personal.platy-atlas.ts.net`);
+    } finally {
+      fs.rmSync(untrusted.root, { recursive: true, force: true });
+    }
   }
 
   function deploymentFixture(failReplacementReadiness, invalidProcedureIdentity = false) {
@@ -662,6 +712,12 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replaceAll('rollback_previous_digest', 'rollback_without_readiness')),
     mutation(deployPath, (body) => body.replace('status --porcelain=v1 --untracked-files=all', 'status --short')),
     mutation(deployPath, (body) => body.replace('remote_procedure_helper() {', 'remote_procedure_helper() {\n  docker compose up -d')),
+    mutation(deployPath, (body) => body.replace('StrictHostKeyChecking=yes', 'StrictHostKeyChecking=no')),
+    mutation(deployPath, (body) => body.replace('HostKeyAlias=${TAILNET_TARGET_HOST}', 'HostKeyAlias=tefx-mbp-personal')),
+    mutation(deployPath, (body) => body.replace('-F none', '-F ~/.ssh/config')),
+    mutation(deployPath, (body) => body.replace('BatchMode=yes', 'BatchMode=yes\n  -o UserKnownHostsFile=/tmp/alternate-known-hosts')),
+    mutation(deployPath, (body) => body.replace('ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST"', 'ssh "$TAILNET_TARGET_HOST"')),
+    mutation(deployPath, (body) => `${body}\nhostname -s\n`),
     mutation(deployPath, (body) => body.replace('  verify_staged_procedure_identity\n  require_command docker', '  require_command docker')),
     mutation(deployPath, (body) => body.replace('PROCEDURE_ROLLBACK=prior_bytes_restored', 'PROCEDURE_ROLLBACK=unavailable')),
     mutation(deployPath, (body) => `${body}\ndocker manifest rm unauthorized\n`),

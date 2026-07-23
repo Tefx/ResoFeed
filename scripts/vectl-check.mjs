@@ -273,6 +273,7 @@ export const PENDING_PROFILE_PAIRS = [
       'MUTABLE_LATEST=forbidden',
       'ROLLBACK=prior_digest_and_readiness',
       'SECRETS=masked_presence_only',
+      'SSH_ENDPOINT_IDENTITY=literal_fqdn_strict_known_key',
       'PROCEDURE_STAGE=clean_commit_two_file_atomic',
       'PROCEDURE_IDENTITY=source_commit_and_sha256',
       'PROCEDURE_RECOVERY=prior_bytes',
@@ -497,6 +498,26 @@ export function verifyImmutableDeploymentSources(sources) {
     'readonly OCI_REPOSITORY="docker.io/tefx/resofeed"',
     'readonly STACK_NAME="resofeed-caddy"',
     'readonly TAILNET_TARGET_HOST="tefx-mbp-personal.platy-atlas.ts.net"',
+    'readonly -a TAILNET_SSH_OPTIONS=(',
+    '-F none',
+    'HostName=${TAILNET_TARGET_HOST}',
+    'HostKeyAlias=${TAILNET_TARGET_HOST}',
+    'StrictHostKeyChecking=yes',
+    'UpdateHostKeys=no',
+    'VerifyHostKeyDNS=no',
+    'CanonicalizeHostname=no',
+    'BatchMode=yes',
+    'PreferredAuthentications=publickey',
+    'PasswordAuthentication=no',
+    'KbdInteractiveAuthentication=no',
+    'NumberOfPasswordPrompts=0',
+    'AddKeysToAgent=no',
+    'ForwardAgent=no',
+    'ClearAllForwardings=yes',
+    'ControlMaster=no',
+    'ControlPath=none',
+    'RequestTTY=no',
+    'ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST"',
     'readonly PROCEDURE_DEPLOY_PATH="deploy/resofeed-caddy/deploy.sh"',
     'readonly PROCEDURE_COMPOSE_PATH="deploy/resofeed-caddy/compose.yml"',
     '--stage-procedure',
@@ -551,6 +572,8 @@ export function verifyImmutableDeploymentSources(sources) {
     '--recover-procedure',
     '--index-digest sha256:<index-64-hex>',
     'restores the captured prior digest',
+    'literal FQDN as the effective SSH HostName and host-key lookup identity',
+    'StrictHostKeyChecking=yes',
     'The script has no registry-deletion operation'
   ]);
   requireDeploymentFragments(sources, '.agents/skills/resofeed-tailnet-deploy/SKILL.md', [
@@ -562,6 +585,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_COMPOSE_SHA256',
     'INDEX_DIGEST=sha256:<64 lowercase hex>',
     'preserves the prior digest and SQLite volume',
+    'literal FQDN as the effective SSH HostName and host-key lookup identity',
+    'StrictHostKeyChecking=yes',
     'Do not execute registry deletion without separate explicit authorization'
   ]);
   requireDeploymentFragments(sources, 'docs/CONTAINER.md', [
@@ -574,6 +599,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_DEPLOY_SHA256',
     'PROCEDURE_COMPOSE_SHA256',
     'resofeed-caddy_resofeed-data',
+    'literal FQDN as both effective HostName and host-key lookup identity',
+    'StrictHostKeyChecking=yes',
     'Failure restores the prior digest'
   ]);
   requireDeploymentFragments(sources, 'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md', [
@@ -583,6 +610,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'clean-commit two-file procedure staging',
     'target-local atomic replacement and prior-byte recovery',
     'prior-digest capture',
+    'strict existing host-key trust for the literal Tailnet FQDN',
     'masked-presence boundary markers'
   ]);
 
@@ -606,6 +634,32 @@ export function verifyImmutableDeploymentSources(sources) {
   }
 
   const deployScript = sources['deploy/resofeed-caddy/deploy.sh'];
+  const strictSSHInvocation = 'ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST"';
+  if ((deployScript.match(new RegExp(strictSSHInvocation.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'gu')) ?? []).length !== 2) {
+    throw new AdapterFailure('immutable deployment procedure did not apply one SSH endpoint policy to every remote helper');
+  }
+  for (const forbidden of [
+    'hostname -s',
+    'StrictHostKeyChecking=no',
+    'StrictHostKeyChecking=accept-new',
+    'UpdateHostKeys=yes',
+    'UserKnownHostsFile',
+    'GlobalKnownHostsFile',
+    'KnownHostsCommand',
+    'ssh-keyscan',
+    'HostKeyAlgorithms',
+    'ProxyCommand',
+    'ProxyJump'
+  ]) {
+    if (deployScript.includes(forbidden)) {
+      throw new AdapterFailure(`immutable deployment SSH endpoint policy retained forbidden fragment: ${forbidden}`);
+    }
+  }
+  for (const relativePath of ['deploy/resofeed-caddy/README.md', '.agents/skills/resofeed-tailnet-deploy/SKILL.md']) {
+    if (/\bssh\s+tefx-mbp-personal(?:\.platy-atlas\.ts\.net)?\b/u.test(sources[relativePath])) {
+      throw new AdapterFailure(`immutable deployment source ${relativePath} retained a bare or short-name SSH entry`);
+    }
+  }
   if ((deployScript.match(/status --porcelain=v1 --untracked-files=all/gu) ?? []).length !== 2) {
     throw new AdapterFailure('immutable deployment procedure did not preserve clean source before and after transfer');
   }
@@ -652,6 +706,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'MUTABLE_LATEST=forbidden',
     'ROLLBACK=prior_digest_and_readiness',
     'SECRETS=masked_presence_only',
+    'SSH_ENDPOINT_IDENTITY=literal_fqdn_strict_known_key',
     'PROCEDURE_STAGE=clean_commit_two_file_atomic',
     'PROCEDURE_IDENTITY=source_commit_and_sha256',
     'PROCEDURE_RECOVERY=prior_bytes',

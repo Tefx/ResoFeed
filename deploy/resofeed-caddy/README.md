@@ -76,6 +76,36 @@ ARM64_DIGEST=sha256:<linux/arm64 manifest 64 lowercase hex>
 
 The index must contain exactly `linux/amd64` and `linux/arm64`. Each platform image must expose `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. An absent, duplicate, additional, incomplete, or mismatched descriptor stops publication/deployment evidence.
 
+## Authenticate the SSH endpoint
+
+Initialize the fixed Bash transport before any maintained manual SSH entry:
+
+```bash
+readonly TAILNET_SSH_HOST="tefx-mbp-personal.platy-atlas.ts.net"
+readonly -a TAILNET_SSH_OPTIONS=(
+  -F none
+  -T
+  -o "HostName=${TAILNET_SSH_HOST}"
+  -o "HostKeyAlias=${TAILNET_SSH_HOST}"
+  -o StrictHostKeyChecking=yes
+  -o UpdateHostKeys=no
+  -o VerifyHostKeyDNS=no
+  -o CanonicalizeHostname=no
+  -o BatchMode=yes
+  -o PreferredAuthentications=publickey
+  -o PasswordAuthentication=no
+  -o KbdInteractiveAuthentication=no
+  -o NumberOfPasswordPrompts=0
+  -o AddKeysToAgent=no
+  -o ForwardAgent=no
+  -o ClearAllForwardings=yes
+  -o ControlMaster=no
+  -o ControlPath=none
+  -o RequestTTY=no
+)
+```
+
+This binds the literal FQDN as the effective SSH HostName and host-key lookup identity. It uses only the default existing OpenSSH known-host trust and public-key credentials in noninteractive mode. Unknown or changed keys fail closed. Do not enroll/update a key, load SSH configuration aliases, rewrite the hostname, use an alternate known-host store, bypass checking, select another account, or substitute another endpoint. The remote internal short hostname is unknown and never authorizes staging, recovery, inspection, or deployment.
 ## Stage the verified procedure bytes
 
 A separately authorized staging operation must run this maintained interface from the root of one clean integrated checkout whose `HEAD` is the full verified commit:
@@ -100,13 +130,25 @@ PROCEDURE_STAGE=verified
 ```
 
 Do not substitute `scp`, `rsync`, ad hoc SSH copy commands, alternate paths, or manual renames.
+The producer uses that exact embedded transport for inspect, prepare, both file transfers, finalize, cleanup, and recovery. After FQDN host-key authentication it verifies the canonical physical home-relative path, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, and Compose shape. An unknown/changed key fails before target-local preparation or transfer; an internal hostname mismatch has no effect.
 ## Deploy the verified digest
-Perform the broader read-only runtime target inspection only after the separately authorized staging operation reports `PROCEDURE_STAGE=verified`. Confirm the host and directory, OrbStack Docker CLI, Compose config, current `resofeed`/`resofeed-caddy` containers, named `/data` volume, Tailnet TCP/443 route, and masked secret presence.
+Perform the broader read-only runtime target inspection only after the separately authorized staging operation reports `PROCEDURE_STAGE=verified`. Through the fixed `TAILNET_SSH_OPTIONS`, confirm the canonical physical home-relative directory, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, OrbStack Docker CLI, Compose config, current `resofeed`/`resofeed-caddy` containers, named `/data` volume, Tailnet TCP/443 route, and masked secret presence. Never compare the internal short hostname.
 
 The deployment authorization must bind the same full commit and both exact SHA-256 values emitted by staging. Then run only:
 
 ```bash
-ssh tefx-mbp-personal.platy-atlas.ts.net 'cd ~/Projects/resofeed-caddy && export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH" && ./deploy.sh \
+ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_SSH_HOST" 'set -Eeuo pipefail
+canonical_home=$(CDPATH= cd -- "$HOME" && pwd -P)
+canonical_stack="${canonical_home}/Projects/resofeed-caddy"
+[ -d "$canonical_stack" ] && [ ! -L "$canonical_stack" ]
+cd "$canonical_stack"
+[ "$(pwd -P)" = "$canonical_stack" ]
+[ "$PWD" = "$canonical_stack" ]
+[ "$(basename "$PWD")" = resofeed-caddy ]
+[ -f deploy.sh ] && [ ! -L deploy.sh ] && [ "$(stat -f "%Lp" deploy.sh 2>/dev/null || stat -c "%a" deploy.sh)" = 755 ]
+[ -f compose.yml ] && [ ! -L compose.yml ] && [ "$(stat -f "%Lp" compose.yml 2>/dev/null || stat -c "%a" compose.yml)" = 644 ]
+export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
+./deploy.sh \
   --verified-commit <40-lowercase-hex> \
   --immutable-tag git-<same-40-lowercase-hex> \
   --index-digest sha256:<index-64-hex> \
@@ -118,9 +160,8 @@ ssh tefx-mbp-personal.platy-atlas.ts.net 'cd ~/Projects/resofeed-caddy && export
 
 `deploy.sh` validates its own bytes and `compose.yml` against the caller-bound procedure identities before reading runtime configuration or invoking Docker, OCI, Compose, Caddy, Tailscale, or readiness work. A mismatch fails before deployment mutation. It then verifies both the immutable tag and digest reference against the supplied index/platform chain, derives `RESOFEED_IMAGE=docker.io/tefx/resofeed@sha256:<index-digest>`, captures the currently deployed repository digest, verifies the existing SQLite volume, writes only non-secret identity fields, pulls the digest, updates the existing stack, and retains all named volumes.
 
-Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, moving-tag substitution, and ad hoc procedure copying are outside this procedure and are refused.
+Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, moving-tag substitution, host-key trust mutation, and ad hoc procedure copying are outside this procedure and are refused.
 ## Verification
-
 Passing deployment evidence contains only non-secret identities and these outcomes:
 
 ```text
@@ -133,16 +174,24 @@ SECRETS=masked_presence_only
 READINESS=root_200_doctor_401
 ```
 
-Read-only verification commands:
+Read-only verification uses the same authenticated endpoint policy:
 
 ```bash
-ssh tefx-mbp-personal.platy-atlas.ts.net 'cd ~/Projects/resofeed-caddy && export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH" && docker compose --env-file .env -f compose.yml ps'
+ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_SSH_HOST" 'set -Eeuo pipefail
+canonical_home=$(CDPATH= cd -- "$HOME" && pwd -P)
+canonical_stack="${canonical_home}/Projects/resofeed-caddy"
+[ -d "$canonical_stack" ] && [ ! -L "$canonical_stack" ]
+cd "$canonical_stack"
+[ "$(pwd -P)" = "$canonical_stack" ]
+[ "$PWD" = "$canonical_stack" ]
+[ "$(basename "$PWD")" = resofeed-caddy ]
+export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
+docker compose --project-name resofeed-caddy --env-file .env -f compose.yml ps'
 curl -I "https://${RESOFEED_DOMAIN}"
 curl -i "https://${RESOFEED_DOMAIN}/api/doctor"
 ```
 
 The root must return `200`; unauthenticated `/api/doctor` must return `401`. Verify the running container's configured image equals the supplied digest reference and Tailscale Serve still maps TCP/443 to `tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}`. Never include response bodies, tokens, provider keys, or `.env` values in evidence.
-
 ## Recovery and orphan recording
 A staging failure before replacement removes only the target-local transaction directory. A partial two-file replacement automatically restores and revalidates both prior procedure files from the content-addressed backup. If a later operator must deliberately recover the reported prior procedure, use only the maintained source-side interface:
 
@@ -167,6 +216,8 @@ When a publication leaves a complete unreferenced index/platform chain, record i
 ```
 
 The fixed local orphan ledger contains only commit, tag, and digests. The script has no registry-deletion operation. Deleting an authorized temporary tag requires a separate registry-specific approval and must never be inferred from deployment authority.
+The source-side recovery interface applies the same fixed strict-known-key SSH transport before any remote recovery command. Unknown or changed FQDN keys fail before lock or rescue creation; no internal hostname, alternate target, or trust override is accepted.
+Repository rollback of the SSH endpoint-identity remediation reverts only `deploy.sh`, the selected-execution adapter/developer test, Tailnet skill, this README, Container guide, and harness contract together. It performs no remote procedure recovery or runtime operation.
 ## Stop
 
 `./stop.sh` stops the stack while preserving named volumes. Data-destruction modes are outside the immutable deployment and rollback procedure.

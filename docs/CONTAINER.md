@@ -297,6 +297,7 @@ docker run -d \
 ```
 
 ## Multi-architecture Build Command
+Tailnet staging, recovery, inspection, and deployment authenticate `tefx-mbp-personal.platy-atlas.ts.net` through the literal FQDN as both effective HostName and host-key lookup identity. The maintained Bash transport uses `-F none`, `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, disabled DNS host-key trust/canonicalization, public-key-only batch authentication, no forwarding or multiplexing, and the default existing OpenSSH known-host files. It never enrolls or updates trust, loads aliases, rewrites the hostname, chooses another trust store/account/endpoint, or accepts an unknown/changed key. After connection it validates the canonical physical home-relative `Projects/resofeed-caddy` path, stack basename/project identity, regular non-symlink two-file procedure, exact `755`/`644` modes, and Compose shape. The internal short hostname is unknown and irrelevant.
 Release publication targets exactly `docker.io/tefx/resofeed`. It starts from a caller-supplied verified commit, binds the tag `git-${VERIFIED_COMMIT}`, labels both platform images with that commit, and publishes exactly `linux/amd64` plus `linux/arm64`:
 
 ```text
@@ -422,3 +423,6 @@ Before accepting the containerization or immutable release procedure:
 - Passing readiness is root `200` plus unauthenticated `/api/doctor` `401`. Failure restores the prior digest against the same named volume and proves the same readiness pair.
 - Evidence contains the verified commit, immutable tag, index/platform digests, target identity, readiness outcomes, and masked secret presence only. It contains no token, credential, provider key, `.env` value, or secret-source path.
 - Publication recovery records a complete orphan digest chain. Registry deletion occurs only under separate explicit authorization and is never inferred from deploy authority.
+- Every maintained SSH path uses one noninteractive strict-existing-key option set with the literal FQDN as destination, effective `HostName`, and host-key lookup identity; unknown/changed keys fail before remote preparation or transfer, no trust/credential/endpoint override is accepted, and the internal short hostname has no authority.
+- Authenticated staging, recovery, inspection, and deployment validate the canonical physical home-relative stack path, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh`/`compose.yml`, exact `755`/`644` modes, and Compose shape before their respective operations.
+- Repository rollback of SSH endpoint identity is one repository-only unit covering `deploy.sh`, the selected-execution adapter/developer test, Tailnet skill, deployment README, this Container guide, and the harness contract; it does not authorize or perform remote recovery or runtime mutation.

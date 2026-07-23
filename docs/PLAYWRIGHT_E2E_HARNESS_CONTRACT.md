@@ -120,12 +120,16 @@ The pending profile matrix is:
 
 The immutable deployment profile uses identity `RF-BUG-V2 immutable OCI and Tailnet deployment procedure`. Its focused regression reads only the bound repository procedure files and fails closed on:
 
-- any repository or Tailnet target other than `docker.io/tefx/resofeed` and `tefx-mbp-personal:resofeed-caddy`;
+- any repository or Tailnet target other than `docker.io/tefx/resofeed` and the literal `tefx-mbp-personal.platy-atlas.ts.net` endpoint with `resofeed-caddy` stack identity;
+- absent uniform `-F none`, literal `HostName`/`HostKeyAlias`, `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, DNS/canonicalization disablement, public-key-only batch authentication, forwarding/multiplexing disablement, or the exact FQDN destination on any procedure SSH call;
+- host-key enrollment/update, SSH config aliases, hostname rewrites, alternate known-host stores, trust bypasses, alternate accounts/endpoints, or internal `hostname`/short-name authority;
+- missing rejection of unknown or changed FQDN keys before target-local preparation or transfer;
+- drift in the canonical physical home-relative path, `resofeed-caddy` basename/project identity, regular non-symlink procedure files, exact `755`/`644` modes, or Compose shape after authentication;
 - a moving image reference or optional Compose image fallback;
 - missing caller-verified commit, `git-<commit>` tag, OCI index, `linux/amd64`, or `linux/arm64` binding;
 - absent platform commit-label verification;
 - dirty or mismatched clean-commit two-file procedure staging, wrong Git modes, or a path outside the exact `deploy.sh` and `compose.yml` source pair;
-- missing procedure-only host/directory inspection, target-local atomic replacement and prior-byte recovery, source/remote SHA-256 comparison, or stable backup recovery interface;
+- missing procedure-only endpoint/directory inspection, target-local atomic replacement and prior-byte recovery, source/remote SHA-256 comparison, or stable backup recovery interface;
 - deployment/runtime identity checks ordered before procedure SHA-256 verification;
 - staging that reads runtime configuration or invokes publication, deployment, stop, restart, credential, secret, data, registry, container, image, volume, Caddy, or Tailscale mutation;
 - absent prior-digest capture, SQLite-volume preservation, direct readiness, or readiness-checked rollback;
@@ -133,13 +137,14 @@ The immutable deployment profile uses identity `RF-BUG-V2 immutable OCI and Tail
 - secret-value output, credential mutation, owner-token rotation, data clearing, or alternate-target switches;
 - drift between the deployment script, Compose/example, Tailnet skill, deployment README, container contract, and this harness contract.
 
-The focused developer test performs staging and recovery only against a temporary local fake SSH target. It verifies exact clean-source binding, two transfer streams, target-local backups, installed byte/mode identity, dirty-source refusal before SSH, pre-deploy identity rejection before Docker/runtime access, and prior-byte restoration after an injected second-file rename failure. It does not contact the Tailnet, Docker daemon, registry, or an external service.
+The focused developer test performs staging and recovery only against a temporary local fake SSH target. It verifies the uniform exact option vector on inspect, prepare, both transfer streams, finalize, cleanup/recovery paths; strict existing host-key trust for the literal Tailnet FQDN; unknown and changed key rejection before target-local writes; internal short-hostname mismatch irrelevance; canonical path/stack/file/mode checks; exact clean-source binding; target-local backups; installed byte/mode identity; dirty-source refusal before SSH; pre-deploy identity rejection before Docker/runtime access; and prior-byte restoration after an injected second-file rename failure. It does not contact the Tailnet, Docker daemon, registry, or an external service.
 
-The profile emits one green evidence envelope only after the focused developer test passes. Its observations retain the repository identity, index/platform binding, Tailnet target, moving-tag refusal, prior-digest/readiness rollback, and masked-presence boundary markers, then add procedure staging, source-commit/SHA-256 identity, prior-byte recovery, and no-side-effect observations. It performs no registry, SSH, Tailnet, Docker, credential, or runtime mutation.
+The profile emits one green evidence envelope only after the focused developer test passes. Its observations retain the repository identity, index/platform binding, Tailnet target, moving-tag refusal, prior-digest/readiness rollback, and masked-presence boundary markers, then add literal-FQDN strict-known-key endpoint identity, procedure staging, source-commit/SHA-256 identity, prior-byte recovery, and no-side-effect observations. It performs no registry, SSH, Tailnet, Docker, credential, or runtime mutation.
 
 The closure profile aggregates current authorities without synthesizing Go tests. It requires exact top-level `TestRFBugCanonicalContracts` identity and canonical markers, exact package-relative web OPML identity, the production Prompting scan, and exact RF-BUG-001 through RF-BUG-010 heading inventory in both protected defect documents. Empty output, no-test output, missing exact pass identities, skipped execution, or retry output fails closed.
 
 The `rf-bug-v2-source-ledger` profile binds `Source Ledger groups and controls render` to its Vitest `test:render` command with exactly one `--reporter=verbose`. Its Playwright commands retain their line reporters.
+Repository rollback for the SSH endpoint-identity remediation reverts only `deploy/resofeed-caddy/deploy.sh`, `scripts/vectl-check.mjs`, `scripts/vectl-check.test.mjs`, the Tailnet skill, deployment README, Container guide, and this harness contract together. It performs no SSH, procedure recovery, deployment, credential, host-key, Docker/registry, data, or external mutation.
 ### RF-BUG-010 Replacement Runtime Isolation Remediation
 
 The bounded project-native remediation profile is:
