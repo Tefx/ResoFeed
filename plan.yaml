@@ -192209,6 +192209,140 @@ phases:
     depends_on:
     - rf-bug-v2-replacement-staging-authorization-review
     agent: vectl-orchestrator
+  - id: rf-bug-v2-detached-head-staging-guard-remediation
+    name: Require clean detached staging source before SSH
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ remediation for the independently observed pre-SSH source-identity gap. Cross-domain\
+      \ justification: the fail-closed Bash source guard, JavaScript project-native\
+      \ adapter and developer fixture, Tailnet procedure skill, and release procedure\
+      \ documentation are one indivisible safety interface with one rollback boundary\
+      \ and one downstream authorization consumer; no registered single-surface specialist\
+      \ covers that combined mutable scope, so `general` is the compatible v2 worker\
+      \ fallback.\n\nAt integrated procedure commit `4b2e878b050bd1820056ca729682bfd24d5a04dd`,\
+      \ `deploy/resofeed-caddy/deploy.sh` checks exact `HEAD`, exact verified commit\
+      \ availability, clean status, exact two-file source identity, and strict literal-FQDN\
+      \ SSH trust, but does not reject an attached symbolic ref before its first SSH\
+      \ call. Its current passing staging fixture creates an attached `git init` branch.\
+      \ Treat direct source inspection as diagnostic authority for this remediation.\
+      \ The correction-exhausted spec-verifier receipts `sha256:213797bdca053a49e703215d017b5f11a803cc749893c127163bd2829b89361b`\
+      \ and `sha256:ba91a224bd9606523fd337b38e15bdb3f78c17e6844bc2778de7deb02f6b6280`,\
+      \ with validator outputs `sha256:6da4b9f76c215aabd77004472fe14ac6f1ea29b744eef57e46b3107f2700b0fe`\
+      \ and `sha256:74a971d105d065905d2995f669441c01ee8aabd2fdade135e2b205a03d0537d9`,\
+      \ remain diagnostic-only because production admission rejected both; they supply\
+      \ neither completion nor rejection authority.\n\nImplement one fail-closed clean\
+      \ detached-HEAD guard inside the maintained `--stage-procedure` source validation\
+      \ before `remote_procedure_helper`, `transfer_procedure_file`, or any other\
+      \ SSH/remote effect. Exact `HEAD` equality to the caller-supplied full verified\
+      \ commit, verified commit availability, clean tracked and untracked status,\
+      \ executable/readable exact two-file source identity, and before/after local\
+      \ Git equality remain mandatory. An attached branch must be rejected even when\
+      \ its tip equals the verified commit and its checkout is clean. A clean detached\
+      \ checkout at that exact commit must continue through the existing fake-target\
+      \ happy, rollback, tamper, target-drift, missing-prior, wrong-mode, and strict\
+      \ host-key matrix.\n\nUpdate the project-native `rf-bug-v2-immutable-deployment-procedure`\
+      \ / `rf_bug_v2_immutable_deployment_procedure_green` profile and its focused\
+      \ developer test so selected execution projects `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`,\
+      \ `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, and `PROCEDURE_DETACHED_MATRIX=green`\
+      \ in `vectl.check.evidence.v1.observations`. The fixture must assert the attached\
+      \ clean branch fails before any fake SSH attempt or target mutation, then detach\
+      \ the successful fixture at its exact commit and retain the complete existing\
+      \ fake-target matrix. Keep selector identity `RF-BUG-V2 immutable OCI and Tailnet\
+      \ deployment procedure` unchanged. Update only affected procedure documentation\
+      \ and the Tailnet skill to state that the maintained invocation itself enforces\
+      \ clean detached source identity before SSH; no wrapper or caller-only preflight\
+      \ may substitute for the script guard.\n\nPreserve the sole endpoint `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`,\
+      \ literal FQDN as effective SSH destination and host-key lookup identity, strict\
+      \ pre-existing OpenSSH host-key trust, `StrictHostKeyChecking=yes`, disabled\
+      \ host-key enrollment/update, unchanged credential/account, exact two-file manifest\
+      \ (`deploy/resofeed-caddy/deploy.sh`, `deploy/resofeed-caddy/compose.yml`),\
+      \ read-only inspection before prepare/transfer, target-local atomic replacement,\
+      \ prior-byte restoration, deterministic local Git equality, immutable OCI/digest\
+      \ rules, prior-digest readiness rollback, masked-secret evidence, and every\
+      \ existing no-alternate-host/path/repository constraint.\n\nThis repository\
+      \ step performs no SSH, staging, publication, deployment, registry, Docker,\
+      \ service, credential/account, host-key, secret, `.env`, application-data, SQLite,\
+      \ owner-token, or external state operation. It grants no staging, publication,\
+      \ or deployment authority. Rollback is repository reversion of this cohesive\
+      \ script/adapter/test/doc change; any scope escape, protected acceptance mutation,\
+      \ weaker source/host-key check, unavailable deterministic fixture, or need for\
+      \ an external operation returns BLOCKED before mutation.\n\nLifecycle dispatch\
+      \ contract: after a real Orchestrator claim creates the immutable worktree,\
+      \ base, claim IDs, and plan hash, the Orchestrator must construct and production-Gate-admit\
+      \ exactly one tagged `<vectl_worker_dispatch>` strict JSON object with `schema_version:\
+      \ vectl.worker.dispatch.v2`, `worker_id: general`, this exact step ID, allowed/blocked\
+      \ paths identical to the contract below, this one selected-execution check,\
+      \ all explicit path/test bindings, `developer_test_globs: [scripts/vectl-check.test.mjs]`,\
+      \ empty acceptance paths, and empty acceptance authorizations. Static placeholders\
+      \ or invented claim/worktree/base values are forbidden. The worker must return\
+      \ exactly one unchanged `vectl.worker.execution.v2` receipt bound to that admitted\
+      \ dispatch, with exact selected/executed identity parity, this claim/check mapping,\
+      \ canonical changed files inside scope, and empty unresolved/acceptance-authorization\
+      \ arrays on PASS.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [.agents/skills/resofeed-tailnet-deploy/SKILL.md, deploy/resofeed-caddy/README.md,\
+      \ deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n  blocked_paths: [.env,\
+      \ deploy/resofeed-caddy/.env.example, deploy/resofeed-caddy/compose.yml, deploy/resofeed-caddy/caddy/**,\
+      \ deploy/resofeed-caddy/stop.sh, docs/ARCHITECTURE.md, docs/DESIGN.md, docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/BUG_REPORT_2026-07-11.md, docs/USAGE.md, Dockerfile, cmd/**, internal/**,\
+      \ web/**, tests/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\n\
+      claims: [RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD]\nchecks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n\
+      \    run:\n      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n      timeout_seconds: 300\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: scripts/vectl-check.test.mjs, access: read, availability:\
+      \ current}\n        - {path: deploy/resofeed-caddy/deploy.sh, access: execute,\
+      \ availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/.env.example,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/README.md,\
+      \ access: read, availability: current}\n        - {path: .agents/skills/resofeed-tailnet-deploy/SKILL.md,\
+      \ access: read, availability: current}\n        - {path: docs/CONTAINER.md,\
+      \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: developer, availability: current}\n\
+      \      selection:\n        command: [node, scripts/vectl-check.mjs, select,\
+      \ rf-bug-v2-immutable-deployment-procedure, rf_bug_v2_immutable_deployment_procedure_green]\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
+      \ ['RF-BUG-V2 immutable OCI and Tailnet deployment procedure']\n        forbidden_ids:\
+      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: immutable OCI and Tailnet deployment procedure},\
+      \ {literal: PROCEDURE_SOURCE_CHECKOUT=clean_detached_head}, {literal: PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected},\
+      \ {literal: PROCEDURE_DETACHED_MATRIX=green}, {literal: 'SSH_ENDPOINT_IDENTITY=literal_fqdn_strict_known_key'},\
+      \ {literal: PROCEDURE_SIDE_EFFECTS=none}]\n        contains_any: []\n      \
+      \  forbids: [{literal: PROCEDURE_ATTACHED_HEAD=accepted}, {literal: secret-value},\
+      \ {literal: no tests to run}]\n    proves: [RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"pre_ssh_source_identity_guard\",\"\
+      external_staging_safety_boundary\",\"shared_bash_adapter_fixture_and_procedure_docs\"\
+      ],\"primary_outcome\":\"RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD\"\
+      ,\"atom\":\"the maintained staging procedure rejects a clean attached branch\
+      \ before any SSH or remote effect and permits the unchanged fake-target matrix\
+      \ only from a clean detached checkout at the exact verified commit\",\"modality\"\
+      :\"test_contract\",\"seam\":\"mock\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The existing project-native selected execution proves a clean attached
+      branch is rejected before any fake SSH attempt, a clean detached checkout at
+      the exact verified commit passes the complete existing fake-target matrix, and
+      the literal-FQDN strict-host-key, two-file, rollback, no-side-effect, documentation,
+      and adapter identity contracts remain intact; downstream spec-verifier review
+      independently binds the integrated commit and source hashes before any external
+      operation.
+    evidence_template: One unchanged vectl.worker.execution.v2 receipt bound to one
+      production-admitted vectl.worker.dispatch.v2, with exact selected/executed identity
+      parity, canonical in-scope changed files, and empty unresolved and acceptance-authorization
+      arrays on PASS.
+    depends_on:
+    - rf-bug-v2-immutable-deployment-procedure
+    agent: general
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
