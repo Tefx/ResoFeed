@@ -191712,7 +191712,7 @@ phases:
       or external operation used.
   - id: rf-bug-v2-remote-procedure-staging-authorization-review
     name: Authorize exact Tailnet procedure staging
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -191767,6 +191767,18 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T20:11:04.650192Z'
+    done_at: '2026-07-23T20:20:08.915999+00:00'
+    evidence: 'Independent spec-verifier review at clean commit 3f6be1c58592f86a5a352518ac747a84f0c2abdc
+      returned semantic PASS and production admission CONFORMANT for only the exact
+      two-file Tailnet staging operation. Source manifest: deploy.sh sha256:e09fb2e9b25fa77cb8823ff7dd79104d28a9e40e831de74d7f973f4b238ff271;
+      compose.yml sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c.
+      Target is limited to tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy
+      with prior-byte backup/restoration and remote-hash postconditions; publication,
+      deployment, service/runtime/data/credential/secret mutation remain unauthorized.
+      Semantic receipt sha256:aa09cc549b5c259d77c747d54cedd8798a5599614febcfbec18330dcfe388ca2;
+      receipt artifact /tmp/larva-agent-artifacts/rf-bug-v2-remote-procedure-staging-authorization-review/receipt.json;
+      validator /tmp/larva-agent-artifacts/rf-bug-v2-remote-procedure-staging-authorization-review/semantic-validator.json;
+      task /Users/tefx/.pi/larva/child-sessions/2026-07-23T20-12-47-867Z_019f909b-f57b-7442-82ed-673cd702a863.jsonl.'
   - id: rf-bug-v2-stage-immutable-deployment-procedure
     name: Stage verified immutable procedure on the exact Tailnet target
     status: pending
