@@ -247,7 +247,8 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     driftPriorAfterTransfer = false,
     missingPriorCompose = false,
     hostKeyState = 'trusted',
-    remoteHostname = 'unknown-internal-host'
+    remoteHostname = 'unknown-internal-host',
+    attachedHead = false
   } = {}) {
     const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-procedure-stage-'));
     const sourceRoot = path.join(root, 'source');
@@ -271,6 +272,16 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     checked('git', ['add', 'deploy/resofeed-caddy/deploy.sh', 'deploy/resofeed-caddy/compose.yml'], { cwd: sourceRoot });
     checked('git', ['commit', '-q', '-m', 'procedure fixture'], { cwd: sourceRoot });
     const sourceCommit = checked('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot });
+    if (!attachedHead) {
+      checked('git', ['checkout', '--detach', '-q', sourceCommit], { cwd: sourceRoot });
+    }
+    const sourceRef = spawnSync('git', ['symbolic-ref', '-q', 'HEAD'], {
+      cwd: sourceRoot,
+      encoding: 'utf8'
+    });
+    assert.equal(sourceRef.status, attachedHead ? 0 : 1);
+    assert.equal(checked('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot }), sourceCommit);
+    assert.equal(checked('git', ['status', '--porcelain=v1', '--untracked-files=all'], { cwd: sourceRoot }), '');
 
     const priorDeploy = '#!/usr/bin/env bash\nset -Eeuo pipefail\nprintf "prior procedure\\n"\n';
     const priorCompose = `${fs.readFileSync(path.join(repoRoot, 'deploy', 'resofeed-caddy', 'compose.yml'), 'utf8')}# prior procedure\n`;
@@ -439,25 +450,26 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     fs.rmSync(staged.root, { recursive: true, force: true });
   }
 
-  const detached = procedureStagingFixture();
+  const attached = procedureStagingFixture({ attachedHead: true });
   try {
-    checked('git', ['checkout', '--detach', '-q', detached.sourceCommit], { cwd: detached.sourceRoot });
-    const detachedRef = spawnSync('git', ['symbolic-ref', '-q', 'HEAD'], {
-      cwd: detached.sourceRoot,
+    const attachedRef = spawnSync('git', ['symbolic-ref', '-q', 'HEAD'], {
+      cwd: attached.sourceRoot,
       encoding: 'utf8'
     });
-    assert.equal(detachedRef.status, 1);
-    assert.equal(checked('git', ['status', '--porcelain=v1', '--untracked-files=all'], { cwd: detached.sourceRoot }), '');
-    const result = detached.runStage();
+    assert.equal(attachedRef.status, 0);
+    assert.equal(checked('git', ['rev-parse', 'HEAD'], { cwd: attached.sourceRoot }), attached.sourceCommit);
+    assert.equal(checked('git', ['status', '--porcelain=v1', '--untracked-files=all'], { cwd: attached.sourceRoot }), '');
+    const result = attached.runStage();
     assert.equal(result.status, 1);
-    assert.match(result.stderr, /source HEAD must be attached to a branch/u);
-    assert.equal(fs.readFileSync(detached.sshAttemptLog, 'utf8'), '');
-    assert.equal(fs.readFileSync(detached.sshLog, 'utf8'), '');
-    assert.equal(fs.readFileSync(path.join(detached.remoteStack, 'deploy.sh'), 'utf8'), detached.priorDeploy);
-    assert.equal(fs.readFileSync(path.join(detached.remoteStack, 'compose.yml'), 'utf8'), detached.priorCompose);
-    assert.equal(fs.existsSync(path.join(detached.remoteStack, '.resofeed-procedure-transaction.lock')), false);
+    assert.match(result.stderr, /source HEAD must be detached/u);
+    assert.equal(fs.readFileSync(attached.sshAttemptLog, 'utf8'), '');
+    assert.equal(fs.readFileSync(attached.sshLog, 'utf8'), '');
+    assert.equal(fs.readFileSync(path.join(attached.remoteStack, 'deploy.sh'), 'utf8'), attached.priorDeploy);
+    assert.equal(fs.readFileSync(path.join(attached.remoteStack, 'compose.yml'), 'utf8'), attached.priorCompose);
+    assert.equal(fs.existsSync(path.join(attached.remoteStack, '.resofeed-procedure-transaction.lock')), false);
+    assert.equal(fs.existsSync(path.join(attached.remoteStack, '.resofeed-procedure-backups')), false);
   } finally {
-    fs.rmSync(detached.root, { recursive: true, force: true });
+    fs.rmSync(attached.root, { recursive: true, force: true });
   }
 
   const partial = procedureStagingFixture({ failComposeReplacement: true });
@@ -732,7 +744,10 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/arm64'", "inspect_manifest_digest 'linux/arm/v7'")),
     mutation(deployPath, (body) => body.replaceAll('rollback_previous_digest', 'rollback_without_readiness')),
     mutation(deployPath, (body) => body.replace('status --porcelain=v1 --untracked-files=all', 'status --short')),
-    mutation(deployPath, (body) => body.replace('git -C "$repo_root" symbolic-ref -q HEAD', 'true')),
+    mutation(deployPath, (body) => body.replace(
+      'if git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1; then',
+      'if ! git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1; then'
+    )),
     mutation(deployPath, (body) => body.replace('remote_procedure_helper() {', 'remote_procedure_helper() {\n  docker compose up -d')),
     mutation(deployPath, (body) => body.replace('StrictHostKeyChecking=yes', 'StrictHostKeyChecking=no')),
     mutation(deployPath, (body) => body.replace('HostKeyAlias=${TAILNET_TARGET_HOST}', 'HostKeyAlias=tefx-mbp-personal')),

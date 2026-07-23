@@ -601,8 +601,9 @@ stage_procedure() {
     || fatal "Procedure staging must run from an integrated repository checkout."
   [ "$SCRIPT_DIR" -ef "${repo_root}/deploy/resofeed-caddy" ] \
     || fatal "Procedure staging source directory is outside the integrated checkout."
-  git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1 \
-    || fatal "Procedure staging source HEAD must be attached to a branch."
+  if git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1; then
+    fatal "Procedure staging source HEAD must be detached."
+  fi
   [ "$(git -C "$repo_root" rev-parse HEAD)" = "$VERIFIED_COMMIT" ] \
     || fatal "Procedure source HEAD does not equal the verified commit."
   git -C "$repo_root" cat-file -e "${VERIFIED_COMMIT}^{commit}" 2>/dev/null \

@@ -526,8 +526,8 @@ export function verifyImmutableDeploymentSources(sources) {
     '--stage-procedure',
     '--recover-procedure',
     'status --porcelain=v1 --untracked-files=all',
-    'git -C "$repo_root" symbolic-ref -q HEAD',
-    'Procedure staging source HEAD must be attached to a branch.',
+    'if git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1; then',
+    'Procedure staging source HEAD must be detached.',
     'PROCEDURE_SOURCE_COMMIT=',
     'PROCEDURE_DEPLOY_SHA256=',
     'PROCEDURE_COMPOSE_SHA256=',
@@ -579,7 +579,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'restores the captured prior digest',
     'literal FQDN as the effective SSH HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
-    'detached `HEAD` before any SSH invocation',
+    'attached `HEAD` before any SSH invocation',
     'The script has no registry-deletion operation'
   ]);
   requireDeploymentFragments(sources, '.agents/skills/resofeed-tailnet-deploy/SKILL.md', [
@@ -593,7 +593,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'preserves the prior digest and SQLite volume',
     'literal FQDN as the effective SSH HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
-    'detached `HEAD` before any SSH invocation',
+    'attached `HEAD` before any SSH invocation',
     'Do not execute registry deletion without separate explicit authorization'
   ]);
   requireDeploymentFragments(sources, 'docs/CONTAINER.md', [
@@ -608,7 +608,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'resofeed-caddy_resofeed-data',
     'literal FQDN as both effective HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
-    'detached `HEAD` before any SSH attempt',
+    'attached `HEAD` before any SSH attempt',
     'Failure restores the prior digest'
   ]);
   requireDeploymentFragments(sources, 'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md', [
@@ -619,7 +619,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'target-local atomic replacement and prior-byte recovery',
     'prior-digest capture',
     'strict existing host-key trust for the literal Tailnet FQDN',
-    'detached `HEAD` refusal before any SSH attempt',
+    'attached `HEAD` refusal before any SSH attempt',
     'PROCEDURE_SOURCE_CHECKOUT=clean_detached_head',
     'PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected',
     'PROCEDURE_DETACHED_MATRIX=green',
@@ -678,11 +678,11 @@ export function verifyImmutableDeploymentSources(sources) {
   const stageFunctionStart = deployScript.indexOf('stage_procedure()');
   const stageFunctionEnd = deployScript.indexOf('recover_procedure()');
   const stageFunction = deployScript.slice(stageFunctionStart, stageFunctionEnd);
-  const attachedHeadGuard = stageFunction.indexOf('git -C "$repo_root" symbolic-ref -q HEAD');
+  const attachedHeadGuard = stageFunction.indexOf('if git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1; then');
   const firstRemoteInspection = stageFunction.indexOf('remote_procedure_helper inspect');
   if (stageFunctionStart < 0 || stageFunctionEnd <= stageFunctionStart
       || attachedHeadGuard < 0 || firstRemoteInspection < 0 || attachedHeadGuard > firstRemoteInspection) {
-    throw new AdapterFailure('immutable deployment procedure did not reject detached source HEAD before SSH');
+    throw new AdapterFailure('immutable deployment procedure did not reject attached source HEAD before SSH');
   }
   const stagingStart = deployScript.indexOf('remote_procedure_helper()');
   const stagingEnd = deployScript.indexOf('record_orphan()');
