@@ -192059,29 +192059,44 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      After the endpoint-identity remediation is integrated and before any external
-      write, independently review one new staging operation identity only: `RF-BUG-V2-STAGE-PROCEDURE-ENDPOINT-IDENTITY-V2`.
+      After `rf-bug-v2-detached-head-staging-guard-remediation` is integrated and
+      before any external write, dispatch a fresh `spec-verifier` child to review
+      one staging operation identity only: `RF-BUG-V2-STAGE-PROCEDURE-ENDPOINT-IDENTITY-V2`.
       Perform no SSH or remote inspection. Bind the exact clean integrated 40-character
-      remediation commit, its producer lineage, and exact SHA-256 identities for `deploy/resofeed-caddy/deploy.sh`
-      and the unchanged `deploy/resofeed-caddy/compose.yml`; require the new deploy
-      script hash and commit to differ from the exhausted `3f6be1c58592f86a5a352518ac747a84f0c2abdc`
-      / `e09fb2e9b25fa77cb8823ff7dd79104d28a9e40e831de74d7f973f4b238ff271` pair. Re-run
-      the current project-native selected execution and inspect the integrated procedure/docs
-      to prove the unknown internal hostname is not an authority anywhere in staging,
-      transfer, recovery, or deployment.
+      detached-guard remediation commit, its producer lineage, and exact SHA-256 identities
+      for `deploy/resofeed-caddy/deploy.sh` and the unchanged `deploy/resofeed-caddy/compose.yml`.
+      The pre-remediation procedure commit `4b2e878b050bd1820056ca729682bfd24d5a04dd`
+      and deploy-script SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`
+      are diagnostic-only stale identities and must differ from the newly integrated
+      commit/hash; the unchanged compose hash remains independently re-derived rather
+      than copied from history.
+
+
+      Re-run the exact current project-native selected execution `node scripts/vectl-check.mjs
+      run rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`
+      and inspect the integrated procedure, focused developer fixture, adapter, Tailnet
+      skill, and affected procedure docs. Require observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`,
+      `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, and `PROCEDURE_DETACHED_MATRIX=green`.
+      Prove an attached clean branch at the exact verified commit is rejected by the
+      maintained script before any fake SSH attempt or target mutation, while a clean
+      detached checkout at that exact commit reaches the unchanged complete fake-target
+      matrix. Confirm this guard executes inside `deploy.sh` before `remote_procedure_helper`,
+      `transfer_procedure_file`, or any SSH/remote effect and cannot be replaced by
+      caller-only or wrapper preflight.
 
 
       Review the sole future invocation as the exact literal command `./deploy/resofeed-caddy/deploy.sh
-      --stage-procedure --verified-commit <the reviewed full remediation commit>`
-      from a clean detached checkout at that same commit. The target remains exactly
-      `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`; no host, directory,
-      account, or script override exists. Require every maintained SSH connection
-      to bind the literal FQDN as effective destination and host-key identity, enforce
-      strict existing-host-key checking with host-key update/enrollment disabled,
-      use only the existing non-interactive credential/account, and fail before target-local
-      prepare or transfer on unknown/changed key, rewritten endpoint, alias, trust
-      bypass, credential drift, missing exact stack identity, or source drift. Do
-      not require, infer, or record the target''s internal hostname.
+      --stage-procedure --verified-commit <the reviewed full detached-guard remediation
+      commit>` from a clean detached checkout at that same commit. The target remains
+      exactly `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`; no
+      host, directory, account, or script override exists. Require exact verified-commit
+      and clean-checkout enforcement, literal FQDN as both effective SSH destination
+      and host-key identity, strict pre-existing host-key checking, host-key update/enrollment
+      disabled, only the existing non-interactive credential/account, and fail-closed
+      rejection before target-local prepare or transfer on attached source, unknown/changed
+      key, rewritten endpoint, alias, trust bypass, credential drift, missing exact
+      stack identity, or source drift. Do not require, infer, query, or record the
+      target''s internal hostname.
 
 
       Verify read-only authenticated inspection precedes prepare, transfer, backup,
@@ -192089,19 +192104,33 @@ phases:
       backup availability, transaction/atomic replacement, shell/Compose validation,
       exact remote hash postconditions, partial-failure restoration, deterministic
       local Git metadata equality, negligible two-file transfer cost, and every secret/runtime/data/Docker/registry
-      prohibition remain complete. The old staging authorization receipt and exhausted
-      command grant no authority to this operation; this review''s exact semantic
-      evidence is the sole producer consumed by the new runtime step. Missing integrated
-      identities, strict host-key enforcement, existing credential/access context,
-      rollback readiness, cost boundary, or exact postconditions returns BLOCKED without
-      SSH, host-key enrollment, alternate-host inspection, or external mutation. This
-      review grants no publication or deployment authority.'
-    verification: Independent R3 review binds one new operation ID, exact remediation
-      commit and two source hashes, exact fixed FQDN/stack/path, strict existing SSH
-      host-key and credential boundary, pre-write ordering, prior-byte recovery, local
-      Git equality, negligible cost, and non-mutation prohibitions; it proves the
-      exhausted command/authority cannot be reused and performs no SSH or external
-      write.
+      prohibition remain complete. The old staging authorization, exhausted command,
+      pre-remediation commit/hash, and correction-exhausted verifier material grant
+      no authority to this operation. This fresh review''s admitted semantic evidence
+      is the sole authorization producer consumed by `rf-bug-v2-stage-immutable-deployment-procedure-v2`;
+      its requirement coverage and state-transition rows must use each caller-bound
+      requirement ID exactly once.
+
+
+      Preserve the initial invalid receipt `sha256:213797bdca053a49e703215d017b5f11a803cc749893c127163bd2829b89361b`,
+      validator `sha256:6da4b9f76c215aabd77004472fe14ac6f1ea29b744eef57e46b3107f2700b0fe`,
+      corrected invalid receipt `sha256:ba91a224bd9606523fd337b38e15bdb3f78c17e6844bc2778de7deb02f6b6280`,
+      and corrected validator `sha256:74a971d105d065905d2995f669441c01ee8aabd2fdade135e2b205a03d0537d9`
+      as diagnostic-only history. Neither invalid receipt supplies completion or rejection
+      authority, and its malformed enums or repeated requirement transitions must
+      not be copied into the fresh review. Missing integrated identities, selected
+      proof, script-local pre-SSH guard, strict host-key enforcement, existing credential/access
+      context, rollback readiness, cost boundary, unique semantic requirement mapping,
+      or exact postconditions returns BLOCKED without SSH, host-key enrollment, alternate-host
+      inspection, or external mutation. This review grants no publication or deployment
+      authority.'
+    verification: A fresh spec-verifier review, with no SSH or side effect, binds
+      operation RF-BUG-V2-STAGE-PROCEDURE-ENDPOINT-IDENTITY-V2 to the newly integrated
+      detached-guard commit and exact two-file hashes; proves attached-clean rejection
+      before SSH, detached-clean full-matrix success, literal-FQDN strict existing-host-key
+      trust, rollback/cost/exclusion boundaries, and unique semantic requirement mapping;
+      and rejects the stale 4b2e878/137289 identities plus both invalid diagnostic
+      receipts as authority.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -192112,7 +192141,7 @@ phases:
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     depends_on:
-    - rf-bug-v2-ssh-endpoint-identity-remediation
+    - rf-bug-v2-detached-head-staging-guard-remediation
     agent: spec-verifier
   - id: rf-bug-v2-stage-immutable-deployment-procedure-v2
     name: Stage immutable procedure through authenticated endpoint identity v2
