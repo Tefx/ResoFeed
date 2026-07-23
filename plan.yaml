@@ -191587,7 +191587,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-immutable-procedure-staging-remediation
     name: Repair immutable procedure staging and pre-deploy identity order
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the integration-verifier FAIL on `RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE`.\
@@ -191699,6 +191699,17 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T19:38:41.398974Z'
+    done_at: '2026-07-23T20:10:16.220013+00:00'
+    evidence: Integrated commit 029ebf724981e6119ab7c9e0ace4eadb85d975dc from isolated
+      worktree /Users/tefx/Projects/ResoFeed-worktrees/rf-bug-v2-immutable-procedure-staging-remediation.
+      Exact selected execution `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green` passed with selected/executed
+      identity `RF-BUG-V2 immutable OCI and Tailnet deployment procedure`; independent
+      Gate receipt admission was CONFORMANT. Worker receipt sha256:2ef8256a1aaa916bd05923c5914cbc9eb333281aa4dc9621c158939b22e987da;
+      dispatch sha256:b530093535188e0749dd643a024c8938d2ad79fb5b516af8e24e97e4cd0f1c20;
+      verdict artifact /tmp/larva-agent-artifacts/rf-bug-v2-immutable-procedure-staging-remediation/worker-receipt-verdict.json.
+      Changed exactly seven allowed staging/test/skill/doc paths; no acceptance authorization
+      or external operation used.
   - id: rf-bug-v2-remote-procedure-staging-authorization-review
     name: Authorize exact Tailnet procedure staging
     status: pending
