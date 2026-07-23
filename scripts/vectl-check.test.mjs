@@ -13,6 +13,7 @@ import {
   childEnvironmentForCommand,
   evidenceEnvelope,
   generatedTreesMatch,
+  immutableDeploymentSources,
   parseEvidenceOutput,
   parseSelectionOutput,
   probeBuildIdentityRejection,
@@ -21,6 +22,7 @@ import {
   inventoryClosureRequirements,
   selectionEnvelope,
   validateClosureAuthorityOutputs,
+  verifyImmutableDeploymentSources,
   withGeneratedTreeRestoration,
   withLockedWebDependencies
 } from './vectl-check.mjs';
@@ -89,6 +91,9 @@ const expectedPending = [
   ]],
   ['rf-bug-v2-generated-webui-baseline-sync', 'rf_bug_v2_generated_webui_baseline_sync_green', [
     'RF-BUG-010 canonical generated webui baseline equality'
+  ]],
+  ['rf-bug-v2-immutable-deployment-procedure', 'rf_bug_v2_immutable_deployment_procedure_green', [
+    'RF-BUG-V2 immutable OCI and Tailnet deployment procedure'
   ]],
   ['rf-bug-v2-source-ledger', 'rf_bug_v2_source_ledger_green', [
     'RF-BUG-004 State import lifecycle',
@@ -167,8 +172,8 @@ test('VECTL-ADAPTER completed-harness-regression', () => {
 });
 
 test('VECTL-ADAPTER pending-profile-discovery', () => {
-  assert.equal(PENDING_PROFILE_PAIRS.length, 20);
-  assert.equal(expectedPending.length, 20);
+  assert.equal(PENDING_PROFILE_PAIRS.length, 21);
+  assert.equal(expectedPending.length, 21);
 
   for (const [suite, checkID, identities] of expectedPending) {
     const profile = findProfile(suite, checkID);
@@ -182,6 +187,231 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
     assert.deepEqual(selection.identities, identities);
     assert.equal(selection.identities.length, identities.length);
   }
+});
+
+test('immutable OCI and Tailnet deployment procedure', () => {
+  const profile = findProfile(
+    'rf-bug-v2-immutable-deployment-procedure',
+    'rf_bug_v2_immutable_deployment_procedure_green'
+  );
+  assert.ok(profile);
+  assert.equal(profile.runner, 'immutable-deployment');
+  assert.deepEqual(profile.identities, ['RF-BUG-V2 immutable OCI and Tailnet deployment procedure']);
+
+  const sources = immutableDeploymentSources();
+  const markers = verifyImmutableDeploymentSources(sources);
+  assert.deepEqual(profile.requiredOutput, [
+    'immutable OCI and Tailnet deployment procedure',
+    ...markers
+  ]);
+
+  const selected = invoke('select', profile.suite, profile.checkID);
+  assert.equal(selected.status, 0, selected.stderr);
+  assert.deepEqual(parseSelectionOutput(selected.stdout, profile), selectionEnvelope(profile));
+
+  const commit = 'a'.repeat(40);
+  const indexDigest = `sha256:${'1'.repeat(64)}`;
+  const amd64Digest = `sha256:${'2'.repeat(64)}`;
+  const arm64Digest = `sha256:${'3'.repeat(64)}`;
+  const priorCommit = 'b'.repeat(40);
+  const priorIndexDigest = `sha256:${'4'.repeat(64)}`;
+  const priorAMD64Digest = `sha256:${'5'.repeat(64)}`;
+  const priorARM64Digest = `sha256:${'6'.repeat(64)}`;
+  const deployArguments = [
+    '--verified-commit', commit,
+    '--immutable-tag', `git-${commit}`,
+    '--index-digest', indexDigest,
+    '--amd64-digest', amd64Digest,
+    '--arm64-digest', arm64Digest
+  ];
+
+  function executable(filePath, lines) {
+    fs.writeFileSync(filePath, `${lines.join('\n')}\n`);
+    fs.chmodSync(filePath, 0o755);
+  }
+
+  function deploymentFixture(failReplacementReadiness) {
+    const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-immutable-deploy-'));
+    const home = path.join(root, 'home');
+    const stack = path.join(home, 'Projects', 'resofeed-caddy');
+    const fakeBin = path.join(root, 'bin');
+    fs.mkdirSync(stack, { recursive: true });
+    fs.mkdirSync(fakeBin);
+    for (const name of ['deploy.sh', 'compose.yml']) {
+      fs.copyFileSync(path.join(repoRoot, 'deploy', 'resofeed-caddy', name), path.join(stack, name));
+    }
+    fs.chmodSync(path.join(stack, 'deploy.sh'), 0o755);
+
+    const priorImage = `docker.io/tefx/resofeed@${priorIndexDigest}`;
+    const targetImage = `docker.io/tefx/resofeed@${indexDigest}`;
+    const envPath = path.join(stack, '.env');
+    fs.writeFileSync(envPath, [
+      'TAILSCALE_IP=100.64.0.8',
+      'CADDY_LOCAL_HTTPS_PORT=8443',
+      'RESOFEED_DOMAIN=resofeed.example.test',
+      'CF_API_TOKEN=fixture-present',
+      'OPENROUTER_KEY=',
+      'TAVILY_API_KEY=',
+      `RESOFEED_IMAGE=${priorImage}`,
+      `RESOFEED_VERIFIED_COMMIT=${priorCommit}`,
+      `RESOFEED_IMMUTABLE_TAG=git-${priorCommit}`,
+      `RESOFEED_INDEX_DIGEST=${priorIndexDigest}`,
+      `RESOFEED_AMD64_DIGEST=${priorAMD64Digest}`,
+      `RESOFEED_ARM64_DIGEST=${priorARM64Digest}`,
+      ''
+    ].join('\n'), { mode: 0o600 });
+
+    const statePath = path.join(root, 'current-image');
+    const dockerLog = path.join(root, 'docker.log');
+    fs.writeFileSync(statePath, `${priorImage}\n`);
+    fs.writeFileSync(dockerLog, '');
+
+    executable(path.join(fakeBin, 'hostname'), [
+      '#!/usr/bin/env bash',
+      'printf "%s\\n" tefx-mbp-personal'
+    ]);
+    executable(path.join(fakeBin, 'sleep'), ['#!/usr/bin/env bash', 'exit 0']);
+    executable(path.join(fakeBin, 'tailscale'), [
+      '#!/usr/bin/env bash',
+      'if [[ "$1" == "ip" ]]; then printf "%s\\n" 100.64.0.8; exit 0; fi',
+      'if [[ "$1 $2" == "serve status" ]]; then printf "%s\\n" "TCP 443 -> tcp://127.0.0.1:8443"; exit 0; fi',
+      'if [[ "$1" == "serve" ]]; then exit 0; fi',
+      'exit 1'
+    ]);
+    executable(path.join(fakeBin, 'curl'), [
+      '#!/usr/bin/env bash',
+      'current=$(cat "$FAKE_STATE")',
+      'url=${@: -1}',
+      'if [[ "$FAKE_FAIL_READINESS" == "1" && "$current" == "$FAKE_TARGET_IMAGE" ]]; then printf "%s" 503; exit 0; fi',
+      'if [[ "$url" == */api/doctor ]]; then printf "%s" 401; else printf "%s" 200; fi'
+    ]);
+    executable(path.join(fakeBin, 'docker'), [
+      '#!/usr/bin/env bash',
+      'printf "%s\\n" "$*" >> "$FAKE_DOCKER_LOG"',
+      'if [[ "$1 $2 $3" == "buildx imagetools inspect" ]]; then',
+      '  if [[ " $* " == *" --format "* ]]; then',
+      '    printf "{\\"org.opencontainers.image.revision\\":\\"%s\\"}\\n" "$FAKE_COMMIT"',
+      '  else',
+      '    cat <<EOF',
+      'Name: $4',
+      'MediaType: application/vnd.oci.image.index.v1+json',
+      'Digest: $FAKE_INDEX_DIGEST',
+      'Manifests:',
+      '  Name: docker.io/tefx/resofeed@$FAKE_AMD64_DIGEST',
+      '  Platform: linux/amd64',
+      '  Name: docker.io/tefx/resofeed@$FAKE_ARM64_DIGEST',
+      '  Platform: linux/arm64',
+      'EOF',
+      '  fi',
+      '  exit 0',
+      'fi',
+      'if [[ "$1 $2" == "container inspect" ]]; then',
+      '  target=${@: -1}',
+      '  if [[ "$target" == "resofeed-caddy" ]]; then exit 0; fi',
+      '  if [[ " $* " == *" --format "* ]]; then',
+      '    if [[ "$*" == *".Config.Image"* ]]; then cat "$FAKE_STATE"; exit 0; fi',
+      '    if [[ "$*" == *".Image"* ]]; then printf "%s\\n" sha256:fixture-image-id; exit 0; fi',
+      '    if [[ "$*" == *".Mounts"* ]]; then printf "%s\\n" "resofeed-caddy_resofeed-data | /data"; exit 0; fi',
+      '  fi',
+      '  exit 0',
+      'fi',
+      'if [[ "$1 $2" == "image inspect" ]]; then printf "%s\\n" "$FAKE_PRIOR_IMAGE"; exit 0; fi',
+      'if [[ "$1" == "compose" ]]; then',
+      '  if [[ " $* " == *" up "* ]]; then awk -F= \'$1=="RESOFEED_IMAGE" {print substr($0, index($0,"=")+1)}\' "$FAKE_ENV" > "$FAKE_STATE"; fi',
+      '  exit 0',
+      'fi',
+      'exit 1'
+    ]);
+
+    const environment = {
+      PATH: `${fakeBin}:${process.env.PATH ?? ''}`,
+      HOME: home,
+      TMPDIR: root,
+      FAKE_STATE: statePath,
+      FAKE_ENV: envPath,
+      FAKE_DOCKER_LOG: dockerLog,
+      FAKE_COMMIT: commit,
+      FAKE_INDEX_DIGEST: indexDigest,
+      FAKE_AMD64_DIGEST: amd64Digest,
+      FAKE_ARM64_DIGEST: arm64Digest,
+      FAKE_PRIOR_IMAGE: priorImage,
+      FAKE_TARGET_IMAGE: targetImage,
+      FAKE_FAIL_READINESS: failReplacementReadiness ? '1' : '0'
+    };
+    const result = spawnSync(path.join(stack, 'deploy.sh'), deployArguments, {
+      cwd: stack,
+      encoding: 'utf8',
+      env: environment
+    });
+    return { root, stack, envPath, statePath, dockerLog, environment, priorImage, targetImage, result };
+  }
+
+  const successful = deploymentFixture(false);
+  try {
+    assert.equal(successful.result.status, 0, successful.result.stderr);
+    assert.equal(fs.readFileSync(successful.statePath, 'utf8').trim(), successful.targetImage);
+    const deployedEnv = fs.readFileSync(successful.envPath, 'utf8');
+    assert.match(deployedEnv, new RegExp(`^RESOFEED_IMAGE=${successful.targetImage}$`, 'mu'));
+    assert.match(deployedEnv, /^CF_API_TOKEN=fixture-present$/mu);
+    assert.match(successful.result.stdout, /READINESS=root_200_doctor_401/u);
+    assert.doesNotMatch(fs.readFileSync(successful.dockerLog, 'utf8'), /(?:down|volume rm|--volumes)/u);
+
+    const orphan = spawnSync(path.join(successful.stack, 'deploy.sh'), ['--record-orphan', ...deployArguments], {
+      cwd: successful.stack,
+      encoding: 'utf8',
+      env: successful.environment
+    });
+    assert.equal(orphan.status, 0, orphan.stderr);
+    const ledger = fs.readFileSync(path.join(successful.stack, '.resofeed-oci-orphans.log'), 'utf8');
+    assert.ok(ledger.includes(`verified_commit=${commit} immutable_tag=git-${commit} index=${indexDigest}`));
+  } finally {
+    fs.rmSync(successful.root, { recursive: true, force: true });
+  }
+
+  const failed = deploymentFixture(true);
+  try {
+    assert.equal(failed.result.status, 1);
+    assert.equal(fs.readFileSync(failed.statePath, 'utf8').trim(), failed.priorImage);
+    assert.match(fs.readFileSync(failed.envPath, 'utf8'), new RegExp(`^RESOFEED_IMAGE=${failed.priorImage}$`, 'mu'));
+    assert.match(failed.result.stderr, /ROLLBACK=prior_digest_and_readiness restored/u);
+    assert.doesNotMatch(fs.readFileSync(failed.dockerLog, 'utf8'), /(?:down|volume rm|--volumes)/u);
+  } finally {
+    fs.rmSync(failed.root, { recursive: true, force: true });
+  }
+
+  function mutation(relativePath, mutate) {
+    return { ...sources, [relativePath]: mutate(sources[relativePath]) };
+  }
+
+  const deployPath = 'deploy/resofeed-caddy/deploy.sh';
+  const composePath = 'deploy/resofeed-caddy/compose.yml';
+  const movingTag = ['late', 'st'].join('');
+  const clearData = ['--clear', '-data'].join('');
+  const resetToken = ['--reset', '-token'].join('');
+  const negativeCases = [
+    mutation(deployPath, (body) => body.replace('docker.io/tefx/resofeed', 'docker.io/alternate/resofeed')),
+    mutation(deployPath, (body) => body.replace('tefx-mbp-personal.platy-atlas.ts.net', 'alternate-host.invalid')),
+    mutation(composePath, (body) => body.replace(
+      'image: ${RESOFEED_IMAGE:?set RESOFEED_IMAGE to docker.io/tefx/resofeed@sha256:<digest>}',
+      `image: \${RESOFEED_IMAGE:-docker.io/tefx/resofeed:${movingTag}}`
+    )),
+    mutation(deployPath, (body) => body.replace('expected_tag="git-${VERIFIED_COMMIT}"', 'expected_tag="$IMMUTABLE_TAG"')),
+    mutation(deployPath, (body) => body.replace('verify_oci_descriptor "${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"', 'true')),
+    mutation(deployPath, (body) => body.replace('application/vnd.oci.image.index.v1+json', 'application/vnd.docker.distribution.manifest.list.v2+json')),
+    mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/amd64'", "inspect_manifest_digest 'linux/386'")),
+    mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/arm64'", "inspect_manifest_digest 'linux/arm/v7'")),
+    mutation(deployPath, (body) => body.replaceAll('rollback_previous_digest', 'rollback_without_readiness')),
+    mutation(deployPath, (body) => `${body}\ndocker manifest rm unauthorized\n`),
+    mutation(deployPath, (body) => `${body}\nprintf '%s\\n' "$OPENROUTER_KEY"\n`),
+    mutation(deployPath, (body) => `${body}\n${clearData}\n`),
+    mutation(deployPath, (body) => `${body}\n${resetToken}\n`)
+  ];
+  for (const invalid of negativeCases) {
+    assert.throws(() => verifyImmutableDeploymentSources(invalid), /immutable deployment/u);
+  }
+
+  console.log('immutable OCI and Tailnet deployment procedure');
+  for (const marker of markers) console.log(marker);
 });
 
 test('RF-BUG-010 runtime isolation adapter contract', () => {
@@ -997,7 +1227,13 @@ test('RF-BUG runtime documentation contract profile', () => {
 
 test('VECTL-ADAPTER protected-scope', () => {
   const allowed = new Set([
+    '.agents/skills/resofeed-tailnet-deploy/SKILL.md',
+    'deploy/resofeed-caddy/.env.example',
+    'deploy/resofeed-caddy/README.md',
+    'deploy/resofeed-caddy/compose.yml',
+    'deploy/resofeed-caddy/deploy.sh',
     'docs/ARCHITECTURE.md',
+    'docs/CONTAINER.md',
     'docs/DESIGN.md',
     'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md',
     'docs/USAGE.md',

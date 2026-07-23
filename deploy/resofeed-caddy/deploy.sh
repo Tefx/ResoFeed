@@ -3,12 +3,23 @@ set -Eeuo pipefail
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 cd "$SCRIPT_DIR"
+umask 077
 
-COMPOSE_FILE="compose.yml"
-ENV_FILE=".env"
-ENV_EXAMPLE=".env.example"
-RESOFEED_IMAGE="tefx/resofeed:latest"
-RESOFEED_VOLUME="resofeed-caddy_resofeed-data"
+readonly COMPOSE_FILE="compose.yml"
+readonly ENV_FILE=".env"
+readonly OCI_REPOSITORY="docker.io/tefx/resofeed"
+readonly STACK_NAME="resofeed-caddy"
+readonly TAILNET_TARGET_HOST="tefx-mbp-personal.platy-atlas.ts.net"
+readonly RESOFEED_VOLUME="resofeed-caddy_resofeed-data"
+readonly ORPHAN_LEDGER=".resofeed-oci-orphans.log"
+
+MODE="deploy"
+VERIFIED_COMMIT=""
+IMMUTABLE_TAG=""
+OCI_INDEX_DIGEST=""
+AMD64_MANIFEST_DIGEST=""
+ARM64_MANIFEST_DIGEST=""
+RESOFEED_IMAGE=""
 
 TAILSCALE_IP=""
 CADDY_LOCAL_HTTPS_PORT=""
@@ -16,23 +27,42 @@ RESOFEED_DOMAIN=""
 CF_API_TOKEN=""
 OPENROUTER_KEY=""
 TAVILY_API_KEY=""
+ENV_VERIFIED_COMMIT=""
+ENV_IMMUTABLE_TAG=""
+ENV_INDEX_DIGEST=""
+ENV_AMD64_DIGEST=""
+ENV_ARM64_DIGEST=""
+
+PREVIOUS_IMAGE=""
+PREVIOUS_VERIFIED_COMMIT=""
+PREVIOUS_IMMUTABLE_TAG=""
+PREVIOUS_INDEX_DIGEST=""
+PREVIOUS_AMD64_DIGEST=""
+PREVIOUS_ARM64_DIGEST=""
+REPLACEMENT_STARTED=0
 
 usage() {
   cat <<'EOF'
-RESOFEED :: CADDY/TAILSCALE DEPLOYMENT
+RESOFEED :: IMMUTABLE OCI / CADDY / TAILSCALE DEPLOYMENT
 
 Usage:
-  ./deploy.sh
-  ./deploy.sh --reset-token
-  ./deploy.sh --help
+  ./deploy.sh --verified-commit <40-hex> --immutable-tag <git-40-hex> \
+    --index-digest <sha256:64-hex> \
+    --amd64-digest <sha256:64-hex> \
+    --arm64-digest <sha256:64-hex>
 
-Default mode creates/starts the Docker Compose stack and ensures Tailscale Serve
-forwards Tailnet TCP/443 to the local Caddy HTTPS listener.
+  ./deploy.sh --record-orphan --verified-commit <40-hex> \
+    --immutable-tag <git-40-hex> \
+    --index-digest <sha256:64-hex> \
+    --amd64-digest <sha256:64-hex> \
+    --arm64-digest <sha256:64-hex>
 
-Options:
-  --reset-token   Stop ResoFeed, reset the stored owner token hash, restart, and
-                  print the newly generated owner token if it appears in logs.
-  --help          Show this help.
+The deploy mode verifies the caller-supplied commit/tag/index/platform chain for
+exactly docker.io/tefx/resofeed, then updates only the tefx-mbp-personal
+resofeed-caddy stack. Failure restores the prior digest and verifies readiness.
+The record-orphan mode appends the complete non-secret chain to the local orphan
+ledger. Registry tag deletion is outside this script and requires separate,
+explicit registry authorization.
 EOF
 }
 
@@ -48,312 +78,464 @@ fail() {
   printf '[ FAIL ] %s\n' "$1" >&2
 }
 
-die() {
+fatal() {
   fail "$1"
-  printf 'Diagnostics: inspect docker logs resofeed-caddy and docker logs resofeed.\n' >&2
   exit 1
 }
 
-run_quiet() {
-  desc=$1
-  shift
-  tmp=$(mktemp "${TMPDIR:-/tmp}/resofeed-deploy.XXXXXX")
-  if "$@" >"$tmp" 2>&1; then
-    rm -f "$tmp"
-    ok "$desc"
-    return 0
-  fi
-  rm -f "$tmp"
-  die "$desc failed. Inspect Docker/Tailscale status and service logs."
-}
-
-mask_if_secret_key() {
-  case "$1" in
-    CF_API_TOKEN|OPENROUTER_KEY|TAVILY_API_KEY) printf '[masked]' ;;
-    *) printf '%s' "$2" ;;
-  esac
-}
-
 require_command() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    die "Required command not found: $1"
-  fi
+  command -v "$1" >/dev/null 2>&1 || fatal "Required command is unavailable: $1"
   ok "Command available: $1"
 }
 
-detect_tailscale_ip() {
-  if command -v tailscale >/dev/null 2>&1; then
-    tailscale ip -4 2>/dev/null | awk 'NF { print; exit }'
-  fi
+is_digest() {
+  [[ "$1" =~ ^sha256:[a-f0-9]{64}$ ]]
 }
 
-set_env_key() {
-  key=$1
-  value=$2
-  tmp=$(mktemp "${ENV_FILE}.XXXXXX")
-  if grep -q "^${key}=" "$ENV_FILE"; then
-    awk -v k="$key" -v v="$value" 'BEGIN{done=0} $0 ~ "^" k "=" {print k "=" v; done=1; next} {print} END{if(!done) print k "=" v}' "$ENV_FILE" > "$tmp"
-  else
-    awk -v k="$key" -v v="$value" '{print} END{print k "=" v}' "$ENV_FILE" > "$tmp"
+parse_arguments() {
+  if [ "${1:-}" = "--record-orphan" ]; then
+    MODE="record-orphan"
+    shift
   fi
-  mv "$tmp" "$ENV_FILE"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --verified-commit)
+        [ "$#" -ge 2 ] || fatal "--verified-commit requires a value."
+        VERIFIED_COMMIT=$2
+        shift 2
+        ;;
+      --immutable-tag)
+        [ "$#" -ge 2 ] || fatal "--immutable-tag requires a value."
+        IMMUTABLE_TAG=$2
+        shift 2
+        ;;
+      --index-digest)
+        [ "$#" -ge 2 ] || fatal "--index-digest requires a value."
+        OCI_INDEX_DIGEST=$2
+        shift 2
+        ;;
+      --amd64-digest)
+        [ "$#" -ge 2 ] || fatal "--amd64-digest requires a value."
+        AMD64_MANIFEST_DIGEST=$2
+        shift 2
+        ;;
+      --arm64-digest)
+        [ "$#" -ge 2 ] || fatal "--arm64-digest requires a value."
+        ARM64_MANIFEST_DIGEST=$2
+        shift 2
+        ;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      *)
+        usage >&2
+        fatal "Unsupported option. Mutable, destructive, credential, and alternate-target modes are refused."
+        ;;
+    esac
+  done
+}
+
+validate_identity_arguments() {
+  [[ "$VERIFIED_COMMIT" =~ ^[a-f0-9]{40}$ ]] || fatal "Verified commit must be exactly 40 lowercase hexadecimal characters."
+  expected_tag="git-${VERIFIED_COMMIT}"
+  [ "$IMMUTABLE_TAG" = "$expected_tag" ] || fatal "Immutable tag must be the git-<verified-commit> binding."
+
+  is_digest "$OCI_INDEX_DIGEST" || fatal "OCI index digest is missing or malformed."
+  is_digest "$AMD64_MANIFEST_DIGEST" || fatal "linux/amd64 manifest digest is missing or malformed."
+  is_digest "$ARM64_MANIFEST_DIGEST" || fatal "linux/arm64 manifest digest is missing or malformed."
+  [ "$OCI_INDEX_DIGEST" != "$AMD64_MANIFEST_DIGEST" ] || fatal "OCI index and linux/amd64 manifest digests must differ."
+  [ "$OCI_INDEX_DIGEST" != "$ARM64_MANIFEST_DIGEST" ] || fatal "OCI index and linux/arm64 manifest digests must differ."
+  [ "$AMD64_MANIFEST_DIGEST" != "$ARM64_MANIFEST_DIGEST" ] || fatal "Platform manifest digests must differ."
+
+  RESOFEED_IMAGE="${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"
+}
+
+validate_target_boundary() {
+  [ "$(basename "$SCRIPT_DIR")" = "$STACK_NAME" ] || fatal "Deployment directory is not the authorized resofeed-caddy stack."
+  [ "$SCRIPT_DIR" = "${HOME}/Projects/${STACK_NAME}" ] || fatal "Deployment directory is outside the authorized Tailnet stack path."
+  [ "$(hostname -s)" = "${TAILNET_TARGET_HOST%%.*}" ] || fatal "Deployment host is outside the authorized Tailnet target."
+}
+
+record_orphan() {
+  validate_target_boundary
+  printf '%s verified_commit=%s immutable_tag=%s index=%s linux_amd64=%s linux_arm64=%s\n' \
+    "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+    "$VERIFIED_COMMIT" "$IMMUTABLE_TAG" "$OCI_INDEX_DIGEST" \
+    "$AMD64_MANIFEST_DIGEST" "$ARM64_MANIFEST_DIGEST" >> "$ORPHAN_LEDGER"
+  ok "ORPHAN_CHAIN=recorded_for_authorized_follow_up"
 }
 
 load_env() {
+  local seen_keys='|'
+  [ -f "$ENV_FILE" ] || fatal "Missing .env. Copy .env.example, configure it locally, and retry."
   while IFS= read -r line || [ -n "$line" ]; do
     case "$line" in
       ''|'#'*) continue ;;
     esac
-    case "$line" in
-      TAILSCALE_IP=*|CADDY_LOCAL_HTTPS_PORT=*|RESOFEED_DOMAIN=*|CF_API_TOKEN=*|OPENROUTER_KEY=*|TAVILY_API_KEY=*|RESOFEED_IMAGE=*)
-        key=${line%%=*}
-        value=${line#*=}
-        value=${value%$'\r'}
-        case "$key" in
-          TAILSCALE_IP) TAILSCALE_IP=$value ;;
-          CADDY_LOCAL_HTTPS_PORT) CADDY_LOCAL_HTTPS_PORT=$value ;;
-          RESOFEED_DOMAIN) RESOFEED_DOMAIN=$value ;;
-          CF_API_TOKEN) CF_API_TOKEN=$value ;;
-          OPENROUTER_KEY) OPENROUTER_KEY=$value ;;
-          TAVILY_API_KEY) TAVILY_API_KEY=$value ;;
-          RESOFEED_IMAGE) RESOFEED_IMAGE=$value ;;
+    key=${line%%=*}
+    value=${line#*=}
+    value=${value%$'\r'}
+    case "$key" in
+      TAILSCALE_IP|CADDY_LOCAL_HTTPS_PORT|RESOFEED_DOMAIN|CF_API_TOKEN|OPENROUTER_KEY|TAVILY_API_KEY|RESOFEED_IMAGE|RESOFEED_VERIFIED_COMMIT|RESOFEED_IMMUTABLE_TAG|RESOFEED_INDEX_DIGEST|RESOFEED_AMD64_DIGEST|RESOFEED_ARM64_DIGEST)
+        case "$seen_keys" in
+          *"|${key}|"*) fatal "Duplicate deployment configuration key is refused: ${key}" ;;
         esac
+        seen_keys="${seen_keys}${key}|"
         ;;
+      *) continue ;;
+    esac
+    case "$key" in
+      TAILSCALE_IP) TAILSCALE_IP=$value ;;
+      CADDY_LOCAL_HTTPS_PORT) CADDY_LOCAL_HTTPS_PORT=$value ;;
+      RESOFEED_DOMAIN) RESOFEED_DOMAIN=$value ;;
+      CF_API_TOKEN) CF_API_TOKEN=$value ;;
+      OPENROUTER_KEY) OPENROUTER_KEY=$value ;;
+      TAVILY_API_KEY) TAVILY_API_KEY=$value ;;
+      RESOFEED_IMAGE) : ;;
+      RESOFEED_VERIFIED_COMMIT) ENV_VERIFIED_COMMIT=$value ;;
+      RESOFEED_IMMUTABLE_TAG) ENV_IMMUTABLE_TAG=$value ;;
+      RESOFEED_INDEX_DIGEST) ENV_INDEX_DIGEST=$value ;;
+      RESOFEED_AMD64_DIGEST) ENV_AMD64_DIGEST=$value ;;
+      RESOFEED_ARM64_DIGEST) ENV_ARM64_DIGEST=$value ;;
     esac
   done < "$ENV_FILE"
 }
 
-ensure_env_file() {
-  section '[ STATE ]'
-  if [ ! -f "$ENV_FILE" ]; then
-    [ -f "$ENV_EXAMPLE" ] || die "Missing ${ENV_EXAMPLE}; cannot create ${ENV_FILE}."
-    cp "$ENV_EXAMPLE" "$ENV_FILE"
-    ok "Created local .env from .env.example"
-
-    detected_ip=$(detect_tailscale_ip || true)
-    if [ -n "$detected_ip" ]; then
-      set_env_key TAILSCALE_IP "$detected_ip"
-      ok "Detected Tailscale IP and wrote TAILSCALE_IP to .env"
-    else
-      fail "Could not auto-detect TAILSCALE_IP; edit .env manually."
-    fi
-
-    section '[ ACTION REQUIRED: AUTHENTICATION ]'
-    printf '[ FAIL ] Edit .env and set CF_API_TOKEN=[masked]. OPENROUTER_KEY=[masked] and TAVILY_API_KEY=[masked] are optional.\n' >&2
-    printf 'Then rerun ./deploy.sh. The local .env file is ignored by git.\n' >&2
-    exit 2
-  fi
-  ok "Found local .env"
-}
-
-validate_and_normalize_env() {
-  load_env
-
+validate_runtime_configuration() {
   if [ -z "$TAILSCALE_IP" ]; then
-    detected_ip=$(detect_tailscale_ip || true)
-    if [ -n "$detected_ip" ]; then
-      TAILSCALE_IP=$detected_ip
-      set_env_key TAILSCALE_IP "$TAILSCALE_IP"
-      ok "Detected Tailscale IP and updated .env"
-    else
-      die "TAILSCALE_IP is empty and tailscale ip -4 did not return an address."
+    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null | awk 'NF {print; exit}')
+  fi
+  [ -n "$TAILSCALE_IP" ] || fatal "TAILSCALE_IP is unavailable."
+  [[ "$CADDY_LOCAL_HTTPS_PORT" =~ ^[0-9]+$ ]] || fatal "CADDY_LOCAL_HTTPS_PORT must be numeric."
+  [ "$CADDY_LOCAL_HTTPS_PORT" -ge 1 ] && [ "$CADDY_LOCAL_HTTPS_PORT" -le 65535 ] \
+    || fatal "CADDY_LOCAL_HTTPS_PORT is outside the TCP port range."
+  [ -n "$RESOFEED_DOMAIN" ] || fatal "RESOFEED_DOMAIN is required."
+  [ -n "$CF_API_TOKEN" ] && [ "$CF_API_TOKEN" != "replace_with_cloudflare_dns01_token" ] \
+    || fatal "CF_API_TOKEN=[masked] must be configured."
+
+  ok "CF_API_TOKEN=[masked-present]"
+  if [ -n "$OPENROUTER_KEY" ]; then ok "OPENROUTER_KEY=[masked-present]"; else ok "OPENROUTER_KEY=[masked-empty]"; fi
+  if [ -n "$TAVILY_API_KEY" ]; then ok "TAVILY_API_KEY=[masked-present]"; else ok "TAVILY_API_KEY=[masked-empty]"; fi
+}
+
+inspect_manifest_digest() {
+  platform=$1
+  awk -v wanted="$platform" '
+    $1 == "Name:" && $2 ~ /@sha256:/ { digest=$2; sub(/^.*@/, "", digest) }
+    $1 == "Platform:" && $2 == wanted { print digest }
+  '
+}
+
+verify_oci_descriptor() {
+  reference=$1
+  output=$(docker buildx imagetools inspect "$reference" 2>/dev/null) \
+    || fatal "OCI identity inspection failed."
+
+  observed_media_type=$(printf '%s\n' "$output" | awk '$1 == "MediaType:" {print $2; exit}')
+  observed_index=$(printf '%s\n' "$output" | awk '$1 == "Digest:" {print $2; exit}')
+  observed_amd64=$(printf '%s\n' "$output" | inspect_manifest_digest 'linux/amd64')
+  observed_arm64=$(printf '%s\n' "$output" | inspect_manifest_digest 'linux/arm64')
+  platform_count=$(printf '%s\n' "$output" | awk '$1 == "Platform:" {count++} END {print count+0}')
+  unexpected_platforms=$(printf '%s\n' "$output" | awk '$1 == "Platform:" && $2 != "linux/amd64" && $2 != "linux/arm64" {count++} END {print count+0}')
+
+  [ "$observed_media_type" = "application/vnd.oci.image.index.v1+json" ] \
+    || fatal "Published descriptor is not an OCI image index."
+  [ "$observed_index" = "$OCI_INDEX_DIGEST" ] || fatal "OCI index digest does not match the caller-supplied chain."
+  [ "$observed_amd64" = "$AMD64_MANIFEST_DIGEST" ] || fatal "linux/amd64 manifest digest does not match the caller-supplied chain."
+  [ "$observed_arm64" = "$ARM64_MANIFEST_DIGEST" ] || fatal "linux/arm64 manifest digest does not match the caller-supplied chain."
+  [ "$platform_count" -eq 2 ] && [ "$unexpected_platforms" -eq 0 ] \
+    || fatal "OCI index must contain exactly linux/amd64 and linux/arm64 manifests."
+}
+
+verify_commit_label() {
+  digest=$1
+  labels=$(docker buildx imagetools inspect "${OCI_REPOSITORY}@${digest}" \
+    --format '{{json .Image.Config.Labels}}' 2>/dev/null) \
+    || fatal "OCI platform commit-label inspection failed."
+  printf '%s' "$labels" | grep -Fq "\"org.opencontainers.image.revision\":\"${VERIFIED_COMMIT}\"" \
+    || fatal "OCI platform image is not bound to the verified commit."
+}
+
+verify_oci_identity() {
+  section '[ OCI IDENTITY ]'
+  verify_oci_descriptor "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"
+  verify_oci_descriptor "${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"
+  verify_commit_label "$AMD64_MANIFEST_DIGEST"
+  verify_commit_label "$ARM64_MANIFEST_DIGEST"
+  ok "VERIFIED_COMMIT=${VERIFIED_COMMIT}"
+  ok "IMMUTABLE_TAG=${IMMUTABLE_TAG}"
+  ok "OCI_INDEX_DIGEST=${OCI_INDEX_DIGEST}"
+  ok "LINUX_AMD64_DIGEST=${AMD64_MANIFEST_DIGEST}"
+  ok "LINUX_ARM64_DIGEST=${ARM64_MANIFEST_DIGEST}"
+}
+
+canonical_repository_digest() {
+  local candidate digest
+  case "$1" in
+    "${OCI_REPOSITORY}@"sha256:*) candidate=$1 ;;
+    "tefx/resofeed@"sha256:*) candidate="docker.io/$1" ;;
+    *) return 1 ;;
+  esac
+  digest=${candidate#*@}
+  is_digest "$digest" || return 1
+  printf '%s' "$candidate"
+}
+
+resolve_previous_image() {
+  if ! docker container inspect resofeed >/dev/null 2>&1; then
+    return 0
+  fi
+
+  configured=$(docker container inspect --format '{{.Config.Image}}' resofeed 2>/dev/null) \
+    || fatal "Unable to inspect the currently deployed ResoFeed container."
+  if previous=$(canonical_repository_digest "$configured"); then
+    PREVIOUS_IMAGE=$previous
+    return 0
+  fi
+
+  image_id=$(docker container inspect --format '{{.Image}}' resofeed 2>/dev/null) \
+    || fatal "Unable to inspect the currently deployed image ID."
+  candidates=$(docker image inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "$image_id" 2>/dev/null) \
+    || fatal "Unable to resolve the prior repository digest."
+  resolved=""
+  while IFS= read -r candidate; do
+    [ -n "$candidate" ] || continue
+    if canonical=$(canonical_repository_digest "$candidate"); then
+      if [ -n "$resolved" ] && [ "$resolved" != "$canonical" ]; then
+        fatal "The prior image resolves to multiple repository digests."
+      fi
+      resolved=$canonical
     fi
-  else
-    ok "TAILSCALE_IP configured: $TAILSCALE_IP"
+  done <<EOF
+$candidates
+EOF
+  [ -n "$resolved" ] || fatal "The current deployment has no recoverable immutable repository digest."
+  PREVIOUS_IMAGE=$resolved
+}
+
+validate_existing_state() {
+  resolve_previous_image
+  if [ -z "$PREVIOUS_IMAGE" ]; then
+    ok "No prior ResoFeed container; first immutable deployment will retain the named SQLite volume."
+    return
   fi
 
-  if [ -z "$CADDY_LOCAL_HTTPS_PORT" ]; then
-    CADDY_LOCAL_HTTPS_PORT=8443
-    set_env_key CADDY_LOCAL_HTTPS_PORT "$CADDY_LOCAL_HTTPS_PORT"
-    ok "CADDY_LOCAL_HTTPS_PORT defaulted to 8443 in .env"
-  else
-    ok "CADDY_LOCAL_HTTPS_PORT configured: $CADDY_LOCAL_HTTPS_PORT"
+  mounts=$(docker container inspect --format '{{range .Mounts}}{{println .Name "|" .Destination}}{{end}}' resofeed 2>/dev/null) \
+    || fatal "Unable to inspect the existing ResoFeed mounts."
+  printf '%s\n' "$mounts" | grep -Fq "${RESOFEED_VOLUME} | /data" \
+    || fatal "Existing ResoFeed does not use the preserved SQLite volume."
+  docker container inspect resofeed-caddy >/dev/null 2>&1 \
+    || fatal "Existing ResoFeed deployment is missing the resofeed-caddy container."
+  ok "Prior immutable digest captured for readiness rollback."
+  ok "SQLite volume preservation verified."
+}
+
+validate_tailscale_boundary() {
+  target="tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}"
+  status=$(tailscale serve status 2>&1 || true)
+  if printf '%s\n' "$status" | grep -qi 'No serve config'; then
+    return 0
   fi
-
-  if [ -z "$RESOFEED_DOMAIN" ]; then
-    die "RESOFEED_DOMAIN is empty in .env. Set it before deploying."
+  if printf '%s\n' "$status" | grep -Fq "$target"; then
+    return 0
   fi
-  ok "RESOFEED_DOMAIN configured: $RESOFEED_DOMAIN"
-
-  if [ -z "$CF_API_TOKEN" ] || [ "$CF_API_TOKEN" = "replace_with_cloudflare_dns01_token" ]; then
-    section '[ ACTION REQUIRED: AUTHENTICATION ]'
-    fail "CF_API_TOKEN=[masked] must be set in .env before Caddy can issue certificates."
-    exit 2
+  if printf '%s\n' "$status" | grep -Eq '(^|[^0-9])443([^0-9]|$)'; then
+    fatal "Tailnet TCP/443 is owned by a different target."
   fi
-  ok "CF_API_TOKEN configured: [masked]"
-
-  if [ -n "$OPENROUTER_KEY" ]; then
-    ok "OPENROUTER_KEY configured: [masked]"
-  else
-    ok "OPENROUTER_KEY empty; model-backed features remain disabled"
-  fi
-
-  if [ -n "$TAVILY_API_KEY" ]; then
-    ok "TAVILY_API_KEY configured: [masked]"
-  else
-    ok "TAVILY_API_KEY empty; external extraction recovery remains disabled"
-  fi
-}
-
-print_state_summary() {
-  mode=$1
-  printf 'MODE: %s\n' "$mode"
-  printf 'DOMAIN: %s\n' "$RESOFEED_DOMAIN"
-  printf 'TAILSCALE IP: %s\n' "$TAILSCALE_IP"
-  printf 'LOCAL CADDY HTTPS: 127.0.0.1:%s\n' "$CADDY_LOCAL_HTTPS_PORT"
-}
-
-dns_host_label() {
-  printf '%s' "${RESOFEED_DOMAIN%%.*}"
-}
-
-print_dns_guidance() {
-  section '[ ACTION REQUIRED: DNS ]'
-  printf 'Create or verify this Cloudflare DNS record:\n'
-  printf 'Type: A\n'
-  printf 'Name: %s\n' "$(dns_host_label)"
-  printf 'Content: %s\n' "$TAILSCALE_IP"
-  printf 'Proxy status: DNS only / gray cloud\n'
-}
-
-compose_pull_resofeed() {
-  run_quiet "Pulled latest ResoFeed image: ${RESOFEED_IMAGE}" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull resofeed
-}
-
-compose_up_all() {
-  compose_pull_resofeed
-  run_quiet "Docker Compose stack is running" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build
-}
-
-compose_stop_resofeed() {
-  run_quiet "Stopped resofeed service" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" stop resofeed
-}
-
-compose_up_resofeed() {
-  compose_pull_resofeed
-  run_quiet "Started resofeed service" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d resofeed
 }
 
 ensure_tailscale_serve() {
   target="tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}"
   status=$(tailscale serve status 2>&1 || true)
-
-  if printf '%s\n' "$status" | grep -qi 'No serve config'; then
-    tailscale serve --bg --tcp=443 "$target"
-    ok "Tailscale Serve configured: TCP/443 to $target"
-    return
+  if ! printf '%s\n' "$status" | grep -Fq "$target"; then
+    tailscale serve --bg --tcp=443 "$target" >/dev/null
   fi
-
-  if printf '%s\n' "$status" | grep -Fq "$target"; then
-    ok "Tailscale Serve already forwards TCP/443 to $target"
-    return
-  fi
-
-  if printf '%s\n' "$status" | grep -Eq '(^|[^0-9])443([^0-9]|$)'; then
-    fail "Tailscale Serve already has a different 443 rule."
-    printf 'Inspect with: tailscale serve status\n' >&2
-    printf 'Reset manually only if you intend this host to serve ResoFeed on Tailnet TCP/443.\n' >&2
-    exit 1
-  fi
-
-  tailscale serve --bg --tcp=443 "$target"
-  ok "Tailscale Serve configured: TCP/443 to $target"
+  ok "Tailnet TCP/443 forwards to the existing local Caddy HTTPS listener."
 }
 
-extract_owner_token() {
-  since_ts=$1
-  docker logs resofeed --since "$since_ts" 2>&1 \
-    | grep -Eo 'owner token generated: rfeed_[A-Za-z0-9_-]+' \
-    | awk '{print $4}' \
-    | tail -n 1 || true
+write_image_chain() {
+  local image=$1
+  local commit=$2
+  local tag=$3
+  local index_digest=$4
+  local amd64_digest=$5
+  local arm64_digest=$6
+  local tmp
+  tmp=$(mktemp "${ENV_FILE}.identity.XXXXXX")
+  chmod 600 "$tmp" || { rm -f "$tmp"; return 1; }
+  if ! awk \
+    -v image="$image" \
+    -v commit="$commit" \
+    -v tag="$tag" \
+    -v index_digest="$index_digest" \
+    -v amd64_digest="$amd64_digest" \
+    -v arm64_digest="$arm64_digest" '
+      BEGIN {
+        values["RESOFEED_IMAGE"]=image
+        values["RESOFEED_VERIFIED_COMMIT"]=commit
+        values["RESOFEED_IMMUTABLE_TAG"]=tag
+        values["RESOFEED_INDEX_DIGEST"]=index_digest
+        values["RESOFEED_AMD64_DIGEST"]=amd64_digest
+        values["RESOFEED_ARM64_DIGEST"]=arm64_digest
+      }
+      /^[A-Z0-9_]+=/ {
+        key=$0; sub(/=.*/, "", key)
+        if (key in values) { print key "=" values[key]; seen[key]=1; next }
+      }
+      { print }
+      END {
+        order[1]="RESOFEED_IMAGE"
+        order[2]="RESOFEED_VERIFIED_COMMIT"
+        order[3]="RESOFEED_IMMUTABLE_TAG"
+        order[4]="RESOFEED_INDEX_DIGEST"
+        order[5]="RESOFEED_AMD64_DIGEST"
+        order[6]="RESOFEED_ARM64_DIGEST"
+        for (i=1; i<=6; i++) if (!(order[i] in seen)) print order[i] "=" values[order[i]]
+      }
+    ' "$ENV_FILE" > "$tmp"; then
+    rm -f "$tmp"
+    return 1
+  fi
+  mv "$tmp" "$ENV_FILE" || { rm -f "$tmp"; return 1; }
 }
 
-print_authentication_result() {
-  since_ts=$1
-  token=""
-  for _ in 1 2 3 4 5 6 7 8 9 10; do
-    token=$(extract_owner_token "$since_ts")
-    [ -n "$token" ] && break
-    sleep 1
+wait_for_readiness() {
+  attempts=${1:-30}
+  for ((attempt=1; attempt<=attempts; attempt++)); do
+    root_code=$(curl -k -sS -o /dev/null -w '%{http_code}' \
+      --resolve "${RESOFEED_DOMAIN}:${CADDY_LOCAL_HTTPS_PORT}:127.0.0.1" \
+      "https://${RESOFEED_DOMAIN}:${CADDY_LOCAL_HTTPS_PORT}/" 2>/dev/null || true)
+    doctor_code=$(curl -k -sS -o /dev/null -w '%{http_code}' \
+      --resolve "${RESOFEED_DOMAIN}:${CADDY_LOCAL_HTTPS_PORT}:127.0.0.1" \
+      "https://${RESOFEED_DOMAIN}:${CADDY_LOCAL_HTTPS_PORT}/api/doctor" 2>/dev/null || true)
+    if [ "$root_code" = "200" ] && [ "$doctor_code" = "401" ]; then
+      return 0
+    fi
+    sleep 2
   done
-  section '[ ACTION REQUIRED: AUTHENTICATION ]'
-  if [ -n "$token" ]; then
-    printf 'Owner token generated in this run/reset flow:\n'
-    printf '%s\n' "$token"
-    printf 'Store it securely; it is not shown here unless ResoFeed generated it in this run.\n'
+  return 1
+}
+
+run_quiet() {
+  description=$1
+  shift
+  tmp=$(mktemp "${TMPDIR:-/tmp}/resofeed-deploy-output.XXXXXX")
+  if "$@" >"$tmp" 2>&1; then
+    rm -f "$tmp"
+    ok "$description"
+    return 0
+  fi
+  rm -f "$tmp"
+  fail "$description failed; inspect local Docker/Tailscale status without exposing secrets."
+  return 1
+}
+
+rollback_previous_digest() {
+  set +e
+  trap - ERR
+  fail "Immutable deployment failed; starting bounded recovery."
+
+  write_image_chain \
+    "$PREVIOUS_IMAGE" "$PREVIOUS_VERIFIED_COMMIT" "$PREVIOUS_IMMUTABLE_TAG" \
+    "$PREVIOUS_INDEX_DIGEST" "$PREVIOUS_AMD64_DIGEST" "$PREVIOUS_ARM64_DIGEST"
+  restore_env_status=$?
+
+  rollback_status=0
+  if [ -n "$PREVIOUS_IMAGE" ]; then
+    if [ "$REPLACEMENT_STARTED" -eq 1 ]; then
+      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull resofeed >/dev/null 2>&1 || rollback_status=1
+      docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d resofeed >/dev/null 2>&1 || rollback_status=1
+    fi
+    wait_for_readiness 30 || rollback_status=1
   else
-    printf 'Owner token was not generated in this run. Use the existing token or run ./deploy.sh --reset-token.\n'
-    printf 'Inspect logs if needed: docker logs resofeed\n'
+    rollback_status=1
+  fi
+
+  if [ "$restore_env_status" -eq 0 ] && [ "$rollback_status" -eq 0 ]; then
+    fail "ROLLBACK=prior_digest_and_readiness restored"
+  else
+    fail "ROLLBACK=manual_intervention_required; SQLite volume was not removed"
+  fi
+  exit 1
+}
+
+capture_previous_chain() {
+  PREVIOUS_VERIFIED_COMMIT=$ENV_VERIFIED_COMMIT
+  PREVIOUS_IMMUTABLE_TAG=$ENV_IMMUTABLE_TAG
+  PREVIOUS_AMD64_DIGEST=$ENV_AMD64_DIGEST
+  PREVIOUS_ARM64_DIGEST=$ENV_ARM64_DIGEST
+
+  if [ -z "$PREVIOUS_IMAGE" ]; then
+    PREVIOUS_VERIFIED_COMMIT=""
+    PREVIOUS_IMMUTABLE_TAG=""
+    PREVIOUS_INDEX_DIGEST=""
+    PREVIOUS_AMD64_DIGEST=""
+    PREVIOUS_ARM64_DIGEST=""
+    return
+  fi
+
+  PREVIOUS_INDEX_DIGEST=${PREVIOUS_IMAGE#*@}
+  if ! [[ "$PREVIOUS_VERIFIED_COMMIT" =~ ^[a-f0-9]{40}$ ]] \
+    || [ "$PREVIOUS_IMMUTABLE_TAG" != "git-${PREVIOUS_VERIFIED_COMMIT}" ] \
+    || [ "$ENV_INDEX_DIGEST" != "$PREVIOUS_INDEX_DIGEST" ] \
+    || ! is_digest "$PREVIOUS_AMD64_DIGEST" \
+    || ! is_digest "$PREVIOUS_ARM64_DIGEST" \
+    || [ "$PREVIOUS_INDEX_DIGEST" = "$PREVIOUS_AMD64_DIGEST" ] \
+    || [ "$PREVIOUS_INDEX_DIGEST" = "$PREVIOUS_ARM64_DIGEST" ] \
+    || [ "$PREVIOUS_AMD64_DIGEST" = "$PREVIOUS_ARM64_DIGEST" ]; then
+    PREVIOUS_VERIFIED_COMMIT=""
+    PREVIOUS_IMMUTABLE_TAG=""
+    PREVIOUS_AMD64_DIGEST=""
+    PREVIOUS_ARM64_DIGEST=""
   fi
 }
 
-default_deploy() {
-  printf 'RESOFEED :: CADDY/TAILSCALE DEPLOYMENT\n'
-  ensure_env_file
-  validate_and_normalize_env
-  print_state_summary 'Initial Deployment / Update'
-
-  section '[ ACTIONS ]'
+deploy_immutable_image() {
+  printf 'RESOFEED :: IMMUTABLE OCI / CADDY / TAILSCALE DEPLOYMENT\n'
+  validate_target_boundary
   require_command docker
   require_command tailscale
+  require_command curl
+  load_env
+  validate_runtime_configuration
+  verify_oci_identity
+  validate_existing_state
+  capture_previous_chain
+  validate_tailscale_boundary
 
-  start_ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-  compose_up_all
+  trap rollback_previous_digest ERR
+  write_image_chain \
+    "$RESOFEED_IMAGE" "$VERIFIED_COMMIT" "$IMMUTABLE_TAG" \
+    "$OCI_INDEX_DIGEST" "$AMD64_MANIFEST_DIGEST" "$ARM64_MANIFEST_DIGEST"
+
+  run_quiet "Compose contract validated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet
+  REPLACEMENT_STARTED=1
+  run_quiet "Immutable ResoFeed digest pulled" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull resofeed
+  run_quiet "Existing resofeed-caddy stack updated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build
   ensure_tailscale_serve
+  wait_for_readiness 30 || false
 
-  print_dns_guidance
-  print_authentication_result "$start_ts"
+  deployed_reference=$(docker container inspect --format '{{.Config.Image}}' resofeed 2>/dev/null)
+  [ "$deployed_reference" = "$RESOFEED_IMAGE" ] || false
+  trap - ERR
 
   section '[ SUCCESS ]'
+  ok "OCI_REPOSITORY=${OCI_REPOSITORY}"
+  ok "OCI_IDENTITY=index_and_platform_digests"
+  ok "TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy"
+  ok "MUTABLE_LATEST=forbidden"
+  ok "ROLLBACK=prior_digest_and_readiness"
+  ok "SECRETS=masked_presence_only"
+  ok "READINESS=root_200_doctor_401"
   printf 'Open from a Tailnet-connected device: https://%s\n' "$RESOFEED_DOMAIN"
 }
 
-reset_token() {
-  printf 'RESOFEED :: CADDY/TAILSCALE DEPLOYMENT\n'
-  ensure_env_file
-  validate_and_normalize_env
-  print_state_summary 'Owner Token Reset'
-
-  section '[ ACTIONS ]'
-  require_command docker
-  require_command tailscale
-
-  compose_stop_resofeed
-
-  compose_pull_resofeed
-
-  run_quiet "Stored owner token hash reset" docker run --rm \
-    -v "${RESOFEED_VOLUME}:/data" \
-    "$RESOFEED_IMAGE" \
-    owner-token reset --db /data/resofeed.sqlite3 --confirm-reset
-
-  restart_ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-  compose_up_resofeed
-  ensure_tailscale_serve
-
-  print_dns_guidance
-  print_authentication_result "$restart_ts"
-
-  section '[ SUCCESS ]'
-  printf 'Owner-token reset flow complete. Open: https://%s\n' "$RESOFEED_DOMAIN"
-}
-
-case "${1:-}" in
-  --help|-h)
-    usage
-    ;;
-  --reset-token)
-    if [ "$#" -ne 1 ]; then
-      usage >&2
-      exit 2
-    fi
-    reset_token
-    ;;
-  '')
-    default_deploy
-    ;;
-  *)
-    usage >&2
-    exit 2
-    ;;
-esac
+parse_arguments "$@"
+validate_identity_arguments
+if [ "$MODE" = "record-orphan" ]; then
+  record_orphan
+else
+  deploy_immutable_image
+fi

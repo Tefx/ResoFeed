@@ -1,256 +1,139 @@
 # ResoFeed on a custom domain with Tailnet-only HTTPS
-
-This deployment runs ResoFeed behind Caddy on a Mac that is already connected to Tailscale. Caddy gets a real HTTPS certificate for the domain configured in `.env` through Cloudflare DNS-01. Caddy publishes HTTPS only on host loopback, and Tailscale Serve forwards Tailnet TCP/443 to that local HTTPS listener.
+This deployment runs ResoFeed behind the existing Caddy/Tailscale stack on `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Caddy publishes HTTPS on host loopback; Tailscale Serve forwards Tailnet TCP/443 to that listener. The ResoFeed service accepts only `docker.io/tefx/resofeed@sha256:<index-digest>`.
 
 ## Topology
 
 ```text
 https://${RESOFEED_DOMAIN}
         ↓ DNS A record, DNS-only
-${TAILSCALE_IP}  (Mac Tailscale IP)
-        ↓ Tailscale Serve TCP :443
+${TAILSCALE_IP} (tefx-mbp-personal Tailscale IP)
+        ↓ Tailscale Serve TCP/443
 127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}
-        ↓ host loopback port
-resofeed-caddy container
-        ↓ Docker private network
+        ↓ resofeed-caddy on the existing private Compose network
 resofeed container on :8080
+        ↓ named volume retained across replacement and rollback
+resofeed-caddy_resofeed-data:/data/resofeed.sqlite3
 ```
 
-## Cloudflare DNS
+No alternate host, repository, stack, or volume is part of this procedure.
 
-Create this DNS record in the Cloudflare zone that owns `RESOFEED_DOMAIN`.
+## Cloudflare boundary
 
-Default `.env.example` values use:
+Create a DNS-only A record for `RESOFEED_DOMAIN` pointing to the Mac's Tailscale IP. Give `CF_API_TOKEN` only `Zone / Zone / Read` and `Zone / DNS / Edit` for the owning zone. The token is used by Caddy for DNS-01 only.
 
-```text
-RESOFEED_DOMAIN=resofeed.tefx.one
-```
-
-Run `./deploy.sh` first, then create or update this record with the Tailscale IP printed by the script:
-
-```text
-Type: A
-Name: resofeed
-Content: <tailscale-ip-printed-by-deploy.sh>
-Proxy status: DNS only / gray cloud
-TTL: Auto
-```
-
-Do not enable the orange-cloud proxy for this record. Cloudflare cannot proxy to a Tailscale `100.x.y.z` address, and enabling proxying would change the intended private access boundary.
-
-## Cloudflare API token
-
-Create a Cloudflare API token with the smallest useful scope:
-
-```text
-Zone / Zone / Read
-Zone / DNS / Edit
-```
-
-Restrict the token to the specific zone:
-
-```text
-Include / Specific zone / tefx.one
-```
-
-The token is used only by Caddy to create and clean up `_acme-challenge.<RESOFEED_DOMAIN>` TXT records for DNS-01 certificate validation.
+The deployment reads `CF_API_TOKEN`, `OPENROUTER_KEY`, and `TAVILY_API_KEY` from the local `.env`. It reports only `[masked-present]` or `[masked-empty]`; commands and evidence must never print values, `.env` contents, or secret-source paths.
 
 ## First-time setup
 
-From this directory:
+On the authorized host:
 
 ```bash
+cd ~/Projects/resofeed-caddy
 cp .env.example .env
+chmod 600 .env
 ```
 
-Edit `.env` and set:
+Set `CADDY_LOCAL_HTTPS_PORT`, `RESOFEED_DOMAIN`, and `CF_API_TOKEN`. `TAILSCALE_IP` may remain empty when `tailscale ip -4` returns the correct address. The provider keys may remain empty. Leave every `RESOFEED_*` identity field blank: `deploy.sh` writes the verified non-secret chain atomically.
+
+The local `.env` is ignored by Git. Never commit it or include it in deployment evidence.
+
+## Publish the immutable OCI index
+
+Run publication from a clean repository checkout only after another authority has supplied and verified the release commit:
 
 ```bash
-CADDY_LOCAL_HTTPS_PORT=8443
-RESOFEED_DOMAIN=resofeed.tefx.one
-CF_API_TOKEN=...
-OPENROUTER_KEY=...
+OCI_REPOSITORY=docker.io/tefx/resofeed
+VERIFIED_COMMIT=<caller-supplied-40-lowercase-hex>
+IMMUTABLE_TAG="git-${VERIFIED_COMMIT}"
+
+test "$(git rev-parse HEAD)" = "$VERIFIED_COMMIT"
+test -z "$(git status --porcelain)"
+git cat-file -e "${VERIFIED_COMMIT}^{commit}"
+
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --label "org.opencontainers.image.revision=${VERIFIED_COMMIT}" \
+  --provenance=false \
+  --sbom=false \
+  --tag "${OCI_REPOSITORY}:${IMMUTABLE_TAG}" \
+  --push \
+  .
 ```
 
-Do not add `TAILSCALE_IP` unless automatic detection is wrong. `deploy.sh` detects it with `tailscale ip -4`, writes it back to `.env`, and prints it in the DNS guidance block.
-
-`OPENROUTER_KEY` may stay empty if model-backed features are not needed yet.
-
-Start the stack:
+Do not add a moving publication tag. Inspect the pushed immutable tag and bind all three digests from one OCI index:
 
 ```bash
-docker compose --env-file .env up -d --build
+docker buildx imagetools inspect "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"
 ```
 
-Then configure Tailscale Serve to forward Tailnet TCP/443 to the local Caddy HTTPS listener:
+Record these caller-supplied values without abbreviation:
+
+```text
+INDEX_DIGEST=sha256:<64 lowercase hex>
+AMD64_DIGEST=sha256:<linux/amd64 manifest 64 lowercase hex>
+ARM64_DIGEST=sha256:<linux/arm64 manifest 64 lowercase hex>
+```
+
+The index must contain exactly `linux/amd64` and `linux/arm64`. Each platform image must expose `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. An absent, duplicate, additional, incomplete, or mismatched descriptor stops publication/deployment evidence.
+
+## Deploy the verified digest
+
+Perform read-only target inspection first. Confirm the host and directory, OrbStack Docker CLI, Compose config, current `resofeed`/`resofeed-caddy` containers, named `/data` volume, Tailnet TCP/443 route, and masked secret presence. Then run:
 
 ```bash
-tailscale serve status
-tailscale serve --bg --tcp=443 tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}
+ssh tefx-mbp-personal.platy-atlas.ts.net 'cd ~/Projects/resofeed-caddy && export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH" && ./deploy.sh \
+  --verified-commit <40-lowercase-hex> \
+  --immutable-tag git-<same-40-lowercase-hex> \
+  --index-digest sha256:<index-64-hex> \
+  --amd64-digest sha256:<amd64-64-hex> \
+  --arm64-digest sha256:<arm64-64-hex>'
 ```
 
-If port `443` is already used in `tailscale serve status`, do not overwrite it until you intentionally decide which service should own Tailnet HTTPS on this node.
+`deploy.sh` verifies both the immutable tag and digest reference against the supplied index/platform chain before changing Compose. It derives `RESOFEED_IMAGE=docker.io/tefx/resofeed@sha256:<index-digest>`, captures the currently deployed repository digest, verifies the existing SQLite volume, writes only non-secret identity fields, pulls the digest, updates the existing stack, and retains all named volumes.
 
-Read the first generated ResoFeed owner token:
-
-```bash
-docker logs resofeed
-```
-
-Open from a Tailnet-connected device:
-
-```bash
-open "https://${RESOFEED_DOMAIN}"
-```
-
-## Deploy/start script
-
-From this directory, run:
-
-```bash
-./deploy.sh
-```
-
-If `.env` does not exist, the script creates it from `.env.example`, fills `TAILSCALE_IP` from `tailscale ip -4` when available, and stops so you can add `CF_API_TOKEN` and optional `OPENROUTER_KEY`. The local `.env` file is ignored by git and should not be committed.
-
-To reset the ResoFeed owner token hash and restart ResoFeed so a new plaintext token is generated:
-
-```bash
-./deploy.sh --reset-token
-```
-
-The script prints an owner token only when ResoFeed generated it during that script run/reset flow. To inspect logs manually:
-
-```bash
-docker logs resofeed
-docker logs resofeed-caddy
-```
-
-## Move to another Mac
-
-Use this order when moving the same domain to another Mac. The safest sequence is: prepare and start the new machine first, then switch DNS, then stop the old machine after verification.
-
-1. On the new Mac, install and authenticate Tailscale and Docker/OrbStack:
-
-   ```bash
-   tailscale status
-   docker version
-   ```
-
-2. Confirm the new Mac has a Tailscale IP. You do not need to copy it manually unless you want to override detection:
-
-   ```bash
-   tailscale ip -4
-   ```
-
-3. Copy this `deploy/resofeed-caddy/` directory to the new Mac and create `.env`:
-
-   ```bash
-   cd deploy/resofeed-caddy
-   cp .env.example .env
-   ```
-
-4. Edit `.env` for the new Mac:
-
-   ```bash
-   CADDY_LOCAL_HTTPS_PORT=8443
-   RESOFEED_DOMAIN=resofeed.tefx.one
-   CF_API_TOKEN=<cloudflare-dns01-token>
-   OPENROUTER_KEY=<optional-openrouter-key>
-   ```
-
-   Do not add `TAILSCALE_IP` unless automatic detection is wrong. If needed, add `TAILSCALE_IP=<new-mac-tailscale-ip>` manually.
-
-5. Start the new Mac deployment before changing DNS:
-
-   ```bash
-   ./deploy.sh
-   ```
-
-   This verifies Docker, Caddy, and Tailscale Serve on the new host and prints the DNS record target plus a generated owner token when one is created.
-
-6. In Cloudflare, switch the DNS record only after the new deployment starts cleanly:
-
-   ```text
-   Type: A
-   Name: resofeed
-   Content: <new-mac-tailscale-ip>
-   Proxy status: DNS only / gray cloud
-   ```
-
-7. Wait for DNS to resolve to the new Mac:
-
-   ```bash
-   dig +short resofeed.tefx.one
-   ```
-
-8. Verify the new endpoint:
-
-   ```bash
-   curl -I "https://${RESOFEED_DOMAIN}"
-   curl -i "https://${RESOFEED_DOMAIN}/api/doctor"
-   ```
-
-   `/` should return `200`. `/api/doctor` should return `401` without an owner token.
-
-9. Stop the old Mac only after the new endpoint is verified:
-
-   ```bash
-   ./stop.sh
-   ```
-
-   Use `./stop.sh --clear-data` on the old Mac only when you are certain the old SQLite state and Caddy cache are no longer needed.
-
-If you need to preserve ResoFeed data across machines, export/import portable state or back up the old Docker volume/SQLite database before clearing the old machine.
+Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, and moving-tag substitution are outside this procedure and are refused.
 
 ## Verification
 
+Passing deployment evidence contains only non-secret identities and these outcomes:
+
+```text
+OCI_REPOSITORY=docker.io/tefx/resofeed
+OCI_IDENTITY=index_and_platform_digests
+TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy
+MUTABLE_LATEST=forbidden
+ROLLBACK=prior_digest_and_readiness
+SECRETS=masked_presence_only
+READINESS=root_200_doctor_401
+```
+
+Read-only verification commands:
+
 ```bash
+ssh tefx-mbp-personal.platy-atlas.ts.net 'cd ~/Projects/resofeed-caddy && export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH" && docker compose --env-file .env -f compose.yml ps'
 curl -I "https://${RESOFEED_DOMAIN}"
 curl -i "https://${RESOFEED_DOMAIN}/api/doctor"
 ```
 
-`/api/doctor` should return `401` without an owner token.
+The root must return `200`; unauthenticated `/api/doctor` must return `401`. Verify the running container's configured image equals the supplied digest reference and Tailscale Serve still maps TCP/443 to `tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}`. Never include response bodies, tokens, provider keys, or `.env` values in evidence.
 
-For MCP clients inside the Tailnet:
+## Recovery and orphan recording
 
-```json
-{
-  "type": "streamable-http",
-  "url": "https://<RESOFEED_DOMAIN>/mcp",
-  "headers": {
-    "Authorization": "Bearer <OWNER_TOKEN>"
-  }
-}
-```
+If replacement or readiness fails, `deploy.sh` restores the captured prior digest in `.env`, recreates only the `resofeed` service against the same named volume, and requires root `200` plus unauthenticated Doctor `401`. It never removes the SQLite volume. A first deployment without a prior digest stops for manual recovery and still leaves data intact.
 
-## Update ResoFeed
+When a publication leaves a complete unreferenced index/platform chain, record it on the authorized stack for later review:
 
 ```bash
-docker compose --env-file .env pull resofeed
-docker compose --env-file .env up -d --build
+./deploy.sh --record-orphan \
+  --verified-commit <40-lowercase-hex> \
+  --immutable-tag git-<same-40-lowercase-hex> \
+  --index-digest sha256:<index-64-hex> \
+  --amd64-digest sha256:<amd64-64-hex> \
+  --arm64-digest sha256:<arm64-64-hex>
 ```
+
+The fixed local orphan ledger contains only commit, tag, and digests. The script has no registry-deletion operation. Deleting an authorized temporary tag requires a separate registry-specific approval and must never be inferred from deployment authority.
 
 ## Stop
 
-```bash
-./stop.sh
-```
-
-The stop script disables host-level Tailscale Serve TCP/443 when `tailscale` is installed, then stops the Docker Compose stack. Persistent state remains in Docker volumes by default:
-
-- `resofeed-data`
-- `caddy-data`
-- `caddy-config`
-
-To stop the stack and remove deployment-owned Compose volumes:
-
-```bash
-./stop.sh --clear-data
-```
-
-This requires typing `CLEAR RESOFEED DATA` interactively because it removes ResoFeed SQLite data and Caddy certificate/config cache. For non-interactive automation, pass `--yes`:
-
-```bash
-./stop.sh --clear-data --yes
-```
+`./stop.sh` stops the stack while preserving named volumes. Data-destruction modes are outside the immutable deployment and rollback procedure.

@@ -262,6 +262,21 @@ export const PENDING_PROFILE_PAIRS = [
     runner: 'generated-webui-baseline'
   },
   {
+    suite: 'rf-bug-v2-immutable-deployment-procedure',
+    checkID: 'rf_bug_v2_immutable_deployment_procedure_green',
+    identities: ['RF-BUG-V2 immutable OCI and Tailnet deployment procedure'],
+    requiredOutput: [
+      'immutable OCI and Tailnet deployment procedure',
+      'OCI_REPOSITORY=docker.io/tefx/resofeed',
+      'OCI_IDENTITY=index_and_platform_digests',
+      'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
+      'MUTABLE_LATEST=forbidden',
+      'ROLLBACK=prior_digest_and_readiness',
+      'SECRETS=masked_presence_only'
+    ],
+    runner: 'immutable-deployment'
+  },
+  {
     suite: 'rf-bug-v2-source-ledger',
     checkID: 'rf_bug_v2_source_ledger_green',
     identities: [
@@ -445,6 +460,130 @@ export const PROFILES = new Map(profileRows.map((profile) => {
   });
   return [profileKey(frozen.suite, frozen.checkID), frozen];
 }));
+
+export const IMMUTABLE_DEPLOYMENT_PATHS = Object.freeze([
+  '.agents/skills/resofeed-tailnet-deploy/SKILL.md',
+  'deploy/resofeed-caddy/.env.example',
+  'deploy/resofeed-caddy/README.md',
+  'deploy/resofeed-caddy/compose.yml',
+  'deploy/resofeed-caddy/deploy.sh',
+  'docs/CONTAINER.md',
+  'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md'
+]);
+
+function requireDeploymentFragments(sources, relativePath, fragments) {
+  const body = sources[relativePath];
+  if (typeof body !== 'string') throw new AdapterFailure(`immutable deployment source is missing: ${relativePath}`);
+  for (const fragment of fragments) {
+    if (!body.includes(fragment)) {
+      throw new AdapterFailure(`immutable deployment source ${relativePath} missed ${fragment}`);
+    }
+  }
+}
+
+export function immutableDeploymentSources(root = repoRoot) {
+  return Object.fromEntries(IMMUTABLE_DEPLOYMENT_PATHS.map((relativePath) => [
+    relativePath,
+    fs.readFileSync(path.join(root, relativePath), 'utf8')
+  ]));
+}
+
+export function verifyImmutableDeploymentSources(sources) {
+  requireDeploymentFragments(sources, 'deploy/resofeed-caddy/deploy.sh', [
+    'readonly OCI_REPOSITORY="docker.io/tefx/resofeed"',
+    'readonly STACK_NAME="resofeed-caddy"',
+    'readonly TAILNET_TARGET_HOST="tefx-mbp-personal.platy-atlas.ts.net"',
+    'expected_tag="git-${VERIFIED_COMMIT}"',
+    'verify_oci_descriptor "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"',
+    'verify_oci_descriptor "${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"',
+    'application/vnd.oci.image.index.v1+json',
+    'org.opencontainers.image.revision',
+    "inspect_manifest_digest 'linux/amd64'",
+    "inspect_manifest_digest 'linux/arm64'",
+    'resolve_previous_image',
+    'resofeed-caddy_resofeed-data',
+    'rollback_previous_digest',
+    'wait_for_readiness',
+    '--record-orphan',
+    'Registry tag deletion is outside this script',
+    'CF_API_TOKEN=[masked-present]',
+    'OPENROUTER_KEY=[masked-present]',
+    'TAVILY_API_KEY=[masked-present]',
+    'ROLLBACK=prior_digest_and_readiness',
+    'SECRETS=masked_presence_only'
+  ]);
+  requireDeploymentFragments(sources, 'deploy/resofeed-caddy/compose.yml', [
+    'image: ${RESOFEED_IMAGE:?set RESOFEED_IMAGE to docker.io/tefx/resofeed@sha256:<digest>}',
+    '- resofeed-data:/data'
+  ]);
+  requireDeploymentFragments(sources, 'deploy/resofeed-caddy/.env.example', [
+    'RESOFEED_IMAGE=',
+    'RESOFEED_VERIFIED_COMMIT=',
+    'RESOFEED_IMMUTABLE_TAG=',
+    'RESOFEED_INDEX_DIGEST=',
+    'RESOFEED_AMD64_DIGEST=',
+    'RESOFEED_ARM64_DIGEST='
+  ]);
+  requireDeploymentFragments(sources, 'deploy/resofeed-caddy/README.md', [
+    'docker.io/tefx/resofeed@sha256:<index-digest>',
+    '--platform linux/amd64,linux/arm64',
+    '--label "org.opencontainers.image.revision=${VERIFIED_COMMIT}"',
+    'tefx-mbp-personal.platy-atlas.ts.net',
+    '--index-digest sha256:<index-64-hex>',
+    'restores the captured prior digest',
+    'The script has no registry-deletion operation'
+  ]);
+  requireDeploymentFragments(sources, '.agents/skills/resofeed-tailnet-deploy/SKILL.md', [
+    'docker.io/tefx/resofeed',
+    'tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy',
+    'INDEX_DIGEST=sha256:<64 lowercase hex>',
+    'preserves the prior digest and SQLite volume',
+    'Do not execute registry deletion without separate explicit authorization'
+  ]);
+  requireDeploymentFragments(sources, 'docs/CONTAINER.md', [
+    'VERIFIED_COMMIT=<caller-supplied-40-lowercase-hex>',
+    'INDEX_DIGEST=sha256:<OCI index 64 hex>',
+    'AMD64_DIGEST=sha256:<linux/amd64 manifest 64 hex>',
+    'ARM64_DIGEST=sha256:<linux/arm64 manifest 64 hex>',
+    'resofeed-caddy_resofeed-data',
+    'Failure restores the prior digest'
+  ]);
+  requireDeploymentFragments(sources, 'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md', [
+    'rf-bug-v2-immutable-deployment-procedure',
+    'rf_bug_v2_immutable_deployment_procedure_green',
+    'RF-BUG-V2 immutable OCI and Tailnet deployment procedure',
+    'prior-digest capture',
+    'masked-presence boundary markers'
+  ]);
+
+  const procedure = IMMUTABLE_DEPLOYMENT_PATHS.map((relativePath) => sources[relativePath]).join('\n');
+  for (const forbidden of [
+    'tefx/resofeed:latest',
+    'RESOFEED_IMAGE=tefx/resofeed:latest',
+    'docker manifest rm',
+    'docker buildx imagetools rm',
+    '--reset-token',
+    '--clear-data',
+    'ghcr.io/'
+  ]) {
+    if (procedure.includes(forbidden)) throw new AdapterFailure(`immutable deployment procedure retained forbidden fragment: ${forbidden}`);
+  }
+  if (sources['deploy/resofeed-caddy/compose.yml'].includes('RESOFEED_IMAGE:-')) {
+    throw new AdapterFailure('immutable deployment Compose image retained an optional or mutable fallback');
+  }
+  if (/(?:printf|echo)[^\n]*(?:\$\{?(?:CF_API_TOKEN|OPENROUTER_KEY|TAVILY_API_KEY)\}?)/u.test(sources['deploy/resofeed-caddy/deploy.sh'])) {
+    throw new AdapterFailure('immutable deployment script can print a runtime secret value');
+  }
+
+  return [
+    'OCI_REPOSITORY=docker.io/tefx/resofeed',
+    'OCI_IDENTITY=index_and_platform_digests',
+    'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
+    'MUTABLE_LATEST=forbidden',
+    'ROLLBACK=prior_digest_and_readiness',
+    'SECRETS=masked_presence_only'
+  ];
+}
 
 export function selectionDigest(selectedIDs) {
   return `sha256:${createHash('sha256').update(JSON.stringify({ identities: selectedIDs })).digest('hex')}`;
@@ -1477,6 +1616,23 @@ function runFoundation(profile) {
   };
 }
 
+function runImmutableDeploymentProcedure(profile) {
+  const output = execute(profile, 'node', [
+    '--test', '--test-name-pattern=immutable OCI and Tailnet deployment procedure',
+    'scripts/vectl-check.test.mjs'
+  ], { timeout: 240_000 });
+  const observations = verifyImmutableDeploymentSources(immutableDeploymentSources());
+  const combined = [output, ...observations].join('\n');
+  const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
+  if (missing.length > 0) throw new AdapterFailure('immutable deployment procedure missed required output', missing);
+  return {
+    outcome: 'green',
+    exitCode: 0,
+    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+    artifacts: []
+  };
+}
+
 function runGenericAdapter(profile) {
   ensureNoProtectedMutation();
   execute(profile, 'node', ['--test', 'scripts/vectl-check.test.mjs'], { timeout: 240_000 });
@@ -1836,8 +1992,10 @@ async function main() {
                     ? runIdentityIntegration(profile)
                     : profile.runner === 'generated-webui-baseline'
                       ? runGeneratedWebUIBaseline(profile)
-                      : profile.runner === 'closure-report'
-                        ? runClosureReport(profile)
+                      : profile.runner === 'immutable-deployment'
+                        ? runImmutableDeploymentProcedure(profile)
+                        : profile.runner === 'closure-report'
+                          ? runClosureReport(profile)
           : profile.runner === 'prompting-v22'
             ? runPromptingV22(profile)
             : profile.runner === 'token-parity'

@@ -206,15 +206,9 @@ Warning: explicit owner tokens passed as CLI arguments may be visible in shell h
 Do not add an owner-token environment variable unless the architecture contract is changed. The current runtime contract uses the CLI flag and stores only the SHA-256 hash in SQLite.
 
 ## Minimal Docker Run Examples
+These examples require a runnable ResoFeed container image. Use `<image-ref>` as either a local single-platform image such as `resofeed:local` or a released immutable reference such as `docker.io/tefx/resofeed@sha256:<index-digest>`. Released deployment, verification, and rollback examples must use the digest form.
 
-These examples require a runnable ResoFeed container image. The command examples use `<image-ref>` as a placeholder for either:
-
-- a local image you built and tagged yourself, such as `resofeed:latest`; or
-- a fully qualified registry image for a released deployment.
-
-Use `resofeed:latest` only when it is a local placeholder tag you created. For released deployments, use the exact registry image reference published by the release process.
-
-Do not paste a real `OPENROUTER_KEY` into copied shell commands. Inline secrets can be saved in shell history, terminal scrollback, and process inspection output. Set `OPENROUTER_KEY` through a secret-safe host mechanism before running Docker, then pass it through with `-e OPENROUTER_KEY` and no inline value. Docker copies the value from the host environment without putting it in the command text.
+Do not paste a real `OPENROUTER_KEY` into copied shell commands. Inline secrets can be saved in shell history, terminal scrollback, and process inspection output. Set `OPENROUTER_KEY` through a secret-safe host mechanism, then pass it through with `-e OPENROUTER_KEY` and no inline value.
 
 One safe interactive shell pattern is:
 
@@ -223,8 +217,44 @@ read -rsp "OpenRouter key: " OPENROUTER_KEY
 export OPENROUTER_KEY
 ```
 
-You can also set `OPENROUTER_KEY` through a service manager or hosting platform secret store. If the host variable is missing, ResoFeed can still start, but OpenRouter-backed summaries, steering translation, and other provider-backed operations are unavailable until the key is configured.
+A service manager or hosting secret store may supply the host variable. If it is absent, ResoFeed starts with model-backed operations unavailable.
 
+### Auto-generated owner token
+
+```text
+docker run -d \
+  --name resofeed \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -v resofeed-data:/data \
+  -e OPENROUTER_KEY \
+  <image-ref> \
+  serve \
+  --addr 0.0.0.0:8080 \
+  --public-url http://<host>:8080 \
+  --db /data/resofeed.sqlite3
+```
+
+Then obtain the generated owner token through the deployment's secret-safe operator channel; do not retain it in release evidence.
+
+### Explicit owner token
+
+Use this form only when you intentionally accept CLI-argument exposure. Auto-generation is safer for most deployments.
+
+```text
+docker run -d \
+  --name resofeed \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -v resofeed-data:/data \
+  -e OPENROUTER_KEY \
+  <image-ref> \
+  serve \
+  --addr 0.0.0.0:8080 \
+  --public-url http://<host>:8080 \
+  --db /data/resofeed.sqlite3 \
+  --owner-token rfeed_<at-least-32-visible-non-whitespace-characters>
+```
 ### Auto-generated owner token
 
 ```text
@@ -267,33 +297,55 @@ docker run -d \
 ```
 
 ## Multi-architecture Build Command
-
-These commands use the repository `Dockerfile`.
-
-Use Docker Buildx for release images that will be published to a registry:
+Release publication targets exactly `docker.io/tefx/resofeed`. It starts from a caller-supplied verified commit, binds the tag `git-${VERIFIED_COMMIT}`, labels both platform images with that commit, and publishes exactly `linux/amd64` plus `linux/arm64`:
 
 ```text
+OCI_REPOSITORY=docker.io/tefx/resofeed
+VERIFIED_COMMIT=<caller-supplied-40-lowercase-hex>
+IMMUTABLE_TAG=git-${VERIFIED_COMMIT}
+
+test "$(git rev-parse HEAD)" = "$VERIFIED_COMMIT"
+test -z "$(git status --porcelain)"
+git cat-file -e "${VERIFIED_COMMIT}^{commit}"
+
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t <registry>/<namespace>/resofeed:<version> \
+  --label "org.opencontainers.image.revision=${VERIFIED_COMMIT}" \
+  --provenance=false \
+  --sbom=false \
+  --tag "${OCI_REPOSITORY}:${IMMUTABLE_TAG}" \
   --push \
   .
+docker buildx imagetools inspect "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"
 ```
 
-`--push` is required for this multi-platform form because Docker cannot load a multi-architecture manifest directly into the local Docker image store. Use an exact, fully qualified registry image reference for release publishing; `resofeed:latest` is only a local placeholder tag.
+`--push` is required because Docker cannot load a multi-platform OCI index into the local image store. `--provenance=false` and `--sbom=false` keep this release index to the two declared runtime platform manifests; provenance policy can be introduced only with a matching identity-contract change.
 
-For local `docker run` testing on the current host, build one platform and load it locally:
+The release record binds all of these unabridged values:
+
+```text
+VERIFIED_COMMIT=<40 lowercase hex>
+IMMUTABLE_TAG=git-<same commit>
+INDEX_DIGEST=sha256:<OCI index 64 hex>
+AMD64_DIGEST=sha256:<linux/amd64 manifest 64 hex>
+ARM64_DIGEST=sha256:<linux/arm64 manifest 64 hex>
+```
+
+Publication fails closed unless the immutable tag and `docker.io/tefx/resofeed@${INDEX_DIGEST}` resolve to the same index, the index contains exactly the supplied two platform descriptors, and each platform image reports `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. Do not publish a moving alias.
+
+The only production Tailnet consumer is `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Its Compose input is `RESOFEED_IMAGE=docker.io/tefx/resofeed@${INDEX_DIGEST}`. The deployment procedure captures the prior repository digest, preserves `resofeed-caddy_resofeed-data`, verifies direct readiness, and restores the prior digest/readiness pair on failure. Credential rotation, data deletion, alternate targets, and registry deletion are outside deployment authority. A complete orphan index/platform chain is recorded for separately authorized cleanup.
+
+For local current-host testing, build and load one explicitly local tag:
 
 ```text
 docker buildx build \
   --platform linux/$(go env GOARCH) \
-  -t resofeed:latest \
+  --tag resofeed:local \
   --load \
   .
 ```
 
-After the `--load` build, `resofeed:latest` is available to `docker run` on that host. Use `--push` instead when the image must be pulled from a registry by another machine.
-
+Local tags are not release, deployment, verification, or rollback identities.
 ## Expected Image Size
 
 Image size target: aim for tens of MB, not hundreds.
@@ -334,19 +386,26 @@ Before opening the production listener, Go validates the embedded UI and derives
 
 Caddy and other reverse proxies must pass these application-owned values unchanged. The policy must boot the embedded UI and preserve ordinary authenticated product operations, including OPML import and JSON State export, import, and download. Container and browser evidence must redact owner tokens, provider keys, authorization values, cookies, provider bodies, and `.env` contents.
 ## Verification Checklist
-
-Before accepting the containerization work:
+Before accepting the containerization or immutable release procedure:
 
 - Build succeeds for `linux/amd64` and `linux/arm64`.
 - Runtime image does not contain `.env`, `.git`, local `data/`, `node_modules`, `web/build`, or any other external UI asset tree.
 - Final image runs as non-root, can create/write `/data/resofeed.sqlite3` through the mounted `/data` volume, and contains no required application runtime artifact beyond `/app/resofeed`.
 - The same final image starts successfully from at least two working directories, including one unrelated to `/app`; UI behavior and generated asset URLs are identical.
 - Container starts with `resofeed serve` and logs `ui: mounted`, `api: enabled`, and `mcp: /mcp`.
-- `GET /` proves the generated SvelteKit UI is served from the binary: the HTML includes at least one generated asset reference containing `_app/immutable/`, and at least one extracted referenced asset under `_app/immutable/` returns HTTP `200`. The fallback owner-token HTML alone is insufficient evidence.
-- Binary-only runtime proof removes or makes unavailable every external UI build directory before startup, then verifies root, generated assets, and a valid deep link. Any request-time read of `web/build` or any working-directory-relative UI path fails this gate.
-- Static GET and HEAD behavior, content types, deep-link fallback, and ordinary not-found responses remain correct without an external UI asset directory.
-- `/api/doctor` returns `401` without owner token and succeeds with the token; its safe output reports the documented embedded-asset readiness without exposing tokens, provider keys, `.env` contents, or secret-source paths.
+- `GET /` proves the generated SvelteKit UI is served from the binary: HTML references `_app/immutable/`, and an extracted referenced asset returns HTTP `200`.
+- Binary-only runtime proof removes or makes unavailable every external UI build directory before startup, then verifies root, generated assets, and a valid deep link.
+- Static GET/HEAD behavior, content types, deep-link fallback, and ordinary not-found responses remain correct without an external UI asset directory.
+- `/api/doctor` returns `401` without owner token and succeeds with the token; safe output reports embedded-asset readiness without exposing tokens, provider keys, `.env` contents, or secret-source paths.
 - `/mcp` returns `401` without owner token before tool handling.
-- Direct and Caddy-fronted responses contain one effective Go-owned Content Security Policy and the required application security headers. Caddy passes them unchanged, with no missing, duplicate, replaced, or weakened values.
-- SQLite state is writable and survives stop/remove/recreate through the same `/data` volume. Gate evidence must show first startup with an empty named volume creates `/data/resofeed.sqlite3`, then a replacement container using that same volume can start and pass `/api/doctor` with the persisted owner-token verifier.
-- Provider HTTPS trust is verified at the app level without shell access inside the final image: run the container with a valid `OPENROUTER_KEY` supplied through the safe `-e OPENROUTER_KEY` host environment pass-through, then from the host call `GET /api/runtime/openrouter-models` with `Authorization: Bearer <OWNER_TOKEN>`. Passing proof is HTTP `200` with the documented JSON model-list shape. `x509: certificate signed by unknown authority` or any TLS trust failure is a failure. Keep the owner token and provider key redacted in evidence.
+- Direct and Caddy-fronted responses contain one effective Go-owned Content Security Policy and the required application security headers.
+- SQLite state is writable and survives stop/remove/recreate through the same `/data` volume.
+- Provider HTTPS trust is verified at the app level without shell access inside the final image. Evidence keeps owner tokens and provider keys redacted.
+- Publication starts from the exact caller-verified commit in a clean checkout and targets only `docker.io/tefx/resofeed`.
+- The immutable `git-<verified-commit>` tag and digest reference resolve to one supplied OCI index digest with exactly the supplied `linux/amd64` and `linux/arm64` manifest digests; both platform labels equal the verified commit.
+- No moving tag appears as publication, deployment, verification, or rollback identity.
+- Tailnet deployment targets only `tefx-mbp-personal:resofeed-caddy`, uses `docker.io/tefx/resofeed@sha256:<index-digest>`, and retains `resofeed-caddy_resofeed-data`.
+- Before replacement, the procedure captures the prior repository digest and validates Compose, Caddy, Tailscale TCP/443, SQLite volume, and masked runtime-secret presence.
+- Passing readiness is root `200` plus unauthenticated `/api/doctor` `401`. Failure restores the prior digest against the same named volume and proves the same readiness pair.
+- Evidence contains the verified commit, immutable tag, index/platform digests, target identity, readiness outcomes, and masked secret presence only. It contains no token, credential, provider key, `.env` value, or secret-source path.
+- Publication recovery records a complete orphan digest chain. Registry deletion occurs only under separate explicit authorization and is never inferred from deploy authority.

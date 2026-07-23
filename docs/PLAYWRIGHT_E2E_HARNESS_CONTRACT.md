@@ -88,7 +88,7 @@ node scripts/vectl-check.mjs run rf-bug-v2-harness-foundation rf_bug_v2_harness_
 
 It emits the generic `vectl.check.selection.v1` / `vectl.check.evidence.v1` contract and proves four identities: adapter envelope, intentional-failure artifact retention, case-local lifecycle isolation, and native lane discovery. Lane discovery uses Playwright `--list` only for the legacy three-file set and replacement five-file set. The foundation check does not execute either product-semantic lane and does not claim Search, Source Ledger, State, route, or responsive behavior. Downstream implementation and independent runtime-verification phases own those semantic executions and the final list/run identity comparison.
 ### Generic Adapter Profile Contract
-`scripts/vectl-check.mjs` dispatches by the exact `(suite, check_id)` pair. `select` emits one `vectl.check.selection.v1` envelope with the contract identities and digest. `run` invokes only that profile's native Go, Vitest, Playwright, or canonical build checks and emits one `vectl.check.evidence.v1` envelope with identical `selected_ids` and `executed_ids`. Unknown suites, unknown checks, and cross-paired suite/check values exit non-zero before any native command starts. The expected-red item contract remains red with exit code 1; green profiles require exit code 0. Runtime-only provider secrets remain absent from child environments and evidence.
+`scripts/vectl-check.mjs` dispatches by the exact `(suite, check_id)` pair. `select` emits one `vectl.check.selection.v1` envelope with fixed identities and digest. `run` invokes only that profile's native checks and emits one `vectl.check.evidence.v1` envelope with identical non-empty `selected_ids` and `executed_ids`. Unknown suites, unknown checks, and cross-paired values exit non-zero before native execution. Expected-red contracts remain red with exit code 1; green profiles require exit code 0. Runtime-only secrets remain absent from child environments and evidence.
 
 The pending profile matrix is:
 
@@ -105,6 +105,9 @@ The pending profile matrix is:
 | `rf-bug-v2-canonical-e2e-embedded-ui-build-remediation` | `rf_bug_v2_canonical_e2e_embedded_ui_build_green` | 1 | green |
 | `rf-bug-v2-deterministic-svelte-build-remediation` | `rf_bug_v2_deterministic_svelte_build_green` | 1 | green |
 | `rf-bug-v2-deterministic-adapter-identity-integration-remediation` | `rf_bug_v2_deterministic_adapter_identity_integration_green` | 1 | green |
+| `rf-bug-v2-deterministic-profile-self-restoration-remediation` | `rf_bug_v2_deterministic_profile_self_restoration_green` | 1 | green |
+| `rf-bug-v2-generated-webui-baseline-sync` | `rf_bug_v2_generated_webui_baseline_sync_green` | 1 | green |
+| `rf-bug-v2-immutable-deployment-procedure` | `rf_bug_v2_immutable_deployment_procedure_green` | 1 | green |
 | `rf-bug-v2-source-ledger` | `rf_bug_v2_source_ledger_green` | 5 | green |
 | `rf-bug-v2-prompting` | `rf_bug_v2_prompting_green` | 4 | green |
 | `rf-bug-v2-prompting-harness` | `rf_bug_v2_prompting_harness_remediation_green` | 4 | green |
@@ -113,13 +116,24 @@ The pending profile matrix is:
 | `item-deep-links-backend` | `item_deep_links_backend_green` | 1 | green |
 | `item-deep-links-frontend` | `item_deep_links_frontend_green` | 2 | green |
 
-`node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the focused Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all twenty selection envelopes against their fixed identities/cardinalities, parses green and red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifact objects, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms protected acceptance scope remains clean. The profile emits `VECTL_ADAPTER_COMPLETED_HARNESS=preserved` and `VECTL_ADAPTER_ARTIFACT_OBJECT_COMPATIBILITY=valid` only after both developer checks pass. It does not execute unfinished consumer product semantics.
+`node scripts/vectl-check.mjs run rf-bug-v2-generic-adapter rf_bug_v2_generic_adapter_green` runs the Node regression and immutable `TestPlaywrightFixtureContract`. The regression validates all twenty-one selection envelopes, parses green/red evidence fixtures, verifies identity parity, accepts only relative-path/SHA-256 artifacts, preserves the completed foundation profile and literal `artifacts: artifactRows` contract, rejects mismatched pairs and malformed artifacts, and confirms protected acceptance scope remains clean. It does not execute unfinished product semantics.
 
-The closure profile aggregates the current authorities without synthesizing Go tests or subtests. It runs exact top-level `TestRFBugCanonicalContracts` and requires its verbose start/pass identity plus `RF_BUG_CANONICAL_DOCUMENTS=9` and `OPML_EXCLUSIONS=2`. It runs package-relative `src/lib/api-client.test.ts` through the web test script with the verbose identity `keeps all nine active documents free of OPML export capabilities` and requires `OPML_ACTIVE_DOCUMENTS=9`. The runner reuses the active production Prompting v2.1 scan and requires `PROMPTING_V21_ACTIVE_MATCHES=0`, then independently inventories exact RF-BUG-001 through RF-BUG-010 headings in both protected defect authority documents before emitting `RF_BUG_CLOSURE_REQUIREMENTS=10`.
+The immutable deployment profile uses identity `RF-BUG-V2 immutable OCI and Tailnet deployment procedure`. Its focused regression reads only the bound repository procedure files and fails closed on:
 
-Empty output, no-test output, missing exact pass identities, missing markers, skipped execution, or retry output fails the closure profile. Focused adapter regression covers those false-green cases. The profile retains its two selection identities and digest; the protected authority documents, Go and web acceptance sources, product code, retries, and skip policy remain unchanged.
+- any repository or Tailnet target other than `docker.io/tefx/resofeed` and `tefx-mbp-personal:resofeed-caddy`;
+- a moving image reference or optional Compose image fallback;
+- missing caller-verified commit, `git-<commit>` tag, OCI index, `linux/amd64`, or `linux/arm64` binding;
+- absent platform commit-label verification;
+- absent prior-digest capture, SQLite-volume preservation, direct readiness, or readiness-checked rollback;
+- registry deletion without a separate authorization boundary or missing complete orphan-chain recording;
+- secret-value output, credential mutation, owner-token rotation, data clearing, or alternate-target switches;
+- drift between the deployment script, Compose/example, Tailnet skill, deployment README, container contract, and this harness contract.
 
-The `rf-bug-v2-source-ledger` profile binds the required `Source Ledger groups and controls render` output marker to its Vitest `test:render` command. That command includes exactly one `--reporter=verbose` argument so Vitest emits the full test title for deterministic marker validation. Neither Source Ledger Playwright command carries the verbose Vitest reporter argument; their existing `--reporter=line` contracts remain unchanged.
+The profile emits one green evidence envelope only after the focused developer test passes. Its observations are exactly the repository identity, index/platform binding, Tailnet target, moving-tag refusal, prior-digest/readiness rollback, and masked-presence boundary markers. It performs no registry, SSH, Tailnet, Docker, credential, or runtime mutation.
+
+The closure profile aggregates current authorities without synthesizing Go tests. It requires exact top-level `TestRFBugCanonicalContracts` identity and canonical markers, exact package-relative web OPML identity, the production Prompting scan, and exact RF-BUG-001 through RF-BUG-010 heading inventory in both protected defect documents. Empty output, no-test output, missing exact pass identities, skipped execution, or retry output fails closed.
+
+The `rf-bug-v2-source-ledger` profile binds `Source Ledger groups and controls render` to its Vitest `test:render` command with exactly one `--reporter=verbose`. Its Playwright commands retain their line reporters.
 ### RF-BUG-010 Replacement Runtime Isolation Remediation
 
 The bounded project-native remediation profile is:

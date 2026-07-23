@@ -20,7 +20,7 @@ services:
       - resofeed-private
 
   resofeed:
-    image: ${RESOFEED_IMAGE:-tefx/resofeed:latest}
+    image: ${RESOFEED_IMAGE:?set RESOFEED_IMAGE to docker.io/tefx/resofeed@sha256:<digest>}
     container_name: resofeed
     restart: unless-stopped
     expose:
