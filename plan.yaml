@@ -192519,7 +192519,7 @@ phases:
       operation occurred.
   - id: rf-bug-v2-detached-head-guard-polarity-remediation
     name: Correct detached-head guard polarity and behavior proof
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ polarity remediation for the completed `rf-bug-v2-detached-head-staging-guard-remediation`;\
@@ -192655,6 +192655,17 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-23T22:35:20.318143Z'
+    done_at: '2026-07-23T22:42:48.919152+00:00'
+    evidence: Integrated commit 1e49621c6b44ac2e55cd82f87960972d571bad64 from isolated
+      worktree/base 5d0f95ad27786edf3743dd5da254dd06370614ce. Production Gate admitted
+      dispatch sha256:17ec4968f5070e46fc5ca20269ef1e29219975be988e1659714f6fe867718203
+      and worker receipt sha256:5e3d14121eaf836af34cfdbb5cb2160fcd9f51013ac61ec3350db81e7af6dc48;
+      post-commit verdict file sha256:3af22b5da2259df19fbbe6d6cee84802b4aa0e913131b6f763bde3465de3754e.
+      Exact selected execution passed only after behavior-backed attached-clean pre-SSH
+      rejection, detached-clean full fake-target matrix, correct symbolic-ref polarity,
+      strict literal-FQDN known-key identity, and no side effects. Valid prior review
+      rejection sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8
+      remains immutable remediation evidence. No external operation occurred.
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
