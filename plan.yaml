@@ -191624,7 +191624,7 @@ phases:
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v3
     name: Verify authenticated-endpoint immutable procedure and target readiness (fresh
       semantic v3)
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -191795,6 +191795,8 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-23T23:30:28.429944Z'
   - id: rf-bug-v2-immutable-procedure-staging-remediation
     name: Repair immutable procedure staging and pre-deploy identity order
     status: done
