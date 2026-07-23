@@ -190307,16 +190307,21 @@ phases:
       redaction, smoke cleanup, and closure authorities passed. go vet and disposable
       build passed and cleaned up; final tracked status/diff empty. Report: /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v4_report.md#sha256=5e045749c4dfffcc7101bd27e5c0850d451108300b502689439c25abd54403f7'
   - id: rf-bug-v2-deployment-authorization-review
-    name: Authorize v2 OCI publication and Tailnet deployment
+    name: Authorize v2 OCI publication and authenticated Tailnet deployment
     status: pending
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
 
 
-      After the repository procedure, separately authorized remote staging, and fresh
-      read-only exact-target verification pass, perform the pre-operation R3 review
-      for the two remaining external operations and their distinct recovery boundaries.
+      After the repository endpoint-identity remediation, separately reviewed and
+      executed v2 procedure staging, and fresh independent read-only exact-target
+      verification pass, perform the pre-operation R3 review for the two remaining
+      external operations and their distinct recovery boundaries. Preserve the exhausted
+      staging incident and require the replacement staging operation, source hashes,
+      strict host-key evidence, staged-byte equality, and local Git metadata equality
+      as immutable inputs; neither the old staging authorization nor the failed command
+      may supply current authority.
 
 
       For immutable publication, verify current accepted-plan orchestration authority
@@ -190326,39 +190331,44 @@ phases:
       without disclosure or account change; no moving alias is published; and partial
       publication either uses separately explicit temporary-tag deletion authority
       or records the complete orphan tag/index/platform chain. Before publication
-      the index and platform digest values do not yet exist. Bind them to the sole
-      producer `rf-bug-v2-publish-immutable-oci`, require that producer to emit one
-      exact index digest and exact linux/amd64 plus linux/arm64 manifest digests with
-      commit-label equality, and forbid fabricated or pre-authorized placeholder digest
-      values.
+      the index and platform digest values do not exist. Bind them to the sole producer
+      `rf-bug-v2-publish-immutable-oci`, require that producer to emit one exact index
+      digest and exact linux/amd64 plus linux/arm64 manifest digests with commit-label
+      equality, and forbid fabricated or pre-authorized placeholder digest values.
 
 
       For Tailnet deployment, verify current accepted-plan orchestration authority
-      names the exact digest deployment operation and sole existing target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
-      the staged procedure bytes and fresh target-readiness evidence match the clean
-      verified commit; the deployment may consume only the exact digest chain produced
-      by `rf-bug-v2-publish-immutable-oci` and proven by `rf-bug-v2-docker-runtime-proof`;
-      existing masked-only `CF_API_TOKEN`, `OPENROUTER_KEY`, and `TAVILY_API_KEY`
-      runtime injection remains available; the current running image has one exact
-      prior repository digest captured for rollback; the SQLite volume and owner-token
-      state are preserved; and rollback restores only that prior digest followed by
-      root `200` plus unauthenticated Doctor `401` readiness.
+      names the exact digest deployment operation and sole endpoint/target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
+      all SSH entry uses the literal FQDN with strict existing host-key verification,
+      host-key update/enrollment disabled, no alias/effective-host rewrite, and only
+      the existing credential/account. The target''s internal hostname is unknown
+      and cannot be an authority. Require the staged procedure bytes and fresh target-readiness
+      evidence to match the clean verified remediation commit; deployment may consume
+      only the exact digest chain produced by `rf-bug-v2-publish-immutable-oci` and
+      proven by `rf-bug-v2-docker-runtime-proof`; existing masked-only `CF_API_TOKEN`,
+      `OPENROUTER_KEY`, and `TAVILY_API_KEY` runtime injection remains available;
+      the current running image has one exact prior repository digest captured for
+      rollback; the SQLite volume and owner-token state are preserved; and rollback
+      restores only that prior digest followed by root `200` plus unauthenticated
+      Doctor `401` readiness.
 
 
       Confirm each accepted operation, target, source/produced-input identity, execution
-      context, preconditions, credentials, cost boundary, rollback/recovery, and evidence
-      topology matches the maintained procedure. The completed staging authorization
+      context, host-key/credential boundary, preconditions, cost boundary, rollback/recovery,
+      and evidence topology matches the maintained procedure. Procedure-staging authority
       does not authorize publication or deployment. Plan-definition authority, acceptance-test
-      authority, masked credential presence, and publication authority do not imply
-      another operation or target. Missing, stale, mismatched, broader, or materially
-      costly authority returns BLOCKED and permits no build, push, tag, delete, pull,
-      deploy, restart, token reset, data clear, credential/account change, secret
-      inspection, mutable-tag substitution, alternate target, or undeclared operation.'
+      authority, masked credential presence, publication authority, or host-key evidence
+      does not imply another operation or target. Missing, stale, mismatched, broader,
+      host-key-bypassed, or materially costly authority returns BLOCKED and permits
+      no build, push, tag, delete, pull, deploy, restart, host-key change, token reset,
+      data clear, credential/account change, secret inspection, mutable-tag substitution,
+      alternate target, or undeclared operation.'
     verification: Current explicit authority separately binds immutable publication
       to the verified commit/tag and exact docker.io/tefx/resofeed producer, and digest-only
-      deployment to the exact staged tefx-mbp-personal resofeed-caddy consumer after
-      produced index/platform proof, with scoped credentials, orphan recovery, prior-digest
-      rollback/readiness, SQLite preservation, cost bounds, and secret non-disclosure.
+      deployment through strict host-key authentication of the exact FQDN to the staged
+      resofeed-caddy consumer after produced index/platform proof, with scoped credentials,
+      orphan recovery, prior-digest rollback/readiness, SQLite preservation, cost
+      bounds, and secret non-disclosure.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
