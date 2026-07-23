@@ -191594,25 +191594,30 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      From one fresh clean integrated head after `rf-bug-v2-detached-head-staging-guard-remediation`,
-      its new independent authorization review, and the bounded v2 staging operation,
-      independently execute the exact current project-native immutable-procedure selected
-      profile and focused developer test without repository mutation. Prove the integrated
-      detached-guard remediation commit is the sole source identity; the manifest
-      covers exactly `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`;
-      the deploy script hash differs from stale pre-remediation SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`;
-      and the live target''s corresponding procedure bytes/modes match both review-bound
+      From one fresh clean integrated head after `rf-bug-v2-detached-head-guard-polarity-remediation`,
+      its fresh independent one-row authorization review, and the bounded v2 staging
+      operation, independently execute the exact current project-native immutable-procedure
+      selected profile and focused developer test without repository mutation. Prove
+      the integrated polarity-remediation commit is the sole source identity; the
+      manifest covers exactly `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`;
+      the deploy script hash differs from stale pre-guard SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`
+      and stale inverted SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`;
+      and the live target''s corresponding procedure bytes/modes match both fresh-review-bound
       source identities.
 
 
       Require selected observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`,
       `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, and `PROCEDURE_DETACHED_MATRIX=green`.
-      Independently prove the maintained script rejects a clean attached branch at
-      the exact verified commit before any fake SSH attempt or target mutation and
-      that a clean detached checkout at that commit passes the complete unchanged
-      fake-target happy, rollback, tamper, target-drift, missing-prior, wrong-mode,
-      and strict host-key matrix. Confirm no wrapper or caller-only preflight substitutes
-      for the guard inside `deploy.sh` before its first SSH/remote effect.
+      Independently prove the maintained script treats `git symbolic-ref -q HEAD`
+      success as attached and rejects an attached clean branch at the exact verified
+      commit with an accurate detached-HEAD fatal message before any fake SSH attempt,
+      command, target mutation, or transaction residue. Prove every successful and
+      failure-matrix fixture is detached at its exact verified commit and the complete
+      unchanged fake-target happy, rollback, tamper, target-drift, missing-prior,
+      wrong-mode, unknown-host-key, and changed-host-key matrix passes. Confirm the
+      adapter selected execution becomes red when polarity is inverted and no wrapper
+      or caller-only preflight substitutes for the guard inside `deploy.sh` before
+      its first SSH/remote effect.
 
 
       Use only read-only SSH inspection of the exact endpoint `tefx-mbp-personal.platy-atlas.ts.net`
@@ -191641,12 +191646,13 @@ phases:
 
       Re-prove the repository procedure''s downstream release contract: publication
       is limited to `docker.io/tefx/resofeed`; the immutable tag is bound to the later
-      verified commit; one OCI index digest and exact linux/amd64 plus linux/arm64
-      manifest digests are required; mutable tags and incomplete or mismatched chains
-      are rejected; temporary-tag cleanup requires separate exact authority or the
-      orphan chain is recorded; deployment remains limited to the exact authenticated
-      FQDN/stack/path; and evidence contains no credential, token, provider key, `.env`
-      value, host-key material, authentication path, or secret-source path.
+      verified polarity-remediation commit; one OCI index digest and exact linux/amd64
+      plus linux/arm64 manifest digests are required; mutable tags and incomplete
+      or mismatched chains are rejected; temporary-tag cleanup requires separate exact
+      authority or the orphan chain is recorded; deployment remains limited to the
+      exact authenticated FQDN/stack/path; and evidence contains no credential, token,
+      provider key, `.env` value, host-key material, authentication path, or secret-source
+      path.
 
 
       Preserve the first immutable-procedure semantic FAIL receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-23T19-22-26-742Z-2026-07-23T19-11-50-828Z_019f9064-282c-7a73-ba92-fcbf9ad1478d.js-f1d73b54f1abcc84.txt`
@@ -191661,11 +191667,17 @@ phases:
       re-observe every required fact from the fresh integrated state.
 
 
-      Preserve the correction-exhausted detached-guard review artifacts `sha256:213797bdca053a49e703215d017b5f11a803cc749893c127163bd2829b89361b`,
+      Preserve the older invalid detached-guard review artifacts `sha256:213797bdca053a49e703215d017b5f11a803cc749893c127163bd2829b89361b`,
       `sha256:6da4b9f76c215aabd77004472fe14ac6f1ea29b744eef57e46b3107f2700b0fe`, `sha256:ba91a224bd9606523fd337b38e15bdb3f78c17e6844bc2778de7deb02f6b6280`,
       and `sha256:74a971d105d065905d2995f669441c01ee8aabd2fdade135e2b205a03d0537d9`
-      as invalid diagnostic-only material. Neither supplies completion or rejection
-      authority.
+      as invalid diagnostic-only material. Preserve the fresh coherent `REJECTED`
+      polarity review evidence `sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8`,
+      receipt-file SHA-256 `f1dbd2f87c98aeb1d17f64672e70a7f49d338f8e966d0c27183ff66533904c19`,
+      and validator-file SHA-256 `7e1e4a26c9f1b01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`
+      as immutable diagnostic remediation evidence only. Neither rejected nor invalid
+      material supplies completion or operation authority. The inverted reviewed commit
+      `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5` and deploy hash `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`
+      are stale.
 
 
       The pre-publication target is not required to run the future unpublished index
@@ -191675,12 +191687,12 @@ phases:
       host keys, pull, build, push, tag, delete, publish, deploy, restart, stop, reset
       tokens, clear data, change credentials/accounts, print `.env`, inspect another
       host, or mutate local/remote state.'
-    verification: Independent selected execution proves attached-clean pre-SSH rejection
-      and detached-clean complete fake-target coverage; read-only exact-FQDN inspection
-      proves the staged two-file bytes, strict existing-host-key boundary, current
-      prior-digest/recovery readiness, unchanged protected state and local Git metadata,
-      and correct deferral of future OCI/deployed identities from the newly integrated
-      remediation inputs.
+    verification: Independent selected execution proves correct symbolic-ref polarity,
+      attached-clean pre-SSH rejection, detached-clean complete fake-target coverage,
+      and red-on-inversion behavior; read-only exact-FQDN inspection proves the freshly
+      reviewed staged two-file bytes, strict existing-host-key boundary, current prior-digest/recovery
+      readiness, unchanged protected state and local Git metadata, and correct deferral
+      of future OCI/deployed identities from the new polarity-remediation inputs.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
