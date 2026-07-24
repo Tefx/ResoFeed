@@ -190432,47 +190432,66 @@ phases:
       preserved diagnostic evidence and were independently adjudicated as non-authoritative
       for this guarded execution path.'
   - id: rf-bug-v2-publish-immutable-oci
-    name: Publish authorized immutable amd64 and arm64 OCI image
+    name: Reject failed OCI publication replay and preserve diagnostics
     status: pending
-    description: 'step_type: verification
+    description: 'step_type: review
 
-      repo_change_policy: runtime_state_only
-
-
-      After the pre-operation R3 authorization review, use only the repaired repository
-      procedure from the clean locally verified polarity-remediation commit bound
-      by the fresh one-row staging review and independent staged-byte verification
-      to build and publish one immutable linux/amd64 and linux/arm64 image to the
-      sole registry target `docker.io/tefx/resofeed`. Bind that verified 40-character
-      commit to one immutable tag, then record and cross-check the OCI index digest
-      and exact linux/amd64 and linux/arm64 manifest digests as downstream inputs.
-      Reject the stale inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`,
-      a moved tag, incomplete platform set, source-commit mismatch, digest mismatch,
-      alternate repository, or mutable tag; `latest` is never a publication, verification,
-      deployment, or rollback identity.
+      repo_change_policy: no_repo_change
 
 
-      Use only the already-authorized repository-scoped registry credential in the
-      authorized execution context and never print secrets. Do not change credentials/accounts
-      or infer broader deletion authority. Recovery may delete only an explicitly
-      authorized temporary tag; otherwise record the orphan immutable tag plus index/platform
-      digest chain for later cleanup. A partial push, unknown remote state, incomplete
-      platform chain, failed digest resolution, or unavailable recovery stops before
-      container or deployment work.'
-    verification: Authorized publication targets only docker.io/tefx/resofeed, binds
-      the freshly reviewed polarity-remediation commit and immutable tag to one OCI
-      index plus exact amd64/arm64 digests, rejects the stale inverted identity and
-      all mutable/mismatched identity, redacts credentials, and records authorized
-      cleanup or orphan recovery.
+      Supersede the failed publication execution while preserving its exact ID as
+      a non-completion diagnostic node. This step authorizes no build, push, builder
+      creation/removal, registry mutation, container operation, deployment, retry,
+      deletion, credential/account change, repository mutation, or other side effect.
+      A conformant review completes only the diagnostic and replay-rejection outcome;
+      it cannot establish publication completion or supply a digest to downstream
+      work.
+
+
+      Review the reconciled attempt from the exact clean detached source commit `1e49621c6b44ac2e55cd82f87960972d571bad64`.
+      Preserve `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json`
+      at raw SHA-256 `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`,
+      `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md`
+      at SHA-256 `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`,
+      and `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt`
+      at SHA-256 `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`.
+      Require the receipt to remain `FAIL`, `gate_open_allowed=false`, and `DO_NOT_COMPLETE`
+      for the original publication outcome.
+
+
+      Confirm three identical authorized commands exited 1 before any observed registry
+      mutation; the sole tag `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      was absent before and after; no OCI index or linux/amd64 or linux/arm64 manifest
+      digest, orphan chain, moving alias, temporary tag, registry deletion, container,
+      deployment, Tailnet, credential/account, or repository mutation occurred; and
+      the source remained detached, clean, and unchanged. Confirm the bounded no-push
+      diagnosis: active builder `orbstack`, driver `docker`, and exact multi-platform
+      check failure `Multi-platform build is not supported for the docker driver.`
+
+
+      Reject replay of the original implicit-active-builder command. Record this step
+      as superseded execution authority and bind all future publication authority
+      to `rf-bug-v2-transient-buildx-builder-authorization-review`, `rf-bug-v2-publish-immutable-oci-v2`,
+      and `rf-bug-v2-publish-immutable-oci-v2-verification`. Do not correct, retry,
+      resume, reinterpret, or promote the failed receipt. Emit one inline `vectl.verifier.semantic.v1`
+      receipt for this lifecycle step with exactly one requirement row and state-transition
+      row for `RF-BUG-V2-OCI-PUBLICATION-FAILURE-DIAGNOSTIC`; cite only the existing
+      immutable artifacts and supplied completed authority evidence, and write no
+      new report file.'
+    verification: Fresh spec review verifies all three diagnostic hashes, exact source/tag/driver/failure
+      identities, three failed attempts, registry and repository nonmutation, absence
+      of any digest/orphan/alias/deployment side effect, preserved FAIL semantics,
+      and permanent rejection of the original command as executable publication authority.
     refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
     - Dockerfile
-    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
-    - deploy/resofeed-caddy/README.md
     depends_on:
     - rf-bug-v2-deployment-authorization-review
-    agent: integration-verifier
+    agent: spec-verifier
   - id: rf-bug-v2-docker-runtime-proof
     name: Verify immutable OCI image on both platforms
     status: pending
