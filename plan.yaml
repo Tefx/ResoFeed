@@ -192961,6 +192961,336 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
+  - id: rf-bug-v2-immutable-deployment-procedure-verification-v9
+    name: Verify authenticated-endpoint immutable procedure through stdin-fed bash
+      -s (semantic v9)
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Fresh transport-corrected successor to the uncompleted `rf-bug-v2-immutable-deployment-procedure-verification-v8`.
+      Preserve v8 as immutable diagnostic history; do not retry, correct, complete,
+      or otherwise mutate v8. A fresh `integration-verifier` child must execute this
+      node. Do not resume any prior child/session. Perform only fresh local checks
+      and exactly one strictly read-only SSH inspection of the exact target. Do not
+      modify repository files, copy or stage files, enroll/update/remove host keys,
+      pull, build, push, tag, delete, publish, deploy, restart, stop, recover, reset
+      tokens, clear data, change credentials/accounts, read or print `.env`, inspect
+      another host, or mutate local/remote state. There is no iterative remote-probe
+      retry inside the child; any nonzero probe ends this attempt and produces the
+      admitted semantic result.
+
+
+      Production semantic admission is mandatory. Emit exactly one `vectl.verifier.semantic.v1`
+      JSON object with the canonical top-level keys and no additions: `schema_version`,
+      `verifier_id`, `step_id`, `scope`, `headline`, `blocking_status`, `proof_gap_status`,
+      `verdict`, `gate_open_allowed`, `orchestrator_action_hint`, `completion_authority`,
+      `blockers`, `warnings`, `notes`, `evidence_refs`, `requirement_coverage`, and
+      `specialist_receipt`. Require `verifier_id` = `integration-verifier`, `step_id`
+      = `rf-bug-v2-immutable-deployment-procedure-verification-v9`, and this exact
+      ordered `scope`: [`corrected symbolic-ref polarity and detached behavior matrix`,
+      `exact staged source and remote procedure hashes and modes`, `strict literal-FQDN
+      trust, recovery readiness, and protected-state invariance`, `future OCI identity
+      deferral`]. Require exactly one `requirement_coverage` row for `RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE`,
+      source ref `docs/BUG_FIX_PLAN_2026-07-12.md`, status matching the admitted outcome,
+      and evidence refs covering every ordered scope atom.
+
+
+      `specialist_receipt` must use the integration-verifier shape with exact keys
+      `mode`, `commands`, `evidence_levels`, `protocols`, and `behavioral_proof_register`;
+      every command row has exact keys `command`, `cwd`, `process`, and `evidence_refs`.
+      Every `commands[*].command` is a non-empty array containing only actual substantive
+      argv strings executed. Forbid placeholders, pseudo-commands, documentation metavariables,
+      elisions, redaction tokens, empty strings, and standalone `none`. Record literal
+      executed argv verbatim. Retained evidence remains bounded and nonsecret. The
+      production semantic validator must admit the fresh receipt before lifecycle
+      completion. For the remote probe, the receipt command row must record exactly
+      the actual local process argv ending `...,"tefx-mbp-personal.platy-atlas.ts.net","bash","-s"`;
+      the stdin-fed remote program is not an argv element. Any nonzero live probe
+      may report `PROBE_FAIL phase=<last_phase> status=<status>` only when that exact
+      marker was actually emitted by the cooperating remote trap. A no-stdout exit
+      or an exit without the remote trap marker is a transport/command-construction
+      failure and cannot be relabeled as a remote phase failure.
+
+
+      From one fresh clean integrated head after completed `rf-bug-v2-detached-head-guard-polarity-remediation`,
+      completed `rf-bug-v2-local-verification-matrix`, and completed `rf-bug-v2-stage-immutable-deployment-procedure-v2`,
+      independently execute exactly one current project-native selected check with
+      selection `node scripts/vectl-check.mjs select rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green`, execution `node scripts/vectl-check.mjs
+      run rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`,
+      and focused developer test `node --test --test-name-pattern=immutable\ OCI\
+      and\ Tailnet\ deployment\ procedure scripts/vectl-check.test.mjs`, without repository
+      mutation. Record each actual argv without shell metavariables. Prove the integrated
+      polarity-remediation commit is the sole source identity; the manifest covers
+      exactly `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`;
+      the deploy-script hash differs from stale pre-guard SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`
+      and stale inverted SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`;
+      and the live target''s procedure bytes and modes match the fresh source identities.
+
+
+      Require selected observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`,
+      `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, and `PROCEDURE_DETACHED_MATRIX=green`.
+      Independently prove `git symbolic-ref -q HEAD` success is treated as attached
+      and rejected at the exact verified commit with an accurate detached-HEAD fatal
+      message before any fake SSH attempt, command, target mutation, or transaction
+      residue. Prove every happy and failure fixture is detached at its exact verified
+      commit and the unchanged fake-target happy, rollback, tamper, target-drift,
+      missing-prior, wrong-mode, unknown-host-key, and changed-host-key matrix passes.
+      Confirm selected execution becomes red when polarity is inverted and no wrapper
+      or caller-only preflight substitutes for the guard inside `deploy.sh` before
+      its first SSH/remote effect.
+
+
+      Use only read-only SSH inspection of literal destination `tefx-mbp-personal.platy-atlas.ts.net`
+      and canonical home-relative stack path `~/Projects/resofeed-caddy`, derived
+      from `.agents/skills/resofeed-tailnet-deploy/SKILL.md`. The SSH FQDN is authoritative
+      only for authenticated transport; it is distinct from the Caddy public HTTPS
+      host. The one local SSH process argv and receipt command row must be exactly
+      `ssh`, `-Fnone`, then every maintained option and value as separate argv elements
+      in this order: `-T`, `-o`, `HostName=tefx-mbp-personal.platy-atlas.ts.net`,
+      `-o`, `HostKeyAlias=tefx-mbp-personal.platy-atlas.ts.net`, `-o`, `StrictHostKeyChecking=yes`,
+      `-o`, `UpdateHostKeys=no`, `-o`, `VerifyHostKeyDNS=no`, `-o`, `CanonicalizeHostname=no`,
+      `-o`, `BatchMode=yes`, `-o`, `PreferredAuthentications=publickey`, `-o`, `PasswordAuthentication=no`,
+      `-o`, `KbdInteractiveAuthentication=no`, `-o`, `NumberOfPasswordPrompts=0`,
+      `-o`, `AddKeysToAgent=no`, `-o`, `ForwardAgent=no`, `-o`, `ClearAllForwardings=yes`,
+      `-o`, `ControlMaster=no`, `-o`, `ControlPath=none`, `-o`, `RequestTTY=no`, literal
+      destination `tefx-mbp-personal.platy-atlas.ts.net`, then two separate argv elements
+      `bash`, `-s`. Supply the bounded remote program exclusively on that SSH process''s
+      stdin. Forbid `bash -c`, separate `bash`, `-c`, any concatenated pseudo-argv,
+      any missing command operand, remote command text as an undocumented argv element,
+      heredoc pseudo-argv, shell evaluation of remote output, and every alternate
+      interpreter. Do not load aliases, rewrite the SSH endpoint, select another trust
+      store/account/path, query an internal hostname, or abbreviate the actual command
+      record.
+
+
+      The one bounded stdin-fed remote program must remain compatible with the target
+      `bash`, begin with compatible shell setup, install the phase variable and cooperating
+      ERR/EXIT trap before the first assertion, and immediately emit `PROBE_PHASE=canonical_stack`
+      before executing that phase. Capture the bounded protected-state fingerprint
+      before assertions only after the phase variable and traps are installed. The
+      cooperating trap emits exactly once `PROBE_FAIL phase=<last_phase> status=<status>`
+      on nonzero with the exact last phase and exit status. A local no-stdout exit,
+      missing phase marker, or missing trap-emitted failure marker is transport/command-construction
+      failure, supplies no remote phase authority, and must not be synthesized into
+      `PROBE_FAIL`. Maintain this nonsecret, non-collapsible ledger and emit each
+      success marker only after its phase passes: `PROBE_PHASE=canonical_stack` then
+      `CANONICAL_STACK=verified`; `PROBE_PHASE=procedure_current` then `PROCEDURE_CURRENT=verified`;
+      `PROBE_PHASE=backup` then `BACKUP=verified`; `PROBE_PHASE=docker_identity` then
+      `DOCKER_IDENTITY=verified`; `PROBE_PHASE=volume` then `VOLUME=verified`; `PROBE_PHASE=tailnet_route`
+      then `TAILNET_ROUTE=verified`; `PROBE_PHASE=public_url` then `PUBLIC_URL_HOST=validated`;
+      `PROBE_PHASE=readiness` then `READINESS=verified`; `PROBE_PHASE=protected_after`
+      then `PROTECTED_STATE=unchanged`; final `PROBE_OK`. Do not collapse Docker identity,
+      volume, Tailnet route, public URL, readiness, or protected-after into a shared
+      `runtime` phase. Emit `PROBE_OK` only after exact before/after protected-state
+      equality and every preceding success marker. Phase output and retained semantic
+      evidence must not reveal raw paths, public host text, configuration, credentials,
+      tokens, keys, `.env` values, host-key material, authentication paths, or secret-source
+      paths. The receipt reports the ordered phase/success markers and terminal `PROBE_OK`
+      or exact one-time remote trap failure marker.
+
+
+      In `canonical_stack`, derive `canonical_home=$(CDPATH= cd -- "$HOME" && pwd
+      -P)` and `canonical_stack="${canonical_home}/Projects/resofeed-caddy"`; verify
+      exact canonical path, basename/project identity, and required regular non-symlink
+      files. Use the same mode helper for staged, prior, manifest, and content-addressed
+      backup files, with BSD-first/GNU-fallback semantics equivalent to `stat -f ''%Lp''
+      "$path" 2>/dev/null || stat -c ''%a'' "$path"`. Use `shasum -a 256` when available
+      with a guarded optional `sha256sum` fallback for every current, prior, manifest-selected,
+      and backup identity. Export `PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"`
+      before every Docker CLI use. Do not invoke or probe `systemctl`.
+
+
+      In `procedure_current`, prove authenticated SSH endpoint identity; exact source/remote
+      current procedure hash and mode equality; `755` for `deploy.sh`; `644` for `compose.yml`;
+      nonsecret prior procedure hashes/modes with prior deploy at `755` and prior
+      compose at `644`; and exact current/prior identities needed for recovery. Verify
+      shell and Compose shape without mutation.
+
+
+      In `backup`, require the content-addressed backup path to be a real directory
+      and not a symlink. Require only contract-owned manifest/file invariants: manifest
+      regular/non-symlink mode `600` with exact identity rows; backup deploy regular/non-symlink
+      mode `755` with hash equal to prior deploy bytes; backup compose regular/non-symlink
+      mode `644` with hash equal to prior compose bytes; and recomputation of the
+      backup identity from those exact rows/files equals the content-addressed identity.
+      Do not assert or require mode `700`, or any other mode, on the content-addressed
+      child directory. `BACKUP_ROOT` protection is non-blocking implementation detail
+      unless the maintained implementation requires observation.
+
+
+      In `docker_identity`, obtain the running `resofeed` container''s exact image
+      ID through read-only `docker container inspect`, then query read-only `docker
+      image inspect` for that exact image ID''s `RepoDigests`. Canonically normalize
+      Docker Hub forms and require at least one real `docker.io/tefx/resofeed@sha256:<64-lowercase-hex>`
+      RepoDigest. Do not require `.Config.Image` to be digest-form, do not require
+      it to equal a future tag, and do not reject an otherwise valid exact-image-ID
+      result merely because the image metadata carries additional RepoDigests; reject
+      zero permitted matches, unresolved image IDs, alternate-only repositories, or
+      non-recoverable prior state. `.Config.Image` may be a moving configured reference
+      only for this pre-publication prior-state observation when it names the permitted
+      repository. This exception authorizes no future moving-tag publication or deployment.
+
+
+      In `volume`, require immutable staged `deploy/resofeed-caddy/compose.yml` at
+      declared SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      to declare service source logical volume `resofeed-data` mounted at `/data`
+      and top-level logical volume key `resofeed-data`. Through read-only `docker
+      container inspect`, require exactly one mount with Type `volume`, Destination
+      `/data`, and a nonempty engine Source/Name. Use that actual engine volume name
+      only internally with read-only `docker volume inspect` and require label `com.docker.compose.volume`
+      exactly `resofeed-data`. Do not require the actual engine name to equal `resofeed-data`
+      or `resofeed_data`; do not require or expose any Compose project prefix/name,
+      actual engine volume name, mount detail, or labels. Emit only `VOLUME=verified`
+      after every condition passes. In `tailnet_route`, use only read-only `tailscale
+      serve status` and, when available, its JSON form; require TCP/HTTPS 443 to route
+      to loopback Caddy on `127.0.0.1:8443`, emit only `TAILNET_ROUTE=verified`, and
+      do not invoke or probe `systemctl`.
+
+
+      In `public_url`, derive the candidate solely from read-only `docker container
+      inspect --format ''{{range .Config.Cmd}}{{println .}}{{end}}'' resofeed`. Treat
+      each output line as one literal argv element without shell evaluation; count
+      exactly one literal `--public-url`, take only its immediate next argv, and require
+      exact `https://<DNS-host>`. Reject missing/duplicate flags, a missing next argv,
+      userinfo, explicit port, path, query, fragment, whitespace, wildcard, shell
+      metacharacters, empty labels, leading/trailing hyphens, non-DNS characters,
+      trailing dot, or fewer than two valid DNS labels. Do not read `.env`, derive
+      from certificate content/SANs, or use the SSH endpoint hostname as Caddy identity.
+      After validation retain only `PUBLIC_URL_HOST=validated`; never emit or retain
+      the host text.
+
+
+      In `readiness`, use only that validated host with actual commands semantically
+      exact to `curl -k --resolve "$public_host:$caddy_port:127.0.0.1" "https://$public_host:$caddy_port/"`
+      and `curl -k --resolve "$public_host:$caddy_port:127.0.0.1" "https://$public_host:$caddy_port/api/doctor"`,
+      with `caddy_port=8443`; require root `200` and unauthenticated Doctor `401`,
+      then emit only `READINESS=verified`. The SSH process continues to authenticate
+      only literal `tefx-mbp-personal.platy-atlas.ts.net`; the transport identity
+      must never become the curl SNI/Host value. Do not expose the public host in
+      command evidence; the actual bounded remote program may use the validated variable
+      internally while retained output records only approved markers and statuses.
+
+
+      In `protected_after`, compare the exact bounded protected-state fingerprint
+      captured before assertions and require byte-for-byte equality, then independently
+      verify completed v2 staging and this read-only probe changed no image, container,
+      `.env`, Caddy/Tailscale state, SQLite volume/data, owner-token state, credential/account,
+      host-key trust, secret input, Docker/registry state, service state, or local
+      repository/Git metadata. Re-prove the downstream release contract without executing
+      it: publication is limited to `docker.io/tefx/resofeed`; the immutable tag is
+      bound to the later verified polarity-remediation commit; one OCI index digest
+      and exact linux/amd64 plus linux/arm64 manifest digests are required; mutable
+      tags and incomplete/mismatched chains are rejected; temporary-tag cleanup requires
+      separate exact authority or the orphan chain is recorded; deployment remains
+      limited to the exact authenticated SSH FQDN/stack/path; Caddy readiness uses
+      the independently validated current public URL host; evidence contains no credential,
+      token, provider key, `.env` value, host-key material, authentication path, secret-source
+      path, or public-host text. Unknown/changed host key, effective endpoint rewrite,
+      trust bypass, alternate host/path/account, credential drift, secret exposure,
+      volume drift, readiness drift, invalid public URL identity, or unresolved image
+      identity blocks later authority.
+
+
+      Preserve v5 evidence unchanged and do not retry, correct, or complete it: first
+      INVALID receipt file SHA-256 `082d6dedfea64940a018388112f601d40ae1643e2876d42b1c4a1605efb1288f`
+      with validator SHA-256 `f85d69f3d0632df69bbf71949cdbc54203d1fccd10093a05d4804567f12f1712`;
+      corrected receipt file SHA-256 `8163f6ae562f4b0b3bd86f343a7125c6db5d8dd7701cd4e5688445177b74b511`
+      with validator SHA-256 `7eeb100335d044eb9e1456dc2c9b9a6b91bc423f71961834c86c495b246a0ad1`;
+      canonical valid `REJECTED` receipt SHA-256 `a8a5e37e20beac3e7e575a7b6a4ff5f87c95cffb0174c0bca8b5b1043d442da5`.
+      V5 decisively passed `canonical_stack`, `procedure_current`, `backup`, `docker_identity`,
+      `volume`, and `tailnet_route`, then emitted `PROBE_FAIL=readiness` with curl
+      exit 35 because it used the SSH FQDN as Caddy TLS SNI/Host. Classify this as
+      a v5 probe identity defect: Caddy serves the running container''s configured
+      public HTTPS domain while the fixed Tailnet FQDN is the SSH transport endpoint.
+      V5 supplies no lifecycle completion, product-failure, target-blocker, or external-operation
+      authority.
+
+
+      Preserve v6 evidence unchanged and do not retry, correct, or complete v6: first
+      INVALID file `sha256:3f96876646e8230fbc3458aa3a58e2434d2c890a4cc2dd14930d52c5d0513615`
+      with validator `sha256:9034edb4495386f99e599814e3c4e9be05aa1e2e607d78acd5ee27554828169f`;
+      corrected file `sha256:ed57db4a6c74399d14b0150191ccdccb7553642080dc09f711573f7c097be55d`
+      with validator `sha256:9ce24bf1680d28dd9545c4a8aa2d3cf093b0e1263fb58785b7b29b73b1c09ff1`;
+      and canonical valid REJECTED receipt `sha256:1c0921dc81a234a853b9665015940be958a34f0d4742d5727209bdb2fd08b176`.
+      V6''s local selected check passed. Its sole remote probe proved current procedure
+      hashes/modes, Compose shape, backup manifest/files, and prior hashes, then emitted
+      `PROBE_FAIL phase=runtime status=1`; readiness/public-host and protected-after
+      did not execute. V5 had already proved the individual Docker identity, volume,
+      and Tailnet-route checks on the same unchanged staged target; its only failure
+      was readiness under the wrong TLS SNI. Classify v6 as insufficiently localized
+      verifier probe logic, not a proven product defect. V6 supplies no lifecycle
+      completion, product-failure, target-blocker, retry, correction, or external-operation
+      authority.
+
+
+      Preserve v7 evidence unchanged and do not retry, correct, or complete v7: first
+      INVALID file `sha256:54ca02b13defd369f040bbf2e11816caa4072b8477811fc26f61245fd482bedf`
+      with validator `sha256:692c9b51af53d3c511781b617e80b4188db587258964ab2a7a93bf92050faafd`;
+      corrected file `sha256:6f69effc76289238254461382c58a9f967179c1f804242677483822d7db85389`
+      with validator `sha256:9f0ddbfcb695f432ab1f86451f8e40e1486ee1b1b10157caf7c07b4b2f0049cb`;
+      and canonical valid REJECTED receipt `sha256:61da90d1566ad49cf20040e4374d9a6bad9afe16efe4481b0830185f5025f026`.
+      All three required local checks passed. Its sole strict read-only probe passed
+      `canonical_stack`, `procedure_current`, `backup`, and `docker_identity`, then
+      emitted `PROBE_FAIL phase=volume status=1`; no later phase ran. The immutable
+      staged Compose source at declared SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      declares service mount `resofeed-data:/data` and top-level logical volume key
+      `resofeed-data`, and does not declare `resofeed_data`. Classify v7 as a verifier-plan
+      volume-identity defect caused by requiring a literal unprefixed engine name;
+      it supplies no evidence of data-volume drift or product failure. V7 supplies
+      no lifecycle completion, target-blocker, retry, correction, or external-operation
+      authority.
+
+
+      Preserve v8 evidence unchanged and do not retry, correct, or complete v8: receipt
+      file `sha256:7d266496a50f0c92de1793385216b4ea4f620eec25e29b8270bd017f7a620582`;
+      semantic validator `sha256:af6bc0f129398222483c28f9df77a23cbbffb3d55fab37e9023328cfd03660c2`;
+      canonical valid `REJECTED` receipt `sha256:25bb15205f5f4773c4acd2b617fc1c10a4fd0aef2972c698b0eccdc458229619`.
+      All three required local checks passed. Its sole SSH argv ended with one literal
+      `bash -c` element and supplied no `-c` command operand, so the remote program
+      never ran; the process exited 1 with no remote stdout. Its synthesized `PROBE_FAIL
+      phase=canonical_stack status=1` was not emitted by a remote trap. Classify v8
+      as verifier command-construction failure. It proves no canonical-stack, volume,
+      readiness, protected-state, target, or product defect. The strict literal-FQDN
+      trust reached a process exit, but no remote phase authority exists. V8 supplies
+      no lifecycle completion, target blocker, retry, correction, or external-operation
+      authority.
+
+
+      Preserve earlier invalid/rejected staging, detached-guard, v3, and v4 evidence
+      already recorded in plan history as immutable diagnostic-only evidence. In particular,
+      v4''s child-directory mode assertion and missing failure-stage ledger remain
+      verifier-generated defects; v5, v6, v7, and v8 remain diagnostic-only and supply
+      no current authority. The pre-publication target is not required to run the
+      future unpublished index digest or contain future commit/tag/index/platform
+      identity fields; those identities remain correctly deferred to `rf-bug-v2-publish-immutable-oci`,
+      `rf-bug-v2-docker-runtime-proof`, and `rf-bug-v2-tailnet-caddy-proof`.'
+    verification: Fresh production-admitted integration-verifier selected execution
+      and exactly one exact-argv portable read-only SSH probe, using local argv ending
+      in separate `bash`, `-s` and supplying the bounded remote program exclusively
+      on stdin, prove corrected symbolic-ref polarity, detached fake-target coverage,
+      strict literal-FQDN SSH trust, staged/current/prior/manifest/backup identities,
+      at least one permitted RepoDigest resolved from the exact running image ID,
+      immutable staged Compose logical volume `resofeed-data` mounted to `/data`,
+      exactly one runtime `/data` volume mount with nonempty engine Source/Name internally
+      verified by label `com.docker.compose.volume=resofeed-data`, TCP/HTTPS 443 to
+      loopback Caddy 8443, argv-derived validated public URL, root 200/Doctor 401,
+      and exact protected-state before/after equality. The remote program installs
+      phase/trap state before its first assertion, immediately emits `PROBE_PHASE=canonical_stack`,
+      then emits all ordered non-collapsible phase/success markers and final `PROBE_OK`,
+      or its cooperating trap actually emits exactly one `PROBE_FAIL phase=<last_phase>
+      status=<status>`; no-stdout or markerless exits are transport/command-construction
+      failures. It performs no retry, correction, external mutation, `.env` read,
+      internal-host query, `systemctl` probe, child-directory mode assertion, future-tag
+      overconstraint, secret/public-host disclosure, alternate interpreter, `bash
+      -c`, or alternate SSH trust/target/path operation.
+    depends_on:
+    - rf-bug-v2-local-verification-matrix
+    - rf-bug-v2-stage-immutable-deployment-procedure-v2
+    agent: integration-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
