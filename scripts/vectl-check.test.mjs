@@ -225,6 +225,26 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     '--amd64-digest', amd64Digest,
     '--arm64-digest', arm64Digest
   ];
+  const separatelyAuthorizedServeRepair = 'tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443';
+  for (const relativePath of [
+    '.agents/skills/resofeed-tailnet-deploy/SKILL.md',
+    'deploy/resofeed-caddy/README.md',
+    'docs/CONTAINER.md',
+    'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md'
+  ]) {
+    assert.equal(
+      sources[relativePath].split(separatelyAuthorizedServeRepair).length - 1,
+      1,
+      `${relativePath} must document the separately authorized noninteractive repair exactly once`
+    );
+  }
+  for (const relativePath of [
+    'deploy/resofeed-caddy/deploy.sh',
+    'deploy/resofeed-caddy/verify.sh',
+    'deploy/resofeed-caddy/verify-remote.sh'
+  ]) {
+    assert.equal(sources[relativePath].includes(separatelyAuthorizedServeRepair), false);
+  }
 
   function executable(filePath, lines) {
     fs.writeFileSync(filePath, `${lines.join('\n')}\n`);
@@ -234,6 +254,13 @@ test('immutable OCI and Tailnet deployment procedure', () => {
   function fileSHA256(filePath) {
     return `sha256:${createHash('sha256').update(fs.readFileSync(filePath)).digest('hex')}`;
   }
+
+  const stagedDeployPath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'deploy.sh');
+  const stagedComposePath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'compose.yml');
+  assert.equal(fileSHA256(stagedDeployPath), 'sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6');
+  assert.equal(fileSHA256(stagedComposePath), 'sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c');
+  assert.equal(fs.statSync(stagedDeployPath).mode & 0o777, 0o755);
+  assert.equal(fs.statSync(stagedComposePath).mode & 0o777, 0o644);
 
   function checked(command, args, options) {
     const result = spawnSync(command, args, { encoding: 'utf8', ...options });
@@ -577,8 +604,10 @@ test('immutable OCI and Tailnet deployment procedure', () => {
 
     const statePath = path.join(root, 'current-image');
     const dockerLog = path.join(root, 'docker.log');
+    const tailscaleLog = path.join(root, 'tailscale.log');
     fs.writeFileSync(statePath, `${priorImage}\n`);
     fs.writeFileSync(dockerLog, '');
+    fs.writeFileSync(tailscaleLog, '');
 
     executable(path.join(fakeBin, 'hostname'), [
       '#!/usr/bin/env bash',
@@ -587,9 +616,10 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     executable(path.join(fakeBin, 'sleep'), ['#!/usr/bin/env bash', 'exit 0']);
     executable(path.join(fakeBin, 'tailscale'), [
       '#!/usr/bin/env bash',
+      'printf "%s\\n" "$*" >> "$FAKE_TAILSCALE_LOG"',
       'if [[ "$1" == "ip" ]]; then printf "%s\\n" 100.64.0.8; exit 0; fi',
       'if [[ "$1 $2" == "serve status" ]]; then printf "%s\\n" "TCP 443 -> tcp://127.0.0.1:8443"; exit 0; fi',
-      'if [[ "$1" == "serve" ]]; then exit 0; fi',
+      'if [[ "$1" == "serve" ]]; then exit 97; fi',
       'exit 1'
     ]);
     executable(path.join(fakeBin, 'curl'), [
@@ -644,6 +674,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       FAKE_STATE: statePath,
       FAKE_ENV: envPath,
       FAKE_DOCKER_LOG: dockerLog,
+      FAKE_TAILSCALE_LOG: tailscaleLog,
       FAKE_COMMIT: commit,
       FAKE_INDEX_DIGEST: indexDigest,
       FAKE_AMD64_DIGEST: amd64Digest,
@@ -669,6 +700,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       envPath,
       statePath,
       dockerLog,
+      tailscaleLog,
       environment,
       priorImage,
       targetImage,
@@ -697,6 +729,11 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.match(deployedEnv, /^CF_API_TOKEN=fixture-present$/mu);
     assert.match(successful.result.stdout, /READINESS=root_200_doctor_401/u);
     assert.doesNotMatch(fs.readFileSync(successful.dockerLog, 'utf8'), /(?:down|volume rm|--volumes)/u);
+    assert.deepEqual(
+      fs.readFileSync(successful.tailscaleLog, 'utf8').trim().split('\n'),
+      ['serve status', 'serve status'],
+      'the unchanged staged deploy procedure must observe the canonical route without mutating Serve'
+    );
 
     const orphan = spawnSync(path.join(successful.stack, 'deploy.sh'), ['--record-orphan', ...ociArguments], {
       cwd: successful.stack,
@@ -717,6 +754,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.match(fs.readFileSync(failed.envPath, 'utf8'), new RegExp(`^RESOFEED_IMAGE=${failed.priorImage}$`, 'mu'));
     assert.match(failed.result.stderr, /ROLLBACK=prior_digest_and_readiness restored/u);
     assert.doesNotMatch(fs.readFileSync(failed.dockerLog, 'utf8'), /(?:down|volume rm|--volumes)/u);
+    assert.doesNotMatch(fs.readFileSync(failed.tailscaleLog, 'utf8'), /--yes|--bg|--tcp/u);
   } finally {
     fs.rmSync(failed.root, { recursive: true, force: true });
   }
@@ -765,6 +803,11 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(remoteProbePath, (body) => body.replace(orbStackPathLine, `${orbStackPathLine}\n${orbStackPathLine}`)),
     mutation(remoteProbePath, (body) => `${body}\nexport DOCKER_HOST=unix:///alternate/docker.sock\n`),
     mutation(remoteProbePath, (body) => `${body}\nprintf '%s\\n' "$PATH"\n`),
+    mutation(remoteProbePath, (body) => body.replace('tailscale serve status --json', 'tailscale serve status')),
+    mutation(remoteProbePath, (body) => body.replace('object_pairs_hook=reject_duplicate_members', 'object_pairs_hook=dict')),
+    mutation(remoteProbePath, (body) => body.replace('set(listener) != {"TCPForward"}', 'False')),
+    mutation(remoteProbePath, (body) => `${body}\n${separatelyAuthorizedServeRepair}\n`),
+    mutation('deploy/resofeed-caddy/README.md', (body) => body.replace(separatelyAuthorizedServeRepair, 'tailscale serve --bg --tcp=443 tcp://127.0.0.1:8443')),
     mutation(deployPath, (body) => `${body}\n${clearData}\n`),
     mutation(deployPath, (body) => `${body}\n${resetToken}\n`)
   ];
@@ -899,11 +942,13 @@ test('RF-BUG-V2 tracked read-only probe harness', () => {
     const curlCountPath = path.join(evidence, 'curl-count');
     const surfaceLogPath = path.join(evidence, 'surfaces');
     const dockerPathChecksPath = path.join(evidence, 'docker-path-checks');
+    const tailscaleCountPath = path.join(evidence, 'tailscale-count');
     fs.writeFileSync(sshAttemptsPath, '');
     fs.writeFileSync(curlLogPath, '');
     fs.writeFileSync(curlCountPath, '0\n');
     fs.writeFileSync(surfaceLogPath, '');
     fs.writeFileSync(dockerPathChecksPath, '');
+    fs.writeFileSync(tailscaleCountPath, '0\n');
 
     executable(path.join(fakeBin, 'ssh'), `#!/usr/bin/env bash
 set -Eeuo pipefail
@@ -956,9 +1001,17 @@ exit 42
     executable(path.join(fakeBin, 'tailscale'), `#!/usr/bin/env bash
 set -Eeuo pipefail
 printf 'tailscale %s\\n' "$*" >> "$FAKE_SURFACE_LOG"
-[[ "$1 $2" == 'serve status' ]]
-printf '%s\\n' "\${FAKE_TAILNET_ROUTE:-TCP 443 -> tcp://127.0.0.1:8443}"
-printf '%s\\n' "\${FAKE_TAILNET_TELEMETRY:-peer-session-volatile}"
+[[ "$#" -eq 3 && "$1 $2 $3" == 'serve status --json' ]]
+count=$(<"$FAKE_TAILSCALE_COUNT")
+count=$((count + 1))
+printf '%s\\n' "$count" > "$FAKE_TAILSCALE_COUNT"
+if [[ "\${FAKE_TAILNET_VOLATILE_SEQUENCE:-0}" == 1 ]]; then
+  printf '{"TCP":{"443":{"TCPForward":"127.0.0.1:8443"}},"PeerTelemetry":{"sequence":%s}}\\n' "$count"
+elif [[ -n "\${FAKE_TAILNET_ROUTE_JSON+x}" ]]; then
+  printf '%s\\n' "$FAKE_TAILNET_ROUTE_JSON"
+else
+  printf '%s\\n' '{"TCP":{"443":{"TCPForward":"127.0.0.1:8443"}},"PeerTelemetry":"peer-session-volatile"}'
+fi
 `);
     executable(path.join(fakeBin, 'curl'), `#!/usr/bin/env bash
 set -Eeuo pipefail
@@ -1010,6 +1063,7 @@ exec "$REAL_SHASUM" "$@"
       FAKE_CURL_LOG: curlLogPath,
       FAKE_CURL_COUNT: curlCountPath,
       FAKE_SURFACE_LOG: surfaceLogPath,
+      FAKE_TAILSCALE_COUNT: tailscaleCountPath,
       REAL_PATH: process.env.PATH ?? '',
       REAL_STAT: realStat,
       REAL_SHASUM: realShasum
@@ -1039,13 +1093,14 @@ exec "$REAL_SHASUM" "$@"
       curlCountPath,
       surfaceLogPath,
       dockerPathChecksPath,
+      tailscaleCountPath,
       orbStackBin
     };
   }
 
   const happy = probeFixture();
   try {
-    const result = happy.run();
+    const result = happy.run({ FAKE_TAILNET_VOLATILE_SEQUENCE: '1' });
     assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}\n${fs.readFileSync(happy.surfaceLogPath, 'utf8')}`);
     assert.equal(result.stdout, successLedger);
     assert.equal(result.stderr, '');
@@ -1066,6 +1121,7 @@ exec "$REAL_SHASUM" "$@"
     assert.notEqual(happy.sourceCommit, happy.integratedCommit);
     assert.equal(fs.readFileSync(happy.sshAttemptsPath, 'utf8'), 'attempt\n');
     assert.equal(fs.readFileSync(happy.curlCountPath, 'utf8'), '2\n');
+    assert.equal(fs.readFileSync(happy.tailscaleCountPath, 'utf8'), '3\n');
     assert.equal(fs.existsSync(path.join(happy.environment.FAKE_REMOTE_BIN, 'docker')), false);
     const dockerPathChecks = fs.readFileSync(happy.dockerPathChecksPath, 'utf8').trim().split('\n');
     assert.equal(dockerPathChecks.length, 21);
@@ -1074,8 +1130,11 @@ exec "$REAL_SHASUM" "$@"
     const dockerObservations = surfaceLog.split('\n').filter((row) => row.startsWith('orbstack-docker '));
     assert.equal(dockerObservations.length, 21);
     assert.equal(surfaceLog.split('\n').some((row) => row.startsWith('docker ')), false);
+    const tailscaleObservations = surfaceLog.split('\n').filter((row) => row.startsWith('tailscale '));
+    assert.deepEqual(tailscaleObservations, Array(3).fill('tailscale serve status --json'));
     const disclosedSurfaces = [result.stdout, result.stderr, fs.readFileSync(happy.remoteOutputPath, 'utf8'), surfaceLog].join('\n');
     assert.doesNotMatch(disclosedSurfaces, /\/Applications\/OrbStack\.app\/Contents\/MacOS\/xbin/u);
+    assert.doesNotMatch(disclosedSurfaces, /TCPForward|PeerTelemetry|peer-session-volatile|127\.0\.0\.1:8443/u);
     assert.equal(disclosedSurfaces.includes(`${happy.orbStackBin}:${happy.environment.FAKE_REMOTE_BIN}:${happy.environment.REAL_PATH}`), false);
     const curlArguments = fs.readFileSync(happy.curlLogPath).toString();
     assert.match(curlArguments, /resofeed\.example\.test:443:127\.0\.0\.1:8443/u);
@@ -1083,7 +1142,8 @@ exec "$REAL_SHASUM" "$@"
     assert.doesNotMatch(result.stdout, /resofeed\.example\.test|peer-session-volatile|sqlite|\.env|token|secret/iu);
     assert.match(surfaceLog, /orbstack-docker container inspect/u);
     assert.match(surfaceLog, /orbstack-docker volume inspect/u);
-    assert.match(surfaceLog, /tailscale serve status/u);
+    assert.match(surfaceLog, /tailscale serve status --json/u);
+    assert.doesNotMatch(surfaceLog, /tailscale serve (?:--yes|--bg|--tcp)/u);
     const procedurePaths = [
       wrapperSource.match(/SOURCE_DEPLOY_PATH="([^"]+)"/u)?.[1],
       wrapperSource.match(/SOURCE_COMPOSE_PATH="([^"]+)"/u)?.[1]
@@ -1110,7 +1170,14 @@ exec "$REAL_SHASUM" "$@"
     ), {}],
     ['docker_identity', () => {}, { FAKE_DOCKER_FAIL: '1' }],
     ['volume', () => {}, { FAKE_VOLUME_LABEL: 'wrong-volume' }],
-    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE: 'TCP 443 -> tcp://127.0.0.1:9443' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: '{"TCP":' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: '{"TCP":{}}' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: '{"TCP":{"443":{"TCPForward":8443}}}' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: '{"TCP":{"443":{"TCPForward":"127.0.0.1:9443"}}}' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: '{"TCP":{"443":{"TCPForward":"127.0.0.1:8443"},"443":{"TCPForward":"127.0.0.1:8443"}}}' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: '{"TCP":{"443":{"TCPForward":"127.0.0.1:8443","TerminateTLS":"resofeed.example.test"}}}' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: 'TCP 443 -> tcp://127.0.0.1:8443' }],
+    ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE_JSON: 'TCP 443\n|-- tcp://127.0.0.1:8443' }],
     ['public_url', () => {}, { FAKE_PUBLIC_URL: 'http://resofeed.example.test' }],
     ['readiness', () => {}, { FAKE_READINESS_FAIL: '1' }],
     ['protected_after', () => {}, { FAKE_PROJECTION_DRIFT: '1' }]
@@ -1125,6 +1192,14 @@ exec "$REAL_SHASUM" "$@"
       assert.equal((result.stdout.match(/PROBE_FAIL/gu) ?? []).length, 1, phase);
       assert.doesNotMatch(result.stdout, /PROBE_OK/u, phase);
       assert.equal(fs.readFileSync(fixture.sshAttemptsPath, 'utf8'), 'attempt\n', phase);
+      if (phase === 'tailnet_route') {
+        assert.equal(fs.readFileSync(fixture.tailscaleCountPath, 'utf8'), '1\n');
+        assert.deepEqual(
+          fs.readFileSync(fixture.surfaceLogPath, 'utf8').split('\n').filter((row) => row.startsWith('tailscale ')),
+          ['tailscale serve status --json']
+        );
+        assert.doesNotMatch(result.stdout, /TCPForward|127\.0\.0\.1:8443/u);
+      }
     } finally {
       fs.rmSync(fixture.root, { recursive: true, force: true });
     }
@@ -1188,8 +1263,12 @@ exec "$REAL_SHASUM" "$@"
   const volatileOne = probeFixture();
   const volatileTwo = probeFixture();
   try {
-    const first = volatileOne.run({ FAKE_TAILNET_TELEMETRY: 'peer=one timestamp=111 sqlite-wal=4 log-counter=8' });
-    const second = volatileTwo.run({ FAKE_TAILNET_TELEMETRY: 'peer=two timestamp=999 sqlite-wal=900 log-counter=77' });
+    const first = volatileOne.run({
+      FAKE_TAILNET_ROUTE_JSON: '{"TCP":{"443":{"TCPForward":"127.0.0.1:8443"}},"PeerTelemetry":"peer=one timestamp=111 sqlite-wal=4 log-counter=8"}'
+    });
+    const second = volatileTwo.run({
+      FAKE_TAILNET_ROUTE_JSON: '{"PeerTelemetry":"peer=two timestamp=999 sqlite-wal=900 log-counter=77","TCP":{"443":{"TCPForward":"127.0.0.1:8443"}}}'
+    });
     assert.equal(first.status, 0, first.stderr);
     assert.equal(second.status, 0, second.stderr);
     assert.equal(first.stdout, second.stdout);
@@ -1211,6 +1290,12 @@ exec "$REAL_SHASUM" "$@"
   assert.doesNotMatch(remoteSource, /EXPECTED_BACKUP_MANIFEST_SHA256|RESOFEED_PROBE_|DOCKER_HOST|CONTAINER_HOST|docker\.sock|\/usr\/local\/bin\/docker|\/opt\/homebrew\/bin\/docker|\/Applications\/Docker\.app|--host| -H /u);
   assert.doesNotMatch(remoteSource, /(?:printf|echo)[^\n]*\$\{?PATH\}?/u);
   assert.equal((remoteSource.match(/\bcurl\b/gu) ?? []).length, 2);
+  assert.equal(remoteSource.split('tailscale serve status --json').length - 1, 1);
+  assert.match(remoteSource, /\/usr\/bin\/python3 -c/u);
+  assert.match(remoteSource, /object_pairs_hook=reject_duplicate_members/u);
+  assert.match(remoteSource, /set\(listener\) != \{"TCPForward"\}/u);
+  assert.match(remoteSource, /target != "127\.0\.0\.1:8443"/u);
+  assert.doesNotMatch(remoteSource, /TCP 443 -> tcp:\/\/127\.0\.0\.1:8443|tailscale serve status \|/u);
   assert.match(remoteSource, /com\.docker\.compose\.volume/u);
   assert.match(remoteSource, /DATA_VOLUME_LABEL.*resofeed-data/su);
   assert.match(remoteSource, /BASELINE_PROJECTION=\$\(stable_projection\)/u);
@@ -1221,6 +1306,8 @@ exec "$REAL_SHASUM" "$@"
   console.log('PROBE_TRANSPORT=one_ssh_stdin');
   console.log('PROBE_PROTECTED_STATE=stable_projection');
   console.log('PROCEDURE_ORBSTACK_DOCKER_PATH=verified');
+  console.log('PROCEDURE_TAILSCALE_ROUTE_JSON=verified');
+  console.log('PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop');
 });
 
 test('RF-BUG-010 runtime isolation adapter contract', () => {

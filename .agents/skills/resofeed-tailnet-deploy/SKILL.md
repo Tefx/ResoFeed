@@ -151,13 +151,27 @@ printf "[CHECK] containers\n"; docker compose --project-name resofeed-caddy --en
 printf "[CHECK] image-reference\n"; docker container inspect --format "{{.Config.Image}}" resofeed 2>/dev/null || true
 printf "[CHECK] sqlite-volume\n"; docker container inspect --format "{{range .Mounts}}{{if eq .Destination \"/data\"}}{{.Name}}{{end}}{{end}}" resofeed 2>/dev/null || true
 printf "[CHECK] secrets\n"; awk -F= "/^(CF_API_TOKEN|OPENROUTER_KEY|TAVILY_API_KEY)=/{printf \"%s=%s\\n\", \$1, (\$2==\"\" ? \"[masked-empty]\" : \"[masked-present]\")}" .env
-printf "[CHECK] tailscale\n"; tailscale serve status
 '
 ```
 
-Stop when strict existing host-key authentication of the literal FQDN fails, the canonical home-relative directory is not exactly `Projects/resofeed-caddy`, the stack basename/project identity or procedure file type/mode drifts, Docker/Compose is unavailable, the running stack uses an alternate image repository, `/data` is not the expected named volume, secrets are unavailable for the existing runtime boundary, or Tailnet TCP/443 points elsewhere. The internal short hostname never authorizes or rejects this target.
+Stop when strict existing host-key authentication of the literal FQDN fails, the canonical home-relative directory is not exactly `Projects/resofeed-caddy`, the stack basename/project identity or procedure file type/mode drifts, Docker/Compose is unavailable, the running stack uses an alternate image repository, `/data` is not the expected named volume, or secrets are unavailable for the existing runtime boundary. The internal short hostname never authorizes or rejects this target. The tracked JSON route probe in the next section exclusively owns Tailnet TCP/443 admission.
 
 Do not include raw command output containing local paths or configuration values in retained evidence. Reduce it to the approved masked/non-secret outcomes.
+## Canonical Tailscale 1.98.8 route precondition
+The current release chain requires the Tailnet route to exist before publication or deployment. The maintained probe calls `tailscale serve status --json` and passes the stream directly to the duplicate-aware `/usr/bin/python3` standard-library parser. It accepts one exact scalar at `TCP.443.TCPForward`: `127.0.0.1:8443`. It retains only `TCP/HTTPS 443 -> 127.0.0.1:8443` inside the stable projection. Raw Serve JSON, human status output, peer/session telemetry, addresses, paths, configuration, and parser diagnostics are discarded.
+
+Malformed JSON, a missing or non-object `TCP`/`443` member, a non-string target, duplicate JSON members, another field claiming the TCP/443 listener, or a different target blocks this release before publication, deployment, or service mutation. The obsolete row and the Tailscale 1.98.8 tree display have no authority. The tracked wrapper performs one SSH attempt without retry, and every route observation remains read-only. The existing `deploy.sh`, `compose.yml`, `verify.sh`, and `stop.sh` identities remain unchanged; the canonical route makes the staged deployment procedure's route branch a no-op.
+
+A separate, current, explicit human authorization may create the route with this exact noninteractive command:
+
+```bash
+tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443
+```
+
+This release chain never invokes that command and never infers repair authority from deployment authority. Missing or drifted routing returns a blocker for separately authorized repair.
+
+Repository rollback of this JSON-route harness remediation reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/verify-remote.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs` to the integrated OrbStack-path-remediation state. It performs no SSH, Serve repair, recovery, deployment, publication, or runtime mutation.
+
 ## Formal deploy
 Deploy only after publication-chain verification, procedure staging, and read-only runtime target inspection pass. Bind the same `PROCEDURE_SOURCE_COMMIT`, `PROCEDURE_DEPLOY_SHA256`, and `PROCEDURE_COMPOSE_SHA256` returned by the maintained staging interface. The same strict literal-FQDN SSH option array is mandatory for this later remote deployment entry:
 
@@ -203,7 +217,7 @@ Also verify read-only that:
 - the running `resofeed` container's configured image equals `docker.io/tefx/resofeed@${INDEX_DIGEST}`;
 - root returns `200` through loopback Caddy and the Tailnet domain;
 - unauthenticated `/api/doctor` returns `401` through both paths;
-- Tailscale Serve maps TCP/443 to `tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}`;
+- `tailscale serve status --json` has one duplicate-free string at `TCP.443.TCPForward`, equal to `127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}`, and the observation invokes no Serve mutation;
 - the existing SQLite named volume remains mounted at `/data`.
 
 ## Recovery

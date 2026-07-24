@@ -356,6 +356,21 @@ docker buildx build \
 ```
 
 Local tags are not release, deployment, verification, or rollback identities.
+## Tailnet Route Admission
+The current Tailnet release chain admits publication and deployment only while the existing Tailscale 1.98.8 route is canonical. The maintained read-only helper consumes `tailscale serve status --json` through a duplicate-aware parser and requires the string `TCP.443.TCPForward` to equal `127.0.0.1:8443`. Its stable projection keeps only `TCP/HTTPS 443 -> 127.0.0.1:8443`. Raw Serve JSON, human tree output, peer/session telemetry, addresses, paths, configuration, and secret values are excluded from evidence.
+
+Malformed JSON, a missing or wrong-type route, duplicate members, ambiguous TCP/443 ownership, or another target blocks before publication, deployment, or service mutation. The old exact text row and the Tailscale 1.98.8 tree view are non-authoritative. The release wrapper uses one SSH attempt without retry and invokes no Serve mutation. Current `deploy.sh`, `compose.yml`, `verify.sh`, and `stop.sh` bytes remain unchanged; the required canonical route keeps the staged procedure on its no-op path.
+
+A separately and explicitly authorized operator may create the route with this exact noninteractive command:
+
+```bash
+tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443
+```
+
+That command is outside publication and deployment authority. Absence or drift returns a blocker until separate current human authorization exists.
+
+Repository rollback of this JSON-route harness remediation reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/verify-remote.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs` to the integrated OrbStack-path-remediation state. It performs no SSH, Serve repair, recovery, publication, deployment, or runtime mutation.
+
 ## Expected Image Size
 
 Image size target: aim for tens of MB, not hundreds.
@@ -419,7 +434,7 @@ Before accepting the containerization or immutable release procedure:
 - Procedure replacement preserves a content-addressed prior-byte backup, uses target-local atomic renames, verifies final hashes/mode, restores both prior files after a partial failure, and exposes only `--recover-procedure --backup-id <sha256>` for deliberate recovery.
 - Formal deployment binds `PROCEDURE_DEPLOY_SHA256` and `PROCEDURE_COMPOSE_SHA256` to the same full verified commit and rejects mismatches before runtime configuration or Docker/OCI operations.
 - Tailnet deployment targets only `tefx-mbp-personal:resofeed-caddy`, uses `docker.io/tefx/resofeed@sha256:<index-digest>`, and retains `resofeed-caddy_resofeed-data`.
-- Before replacement, the procedure captures the prior repository digest and validates Compose, Caddy, Tailscale TCP/443, SQLite volume, and masked runtime-secret presence.
+- Before publication or replacement, the tracked read-only probe requires duplicate-free `tailscale serve status --json` with `TCP.443.TCPForward = 127.0.0.1:8443`; absence or drift blocks, and this release invokes no Serve mutation.
 - Passing readiness is root `200` plus unauthenticated `/api/doctor` `401`. Failure restores the prior digest against the same named volume and proves the same readiness pair.
 - Evidence contains the verified commit, immutable tag, index/platform digests, target identity, readiness outcomes, and masked secret presence only. It contains no token, credential, provider key, `.env` value, or secret-source path.
 - Publication recovery records a complete orphan digest chain. Registry deletion occurs only under separate explicit authorization and is never inferred from deploy authority.

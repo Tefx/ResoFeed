@@ -130,6 +130,21 @@ PROCEDURE_STAGE=verified
 
 Do not substitute `scp`, `rsync`, ad hoc SSH copy commands, alternate paths, or manual renames.
 The producer uses that exact embedded transport for inspect, prepare, both file transfers, finalize, cleanup, and recovery. After FQDN host-key authentication it verifies the canonical physical home-relative path, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, and Compose shape. An unknown/changed key fails before target-local preparation or transfer; an internal hostname mismatch has no effect.
+## Canonical Tailscale 1.98.8 route precondition
+This release requires an existing canonical route before publication or deployment. The tracked read-only helper obtains `tailscale serve status --json`, rejects duplicate JSON members, and accepts only the string at `TCP.443.TCPForward` when it equals `127.0.0.1:8443`. The stable protected-state projection retains only `TCP/HTTPS 443 -> 127.0.0.1:8443`; raw Serve JSON, human output, peer/session telemetry, addresses, paths, configuration, and parser diagnostics never enter retained output.
+
+Malformed, missing, wrong-type, duplicate, ambiguous, or wrong-target TCP/443 state blocks before deployment. The obsolete exact row and Tailscale 1.98.8 tree output are display text without route authority. The current release performs no Serve mutation and does not retry the tracked SSH wrapper. The existing `deploy.sh`, `compose.yml`, `verify.sh`, and `stop.sh` remain unchanged; a canonical route keeps the staged deployment route branch on its no-op path.
+
+A separate, current, explicit human authorization may use this exact noninteractive repair:
+
+```bash
+tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443
+```
+
+Deployment authority does not authorize that repair. Route absence or drift must return a blocker before build, publication, deployment, restart, or other service mutation.
+
+Repository rollback of this JSON-route harness remediation reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/verify-remote.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs` to the integrated OrbStack-path-remediation state. It performs no SSH, Serve repair, procedure recovery, deployment, publication, or runtime mutation.
+
 ## Deploy the verified digest
 Perform the broader read-only runtime target inspection only after the separately authorized staging operation reports `PROCEDURE_STAGE=verified`. Through the fixed `TAILNET_SSH_OPTIONS`, confirm the canonical physical home-relative directory, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, OrbStack Docker CLI, Compose config, current `resofeed`/`resofeed-caddy` containers, named `/data` volume, Tailnet TCP/443 route, and masked secret presence. Never compare the internal short hostname.
 
@@ -193,7 +208,7 @@ compose.yml=<supplied prior Compose SHA-256> mode=<supplied prior Compose mode>
 
 It derives that byte sequence's SHA-256 internally, requires the actual regular non-symlink manifest to have mode `600`, exactly four rows, exact bytes, and the same hash, and never discloses the manifest hash.
 
-The remote program creates no file and reads no runtime secret or Caddy configuration. Its executable surface is limited to shell control, canonical path/file/hash/mode checks, read-only Docker container/image/volume inspection through the exact OrbStack-prefixed PATH contract, `tailscale serve status`, and exactly two GET-only `curl` calls. It derives exactly one HTTPS public host from the running ResoFeed `--public-url` argument, keeps that host undisclosed, and uses it for SNI and Host while connecting to loopback Caddy port `8443`. Passing readiness is root `200` plus unauthenticated Doctor `401`; the Tailnet SSH FQDN is never used as the public Host or SNI identity.
+The remote program creates no file and reads no runtime secret or Caddy configuration. Its executable surface is limited to shell control, canonical path/file/hash/mode checks, read-only Docker container/image/volume inspection through the exact OrbStack-prefixed PATH contract, `tailscale serve status --json`, one duplicate-aware `/usr/bin/python3` standard-library parse, and exactly two GET-only `curl` calls. It derives exactly one HTTPS public host from the running ResoFeed `--public-url` argument, keeps that host undisclosed, and uses it for SNI and Host while connecting to loopback Caddy port `8443`. Passing readiness is root `200` plus unauthenticated Doctor `401`; the Tailnet SSH FQDN is never used as the public Host or SNI identity.
 
 The bounded stdout ledger is:
 
@@ -221,7 +236,7 @@ PROBE_OK
 
 A remote assertion failure emits one `PROBE_FAIL phase=<last_phase> status=<status>`. Markerless SSH failure remains `PROBE_TRANSPORT_FAIL`; local input or source construction failure remains `PROBE_CONSTRUCTION_FAIL`. The wrapper suppresses unbounded remote diagnostics and never synthesizes phase success.
 
-Before and after readiness, the same helper hashes a canonically sorted stable projection of current procedure hashes/modes; the internally derived backup-manifest identity and mode; prior procedure hashes/modes; running ResoFeed and Caddy container/image IDs; `/data` mount type, destination, actual engine-volume identity, and logical `com.docker.compose.volume=resofeed-data` label; canonical Tailnet TCP/443 routing; and a SHA-256 of the validated public host. The projection excludes SQLite main/WAL/SHM bytes, rows, sizes, and times; app/Caddy logs and counters; health/status timestamps, PIDs, exec and transient network fields; Tailnet peer/address/session telemetry; access times, command order, timestamps, and every secret or configuration value.
+Before and after readiness, the same helper hashes a canonically sorted stable projection of current procedure hashes/modes; the internally derived backup-manifest identity and mode; prior procedure hashes/modes; running ResoFeed and Caddy container/image IDs; `/data` mount type, destination, actual engine-volume identity, and logical `com.docker.compose.volume=resofeed-data` label; the normalized canonical Tailnet value `TCP/HTTPS 443 -> 127.0.0.1:8443`; and a SHA-256 of the validated public host. The projection excludes SQLite main/WAL/SHM bytes, rows, sizes, and times; app/Caddy logs and counters; health/status timestamps, PIDs, exec and transient network fields; Tailnet peer/address/session telemetry; access times, command order, timestamps, and every secret or configuration value.
 
 This probe performs no publication, procedure staging, deployment, rollback, service change, registry operation, credential change, or data operation. Later publication and deployment remain separate accepted steps. Rollback of the OrbStack PATH remediation reverts only `verify-remote.sh`, `scripts/vectl-check.mjs`, `scripts/vectl-check.test.mjs`, and this README to the integrated transport-remediation state; it performs no remote recovery or deployment.
 ## Verification
@@ -254,7 +269,7 @@ curl -I "https://${RESOFEED_DOMAIN}"
 curl -i "https://${RESOFEED_DOMAIN}/api/doctor"
 ```
 
-The root must return `200`; unauthenticated `/api/doctor` must return `401`. Verify the running container's configured image equals the supplied digest reference and Tailscale Serve still maps TCP/443 to `tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}`. Never include response bodies, tokens, provider keys, or `.env` values in evidence.
+The root must return `200`; unauthenticated `/api/doctor` must return `401`. Verify the running container's configured image equals the supplied digest reference and the tracked JSON probe still finds only `TCP.443.TCPForward = 127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}` without Serve mutation. Never include raw Serve JSON, response bodies, tokens, provider keys, or `.env` values in evidence.
 ## Recovery and orphan recording
 A staging failure before replacement removes only the target-local transaction directory. A partial two-file replacement automatically restores and revalidates both prior procedure files from the content-addressed backup. If a later operator must deliberately recover the reported prior procedure, use only the maintained source-side interface:
 

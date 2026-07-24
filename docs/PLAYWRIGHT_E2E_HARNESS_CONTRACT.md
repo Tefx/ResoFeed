@@ -130,6 +130,7 @@ The immutable deployment profile uses identity `RF-BUG-V2 immutable OCI and Tail
 - absent platform commit-label verification;
 - missing attached `HEAD` refusal before any SSH attempt, dirty or mismatched clean-commit two-file procedure staging from a detached `HEAD`, wrong Git modes, or a path outside the exact `deploy.sh` and `compose.yml` source pair;
 - missing procedure-only endpoint/directory inspection, target-local atomic replacement and prior-byte recovery, source/remote SHA-256 comparison, or stable backup recovery interface;
+- missing duplicate-free Tailscale 1.98.8 JSON validation of `TCP.443.TCPForward = 127.0.0.1:8443`, normalized projection, human-output rejection, canonical-route no-op, or raw-JSON nondisclosure;
 - deployment/runtime identity checks ordered before procedure SHA-256 verification;
 - staging that reads runtime configuration or invokes publication, deployment, stop, restart, credential, secret, data, registry, container, image, volume, Caddy, or Tailscale mutation;
 - absent prior-digest capture, SQLite-volume preservation, direct readiness, or readiness-checked rollback;
@@ -139,12 +140,27 @@ The immutable deployment profile uses identity `RF-BUG-V2 immutable OCI and Tail
 
 The focused developer test performs staging and recovery only against a temporary local fake SSH target. It verifies the uniform exact option vector on inspect, prepare, both transfer streams, finalize, cleanup/recovery paths; strict existing host-key trust for the literal Tailnet FQDN; unknown and changed key rejection before target-local writes; internal short-hostname mismatch irrelevance; canonical path/stack/file/mode checks; exact clean-source binding; attached `HEAD` refusal before any SSH attempt; detached success/failure fixtures at their own verified commits; target-local backups; installed byte/mode identity; dirty-source refusal before SSH; pre-deploy identity rejection before Docker/runtime access; and prior-byte restoration after an injected second-file rename failure. It does not contact the Tailnet, Docker daemon, registry, or an external service.
 
-The profile emits one green evidence envelope only after the focused developer test passes. Its observations retain the repository identity, index/platform binding, Tailnet target, moving-tag refusal, prior-digest/readiness rollback, and masked-presence boundary markers, then add literal-FQDN strict-known-key endpoint identity, procedure staging, `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`, `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, `PROCEDURE_DETACHED_MATRIX=green`, source-commit/SHA-256 identity, prior-byte recovery, and no-side-effect observations. It performs no registry, SSH, Tailnet, Docker, credential, or runtime mutation.
+The profile emits one green evidence envelope only after the focused developer test passes. Its observations retain the repository identity, index/platform binding, Tailnet target, moving-tag refusal, prior-digest/readiness rollback, and masked-presence boundary markers, then add literal-FQDN strict-known-key endpoint identity, procedure staging, `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`, `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, `PROCEDURE_DETACHED_MATRIX=green`, `PROCEDURE_TAILSCALE_ROUTE_JSON=verified`, `PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop`, source-commit/SHA-256 identity, prior-byte recovery, and no-side-effect observations. It performs no registry, SSH, Tailnet, Docker, credential, or runtime mutation.
 
 The closure profile aggregates current authorities without synthesizing Go tests. It requires exact top-level `TestRFBugCanonicalContracts` identity and canonical markers, exact package-relative web OPML identity, the production Prompting scan, and exact RF-BUG-001 through RF-BUG-010 heading inventory in both protected defect documents. Empty output, no-test output, missing exact pass identities, skipped execution, or retry output fails closed.
 
 The `rf-bug-v2-source-ledger` profile binds `Source Ledger groups and controls render` to its Vitest `test:render` command with exactly one `--reporter=verbose`. Its Playwright commands retain their line reporters.
 Repository rollback for the SSH endpoint-identity remediation reverts only `deploy/resofeed-caddy/deploy.sh`, `scripts/vectl-check.mjs`, `scripts/vectl-check.test.mjs`, the Tailnet skill, deployment README, Container guide, and this harness contract together. It performs no SSH, procedure recovery, deployment, credential, host-key, Docker/registry, data, or external mutation.
+### Tailscale 1.98.8 JSON Route Harness Remediation
+The immutable-deployment profile retains the exact selection identity `RF-BUG-V2 immutable OCI and Tailnet deployment procedure`. Its deterministic fake surface requires `tailscale serve status --json` and accepts only a duplicate-free JSON object whose string `TCP.443.TCPForward` equals `127.0.0.1:8443`. Malformed JSON, missing or wrong-type members, duplicate members, extra TCP/443 ownership fields, another target, the obsolete exact row, and the Tailscale 1.98.8 human tree form all fail at `tailnet_route`.
+
+Passing coverage varies unrelated JSON telemetry and member order between observations while requiring stable-projection equality from the normalized `TCP/HTTPS 443 -> 127.0.0.1:8443` value. It proves one tracked SSH attempt, no retry, no Serve mutation, and no retained raw JSON, telemetry, address, path, configuration, public-host, PATH, or secret material. The adapter emits `PROCEDURE_TAILSCALE_ROUTE_JSON=verified` and `PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop` only after all retained immutable-procedure cases pass.
+
+The canonical route is a release precondition. Missing or drifted routing blocks before publication or deployment and cannot invoke repair. A separate current explicit human authorization may use exactly:
+
+```bash
+tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443
+```
+
+The executable probe and current release chain never contain or invoke that repair. Current `deploy.sh`, `compose.yml`, `verify.sh`, and `stop.sh` stay byte-identical; canonical routing keeps the staged procedure's existing route branch a no-op.
+
+Repository rollback reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/verify-remote.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs` to the integrated OrbStack-path-remediation state. It performs no SSH, Serve repair, recovery, publication, deployment, or runtime mutation.
+
 ### RF-BUG-010 Replacement Runtime Isolation Remediation
 
 The bounded project-native remediation profile is:

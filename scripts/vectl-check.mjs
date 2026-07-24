@@ -281,6 +281,8 @@ export const PENDING_PROFILE_PAIRS = [
       'PROCEDURE_IDENTITY=source_commit_and_sha256',
       'PROCEDURE_RECOVERY=prior_bytes',
       'PROCEDURE_ORBSTACK_DOCKER_PATH=verified',
+      'PROCEDURE_TAILSCALE_ROUTE_JSON=verified',
+      'PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop',
       'PROCEDURE_SIDE_EFFECTS=none',
       'PROBE_HARNESS=tracked_read_only',
       'PROBE_TRANSPORT=one_ssh_stdin',
@@ -488,6 +490,21 @@ export const READ_ONLY_PROBE_PATHS = Object.freeze([
   'deploy/resofeed-caddy/verify-remote.sh'
 ]);
 
+const STAGED_PROCEDURE_FILES = Object.freeze([
+  Object.freeze({
+    path: 'deploy/resofeed-caddy/deploy.sh',
+    mode: 0o755,
+    sha256: 'sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6'
+  }),
+  Object.freeze({
+    path: 'deploy/resofeed-caddy/compose.yml',
+    mode: 0o644,
+    sha256: 'sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c'
+  })
+]);
+
+const SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR = 'tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443';
+
 function requireDeploymentFragments(sources, relativePath, fragments) {
   const body = sources[relativePath];
   if (typeof body !== 'string') throw new AdapterFailure(`immutable deployment source is missing: ${relativePath}`);
@@ -499,6 +516,19 @@ function requireDeploymentFragments(sources, relativePath, fragments) {
 }
 
 export function immutableDeploymentSources(root = repoRoot) {
+  for (const identity of STAGED_PROCEDURE_FILES) {
+    const filePath = path.join(root, identity.path);
+    const mode = fs.statSync(filePath).mode & 0o777;
+    const sha256 = `sha256:${createHash('sha256').update(fs.readFileSync(filePath)).digest('hex')}`;
+    if (mode !== identity.mode || sha256 !== identity.sha256) {
+      throw new AdapterFailure(`immutable deployment staged procedure identity drifted: ${identity.path}`);
+    }
+  }
+  for (const [relativePath, expectedMode] of READ_ONLY_PROBE_PATHS.map((relativePath) => [relativePath, 0o755])) {
+    if ((fs.statSync(path.join(root, relativePath)).mode & 0o777) !== expectedMode) {
+      throw new AdapterFailure(`immutable deployment tracked probe mode drifted: ${relativePath}`);
+    }
+  }
   return Object.fromEntries([...IMMUTABLE_DEPLOYMENT_PATHS, ...READ_ONLY_PROBE_PATHS].map((relativePath) => [
     relativePath,
     fs.readFileSync(path.join(root, relativePath), 'utf8')
@@ -589,6 +619,9 @@ export function verifyImmutableDeploymentSources(sources) {
     'literal FQDN as the effective SSH HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
     'attached `HEAD` before any SSH invocation',
+    'TCP.443.TCPForward',
+    'tailscale serve status --json',
+    SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
     'The script has no registry-deletion operation'
   ]);
   requireDeploymentFragments(sources, '.agents/skills/resofeed-tailnet-deploy/SKILL.md', [
@@ -603,6 +636,9 @@ export function verifyImmutableDeploymentSources(sources) {
     'literal FQDN as the effective SSH HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
     'attached `HEAD` before any SSH invocation',
+    'TCP.443.TCPForward',
+    'tailscale serve status --json',
+    SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
     'Do not execute registry deletion without separate explicit authorization'
   ]);
   requireDeploymentFragments(sources, 'docs/CONTAINER.md', [
@@ -618,6 +654,9 @@ export function verifyImmutableDeploymentSources(sources) {
     'literal FQDN as both effective HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
     'attached `HEAD` before any SSH attempt',
+    'TCP.443.TCPForward',
+    'tailscale serve status --json',
+    SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
     'Failure restores the prior digest'
   ]);
   requireDeploymentFragments(sources, 'deploy/resofeed-caddy/verify.sh', [
@@ -641,6 +680,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"',
     'com.docker.compose.volume',
     'resofeed-data',
+    'tailscale serve status --json',
+    '/usr/bin/python3 -c',
+    'object_pairs_hook=reject_duplicate_members',
+    'set(listener) != {"TCPForward"}',
+    'target != "127.0.0.1:8443"',
     'TCP/HTTPS 443 -> 127.0.0.1:8443',
     '.Config.Cmd',
     '--connect-to "${PUBLIC_HOST}:443:127.0.0.1:8443"',
@@ -655,6 +699,10 @@ export function verifyImmutableDeploymentSources(sources) {
     'macOS target requires OrbStack',
     'preserves the caller PATH as the unchanged suffix',
     'never prints or discloses PATH',
+    'tailscale serve status --json',
+    'TCP.443.TCPForward',
+    'TCP/HTTPS 443 -> 127.0.0.1:8443',
+    SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
     'stable projection'
   ]);
   requireDeploymentFragments(sources, 'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md', [
@@ -669,6 +717,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_SOURCE_CHECKOUT=clean_detached_head',
     'PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected',
     'PROCEDURE_DETACHED_MATRIX=green',
+    'PROCEDURE_TAILSCALE_ROUTE_JSON=verified',
+    'PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop',
+    'tailscale serve status --json',
+    'TCP.443.TCPForward',
+    SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
     'masked-presence boundary markers'
   ]);
 
@@ -690,6 +743,17 @@ export function verifyImmutableDeploymentSources(sources) {
 
   const probeWrapper = sources['deploy/resofeed-caddy/verify.sh'];
   const remoteProbe = sources['deploy/resofeed-caddy/verify-remote.sh'];
+  const routeStatusCommand = 'tailscale serve status --json';
+  if (remoteProbe.split(routeStatusCommand).length - 1 !== 1
+      || remoteProbe.includes('tailscale serve status |')
+      || remoteProbe.includes('TCP 443 -> tcp://127.0.0.1:8443')) {
+    throw new AdapterFailure('immutable deployment tracked probe must derive TCP/443 only from one Serve JSON command');
+  }
+  for (const relativePath of ['deploy/resofeed-caddy/deploy.sh', 'deploy/resofeed-caddy/verify.sh', 'deploy/resofeed-caddy/verify-remote.sh']) {
+    if (sources[relativePath].includes(SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR)) {
+      throw new AdapterFailure(`immutable deployment executable retained separately authorized Serve repair: ${relativePath}`);
+    }
+  }
   if ((probeWrapper.match(/\bssh\b/gu) ?? []).length !== 1) {
     throw new AdapterFailure('tracked read-only probe wrapper must contain exactly one SSH invocation');
   }
@@ -831,6 +895,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_IDENTITY=source_commit_and_sha256',
     'PROCEDURE_RECOVERY=prior_bytes',
     'PROCEDURE_ORBSTACK_DOCKER_PATH=verified',
+    'PROCEDURE_TAILSCALE_ROUTE_JSON=verified',
+    'PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop',
     'PROCEDURE_SIDE_EFFECTS=none',
     'PROBE_HARNESS=tracked_read_only',
     'PROBE_TRANSPORT=one_ssh_stdin',

@@ -97,10 +97,40 @@ public_url_host() {
 }
 
 canonical_tailnet_route() {
-  local route_count
-  route_count=$(tailscale serve status | awk '$0 == "TCP 443 -> tcp://127.0.0.1:8443" {count++} END {print count+0}')
-  [ "$route_count" -eq 1 ]
-  CANONICAL_ROUTE='TCP/HTTPS 443 -> 127.0.0.1:8443'
+  local route
+  route=$(
+    tailscale serve status --json 2>/dev/null |
+      /usr/bin/python3 -c '
+import json
+import sys
+
+
+def reject_duplicate_members(pairs):
+    value = {}
+    for key, member in pairs:
+        if key in value:
+            raise ValueError("duplicate JSON member")
+        value[key] = member
+    return value
+
+
+try:
+    document = json.load(sys.stdin, object_pairs_hook=reject_duplicate_members)
+    tcp_routes = document.get("TCP") if type(document) is dict else None
+    listener = tcp_routes.get("443") if type(tcp_routes) is dict else None
+    if type(listener) is not dict or set(listener) != {"TCPForward"}:
+        raise ValueError("ambiguous TCP/443 listener")
+    target = listener["TCPForward"]
+    if type(target) is not str or target != "127.0.0.1:8443":
+        raise ValueError("noncanonical TCP/443 target")
+except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+    raise SystemExit(1)
+
+sys.stdout.write("TCP/HTTPS 443 -> 127.0.0.1:8443")
+' 2>/dev/null
+  ) || return 1
+  [ "$route" = 'TCP/HTTPS 443 -> 127.0.0.1:8443' ]
+  CANONICAL_ROUTE=$route
 }
 
 read_docker_identity() {
