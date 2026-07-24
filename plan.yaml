@@ -190564,35 +190564,29 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      After `rf-bug-v2-docker-runtime-proof`, consume only the OCI index digest chain
-      produced by `rf-bug-v2-publish-immutable-oci-v2`, independently admitted by
-      `rf-bug-v2-publish-immutable-oci-v2-verification`, and proven on both platforms.
-      The superseded original publication ID and FAIL receipt remain diagnostic-only.
-      Require the transient commit-bound builder and its BuildKit container absent
-      and the user''s active/default builder unchanged before deployment.
-
-
-      Use only the newly staged maintained procedure to deploy `docker.io/tefx/resofeed@sha256:<replacement-verified-index-digest>`
+      After exact immutable OCI publication and independent both-platform proof, use
+      only the newly staged maintained procedure to deploy `docker.io/tefx/resofeed@sha256:<verified-index-digest>`
       to the existing `resofeed-caddy` stack at `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
       Require the reviewed operation/target authority, exact staged polarity-remediation
-      commit and procedure hashes, replacement source/tag/index/platform/revision-label
-      chain, and existing runtime-secret injection. Reject the stale inverted commit
-      `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`, deploy SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`,
-      original failed publication evidence as a digest source, and every mutable or
-      mismatched identity. Enter only through the literal FQDN authenticated by strict
-      existing SSH host-key verification with host-key update/enrollment disabled,
+      commit and procedure hashes, the same-step publication''s exact tag/index/platform/revision
+      chain, transient-builder cleanup, unchanged active/default builder, and existing
+      runtime-secret injection. Reject the stale inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`,
+      deploy SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`,
+      all original failed publication artifacts as digest authority, and every mutable
+      or mismatched identity. Enter only through the literal FQDN authenticated by
+      strict existing SSH host-key verification with host-key update/enrollment disabled,
       no alias or effective-host rewrite, and the unchanged existing credential/account.
       The remote internal hostname is unknown and cannot authorize or block the operation.
       Preserve the prior deployed digest, SQLite volume, and owner-token state.
 
 
-      Never read or print `.env`, host-key material, authentication paths, or secret
-      values; substitute `latest` or another tag/repository/host/stack; change host-key
-      trust, credentials, or accounts; reset the token; clear data; inspect another
-      host; recreate a Buildx builder; mutate Tailscale routing; or execute an undeclared
-      operation. Unknown/changed host key, endpoint/path/stack/source drift, replacement
-      digest drift, builder residue, default-builder drift, or unresolved prior digest
-      stops before deployment mutation.
+      Never read or print `.env`, host-key material, authentication paths, secret
+      values, PATH, raw Serve JSON, or response bodies; substitute `latest` or another
+      tag/repository/host/stack; change host-key trust, credentials, or accounts;
+      reset the token; clear data; inspect another host; recreate a Buildx builder;
+      mutate Tailscale routing; or execute an undeclared operation. Unknown/changed
+      host key, endpoint/path/stack/source/digest drift, unresolved prior digest,
+      builder residue, or default-builder drift stops before deployment mutation.
 
 
       Verify direct/public equality for all four Go-owned headers on HTML, JSON, MCP,
@@ -190604,11 +190598,11 @@ phases:
       through the declared recovery path, retain the SQLite volume, and verify readiness.
       If rollback identity, strict endpoint authentication, or readiness recovery
       is unavailable, report BLOCKED without an alternate target or destructive fallback.'
-    verification: The maintained procedure deploys only the replacement verifier-admitted
-      docker.io/tefx/resofeed index digest through strict literal-FQDN authentication
-      to the existing stack; builder cleanup/default invariants, direct/public headers,
-      Caddy ownership, browser/CSP/routes/tokens/state, prior-digest rollback, SQLite
-      preservation, readiness, unchanged credential/host-key trust, and secret nondisclosure
+    verification: The maintained procedure deploys only the same-step publication's
+      independently verified docker.io/tefx/resofeed index digest through strict literal-FQDN
+      authentication to the existing stack; builder cleanup/default invariants, direct/public
+      headers, Caddy ownership, browser/CSP/routes/tokens/state, prior-digest rollback,
+      SQLite preservation, readiness, unchanged credential/host-key trust, and nondisclosure
       are proven.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
