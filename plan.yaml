@@ -190709,188 +190709,91 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Replacement for `rf-bug-assurance-closure-full-gate`. Require the corrected
-      v2 local matrix, retry-free RF-BUG-005 streaming remediation, both frontend
-      CSP remediations and shared fresh verification, closure-selector remediation
+      Replacement Full Gate for the RF-BUG Assurance v2 release chain. Require the
+      corrected v2 local matrix, retry-free RF-BUG-005 streaming remediation, both
+      frontend CSP remediations and shared fresh verification, closure-selector remediation
       and verification, immutable OCI/Tailnet repository procedure, preserved staging
-      incident history, completed inverted detached-head remediation as immutable
-      history, integrated detached-head polarity remediation, fresh no-SSH one-row
-      replacement staging authorization, exact v2 two-file staging operation, independent
-      v8 diagnostic-phase staged-byte/current-prior/backup-digest/runtime/readiness
+      incident history, completed detached-head guard and polarity remediation, fresh
+      no-SSH one-row replacement staging authorization, exact v2 two-file staging
+      operation, independent v9 stdin-fed `bash -s` diagnostic-phase staged-byte/current-prior/backup-digest/runtime/readiness
       evidence, current publication/deployment authorization, immutable two-platform
       OCI publication, both-platform container proof, strict-host-key-authenticated
       digest deployment to the sole FQDN/stack/path, formal security review, independent
       black-box verification, and defect-report closure.
 
 
-      Preserve the failed fan-in report `/tmp/larva-agent-artifacts/rf-bug-v2-streaming-contract-verification_report.md#sha256=5245954d4775fadf8e6d846b8b251d6dae390edfe15488626ab5a7021107b0d7`
-      as evidence that the Go lane passed while Chromium CSP and generated baseline
-      blocked admission; require the replacement verification to retain that Go evidence
-      and close both blockers from one fresh canonical profile. Preserve immutable-procedure
-      semantic receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-23T19-22-26-742Z-2026-07-23T19-11-50-828Z_019f9064-282c-7a73-ba92-fcbf9ad1478d.js-f1d73b54f1abcc84.txt#sha256=f1d73b54f1abcc84dc66b45a4ef91f8b9ad1cf9f8f888b54eae5c7437707662c`
-      and semantic validator `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification/semantic-validator.json#sha256=7d5d30480770270d1ee4a95c7e728cd574be7f984ac00b6a534ef635e4449b99`
-      as definitive pre-remediation `REJECTED` / `FAIL` / `DISPROVEN` evidence.
+      Preserve all prior failed/invalid/REJECTED staging, detached-guard, polarity-review,
+      v4, v5, v6, and v7 artifacts as immutable diagnostic-only history with no lifecycle
+      or external-operation authority. Preserve v8 evidence unchanged and do not retry,
+      correct, or complete v8: receipt file `sha256:7d266496a50f0c92de1793385216b4ea4f620eec25e29b8270bd017f7a620582`,
+      validator `sha256:af6bc0f129398222483c28f9df77a23cbbffb3d55fab37e9023328cfd03660c2`,
+      and canonical valid `REJECTED` receipt `sha256:25bb15205f5f4773c4acd2b617fc1c10a4fd0aef2972c698b0eccdc458229619`.
+      V8''s three local checks passed, but its one SSH argv ended with literal `bash
+      -c` and no command operand; the remote program never ran, exit 1 produced no
+      remote stdout, and the synthesized `PROBE_FAIL phase=canonical_stack status=1`
+      was not emitted by a remote trap. Treat v8 solely as verifier command-construction
+      failure. It proves no canonical-stack, volume, readiness, protected-state, target,
+      or product defect, and supplies no remote phase or later-operation authority.
 
 
-      Preserve the exhausted staging attempt exactly: command `./deploy/resofeed-caddy/deploy.sh
-      --stage-procedure --verified-commit 3f6be1c58592f86a5a352518ac747a84f0c2abdc`;
-      before SHA-256 `662030f3c6791cf8924062d7cb7a4373e9cf78ff56a00d3c28c65166033d951a`;
-      output SHA-256 `2e1c731f67e5489065ba65a1734acaf64f9a93b45ec0059ba89f2d6b81a0e91d`;
-      after SHA-256 `207f470451247d8fcb01cfef51585ac81b155e7d992c2f20a33d258fa95e114c`;
-      equal before/after local Git metadata `sha256:7bf520a2b04dd5c1ce3febacc0d974eb1309cfa9064b8eff556e10a6d102b913`;
-      and exact pre-write `target host identity drifted` failure. Require proof that
-      command/commit and prior authority were never rerun, no state changed, and the
-      unknown internal hostname was never guessed or substituted.
-
-
-      Preserve older invalid detached-guard receipt/validator pairs `sha256:213797bdca053a49e703215d017b5f11a803cc749893c127163bd2829b89361b`
-      / `sha256:6da4b9f76c215aabd77004472fe14ac6f1ea29b744eef57e46b3107f2700b0fe`
-      and `sha256:ba91a224bd9606523fd337b38e15bdb3f78c17e6844bc2778de7deb02f6b6280`
-      / `sha256:74a971d105d065905d2995f669441c01ee8aabd2fdade135e2b205a03d0537d9`
-      exactly as invalid diagnostic history. Preserve coherent `REJECTED` polarity-review
-      semantic receipt `sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8`,
-      receipt-file SHA-256 `f1dbd2f87c98aeb1d17f64672e70a7f49d338f8e966d0c27183ff66533904c19`,
-      and production-validator SHA-256 `7e1e4a26c9f1b01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`
-      as immutable diagnostic-only evidence. The fresh replacement review must contain
-      exactly one requirement-coverage row and one state-transition row for sole caller-bound
-      ID `RF-BUG-V2-STAGE-PROCEDURE-ENDPOINT-IDENTITY-V2`.
-
-
-      Preserve v4 receipt file SHA-256 `6d095829aca527e29d3d10caa088545cb884278161c7e0af2c260cf31f83d8c0`,
-      validator file SHA-256 `22f1eac592857d7f2b6dd7e10145b13c8f9f99a50388a11894416e465c4ade31`,
-      and canonical semantic receipt SHA-256 `ff2e910222fa30439e8d260c868bd03f917f05ccca982ab372a660e88d18aa54`
-      unchanged as production-validator-admitted `REJECTED` evidence with `INCONCLUSIVE`
-      / `ESCALATE`. V4 local selected proof passed, but its one live probe added an
-      undeclared content-addressed child-directory mode-700 assertion before positive
-      evidence and emitted no failure-stage marker. Treat those as verifier-generated
-      probe defects. V4 supplies no lifecycle completion, product-failure, target-blocker,
-      or external-operation authority and must not be retried, corrected, or completed.
-
-
-      Preserve v5 evidence unchanged: first INVALID receipt file SHA-256 `082d6dedfea64940a018388112f601d40ae1643e2876d42b1c4a1605efb1288f`
-      with validator SHA-256 `f85d69f3d0632df69bbf71949cdbc54203d1fccd10093a05d4804567f12f1712`;
-      corrected receipt file SHA-256 `8163f6ae562f4b0b3bd86f343a7125c6db5d8dd7701cd4e5688445177b74b511`
-      with validator SHA-256 `7eeb100335d044eb9e1456dc2c9b9a6b91bc423f71961834c86c495b246a0ad1`;
-      canonical valid `REJECTED` receipt SHA-256 `a8a5e37e20beac3e7e575a7b6a4ff5f87c95cffb0174c0bca8b5b1043d442da5`.
-      V5 passed `canonical_stack`, `procedure_current`, `backup`, `docker_identity`,
-      `volume`, and `tailnet_route`, then emitted `PROBE_FAIL=readiness`; curl exited
-      35 because the probe used the SSH endpoint FQDN as Caddy TLS SNI/Host. Caddy
-      serves the nonsecret public HTTPS domain configured in the running container''s
-      `--public-url`; the fixed Tailnet FQDN remains authoritative only for SSH transport.
-      V5 must not be retried, corrected, or completed and supplies no lifecycle completion,
-      product-failure, target-blocker, or external-operation authority.
-
-
-      Preserve v6 evidence unchanged and do not retry, correct, or complete v6: first
-      INVALID file `sha256:3f96876646e8230fbc3458aa3a58e2434d2c890a4cc2dd14930d52c5d0513615`
-      with validator `sha256:9034edb4495386f99e599814e3c4e9be05aa1e2e607d78acd5ee27554828169f`;
-      corrected file `sha256:ed57db4a6c74399d14b0150191ccdccb7553642080dc09f711573f7c097be55d`
-      with validator `sha256:9ce24bf1680d28dd9545c4a8aa2d3cf093b0e1263fb58785b7b29b73b1c09ff1`;
-      and canonical valid REJECTED receipt `sha256:1c0921dc81a234a853b9665015940be958a34f0d4742d5727209bdb2fd08b176`.
-      V6''s local selected check passed. Its sole remote probe proved current procedure
-      hashes/modes, Compose shape, backup manifest/files, and prior hashes, then emitted
-      `PROBE_FAIL phase=runtime status=1`; readiness/public-host and protected-after
-      did not execute. V5 had already proved the individual Docker identity, volume,
-      and Tailnet-route checks on the same unchanged staged target; its only failure
-      was readiness under the wrong TLS SNI. Classify v6 as insufficiently localized
-      verifier probe logic, not a proven product defect. V6 supplies no lifecycle
-      completion, product-failure, target-blocker, retry, correction, or external-operation
-      authority.
-
-
-      Preserve v7 evidence unchanged and do not retry, correct, or complete v7: first
-      INVALID file `sha256:54ca02b13defd369f040bbf2e11816caa4072b8477811fc26f61245fd482bedf`
-      with validator `sha256:692c9b51af53d3c511781b617e80b4188db587258964ab2a7a93bf92050faafd`;
-      corrected file `sha256:6f69effc76289238254461382c58a9f967179c1f804242677483822d7db85389`
-      with validator `sha256:9f0ddbfcb695f432ab1f86451f8e40e1486ee1b1b10157caf7c07b4b2f0049cb`;
-      and canonical valid REJECTED receipt `sha256:61da90d1566ad49cf20040e4374d9a6bad9afe16efe4481b0830185f5025f026`.
-      V7 passed all three required local checks. Its sole strict read-only probe passed
-      `canonical_stack`, `procedure_current`, `backup`, and `docker_identity`, then
-      emitted `PROBE_FAIL phase=volume status=1`; no later phase ran. The immutable
-      staged Compose source at declared SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
-      declares service mount `resofeed-data:/data` and top-level logical volume key
-      `resofeed-data`, and does not declare `resofeed_data`. Classify v7 as a verifier-plan
-      volume-identity defect caused by requiring a literal unprefixed engine name;
-      it supplies no evidence of data-volume drift or product failure. V7 supplies
-      no lifecycle completion, target-blocker, retry, correction, or external-operation
-      authority.
-
-
-      Admit only fresh v8 evidence that retains every portable, strict, read-only
-      assertion and constraint from v6 while splitting runtime attribution into the
-      exact ordered phases and success markers required by v8. V8 authorizes one local
-      selected check, exactly one fresh `-Fnone` remote read-only probe, and no internal
-      retry/correction. It requires literal-FQDN SSH trust, portable stat/hash helpers,
-      OrbStack Docker PATH, current/prior/manifest/backup identities without backup
-      child-directory mode assertion, exact running-image-ID RepoDigest resolution
-      with at least one permitted canonical digest, immutable staged Compose logical
-      volume `resofeed-data` mounted at `/data` plus exactly one runtime `/data` volume
-      mount whose nonempty engine name is internally bound by `com.docker.compose.volume=resofeed-data`
-      without engine-name or label disclosure, Tailnet TCP/HTTPS 443 to loopback Caddy
-      8443, argv-only public URL validation, root 200/Doctor 401 readiness, and exact
-      protected-state before/after equality. The probe must emit `PROBE_PHASE=docker_identity`/`DOCKER_IDENTITY=verified`,
-      `PROBE_PHASE=volume`/`VOLUME=verified`, `PROBE_PHASE=tailnet_route`/`TAILNET_ROUTE=verified`,
-      `PROBE_PHASE=public_url`/`PUBLIC_URL_HOST=validated`, `PROBE_PHASE=readiness`/`READINESS=verified`,
-      `PROBE_PHASE=protected_after`/`PROTECTED_STATE=unchanged`, then `PROBE_OK`,
-      or exactly one `PROBE_FAIL phase=<last_phase> status=<status>`.
+      Admit only fresh v9 evidence that retains the full v8 read-only procedure, corrected
+      Compose logical volume key `resofeed-data`, runtime mount and volume-label proof,
+      non-collapsible diagnostic phases, public-URL host validation, readiness, protected-state
+      equality, portability, strict literal-FQDN trust, one-probe/no-retry behavior,
+      and nondisclosure constraints. Require the actual local SSH argv to use `ssh`,
+      `-Fnone`, all maintained options and values as separate elements, literal destination
+      `tefx-mbp-personal.platy-atlas.ts.net`, then separate `bash`, `-s`, with the
+      bounded compatible remote program supplied exclusively on stdin. Reject `bash
+      -c`, `bash` plus `-c`, concatenated pseudo-argv, missing command operands, undocumented
+      remote-command argv elements, heredoc pseudo-argv, shell evaluation of remote
+      output, and alternate interpreters. Require the remote script to install phase
+      state and cooperating ERR/EXIT traps before its first assertion, immediately
+      emit `PROBE_PHASE=canonical_stack`, and emit every ordered success marker through
+      `PROBE_OK`. A no-stdout or markerless exit is transport/command-construction
+      failure; only an actual remote trap marker establishes `PROBE_FAIL phase=<last_phase>
+      status=<status>`.
 
 
       Require the current integrated polarity-remediation commit and deploy-script
-      hash to differ from pre-guard commit `4b2e878b050bd1820056ca729682bfd24d5a04dd`
-      / SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`
-      and inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5` / SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`;
-      independently derive the unchanged compose hash. Require observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`,
-      `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, and `PROCEDURE_DETACHED_MATRIX=green`.
-      Prove symbolic-ref success is rejected as attached before SSH, every fixture
-      is detached at its exact commit, the complete fake-target matrix passes, and
-      selected execution turns red when polarity is inverted.
+      hash to differ from the pre-guard and inverted identities; require observations
+      `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`, `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`,
+      and `PROCEDURE_DETACHED_MATRIX=green`; require exact `~/Projects/resofeed-caddy`
+      stack identity, source/remote hash and mode equality, prior-byte recovery, manifest
+      mode `600`, backup file identities and modes without child-directory mode assertion,
+      deterministic local Git metadata equality, and no short-host authority. Require
+      actual-running-image-ID RepoDigest resolution, staged Compose logical volume
+      `resofeed-data` at `/data`, exactly one runtime `/data` volume mount internally
+      bound by `com.docker.compose.volume=resofeed-data` without engine-name/label
+      disclosure, Tailnet TCP/HTTPS 443 to loopback Caddy 8443, argv-only public URL
+      validation without host disclosure, root `200`, unauthenticated Doctor `401`,
+      and exact protected-state before/after equality. Final immutable deployed identity
+      remains proven only by the publication, dual-platform, and deployment producers.
 
 
-      Require exact `~/Projects/resofeed-caddy` stack identity, fresh-review-bound
-      source/remote hash and mode equality, prior-byte recovery, manifest mode `600`
-      and exact identity rows, regular non-symlink backup files matching prior bytes
-      and modes `755`/`644`, backup identity recomputation, deterministic local Git
-      metadata equality, and no hostname-short authority. Require actual-image-ID
-      RepoDigest resolution with Docker Hub canonical normalization; `.Config.Image`
-      need not itself be digest-form for the pre-publication prior-state check. Final
-      immutable deployed identity is proven only after publication and deployment
-      producers run. Completed old staging nodes, inverted remediation, v4, and v5
-      remain immutable diagnostic history outside current authority; only the polarity
-      remediation, fresh replacement review, v2 operation, fresh v8 proof, and downstream
-      fresh evidence authorize the replacement chain.
-
-
-      Retain all prior passed clean local procedure, Compose/Caddy/Tailscale target,
-      SQLite-volume, masked-secret-marker, repository-credential-context, root-`200`,
-      and unauthenticated-Doctor-`401` observations as history while re-observing
-      current facts. Immediately before closure require Vectl validate/check-refs,
-      repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,
-      authority-reference commit `29c3d711ad83d4f58ffdce69ada3b2403c81326e`, empty
-      active claims, current operation authorization for every declared external operation,
-      exact replacement source/staged procedure hashes, exact verified commit/tag/index/platform
-      and deployed-digest bindings, separate staging/publication/deployment authority,
-      prior-procedure and orphan/prior-digest recovery evidence, strict host-key and
-      credential boundaries, secret non-disclosure, and no unresolved finding. Bind
-      `post_closure_report_sha256` and `closure_commit` from the replacement closure
-      step and require current report hash and HEAD equality. Skipped legacy nodes,
-      invalid/rejected diagnostic receipts, stale identities, and item-deep-links
-      future work are never admission inputs.
+      Immediately before closure require Vectl structure/ref validation, current accepted-plan
+      operation authorization for every external operation, exact replacement source/staged
+      procedure hashes, exact verified commit/tag/index/platform and deployed-digest
+      bindings, separate staging/publication/deployment authority, prior-procedure
+      and orphan/prior-digest recovery evidence, strict host-key and credential boundaries,
+      secret non-disclosure, public-host non-disclosure, no unresolved finding, current
+      report hash, and HEAD equality. Skipped legacy nodes, invalid/rejected diagnostic
+      receipts, stale identities, v8, and item-deep-links future work are never admission
+      inputs.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v8","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v9","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
     verification: Full Gate covers the polarity remediation, behavior-backed symbolic-ref
       proof, one-row fresh no-SSH staging review, exact-once v2 staging, independent
-      v8 diagnostic-phase staged-byte/runtime/readiness proof, current publication/deployment
-      authority, immutable OCI and dual-platform proof, strict-FQDN SSH digest deployment,
-      public-URL-derived Caddy readiness, security/black-box/closure evidence, current
-      hashes/HEAD, separate recovery boundaries, secret and public-host non-disclosure,
-      and no out-of-scope blocker; v4, v5, the inverted completed remediation, and
-      all stale, invalid, or REJECTED incident material remain immutable diagnostic-only
-      history.
+      v9 stdin-fed `bash -s` diagnostic-phase staged-byte/runtime/readiness proof,
+      current publication/deployment authority, immutable OCI and dual-platform proof,
+      strict-FQDN SSH digest deployment, public-URL-derived Caddy readiness, security/black-box/closure
+      evidence, current hashes/HEAD, separate recovery boundaries, secret and public-host
+      non-disclosure, and no out-of-scope blocker; v8 and all stale, invalid, or REJECTED
+      incident material remain immutable diagnostic-only history.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
