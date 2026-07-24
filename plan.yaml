@@ -190439,107 +190439,77 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Execution route: `vectl-orchestrator` directly performs this already-authorized
-      publication effect; no repository-changing worker contract applies. Preserve
-      the earlier diagnostic-only publication history unchanged: `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json`
-      SHA-256 `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`,
-      `publication-evidence.md` SHA-256 `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`,
-      and `buildx-driver-diagnostic.txt` SHA-256 `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`.
-      Those artifacts prove three implicit-active-builder commands exited 1 with `Multi-platform
-      build is not supported for the docker driver.`, the immutable tag remained absent,
-      and no registry, digest, orphan, alias, container, deployment, Tailnet, credential/account,
-      or repository mutation occurred. Never promote that FAIL receipt, replay its
-      implicit-builder command, or count those commands as corrected attempts.
+      Execution route: `vectl-orchestrator` directly performs this renewed publication
+      effect after `rf-bug-v2-renewed-source-publication-authorization-review`; no
+      repository-changing worker contract applies.
 
 
-      Also preserve mode-0600 `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json`
-      SHA-256 `b4489129b3b50b50d65f4111d521524979396e25515305d38603fdee05dec36b` as
-      the zero-command corrected preflight and mode-0600 `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json`
-      SHA-256 `e3601edf0c53c36c6f03f5a37f567d715003cc3ac8508489aeae6e690632ff7d` as
-      corrected build/push attempt 1. The execution receipt proves exactly one transient-builder
-      create, bootstrap, explicit-builder build/push, and cleanup; build exited 1;
-      the exact tag remained absent; the named builder and attributable BuildKit container
-      were absent afterward; the active/default builder fingerprint was unchanged;
-      and detached source commit/tree remained exact and clean. Its complete build
-      output was not retained, so its failure class is unknown and must not be inferred.
-      Neither corrected receipt completes publication.
+      Preserve every prior diagnostic and corrected old-source artifact unchanged.
+      The three implicit-active-builder diagnostics remain non-authoritative at SHA-256
+      `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`, `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`,
+      and `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`. Preserve
+      zero-command corrected preflight SHA-256 `b4489129b3b50b50d65f4111d521524979396e25515305d38603fdee05dec36b`,
+      old-source attempt-1 receipt SHA-256 `e3601edf0c53c36c6f03f5a37f567d715003cc3ac8508489aeae6e690632ff7d`,
+      and old-source attempt-2 complete log/classification/receipt SHA-256 `a46303ce5bac510f91fb22570ff3b9c9b88d9bf217ac8000a84f04688818433c`,
+      `51702864fbdb5c16cd85564cb175fd8a94bb1d634efaa809696067365e931b6c`, and `03ffb7837c738b0eb910321785566e239236c1cab67b019258f41254dfb8c873`.
+      Attempt 1 failed with unknown class and no retained complete log; attempt 2
+      retained a complete mode-0600 log, deterministically classified `deterministic_source_build_or_toolchain`,
+      left the old tag absent, cleaned builder/BuildKit residue, and preserved source/context/default-builder
+      fingerprints. The old commit/tree/tag/builder are permanently stopped and must
+      never be retried, completed, promoted, or counted in the renewed-source attempt
+      cardinality.
 
 
-      Use one isolated clean detached checkout at exact commit `1e49621c6b44ac2e55cd82f87960972d571bad64`
-      and tree `36bc981e5a01c14a6355162a6679ec8c144d5313`. The sole target is `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`;
-      the sole platforms are `linux/amd64,linux/arm64`; and both platform images must
-      carry `org.opencontainers.image.revision=1e49621c6b44ac2e55cd82f87960972d571bad64`.
-      Before every additional attempt require exact clean detached source identity
-      and bytes, the immutable tag absent, transient builder `resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`
-      and its attributable BuildKit state absent, prior cleanup confirmed, and a nonsecret
-      stable fingerprint proving the active/default builder unchanged. Require the
-      same existing Docker context/daemon, repository, tag, platforms, revision label,
-      already-authorized repository-scoped credential/account, and no-paid/cloud-builder
-      cost boundary without disclosure or identity change.
+      Consume only the exact clean detached 40-character integrated commit admitted
+      by the new implementation receipt and renewed review. Call it `INTEGRATED_COMMIT`;
+      the sole target is `docker.io/tefx/resofeed:git-${INTEGRATED_COMMIT}`, the sole
+      platforms are `linux/amd64,linux/arm64`, both images carry `org.opencontainers.image.revision=${INTEGRATED_COMMIT}`,
+      and the transient builder is `resofeed-publish-${INTEGRATED_COMMIT}`. Before
+      each attempt require exact clean detached source and tree, the new immutable
+      tag absent, named builder and attributable BuildKit state absent, prior cleanup
+      confirmed, and nonsecret fingerprints proving the reviewed Docker context/daemon
+      and active/default builder unchanged. Require the same repository-scoped credential/account
+      and no-paid/cloud-builder cost boundary without disclosure or identity change.
 
 
-      The existing execution receipt is corrected build/push attempt 1. Within this
-      same operation, target, effect, and rollback boundary, authorize at most two
-      additional corrected build/push attempts, for a cumulative corrected history
-      of one to three attempts, without further human confirmation. Corrected attempt
-      2 is allowed despite the unknown attempt-1 failure class because immutable evidence
-      proves tag absence, successful cleanup, unchanged default builder and source,
-      and no remote mutation. Before each additional attempt, create a new non-overwriting
-      mode-0600 local artifact that retains the complete command output for that attempt.
-      Each additional attempt may create the exact named builder once with driver
-      `docker-container` and without `--use`, bootstrap it once through explicit `--builder`,
-      perform one multi-platform build/push through explicit `--builder`, `--provenance=false`,
-      `--sbom=false`, the exact tag, revision label, and context `.`, and make one
-      cleanup attempt on every post-create exit path. Do not repeat create, bootstrap,
-      build/push, or cleanup inside an attempt.
+      Authorize one to three renewed-source build/push attempts. Each attempt uses
+      at most one named `docker-container` builder create without `--use`, one explicit-builder
+      bootstrap, one explicit-builder multi-platform build/push with `--provenance=false`,
+      `--sbom=false`, exact tag/revision/context `.`, and one cleanup attempt on every
+      post-create exit. Retain complete command output for every attempt in a new
+      non-overwriting mode-0600 local artifact and emit a sanitized classification
+      containing no secret, PATH, credential path/value, `.env`, response body, or
+      raw registry/config content. A later attempt is allowed only after the immediately
+      preceding attempt is classified as a transient non-mutating transport, registry,
+      or network failure, the exact new tag remains absent, and all source, cleanup,
+      builder, context/daemon, default-builder, repository/tag/platform/revision,
+      credential/account, and cost invariants are re-proven. Deterministic source/build/toolchain
+      failure, authentication/authorization failure, unknown remote state, incomplete/orphan
+      chain, cleanup failure/residue, fingerprint/source/credential drift, suspect
+      log, or already complete chain stops without another attempt. A complete exact
+      chain observed after a nonzero command is success and must not be pushed again.
 
 
-      After each attempt, emit a sanitized failure classification that contains no
-      secret, PATH, credential path or value, `.env`, response body, or raw registry/config
-      content. Corrected attempt 3 is allowed only when the immediately preceding
-      retained log classifies a transient non-mutating transport, registry, or network
-      failure, the exact tag remains absent, and every cleanup, active/default-builder,
-      source, Docker context/daemon, repository/tag/platform/revision, credential/account,
-      and cost invariant is re-proven. A deterministic source, build, or toolchain
-      failure; authentication or authorization failure; unknown remote state; present
-      incomplete or orphan chain; cleanup failure or residue; active/default-builder
-      drift; source drift; credential/account drift; or missing or suspect retained
-      log stops without another attempt. A complete exact tag/index/platform/revision
-      chain observed after a nonzero command is verified as the publication result
-      and must not be pushed again.
-
-
-      The only allowed local side effect is the exact named builder and its attributable
-      BuildKit container during an authorized attempt; the only allowed remote side
-      effect is the same immutable two-platform push. Forbid daemon restart, context/default-builder
-      change, paid/cloud/remote builders, another container/service mutation, temporary
-      or moving tags, alternate repositories, registry deletion, credential/account/trust
-      change, deployment, Tailnet mutation, or repository/Git mutation.
-
-
-      After publication, resolve and record the OCI index digest, exact amd64 and
-      arm64 manifest digests, exact platform set, and revision-label equality. After
-      any failed build/push, perform one final read-only observation of the sole tag
-      and record confirmed absence or the complete index/platform chain; deletion
-      authority remains absent. After each cleanup attempt, prove the named builder
-      and attributable BuildKit container are absent and the active/default fingerprint
-      is unchanged. Cleanup residue, unknown registry state, incomplete digest/orphan
-      chain, identity drift, unavailable recovery, missing/suspect log, or secret
-      disclosure leaves this step incomplete and blocks container/deployment work.
-      Require final clean detached HEAD, exact tree, and unchanged source/Git metadata.'
-    verification: An Orchestrator-owned immutable receipt/log chain preserves the
-      three original implicit-builder diagnostics, the zero-command corrected preflight,
-      corrected attempt 1, and every authorized additional attempt. It proves cumulative
-      corrected build/push cardinality of one to three with no more than two attempts
-      after the recorded first; exact preconditions and per-attempt create/bootstrap/build-push/cleanup
-      cardinality; non-overwriting mode-0600 complete output and sanitized classification
-      for each additional attempt; conditional admission of attempt 3; final tag/index/amd64/arm64/revision
-      state; builder/container absence; unchanged active/default builder; exact clean
-      detached source; nondisclosure; and no undeclared effect. Complete only when
-      one corrected attempt yields the exact immutable chain and every cleanup, default-builder,
-      source, and identity invariant passes; any exhausted publication failure, prohibited
-      failure class, remote-state uncertainty, cleanup defect, drift, or suspect log
-      keeps the step incomplete.
+      The only allowed local side effect is the exact transient builder/BuildKit container
+      during an attempt; the only allowed remote side effect is the renewed immutable
+      two-platform push. Forbid daemon restart, context/default-builder change, paid/cloud/remote
+      builders, unrelated containers/services, temporary or moving tags, alternate
+      repository, registry deletion, credential/account/trust change, deployment,
+      Tailnet mutation, repository/Git mutation, or disclosure. After every attempt
+      observe the sole new tag; after success record exact index, amd64, and arm64
+      digests, exact platform set, and both revision labels. After cleanup prove builder/container
+      absence and unchanged fingerprints. Unknown registry state, incomplete chain,
+      unavailable recovery, cleanup residue, or disclosure leaves the step incomplete
+      and blocks all downstream work. Final source remains exact, clean, and detached.'
+    verification: The Orchestrator receipt/log chain preserves all old-source diagnostics
+      and attempts, proves the old tag/source were never retried, binds the renewed
+      series only to the independently admitted integrated commit, records one-to-three
+      attempt cardinality and per-attempt create/bootstrap/build-push/cleanup, complete
+      mode-0600 logs, sanitized classifications, retry/stop eligibility, final exact
+      index/amd64/arm64/revision chain, tag observations, cleanup, unchanged context/daemon/default-builder
+      and clean detached source, nondisclosure, and no undeclared effect. Complete
+      only on the exact renewed immutable chain; any exhausted/prohibited failure
+      or uncertainty keeps the step incomplete.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
@@ -190551,8 +190521,11 @@ phases:
     - deploy/resofeed-caddy/README.md
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-complete.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
     depends_on:
-    - rf-bug-v2-deployment-authorization-review
+    - rf-bug-v2-renewed-source-publication-authorization-review
     agent: vectl-orchestrator
   - id: rf-bug-v2-docker-runtime-proof
     name: Verify immutable OCI image on both platforms
