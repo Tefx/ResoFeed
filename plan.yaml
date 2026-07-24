@@ -190308,7 +190308,7 @@ phases:
       build passed and cleaned up; final tracked status/diff empty. Report: /tmp/larva-agent-artifacts/rf-bug-v2-local-verification-matrix-v4_report.md#sha256=5e045749c4dfffcc7101bd27e5c0850d451108300b502689439c25abd54403f7'
   - id: rf-bug-v2-deployment-authorization-review
     name: Authorize v2 OCI publication and authenticated Tailnet deployment
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -190414,6 +190414,23 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-24T17:14:00.639370Z'
+    done_at: '2026-07-24T18:04:15.402339+00:00'
+    evidence: 'Fresh spec-verifier R3 review admitted after adjudicated rerun. One
+      maintained strict-FQDN read-only wrapper attempt exited 0 with TAILNET_ROUTE=verified,
+      PROTECTED_STATE=unchanged, and PROBE_OK; no publication, deployment, Serve mutation,
+      restart, reauthentication, credential/trust change, or repository mutation occurred.
+      Current authority is limited to the exact downstream immutable OCI publication,
+      two-platform proof, and digest deployment steps; any route drift blocks before
+      side effects. Production intent-closure Gate: status=CONFORMANT, semantic_completion_admissible=true,
+      context_hash=sha256:1a0ddef23b277f01e8bfbc1292c0ee7ab34f3c3271df67bb2a0660dc45a7aab8,
+      canonical semantic_receipt_sha256=sha256:ebe40dd9fa4c7935c80f8812435d208d312b2bb71776dd6b86c329b8594fe596.
+      Exact receipt: /tmp/larva-agent-artifacts/rf-bug-v2-deployment-authorization-review/semantic-receipt-admission-candidate.json
+      raw SHA-256 aef4e0d57037639e8ccb3ce822489ee96c072b3cabfd15cb100adc6dc5bea733.
+      Remote report: /tmp/larva-agent-artifacts/rf-bug-v2-deployment-authorization-review-r3/remote-wrapper-report.XXXXXX.json
+      SHA-256 cc30494c9bf03ab05e40d4d8cb414ac573a76e862a2ec9601cfb580ad97c42ca, 3071
+      bytes. The earlier local-context blocker and static repair-branch finding remain
+      preserved diagnostic evidence and were independently adjudicated as non-authoritative
+      for this guarded execution path.'
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
     status: pending
