@@ -192575,7 +192575,7 @@ phases:
       remains immutable remediation evidence. No external operation occurred.
   - id: rf-bug-v2-tracked-read-only-probe-harness-remediation
     name: Track, test, and document the immutable read-only probe harness
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nImplement\
       \ one repository-owned, tracked, read-only verification harness after repeated\
@@ -192741,6 +192741,15 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-24T08:18:43.754775Z'
+    done_at: '2026-07-24T08:56:00.096234+00:00'
+    evidence: Integrated commit d446cfb26b875ad1e5fa5c7f9b109691d7b7e7a0. Gate-admitted
+      worker execution receipt sha256:198b410c85541565258da7d856ce2a92cbddbfc0a55ea980250daa794c25d68d;
+      dispatch sha256:5c70f2a3bd9076e57deb0d83cabecba6ec330aa399637bcd4ee8bc85cd143aa2;
+      validator file sha256:52ea9ab82cbeabfb61c470160222a9eac3f9570650714fd4d0e0221fe2040bea.
+      Independent Gate reran node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green and admitted exact modified paths.
+      git diff --check passed. Source, tests, and deploy/resofeed-caddy/README.md
+      updated synchronously; no real SSH or external operation executed.
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v11
     name: Verify the tracked immutable read-only procedure probe (semantic v11)
     status: pending
