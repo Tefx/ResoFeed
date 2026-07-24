@@ -190433,7 +190433,7 @@ phases:
       for this guarded execution path.'
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
-    status: claimed
+    status: pending
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -190507,8 +190507,6 @@ phases:
     depends_on:
     - rf-bug-v2-deployment-authorization-review
     agent: vectl-orchestrator
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-24T19:29:12.452234Z'
   - id: rf-bug-v2-docker-runtime-proof
     name: Verify immutable OCI image on both platforms
     status: pending
