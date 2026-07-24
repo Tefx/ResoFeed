@@ -192700,8 +192700,8 @@ phases:
       ,\"seam\":\"real\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
       ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v11\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"deploy/resofeed-caddy/verify.sh\"\
-      ,\"deploy/resofeed-caddy/verify-remote.sh\",\"scripts/vectl-check.mjs\",\"scripts/vectl-check.test.mjs\"\
-      ],\"acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
+      ,\"deploy/resofeed-caddy/verify-remote.sh\",\"scripts/vectl-check.mjs\"],\"\
+      acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
       :[\"rf_bug_v2_immutable_deployment_procedure_green\"],\"acceptance_mutation\"\
       :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-v2-tracked-read-only-probe-harness-remediation\"\
       ,\"path\":\"scripts/vectl-check.test.mjs\",\"purpose\":\"Add only deterministic\
