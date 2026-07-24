@@ -190314,34 +190314,44 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      After the detached-head guard polarity remediation, its fresh no-SSH one-row
-      replacement staging authorization review, the exactly once v2 procedure staging
-      operation, and fresh independent v10 read-only exact-target verification pass,
-      including the explicitly bounded stable protected-state projection, Compose-logical/runtime-label
-      volume identity, closed-command nonmutation proof, and stdin-fed `bash -s` transport
-      proof, perform the pre-operation R3 review for the two remaining external operations
-      and their distinct recovery boundaries. Preserve every exhausted staging, invalid-review,
-      and coherent `REJECTED` polarity-review artifact as diagnostic-only history.
-      Require the newly integrated polarity-remediation commit, fresh-review-bound
-      source hashes, behavior-backed selected detached/attached proof, strict host-key
-      evidence, staged-byte equality, identical clean local HEAD/status before and
-      after v10, and v10 stable-projection equality as immutable inputs; no stale
-      commit/hash, old staging authorization, failed command, rejected diagnostic
-      receipt, overbroad global-state comparison, or invalid semantic receipt may
-      supply current authority.
+      After the detached-head polarity remediation, fresh no-SSH staging authorization,
+      exact v2 two-file staging, tracked read-only probe-harness remediation, and
+      fresh independent v11 verification pass, perform the pre-operation R3 review
+      for immutable OCI publication and authenticated Tailnet digest deployment. V11
+      must provide clean-detached local identity, exact tracked wrapper and stdin-program
+      identity, one literal strict-FQDN SSH probe, bounded phase/readiness markers,
+      corrected Compose logical/runtime-label volume identity, exact stable protected-state
+      equality with explicit volatile-state exclusions, and closed-command nonmutation
+      proof. The harness and v11 authorize no publication, deployment, registry, service,
+      credential, trust, data, or persistent-state operation.
+
+
+      Preserve v10 unchanged and do not retry, correct, complete, resume, or use it
+      as authority: receipt file `sha256:ecf06ad1a71013da0e7794dd9c7e2780ff8d035b67a22568f260e22383506e3d`,
+      validator `sha256:ea40abf245650b9381533bbcf5a5ad86a461a2f458c5a7666a059a42aba906d8`,
+      canonical valid `REJECTED` receipt `sha256:316c931845a094a7cbdc4a6dfbe415309428502a88231467e81d593d08d6cbb0`.
+      V10 passed local selection/run/focused test and local Git checks but failed
+      while dynamically constructing stdin before SSH spawn; no remote command or
+      marker exists. Preserve v9 receipt file `sha256:7e71dfe984f36e3199048e5f5c3056346660b166baf690e5bf5b2965b2d964a0`,
+      validator `sha256:cbfec7049af89b8bfd43d27b6b7992449628726a687eeb563259d4bf2f62ce71`,
+      and canonical valid `REJECTED` receipt `sha256:288d231af7049705288d4ac9651c9b91e99ca932227d57d821d8461a28a7a4b5`
+      as diagnostic-only proof that the strict stdin-fed procedure reached readiness
+      before its overbroad volatile-state fingerprint failed. Preserve every earlier
+      failed, invalid, or REJECTED staging/verifier artifact and stale commit/hash
+      as immutable non-authoritative history.
 
 
       For immutable publication, verify current accepted-plan orchestration authority
-      names the exact build-and-push operation and sole registry target `docker.io/tefx/resofeed`;
-      the clean locally verified 40-character polarity-remediation commit is the sole
-      source; the only tag is `git-<same-commit>`; repository-scoped registry credentials
+      names the exact build-and-push operation and sole registry `docker.io/tefx/resofeed`;
+      the clean locally verified 40-character integrated commit is the sole source;
+      the only tag is `git-<same-commit>`; repository-scoped registry credentials
       are available without disclosure or account change; no moving alias is published;
       and partial publication either uses separately explicit temporary-tag deletion
-      authority or records the complete orphan tag/index/platform chain. Before publication
-      the index and platform digest values do not exist. Bind them to the sole producer
-      `rf-bug-v2-publish-immutable-oci`, require that producer to emit one exact index
-      digest and exact linux/amd64 plus linux/arm64 manifest digests with commit-label
-      equality, and forbid fabricated or pre-authorized placeholder digest values.
+      authority or records the complete orphan tag/index/platform chain. Before publication,
+      index and platform digests do not exist. Bind them only to `rf-bug-v2-publish-immutable-oci`,
+      require one exact index digest and exact linux/amd64 plus linux/arm64 manifest
+      digests with commit-label equality, and forbid placeholders, fabricated values,
+      pre-authorized digest values, or mutable/incomplete chains.
 
 
       For Tailnet deployment, verify current accepted-plan orchestration authority
@@ -190349,85 +190359,48 @@ phases:
       all SSH entry uses the literal FQDN with strict existing host-key verification,
       host-key update/enrollment disabled, no alias/effective-host rewrite, and only
       the existing credential/account. The target''s internal hostname is unknown
-      and cannot be an authority. Require the staged procedure bytes and fresh target-readiness
-      evidence to match the clean verified polarity-remediation commit and prove the
-      maintained script treats symbolic-ref success as attached and rejects it before
-      SSH. Deployment may consume only the exact digest chain produced by `rf-bug-v2-publish-immutable-oci`
-      and proven by `rf-bug-v2-docker-runtime-proof`; existing masked-only `CF_API_TOKEN`,
+      and cannot be authority. Require staged procedure bytes and v11 target-readiness
+      evidence to match the integrated detached commit and exact known source/staged
+      identities. Deployment consumes only the digest chain produced by `rf-bug-v2-publish-immutable-oci`
+      and proven by `rf-bug-v2-docker-runtime-proof`; masked-only `CF_API_TOKEN`,
       `OPENROUTER_KEY`, and `TAVILY_API_KEY` runtime injection remains available;
-      the current running image has one exact prior repository digest captured for
-      rollback; the SQLite volume and owner-token state are preserved; and rollback
-      restores only that prior digest followed by root `200` plus unauthenticated
-      Doctor `401` readiness.
+      the current running image has one exact prior repository digest for rollback;
+      the SQLite volume and owner-token state remain preserved; and rollback restores
+      only that prior digest followed by root `200` and unauthenticated Doctor `401`
+      readiness.
 
 
-      Preserve canonical coherent `REJECTED` diagnostic receipt `sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8`,
-      receipt-file SHA-256 `f1dbd2f87c98aeb1d17f64672e70a7f49d338f8e966d0c27183ff66533904c19`,
-      validator-file SHA-256 `7e1e4a26c9f1b01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`,
-      inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`, and inverted deploy
-      SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1` as
-      immutable non-authoritative history. Require the current reviewed source identities
-      to differ.
-
-
-      Preserve v8 evidence unchanged and do not retry, correct, or complete v8: receipt
-      file `sha256:7d266496a50f0c92de1793385216b4ea4f620eec25e29b8270bd017f7a620582`,
-      validator `sha256:af6bc0f129398222483c28f9df77a23cbbffb3d55fab37e9023328cfd03660c2`,
-      and canonical valid `REJECTED` receipt `sha256:25bb15205f5f4773c4acd2b617fc1c10a4fd0aef2972c698b0eccdc458229619`.
-      V8''s three local checks passed, but its one SSH argv ended with literal `bash
-      -c` and no command operand; the remote program never ran, exit 1 produced no
-      remote stdout, and the synthesized `PROBE_FAIL phase=canonical_stack status=1`
-      was not remote trap output. Treat v8 solely as verifier command-construction
-      failure with no remote phase, product, target, volume, readiness, or protected-state
-      authority.
-
-
-      Preserve v9 evidence unchanged and do not retry, correct, or complete v9: receipt
-      file `sha256:7e71dfe984f36e3199048e5f5c3056346660b166baf690e5bf5b2965b2d964a0`,
-      validator `sha256:cbfec7049af89b8bfd43d27b6b7992449628726a687eeb563259d4bf2f62ce71`,
-      and canonical valid `REJECTED` receipt `sha256:288d231af7049705288d4ac9651c9b91e99ca932227d57d821d8461a28a7a4b5`.
-      V9''s three local checks passed; its exact stdin-fed strict SSH probe passed
-      canonical_stack, procedure_current, backup, docker_identity, corrected Compose
-      volume, tailnet_route, public_url, and root-200/Doctor-401 readiness, then actually
-      emitted `PROBE_FAIL phase=protected_after status=1`. Treat v9 solely as an undefined
-      overbroad protected-state fingerprint defect: active background ingest and Caddy
-      readiness may legitimately change excluded SQLite/WAL, log, counter, timestamp,
-      telemetry, transient, atime, ordering, and sensitive fields. V9 supplies no
-      product, data, target, lifecycle, retry, correction, or external-operation authority.
-
-
-      Admit only v10''s exact deterministic projection of current remote deploy/Compose
-      hashes and modes; backup manifest hash/mode and backup deploy/Compose hashes/modes;
-      running resofeed and Caddy container IDs and exact image IDs; resofeed `/data`
-      mount Type/Destination plus internal actual engine-volume identity and logical
-      `com.docker.compose.volume=resofeed-data`; canonical `TCP/HTTPS 443 -> 127.0.0.1:8443`;
-      and internal validated-public-host hash. Require identical helpers, canonical
-      sorting, final-digest-only comparison, approved marker-only output, and the
-      closed read-only local/remote command allowlist. Explicitly exclude volatile
-      background-ingest/database/WAL/log/counter/health/PID/exec/network/Tailscale
-      telemetry/atime/output-order state and all sensitive/config values. Future OCI
-      deferral remains a static contract assertion outside the runtime fingerprint.
+      Admit v11''s exact deterministic projection only: current deploy/Compose hashes
+      and modes; backup manifest hash/mode and backup deploy/Compose hashes/modes;
+      running resofeed/Caddy container IDs and exact image IDs; `/data` mount Type/Destination
+      plus internal actual volume identity and logical `com.docker.compose.volume=resofeed-data`;
+      canonical `TCP/HTTPS 443 -> 127.0.0.1:8443`; and internal validated-public-host
+      hash. Require identical helpers, canonical sorting, final-digest-only comparison,
+      approved-marker-only output, and the tracked closed read-only command allowlist.
+      Explicitly exclude volatile background-ingest SQLite/WAL/SHM, logs, counters,
+      health/PID/exec/network timestamps, Tailscale telemetry, atime, output order,
+      timestamps, and all sensitive/config values. Future OCI deferral stays outside
+      the runtime fingerprint.
 
 
       Confirm each accepted operation, target, source/produced-input identity, execution
-      context, script-local detached-source polarity, host-key/credential boundary,
-      preconditions, cost boundary, rollback/recovery, and evidence topology matches
-      the maintained procedure. Procedure-staging authority does not authorize publication
-      or deployment. Plan-definition authority, acceptance-test authority, masked
-      credential presence, publication authority, or host-key evidence does not imply
-      another operation or target. Missing, stale, mismatched, broader, host-key-bypassed,
-      or materially costly authority returns BLOCKED and permits no build, push, tag,
-      delete, pull, deploy, restart, host-key change, token reset, data clear, credential/account
-      change, secret inspection, mutable-tag substitution, alternate target, or undeclared
-      operation.'
+      context, script-local detached-source polarity, tracked verification input identity,
+      host-key/credential boundary, preconditions, cost boundary, rollback/recovery,
+      and evidence topology matches the maintained procedure. Procedure staging, repository
+      harness mutation, v11 read-only probing, plan definition, acceptance-test mutation,
+      masked credential presence, publication authority, or host-key evidence cannot
+      imply another operation or target. Missing, stale, mismatched, broader, host-key-bypassed,
+      rollback-incomplete, or materially costly authority returns BLOCKED and permits
+      no build, push, tag, delete, pull, deploy, restart, host-key change, token reset,
+      data clear, credential/account change, secret inspection, mutable-tag substitution,
+      alternate target, or undeclared operation.'
     verification: Current R3 authorization binds immutable publication and digest-only
-      deployment to the independently verified polarity-remediation commit, exact
-      freshly reviewed and staged two-file hashes, correct script-local attached-source
-      pre-SSH rejection, exact stdin-fed `bash -s` read-only v10 transport, exact
-      defined stable-projection equality plus closed-command nonmutation proof, strict
-      literal-FQDN host-key boundary, produced OCI digest chain, rollback/readiness,
-      scoped credentials, costs, and exclusions; v8/v9 rejections, the coherent REJECTED
-      review, and all stale/invalid material remain diagnostic only.
+      deployment to the independently verified tracked v11 harness, integrated clean
+      detached commit, exact staged two-file identities, exact defined stable projection
+      and exclusions, closed-command nonmutation proof, strict literal-FQDN host-key
+      boundary, produced OCI digest chain, rollback/readiness, scoped credentials,
+      costs, and exclusions. V10 and all stale/failed/rejected material remain diagnostic
+      only.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -190437,7 +190410,7 @@ phases:
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
-    - rf-bug-v2-immutable-deployment-procedure-verification-v10
+    - rf-bug-v2-immutable-deployment-procedure-verification-v11
     agent: spec-verifier
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
