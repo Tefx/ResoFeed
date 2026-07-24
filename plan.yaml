@@ -190850,42 +190850,54 @@ phases:
       \ lowercase hex>` plus `closure_commit=<40 lowercase hex>` for the terminal\
       \ gate. Preserve completed local-matrix receipt `sha256:a3d8bb0b5fdc43c6fbf007682c73bc3b40e25fc5aa2ab178e2491497f1430630`,\
       \ the repair plan, canonical docs, protected acceptance, audits, and completed\
-      \ history.\n\nThe report must retain the prior OCI FAIL receipt, publication\
+      \ history.\n\nThe report must retain the original OCI FAIL receipt, publication\
       \ report, and driver diagnostic at SHA-256 `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`,\
       \ `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`, and `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`\
-      \ as superseded non-completion diagnostics. Distinguish those failed implicit-builder\
-      \ attempts from the corrected same-step transient-builder publication, its independently\
-      \ verified index/platform/revision chain, cleanup/default-builder proof, and\
-      \ deployed digest. Do not reference removed replacement-plan nodes as authority.\n\
-      \nWitnessed current profile: existing `scripts/vectl-check.mjs` suite/check\
-      \ `rf-bug-v2-closure-report` / `rf_bug_v2_defect_report_closure_green` provides\
-      \ both `select` and `run`. Its two current identities are sourced by the current\
-      \ protected `tests/rf_bug_canonical_contract_test.go`, current protected `web/src/lib/api-client.test.ts`,\
-      \ current focused `scripts/vectl-check.test.mjs` closure guard, and the adapter's\
-      \ current report/repair-plan inventory. The step may change only the current\
-      \ adapter, its current developer test, and the harness documentation as needed\
-      \ to admit the exact report path after the pre-mutation hash check while retaining\
-      \ the profile identities, commands, required observations, repair-plan protection,\
-      \ acceptance immutability, selected/executed parity, and fail-closed behavior.\
-      \ No absent test or harness is a producer input. Rollback atomically reverts\
-      \ the report, adapter, adapter test, and harness documentation. Registries,\
-      \ generators, receipt schemas, duplicate phases, secrets, and raw credentials\
-      \ remain forbidden.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
-      \ [docs/BUG_REPORT_2026-07-11.md, scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
-      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md,\
-      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md,\
-      \ docs/USAGE.md, tests/rf_bug_canonical_contract_test.go, internal/**, cmd/**,\
-      \ web/**, docs/audits/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
-      \ .venv/]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n  - id: rf_bug_v2_defect_report_closure_green\n\
-      \    run: {command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-closure-report,\
-      \ rf_bug_v2_defect_report_closure_green], timeout_seconds: 600}\n    evidence:\n\
-      \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
-      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
-      \ access: read, availability: current}\n        - {path: go.mod, access: read,\
-      \ availability: current}\n        - {path: web/package.json, access: read, availability:\
-      \ current}\n      test_bindings:\n        - {path: scripts/vectl-check.test.mjs,\
-      \ classification: developer, availability: current}\n        - {path: tests/rf_bug_canonical_contract_test.go,\
+      \ as superseded non-completion diagnostics and keep their three implicit-builder\
+      \ commands separate from corrected-attempt cardinality. It must also retain\
+      \ mode-0600 zero-command corrected preflight receipt SHA-256 `b4489129b3b50b50d65f4111d521524979396e25515305d38603fdee05dec36b`\
+      \ and corrected build/push attempt-1 receipt SHA-256 `e3601edf0c53c36c6f03f5a37f567d715003cc3ac8508489aeae6e690632ff7d`\
+      \ as non-completion history, including attempt 1's unknown failure class, tag\
+      \ absence, successful cleanup, unchanged default builder, and exact clean source.\n\
+      \nDistinguish that history from the corrected same-step publication result.\
+      \ Record the complete one-to-three corrected build/push attempt ledger, with\
+      \ no more than two attempts after the recorded first; every additional non-overwriting\
+      \ mode-0600 complete-output artifact and sanitized classification; the preconditions\
+      \ admitting attempt 2; the transient non-mutating transport/registry/network\
+      \ classification and re-proven invariants admitting attempt 3 when used; all\
+      \ applicable stop conditions; per-attempt create/bootstrap/build-push/cleanup\
+      \ cardinality; no push after a complete chain; and the independently verified\
+      \ index/platform/revision, cleanup/default-builder, source, and deployed-digest\
+      \ proof. Do not reference removed replacement-plan nodes as authority.\n\nWitnessed\
+      \ current profile: existing `scripts/vectl-check.mjs` suite/check `rf-bug-v2-closure-report`\
+      \ / `rf_bug_v2_defect_report_closure_green` provides both `select` and `run`.\
+      \ Its two current identities are sourced by the current protected `tests/rf_bug_canonical_contract_test.go`,\
+      \ current protected `web/src/lib/api-client.test.ts`, current focused `scripts/vectl-check.test.mjs`\
+      \ closure guard, and the adapter's current report/repair-plan inventory. The\
+      \ step may change only the current adapter, its current developer test, and\
+      \ the harness documentation as needed to admit the exact report path after the\
+      \ pre-mutation hash check while retaining the profile identities, commands,\
+      \ required observations, repair-plan protection, acceptance immutability, selected/executed\
+      \ parity, and fail-closed behavior. No absent test or harness is a producer\
+      \ input. Rollback atomically reverts the report, adapter, adapter test, and\
+      \ harness documentation. Registries, generators, receipt schemas, duplicate\
+      \ phases, secrets, and raw credentials remain forbidden.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md, scripts/vectl-check.mjs,\
+      \ scripts/vectl-check.test.mjs, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n \
+      \ blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md, tests/rf_bug_canonical_contract_test.go,\
+      \ internal/**, cmd/**, web/**, docs/audits/**]\n  ignored_runtime_paths: [.git/,\
+      \ .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n  -\
+      \ id: rf_bug_v2_defect_report_closure_green\n    run: {command: [node, scripts/vectl-check.mjs,\
+      \ run, rf-bug-v2-closure-report, rf_bug_v2_defect_report_closure_green], timeout_seconds:\
+      \ 600}\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
+      \        - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: scripts/vectl-check.test.mjs, access: read, availability:\
+      \ current}\n        - {path: go.mod, access: read, availability: current}\n\
+      \        - {path: web/package.json, access: read, availability: current}\n \
+      \     test_bindings:\n        - {path: scripts/vectl-check.test.mjs, classification:\
+      \ developer, availability: current}\n        - {path: tests/rf_bug_canonical_contract_test.go,\
       \ classification: acceptance, availability: current}\n        - {path: web/src/lib/api-client.test.ts,\
       \ classification: acceptance, availability: current}\n      selection:\n   \
       \     command: [node, scripts/vectl-check.mjs, select, rf-bug-v2-closure-report,\
@@ -190913,11 +190925,14 @@ phases:
       web/src/lib/api-client.test.ts\"],\"acceptance_check_ids\":[\"rf_bug_v2_defect_report_closure_green\"\
       ],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n\
       </vectl_step_policy>"
-    verification: Pre-closure authority hashes match; original OCI failure artifacts
-      remain exact non-completion diagnostics; the corrected same-step immutable index/platform/revision
-      and cleanup/default-builder chain is recorded as positive authority; exact ten
-      closure subtests and active scans pass; post_closure_report_sha256 and closure_commit
-      are recorded; only the authorized closure unit changes.
+    verification: Pre-closure authority hashes match; original implicit-builder failure
+      artifacts, the zero-command corrected preflight, and failed corrected attempt
+      1 remain exact non-completion diagnostics; the bounded one-to-three same-step
+      corrected history, retained logs/classifications, retry admissions, stop rules,
+      successful immutable index/platform/revision chain, and cleanup/default-builder/source
+      proof are recorded accurately; exact ten closure subtests and active scans pass;
+      `post_closure_report_sha256` and `closure_commit` are recorded; only the authorized
+      closure unit changes.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -190927,6 +190942,8 @@ phases:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json
     depends_on:
     - rf-bug-v2-formal-security-review
     - rf-bug-v2-independent-runtime-ui
