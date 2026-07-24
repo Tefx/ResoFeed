@@ -190735,13 +190735,37 @@ phases:
       For publication, preserve the original FAIL receipt, report, and Buildx diagnostic
       at SHA-256 `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`,
       `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`, and `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`
-      as non-completion evidence. Confirm the implicit active `orbstack` docker-driver
-      command was never replayed. Require the corrected continuation on the same publication
-      step to use the exact named `docker-container` builder through explicit `--builder`,
-      one push and one cleanup attempt, exact index/amd64/arm64/revision chain, builder
-      and BuildKit residue absence, unchanged active/default builder, no retry or
-      alias/deletion/temp-tag/credential/account/daemon/context/other-container mutation,
-      and no disclosure. Registry or cleanup uncertainty remains blocking.
+      as non-completion evidence. Confirm the three implicit active `orbstack` docker-driver
+      commands remain separate diagnostic-only history and were never replayed. Preserve
+      mode-0600 zero-command corrected preflight receipt SHA-256 `b4489129b3b50b50d65f4111d521524979396e25515305d38603fdee05dec36b`
+      and corrected build/push attempt-1 receipt SHA-256 `e3601edf0c53c36c6f03f5a37f567d715003cc3ac8508489aeae6e690632ff7d`;
+      confirm attempt 1 exited 1 with no retained complete build output or knowable
+      failure class, the tag remained absent, cleanup completed, builder/BuildKit
+      state was absent, the active/default builder was unchanged, and exact clean
+      detached commit/tree remained intact.
+
+
+      Require the corrected same-step publication history to contain one to three
+      total build/push attempts and no more than two attempts after the recorded first.
+      Confirm attempt 2 began without further human confirmation only after exact
+      source commit `1e49621c6b44ac2e55cd82f87960972d571bad64` and tree `36bc981e5a01c14a6355162a6679ec8c144d5313`,
+      tag absence, prior cleanup, builder/BuildKit absence, unchanged active/default
+      builder, and unchanged Docker context/daemon, repository/tag/platform/revision,
+      credential/account, and cost boundary were proven. Require each additional attempt
+      to retain complete local command output in a new non-overwriting mode-0600 artifact,
+      emit a sanitized classification containing no secret, PATH, credential path/value,
+      `.env`, response body, or raw registry/config content, and perform at most one
+      exact named `docker-container` builder create, one explicit-builder bootstrap,
+      one explicit-builder push, and one cleanup attempt. Admit attempt 3 only after
+      the immediately preceding retained log classifies a transient non-mutating transport,
+      registry, or network failure and every invariant is re-proven. Confirm deterministic
+      source/build/toolchain failure, authentication/authorization failure, unknown
+      remote state, incomplete/orphan chain, cleanup failure/residue, default-builder/source/credential/account
+      drift, or missing/suspect log stopped further execution. A complete exact index/amd64/arm64/revision
+      chain after a nonzero command is the publication result and must have no later
+      push. Require builder and BuildKit residue absence, unchanged active/default
+      builder, no alias/deletion/temp-tag/credential/account/daemon/context/other-container
+      mutation, and no disclosure. Registry or cleanup uncertainty remains blocking.
 
 
       Require the integrated source commit and deploy hash to differ from inverted
@@ -190753,9 +190777,11 @@ phases:
       step and block closure.'
     verification: Fresh security review finds no unresolved embed, CSP/header, streaming/cancellation,
       token, OPML/state, E2E cleanup, secret, symbolic-ref polarity, detached-source
-      pre-SSH, strict endpoint, staged-byte, same-step Buildx lifecycle/cleanup, immutable
-      digest, deployment, host-key/credential, or rollback defect; all failed/rejected
-      diagnostics remain non-authoritative.
+      pre-SSH, strict endpoint, staged-byte, bounded one-to-three same-step Buildx
+      history, retained-log classification, retry admission, lifecycle/cleanup, immutable
+      digest, deployment, host-key/credential, or rollback defect. It proves all stop
+      conditions and no-push-after-complete-chain behavior; all failed/rejected diagnostics
+      remain non-authoritative.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - AGENTS.md
@@ -190766,6 +190792,8 @@ phases:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
