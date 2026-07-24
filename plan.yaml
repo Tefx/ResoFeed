@@ -190535,72 +190535,52 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Independently consume and re-observe the OCI index and exact linux/amd64 and
-      linux/arm64 manifest digests produced by `rf-bug-v2-publish-immutable-oci` for
-      `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`. Require
-      exactly those two platforms and `org.opencontainers.image.revision=1e49621c6b44ac2e55cd82f87960972d571bad64`
+      Independently consume the exact index, linux/amd64 manifest, and linux/arm64
+      manifest produced by `rf-bug-v2-publish-immutable-oci` for `docker.io/tefx/resofeed:git-<renewed-review-integrated-commit>`.
+      Re-observe exactly those two platforms, tag/index equality, and `org.opencontainers.image.revision=<same-full-integrated-commit>`
       on both images. Reject placeholders, extra/missing platforms, mutable aliases,
-      alternate repository/tag, incomplete or mismatched chains, source mismatch,
-      builder residue, or active/default-builder drift.
+      alternate repository/tag, incomplete chains, source mismatch, builder residue,
+      or context/daemon/default-builder drift.
 
 
-      Preserve the original three failed implicit-builder commands and their FAIL
-      artifacts as separate diagnostic-only history; they supply no digest or runtime
-      authority and do not count as corrected attempts. Independently verify mode-0600
-      zero-command corrected preflight receipt `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json`
-      SHA-256 `b4489129b3b50b50d65f4111d521524979396e25515305d38603fdee05dec36b` and
-      corrected build/push attempt-1 receipt `/tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json`
-      SHA-256 `e3601edf0c53c36c6f03f5a37f567d715003cc3ac8508489aeae6e690632ff7d`.
-      Confirm attempt 1 exited 1, retained no complete build output, left the exact
-      tag absent, cleaned the named builder and attributable BuildKit state, preserved
-      the active/default builder, and kept exact clean detached commit `1e49621c6b44ac2e55cd82f87960972d571bad64`
-      and tree `36bc981e5a01c14a6355162a6679ec8c144d5313`.
+      Preserve and independently classify all old-source history as non-authoritative:
+      the three implicit-builder diagnostics; zero-command corrected preflight; attempt-1
+      receipt with unknown failure class; and mode-0600 attempt-2 complete log/classification/receipt
+      SHA-256 `a46303ce5bac510f91fb22570ff3b9c9b88d9bf217ac8000a84f04688818433c`,
+      `51702864fbdb5c16cd85564cb175fd8a94bb1d634efaa809696067365e931b6c`, and `03ffb7837c738b0eb910321785566e239236c1cab67b019258f41254dfb8c873`.
+      Confirm attempt 2 deterministically stopped commit `1e49621c6b44ac2e55cd82f87960972d571bad64`
+      and its absent old tag after complete cleanup; no old-source command appears
+      in the renewed attempt series.
 
 
-      Cross-check the complete same-step publication evidence chain. Require cumulative
-      corrected build/push cardinality of one to three, at most two attempts after
-      the recorded first, and at most one exact-builder create, explicit bootstrap,
-      explicit build/push, and cleanup attempt within each additional attempt. Require
-      each additional attempt''s complete local command output in a new non-overwriting
-      mode-0600 artifact and a failure classification free of secrets, PATH, credential
-      paths/values, `.env`, response bodies, and raw registry/config content. Confirm
-      corrected attempt 2 began only after every source, tag-absence, cleanup, builder/BuildKit-absence,
-      active/default-builder, Docker context/daemon, repository/tag/platform/revision,
-      credential/account, and cost invariant was proven. Admit corrected attempt 3
-      only when the immediately preceding retained log classified a transient non-mutating
-      transport, registry, or network failure, the tag remained absent, and all invariants
-      were re-proven. Reject any continuation after a deterministic source/build/toolchain
-      failure, authentication/authorization failure, unknown remote state, incomplete/orphan
-      chain, cleanup failure/residue, default-builder or source drift, credential/account
-      drift, missing/suspect log, or an already complete tag/index/platform/revision
-      chain. Treat a complete exact chain after a nonzero command as publication success
-      and prove no later push occurred.
+      Cross-check the renewed same-step series: one to three build/push attempts;
+      at most one exact-builder create, explicit bootstrap, explicit build/push, and
+      cleanup per attempt; a new non-overwriting mode-0600 complete log and secret-safe
+      classification per attempt; admission of a later attempt only after transient
+      non-mutating transport/registry/network classification, tag absence, and complete
+      invariant re-proof; stop on every deterministic/auth/unknown-state/orphan/cleanup/drift/suspect-log
+      condition; and no push after a complete chain. Confirm exact clean detached
+      integrated source and tree, unchanged reviewed Docker context/daemon/default-builder,
+      builder/BuildKit absence, no credential/account/cost drift, no disclosure, and
+      no undeclared side effect.
 
 
-      Run the container contract against the exact successful immutable identity on
-      both platforms. Prove `/app/resofeed`, writable persistent `/data`, non-root
-      runtime, arbitrary cwd, embedded UI without an external UI tree or Node runtime,
-      redacted Doctor lines, import-only OPML, JSON State backup/restore, four headers,
-      CSP, and A-to-B persistence. Cross-check the successful attempt, all prior corrected
-      failures, transient-builder lifecycle and cleanup, and unchanged default-builder
-      fingerprint against the publication evidence chain.
-
-
-      Recovery removes only ephemeral verification containers and volumes created
-      by this step. It cannot mutate builders, registry objects, deployment, credentials/accounts,
-      or unrelated containers/volumes. Any attempt-history, platform, digest, label,
-      cleanup, runtime, nondisclosure, or identity failure blocks deployment and records
-      bounded nonsecret residue/recovery evidence.'
-    verification: Fresh independent evidence binds the exact tag/index/amd64/arm64/revision
-      chain to one successful attempt within the bounded one-to-three corrected same-step
-      history; validates the preserved zero-command preflight and failed attempt-1
-      receipts; proves every additional attempt's mode-0600 complete log, sanitized
-      classification, preconditions, cardinality, retry eligibility, and stop rules;
-      proves no push followed a complete chain; and confirms named-builder/BuildKit
-      absence, unchanged default builder, and exact clean source. Both-platform non-root
-      binary-only runtime, writable `/data`, arbitrary cwd, embedded UI/Doctor, state,
-      headers/CSP, persistence, and bounded cleanup pass. Original implicit-builder
-      failures remain non-authoritative diagnostics.
+      Run the existing container contract against the exact successful immutable identity
+      on both platforms. Prove `/app/resofeed`, writable persistent `/data`, non-root
+      runtime, arbitrary cwd, embedded UI without external UI tree or Node runtime,
+      redacted Doctor, import-only OPML, JSON State backup/restore, four headers,
+      CSP, and A-to-B persistence. Recovery removes only verification containers/volumes
+      created by this step; it cannot mutate builders, registry objects, deployment,
+      credentials/accounts, or unrelated state. Any identity, history, runtime, cleanup,
+      nondisclosure, or recovery defect blocks deployment.'
+    verification: Fresh independent evidence binds the renewed review's integrated
+      commit to the exact tag/index/amd64/arm64/revision chain and one successful
+      attempt within a one-to-three renewed series; proves every old-source attempt
+      stayed stopped and separate; validates complete logs, classifications, retry/stop
+      rules, cleanup and unchanged source/context/daemon/default-builder; and passes
+      the both-platform non-root binary-only runtime, writable data, arbitrary cwd,
+      embedded UI/Doctor, state, headers/CSP, persistence, nondisclosure, and bounded
+      cleanup contract.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
@@ -190610,6 +190590,9 @@ phases:
     - Dockerfile
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-complete.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
     depends_on:
     - rf-bug-v2-publish-immutable-oci
     agent: integration-verifier
