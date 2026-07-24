@@ -190316,16 +190316,18 @@ phases:
 
       After the detached-head guard polarity remediation, its fresh no-SSH one-row
       replacement staging authorization review, the exactly once v2 procedure staging
-      operation, and fresh independent v9 read-only exact-target verification pass,
-      including Compose-logical/runtime-label volume identity and stdin-fed `bash
-      -s` transport proof, perform the pre-operation R3 review for the two remaining
-      external operations and their distinct recovery boundaries. Preserve every exhausted
-      staging, invalid-review, and coherent `REJECTED` polarity-review artifact as
-      diagnostic-only history. Require the newly integrated polarity-remediation commit,
-      fresh-review-bound source hashes, behavior-backed selected detached/attached
-      proof, strict host-key evidence, staged-byte equality, and local Git metadata
-      equality as immutable inputs; no stale commit/hash, old staging authorization,
-      failed command, rejected diagnostic receipt, or invalid semantic receipt may
+      operation, and fresh independent v10 read-only exact-target verification pass,
+      including the explicitly bounded stable protected-state projection, Compose-logical/runtime-label
+      volume identity, closed-command nonmutation proof, and stdin-fed `bash -s` transport
+      proof, perform the pre-operation R3 review for the two remaining external operations
+      and their distinct recovery boundaries. Preserve every exhausted staging, invalid-review,
+      and coherent `REJECTED` polarity-review artifact as diagnostic-only history.
+      Require the newly integrated polarity-remediation commit, fresh-review-bound
+      source hashes, behavior-backed selected detached/attached proof, strict host-key
+      evidence, staged-byte equality, identical clean local HEAD/status before and
+      after v10, and v10 stable-projection equality as immutable inputs; no stale
+      commit/hash, old staging authorization, failed command, rejected diagnostic
+      receipt, overbroad global-state comparison, or invalid semantic receipt may
       supply current authority.
 
 
@@ -190361,7 +190363,7 @@ phases:
 
       Preserve canonical coherent `REJECTED` diagnostic receipt `sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8`,
       receipt-file SHA-256 `f1dbd2f87c98aeb1d17f64672e70a7f49d338f8e966d0c27183ff66533904c19`,
-      validator-file SHA-256 `7e1e4a26c9f1b01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`,
+      validator-file SHA-256 `7e1e4a26c9f01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`,
       inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`, and inverted deploy
       SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1` as
       immutable non-authoritative history. Require the current reviewed source identities
@@ -190380,6 +190382,33 @@ phases:
       authority.
 
 
+      Preserve v9 evidence unchanged and do not retry, correct, or complete v9: receipt
+      file `sha256:7e71dfe984f36e3199048e5f5c3056346660b166baf690e5bf5b2965b2d964a0`,
+      validator `sha256:cbfec7049af89b8bfd43d27b6b7992449628726a687eeb563259d4bf2f62ce71`,
+      and canonical valid `REJECTED` receipt `sha256:288d231af7049705288d4ac9651c9b91e99ca932227d57d821d8461a28a7a4b5`.
+      V9''s three local checks passed; its exact stdin-fed strict SSH probe passed
+      canonical_stack, procedure_current, backup, docker_identity, corrected Compose
+      volume, tailnet_route, public_url, and root-200/Doctor-401 readiness, then actually
+      emitted `PROBE_FAIL phase=protected_after status=1`. Treat v9 solely as an undefined
+      overbroad protected-state fingerprint defect: active background ingest and Caddy
+      readiness may legitimately change excluded SQLite/WAL, log, counter, timestamp,
+      telemetry, transient, atime, ordering, and sensitive fields. V9 supplies no
+      product, data, target, lifecycle, retry, correction, or external-operation authority.
+
+
+      Admit only v10''s exact deterministic projection of current remote deploy/Compose
+      hashes and modes; backup manifest hash/mode and backup deploy/Compose hashes/modes;
+      running resofeed and Caddy container IDs and exact image IDs; resofeed `/data`
+      mount Type/Destination plus internal actual engine-volume identity and logical
+      `com.docker.compose.volume=resofeed-data`; canonical `TCP/HTTPS 443 -> 127.0.0.1:8443`;
+      and internal validated-public-host hash. Require identical helpers, canonical
+      sorting, final-digest-only comparison, approved marker-only output, and the
+      closed read-only local/remote command allowlist. Explicitly exclude volatile
+      background-ingest/database/WAL/log/counter/health/PID/exec/network/Tailscale
+      telemetry/atime/output-order state and all sensitive/config values. Future OCI
+      deferral remains a static contract assertion outside the runtime fingerprint.
+
+
       Confirm each accepted operation, target, source/produced-input identity, execution
       context, script-local detached-source polarity, host-key/credential boundary,
       preconditions, cost boundary, rollback/recovery, and evidence topology matches
@@ -190394,11 +190423,11 @@ phases:
     verification: Current R3 authorization binds immutable publication and digest-only
       deployment to the independently verified polarity-remediation commit, exact
       freshly reviewed and staged two-file hashes, correct script-local attached-source
-      pre-SSH rejection, exact stdin-fed `bash -s` read-only verification transport,
-      strict literal-FQDN host-key boundary, produced OCI digest chain, rollback/readiness,
-      scoped credentials, costs, and exclusions; v8's command-construction rejection,
-      the coherent REJECTED review, and all stale/invalid material remain diagnostic
-      only.
+      pre-SSH rejection, exact stdin-fed `bash -s` read-only v10 transport, exact
+      defined stable-projection equality plus closed-command nonmutation proof, strict
+      literal-FQDN host-key boundary, produced OCI digest chain, rollback/readiness,
+      scoped credentials, costs, and exclusions; v8/v9 rejections, the coherent REJECTED
+      review, and all stale/invalid material remain diagnostic only.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -190408,7 +190437,7 @@ phases:
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
-    - rf-bug-v2-immutable-deployment-procedure-verification-v9
+    - rf-bug-v2-immutable-deployment-procedure-verification-v10
     agent: spec-verifier
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
