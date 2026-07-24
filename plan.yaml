@@ -193074,7 +193074,7 @@ phases:
       untracked directories were left untouched.'
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v14
     name: Verify Tailscale 1.98.8 JSON route probe (semantic v14)
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -193192,6 +193192,8 @@ phases:
     depends_on:
     - rf-bug-v2-tailscale-198-route-harness-remediation
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-24T16:54:16.589941Z'
   - id: rf-bug-v2-tailscale-198-route-harness-remediation
     name: Repair Tailscale 1.98.8 route verification harness
     status: done
