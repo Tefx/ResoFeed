@@ -192828,6 +192828,288 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
+  - id: rf-bug-v2-tracked-read-only-probe-harness-remediation
+    name: Track, test, and document the immutable read-only probe harness
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nImplement\
+      \ one repository-owned, tracked, read-only verification harness after repeated\
+      \ verifier-generated stdin-program defects. This is an indivisible shell, Node-adapter/test,\
+      \ and deployment-documentation rollback unit, so `general` owns the cross-domain\
+      \ mutation. It changes verification infrastructure only; it must not change\
+      \ deployment, Compose, Caddy, application, data, credential, publication, or\
+      \ service behavior.\n\nSupersede the uncompleted v10 verifier without retrying,\
+      \ correcting, completing, or executing it. Preserve its diagnostic artifacts\
+      \ unchanged: receipt file `sha256:ecf06ad1a71013da0e7794dd9c7e2780ff8d035b67a22568f260e22383506e3d`,\
+      \ validator `sha256:ea40abf245650b9381533bbcf5a5ad86a461a2f458c5a7666a059a42aba906d8`,\
+      \ and canonical valid `REJECTED` receipt `sha256:316c931845a094a7cbdc4a6dfbe415309428502a88231467e81d593d08d6cbb0`.\
+      \ V10's local selection, run, focused test, and local Git before/after checks\
+      \ passed; its verifier failed while dynamically constructing the stdin program\
+      \ before spawning SSH. It produced no remote command or marker and supplies\
+      \ no runtime, target, lifecycle, retry, correction, publication, or deployment\
+      \ authority. V9 remains the diagnostic proof that the exact strict SSH procedure\
+      \ reaches readiness.\n\nCreate executable `deploy/resofeed-caddy/verify.sh`\
+      \ as the local wrapper and executable `deploy/resofeed-caddy/verify-remote.sh`\
+      \ as the literal stdin-fed remote program. `verify.sh` must validate exact nonsecret\
+      \ 40-lowercase-hex source commit, current deploy/Compose SHA-256 and modes,\
+      \ backup identity and manifest mode, and prior deploy/Compose SHA-256 and modes;\
+      \ require a clean detached local checkout at the supplied commit; prove the\
+      \ source procedure still consists of exactly `deploy/resofeed-caddy/deploy.sh`\
+      \ and `deploy/resofeed-caddy/compose.yml`; and invoke exactly one SSH process\
+      \ with separate literal argv: `ssh`, `-Fnone`, `-T`, then the existing strict\
+      \ literal-FQDN options and destination `tefx-mbp-personal.platy-atlas.ts.net`,\
+      \ ending with separate `bash`, `-s`. Feed the tracked bytes of `verify-remote.sh`\
+      \ only through stdin. Forbid `eval`, generated shell, `bash -c`, remote-command\
+      \ argv, alternate interpreter, target, account, host alias, trust store, stack,\
+      \ retry, or second probe. The wrapper must emit only bounded approved markers\
+      \ and transport/construction failure status.\n\n`verify-remote.sh` installs\
+      \ cooperating phase state and ERR/EXIT traps before its first assertion and\
+      \ immediately emits `PROBE_PHASE=canonical_stack`. Preserve the exact phase/success\
+      \ ledger: `canonical_stack`/`CANONICAL_STACK=verified`; `procedure_current`/`PROCEDURE_CURRENT=verified`;\
+      \ `backup`/`BACKUP=verified`; `docker_identity`/`DOCKER_IDENTITY=verified`;\
+      \ `volume`/`VOLUME=verified`; `tailnet_route`/`TAILNET_ROUTE=verified`; `public_url`/`PUBLIC_URL_HOST=validated`;\
+      \ `readiness`/`READINESS=verified`; `protected_after`/`PROTECTED_STATE=unchanged`;\
+      \ final `PROBE_OK`. A failure emits exactly one `PROBE_FAIL phase=<last_phase>\
+      \ status=<status>`; markerless/non-stdout exits remain transport failures and\
+      \ are never synthesized as phase output.\n\nThe remote executable allowlist\
+      \ is closed to temporary in-memory shell control plus `cd`, `pwd`, `test`, `stat`,\
+      \ `shasum` or guarded `sha256sum`, `grep`, `awk`, `sort`, `printf`, `cut`, `tr`,\
+      \ `case`, read-only `docker container inspect`, `docker image inspect`, `docker\
+      \ volume inspect`, read-only `tailscale serve status`, and exactly two GET-only\
+      \ `curl` readiness calls. It creates no persistent file. Forbid `.env`, secret/config/trust\
+      \ paths or values, internal hostname, `systemctl`, SQLite commands, file writes/moves/copies,\
+      \ Docker Compose, Docker/registry/service mutation, Tailscale mutation, credential/account/host-key\
+      \ mutation, extra hosts, retries, publication, or deployment.\n\nUse identical\
+      \ helpers before and after to compare one deterministic stable projection containing\
+      \ only current remote deploy/Compose hashes and modes; backup manifest hash/mode\
+      \ and backup deploy/Compose hashes/modes; running resofeed and Caddy container\
+      \ IDs and exact image IDs; the resofeed `/data` mount Type and Destination plus\
+      \ internal actual engine-volume identity and logical label `com.docker.compose.volume=resofeed-data`;\
+      \ canonical `TCP/HTTPS 443 -> 127.0.0.1:8443`; and an internal SHA-256 of the\
+      \ validated public URL host. Canonically sort multivalues and retain only the\
+      \ final digest. Exclude SQLite main/WAL/SHM bytes, sizes, mtimes, and rows;\
+      \ app/Caddy logs; HTTP/access counters; Docker health/status timestamps, PID,\
+      \ exec, and transient network fields; Tailscale peer/address/session telemetry;\
+      \ atime; command order; timestamps; and all secret/config values. Derive exactly\
+      \ one `https://<DNS-host>` from the resofeed `--public-url` argv, validate it\
+      \ without disclosure, use that host for SNI/Host against loopback Caddy `8443`,\
+      \ and require root `200` plus unauthenticated Doctor `401`; never use the SSH\
+      \ FQDN as SNI/Host.\n\nExtend `scripts/vectl-check.test.mjs` and, only when\
+      \ selection/run wiring requires it, `scripts/vectl-check.mjs`. Deterministic\
+      \ tests use fake SSH, Docker, Tailscale, curl, stat, and hash surfaces and cover\
+      \ shell syntax; exact SSH argv and byte-identical stdin transfer; happy `PROBE_OK`;\
+      \ each phase-specific failure marker; markerless transport failure; corrected\
+      \ Compose logical volume label; public-URL validation and SNI separation; stable-projection\
+      \ equality; exclusion of volatile SQLite/log/timestamp/telemetry state; malformed\
+      \ hash/commit/backup/mode inputs; attached or dirty source refusal; closed command\
+      \ allowlist; nondisclosure; no retry; and no second probe. The harness must\
+      \ not stage itself, alter `deploy.sh` or `compose.yml`, or add itself to the\
+      \ existing exact two-file procedure manifest.\n\nSynchronize `deploy/resofeed-caddy/README.md`\
+      \ with the harness purpose, exact read-only boundary, required nonsecret inputs,\
+      \ strict target/stack, bounded marker contract, one-probe/no-retry rule, stable\
+      \ projection/exclusions, and the separation of later publication and deployment\
+      \ into their own accepted steps. Include no secret example or CLI secret flag.\
+      \ Rollback removes the two harness scripts and reverts only their adapter/test/README\
+      \ integration.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [deploy/resofeed-caddy/verify.sh, deploy/resofeed-caddy/verify-remote.sh,\
+      \ scripts/vectl-check.test.mjs, scripts/vectl-check.mjs, deploy/resofeed-caddy/README.md]\n\
+      \  blocked_paths: [deploy/resofeed-caddy/deploy.sh, deploy/resofeed-caddy/compose.yml,\
+      \ deploy/resofeed-caddy/Caddyfile, deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example,\
+      \ internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ plan.yaml]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims:\
+      \ [RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS]\nchecks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n\
+      \    run:\n      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n      timeout_seconds: 300\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: .agents/skills/resofeed-tailnet-deploy/SKILL.md, access: read,\
+      \ availability: current}\n        - {path: deploy/resofeed-caddy/.env.example,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/README.md,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/deploy.sh,\
+      \ access: read, availability: current}\n        - {path: docs/CONTAINER.md,\
+      \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: acceptance, availability: current}\n\
+      \      selection:\n        command: [node, scripts/vectl-check.mjs, select,\
+      \ rf-bug-v2-immutable-deployment-procedure, rf_bug_v2_immutable_deployment_procedure_green]\n\
+      \        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
+      \ [RF-BUG-V2 immutable OCI and Tailnet deployment procedure]\n        forbidden_ids:\
+      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: PROCEDURE_SOURCE_CHECKOUT=clean_detached_head},\
+      \ {literal: PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected}, {literal: PROCEDURE_DETACHED_MATRIX=green},\
+      \ {literal: PROCEDURE_SIDE_EFFECTS=none}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n\
+      \        contains_any: []\n        forbids: [{literal: ERROR collecting}, {literal:\
+      \ no tests to run}, {literal: skipped}, {literal: retry}, {literal: OPENROUTER_KEY=}]\n\
+      \    proves: [RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS]\nbindings:\n  expected_red:\
+      \ {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"cross_component_verification_infrastructure\"\
+      ,\"strict_external_transport_contract\",\"shared_project_native_adapter\"],\"\
+      primary_outcome\":\"RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS\"\
+      ,\"atom\":\"the tracked wrapper and stdin-fed program exercise the exact read-only\
+      \ remote procedure through bounded markers without generated shell, mutation,\
+      \ secret access, retry, or projection of volatile state\",\"modality\":\"runtime\"\
+      ,\"seam\":\"real\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v11\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"deploy/resofeed-caddy/verify.sh\"\
+      ,\"deploy/resofeed-caddy/verify-remote.sh\",\"scripts/vectl-check.mjs\",\"scripts/vectl-check.test.mjs\"\
+      ],\"acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_v2_immutable_deployment_procedure_green\"],\"acceptance_mutation\"\
+      :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-v2-tracked-read-only-probe-harness-remediation\"\
+      ,\"path\":\"scripts/vectl-check.test.mjs\",\"purpose\":\"Add only deterministic\
+      \ tracked read-only probe harness coverage for syntax, exact SSH argv/stdin\
+      \ transfer, phase markers and failures, transport failure, corrected volume\
+      \ identity, public-host/SNI separation, stable projection and exclusions, malformed\
+      \ inputs, clean detached source, closed allowlist, nondisclosure, no retry,\
+      \ and procedure-manifest noninterference\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
+    verification: The existing project-native immutable-deployment profile selects
+      its exact current identity and runs green after exercising shell syntax, fake-surface
+      unit/integration cases, manifest noninterference, strict argv/stdin transfer,
+      bounded marker projection, every named phase failure, stable protected-state
+      equality, and malformed/attached/dirty refusal. Only the two tracked probe scripts,
+      adapter wiring if required, its exact test file, and deployment README may change;
+      no SSH or external operation occurs in this implementation step.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/.env.example
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - rf-bug-v2-local-verification-matrix
+    - rf-bug-v2-stage-immutable-deployment-procedure-v2
+    agent: general
+  - id: rf-bug-v2-immutable-deployment-procedure-verification-v11
+    name: Verify the tracked immutable read-only procedure probe (semantic v11)
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Fresh successor to the uncompleted v10 attempt. Preserve v10 unchanged and do
+      not retry, correct, complete, resume, or execute it: receipt file `sha256:ecf06ad1a71013da0e7794dd9c7e2780ff8d035b67a22568f260e22383506e3d`,
+      validator `sha256:ea40abf245650b9381533bbcf5a5ad86a461a2f458c5a7666a059a42aba906d8`,
+      canonical valid `REJECTED` receipt `sha256:316c931845a094a7cbdc4a6dfbe415309428502a88231467e81d593d08d6cbb0`.
+      V10''s local selection/run/focused test and local Git before/after checks passed,
+      but its dynamically constructed stdin program failed before SSH spawn; no remote
+      command or marker exists. Treat it only as verifier-construction diagnostics
+      with no remote, product, target, lifecycle, retry, correction, publication,
+      or deployment authority.
+
+
+      A fresh `integration-verifier` executes only this v11 node from a fresh clean
+      detached integrated head after the tracked harness remediation, completed local
+      matrix, and exact v2 staging. Do not resume a prior child/session. Capture full
+      local HEAD and status before the entire attempt and after it; require exact
+      equality, detachment, and cleanliness. Execute exactly once each: `node scripts/vectl-check.mjs
+      select rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`;
+      `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`;
+      and `node --test --test-name-pattern=immutable\ OCI\ and\ Tailnet\ deployment\
+      procedure scripts/vectl-check.test.mjs`. Require exact selected/executed identity
+      parity and observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`, `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`,
+      `PROCEDURE_DETACHED_MATRIX=green`, `PROCEDURE_SIDE_EFFECTS=none`, and the tracked-harness
+      green projection added by the implementation.
+
+
+      Then execute tracked `./deploy/resofeed-caddy/verify.sh` exactly once through
+      the exact nonsecret input interface documented by the integrated README. Supply
+      the completed stage-v2 identities exactly: source commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      current deploy SHA-256 `5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
+      mode `755`, current Compose SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      mode `644`, backup identity `97058a9435f10cb4c7a69e20bb6de89f9b77da56caa8bf05eb18729c3089fcc0`,
+      backup manifest mode `600`, prior deploy SHA-256 `4e8b619115cbff6e01da67db0e08b0758fe56efdbf510e24ec055b16e919222f`
+      mode `755`, and prior Compose SHA-256 `eeb9888c7cb8f6f7ab05bc8934eba241588021ba0a99de592e5c51665d09706c`
+      mode `644`. Record the resulting literal argv exactly; do not reconstruct, edit,
+      source, wrap, pipe into, generate, or evaluate shell.
+
+
+      The wrapper must spawn exactly one SSH process whose separate argv are `ssh`,
+      `-Fnone`, `-T`, the integrated strict endpoint options, literal destination
+      `tefx-mbp-personal.platy-atlas.ts.net`, `bash`, `-s`, and no remote command
+      argument. It must feed the byte-identical tracked `deploy/resofeed-caddy/verify-remote.sh`
+      through stdin. No `bash -c`, alias, endpoint rewrite, alternate trust/account/path/interpreter,
+      internal-hostname query, host-key mutation, second probe, or retry is allowed.
+      Markerless/no-stdout/nonzero transport exits remain transport/construction failures;
+      never synthesize remote phase output.
+
+
+      Admit only the exact bounded remote ledger from the tracked program: `PROBE_PHASE=canonical_stack`/`CANONICAL_STACK=verified`;
+      `PROBE_PHASE=procedure_current`/`PROCEDURE_CURRENT=verified`; `PROBE_PHASE=backup`/`BACKUP=verified`;
+      `PROBE_PHASE=docker_identity`/`DOCKER_IDENTITY=verified`; `PROBE_PHASE=volume`/`VOLUME=verified`;
+      `PROBE_PHASE=tailnet_route`/`TAILNET_ROUTE=verified`; `PROBE_PHASE=public_url`/`PUBLIC_URL_HOST=validated`;
+      `PROBE_PHASE=readiness`/`READINESS=verified`; `PROBE_PHASE=protected_after`/`PROTECTED_STATE=unchanged`;
+      final `PROBE_OK`. A remote failure may emit exactly one `PROBE_FAIL phase=<last_phase>
+      status=<status>` and cannot pass.
+
+
+      Directly observe the tracked program''s closed read-only allowlist and stable
+      projection. Require exact source/remote current hashes and modes, nonsecret
+      prior and backup identities, real regular non-symlink backup manifest mode `600`,
+      backup file modes, running resofeed/Caddy exact image identities, normalized
+      `docker.io/tefx/resofeed@sha256:<64-lowercase-hex>` RepoDigest, corrected logical
+      `resofeed-data:/data` and runtime label `com.docker.compose.volume=resofeed-data`,
+      canonical Tailnet route `TCP/HTTPS 443 -> 127.0.0.1:8443`, strict validated
+      non-disclosed public URL host used for loopback-Caddy SNI/Host, root `200`,
+      and unauthenticated Doctor `401`. Compare before/after only the defined stable
+      projection with identical helpers and canonical sorting; exclude volatile SQLite/WAL/SHM,
+      logs, counters, health/PID/exec/network timestamps, Tailscale telemetry, atime,
+      output order, timestamps, and all secret/config values. The active background
+      ingest loop remains allowed.
+
+
+      No repository, target, publication, deployment, service, credential, trust,
+      secret, configuration, data, or persistent-state mutation is authorized. The
+      command allowlist cannot read secret/trust/config surfaces and cannot mutate
+      Docker, registry, Tailscale, files, SQLite, services, credentials, accounts,
+      host keys, or application state. Future publication remains a static assertion
+      limited to `docker.io/tefx/resofeed`, commit-bound immutable tag/index, exact
+      linux/amd64 and linux/arm64 digests, separately authorized cleanup, exact FQDN/stack
+      deployment, public-host-derived readiness, and rejection of incomplete/mutable/mismatched
+      chains; it does not enter the runtime fingerprint.
+
+
+      Production semantic admission is mandatory. Emit exactly one `vectl.verifier.semantic.v1`
+      object with canonical keys only. Require `verifier_id=integration-verifier`,
+      `step_id=rf-bug-v2-immutable-deployment-procedure-verification-v11`, and exact
+      ordered `scope`: [`tracked wrapper, stdin program, and clean detached source
+      identity`, `strict literal-FQDN one-probe transport and bounded phase ledger`,
+      `readiness, stable projection equality, exclusions, and closed-command nonmutation`,
+      `future OCI identity deferral`]. Require exactly two outcome-consistent coverage
+      rows: `RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS` from `deploy/resofeed-caddy/README.md`
+      and `RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE` from `docs/BUG_FIX_PLAN_2026-07-12.md`.
+      `specialist_receipt` uses the integration-verifier shape; command rows contain
+      literal substantive argv actually executed and never placeholders, pseudo-commands,
+      metavariables, elisions, redaction tokens, empty argv, or fabricated markers.'
+    verification: Fresh production-admitted integration-verifier evidence runs the
+      three exact local commands and the tracked wrapper exactly once from a clean
+      detached integrated head. It proves the exact strict-FQDN SSH argv and byte-identical
+      tracked stdin program, every phase through readiness and stable protected-state
+      equality, bounded markers, local Git equality, one probe/no retry, nondisclosure,
+      no mutation, and static future OCI deferral.
+    refs:
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - rf-bug-v2-tracked-read-only-probe-harness-remediation
+    - rf-bug-v2-local-verification-matrix
+    - rf-bug-v2-stage-immutable-deployment-procedure-v2
+    agent: integration-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
