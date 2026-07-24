@@ -192875,6 +192875,238 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
+  - id: rf-bug-v2-immutable-deployment-procedure-verification-v6
+    name: Verify authenticated-endpoint immutable procedure and public-URL Caddy readiness
+      (bounded-marker semantic v6)
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Fresh public-URL-aware successor to the uncompleted `rf-bug-v2-immutable-deployment-procedure-verification-v5`.
+      A fresh `integration-verifier` child must execute this node. Do not resume,
+      retry, correct, or complete v5 or any prior child/session. Perform only fresh
+      local checks and exactly one strictly read-only SSH inspection of the exact
+      target. Do not modify repository files, copy or stage files, enroll/update/remove
+      host keys, pull, build, push, tag, delete, publish, deploy, restart, stop, recover,
+      reset tokens, clear data, change credentials/accounts, read or print `.env`,
+      inspect another host, or mutate local/remote state. There is no iterative remote-probe
+      retry inside the child; any nonzero probe ends this attempt and produces the
+      admitted semantic result.
+
+
+      Production semantic admission is mandatory. Emit exactly one `vectl.verifier.semantic.v1`
+      JSON object with the canonical top-level keys and no additions: `schema_version`,
+      `verifier_id`, `step_id`, `scope`, `headline`, `blocking_status`, `proof_gap_status`,
+      `verdict`, `gate_open_allowed`, `orchestrator_action_hint`, `completion_authority`,
+      `blockers`, `warnings`, `notes`, `evidence_refs`, `requirement_coverage`, and
+      `specialist_receipt`. Require `verifier_id` = `integration-verifier`, `step_id`
+      = `rf-bug-v2-immutable-deployment-procedure-verification-v6`, and this exact
+      ordered `scope`: [`corrected symbolic-ref polarity and detached behavior matrix`,
+      `exact staged source and remote procedure hashes and modes`, `strict literal-FQDN
+      trust, recovery readiness, and protected-state invariance`, `future OCI identity
+      deferral`]. Require exactly one `requirement_coverage` row for `RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE`,
+      source ref `docs/BUG_FIX_PLAN_2026-07-12.md`, status matching the admitted outcome,
+      and evidence refs covering every ordered scope atom.
+
+
+      `specialist_receipt` must use the integration-verifier shape with exact keys
+      `mode`, `commands`, `evidence_levels`, `protocols`, and `behavioral_proof_register`;
+      every command row has exact keys `command`, `cwd`, `process`, and `evidence_refs`.
+      Every `commands[*].command` is a non-empty array containing only actual substantive
+      argv strings executed. Forbid placeholders, pseudo-commands, documentation metavariables,
+      elisions, redaction tokens, empty strings, and standalone `none`. Record literal
+      executed shell syntax verbatim. Retained evidence remains bounded and nonsecret.
+      The production semantic validator must admit the fresh receipt before lifecycle
+      completion. Any nonzero live probe must report the last emitted phase and cannot
+      hide the failure stage.
+
+
+      From one fresh clean integrated head after completed `rf-bug-v2-detached-head-guard-polarity-remediation`,
+      completed `rf-bug-v2-local-verification-matrix`, and completed `rf-bug-v2-stage-immutable-deployment-procedure-v2`,
+      independently execute the current project-native immutable-procedure selected
+      profile and focused developer test without repository mutation. Prove the integrated
+      polarity-remediation commit is the sole source identity; the manifest covers
+      exactly `deploy/resofeed-caddy/deploy.sh` and `deploy/resofeed-caddy/compose.yml`;
+      the deploy-script hash differs from stale pre-guard SHA-256 `1372895087fba50bb6303c7fbbc9b50f2a9ce3208a61fefdb26445b86364ae3d`
+      and stale inverted SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`;
+      and the live target''s procedure bytes and modes match the fresh source identities.
+
+
+      Require selected observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`,
+      `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`, and `PROCEDURE_DETACHED_MATRIX=green`.
+      Independently prove `git symbolic-ref -q HEAD` success is treated as attached
+      and rejected at the exact verified commit with an accurate detached-HEAD fatal
+      message before any fake SSH attempt, command, target mutation, or transaction
+      residue. Prove every happy and failure fixture is detached at its exact verified
+      commit and the unchanged fake-target happy, rollback, tamper, target-drift,
+      missing-prior, wrong-mode, unknown-host-key, and changed-host-key matrix passes.
+      Confirm selected execution becomes red when polarity is inverted and no wrapper
+      or caller-only preflight substitutes for the guard inside `deploy.sh` before
+      its first SSH/remote effect.
+
+
+      Use only read-only SSH inspection of literal destination `tefx-mbp-personal.platy-atlas.ts.net`
+      and canonical home-relative stack path `~/Projects/resofeed-caddy`, derived
+      from `.agents/skills/resofeed-tailnet-deploy/SKILL.md`. The SSH FQDN is authoritative
+      only for authenticated transport; it is distinct from the Caddy public HTTPS
+      host. The actual SSH process argv and receipt command row must use one schema-safe
+      OpenSSH-equivalent `-Fnone` argument followed by every maintained option and
+      value: `-T`, `-o`, `HostName=tefx-mbp-personal.platy-atlas.ts.net`, `-o`, `HostKeyAlias=tefx-mbp-personal.platy-atlas.ts.net`,
+      `-o`, `StrictHostKeyChecking=yes`, `-o`, `UpdateHostKeys=no`, `-o`, `VerifyHostKeyDNS=no`,
+      `-o`, `CanonicalizeHostname=no`, `-o`, `BatchMode=yes`, `-o`, `PreferredAuthentications=publickey`,
+      `-o`, `PasswordAuthentication=no`, `-o`, `KbdInteractiveAuthentication=no`,
+      `-o`, `NumberOfPasswordPrompts=0`, `-o`, `AddKeysToAgent=no`, `-o`, `ForwardAgent=no`,
+      `-o`, `ClearAllForwardings=yes`, `-o`, `ControlMaster=no`, `-o`, `ControlPath=none`,
+      `-o`, `RequestTTY=no`, the literal destination, and the exact bounded remote
+      shell program as the final argument. Do not load aliases, rewrite the SSH endpoint,
+      select another trust store/account/path, query an internal hostname, or abbreviate
+      the actual command record.
+
+
+      The one bounded remote program must remain portable to the macOS Tailnet target
+      with safe GNU fallbacks. Maintain a nonsecret phase ledger: immediately before
+      each assertion group set the last-phase value and emit exactly one stable marker
+      in this order: `PROBE_PHASE=canonical_stack`, `PROBE_PHASE=procedure_current`,
+      `PROBE_PHASE=backup`, `PROBE_PHASE=docker_identity`, `PROBE_PHASE=volume`, `PROBE_PHASE=tailnet_route`,
+      `PROBE_PHASE=readiness`, and `PROBE_PHASE=protected_state`. Install an EXIT
+      trap before assertions that emits exactly `PROBE_FAIL=<last-phase>` on nonzero.
+      Emit `PROBE_OK` only after every assertion passes. Phase output and retained
+      semantic evidence must not reveal raw paths, public host text, configuration,
+      credentials, tokens, keys, `.env` values, host-key material, authentication
+      paths, or secret-source paths. The receipt reports the ordered phase markers
+      and terminal `PROBE_OK` or exact `PROBE_FAIL=<last-phase>`.
+
+
+      In `canonical_stack`, derive `canonical_home=$(CDPATH= cd -- "$HOME" && pwd
+      -P)` and `canonical_stack="${canonical_home}/Projects/resofeed-caddy"`; verify
+      exact canonical path, basename/project identity, and required regular non-symlink
+      files. Use the same mode helper for staged, prior, manifest, and content-addressed
+      backup files, with BSD-first/GNU-fallback semantics equivalent to `stat -f ''%Lp''
+      "$path" 2>/dev/null || stat -c ''%a'' "$path"`. Use `shasum -a 256` when available
+      with a guarded optional `sha256sum` fallback for every current, prior, manifest-selected,
+      and backup identity. Export `PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"`
+      before every Docker CLI use. Do not invoke or probe `systemctl`.
+
+
+      In `procedure_current`, prove authenticated SSH endpoint identity; exact source/remote
+      current procedure hash and mode equality; `755` for `deploy.sh`; `644` for `compose.yml`;
+      nonsecret prior procedure hashes/modes with prior deploy at `755` and prior
+      compose at `644`; and exact current/prior identities needed for recovery. Verify
+      shell and Compose shape without mutation.
+
+
+      In `backup`, require the content-addressed backup path to be a real directory
+      and not a symlink. Require only contract-owned manifest/file invariants: manifest
+      regular/non-symlink mode `600` with exact identity rows; backup deploy regular/non-symlink
+      mode `755` with hash equal to prior deploy bytes; backup compose regular/non-symlink
+      mode `644` with hash equal to prior compose bytes; and recomputation of the
+      backup identity from those exact rows/files equals the content-addressed identity.
+      Do not assert or require mode `700`, or any other mode, on the content-addressed
+      child directory. `BACKUP_ROOT` protection is non-blocking implementation detail
+      unless the maintained implementation requires observation.
+
+
+      In `docker_identity`, derive the running `resofeed` container''s actual immutable
+      image ID through read-only Docker container metadata, then resolve that exact
+      image ID''s repository digests through read-only Docker image metadata. Canonically
+      normalize Docker Hub forms to `docker.io/tefx/resofeed` and accept prior rollback
+      identity only when the actual running image ID resolves uniquely to exactly
+      one `docker.io/tefx/resofeed@sha256:<64-lowercase-hex>` digest. `.Config.Image`
+      may be a moving configured reference for this pre-publication prior-state check
+      only when it names the permitted repository and the actual image ID resolves
+      uniquely to the permitted repository digest. Alternate repositories, zero/multiple
+      matches, unresolved image IDs, or non-recoverable prior state are blocking.
+      This exception authorizes no future moving-tag publication or deployment.
+
+
+      In `volume`, verify named volume `resofeed-caddy_resofeed-data` remains mounted
+      at `/data`. In `tailnet_route`, inspect only available read-only `tailscale
+      serve status`, require Tailnet TCP/443 ownership by the maintained stack, and
+      do not invoke or probe `systemctl`.
+
+
+      In `readiness`, derive the nonsecret current public URL solely from read-only
+      `docker container inspect` of the running `resofeed` container''s command argv.
+      Flatten `.Config.Cmd` one argument per line without shell evaluation. Select
+      exactly the one argv element immediately following a literal `--public-url`;
+      require exactly one literal flag occurrence and exactly one following value.
+      Validate that value as exact `https://<DNS-host>` with no userinfo, explicit
+      port, path, query, fragment, whitespace, wildcard, shell metacharacter, empty
+      label, leading/trailing hyphen label, non-DNS character, or trailing dot. Require
+      at least two DNS labels. Do not read `.env`, derive from certificate content/SANs,
+      or use the SSH endpoint hostname as Caddy identity. After validation, retain
+      only `PUBLIC_URL_HOST=validated`; never emit or retain the host text.
+
+
+      Use the validated public host for loopback Caddy TLS SNI/Host via actual commands
+      semantically exact to `curl -k --resolve "$public_host:$caddy_port:127.0.0.1"
+      "https://$public_host:$caddy_port/"` and `curl -k --resolve "$public_host:$caddy_port:127.0.0.1"
+      "https://$public_host:$caddy_port/api/doctor"`; require root `200` and unauthenticated
+      Doctor `401`. The SSH command continues to authenticate only literal `tefx-mbp-personal.platy-atlas.ts.net`;
+      that transport identity must never become the curl SNI/Host value. Do not expose
+      the public host in command evidence; the actual bounded remote program may use
+      the validated variable internally while retained output records only the approved
+      marker and status outcomes.
+
+
+      In `protected_state`, independently verify completed v2 staging and this read-only
+      probe changed no image, container, `.env`, Caddy/Tailscale state, SQLite volume/data,
+      owner-token state, credential/account, host-key trust, secret input, Docker/registry
+      state, service state, or local repository/Git metadata. Re-prove the downstream
+      release contract without executing it: publication is limited to `docker.io/tefx/resofeed`;
+      the immutable tag is bound to the later verified polarity-remediation commit;
+      one OCI index digest and exact linux/amd64 plus linux/arm64 manifest digests
+      are required; mutable tags and incomplete/mismatched chains are rejected; temporary-tag
+      cleanup requires separate exact authority or the orphan chain is recorded; deployment
+      remains limited to the exact authenticated SSH FQDN/stack/path; Caddy readiness
+      uses the independently validated current public URL host; evidence contains
+      no credential, token, provider key, `.env` value, host-key material, authentication
+      path, secret-source path, or public-host text. Unknown/changed host key, effective
+      endpoint rewrite, trust bypass, alternate host/path/account, credential drift,
+      secret exposure, volume drift, readiness drift, invalid public URL identity,
+      or unresolved image identity blocks later authority.
+
+
+      Preserve v5 evidence unchanged and do not retry, correct, or complete it: first
+      INVALID receipt file SHA-256 `082d6dedfea64940a018388112f601d40ae1643e2876d42b1c4a1605efb1288f`
+      with validator SHA-256 `f85d69f3d0632df69bbf71949cdbc54203d1fccd10093a05d4804567f12f1712`;
+      corrected receipt file SHA-256 `8163f6ae562f4b0b3bd86f343a7125c6db5d8dd7701cd4e5688445177b74b511`
+      with validator SHA-256 `7eeb100335d044eb9e1456dc2c9b9a6b91bc423f71961834c86c495b246a0ad1`;
+      canonical valid `REJECTED` receipt SHA-256 `a8a5e37e20beac3e7e575a7b6a4ff5f87c95cffb0174c0bca8b5b1043d442da5`.
+      V5 decisively passed `canonical_stack`, `procedure_current`, `backup`, `docker_identity`,
+      `volume`, and `tailnet_route`, then emitted `PROBE_FAIL=readiness` with curl
+      exit 35 because it used the SSH FQDN as Caddy TLS SNI/Host. Classify this as
+      a v5 probe identity defect: Caddy serves the running container''s configured
+      public HTTPS domain while the fixed Tailnet FQDN is the SSH transport endpoint.
+      V5 supplies no lifecycle completion, product-failure, target-blocker, or external-operation
+      authority.
+
+
+      Preserve earlier invalid/rejected staging, detached-guard, v3, and v4 evidence
+      already recorded in plan history as immutable diagnostic-only evidence. In particular,
+      v4''s child-directory mode assertion and missing failure-stage ledger remain
+      verifier-generated defects, and neither prior diagnostic nor v5 supplies authority.
+      The pre-publication target is not required to run the future unpublished index
+      digest or contain future commit/tag/index/platform identity fields; those identities
+      remain correctly deferred to `rf-bug-v2-publish-immutable-oci`, `rf-bug-v2-docker-runtime-proof`,
+      and `rf-bug-v2-tailnet-caddy-proof`.'
+    verification: Fresh production-admitted integration-verifier selected execution
+      and exactly one exact-argv portable read-only SSH probe prove corrected symbolic-ref
+      polarity, detached fake-target coverage, strict literal-FQDN SSH trust, staged/current/prior/manifest/backup
+      identities, unique actual-image-ID RepoDigest resolution, named /data volume,
+      exact Tailnet route, validated public-URL-derived Caddy SNI/Host with 200/401
+      readiness, protected-state invariance, and future OCI deferral. The program
+      emits the ordered PROBE_PHASE ledger, PUBLIC_URL_HOST=validated without host
+      disclosure, exactly one PROBE_FAIL=<last-phase> on nonzero, and PROBE_OK only
+      after all assertions; it never reads .env, uses the SSH FQDN for Caddy SNI,
+      requires mode 700 on the backup child, derives certificate SANs, invokes systemctl,
+      retries the remote probe, or records placeholders/standalone none.
+    depends_on:
+    - rf-bug-v2-local-verification-matrix
+    - rf-bug-v2-stage-immutable-deployment-procedure-v2
+    agent: integration-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
