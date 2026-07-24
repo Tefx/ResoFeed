@@ -624,9 +624,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'symbolic-ref -q HEAD',
     'SOURCE_DEPLOY_PATH="deploy/resofeed-caddy/deploy.sh"',
     'SOURCE_COMPOSE_PATH="deploy/resofeed-caddy/compose.yml"',
+    'SOURCE_WRAPPER_PATH="deploy/resofeed-caddy/verify.sh"',
     'SOURCE_REMOTE_PATH="deploy/resofeed-caddy/verify-remote.sh"',
-    'ssh -F none -T "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST"',
-    'bash -s',
+    'merge-base --is-ancestor "$SOURCE_COMMIT" "$integrated_head"',
+    'ssh -Fnone -T "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST"',
+    'bash -s --',
     '< "$REMOTE_PROGRAM"',
     'PROBE_TRANSPORT_FAIL status=',
     'PROBE_CONSTRUCTION_FAIL status=2'
@@ -685,6 +687,16 @@ export function verifyImmutableDeploymentSources(sources) {
   const remoteProbe = sources['deploy/resofeed-caddy/verify-remote.sh'];
   if ((probeWrapper.match(/\bssh\b/gu) ?? []).length !== 1) {
     throw new AdapterFailure('tracked read-only probe wrapper must contain exactly one SSH invocation');
+  }
+  if (probeWrapper.includes('ssh -F none') || !probeWrapper.includes('ssh -Fnone -T')) {
+    throw new AdapterFailure('tracked read-only probe must use one literal -Fnone SSH argument');
+  }
+  if (probeWrapper.includes('--backup-manifest-sha256') || /RESOFEED_PROBE_/u.test(`${probeWrapper}\n${remoteProbe}`)) {
+    throw new AdapterFailure('tracked read-only probe retained caller manifest hash or environment-assignment transport');
+  }
+  if ((remoteProbe.match(/^shift$/gmu) ?? []).length !== 11
+      || !remoteProbe.includes("expected_manifest_sha256=$(printf 'schema_version=resofeed.procedure-backup.v1\\nbackup_id=%s\\ndeploy.sh=%s mode=%s\\ncompose.yml=%s mode=%s\\n'")) {
+    throw new AdapterFailure('tracked read-only probe missed exact positional consumption or internal manifest derivation');
   }
   for (const forbidden of ['eval ', 'bash -c', 'scp ', 'rsync ', 'StrictHostKeyChecking=no', 'accept-new', 'ProxyCommand', 'ProxyJump']) {
     if (`${probeWrapper}\n${remoteProbe}`.includes(forbidden)) {

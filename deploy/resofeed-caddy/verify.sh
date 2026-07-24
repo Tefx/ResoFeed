@@ -2,9 +2,11 @@
 set -Eeuo pipefail
 
 readonly SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+readonly WRAPPER_PROGRAM="${SCRIPT_DIR}/verify.sh"
 readonly REMOTE_PROGRAM="${SCRIPT_DIR}/verify-remote.sh"
 readonly SOURCE_DEPLOY_PATH="deploy/resofeed-caddy/deploy.sh"
 readonly SOURCE_COMPOSE_PATH="deploy/resofeed-caddy/compose.yml"
+readonly SOURCE_WRAPPER_PATH="deploy/resofeed-caddy/verify.sh"
 readonly SOURCE_REMOTE_PATH="deploy/resofeed-caddy/verify-remote.sh"
 readonly TAILNET_TARGET_HOST="tefx-mbp-personal.platy-atlas.ts.net"
 readonly -a TAILNET_SSH_OPTIONS=(
@@ -33,7 +35,6 @@ DEPLOY_MODE=""
 COMPOSE_SHA256=""
 COMPOSE_MODE=""
 BACKUP_ID=""
-BACKUP_MANIFEST_SHA256=""
 BACKUP_MANIFEST_MODE=""
 PRIOR_DEPLOY_SHA256=""
 PRIOR_DEPLOY_MODE=""
@@ -55,6 +56,16 @@ file_sha256() {
     printf 'sha256:%s' "$(shasum -a 256 "$1" | awk '{print $1}')"
   elif command -v sha256sum >/dev/null 2>&1; then
     printf 'sha256:%s' "$(sha256sum "$1" | awk '{print $1}')"
+  else
+    return 1
+  fi
+}
+
+stream_sha256() {
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 | awk '{print "sha256:" $1}'
+  elif command -v sha256sum >/dev/null 2>&1; then
+    sha256sum | awk '{print "sha256:" $1}'
   else
     return 1
   fi
@@ -83,7 +94,6 @@ while [ "$#" -gt 0 ]; do
     --compose-sha256) COMPOSE_SHA256=$value ;;
     --compose-mode) COMPOSE_MODE=$value ;;
     --backup-id) BACKUP_ID=$value ;;
-    --backup-manifest-sha256) BACKUP_MANIFEST_SHA256=$value ;;
     --backup-manifest-mode) BACKUP_MANIFEST_MODE=$value ;;
     --prior-deploy-sha256) PRIOR_DEPLOY_SHA256=$value ;;
     --prior-deploy-mode) PRIOR_DEPLOY_MODE=$value ;;
@@ -94,10 +104,10 @@ while [ "$#" -gt 0 ]; do
   shift 2
 done
 
-[ "$SEEN_ARGUMENTS" = '|--source-commit|--deploy-sha256|--deploy-mode|--compose-sha256|--compose-mode|--backup-id|--backup-manifest-sha256|--backup-manifest-mode|--prior-deploy-sha256|--prior-deploy-mode|--prior-compose-sha256|--prior-compose-mode|' ] \
+[ "$SEEN_ARGUMENTS" = '|--source-commit|--deploy-sha256|--deploy-mode|--compose-sha256|--compose-mode|--backup-id|--backup-manifest-mode|--prior-deploy-sha256|--prior-deploy-mode|--prior-compose-sha256|--prior-compose-mode|' ] \
   || construction_fail
 [[ "$SOURCE_COMMIT" =~ ^[a-f0-9]{40}$ ]] || construction_fail
-for digest in "$DEPLOY_SHA256" "$COMPOSE_SHA256" "$BACKUP_ID" "$BACKUP_MANIFEST_SHA256" "$PRIOR_DEPLOY_SHA256" "$PRIOR_COMPOSE_SHA256"; do
+for digest in "$DEPLOY_SHA256" "$COMPOSE_SHA256" "$BACKUP_ID" "$PRIOR_DEPLOY_SHA256" "$PRIOR_COMPOSE_SHA256"; do
   is_sha256 "$digest" || construction_fail
 done
 [ "$DEPLOY_MODE" = 755 ] || construction_fail
@@ -108,13 +118,16 @@ done
 
 repo_root=$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null) || construction_fail
 [ "$SCRIPT_DIR" -ef "${repo_root}/deploy/resofeed-caddy" ] || construction_fail
+[ -f "$WRAPPER_PROGRAM" ] && [ ! -L "$WRAPPER_PROGRAM" ] && [ -x "$WRAPPER_PROGRAM" ] || construction_fail
 [ -f "$REMOTE_PROGRAM" ] && [ ! -L "$REMOTE_PROGRAM" ] && [ -x "$REMOTE_PROGRAM" ] || construction_fail
 if git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1; then
   construction_fail
 fi
-[ "$(git -C "$repo_root" rev-parse HEAD 2>/dev/null)" = "$SOURCE_COMMIT" ] || construction_fail
+integrated_head=$(git -C "$repo_root" rev-parse HEAD 2>/dev/null) || construction_fail
+[[ "$integrated_head" =~ ^[a-f0-9]{40}$ ]] || construction_fail
 [ -z "$(git -C "$repo_root" status --porcelain=v1 --untracked-files=all 2>/dev/null)" ] || construction_fail
 git -C "$repo_root" cat-file -e "${SOURCE_COMMIT}^{commit}" 2>/dev/null || construction_fail
+git -C "$repo_root" merge-base --is-ancestor "$SOURCE_COMMIT" "$integrated_head" 2>/dev/null || construction_fail
 
 source_deploy="${repo_root}/${SOURCE_DEPLOY_PATH}"
 source_compose="${repo_root}/${SOURCE_COMPOSE_PATH}"
@@ -129,28 +142,34 @@ expected_deploy_entry="100755 blob $(git -C "$repo_root" rev-parse "${SOURCE_COM
 expected_compose_entry="100644 blob $(git -C "$repo_root" rev-parse "${SOURCE_COMMIT}:${SOURCE_COMPOSE_PATH}" 2>/dev/null)"$'\t'"${SOURCE_COMPOSE_PATH}"
 [ "$(git -C "$repo_root" ls-tree "$SOURCE_COMMIT" -- "$SOURCE_DEPLOY_PATH")" = "$expected_deploy_entry" ] || construction_fail
 [ "$(git -C "$repo_root" ls-tree "$SOURCE_COMMIT" -- "$SOURCE_COMPOSE_PATH")" = "$expected_compose_entry" ] || construction_fail
-commit_deploy_sha256="sha256:$(git -C "$repo_root" cat-file blob "${SOURCE_COMMIT}:${SOURCE_DEPLOY_PATH}" | shasum -a 256 | awk '{print $1}')"
-commit_compose_sha256="sha256:$(git -C "$repo_root" cat-file blob "${SOURCE_COMMIT}:${SOURCE_COMPOSE_PATH}" | shasum -a 256 | awk '{print $1}')"
-[ "$commit_deploy_sha256" = "$DEPLOY_SHA256" ] || construction_fail
-[ "$commit_compose_sha256" = "$COMPOSE_SHA256" ] || construction_fail
-[ "$(git -C "$repo_root" cat-file blob "${SOURCE_COMMIT}:${SOURCE_REMOTE_PATH}" | shasum -a 256 | awk '{print $1}')" = "$(shasum -a 256 "$REMOTE_PROGRAM" | awk '{print $1}')" ] \
-  || construction_fail
+[ "$(git -C "$repo_root" cat-file blob "${SOURCE_COMMIT}:${SOURCE_DEPLOY_PATH}" | stream_sha256)" = "$DEPLOY_SHA256" ] || construction_fail
+[ "$(git -C "$repo_root" cat-file blob "${SOURCE_COMMIT}:${SOURCE_COMPOSE_PATH}" | stream_sha256)" = "$COMPOSE_SHA256" ] || construction_fail
+
+for helper_binding in "${SOURCE_WRAPPER_PATH}|${WRAPPER_PROGRAM}" "${SOURCE_REMOTE_PATH}|${REMOTE_PROGRAM}"; do
+  helper_path=${helper_binding%%|*}
+  helper_file=${helper_binding#*|}
+  helper_oid=$(git -C "$repo_root" rev-parse "${integrated_head}:${helper_path}" 2>/dev/null) || construction_fail
+  expected_helper_entry="100755 blob ${helper_oid}"$'\t'"${helper_path}"
+  [ "$(git -C "$repo_root" ls-tree "$integrated_head" -- "$helper_path")" = "$expected_helper_entry" ] || construction_fail
+  [ "$(file_mode "$helper_file")" = 755 ] || construction_fail
+  [ "$(git -C "$repo_root" cat-file blob "${integrated_head}:${helper_path}" | stream_sha256)" = "$(file_sha256 "$helper_file")" ] || construction_fail
+done
 
 ssh_status=0
-if probe_output=$(ssh -F none -T "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST" \
-  "RESOFEED_PROBE_SOURCE_COMMIT=$SOURCE_COMMIT" \
-  "RESOFEED_PROBE_DEPLOY_SHA256=$DEPLOY_SHA256" \
-  "RESOFEED_PROBE_DEPLOY_MODE=$DEPLOY_MODE" \
-  "RESOFEED_PROBE_COMPOSE_SHA256=$COMPOSE_SHA256" \
-  "RESOFEED_PROBE_COMPOSE_MODE=$COMPOSE_MODE" \
-  "RESOFEED_PROBE_BACKUP_ID=$BACKUP_ID" \
-  "RESOFEED_PROBE_BACKUP_MANIFEST_SHA256=$BACKUP_MANIFEST_SHA256" \
-  "RESOFEED_PROBE_BACKUP_MANIFEST_MODE=$BACKUP_MANIFEST_MODE" \
-  "RESOFEED_PROBE_PRIOR_DEPLOY_SHA256=$PRIOR_DEPLOY_SHA256" \
-  "RESOFEED_PROBE_PRIOR_DEPLOY_MODE=$PRIOR_DEPLOY_MODE" \
-  "RESOFEED_PROBE_PRIOR_COMPOSE_SHA256=$PRIOR_COMPOSE_SHA256" \
-  "RESOFEED_PROBE_PRIOR_COMPOSE_MODE=$PRIOR_COMPOSE_MODE" \
-  bash -s < "$REMOTE_PROGRAM" 2>/dev/null); then
+if probe_output=$(ssh -Fnone -T "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST" \
+  bash -s -- \
+  "$SOURCE_COMMIT" \
+  "$DEPLOY_SHA256" \
+  "$DEPLOY_MODE" \
+  "$COMPOSE_SHA256" \
+  "$COMPOSE_MODE" \
+  "$BACKUP_ID" \
+  "$BACKUP_MANIFEST_MODE" \
+  "$PRIOR_DEPLOY_SHA256" \
+  "$PRIOR_DEPLOY_MODE" \
+  "$PRIOR_COMPOSE_SHA256" \
+  "$PRIOR_COMPOSE_MODE" \
+  < "$REMOTE_PROGRAM" 2>/dev/null); then
   ssh_status=0
 else
   ssh_status=$?

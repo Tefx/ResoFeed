@@ -1,6 +1,31 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+[ "$#" -ge 11 ] || exit 2
+readonly SOURCE_COMMIT=$1
+shift
+readonly EXPECTED_DEPLOY_SHA256=$1
+shift
+readonly EXPECTED_DEPLOY_MODE=$1
+shift
+readonly EXPECTED_COMPOSE_SHA256=$1
+shift
+readonly EXPECTED_COMPOSE_MODE=$1
+shift
+readonly BACKUP_ID=$1
+shift
+readonly EXPECTED_BACKUP_MANIFEST_MODE=$1
+shift
+readonly EXPECTED_PRIOR_DEPLOY_SHA256=$1
+shift
+readonly EXPECTED_PRIOR_DEPLOY_MODE=$1
+shift
+readonly EXPECTED_PRIOR_COMPOSE_SHA256=$1
+shift
+readonly EXPECTED_PRIOR_COMPOSE_MODE=$1
+shift
+readonly STACK_NAME="resofeed-caddy"
+
 probe_phase=canonical_stack
 probe_failure_emitted=0
 
@@ -29,24 +54,6 @@ on_probe_exit() {
 trap on_probe_error ERR
 trap on_probe_exit EXIT
 printf 'PROBE_PHASE=canonical_stack\n'
-
-[ "$#" -eq 0 ]
-readonly SOURCE_COMMIT=${RESOFEED_PROBE_SOURCE_COMMIT:-}
-readonly EXPECTED_DEPLOY_SHA256=${RESOFEED_PROBE_DEPLOY_SHA256:-}
-readonly EXPECTED_DEPLOY_MODE=${RESOFEED_PROBE_DEPLOY_MODE:-}
-readonly EXPECTED_COMPOSE_SHA256=${RESOFEED_PROBE_COMPOSE_SHA256:-}
-readonly EXPECTED_COMPOSE_MODE=${RESOFEED_PROBE_COMPOSE_MODE:-}
-readonly BACKUP_ID=${RESOFEED_PROBE_BACKUP_ID:-}
-readonly EXPECTED_BACKUP_MANIFEST_SHA256=${RESOFEED_PROBE_BACKUP_MANIFEST_SHA256:-}
-readonly EXPECTED_BACKUP_MANIFEST_MODE=${RESOFEED_PROBE_BACKUP_MANIFEST_MODE:-}
-readonly EXPECTED_PRIOR_DEPLOY_SHA256=${RESOFEED_PROBE_PRIOR_DEPLOY_SHA256:-}
-readonly EXPECTED_PRIOR_DEPLOY_MODE=${RESOFEED_PROBE_PRIOR_DEPLOY_MODE:-}
-readonly EXPECTED_PRIOR_COMPOSE_SHA256=${RESOFEED_PROBE_PRIOR_COMPOSE_SHA256:-}
-readonly EXPECTED_PRIOR_COMPOSE_MODE=${RESOFEED_PROBE_PRIOR_COMPOSE_MODE:-}
-readonly STACK_NAME="resofeed-caddy"
-readonly CANONICAL_HOME=$(CDPATH= cd -P -- "$HOME" && pwd -P)
-readonly STACK_DIR="${CANONICAL_HOME}/Projects/${STACK_NAME}"
-readonly BACKUP_DIR=".resofeed-procedure-backups/${BACKUP_ID#sha256:}"
 
 is_sha256() {
   [[ "$1" =~ ^sha256:[a-f0-9]{64}$ ]]
@@ -166,8 +173,9 @@ stable_projection() {
     | sort | stream_sha256
 }
 
+[ "$#" -eq 0 ]
 [[ "$SOURCE_COMMIT" =~ ^[a-f0-9]{40}$ ]]
-for digest in "$EXPECTED_DEPLOY_SHA256" "$EXPECTED_COMPOSE_SHA256" "$BACKUP_ID" "$EXPECTED_BACKUP_MANIFEST_SHA256" "$EXPECTED_PRIOR_DEPLOY_SHA256" "$EXPECTED_PRIOR_COMPOSE_SHA256"; do
+for digest in "$EXPECTED_DEPLOY_SHA256" "$EXPECTED_COMPOSE_SHA256" "$BACKUP_ID" "$EXPECTED_PRIOR_DEPLOY_SHA256" "$EXPECTED_PRIOR_COMPOSE_SHA256"; do
   is_sha256 "$digest"
 done
 [ "$EXPECTED_DEPLOY_MODE" = 755 ]
@@ -175,6 +183,9 @@ done
 [ "$EXPECTED_BACKUP_MANIFEST_MODE" = 600 ]
 [ "$EXPECTED_PRIOR_DEPLOY_MODE" = 755 ]
 [ "$EXPECTED_PRIOR_COMPOSE_MODE" = 644 ]
+readonly CANONICAL_HOME=$(CDPATH= cd -P -- "$HOME" && pwd -P)
+readonly STACK_DIR="${CANONICAL_HOME}/Projects/${STACK_NAME}"
+readonly BACKUP_DIR=".resofeed-procedure-backups/${BACKUP_ID#sha256:}"
 [ -d "$STACK_DIR" ] && [ ! -L "$STACK_DIR" ]
 cd -P "$STACK_DIR"
 [ "$(pwd -P)" = "$STACK_DIR" ]
@@ -200,8 +211,13 @@ computed_backup_id=$(printf 'resofeed.procedure-backup.v1\ndeploy.sh=%s mode=%s\
 [ "$computed_backup_id" = "$BACKUP_ID" ]
 [ -d "$BACKUP_DIR" ] && [ ! -L "$BACKUP_DIR" ]
 [ -f "$BACKUP_DIR/manifest" ] && [ ! -L "$BACKUP_DIR/manifest" ]
-[ "$(file_sha256 "$BACKUP_DIR/manifest")" = "$EXPECTED_BACKUP_MANIFEST_SHA256" ]
+expected_manifest_sha256=$(printf 'schema_version=resofeed.procedure-backup.v1\nbackup_id=%s\ndeploy.sh=%s mode=%s\ncompose.yml=%s mode=%s\n' \
+  "$BACKUP_ID" \
+  "$EXPECTED_PRIOR_DEPLOY_SHA256" "$EXPECTED_PRIOR_DEPLOY_MODE" \
+  "$EXPECTED_PRIOR_COMPOSE_SHA256" "$EXPECTED_PRIOR_COMPOSE_MODE" | stream_sha256)
 [ "$(file_mode "$BACKUP_DIR/manifest")" = "$EXPECTED_BACKUP_MANIFEST_MODE" ]
+[ "$(awk 'END {print NR}' "$BACKUP_DIR/manifest")" = 4 ]
+[ "$(file_sha256 "$BACKUP_DIR/manifest")" = "$expected_manifest_sha256" ]
 grep -Fxq 'schema_version=resofeed.procedure-backup.v1' "$BACKUP_DIR/manifest"
 grep -Fxq "backup_id=$BACKUP_ID" "$BACKUP_DIR/manifest"
 grep -Fxq "deploy.sh=$EXPECTED_PRIOR_DEPLOY_SHA256 mode=$EXPECTED_PRIOR_DEPLOY_MODE" "$BACKUP_DIR/manifest"

@@ -827,21 +827,32 @@ test('RF-BUG-V2 tracked read-only probe harness', () => {
     const evidence = path.join(root, 'evidence');
     for (const directory of [sourceStack, remoteStack, fakeBin, evidence]) fs.mkdirSync(directory, { recursive: true });
 
-    for (const name of ['deploy.sh', 'compose.yml', 'verify.sh', 'verify-remote.sh']) {
+    for (const name of ['deploy.sh', 'compose.yml']) {
       fs.copyFileSync(path.join(repoRoot, 'deploy', 'resofeed-caddy', name), path.join(sourceStack, name));
     }
     fs.chmodSync(path.join(sourceStack, 'deploy.sh'), 0o755);
     fs.chmodSync(path.join(sourceStack, 'compose.yml'), 0o644);
-    fs.chmodSync(path.join(sourceStack, 'verify.sh'), 0o755);
-    fs.chmodSync(path.join(sourceStack, 'verify-remote.sh'), 0o755);
 
     checked('git', ['init', '-q'], { cwd: sourceRoot });
     checked('git', ['config', 'user.name', 'Probe Fixture'], { cwd: sourceRoot });
     checked('git', ['config', 'user.email', 'probe@example.invalid'], { cwd: sourceRoot });
     checked('git', ['add', '.'], { cwd: sourceRoot });
-    checked('git', ['commit', '-qm', 'tracked probe fixture'], { cwd: sourceRoot });
+    checked('git', ['commit', '-qm', 'staged procedure fixture'], { cwd: sourceRoot });
     const sourceCommit = checked('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot });
-    if (!attached) checked('git', ['checkout', '--detach', '-q', sourceCommit], { cwd: sourceRoot });
+
+    for (const name of ['verify.sh', 'verify-remote.sh']) {
+      fs.copyFileSync(path.join(repoRoot, 'deploy', 'resofeed-caddy', name), path.join(sourceStack, name));
+      fs.chmodSync(path.join(sourceStack, name), 0o755);
+    }
+    checked('git', ['add', '.'], { cwd: sourceRoot });
+    checked('git', ['commit', '-qm', 'integrated tracked helpers'], { cwd: sourceRoot });
+    const integratedCommit = checked('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot });
+    assert.notEqual(integratedCommit, sourceCommit);
+    assert.notEqual(spawnSync('git', ['cat-file', '-e', `${sourceCommit}:deploy/resofeed-caddy/verify.sh`], {
+      cwd: sourceRoot,
+      encoding: 'utf8'
+    }).status, 0, 'the staged source commit must not contain the later helper');
+    if (!attached) checked('git', ['checkout', '--detach', '-q', integratedCommit], { cwd: sourceRoot });
 
     for (const name of ['deploy.sh', 'compose.yml']) {
       fs.copyFileSync(path.join(sourceStack, name), path.join(remoteStack, name));
@@ -891,15 +902,15 @@ printf 'attempt\\n' >> "$FAKE_SSH_ATTEMPTS"
 printf '%s\\0' "$@" > "$FAKE_SSH_ARGUMENTS"
 /bin/cat > "$FAKE_SSH_STDIN"
 if [[ "\${FAKE_TRANSPORT_FAIL:-0}" == 1 ]]; then exit 87; fi
-while [[ "\${1:-}" != tefx-mbp-personal.platy-atlas.ts.net ]]; do shift; done
-shift
-while [[ "\${1:-}" != bash ]]; do export "$1"; shift; done
-shift
-[[ "\${1:-}" == -s ]]
-shift
-[[ "$#" -eq 0 ]]
+expected=(-Fnone -T -o HostName=tefx-mbp-personal.platy-atlas.ts.net -o HostKeyAlias=tefx-mbp-personal.platy-atlas.ts.net -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o VerifyHostKeyDNS=no -o CanonicalizeHostname=no -o BatchMode=yes -o PreferredAuthentications=publickey -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no -o NumberOfPasswordPrompts=0 -o AddKeysToAgent=no -o ForwardAgent=no -o ClearAllForwardings=yes -o ControlMaster=no -o ControlPath=none -o RequestTTY=no tefx-mbp-personal.platy-atlas.ts.net bash -s --)
+for expected_argument in "\${expected[@]}"; do
+  [[ "\${1:-}" == "$expected_argument" ]] || exit 68
+  shift
+done
+[[ "$#" -eq 11 ]]
+for transported in "$@"; do [[ "$transported" != *=* ]]; done
 set +e
-remote_output=$(HOME="$FAKE_REMOTE_HOME" PATH="$FAKE_REMOTE_BIN:$REAL_PATH" /bin/bash -s < "$FAKE_SSH_STDIN" 2>> "$FAKE_SURFACE_LOG")
+remote_output=$(HOME="$FAKE_REMOTE_HOME" PATH="$FAKE_REMOTE_BIN:$REAL_PATH" /bin/bash -s -- "$@" < "$FAKE_SSH_STDIN" 2>> "$FAKE_SURFACE_LOG")
 remote_status=$?
 set -e
 printf '%s\\n' "$remote_output" > "$FAKE_REMOTE_OUTPUT"
@@ -966,7 +977,6 @@ exec "$REAL_SHASUM" "$@"
       '--compose-sha256', composeSHA256,
       '--compose-mode', '644',
       '--backup-id', backupID,
-      '--backup-manifest-sha256', fileSHA256(manifestPath),
       '--backup-manifest-mode', '600',
       '--prior-deploy-sha256', priorDeploySHA256,
       '--prior-deploy-mode', '755',
@@ -1006,6 +1016,7 @@ exec "$REAL_SHASUM" "$@"
       environment,
       run,
       sourceCommit,
+      integratedCommit,
       sshArgumentsPath,
       sshStdinPath,
       sshAttemptsPath,
@@ -1024,23 +1035,19 @@ exec "$REAL_SHASUM" "$@"
     assert.equal(result.stderr, '');
     assert.deepEqual(fs.readFileSync(happy.sshStdinPath), fs.readFileSync(path.join(happy.sourceStack, 'verify-remote.sh')));
     const sshArguments = fs.readFileSync(happy.sshArgumentsPath).toString().split('\0').filter(Boolean);
-    assert.deepEqual(sshArguments.slice(0, 4), ['-F', 'none', '-T', '-o']);
-    assert.equal(sshArguments.at(-15), 'tefx-mbp-personal.platy-atlas.ts.net');
-    assert.deepEqual(sshArguments.slice(-2), ['bash', '-s']);
-    assert.deepEqual(sshArguments.slice(-14, -2), [
-      'RESOFEED_PROBE_SOURCE_COMMIT',
-      'RESOFEED_PROBE_DEPLOY_SHA256',
-      'RESOFEED_PROBE_DEPLOY_MODE',
-      'RESOFEED_PROBE_COMPOSE_SHA256',
-      'RESOFEED_PROBE_COMPOSE_MODE',
-      'RESOFEED_PROBE_BACKUP_ID',
-      'RESOFEED_PROBE_BACKUP_MANIFEST_SHA256',
-      'RESOFEED_PROBE_BACKUP_MANIFEST_MODE',
-      'RESOFEED_PROBE_PRIOR_DEPLOY_SHA256',
-      'RESOFEED_PROBE_PRIOR_DEPLOY_MODE',
-      'RESOFEED_PROBE_PRIOR_COMPOSE_SHA256',
-      'RESOFEED_PROBE_PRIOR_COMPOSE_MODE'
-    ].map((name, index) => `${name}=${happy.probeArguments[index * 2 + 1]}`));
+    const transportedValues = happy.probeArguments.filter((_, index) => index % 2 === 1);
+    const destinationIndex = sshArguments.indexOf('tefx-mbp-personal.platy-atlas.ts.net');
+    assert.deepEqual(sshArguments.slice(0, 3), ['-Fnone', '-T', '-o']);
+    assert.equal(sshArguments.includes('-F'), false);
+    assert.equal(sshArguments.includes('none'), false);
+    assert.deepEqual(sshArguments.slice(destinationIndex), [
+      'tefx-mbp-personal.platy-atlas.ts.net',
+      'bash', '-s', '--',
+      ...transportedValues
+    ]);
+    assert.equal(transportedValues.length, 11);
+    assert.equal(sshArguments.some((argument) => /^[A-Z_]+=/u.test(argument)), false);
+    assert.notEqual(happy.sourceCommit, happy.integratedCommit);
     assert.equal(fs.readFileSync(happy.sshAttemptsPath, 'utf8'), 'attempt\n');
     assert.equal(fs.readFileSync(happy.curlCountPath, 'utf8'), '2\n');
     const curlArguments = fs.readFileSync(happy.curlLogPath).toString();
@@ -1055,6 +1062,11 @@ exec "$REAL_SHASUM" "$@"
       wrapperSource.match(/SOURCE_COMPOSE_PATH="([^"]+)"/u)?.[1]
     ];
     assert.deepEqual(procedurePaths, ['deploy/resofeed-caddy/deploy.sh', 'deploy/resofeed-caddy/compose.yml']);
+    assert.match(wrapperSource, /merge-base --is-ancestor "\$SOURCE_COMMIT" "\$integrated_head"/u);
+    assert.match(wrapperSource, /SOURCE_WRAPPER_PATH="deploy\/resofeed-caddy\/verify\.sh"/u);
+    assert.match(wrapperSource, /SOURCE_REMOTE_PATH="deploy\/resofeed-caddy\/verify-remote\.sh"/u);
+    assert.doesNotMatch(wrapperSource, /--backup-manifest-sha256|RESOFEED_PROBE_/u);
+    assert.doesNotMatch(remoteSource, /RESOFEED_PROBE_/u);
   } finally {
     fs.rmSync(happy.root, { recursive: true, force: true });
   }
@@ -1063,6 +1075,12 @@ exec "$REAL_SHASUM" "$@"
     ['canonical_stack', (fixture) => fs.renameSync(fixture.remoteStack, `${fixture.remoteStack}-missing`), {}],
     ['procedure_current', (fixture) => fs.appendFileSync(path.join(fixture.remoteStack, 'deploy.sh'), '# drift\n'), {}],
     ['backup', (fixture) => fs.appendFileSync(fixture.manifestPath, 'drift=yes\n'), {}],
+    ['backup', (fixture) => fs.chmodSync(fixture.manifestPath, 0o644), {}],
+    ['backup', (fixture) => fs.writeFileSync(
+      fixture.manifestPath,
+      fs.readFileSync(fixture.manifestPath, 'utf8').slice(0, -1),
+      { mode: 0o600 }
+    ), {}],
     ['docker_identity', () => {}, { FAKE_DOCKER_FAIL: '1' }],
     ['volume', () => {}, { FAKE_VOLUME_LABEL: 'wrong-volume' }],
     ['tailnet_route', () => {}, { FAKE_TAILNET_ROUTE: 'TCP 443 -> tcp://127.0.0.1:9443' }],
@@ -1095,13 +1113,27 @@ exec "$REAL_SHASUM" "$@"
     fs.rmSync(transport.root, { recursive: true, force: true });
   }
 
-  for (const mutateArguments of [
+  const invalidCallerArguments = [
+    ['--source-commit', 'A'.repeat(40)],
+    ['--source-commit', `${'a'.repeat(39)};`],
+    ['--deploy-sha256', 'sha256:malformed'],
+    ['--compose-sha256', `sha256:${'1'.repeat(64)} `],
+    ['--backup-id', `sha256:${'2'.repeat(63)}$`],
+    ['--prior-deploy-sha256', 'sha256:malformed'],
+    ['--prior-compose-sha256', `sha256:${'3'.repeat(64)}\n`],
+    ['--deploy-mode', '755;id'],
+    ['--compose-mode', '600'],
+    ['--backup-manifest-mode', '644'],
+    ['--prior-deploy-mode', '0755'],
+    ['--prior-compose-mode', '644 ']
+  ];
+  const argumentMutations = [
     (args) => args.map((value) => value === '--source-commit' ? '--unknown' : value),
-    (args) => args.map((value, index) => args[index - 1] === '--source-commit' ? 'A'.repeat(40) : value),
-    (args) => args.map((value, index) => args[index - 1] === '--deploy-sha256' ? 'sha256:malformed' : value),
-    (args) => args.map((value, index) => args[index - 1] === '--backup-id' ? 'sha256:malformed' : value),
-    (args) => args.map((value, index) => args[index - 1] === '--backup-manifest-mode' ? '644' : value)
-  ]) {
+    ...invalidCallerArguments.map(([option, invalid]) => (
+      (args) => args.map((value, index) => args[index - 1] === option ? invalid : value)
+    ))
+  ];
+  for (const mutateArguments of argumentMutations) {
     const fixture = probeFixture();
     try {
       const result = fixture.run({}, mutateArguments([...fixture.probeArguments]));
@@ -1141,6 +1173,11 @@ exec "$REAL_SHASUM" "$@"
   }
 
   assert.equal((wrapperSource.match(/\bssh\b/gu) ?? []).length, 1);
+  assert.match(wrapperSource, /ssh -Fnone -T/u);
+  assert.doesNotMatch(wrapperSource, /ssh -F none|--backup-manifest-sha256|RESOFEED_PROBE_/u);
+  assert.equal((remoteSource.match(/^shift$/gmu) ?? []).length, 11);
+  assert.match(remoteSource, /expected_manifest_sha256=\$\(printf 'schema_version=resofeed\.procedure-backup\.v1\\nbackup_id=%s\\ndeploy\.sh=%s mode=%s\\ncompose\.yml=%s mode=%s\\n'/u);
+  assert.doesNotMatch(remoteSource, /EXPECTED_BACKUP_MANIFEST_SHA256|RESOFEED_PROBE_/u);
   assert.equal((remoteSource.match(/\bcurl\b/gu) ?? []).length, 2);
   assert.match(remoteSource, /com\.docker\.compose\.volume/u);
   assert.match(remoteSource, /DATA_VOLUME_LABEL.*resofeed-data/su);

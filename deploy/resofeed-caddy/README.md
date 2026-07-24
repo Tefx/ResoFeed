@@ -161,23 +161,35 @@ export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
 
 Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, moving-tag substitution, host-key trust mutation, and ad hoc procedure copying are outside this procedure and are refused.
 ## Tracked read-only probe harness
-Invoke the wrapper with the complete nonsecret receipt:
+Invoke the wrapper from the repository root with the complete nonsecret staging receipt except for a caller-supplied manifest hash:
 
 ```bash
 ./deploy/resofeed-caddy/verify.sh \
-  --source-commit <40-lowercase-hex> \
+  --source-commit <staged-procedure-40-lowercase-hex> \
   --deploy-sha256 sha256:<current-deploy-64-hex> --deploy-mode 755 \
   --compose-sha256 sha256:<current-compose-64-hex> --compose-mode 644 \
   --backup-id sha256:<backup-64-hex> \
-  --backup-manifest-sha256 sha256:<manifest-64-hex> --backup-manifest-mode 600 \
+  --backup-manifest-mode 600 \
   --prior-deploy-sha256 sha256:<prior-deploy-64-hex> --prior-deploy-mode 755 \
   --prior-compose-sha256 sha256:<prior-compose-64-hex> --prior-compose-mode 644
 ```
 
+`verify.sh` is the repository-owned wrapper for one immutable, read-only target probe. Run it only from a clean detached integrated checkout. The supplied staged procedure source commit must be an ancestor of the current integrated helper `HEAD`; equality is neither required nor expected. The staged source commit binds only exact `100755` `deploy.sh` and `100644` `compose.yml` blobs. Their current regular non-symlink bytes, modes, and caller SHA-256 identities must still equal those staged blobs. Both executable helper files, `verify.sh` and `verify-remote.sh`, are instead bound to exact `100755` tracked blobs and byte-identical files at the current integrated `HEAD`; the staged source commit need not contain either helper.
 
-`verify.sh` is the repository-owned wrapper for one immutable, read-only target probe. Run it only from a clean detached checkout whose `HEAD` equals the full staged procedure source commit. Supply the nonsecret staging receipt identities: current `deploy.sh` and `compose.yml` SHA-256 values and modes, backup ID, backup-manifest SHA-256 and mode, and prior procedure SHA-256 values and modes. The wrapper confirms that the integrated checkout and supplied commit contain the exact `deploy.sh` (`100755`) and `compose.yml` (`100644`) bytes before transport. The probe scripts are not added to that two-file procedure manifest.
+Before SSH, the wrapper validates the exact scalar type at every interface position: one lowercase 40-hex commit, five `sha256:` plus 64-lowercase-hex identities, and exact `755`, `644`, or `600` modes according to the field. Whitespace, shell metacharacters, malformed values, missing or duplicate options, and alternate argument order fail locally as `PROBE_CONSTRUCTION_FAIL` before transport.
 
-The wrapper fixes the destination to `tefx-mbp-personal.platy-atlas.ts.net`, the stack to `~/Projects/resofeed-caddy`, and the default existing strict-known-key SSH policy. It starts exactly one SSH process and never retries. The tracked bytes of `verify-remote.sh` are the only stdin program; the remote interpreter is `bash -s`. There is no target, account, host alias, trust-store, stack, interpreter, or remote-program override.
+The wrapper fixes the destination to `tefx-mbp-personal.platy-atlas.ts.net`, the stack to `~/Projects/resofeed-caddy`, and the default existing strict-known-key SSH policy. It starts exactly one SSH process and never retries. The SSH argv uses literal one-argument `-Fnone`, `-T`, the fixed FQDN options and destination, then `bash`, `-s`, `--`, followed by exactly eleven positional values in this order: staged source commit; current deploy SHA-256; current deploy mode; current Compose SHA-256; current Compose mode; backup ID; backup manifest mode; prior deploy SHA-256; prior deploy mode; prior Compose SHA-256; prior Compose mode. It sends no environment-assignment argv. The byte-identical tracked `verify-remote.sh` is the only stdin program. There is no target, account, host alias, trust-store, stack, interpreter, option, argument-order, or remote-program override, and there is no second probe.
+
+The remote helper consumes those eleven values positionally before installing its cooperating `ERR`/`EXIT` traps, then requires no remaining arguments and revalidates every scalar before observing the target. It never consumes probe inputs from the environment. The backup manifest has no caller-supplied SHA-256. The helper derives the canonical manifest internally as exactly these four newline-terminated rows, in order, with one final newline and no extra byte:
+
+```text
+schema_version=resofeed.procedure-backup.v1
+backup_id=<supplied backup ID>
+deploy.sh=<supplied prior deploy SHA-256> mode=<supplied prior deploy mode>
+compose.yml=<supplied prior Compose SHA-256> mode=<supplied prior Compose mode>
+```
+
+It derives that byte sequence's SHA-256 internally, requires the actual regular non-symlink manifest to have mode `600`, exactly four rows, exact bytes, and the same hash, and never discloses the manifest hash.
 
 The remote program creates no file and reads no runtime secret or Caddy configuration. Its executable surface is limited to shell control, canonical path/file/hash/mode checks, read-only Docker container/image/volume inspection, `tailscale serve status`, and exactly two GET-only `curl` calls. It derives exactly one HTTPS public host from the running ResoFeed `--public-url` argument, keeps that host undisclosed, and uses it for SNI and Host while connecting to loopback Caddy port `8443`. Passing readiness is root `200` plus unauthenticated Doctor `401`; the Tailnet SSH FQDN is never used as the public Host or SNI identity.
 
@@ -207,9 +219,9 @@ PROBE_OK
 
 A remote assertion failure emits one `PROBE_FAIL phase=<last_phase> status=<status>`. Markerless SSH failure remains `PROBE_TRANSPORT_FAIL`; local input or source construction failure remains `PROBE_CONSTRUCTION_FAIL`. The wrapper suppresses unbounded remote diagnostics and never synthesizes phase success.
 
-Before and after readiness, the same helper hashes a canonically sorted stable projection of current procedure hashes/modes; backup manifest and prior procedure hashes/modes; running ResoFeed and Caddy container/image IDs; `/data` mount type, destination, actual engine-volume identity, and logical `com.docker.compose.volume=resofeed-data` label; canonical Tailnet TCP/443 routing; and a SHA-256 of the validated public host. The projection excludes SQLite main/WAL/SHM bytes, rows, sizes, and times; app/Caddy logs and counters; health/status timestamps, PIDs, exec and transient network fields; Tailnet peer/address/session telemetry; access times, command order, timestamps, and every secret or configuration value.
+Before and after readiness, the same helper hashes a canonically sorted stable projection of current procedure hashes/modes; the internally derived backup-manifest identity and mode; prior procedure hashes/modes; running ResoFeed and Caddy container/image IDs; `/data` mount type, destination, actual engine-volume identity, and logical `com.docker.compose.volume=resofeed-data` label; canonical Tailnet TCP/443 routing; and a SHA-256 of the validated public host. The projection excludes SQLite main/WAL/SHM bytes, rows, sizes, and times; app/Caddy logs and counters; health/status timestamps, PIDs, exec and transient network fields; Tailnet peer/address/session telemetry; access times, command order, timestamps, and every secret or configuration value.
 
-This probe performs no publication, procedure staging, deployment, rollback, service change, registry operation, credential change, or data operation. Later publication and deployment remain separate accepted steps. Repository rollback removes `verify.sh` and `verify-remote.sh` and reverts only their adapter test and this README section; it does not run remote recovery or deployment.
+This probe performs no publication, procedure staging, deployment, rollback, service change, registry operation, credential change, or data operation. Later publication and deployment remain separate accepted steps. Repository rollback reverts only `verify.sh`, `verify-remote.sh`, `scripts/vectl-check.mjs`, `scripts/vectl-check.test.mjs`, and this README to the completed harness state; it performs no remote recovery or deployment.
 ## Verification
 Passing deployment evidence contains only non-secret identities and these outcomes:
 
