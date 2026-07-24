@@ -190811,17 +190811,44 @@ phases:
       Terminal Full Gate for the RF-BUG Assurance v2 release chain. Require the corrected
       local matrix; retry-free SQLite/streaming, frontend CSP, and closure-selector
       remediations with independent evidence; immutable OCI/Tailnet procedure and
-      tracked-probe remediations; the exact staged-procedure and strict endpoint chain;
-      the Tailscale 1.98.8 JSON-route harness remediation; fresh semantic v14 proof
-      through `PROBE_OK`; current publication/deployment authorization; immutable
-      two-platform OCI publication and proof; strict-FQDN digest deployment to the
-      sole stack; formal security review; black-box runtime/UI verification; and defect-report
-      closure.
+      tracked-probe remediations; exact staged-procedure and strict endpoint chain;
+      Tailscale 1.98.8 JSON-route harness; fresh semantic v14 proof through `PROBE_OK`;
+      current publication/deployment authority; bounded replacement OCI publication
+      through a transient commit-bound Buildx builder; fresh publication and cleanup
+      verification; dual-platform container proof; strict-FQDN digest deployment to
+      the sole stack; formal security review; black-box runtime/UI verification; and
+      defect-report closure.
 
 
-      Semantic v13 and the superseded runtime route step are absent from executable
-      topology. Preserve semantic v13 unchanged and diagnostic-only: raw rejected
-      receipt SHA-256 `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`,
+      Preserve `rf-bug-v2-publish-immutable-oci` as a superseded diagnostic review.
+      Require original failed semantic receipt raw SHA-256 `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`,
+      publication report SHA-256 `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`,
+      and driver diagnostic SHA-256 `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`
+      unchanged. Confirm three identical implicit-active-builder pushes exited 1,
+      source stayed detached/clean at `1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      the immutable tag stayed absent, and no registry, digest, orphan, alias, deletion,
+      container, deployment, Tailnet, credential/account, or repository mutation occurred.
+      The active `orbstack` builder''s `docker` driver and no-push multi-platform
+      failure remain root-cause evidence. This ID and its FAIL receipt supply no executable
+      publication or digest authority.
+
+
+      Admit replacement publication authority only from `rf-bug-v2-transient-buildx-builder-authorization-review`.
+      Require exact builder `resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      driver `docker-container`, explicit `--builder`, no `--use`, one create, one
+      bootstrap, one immutable two-platform push, and one cleanup attempt after success
+      or bounded failure. Require builder and attributable BuildKit container absent,
+      active/default builder unchanged, exact source/tag/platform/revision-label identity,
+      complete OCI index plus amd64/arm64 manifest chain, and no daemon restart, context/default
+      change, paid/cloud/remote builder, other container/service mutation, temp tag,
+      moving alias, deletion, credential/account change, retry, disclosure, or undeclared
+      side effect. Cleanup residue, unknown registry state, or incomplete orphan recovery
+      blocks every downstream step. Only the admitted `rf-bug-v2-publish-immutable-oci-v2-verification`
+      receipt supplies the digest chain to container and deployment work.
+
+
+      Semantic v13 and the superseded runtime route step remain absent from executable
+      topology. Preserve semantic v13 raw rejected receipt SHA-256 `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`,
       production canonical semantic receipt SHA-256 `sha256:fbe2f0847ae59f9751e79626936f5321dfb27a26cc106ff176e45a7b1e0b9084`,
       context hash `sha256:5b020c1cc69ee7f2b6de29d7dd8cdc41d3d0b3f97f526a3ae68485dc2da3856f`,
       verdict `FAIL`, and `gate_open_allowed=false`. Preserve blocked runtime receipt
@@ -190830,17 +190857,17 @@ phases:
       direct debug evidence `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/direct-debug-evidence.json`
       SHA-256 `5bc4ffd48f165f2b5426010a76e4ceface3d6bb8939681dfc3f594c7e74338fa` unchanged
       and diagnostic-only. Do not retry, correct, resume, complete, execute, or admit
-      any of them as positive lifecycle, publication, deployment, or route-mutation
-      authority.
+      them as positive lifecycle, publication, deployment, or route-mutation authority.
 
 
-      Admit the repository remediation only when its one v2 worker execution changed
-      exactly the authorized seven paths; the project-native selected identity remained
-      exact; deterministic tests proved `tailscale serve status --json` shape `TCP.443.TCPForward
-      = 127.0.0.1:8443`; malformed, wrong, ambiguous, legacy-row, and 1.98.8 tree
-      output failed as authority; normalized projection and nondisclosure held; deployment
-      documentation synchronized; and no SSH/runtime operation occurred. Current `deploy.sh`,
-      `compose.yml`, `verify.sh`, and `stop.sh` identities must remain unchanged.
+      Admit the repository JSON-route remediation only when its one v2 worker execution
+      changed exactly the authorized seven paths; the project-native selected identity
+      remained exact; deterministic tests proved `tailscale serve status --json` shape
+      `TCP.443.TCPForward = 127.0.0.1:8443`; malformed, wrong, ambiguous, legacy-row,
+      and human-tree output failed as authority; normalized projection and nondisclosure
+      held; deployment documentation synchronized; and no SSH/runtime operation occurred.
+      Current `deploy.sh`, `compose.yml`, `verify.sh`, and `stop.sh` identities must
+      remain unchanged.
 
 
       Admit positive runtime procedure evidence only from fresh semantic v14. Require
@@ -190852,42 +190879,44 @@ phases:
       eleven validated positional values, and byte-identical tracked stdin; exact
       OrbStack PATH without disclosure/fallback; exact internal manifest derivation;
       Docker/image and corrected volume identities; real JSON route validation; public-host
-      validation; root `200`; unauthenticated Doctor `401`; the complete ordered marker
-      ledger through `TAILNET_ROUTE=verified`, `PROTECTED_STATE=unchanged`, and `PROBE_OK`;
+      validation; root `200`; unauthenticated Doctor `401`; complete ordered markers
+      through `TAILNET_ROUTE=verified`, `PROTECTED_STATE=unchanged`, and `PROBE_OK`;
       deterministic stable projection; closed read-only command authority; one probe;
-      no retry; no mutation; and future OCI deferral.
+      no retry; no mutation; and future OCI deferral at the time of v14.
 
 
       The canonical route is a mandatory no-op precondition for this release. Any
       absence, ambiguity, malformed JSON, or different TCP/443 owner blocks before
-      publication/deployment. No accepted step may invoke `tailscale serve`; the exact
-      `tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443` form remains documented
-      only for a separate current explicit human authorization. Forbid `EncryptState`
-      changes, Tailscale restart/reauthentication, Keychain repair, automatic route
-      rollback, alternate endpoint/account/trust, or reuse of the direct debug authority.
+      publication/deployment. No accepted step may invoke `tailscale serve`; the documented
+      `tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443` form requires separate
+      current explicit human authority. Forbid `EncryptState` changes, Tailscale restart/reauthentication,
+      Keychain repair, automatic route rollback, alternate endpoint/account/trust,
+      or reuse of direct debug authority.
 
 
       Immediately before closure require Vectl structure/ref validation, current accepted-plan
       authority for every external operation, exact integrated source/staged/helper
-      identities, exact commit/tag/index/platform/deployed-digest bindings, prior-procedure
-      and orphan/prior-digest recovery evidence, strict host-key and credential boundaries,
-      secret/PATH/public-host nondisclosure, SQLite/owner-token preservation, no unresolved
-      in-scope finding, current report hash, and HEAD equality. Item-deep-links future
-      work remains outside scope.
+      identities, exact replacement commit/tag/index/platform/deployed-digest bindings,
+      transient-builder cleanup/default invariants, prior-procedure and orphan/prior-digest
+      recovery evidence, strict host-key and credential boundaries, secret/PATH/public-host
+      nondisclosure, SQLite/owner-token preservation, no unresolved in-scope finding,
+      current report hash, and HEAD equality. The defect report must retain original
+      publication diagnostics and identify the replacement digest chain as sole positive
+      publication evidence. Item-deep-links future work remains outside scope.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-OCI-PUBLICATION-FAILURE-DIAGNOSTIC","RF-BUG-V2-TRANSIENT-BUILDX-BUILDER-AUTHORITY","RF-BUG-V2-IMMUTABLE-OCI-PUBLICATION-REPLACEMENT","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci-v2","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci-v2-verification","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-transient-buildx-builder-authorization-review"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers the repository JSON-route harness remediation,
-      fresh semantic v14 one-probe/no-mutation proof, current publication/deployment
-      authority, immutable OCI/dual-platform proof, strict-FQDN digest deployment,
-      readiness, security/black-box/report evidence, current hashes/HEAD, recovery
-      and data-preservation boundaries, nondisclosure, and no out-of-scope blocker.
-      V13, the blocked runtime receipt, and direct debug evidence remain unchanged
-      non-authoritative diagnostics.
+    verification: Full Gate covers original publication failure preservation and replay
+      rejection, fresh transient-builder R3 authority, exact one-push replacement
+      digest chain, builder/BuildKit cleanup and unchanged default, dual-platform
+      runtime, strict-FQDN digest deployment, semantic v14, readiness, security/black-box/report
+      evidence, current hashes/HEAD, recovery/data-preservation boundaries, nondisclosure,
+      and no out-of-scope blocker. Only the replacement verifier receipt is positive
+      publication authority.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/runtime-receipt-blocked.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/direct-debug-evidence.json
