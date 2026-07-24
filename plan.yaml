@@ -193074,7 +193074,7 @@ phases:
       untracked directories were left untouched.'
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v14
     name: Verify Tailscale 1.98.8 JSON route probe (semantic v14)
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -193194,6 +193194,20 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-24T16:54:16.589941Z'
+    done_at: '2026-07-24T17:13:10.385450+00:00'
+    evidence: 'Fresh integration-verifier ran from clean detached HEAD 65ce2fbf50836e3edb8d8771c70c5434eb213b0a
+      and executed the three exact local commands plus tracked wrapper once. Live
+      read-only seam returned TAILNET_ROUTE=verified, PROTECTED_STATE=unchanged, and
+      PROBE_OK; no Serve mutation, retry, deployment, publication, restart, or reauthentication
+      occurred. Production intent-closure Gate admitted the verifier-owned corrected
+      receipt: status=CONFORMANT, semantic_completion_admissible=true, context_hash=sha256:e36313ce2206ae7ddba0066d5ec08735a6ac9f33abb9c0b9ad748aa31bee51f4,
+      canonical semantic_receipt_sha256=sha256:9f530713c383c4dfe76d3dd06e336eadedc3cf40e2d13a9e241fe4720ddc1ef6.
+      Exact receipt artifact: /tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v14/semantic-receipt-admission-candidate.json
+      raw SHA-256 c6bfdfd07ec46fbd58cf5c39cb314c0e767b113b2e09509063447f12e3190dc3.
+      Corrected report: /tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v14_corrected-report.md
+      SHA-256 b8771b9dbf51bfbb29dcfc71869e7520233c704a9c680de355fb4129bd823c97, 4234
+      bytes. PASS_WITH_DEBT warning is nonblocking, owned by vectl-orchestrator, and
+      preserves plan-retained v13 hashes without reconstructing absent bodies.'
   - id: rf-bug-v2-tailscale-198-route-harness-remediation
     name: Repair Tailscale 1.98.8 route verification harness
     status: done
