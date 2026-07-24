@@ -190725,47 +190725,56 @@ phases:
       remediations and shared fresh verification, closure-selector remediation and
       verification, immutable OCI/Tailnet repository procedure, detached-head guard
       and polarity remediation, fresh no-SSH staging authorization, exact v2 two-file
-      staging operation, completed tracked probe harness, append-only integrated-HEAD/positional-transport/manifest
-      remediation, independent v12 exact-target proof, current publication/deployment
-      authorization, immutable two-platform OCI publication, both-platform container
-      proof, strict-host-key-authenticated digest deployment to the sole FQDN/stack/path,
-      formal security review, independent black-box verification, and defect-report
-      closure.
+      staging operation, completed tracked probe harness, integrated-HEAD/positional-transport/manifest
+      remediation, OrbStack Docker CLI PATH remediation, independent v13 exact-target
+      proof, current publication/deployment authorization, immutable two-platform
+      OCI publication, both-platform container proof, strict-host-key-authenticated
+      digest deployment to the sole FQDN/stack/path, formal security review, independent
+      black-box verification, and defect-report closure.
 
 
-      The unclaimed v11 verifier is superseded before execution and is not an admission
-      input. Preserve v10 unchanged and do not retry, correct, complete, resume, or
-      admit it: receipt file `sha256:ecf06ad1a71013da0e7794dd9c7e2780ff8d035b67a22568f260e22383506e3d`,
-      validator `sha256:ea40abf245650b9381533bbcf5a5ad86a461a2f458c5a7666a059a42aba906d8`,
-      canonical valid `REJECTED` receipt `sha256:316c931845a094a7cbdc4a6dfbe415309428502a88231467e81d593d08d6cbb0`.
-      Preserve v9 and all earlier failed/invalid/REJECTED staging and verifier artifacts
-      as diagnostic-only history with no lifecycle or external-operation authority.
+      Preserve v12 unchanged and do not retry, correct, resume, complete, or admit
+      it: receipt file `sha256:19a033a426f5915382ce1c738ac663186159645c970c2b5be45f2798977c5705`,
+      validator `sha256:c478e23ea5a00a518cc3c1afabd3af99ded09f9e8a9b87952b043584ab511345`,
+      canonical valid `REJECTED` receipt `sha256:164684b7966d26fc9a8da818abd5eaa04f614028a8064506129c07ca0e69814c`.
+      Its actual `PROBE_FAIL phase=docker_identity status=127` and passed preceding
+      phases remain diagnostic evidence of the harness command-resolution defect only.
+      Preserve v11, v10, v9, and every earlier failed, invalid, or rejected staging/verifier
+      artifact as diagnostic-only history with no lifecycle or external-operation
+      authority.
 
 
-      Admit only the immutable completed harness, append-only remediation, and fresh
-      v12 evidence. Require exact local selection/run/focused tests; clean detached
-      integrated helper HEAD and identical local status before/after; staged source
-      commit `1e49621c6b44ac2e55cd82f87960972d571bad64` as an ancestor distinct from
-      integrated helper HEAD; exact current/staged deploy and Compose bytes/modes;
-      tracked executable helper blobs/current bytes from integrated HEAD without requiring
-      helper presence in staged source; exact nonsecret stage/backup/prior identities;
-      one SSH process with one-argv `-Fnone`, strict options and literal destination,
-      separate `bash`, `-s`, `--`, and exactly eleven validated positional values;
-      no assignment argv; byte-identical tracked remote stdin; remote positional consumption
-      before traps and validation after trap installation; all non-collapsible phase/success
-      markers through `PROTECTED_STATE=unchanged` and `PROBE_OK`; one probe/no retry;
-      markerless transport-failure classification; and bounded nondisclosure.
+      Admit only the immutable completed harness, integrated-HEAD/transport remediation,
+      OrbStack PATH remediation, and fresh v13 evidence. Require exact local selection/run/focused
+      tests; clean detached integrated helper HEAD and identical local status before/after;
+      staged source commit `1e49621c6b44ac2e55cd82f87960972d571bad64` as an ancestor
+      distinct from integrated helper HEAD; exact current/staged deploy and Compose
+      bytes/modes; tracked executable helper blobs/current bytes from integrated HEAD
+      without requiring helper presence in staged source; exact nonsecret stage/backup/prior
+      identities; one SSH process with one-argv `-Fnone`, strict options and literal
+      destination, separate `bash`, `-s`, `--`, and exactly eleven validated positional
+      values; no assignment argv; byte-identical tracked remote stdin; remote positional
+      consumption before traps and validation after trap installation; all non-collapsible
+      phase/success markers through `PROTECTED_STATE=unchanged` and `PROBE_OK`; one
+      probe/no retry; markerless transport-failure classification; and bounded nondisclosure.
 
 
-      Require local and remote derivation of the exact four-row, one-final-newline
-      backup manifest from schema, supplied backup ID, prior deploy hash/mode, and
-      prior Compose hash/mode. The caller supplies no manifest hash. Require exact
-      actual manifest bytes, mode `600`, internally derived hash equality, and no
-      extra row or byte. Require the harness''s closed local/remote command authority
-      and deterministic protected-state projection: current deploy/Compose hashes
-      and modes; internal backup manifest hash/mode and backup file hashes/modes;
-      running resofeed/Caddy container IDs and exact image IDs; resofeed `/data` mount
-      Type/Destination plus internal actual volume identity and logical `com.docker.compose.volume=resofeed-data`;
+      Require the remote program to set and export exactly once `PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"`
+      after typed validation/trap setup and before every Docker-backed observation,
+      preserve the caller PATH suffix, emit no PATH value, resolve the actual macOS
+      OrbStack Docker CLI, and use no alternate Docker path/socket/host, installation,
+      configuration mutation, `systemctl`, fallback, or retry. Require local and remote
+      derivation of the exact four-row, one-final-newline backup manifest from schema,
+      supplied backup ID, prior deploy hash/mode, and prior Compose hash/mode. The
+      caller supplies no manifest hash. Require exact actual manifest bytes, mode
+      `600`, internally derived hash equality, and no extra row or byte.
+
+
+      Require the harness''s closed local/remote command authority and deterministic
+      protected-state projection: current deploy/Compose hashes and modes; internal
+      backup manifest hash/mode and backup file hashes/modes; running resofeed/Caddy
+      container IDs and exact image IDs; resofeed `/data` mount Type/Destination plus
+      internal actual volume identity and logical `com.docker.compose.volume=resofeed-data`;
       canonical `TCP/HTTPS 443 -> 127.0.0.1:8443`; and internal validated-public-host
       hash. Require identical helpers, canonical sorting, final-digest-only equality,
       corrected volume identity, exact public-host validation with loopback-Caddy
@@ -190783,23 +190792,23 @@ phases:
       procedure and tracked-helper identities, exact verified commit/tag/index/platform/deployed-digest
       bindings, separate staging/publication/deployment authority, prior-procedure
       and orphan/prior-digest recovery evidence, strict host-key and credential boundaries,
-      secret and public-host nondisclosure, no unresolved finding, current report
-      hash, and HEAD equality. Skipped legacy nodes, stale/invalid/rejected diagnostics,
-      v11, v10, and item-deep-links future work are never admission inputs.
+      secret, PATH, and public-host nondisclosure, no unresolved finding, current
+      report hash, and HEAD equality. Rejected diagnostics, v12, and item-deep-links
+      future work are never admission inputs.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v12"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v13"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate covers the immutable completed harness, append-only integrated-HEAD/positional-transport/manifest
-      remediation, fresh semantic v12 one-probe proof, exact stable projection and
-      exclusions, current publication/deployment authority, immutable OCI and dual-platform
-      proof, strict-FQDN digest deployment, public-host-derived readiness, security/black-box/closure
-      evidence, current hashes/HEAD, separate recovery boundaries, nondisclosure,
-      and no out-of-scope blocker. V11, v10, and all stale/failed/rejected incident
-      material remain non-authoritative.
+    verification: Full Gate covers the immutable completed harness, integrated-HEAD/positional-transport/manifest
+      remediation, OrbStack PATH remediation, fresh semantic v13 one-probe proof,
+      exact stable projection and exclusions, current publication/deployment authority,
+      immutable OCI and dual-platform proof, strict-FQDN digest deployment, public-host-derived
+      readiness, security/black-box/closure evidence, current hashes/HEAD, separate
+      recovery boundaries, nondisclosure, and no out-of-scope blocker. V12 and earlier
+      incident material remain diagnostic and non-authoritative.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
