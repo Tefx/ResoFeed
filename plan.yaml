@@ -190855,7 +190855,6 @@ phases:
     - deploy/resofeed-caddy/README.md
     depends_on:
     - rf-bug-v2-close-defect-report
-    - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
