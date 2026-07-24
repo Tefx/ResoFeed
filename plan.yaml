@@ -193065,7 +193065,7 @@ phases:
       untracked directories were left untouched.'
   - id: rf-bug-v2-tailnet-route-state-remediation
     name: Restore canonical Tailnet TCP/443 route after semantic v13 failure
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -193149,6 +193149,8 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-24T14:18:27.278748Z'
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v14
     name: Verify Tailnet-route-remediated immutable read-only procedure probe (semantic
       v14)
