@@ -190694,24 +190694,24 @@ phases:
 
 
       Fresh black-box verification uses only public interfaces, docs, protected acceptance,
-      the built binary, the replacement verifier-admitted immutable OCI index/platform
-      chain, and the deployed Tailnet UI. The superseded original publication step
-      and its FAIL artifacts are diagnostic-only and cannot supply an image or deployed
-      identity. Require the observed container and deployed runtime to resolve to
-      the exact replacement index digest before behavioral proof.
+      the built binary, the independently verified immutable index/platform chain
+      from `rf-bug-v2-publish-immutable-oci`, and the deployed Tailnet UI. Require
+      container and deployed runtime identity to resolve to that exact index digest.
+      The original three failed implicit-builder attempts and their FAIL artifacts
+      remain diagnostic-only and cannot supply an image or deployed identity.
 
 
       Cover RF-BUG-001–010: Inspector pending/failure/stale selection; opaque routes/history;
       titles; EN/ZH Steer alerts; embedded UI/Doctor; import-only OPML/State; headers/CSP/streaming/cancellation;
       Source Ledger controls/states at five viewports with grouping, overflow, keyboard
-      and 44px evidence; Prompting v2.2; and E2E isolation/cleanup. Confirm no public
-      evidence exposes credential values, builder/container residue, mutable image
+      and 44px evidence; Prompting v2.2; and E2E isolation/cleanup. Confirm public
+      evidence exposes no credential values, transient-builder residue, mutable image
       aliases, or alternate deployment identity. Any inaccessible required surface,
-      digest mismatch, unresolved vulnerability, or stale/original publication identity
-      blocks closure.'
+      digest mismatch, unresolved vulnerability, or stale publication identity blocks
+      closure.'
     verification: Fresh public-surface proof covers RF-BUG-001–010 on the built binary,
-      replacement immutable digest, and exact deployed Tailnet UI with five viewport
-      screenshots, digest equality, no stale publication authority, no sensitive builder/credential
+      exact immutable digest, and deployed Tailnet UI with five viewport screenshots,
+      digest equality, no stale publication authority, no sensitive builder/credential
       leakage, and no unresolved finding.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
