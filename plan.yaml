@@ -192763,7 +192763,7 @@ phases:
   - id: rf-bug-v2-tracked-probe-integrated-head-transport-remediation
     name: Repair tracked probe integrated-HEAD identity, positional transport, and
       manifest derivation
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the completed tracked read-only probe harness. Preserve `rf-bug-v2-tracked-read-only-probe-harness-remediation`,\
@@ -192921,6 +192921,14 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-24T09:13:29.929055Z'
+    done_at: '2026-07-24T09:28:05.226158+00:00'
+    evidence: Integrated commit 6a15e517c2503abc2f26967195f6422ee3373ab0. Gate-admitted
+      worker receipt sha256:574894e77a8498ea3f92fa6d36c9a64d0ffe261e2871d2efd105a0b385b95324;
+      dispatch sha256:70975cde100ac5bd1ca2d95a1323baecfc0751fe1161a8454467a8a340534ac3;
+      validator file sha256:1412d92b71fddee55929b159f8686b4f73762d40e5e8b68f1b1fb3c0fd12d550.
+      Independent Gate reran the selected immutable-deployment profile green; git
+      diff --check passed. verify.sh, verify-remote.sh, deterministic tests/adapter,
+      and README changed synchronously. No SSH or external operation executed.
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v12
     name: Verify repaired tracked immutable read-only procedure probe (semantic v12)
     status: pending
