@@ -193620,7 +193620,7 @@ phases:
       \ web/svelte.config.js, web/vite.config.ts, web/src/**, web/static/**, internal/**,\
       \ cmd/**, tests/**, deploy/**, .agents/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
       \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md]\n  ignored_runtime_paths:\
-      \ [.git/, .vectl/, .agent/, .venv/, node_modules/]\nclaims: [RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR]\n\
+      \ [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR]\n\
       checks:\n  - id: rf_bug_v2_container_build_context_green\n    run:\n      command:\
       \ [node, --test, '--test-name-pattern=RF-BUG-V2 container build context derives\
       \ trusted identity in dual-platform no-push build', scripts/vectl-check.test.mjs]\n\
