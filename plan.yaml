@@ -192649,7 +192649,9 @@ phases:
       \ hash/commit/backup/mode inputs; attached or dirty source refusal; closed command\
       \ allowlist; nondisclosure; no retry; and no second probe. The harness must\
       \ not stage itself, alter `deploy.sh` or `compose.yml`, or add itself to the\
-      \ existing exact two-file procedure manifest.\n\nSynchronize `deploy/resofeed-caddy/README.md`\
+      \ existing exact two-file procedure manifest. Preserve the existing Go developer\
+      \ test for generic project-native adapter envelope provenance; it remains read-only\
+      \ and must pass without mutation.\n\nSynchronize `deploy/resofeed-caddy/README.md`\
       \ with the harness purpose, exact read-only boundary, required nonsecret inputs,\
       \ strict target/stack, bounded marker contract, one-probe/no-retry rule, stable\
       \ projection/exclusions, and the separation of later publication and deployment\
@@ -192677,12 +192679,14 @@ phases:
       \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
       \ access: read, availability: current}\n      test_bindings:\n        - {path:\
       \ scripts/vectl-check.test.mjs, classification: acceptance, availability: current}\n\
-      \      selection:\n        command: [node, scripts/vectl-check.mjs, select,\
-      \ rf-bug-v2-immutable-deployment-procedure, rf_bug_v2_immutable_deployment_procedure_green]\n\
-      \        timeout_seconds: 30\n        cardinality: {exact: 1}\n        required_ids:\
-      \ [RF-BUG-V2 immutable OCI and Tailnet deployment procedure]\n        forbidden_ids:\
-      \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: PROCEDURE_SOURCE_CHECKOUT=clean_detached_head},\
+      \        - {path: internal/resofeed/playwright_fixture_test.go, classification:\
+      \ developer, availability: current}\n      selection:\n        command: [node,\
+      \ scripts/vectl-check.mjs, select, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n        timeout_seconds:\
+      \ 30\n        cardinality: {exact: 1}\n        required_ids: [RF-BUG-V2 immutable\
+      \ OCI and Tailnet deployment procedure]\n        forbidden_ids: []\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: PROCEDURE_SOURCE_CHECKOUT=clean_detached_head},\
       \ {literal: PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected}, {literal: PROCEDURE_DETACHED_MATRIX=green},\
       \ {literal: PROCEDURE_SIDE_EFFECTS=none}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n\
       \        contains_any: []\n        forbids: [{literal: ERROR collecting}, {literal:\
@@ -192700,8 +192704,8 @@ phases:
       ,\"seam\":\"real\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
       ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v11\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"deploy/resofeed-caddy/verify.sh\"\
-      ,\"deploy/resofeed-caddy/verify-remote.sh\",\"scripts/vectl-check.mjs\"],\"\
-      acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
+      ,\"deploy/resofeed-caddy/verify-remote.sh\",\"scripts/vectl-check.mjs\",\"internal/resofeed/playwright_fixture_test.go\"\
+      ],\"acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
       :[\"rf_bug_v2_immutable_deployment_procedure_green\"],\"acceptance_mutation\"\
       :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-v2-tracked-read-only-probe-harness-remediation\"\
       ,\"path\":\"scripts/vectl-check.test.mjs\",\"purpose\":\"Add only deterministic\
@@ -192729,6 +192733,7 @@ phases:
     - deploy/resofeed-caddy/deploy.sh
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
+    - internal/resofeed/playwright_fixture_test.go
     depends_on:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
