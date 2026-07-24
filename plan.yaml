@@ -190316,16 +190316,17 @@ phases:
 
       After the detached-head guard polarity remediation, its fresh no-SSH one-row
       replacement staging authorization review, the exactly once v2 procedure staging
-      operation, and fresh independent v8 read-only exact-target verification pass,
-      including Compose-logical/runtime-label volume identity, perform the pre-operation
-      R3 review for the two remaining external operations and their distinct recovery
-      boundaries. Preserve every exhausted staging, invalid-review, and coherent `REJECTED`
-      polarity-review artifact as diagnostic-only history. Require the newly integrated
-      polarity-remediation commit, fresh-review-bound source hashes, behavior-backed
-      selected detached/attached proof, strict host-key evidence, staged-byte equality,
-      and local Git metadata equality as immutable inputs; no stale commit/hash, old
-      staging authorization, failed command, rejected diagnostic receipt, or invalid
-      semantic receipt may supply current authority.
+      operation, and fresh independent v9 read-only exact-target verification pass,
+      including Compose-logical/runtime-label volume identity and stdin-fed `bash
+      -s` transport proof, perform the pre-operation R3 review for the two remaining
+      external operations and their distinct recovery boundaries. Preserve every exhausted
+      staging, invalid-review, and coherent `REJECTED` polarity-review artifact as
+      diagnostic-only history. Require the newly integrated polarity-remediation commit,
+      fresh-review-bound source hashes, behavior-backed selected detached/attached
+      proof, strict host-key evidence, staged-byte equality, and local Git metadata
+      equality as immutable inputs; no stale commit/hash, old staging authorization,
+      failed command, rejected diagnostic receipt, or invalid semantic receipt may
+      supply current authority.
 
 
       For immutable publication, verify current accepted-plan orchestration authority
@@ -190367,6 +190368,18 @@ phases:
       to differ.
 
 
+      Preserve v8 evidence unchanged and do not retry, correct, or complete v8: receipt
+      file `sha256:7d266496a50f0c92de1793385216b4ea4f620eec25e29b8270bd017f7a620582`,
+      validator `sha256:af6bc0f129398222483c28f9df77a23cbbffb3d55fab37e9023328cfd03660c2`,
+      and canonical valid `REJECTED` receipt `sha256:25bb15205f5f4773c4acd2b617fc1c10a4fd0aef2972c698b0eccdc458229619`.
+      V8''s three local checks passed, but its one SSH argv ended with literal `bash
+      -c` and no command operand; the remote program never ran, exit 1 produced no
+      remote stdout, and the synthesized `PROBE_FAIL phase=canonical_stack status=1`
+      was not remote trap output. Treat v8 solely as verifier command-construction
+      failure with no remote phase, product, target, volume, readiness, or protected-state
+      authority.
+
+
       Confirm each accepted operation, target, source/produced-input identity, execution
       context, script-local detached-source polarity, host-key/credential boundary,
       preconditions, cost boundary, rollback/recovery, and evidence topology matches
@@ -190381,9 +190394,11 @@ phases:
     verification: Current R3 authorization binds immutable publication and digest-only
       deployment to the independently verified polarity-remediation commit, exact
       freshly reviewed and staged two-file hashes, correct script-local attached-source
-      pre-SSH rejection, strict literal-FQDN host-key boundary, produced OCI digest
-      chain, rollback/readiness, scoped credentials, costs, and exclusions; the coherent
-      REJECTED review and all stale/invalid material remain diagnostic only.
+      pre-SSH rejection, exact stdin-fed `bash -s` read-only verification transport,
+      strict literal-FQDN host-key boundary, produced OCI digest chain, rollback/readiness,
+      scoped credentials, costs, and exclusions; v8's command-construction rejection,
+      the coherent REJECTED review, and all stale/invalid material remain diagnostic
+      only.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -190393,7 +190408,7 @@ phases:
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
-    - rf-bug-v2-immutable-deployment-procedure-verification-v8
+    - rf-bug-v2-immutable-deployment-procedure-verification-v9
     agent: spec-verifier
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
