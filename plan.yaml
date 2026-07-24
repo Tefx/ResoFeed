@@ -192931,7 +192931,7 @@ phases:
       and README changed synchronously. No SSH or external operation executed.
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v12
     name: Verify repaired tracked immutable read-only procedure probe (semantic v12)
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -193037,6 +193037,8 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-24T09:28:47.099973Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
