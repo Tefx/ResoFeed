@@ -193626,19 +193626,19 @@ phases:
       \ trusted identity in dual-platform no-push build', scripts/vectl-check.test.mjs]\n\
       \      timeout_seconds: 1800\n    evidence:\n      mode: command_outcome\n \
       \     path_bindings:\n        - {path: Dockerfile, access: read, availability:\
-      \ produced_by_step}\n        - {path: scripts/vectl-check.test.mjs, access:\
-      \ read, availability: produced_by_step}\n        - {path: docs/CONTAINER.md,\
-      \ access: read, availability: produced_by_step}\n        - {path: scripts/build-resofeed.sh,\
-      \ access: execute, availability: current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs,\
-      \ access: execute, availability: current}\n        - {path: web/package.json,\
-      \ access: read, availability: current}\n        - {path: web/package-lock.json,\
-      \ access: read, availability: current}\n        - {path: web/svelte.config.js,\
-      \ access: read, availability: current}\n        - {path: web/vite.config.ts,\
-      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
-      \ scripts/vectl-check.test.mjs, classification: developer, availability: produced_by_step}\n\
-      \    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
-      \        contains_all: [{literal: 'RF-BUG-V2 container build context derives\
-      \ trusted identity in dual-platform no-push build'}, {literal: BUILD_IDENTITY=trusted_canonical_derivation},\
+      \ current}\n        - {path: scripts/vectl-check.test.mjs, access: read, availability:\
+      \ current}\n        - {path: docs/CONTAINER.md, access: read, availability:\
+      \ current}\n        - {path: scripts/build-resofeed.sh, access: execute, availability:\
+      \ current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs, access:\
+      \ execute, availability: current}\n        - {path: web/package.json, access:\
+      \ read, availability: current}\n        - {path: web/package-lock.json, access:\
+      \ read, availability: current}\n        - {path: web/svelte.config.js, access:\
+      \ read, availability: current}\n        - {path: web/vite.config.ts, access:\
+      \ read, availability: current}\n      test_bindings:\n        - {path: scripts/vectl-check.test.mjs,\
+      \ classification: developer, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: 'RF-BUG-V2 container build context derives trusted identity in\
+      \ dual-platform no-push build'}, {literal: BUILD_IDENTITY=trusted_canonical_derivation},\
       \ {literal: 'PLATFORMS=linux/amd64,linux/arm64'}, {literal: PUBLISH=none}, {literal:\
       \ SECRETS=absent}, {literal: RESIDUE=none}]\n        contains_any: []\n    \
       \    forbids: [{literal: --push}, {literal: --load}, {literal: 'RESOFEED_SVELTE_BUILD_IDENTITY\
