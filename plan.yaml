@@ -192948,7 +192948,7 @@ phases:
       and README changed synchronously. No SSH or external operation executed.
   - id: rf-bug-v2-tracked-probe-orbstack-path-remediation
     name: Repair tracked remote probe OrbStack Docker CLI PATH
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the tracked read-only remote probe after semantic v12 validly\
@@ -193078,6 +193078,19 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-24T09:57:35.761713Z'
+    done_at: '2026-07-24T13:53:34.503962+00:00'
+    evidence: 'Worker execution admitted by central intent-closure Gate: status=CONFORMANT,
+      worker_execution_admissible=true, context_hash=sha256:9e509586636c76f27b1a6519a7ef1d7314e1b3b97c9b65719f8f8aeda57d330f,
+      canonical worker_receipt_sha256=sha256:0ff37de75d3c1865cc743d6e8a1af4ee49ed79c5baaec83ff695a5ec7d1b6e9f,
+      canonical dispatch_sha256=sha256:4049a5b8059f5904cbe9fc385d5bef01b7f6edefdcba86e6ed894d84b7e177a6.
+      Exact child artifacts persisted unchanged at /tmp/larva-agent-artifacts/rf-bug-v2-tracked-probe-orbstack-path-remediation/{dispatch.json,worker-receipt.json}.
+      Integrated exact four-path diff as commit b07df8082c7ce81e7e7417541c8e94e824f56273.
+      Replayed `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green`: exit 0, outcome green, selected_ids=executed_ids=[RF-BUG-V2
+      immutable OCI and Tailnet deployment procedure], observation PROCEDURE_ORBSTACK_DOCKER_PATH=verified
+      and VECTL_GENERIC_EVIDENCE=valid. No SSH/external operation ran. Unrelated user
+      changes in docs/ARCHITECTURE.md, docs/DESIGN.md, docs/ITEM_DEEP_LINKS.md and
+      untracked directories were left untouched.'
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v13
     name: Verify OrbStack PATH-remediated immutable read-only procedure probe (semantic
       v13)
