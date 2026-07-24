@@ -190781,15 +190781,21 @@ phases:
       web/src/lib/api-client.test.ts\"],\"acceptance_check_ids\":[\"rf_bug_v2_defect_report_closure_green\"\
       ],\"acceptance_mutation\":\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n\
       </vectl_step_policy>"
-    verification: Pre-closure authority hashes match; exact ten closure subtests and
-      active scans pass; post_closure_report_sha256 and closure_commit are recorded;
-      only report/test pair changes.
+    verification: Pre-closure authority hashes match; the report preserves the three
+      exact original publication-failure hashes as superseded non-completion diagnostics,
+      records the replacement R3 builder authority plus verifier-admitted index/platform/label
+      and cleanup/default-builder evidence, binds deployment only to that replacement
+      digest, passes the exact ten closure identities and active scans, records post_closure_report_sha256
+      and closure_commit, and changes only its authorized closure unit.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/PROMPTING_SYSTEM.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
     depends_on:
     - rf-bug-v2-formal-security-review
     - rf-bug-v2-independent-runtime-ui
