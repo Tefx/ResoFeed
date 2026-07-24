@@ -192763,7 +192763,7 @@ phases:
   - id: rf-bug-v2-tracked-probe-integrated-head-transport-remediation
     name: Repair tracked probe integrated-HEAD identity, positional transport, and
       manifest derivation
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ remediation for the completed tracked read-only probe harness. Preserve `rf-bug-v2-tracked-read-only-probe-harness-remediation`,\
@@ -192919,6 +192919,8 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-24T09:13:29.929055Z'
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v12
     name: Verify repaired tracked immutable read-only procedure probe (semantic v12)
     status: pending
