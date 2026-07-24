@@ -160,6 +160,56 @@ export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
 `deploy.sh` validates its own bytes and `compose.yml` against the caller-bound procedure identities before reading runtime configuration or invoking Docker, OCI, Compose, Caddy, Tailscale, or readiness work. A mismatch fails before deployment mutation. It then verifies both the immutable tag and digest reference against the supplied index/platform chain, derives `RESOFEED_IMAGE=docker.io/tefx/resofeed@sha256:<index-digest>`, captures the currently deployed repository digest, verifies the existing SQLite volume, writes only non-secret identity fields, pulls the digest, updates the existing stack, and retains all named volumes.
 
 Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, moving-tag substitution, host-key trust mutation, and ad hoc procedure copying are outside this procedure and are refused.
+## Tracked read-only probe harness
+Invoke the wrapper with the complete nonsecret receipt:
+
+```bash
+./deploy/resofeed-caddy/verify.sh \
+  --source-commit <40-lowercase-hex> \
+  --deploy-sha256 sha256:<current-deploy-64-hex> --deploy-mode 755 \
+  --compose-sha256 sha256:<current-compose-64-hex> --compose-mode 644 \
+  --backup-id sha256:<backup-64-hex> \
+  --backup-manifest-sha256 sha256:<manifest-64-hex> --backup-manifest-mode 600 \
+  --prior-deploy-sha256 sha256:<prior-deploy-64-hex> --prior-deploy-mode 755 \
+  --prior-compose-sha256 sha256:<prior-compose-64-hex> --prior-compose-mode 644
+```
+
+
+`verify.sh` is the repository-owned wrapper for one immutable, read-only target probe. Run it only from a clean detached checkout whose `HEAD` equals the full staged procedure source commit. Supply the nonsecret staging receipt identities: current `deploy.sh` and `compose.yml` SHA-256 values and modes, backup ID, backup-manifest SHA-256 and mode, and prior procedure SHA-256 values and modes. The wrapper confirms that the integrated checkout and supplied commit contain the exact `deploy.sh` (`100755`) and `compose.yml` (`100644`) bytes before transport. The probe scripts are not added to that two-file procedure manifest.
+
+The wrapper fixes the destination to `tefx-mbp-personal.platy-atlas.ts.net`, the stack to `~/Projects/resofeed-caddy`, and the default existing strict-known-key SSH policy. It starts exactly one SSH process and never retries. The tracked bytes of `verify-remote.sh` are the only stdin program; the remote interpreter is `bash -s`. There is no target, account, host alias, trust-store, stack, interpreter, or remote-program override.
+
+The remote program creates no file and reads no runtime secret or Caddy configuration. Its executable surface is limited to shell control, canonical path/file/hash/mode checks, read-only Docker container/image/volume inspection, `tailscale serve status`, and exactly two GET-only `curl` calls. It derives exactly one HTTPS public host from the running ResoFeed `--public-url` argument, keeps that host undisclosed, and uses it for SNI and Host while connecting to loopback Caddy port `8443`. Passing readiness is root `200` plus unauthenticated Doctor `401`; the Tailnet SSH FQDN is never used as the public Host or SNI identity.
+
+The bounded stdout ledger is:
+
+```text
+PROBE_PHASE=canonical_stack
+CANONICAL_STACK=verified
+PROBE_PHASE=procedure_current
+PROCEDURE_CURRENT=verified
+PROBE_PHASE=backup
+BACKUP=verified
+PROBE_PHASE=docker_identity
+DOCKER_IDENTITY=verified
+PROBE_PHASE=volume
+VOLUME=verified
+PROBE_PHASE=tailnet_route
+TAILNET_ROUTE=verified
+PROBE_PHASE=public_url
+PUBLIC_URL_HOST=validated
+PROBE_PHASE=readiness
+READINESS=verified
+PROBE_PHASE=protected_after
+PROTECTED_STATE=unchanged
+PROBE_OK
+```
+
+A remote assertion failure emits one `PROBE_FAIL phase=<last_phase> status=<status>`. Markerless SSH failure remains `PROBE_TRANSPORT_FAIL`; local input or source construction failure remains `PROBE_CONSTRUCTION_FAIL`. The wrapper suppresses unbounded remote diagnostics and never synthesizes phase success.
+
+Before and after readiness, the same helper hashes a canonically sorted stable projection of current procedure hashes/modes; backup manifest and prior procedure hashes/modes; running ResoFeed and Caddy container/image IDs; `/data` mount type, destination, actual engine-volume identity, and logical `com.docker.compose.volume=resofeed-data` label; canonical Tailnet TCP/443 routing; and a SHA-256 of the validated public host. The projection excludes SQLite main/WAL/SHM bytes, rows, sizes, and times; app/Caddy logs and counters; health/status timestamps, PIDs, exec and transient network fields; Tailnet peer/address/session telemetry; access times, command order, timestamps, and every secret or configuration value.
+
+This probe performs no publication, procedure staging, deployment, rollback, service change, registry operation, credential change, or data operation. Later publication and deployment remain separate accepted steps. Repository rollback removes `verify.sh` and `verify-remote.sh` and reverts only their adapter test and this README section; it does not run remote recovery or deployment.
 ## Verification
 Passing deployment evidence contains only non-secret identities and these outcomes:
 

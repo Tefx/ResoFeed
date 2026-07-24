@@ -280,7 +280,10 @@ export const PENDING_PROFILE_PAIRS = [
       'PROCEDURE_DETACHED_MATRIX=green',
       'PROCEDURE_IDENTITY=source_commit_and_sha256',
       'PROCEDURE_RECOVERY=prior_bytes',
-      'PROCEDURE_SIDE_EFFECTS=none'
+      'PROCEDURE_SIDE_EFFECTS=none',
+      'PROBE_HARNESS=tracked_read_only',
+      'PROBE_TRANSPORT=one_ssh_stdin',
+      'PROBE_PROTECTED_STATE=stable_projection'
     ],
     runner: 'immutable-deployment'
   },
@@ -479,6 +482,11 @@ export const IMMUTABLE_DEPLOYMENT_PATHS = Object.freeze([
   'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md'
 ]);
 
+export const READ_ONLY_PROBE_PATHS = Object.freeze([
+  'deploy/resofeed-caddy/verify.sh',
+  'deploy/resofeed-caddy/verify-remote.sh'
+]);
+
 function requireDeploymentFragments(sources, relativePath, fragments) {
   const body = sources[relativePath];
   if (typeof body !== 'string') throw new AdapterFailure(`immutable deployment source is missing: ${relativePath}`);
@@ -490,7 +498,7 @@ function requireDeploymentFragments(sources, relativePath, fragments) {
 }
 
 export function immutableDeploymentSources(root = repoRoot) {
-  return Object.fromEntries(IMMUTABLE_DEPLOYMENT_PATHS.map((relativePath) => [
+  return Object.fromEntries([...IMMUTABLE_DEPLOYMENT_PATHS, ...READ_ONLY_PROBE_PATHS].map((relativePath) => [
     relativePath,
     fs.readFileSync(path.join(root, relativePath), 'utf8')
   ]));
@@ -611,6 +619,37 @@ export function verifyImmutableDeploymentSources(sources) {
     'attached `HEAD` before any SSH attempt',
     'Failure restores the prior digest'
   ]);
+  requireDeploymentFragments(sources, 'deploy/resofeed-caddy/verify.sh', [
+    'status --porcelain=v1 --untracked-files=all',
+    'symbolic-ref -q HEAD',
+    'SOURCE_DEPLOY_PATH="deploy/resofeed-caddy/deploy.sh"',
+    'SOURCE_COMPOSE_PATH="deploy/resofeed-caddy/compose.yml"',
+    'SOURCE_REMOTE_PATH="deploy/resofeed-caddy/verify-remote.sh"',
+    'ssh -F none -T "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST"',
+    'bash -s',
+    '< "$REMOTE_PROGRAM"',
+    'PROBE_TRANSPORT_FAIL status=',
+    'PROBE_CONSTRUCTION_FAIL status=2'
+  ]);
+  requireDeploymentFragments(sources, 'deploy/resofeed-caddy/verify-remote.sh', [
+    'trap on_probe_error ERR',
+    'trap on_probe_exit EXIT',
+    "printf 'PROBE_PHASE=canonical_stack\\n'",
+    'com.docker.compose.volume',
+    'resofeed-data',
+    'TCP/HTTPS 443 -> 127.0.0.1:8443',
+    '.Config.Cmd',
+    '--connect-to "${PUBLIC_HOST}:443:127.0.0.1:8443"',
+    'BASELINE_PROJECTION=$(stable_projection)',
+    'AFTER_PROJECTION=$(stable_projection)',
+    "printf 'PROBE_OK\\n'"
+  ]);
+  requireDeploymentFragments(sources, 'deploy/resofeed-caddy/README.md', [
+    'Tracked read-only probe harness',
+    'PROBE_PHASE=canonical_stack',
+    'one SSH process and never retries',
+    'stable projection'
+  ]);
   requireDeploymentFragments(sources, 'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md', [
     'rf-bug-v2-immutable-deployment-procedure',
     'rf_bug_v2_immutable_deployment_procedure_green',
@@ -640,6 +679,28 @@ export function verifyImmutableDeploymentSources(sources) {
   }
   if (sources['deploy/resofeed-caddy/compose.yml'].includes('RESOFEED_IMAGE:-')) {
     throw new AdapterFailure('immutable deployment Compose image retained an optional or mutable fallback');
+  }
+
+  const probeWrapper = sources['deploy/resofeed-caddy/verify.sh'];
+  const remoteProbe = sources['deploy/resofeed-caddy/verify-remote.sh'];
+  if ((probeWrapper.match(/\bssh\b/gu) ?? []).length !== 1) {
+    throw new AdapterFailure('tracked read-only probe wrapper must contain exactly one SSH invocation');
+  }
+  for (const forbidden of ['eval ', 'bash -c', 'scp ', 'rsync ', 'StrictHostKeyChecking=no', 'accept-new', 'ProxyCommand', 'ProxyJump']) {
+    if (`${probeWrapper}\n${remoteProbe}`.includes(forbidden)) {
+      throw new AdapterFailure(`tracked read-only probe retained forbidden transport fragment: ${forbidden}`);
+    }
+  }
+  for (const forbidden of ['docker compose', 'docker pull', 'docker push', 'docker restart', 'docker stop', 'docker rm', 'tailscale serve --', 'systemctl', 'sqlite3', '.env', 'mktemp', 'mkdir ', 'rm ', 'mv ', 'cp ', 'sleep ']) {
+    if (remoteProbe.includes(forbidden)) {
+      throw new AdapterFailure(`remote read-only probe retained forbidden executable or persistent-file fragment: ${forbidden}`);
+    }
+  }
+  if ((remoteProbe.match(/\bcurl\b/gu) ?? []).length !== 2) {
+    throw new AdapterFailure('remote read-only probe must contain exactly two GET-only curl calls');
+  }
+  if (!remoteProbe.includes('docker volume inspect') || !remoteProbe.includes('docker container inspect')) {
+    throw new AdapterFailure('remote read-only probe missed its closed Docker inspect surface');
   }
   if (/(?:printf|echo)[^\n]*(?:\$\{?(?:CF_API_TOKEN|OPENROUTER_KEY|TAVILY_API_KEY)\}?)/u.test(sources['deploy/resofeed-caddy/deploy.sh'])) {
     throw new AdapterFailure('immutable deployment script can print a runtime secret value');
@@ -734,7 +795,10 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_DETACHED_MATRIX=green',
     'PROCEDURE_IDENTITY=source_commit_and_sha256',
     'PROCEDURE_RECOVERY=prior_bytes',
-    'PROCEDURE_SIDE_EFFECTS=none'
+    'PROCEDURE_SIDE_EFFECTS=none',
+    'PROBE_HARNESS=tracked_read_only',
+    'PROBE_TRANSPORT=one_ssh_stdin',
+    'PROBE_PROTECTED_STATE=stable_projection'
   ];
 }
 
@@ -1771,7 +1835,7 @@ function runFoundation(profile) {
 
 function runImmutableDeploymentProcedure(profile) {
   const output = execute(profile, 'node', [
-    '--test', '--test-name-pattern=immutable OCI and Tailnet deployment procedure',
+    '--test', '--test-name-pattern=^(immutable OCI and Tailnet deployment procedure|RF-BUG-V2 tracked read-only probe harness)$',
     'scripts/vectl-check.test.mjs'
   ], { timeout: 240_000 });
   const observations = verifyImmutableDeploymentSources(immutableDeploymentSources());
