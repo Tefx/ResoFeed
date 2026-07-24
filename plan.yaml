@@ -190609,9 +190609,12 @@ phases:
 
       Independently review the completed local evidence, preserved inverted detached-head
       remediation history, newly integrated polarity remediation, one-row authenticated-endpoint
-      staging review, procedure staging, immutable-image, dual-platform container,
-      and Tailnet evidence for RF-BUG-003/004/005/010, `RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF`,
-      `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD`, and `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY`.
+      staging review, procedure staging, original OCI publication failure diagnostics,
+      fresh transient-builder R3 authority, replacement immutable-image publication
+      and semantic verification, dual-platform container proof, and Tailnet evidence
+      for RF-BUG-003/004/005/010, `RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF`, `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD`,
+      `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY`, `RF-BUG-V2-OCI-PUBLICATION-FAILURE-DIAGNOSTIC`,
+      `RF-BUG-V2-TRANSIENT-BUILDX-BUILDER-AUTHORITY`, and `RF-BUG-V2-IMMUTABLE-OCI-PUBLICATION-REPLACEMENT`.
       Cover embed.FS traversal/fallback, no external UI root, four outer headers,
       embedded CSP without unsafe-inline, streaming/cancellation, Owner Token, import-only
       OPML and atomic minimal State, case-local E2E state and cleanup, live-provider
@@ -190621,16 +190624,29 @@ phases:
       For the source/endpoint boundary, preserve every exhausted staging and invalid-review
       artifact plus coherent `REJECTED` polarity evidence as diagnostic-only history.
       Prove the replacement chain accepts staging only from a clean detached checkout
-      at the exact freshly reviewed polarity-remediation commit, treats `git symbolic-ref
-      -q HEAD` success as attached, rejects an attached clean branch inside the maintained
-      script with an accurate detached-HEAD fatal message before any SSH attempt or
-      target mutation, authenticates only the literal `tefx-mbp-personal.platy-atlas.ts.net`
-      SSH endpoint through strict existing host-key trust, never uses the unknown
-      internal hostname as authority, never enrolls/updates/removes host keys or changes
-      credentials/accounts, stages only the fresh-review-bound two-file hashes to
-      `~/Projects/resofeed-caddy`, keeps deterministic local Git metadata equal, and
-      deploys only after fresh authorization. Verify prior-procedure restoration and
-      prior-digest readiness recovery remain distinct, complete, and secret-safe.
+      at exact polarity-remediation commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      treats `git symbolic-ref -q HEAD` success as attached, rejects an attached clean
+      branch inside the maintained script before any SSH attempt or target mutation,
+      authenticates only literal `tefx-mbp-personal.platy-atlas.ts.net` through strict
+      existing host-key trust, never uses the unknown internal hostname as authority,
+      never enrolls/updates/removes host keys or changes credentials/accounts, stages
+      only the fresh-review-bound two-file hashes to `~/Projects/resofeed-caddy`,
+      keeps deterministic local Git metadata equal, and deploys only after fresh authorization.
+      Verify prior-procedure restoration and prior-digest readiness recovery remain
+      distinct, complete, and secret-safe.
+
+
+      For the publication boundary, preserve the original failed semantic receipt
+      raw SHA-256 `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`,
+      publication report SHA-256 `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`,
+      and driver diagnostic SHA-256 `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`
+      as non-completion diagnostics. Confirm the implicit active `orbstack` docker-driver
+      command was never replayed. Require the replacement''s exact `resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      docker-container builder lifecycle, explicit `--builder`, one push, one cleanup
+      attempt, exact index plus amd64/arm64 manifests and revision labels, builder/BuildKit
+      residue absence, unchanged active/default builder, no alias/deletion/temp-tag/credential/account/daemon/context/other-container
+      mutation, and no secret disclosure. Cleanup or registry uncertainty remains
+      blocking.
 
 
       Require the integrated source commit and deploy hash to differ from inverted
@@ -190638,13 +190654,13 @@ phases:
       Preserve coherent `REJECTED` semantic receipt `sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8`,
       receipt-file SHA-256 `f1dbd2f87c98aeb1d17f64672e70a7f49d338f8e966d0c27183ff66533904c19`,
       and production-validator SHA-256 `7e1e4a26c9f1b01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`
-      as non-authoritative remediation history. Findings route to modifying owners
-      and block closure.'
+      as non-authoritative remediation history. Findings route to the owning pending
+      remediation chain and block closure.'
     verification: Fresh security review finds no unresolved embed, CSP/header, streaming/cancellation,
       token, OPML/state, E2E cleanup, secret, symbolic-ref polarity, detached-source
-      pre-SSH, strict endpoint identity, staged-byte, digest, deployment, host-key/credential,
-      or rollback defect; fresh source identities supersede the inverted commit/hash
-      and all rejected/invalid diagnostics remain non-authoritative.
+      pre-SSH, strict endpoint, staged-byte, replacement Buildx authority/lifecycle/cleanup,
+      immutable digest, deployment, host-key/credential, or rollback defect; all failed/rejected
+      diagnostics remain non-authoritative.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - AGENTS.md
