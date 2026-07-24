@@ -193150,38 +193150,40 @@ phases:
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: general
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v14
-    name: Verify Tailnet-route-remediated immutable read-only procedure probe (semantic
-      v14)
+    name: Verify Tailscale 1.98.8 JSON route probe (semantic v14)
     status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
 
 
-      Fresh successor after semantic v13 validly disproved only the Tailnet route
-      seam. Preserve the exact rejected v13 material unchanged and diagnostic-only:
-      raw receipt artifact `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v13/semantic-receipt-fail.json`
-      SHA-256 `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`;
-      production Gate canonical semantic receipt SHA-256 `sha256:fbe2f0847ae59f9751e79626936f5321dfb27a26cc106ff176e45a7b1e0b9084`;
-      context hash `sha256:5b020c1cc69ee7f2b6de29d7dd8cdc41d3d0b3f97f526a3ae68485dc2da3856f`;
-      verdict `FAIL`; `gate_open_allowed=false`. Do not retry, correct, resume, complete,
-      or execute v13. Its clean detached helper HEAD `73a399cd1be9de4cccb491b2439d124178bcfdeb`,
-      three once-only green local commands, exact once-only tracked-wrapper argv,
-      proven integrated transport and OrbStack PATH, Docker identity, volume identity,
-      no-retry, and nonmutation observations remain valid diagnostics. V14 alone supplies
-      fresh positive semantic evidence after `rf-bug-v2-tailnet-route-state-remediation`;
-      neither step authorizes publication, deployment, registry, service, credential,
-      trust, configuration, data, or any additional persistent-state mutation.
+      Fresh independent successor after semantic v13 and the superseded runtime remediation
+      remained valid diagnostics but the direct authorized diagnosis proved the canonical
+      route present and exposed legacy human-output parsing as the defect. Preserve
+      semantic v13 unchanged: raw rejected receipt SHA-256 `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`,
+      production canonical semantic receipt SHA-256 `sha256:fbe2f0847ae59f9751e79626936f5321dfb27a26cc106ff176e45a7b1e0b9084`,
+      context hash `sha256:5b020c1cc69ee7f2b6de29d7dd8cdc41d3d0b3f97f526a3ae68485dc2da3856f`,
+      verdict `FAIL`, and `gate_open_allowed=false`. Preserve blocked runtime receipt
+      `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/runtime-receipt-blocked.json`
+      SHA-256 `0912f035667d299eaee782e216952be3e1518d0836da43b11680e4a6c5be7a25` and
+      direct debug evidence `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/direct-debug-evidence.json`
+      SHA-256 `5bc4ffd48f165f2b5426010a76e4ceface3d6bb8939681dfc3f594c7e74338fa` unchanged
+      and diagnostic-only. Do not retry, correct, resume, complete, or execute v13
+      or the superseded runtime step. The direct debug operation supplies no authority
+      to repeat or extend SSH, Serve mutation, restart, reauthentication, deployment,
+      publication, or any other state change.
 
 
-      A fresh `integration-verifier` starts from a fresh clean detached checkout at
-      the integrated HEAD. Require before/after HEAD equality, detachment, empty tracked
-      and untracked status, and exact current tracked executable blobs/bytes for `verify.sh`
-      and `verify-remote.sh`. Require staged source commit `1e49621c6b44ac2e55cd82f87960972d571bad64`
-      to be an ancestor distinct from integrated HEAD. Require that commit''s exact
-      `deploy.sh` SHA-256 `sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
+      A fresh `integration-verifier` starts from a new clean detached checkout at
+      the integrated HEAD after `rf-bug-v2-tailscale-198-route-harness-remediation`.
+      Require before/after HEAD equality, detachment, empty tracked and untracked
+      status, and exact tracked executable bytes/modes for `verify.sh` and `verify-remote.sh`.
+      Require staged source commit `1e49621c6b44ac2e55cd82f87960972d571bad64` to remain
+      an ancestor distinct from integrated HEAD. The repo remediation forbids changes
+      to the staged two-file procedure, so require current and staged `deploy.sh`
+      SHA-256 `sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
       mode `755` and `compose.yml` SHA-256 `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
-      mode `644` to equal current bytes/modes.
+      mode `644` to remain equal.
 
 
       Execute exactly once each: `node scripts/vectl-check.mjs select rf-bug-v2-immutable-deployment-procedure
@@ -193191,6 +193193,7 @@ phases:
       procedure scripts/vectl-check.test.mjs`. Require exact selected/executed identity
       parity and observations `PROCEDURE_SOURCE_CHECKOUT=clean_detached_head`, `PROCEDURE_ATTACHED_HEAD=pre_ssh_rejected`,
       `PROCEDURE_DETACHED_MATRIX=green`, `PROCEDURE_ORBSTACK_DOCKER_PATH=verified`,
+      `PROCEDURE_TAILSCALE_ROUTE_JSON=verified`, `PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop`,
       `PROCEDURE_SIDE_EFFECTS=none`, and `VECTL_GENERIC_EVIDENCE=valid`.
 
 
@@ -193209,43 +193212,52 @@ phases:
       integrated strict endpoint options, literal destination `tefx-mbp-personal.platy-atlas.ts.net`,
       `bash -s --`, exactly eleven validated positional values in documented order,
       and byte-identical tracked `verify-remote.sh` stdin. Forbid alternate endpoint/account/trust/interpreter/options,
-      assignments, unvalidated strings, `bash -c`, second probe, and retry. Require
+      assignments, unvalidated strings, `bash -c`, second probe, or retry. Require
       exact single OrbStack PATH prefixing without disclosure or fallback; exact internal
       four-row manifest derivation/mode/hash equality without caller hash; current/staged
       procedure identities; Docker/container/image and corrected `/data` volume identities;
-      canonical `TCP 443 -> tcp://127.0.0.1:8443`; public-host validation; root `200`;
-      unauthenticated Doctor `401`; stable protected-state equality with documented
-      volatile exclusions; closed read-only command authority; and the complete ordered
-      ledger through `TAILNET_ROUTE=verified`, `PROTECTED_STATE=unchanged`, and `PROBE_OK`.
-      Any failure, missing marker, transport ambiguity, retry, second probe, mutation,
-      or disclosure is `FAIL`.
+      and the Tailscale 1.98.8 JSON shape `TCP.443.TCPForward = 127.0.0.1:8443`. The
+      existing route is a mandatory no-op precondition: forbid every `tailscale serve`
+      mutation, including the separately documented `--yes` repair command. The obsolete
+      exact row and human tree output are not authority.
+
+
+      Require public-host validation, root `200`, unauthenticated Doctor `401`, stable
+      protected-state equality with documented volatile exclusions, closed read-only
+      command authority, and the complete ordered ledger through `TAILNET_ROUTE=verified`,
+      `PROTECTED_STATE=unchanged`, and `PROBE_OK`. Any failure, missing marker, transport
+      ambiguity, route absence/drift, mutation, retry, second probe, or disclosure
+      is `FAIL`; do not repair, roll back, deploy, publish, restart, or mutate after
+      failure.
 
 
       Production semantic admission is mandatory. Emit exactly one `vectl.verifier.semantic.v1`
       object with canonical keys only. Require `verifier_id=integration-verifier`,
       `step_id=rf-bug-v2-immutable-deployment-procedure-verification-v14`, and ordered
-      `scope`: [`semantic v13 preserved diagnostics and bounded Tailnet route remediation`,
-      `integrated helper HEAD and ancestor staged-procedure identity`, `exact -Fnone
-      positional transport and byte-identical stdin`, `derived manifest identity and
-      bounded phase/protected-state ledger`, `future OCI identity deferral`]. Require
-      exactly four outcome-consistent coverage rows: `RF-BUG-V2-TAILNET-ROUTE-STATE-REMEDIATION`
-      from `deploy/resofeed-caddy/deploy.sh`; `RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION`
+      `scope`: [`semantic v13 plus blocked runtime receipt preserved diagnostics`,
+      `integrated Tailscale 1.98.8 JSON harness and unchanged ancestor staged-procedure
+      identity`, `exact -Fnone positional transport and byte-identical stdin`, `canonical
+      route no-op and bounded phase/protected-state ledger`, `future OCI identity
+      deferral`]. Require exactly four outcome-consistent coverage rows: `RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION`
+      from `deploy/resofeed-caddy/verify-remote.sh`; `RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION`
       from `deploy/resofeed-caddy/README.md`; `RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION`
       from `deploy/resofeed-caddy/README.md`; and `RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE`
       from `docs/BUG_FIX_PLAN_2026-07-12.md`. Command rows contain literal substantive
       argv actually executed, including the wrapper''s safe nonsecret values, with
       no placeholders, pseudo-commands, metavariables, elisions, redaction tokens,
-      empty argv, or fabricated markers.'
+      empty argv, fabricated markers, or raw Serve JSON.'
     verification: Fresh production-admitted `integration-verifier` evidence runs the
       three exact local commands and tracked wrapper exactly once from a clean detached
-      integrated HEAD and proves the remediated canonical Tailnet route plus every
-      retained identity, transport, OrbStack PATH, manifest, phase, projection, readiness,
-      nondisclosure, nonmutation, one-probe/no-retry, and future-OCI-deferral contract
-      through `PROBE_OK`.
+      integrated HEAD. It proves the new selected observations, unchanged staged procedure
+      identity, exact strict transport, real Tailscale 1.98.8 JSON route shape as
+      a no-mutation precondition, every retained identity/projection/readiness invariant,
+      one probe, no retry/disclosure, and the ordered ledger through `PROBE_OK`.
     refs:
-    - /tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v13/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/runtime-receipt-blocked.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/direct-debug-evidence.json
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - .agents/skills/resofeed-tailnet-deploy/SKILL.md
     - deploy/resofeed-caddy/README.md
     - deploy/resofeed-caddy/compose.yml
@@ -193255,7 +193267,7 @@ phases:
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     depends_on:
-    - rf-bug-v2-tailnet-route-state-remediation
+    - rf-bug-v2-tailscale-198-route-harness-remediation
     agent: integration-verifier
   - id: rf-bug-v2-tailscale-198-route-harness-remediation
     name: Repair Tailscale 1.98.8 route verification harness
