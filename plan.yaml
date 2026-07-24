@@ -193392,6 +193392,229 @@ phases:
       PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop, PROCEDURE_SIDE_EFFECTS=none,
       and VECTL_GENERIC_EVIDENCE=valid. No SSH/runtime operation occurred in this
       repository step. Unrelated user-owned working-tree changes remained untouched.'
+  - id: rf-bug-v2-transient-buildx-builder-authorization-review
+    name: Authorize transient commit-bound Buildx builder lifecycle
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Perform a fresh R3 pre-operation review after the original publication failure
+      is preserved and rejected as replay authority. Retain every admitted operation,
+      target, source, credential, cost, orphan, deployment, and recovery boundary
+      from `rf-bug-v2-deployment-authorization-review`, except its failed producer
+      binding. Supersede that binding with the replacement execution and verification
+      steps only. This review performs no build, builder mutation, push, registry
+      write, container/service mutation, credential/account change, or repository
+      mutation.
+
+
+      Bind the sole source to a fresh isolated clean detached checkout at commit `1e49621c6b44ac2e55cd82f87960972d571bad64`;
+      the sole repository/tag to `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`;
+      the sole platforms to `linux/amd64,linux/arm64`; and the revision label to `org.opencontainers.image.revision=1e49621c6b44ac2e55cd82f87960972d571bad64`.
+      Require the immutable tag to remain absent immediately before mutation. Use
+      only the existing Docker context/daemon and repository-scoped credential without
+      disclosure or account change.
+
+
+      Authorize exactly one transient builder named `resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      created with driver `docker-container` and without `--use`. Require the name
+      to be absent before creation and record a nonsecret stable fingerprint of the
+      user''s active/default builder before mutation. A pre-existing builder with
+      that name blocks before mutation and cannot be reused or removed. Authorize
+      only these command identities from the source checkout: `docker buildx create
+      --name resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64 --driver docker-container`;
+      `docker buildx inspect --builder resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64
+      --bootstrap`; one `docker buildx build --builder resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64
+      --platform linux/amd64,linux/arm64 --label org.opencontainers.image.revision=1e49621c6b44ac2e55cd82f87960972d571bad64
+      --provenance=false --sbom=false --tag docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64
+      --push .`; and one `docker buildx rm resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      cleanup attempt after success or bounded failure. The build command must use
+      explicit `--builder`; `--use`, default-builder mutation, Docker-context switching,
+      and fallback to the active `orbstack` docker driver are forbidden.
+
+
+      The authorized transient side effect is limited to the exact builder and its
+      BuildKit container plus the one immutable two-platform push. No daemon restart,
+      paid/cloud/remote builder, alternate endpoint, other container or service mutation,
+      temporary registry tag, moving alias, alternate registry/repository, registry
+      deletion, credential/account/trust change, deployment, Tailnet operation, repository
+      write, or retry is authorized. Local compute and existing Docker Hub transfer
+      are the complete cost boundary.
+
+
+      Require one cleanup attempt on every post-create exit path, then verify the
+      exact builder is absent and the active/default builder fingerprint is unchanged.
+      Cleanup failure, unknown builder ownership, or residual BuildKit state blocks
+      downstream and records the exact nonsecret builder/container residue plus the
+      bounded recovery command; do not retry cleanup or proceed. A failed or partial
+      push requires one final read-only tag observation and complete absent/orphan
+      index/platform-chain recording; no deletion authority exists. Unknown registry
+      state, incomplete digest chain, source/tag/platform/label drift, credential
+      drift, or unavailable cleanup blocks before Docker runtime or deployment work.
+
+
+      Emit one inline production-admissible `vectl.verifier.semantic.v1` receipt with
+      exactly one requirement row and state-transition row for `RF-BUG-V2-TRANSIENT-BUILDX-BUILDER-AUTHORITY`.
+      Prove the exact operation/target/source/execution context, builder ownership
+      and cleanup, unchanged-default invariant, credential/cost bounds, orphan recovery,
+      and all exclusions without requesting consent again or writing a report file.'
+    verification: Fresh R3 spec review grants only the exact commit-bound docker-container
+      builder create/bootstrap/one-push/remove lifecycle, preserves the existing publication/deployment
+      boundaries, proves preconditions and cleanup/orphan recovery, forbids default-builder
+      change and every undeclared side effect, and emits one admitted authority row.
+    refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    depends_on:
+    - rf-bug-v2-publish-immutable-oci
+    agent: spec-verifier
+  - id: rf-bug-v2-publish-immutable-oci-v2
+    name: Publish immutable OCI through transient commit-bound Buildx builder
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Execution route: `vectl-orchestrator` directly performs exactly one accepted
+      runtime-state operation identified as `RF-BUG-V2-IMMUTABLE-OCI-PUBLICATION-REPLACEMENT`.
+      This node has no repository-changing worker contract. Its sole new side-effect
+      authority is the completed `rf-bug-v2-transient-buildx-builder-authorization-review`;
+      the earlier failed publication step and its FAIL receipt remain diagnostic-only
+      and cannot authorize a replay.
+
+
+      Execute from one fresh isolated clean detached checkout at exact commit `1e49621c6b44ac2e55cd82f87960972d571bad64`.
+      Before mutation, require exact HEAD, empty tracked/untracked status, unchanged
+      source bytes, the sole immutable tag `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      absent, the exact builder name `resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      absent, and the current active/default builder captured as a nonsecret stable
+      fingerprint. Use only the existing Docker context/daemon and repository-scoped
+      credential without querying or retaining credential/account details.
+
+
+      Run the review-admitted lifecycle only. Create `resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      with `docker-container` and no `--use`; bootstrap only that builder through
+      explicit `--builder`; execute exactly one immutable push with explicit `--builder`,
+      platforms `linux/amd64,linux/arm64`, revision label `org.opencontainers.image.revision=1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      `--provenance=false`, `--sbom=false`, the sole tag, and context `.`; and attempt
+      exactly one `docker buildx rm resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      cleanup after every post-create success or bounded failure. Do not retry any
+      create, bootstrap, build, push, cleanup, or registry operation.
+
+
+      After a successful push, resolve and record the OCI index digest, exact linux/amd64
+      and linux/arm64 manifest digests, platform set, and revision-label equality.
+      Reject extra/missing platforms, incomplete or mismatched digest chains, a moved/mutable
+      alias, alternate repository/tag, or source mismatch. The resulting digest chain
+      is provisional until `rf-bug-v2-publish-immutable-oci-v2-verification` independently
+      admits it.
+
+
+      After any build or push failure, perform one final read-only observation of
+      the sole immutable tag and record either confirmed absence or the complete orphan
+      index/platform chain. Registry deletion, temporary tags, alias updates, and
+      a second push remain forbidden. Unknown remote state or an incomplete orphan
+      chain blocks and permits no downstream container or deployment operation.
+
+
+      After the single cleanup attempt, prove the exact builder and its BuildKit container
+      are absent and the user''s active/default builder fingerprint is unchanged.
+      Cleanup failure blocks even when publication succeeded; record exact nonsecret
+      residue, ownership evidence, and the authorized manual recovery command without
+      executing a retry. Never change Docker context/default builder, restart the
+      daemon, use a paid/cloud/remote builder, mutate another container/service, read
+      `.env`, expose secrets or credential paths, change credentials/accounts, delete
+      registry objects, deploy, touch Tailnet, or modify repository/Git state. Require
+      final detached clean HEAD and deterministic Git metadata equality.'
+    verification: One Orchestrator-owned runtime receipt records exact preconditions,
+      create/bootstrap/one-push/one-cleanup commands and exits, immutable index plus
+      amd64/arm64 digests and revision labels, final tag state, builder/container
+      absence, unchanged active/default builder, clean detached source, no secrets,
+      and no undeclared side effect; any publication, remote-state, or cleanup failure
+      leaves this step incomplete and blocks downstream.
+    refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    depends_on:
+    - rf-bug-v2-transient-buildx-builder-authorization-review
+    agent: vectl-orchestrator
+  - id: rf-bug-v2-publish-immutable-oci-v2-verification
+    name: Independently verify replacement OCI publication and builder cleanup
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      After the replacement execution completes, dispatch a fresh `integration-verifier`
+      with no publication or cleanup mutation authority. Independently re-observe
+      the sole immutable identity `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      and require one OCI index containing exactly linux/amd64 and linux/arm64, exact
+      platform manifest digests, and `org.opencontainers.image.revision=1e49621c6b44ac2e55cd82f87960972d571bad64`
+      on both platform images. Cross-check every digest and command identity against
+      the execution receipt. Reject placeholders, extra/missing platforms, mutable
+      aliases as authority, alternate repositories/tags, source mismatch, or an incomplete
+      chain.
+
+
+      Review the complete execution ledger and directly inspect current nonsecret
+      Docker state. Require exact builder `resofeed-publish-1e49621c6b44ac2e55cd82f87960972d571bad64`
+      absent, no BuildKit container residue attributable to it, and the active/default
+      builder fingerprint equal to the pre-operation fingerprint. Confirm the replacement
+      used driver `docker-container`, explicit `--builder`, no `--use`, one create,
+      one bootstrap, one push, and one cleanup attempt; the original three implicit-builder
+      failures were not retried; and no daemon restart, context/default change, paid/cloud/remote
+      builder, other container/service mutation, temporary tag, moving alias, registry
+      deletion, credential/account change, deployment, Tailnet action, or repository
+      mutation occurred.
+
+
+      Require the source execution checkout to have remained clean, detached, and
+      exact at `1e49621c6b44ac2e55cd82f87960972d571bad64`, with final Git metadata
+      equality. Preserve the three original failure artifacts and hashes as diagnostic-only
+      evidence. This verifier may run only read-only registry, Docker inventory, and
+      Git observations; it must not build, push, pull, create/remove a builder, remove
+      a container, delete a tag, deploy, or write a repository/report file.
+
+
+      Emit exactly one inline production-admissible `vectl.verifier.semantic.v1` receipt
+      for this lifecycle step. Use requirement ID `RF-BUG-V2-IMMUTABLE-OCI-PUBLICATION-REPLACEMENT`
+      for the exact index/platform/source-label chain and cleanup/default-builder
+      state transition. A missing digest, missing label, builder/container residue,
+      default drift, disclosure, unknown state, or undeclared side effect is blocking
+      and supplies no digest authority to `rf-bug-v2-docker-runtime-proof`.'
+    verification: Fresh L3 evidence independently proves the exact immutable index
+      and amd64/arm64 digest/label chain, execution command cardinality, original-failure
+      non-replay, transient builder/container removal, unchanged active/default builder
+      and source, nondisclosure, and absence of undeclared side effects; only its
+      admitted receipt supplies downstream digest authority.
+    refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    depends_on:
+    - rf-bug-v2-publish-immutable-oci-v2
+    agent: integration-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
