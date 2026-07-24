@@ -190744,43 +190744,70 @@ phases:
       and verification, immutable OCI/Tailnet repository procedure, preserved staging
       incident history, completed detached-head guard and polarity remediation, fresh
       no-SSH one-row replacement staging authorization, exact v2 two-file staging
-      operation, independent v9 stdin-fed `bash -s` diagnostic-phase staged-byte/current-prior/backup-digest/runtime/readiness
-      evidence, current publication/deployment authorization, immutable two-platform
+      operation, independent v10 stdin-fed `bash -s` diagnostic-phase staged-byte/current-prior/backup-digest/runtime/readiness
+      evidence with the exact stable protected-state projection and closed-command
+      nonmutation proof, current publication/deployment authorization, immutable two-platform
       OCI publication, both-platform container proof, strict-host-key-authenticated
       digest deployment to the sole FQDN/stack/path, formal security review, independent
       black-box verification, and defect-report closure.
 
 
       Preserve all prior failed/invalid/REJECTED staging, detached-guard, polarity-review,
-      v4, v5, v6, and v7 artifacts as immutable diagnostic-only history with no lifecycle
-      or external-operation authority. Preserve v8 evidence unchanged and do not retry,
-      correct, or complete v8: receipt file `sha256:7d266496a50f0c92de1793385216b4ea4f620eec25e29b8270bd017f7a620582`,
-      validator `sha256:af6bc0f129398222483c28f9df77a23cbbffb3d55fab37e9023328cfd03660c2`,
-      and canonical valid `REJECTED` receipt `sha256:25bb15205f5f4773c4acd2b617fc1c10a4fd0aef2972c698b0eccdc458229619`.
-      V8''s three local checks passed, but its one SSH argv ended with literal `bash
-      -c` and no command operand; the remote program never ran, exit 1 produced no
-      remote stdout, and the synthesized `PROBE_FAIL phase=canonical_stack status=1`
-      was not emitted by a remote trap. Treat v8 solely as verifier command-construction
-      failure. It proves no canonical-stack, volume, readiness, protected-state, target,
-      or product defect, and supplies no remote phase or later-operation authority.
+      v4-v8 artifacts as immutable diagnostic-only history with no lifecycle or external-operation
+      authority. Preserve v9 evidence unchanged and do not retry, correct, or complete
+      v9: receipt file `sha256:7e71dfe984f36e3199048e5f5c3056346660b166baf690e5bf5b2965b2d964a0`,
+      validator `sha256:cbfec7049af89b8bfd43d27b6b7992449628726a687eeb563259d4bf2f62ce71`,
+      and canonical valid `REJECTED` receipt `sha256:288d231af7049705288d4ac9651c9b91e99ca932227d57d821d8461a28a7a4b5`.
+      V9 passed all three local checks and, through the exact stdin-fed strict SSH
+      transport, passed canonical_stack, procedure_current, backup, docker_identity,
+      corrected Compose volume, tailnet_route, public_url, and root-200/Doctor-401
+      readiness, then actually emitted `PROBE_FAIL phase=protected_after status=1`.
+      Treat v9 solely as a verifier-plan fingerprint defect caused by undefined overbroad
+      equality across legitimately volatile background-ingest and Caddy-observation
+      state. It proves no product/data/target drift and supplies no lifecycle, retry,
+      correction, or external-operation authority.
 
 
-      Admit only fresh v9 evidence that retains the full v8 read-only procedure, corrected
-      Compose logical volume key `resofeed-data`, runtime mount and volume-label proof,
-      non-collapsible diagnostic phases, public-URL host validation, readiness, protected-state
-      equality, portability, strict literal-FQDN trust, one-probe/no-retry behavior,
-      and nondisclosure constraints. Require the actual local SSH argv to use `ssh`,
-      `-Fnone`, all maintained options and values as separate elements, literal destination
-      `tefx-mbp-personal.platy-atlas.ts.net`, then separate `bash`, `-s`, with the
-      bounded compatible remote program supplied exclusively on stdin. Reject `bash
-      -c`, `bash` plus `-c`, concatenated pseudo-argv, missing command operands, undocumented
-      remote-command argv elements, heredoc pseudo-argv, shell evaluation of remote
-      output, and alternate interpreters. Require the remote script to install phase
-      state and cooperating ERR/EXIT traps before its first assertion, immediately
-      emit `PROBE_PHASE=canonical_stack`, and emit every ordered success marker through
-      `PROBE_OK`. A no-stdout or markerless exit is transport/command-construction
-      failure; only an actual remote trap marker establishes `PROBE_FAIL phase=<last_phase>
-      status=<status>`.
+      Admit only fresh v10 evidence that retains every successful v9 contract: the
+      exact three local commands; exact literal-FQDN SSH argv ending in separate `bash`,
+      `-s`; bounded compatible stdin program; phase/trap installation before first
+      assertion; immediate canonical_stack marker; all non-collapsible phase/success
+      markers through `PROTECTED_STATE=unchanged` and `PROBE_OK`; exact current/prior/backup
+      hashes and modes; actual-running-image-ID RepoDigest resolution; staged Compose
+      logical `resofeed-data:/data`; runtime `/data` engine volume internally verified
+      by `com.docker.compose.volume=resofeed-data`; Tailnet TCP/HTTPS 443 to loopback
+      Caddy 8443; argv-only public URL validation without host disclosure; root `200`;
+      unauthenticated Doctor `401`; one probe/no retry; portability; and nondisclosure.
+
+
+      Require v10 to capture identical clean local repository HEAD/status before and
+      after the entire attempt. Its closed local allowlist contains only `git` reads
+      and exact `node` selection/run/test commands. Its remote stdin script may use
+      temporary in-memory shell variables/functions/conditionals/traps/substitutions/pipes,
+      but executable authority is closed to `cd/pwd/test/stat/shasum|sha256sum/grep/awk/sort/printf/cut/tr/case`,
+      read-only Docker container/image/volume inspection, read-only Tailscale serve
+      status, and exactly two GET-only curl readiness calls. It creates no persistent
+      file and cannot invoke Docker Compose or any pull/build/push/tag/rm/restart/stop/exec/cp,
+      Tailscale mutation, file write/move/copy, SQLite command, credential/secret/config
+      access, host-key mutation, or `systemctl`.
+
+
+      Require one deterministic protected-state projection captured before and after
+      by identical helpers, containing only: current remote deploy/Compose hashes
+      and modes; backup manifest hash/mode and backup deploy/Compose hashes/modes;
+      running resofeed container ID and exact image ID; running Caddy container ID
+      and exact image ID; resofeed `/data` mount Type/Destination plus internal actual
+      engine-volume identity and logical label `com.docker.compose.volume=resofeed-data`;
+      canonical route `TCP/HTTPS 443 -> 127.0.0.1:8443`; and internal hash of the
+      validated public URL host. Sort/canonicalize multi-value fields, compare only
+      the final digest internally, and emit only `PROTECTED_STATE=unchanged`. Explicitly
+      exclude SQLite main/WAL/SHM bytes, sizes, mtimes, and rows; application/Caddy
+      logs; HTTP/access counters; Docker health/status timestamps, PID, exec, and
+      transient network fields; Tailscale peer/address/session telemetry; filesystem
+      atime; command output order; and all secret/config values. Background ingest
+      remains allowed. `PROTECTED_STATE=unchanged` proves equality of this stable
+      projection plus the closed-command proof, never global machine/database equality.
+      Future OCI deferral is static and excluded from the fingerprint.
 
 
       Require the current integrated polarity-remediation commit and deploy-script
@@ -190789,14 +190816,8 @@ phases:
       and `PROCEDURE_DETACHED_MATRIX=green`; require exact `~/Projects/resofeed-caddy`
       stack identity, source/remote hash and mode equality, prior-byte recovery, manifest
       mode `600`, backup file identities and modes without child-directory mode assertion,
-      deterministic local Git metadata equality, and no short-host authority. Require
-      actual-running-image-ID RepoDigest resolution, staged Compose logical volume
-      `resofeed-data` at `/data`, exactly one runtime `/data` volume mount internally
-      bound by `com.docker.compose.volume=resofeed-data` without engine-name/label
-      disclosure, Tailnet TCP/HTTPS 443 to loopback Caddy 8443, argv-only public URL
-      validation without host disclosure, root `200`, unauthenticated Doctor `401`,
-      and exact protected-state before/after equality. Final immutable deployed identity
-      remains proven only by the publication, dual-platform, and deployment producers.
+      and no short-host authority. Final immutable deployed identity remains proven
+      only by the publication, dual-platform, and deployment producers.
 
 
       Immediately before closure require Vectl structure/ref validation, current accepted-plan
@@ -190806,23 +190827,24 @@ phases:
       and orphan/prior-digest recovery evidence, strict host-key and credential boundaries,
       secret non-disclosure, public-host non-disclosure, no unresolved finding, current
       report hash, and HEAD equality. Skipped legacy nodes, invalid/rejected diagnostic
-      receipts, stale identities, v8, and item-deep-links future work are never admission
+      receipts, stale identities, v9, and item-deep-links future work are never admission
       inputs.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v9","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v10","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
     verification: Full Gate covers the polarity remediation, behavior-backed symbolic-ref
       proof, one-row fresh no-SSH staging review, exact-once v2 staging, independent
-      v9 stdin-fed `bash -s` diagnostic-phase staged-byte/runtime/readiness proof,
-      current publication/deployment authority, immutable OCI and dual-platform proof,
-      strict-FQDN SSH digest deployment, public-URL-derived Caddy readiness, security/black-box/closure
-      evidence, current hashes/HEAD, separate recovery boundaries, secret and public-host
-      non-disclosure, and no out-of-scope blocker; v8 and all stale, invalid, or REJECTED
-      incident material remain immutable diagnostic-only history.
+      v10 stdin-fed `bash -s` proof, exact defined stable protected-state projection
+      plus closed-command nonmutation evidence, current publication/deployment authority,
+      immutable OCI and dual-platform proof, strict-FQDN digest deployment, public-host-derived
+      Caddy readiness, security/black-box/closure evidence, current hashes/HEAD, separate
+      recovery boundaries, nondisclosure, and no out-of-scope blocker; v9 and all
+      stale, invalid, or REJECTED incident material remain immutable diagnostic-only
+      history.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
