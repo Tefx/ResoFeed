@@ -190392,7 +190392,7 @@ phases:
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
-    - rf-bug-v2-immutable-deployment-procedure-verification-v5
+    - rf-bug-v2-immutable-deployment-procedure-verification-v6
     agent: spec-verifier
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
