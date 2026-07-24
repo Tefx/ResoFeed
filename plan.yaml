@@ -190392,7 +190392,7 @@ phases:
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
-    - rf-bug-v2-immutable-deployment-procedure-verification-v4
+    - rf-bug-v2-immutable-deployment-procedure-verification-v5
     agent: spec-verifier
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
@@ -192584,19 +192584,19 @@ phases:
       strict literal-FQDN known-key identity, and no side effects. Valid prior review
       rejection sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8
       remains immutable remediation evidence. No external operation occurred.
-  - id: rf-bug-v2-immutable-deployment-procedure-verification-v4
-    name: Verify authenticated-endpoint immutable procedure and target readiness (portable
-      semantic v4)
+  - id: rf-bug-v2-immutable-deployment-procedure-verification-v5
+    name: Verify authenticated-endpoint immutable procedure and target readiness (bounded-marker
+      semantic v5)
     status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
 
 
-      Fresh portable successor to the uncompleted `rf-bug-v2-immutable-deployment-procedure-verification-v3`.
-      A fresh `integration-verifier` child must execute this node; do not resume or
-      correct any prior child/session and do not complete or retry v3. Perform only
-      fresh local checks and strictly read-only SSH inspection of the exact target.
+      Fresh bounded-marker successor to the uncompleted `rf-bug-v2-immutable-deployment-procedure-verification-v4`.
+      A fresh `integration-verifier` child must execute this node; do not resume,
+      retry, correct, or complete v4 or any prior child/session. Perform only fresh
+      local checks and one strictly read-only SSH inspection of the exact target.
       Do not modify repository files, copy or stage files, enroll/update/remove host
       keys, pull, build, push, tag, delete, publish, deploy, restart, stop, recover,
       reset tokens, clear data, change credentials/accounts, print `.env`, inspect
@@ -192609,7 +192609,7 @@ phases:
       `verdict`, `gate_open_allowed`, `orchestrator_action_hint`, `completion_authority`,
       `blockers`, `warnings`, `notes`, `evidence_refs`, `requirement_coverage`, and
       `specialist_receipt`. Require `verifier_id` = `integration-verifier`, `step_id`
-      = `rf-bug-v2-immutable-deployment-procedure-verification-v4`, and this exact
+      = `rf-bug-v2-immutable-deployment-procedure-verification-v5`, and this exact
       ordered `scope`: [`corrected symbolic-ref polarity and detached behavior matrix`,
       `exact staged source and remote procedure hashes and modes`, `strict literal-FQDN
       trust, recovery readiness, and protected-state invariance`, `future OCI identity
@@ -192629,7 +192629,9 @@ phases:
       Literal shell syntax actually executed is recorded verbatim. Keep command content
       bounded and nonsecret; retained evidence values remain masked or nonsecret.
       The production semantic validator must admit the fresh receipt before lifecycle
-      completion.
+      completion. This v5 may pass and be completed only when every required proof
+      holds; any nonzero live probe must produce an admitted receipt that identifies
+      the last emitted probe phase and cannot hide the failure stage.
 
 
       From one fresh clean integrated head after completed `rf-bug-v2-detached-head-guard-polarity-remediation`,
@@ -192675,26 +192677,58 @@ phases:
       or omitted program text in the command record.
 
 
-      The bounded remote program must be portable to the macOS Tailnet target while
-      retaining safe GNU fallbacks. Derive the canonical stack from `canonical_home=$(CDPATH=
+      The one bounded remote program must be portable to the macOS Tailnet target
+      while retaining safe GNU fallbacks. It must maintain a nonsecret phase ledger:
+      immediately before each assertion group set the last-phase value and emit exactly
+      one stable marker in this order: `PROBE_PHASE=canonical_stack`, `PROBE_PHASE=procedure_current`,
+      `PROBE_PHASE=backup`, `PROBE_PHASE=docker_identity`, `PROBE_PHASE=volume`, `PROBE_PHASE=tailnet_route`,
+      `PROBE_PHASE=readiness`, and `PROBE_PHASE=protected_state`. Install an EXIT
+      trap before assertions that emits exactly `PROBE_FAIL=<last-phase>` on nonzero.
+      Emit `PROBE_OK` only after every assertion passes. Phase output must not reveal
+      raw paths, configuration, credentials, tokens, keys, `.env` values, host-key
+      material, authentication paths, or secret-source paths. The semantic receipt
+      must report the observed ordered phase markers and the terminal `PROBE_OK` or
+      exact `PROBE_FAIL=<last-phase>` marker.
+
+
+      In `canonical_stack`, derive the canonical stack from `canonical_home=$(CDPATH=
       cd -- "$HOME" && pwd -P)` and `canonical_stack="${canonical_home}/Projects/resofeed-caddy"`;
-      verify exact canonical path, basename/project identity, and regular non-symlink
-      files. Use the same mode helper for staged, prior, and content-addressed backup
-      files, with BSD-first/GNU-fallback semantics exactly equivalent to `stat -f
-      ''%Lp'' "$path" 2>/dev/null || stat -c ''%a'' "$path"`, and require `755` for
-      `deploy.sh` plus `644` for `compose.yml` and their prior/backup counterparts.
+      verify exact canonical path, basename/project identity, and required regular
+      non-symlink files. Use the same mode helper for staged, prior, manifest, and
+      content-addressed backup files, with BSD-first/GNU-fallback semantics exactly
+      equivalent to `stat -f ''%Lp'' "$path" 2>/dev/null || stat -c ''%a'' "$path"`.
       Use `shasum -a 256` when available, with a guarded optional `sha256sum` fallback,
-      for every current, prior, and backup byte identity; do not assume GNU utilities.
-      Export `PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"` before
-      every Docker CLI use. Do not invoke or probe `systemctl`. Inspect Tailnet routing
-      only with available read-only `tailscale serve status`. Verify shell and Compose
-      shape without mutation and record only approved nonsecret/masked outcomes.
+      for every current, prior, manifest-selected, and backup byte identity; do not
+      assume GNU utilities. Export `PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"`
+      before every Docker CLI use. Do not invoke or probe `systemctl`.
 
 
-      Derive the running `resofeed` container''s actual immutable image ID through
-      read-only Docker container metadata, then resolve that exact image ID''s repository
-      digests through read-only Docker image metadata. Accept prior rollback identity
-      only when the actual running image ID resolves uniquely to exactly one `docker.io/tefx/resofeed@sha256:<64-lowercase-hex>`
+      In `procedure_current`, prove authenticated endpoint identity; exact source/remote
+      current procedure hash and mode equality; `755` for `deploy.sh`; `644` for `compose.yml`;
+      and nonsecret prior procedure hashes/modes with the prior deploy file at `755`,
+      prior compose file at `644`, and exact current/prior identities needed for recovery.
+      Verify shell and Compose shape without mutation.
+
+
+      In `backup`, require the content-addressed backup path to be a real directory
+      and not a symlink. Require only contract-owned manifest/file invariants: the
+      manifest is a regular non-symlink file at mode `600` with exact identity rows;
+      the backup deploy file is regular/non-symlink at mode `755` with hash exactly
+      equal to the prior deploy bytes; the backup compose file is regular/non-symlink
+      at mode `644` with hash exactly equal to the prior compose bytes; and recomputation
+      of the backup identity from those exact rows/files equals the content-addressed
+      identity. Do not assert or require mode `700`, or any other mode, on the content-addressed
+      child directory. `BACKUP_ROOT` protection may be observed only when the maintained
+      implementation requires that observation; it is non-blocking implementation
+      detail and must not become a new product requirement or blocker.
+
+
+      In `docker_identity`, derive the running `resofeed` container''s actual immutable
+      image ID through read-only Docker container metadata, then resolve that exact
+      image ID''s repository digests through read-only Docker image metadata. Canonically
+      normalize Docker Hub forms so permitted `tefx/resofeed`/Docker-Hub equivalents
+      compare as `docker.io/tefx/resofeed`, then accept prior rollback identity only
+      when the actual running image ID resolves uniquely to exactly one `docker.io/tefx/resofeed@sha256:<64-lowercase-hex>`
       repository digest. Do not require `.Config.Image` itself to be digest-form:
       a moving configured reference is acceptable for this pre-publication prior-state
       check only when it names the permitted repository and the actual running image
@@ -192704,29 +192738,32 @@ phases:
       publication or deployment.
 
 
-      Prove authenticated endpoint identity, exact source/remote current procedure
-      hash and mode equality, nonsecret prior procedure hashes/modes, content-addressed
-      backup identity and matching backup modes, and available restoration without
-      executing recovery. Verify the named volume `resofeed-caddy_resofeed-data` remains
-      mounted at `/data`; root readiness is `200`; unauthenticated `/api/doctor` readiness
-      is `401`; and Tailnet TCP/443 ownership matches the maintained stack. Unknown/changed
-      host key, effective endpoint rewrite, trust bypass, alternate host/path/account,
-      credential drift, secret exposure, volume drift, readiness drift, or unresolved
-      image identity is BLOCKED before any later authority.
+      In `volume`, verify the named volume `resofeed-caddy_resofeed-data` remains
+      mounted at `/data`. In `tailnet_route`, inspect only available read-only `tailscale
+      serve status`, require Tailnet TCP/443 ownership by the maintained stack, and
+      do not invoke or probe `systemctl`. In `readiness`, use the exact authorized
+      FQDN directly for loopback Caddy probes, including curl `--resolve tefx-mbp-personal.platy-atlas.ts.net:443:127.0.0.1`
+      against HTTPS URLs whose host is exactly `tefx-mbp-personal.platy-atlas.ts.net`;
+      require root readiness `200` and unauthenticated `/api/doctor` readiness `401`.
+      Do not derive certificate SANs, inspect certificate content, or add certificate-content
+      requirements absent from the plan.
 
 
-      Independently verify completed v2 staging changed no image, container, `.env`,
-      Caddy/Tailscale state, SQLite volume/data, owner-token state, credential/account,
-      host-key trust, secret input, Docker/registry state, service state, or local
-      repository/Git metadata. Re-prove the downstream release contract without executing
-      it: publication is limited to `docker.io/tefx/resofeed`; the immutable tag is
-      bound to the later verified polarity-remediation commit; one OCI index digest
-      and exact linux/amd64 plus linux/arm64 manifest digests are required; mutable
-      tags and incomplete or mismatched chains are rejected; temporary-tag cleanup
-      requires separate exact authority or the orphan chain is recorded; deployment
+      In `protected_state`, independently verify completed v2 staging changed no image,
+      container, `.env`, Caddy/Tailscale state, SQLite volume/data, owner-token state,
+      credential/account, host-key trust, secret input, Docker/registry state, service
+      state, or local repository/Git metadata. Re-prove the downstream release contract
+      without executing it: publication is limited to `docker.io/tefx/resofeed`; the
+      immutable tag is bound to the later verified polarity-remediation commit; one
+      OCI index digest and exact linux/amd64 plus linux/arm64 manifest digests are
+      required; mutable tags and incomplete or mismatched chains are rejected; temporary-tag
+      cleanup requires separate exact authority or the orphan chain is recorded; deployment
       remains limited to the exact authenticated FQDN/stack/path; and evidence contains
       no credential, token, provider key, `.env` value, host-key material, authentication
-      path, or secret-source path.
+      path, or secret-source path. Unknown/changed host key, effective endpoint rewrite,
+      trust bypass, alternate host/path/account, credential drift, secret exposure,
+      volume drift, readiness drift, or unresolved image identity is blocking before
+      any later authority.
 
 
       Preserve the first immutable-procedure semantic FAIL receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-23T19-22-26-742Z-2026-07-23T19-11-50-828Z_019f9064-282c-7a73-ba92-fcbf9ad1478d.js-f1d73b54f1abcc84.txt`
@@ -192774,14 +192811,19 @@ phases:
       authority and must not be retried, corrected, or completed.
 
 
-      V3 local selected execution passed, while its sole live read-only probe exited
-      before positive evidence. Its generated program used Linux-only `stat -c` and
-      `systemctl` on the macOS Tailnet target, omitted the required OrbStack Docker
-      PATH before Docker CLI use, and incorrectly required `.Config.Image` itself
-      to be digest-pinned despite the permitted actual-image-ID resolution rule. Classify
-      these as verifier-generated probe defects, not product or target defects; v4
-      must freshly re-observe every remote fact with the portable maintained probe
-      contract above.
+      Preserve v4 receipt file SHA-256 `6d095829aca527e29d3d10caa088545cb884278161c7e0af2c260cf31f83d8c0`,
+      validator file SHA-256 `22f1eac592857d7f2b6dd7e10145b13c8f9f99a50388a11894416e465c4ade31`,
+      and canonical semantic receipt SHA-256 `ff2e910222fa30439e8d260c868bd03f917f05ccca982ab372a660e88d18aa54`
+      unchanged as production-validator-admitted `REJECTED` evidence with `INCONCLUSIVE`
+      / `ESCALATE`. V4 local selected proof passed, but its sole live read-only probe
+      exited before positive evidence. The probe asserted mode `700` on the content-addressed
+      child backup directory even though maintained `create_backup` only protects
+      `.resofeed-procedure-backups` and creates the child with ordinary `mkdir`; it
+      also emitted only final `PROBE_OK`, so no failure stage was observable. Classify
+      the child-directory mode assertion and missing failure-stage ledger as verifier-generated
+      probe defects, not product or target defects. V4 supplies no lifecycle completion,
+      product-failure, target-blocker, or external-operation authority and must not
+      be retried, corrected, or completed.
 
 
       The pre-publication target is not required to run the future unpublished index
@@ -192790,13 +192832,15 @@ phases:
       and `rf-bug-v2-tailnet-caddy-proof`; record them as correctly deferred, not
       as current gaps.'
     verification: Fresh production-admitted integration-verifier selected execution
-      and exact-argv portable read-only SSH receipt prove corrected symbolic-ref polarity,
-      detached fake-target coverage, strict literal-FQDN trust, staged/current/prior/backup
-      byte and mode identities, unique actual-image-ID resolution to the permitted
-      repository digest, protected-state invariance, named /data volume, 200/401 readiness,
-      and correct future OCI deferral; command records contain `-Fnone`, every maintained
-      option, and the full actual bounded remote program with no placeholders or standalone
-      `none`.
+      and one exact-argv portable read-only SSH receipt prove corrected symbolic-ref
+      polarity, detached fake-target coverage, strict literal-FQDN trust, staged/current/prior/manifest/backup
+      file identities, unique actual-image-ID RepoDigest resolution with Docker Hub
+      canonical normalization, named /data volume, exact Tailnet route, 200/401 loopback-FQDN
+      readiness, protected-state invariance, and correct future OCI deferral. The
+      live program emits the ordered bounded `PROBE_PHASE` ledger, exactly one `PROBE_FAIL=<last-phase>`
+      on nonzero, and final `PROBE_OK` only after all assertions; it never requires
+      mode 700 on the content-addressed backup child, derives certificate SANs, invokes
+      systemctl, or records placeholders/standalone none.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
