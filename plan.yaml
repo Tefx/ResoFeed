@@ -190515,39 +190515,46 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Consume only the OCI index and exact linux/amd64 and linux/arm64 manifest digests
-      admitted by `rf-bug-v2-publish-immutable-oci-v2-verification` for `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`.
-      The superseded `rf-bug-v2-publish-immutable-oci` step, its three failed commands,
-      and its FAIL receipt are diagnostic-only and supply no digest, pull, container,
-      deployment, or retry authority. Reject an incomplete or mismatched chain, wrong
-      revision label, extra/missing platform, alternate repository/tag, mutable alias,
-      placeholder, builder residue, or default-builder drift.
+      Independently consume and re-observe the OCI index and exact linux/amd64 and
+      linux/arm64 manifest digests produced by `rf-bug-v2-publish-immutable-oci` for
+      `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`. Require
+      exactly those two platforms and `org.opencontainers.image.revision=1e49621c6b44ac2e55cd82f87960972d571bad64`
+      on both images. Reject placeholders, extra/missing platforms, mutable aliases,
+      alternate repository/tag, incomplete or mismatched chains, source mismatch,
+      builder residue, or active/default-builder drift. Preserve the original three
+      failed implicit-builder attempts and their FAIL artifacts as diagnostic-only
+      evidence; they supply no digest or runtime authority.
 
 
-      Run the container contract against that exact immutable index identity on both
-      platforms. Prove `/app/resofeed`, writable persistent `/data`, non-root runtime,
-      arbitrary cwd, embedded UI without an external UI tree or Node runtime, redacted
-      Doctor lines, import-only OPML, JSON State backup/restore, four headers, CSP,
-      and A-to-B persistence. Bind every observed runtime image to the replacement
-      index/platform chain.
+      Run the container contract against that exact immutable identity on both platforms.
+      Prove `/app/resofeed`, writable persistent `/data`, non-root runtime, arbitrary
+      cwd, embedded UI without an external UI tree or Node runtime, redacted Doctor
+      lines, import-only OPML, JSON State backup/restore, four headers, CSP, and A-to-B
+      persistence. Cross-check publication command cardinality, explicit transient
+      builder use, its cleanup, and unchanged default-builder fingerprint against
+      the publication receipt.
 
 
-      Recovery removes only the ephemeral verification containers and volumes created
-      by this step. It cannot remove or alter the transient Buildx builder, registry
-      objects, application deployment, credentials/accounts, or unrelated containers/volumes.
-      Any platform, digest, label, cleanup, or runtime failure blocks deployment and
-      records exact nonsecret residue/recovery without alternate identity or destructive
-      fallback.'
-    verification: Only the replacement verifier-admitted immutable digest chain is
-      tested; exact amd64 and arm64 probes prove non-root binary-only runtime, writable
-      /data, arbitrary cwd, embedded UI/Doctor, state, headers/CSP, persistence, and
-      bounded ephemeral cleanup while the original failed publication remains non-authoritative.
+      Recovery removes only ephemeral verification containers and volumes created
+      by this step. It cannot mutate builders, registry objects, deployment, credentials/accounts,
+      or unrelated containers/volumes. Any platform, digest, label, cleanup, runtime,
+      nondisclosure, or identity failure blocks deployment and records bounded nonsecret
+      residue/recovery evidence.'
+    verification: Fresh independent evidence binds the exact tag/index/amd64/arm64/revision
+      chain to the corrected same-step publication, proves the named transient builder
+      and attributable container are absent with the default builder unchanged, and
+      passes both-platform non-root binary-only runtime, writable /data, arbitrary
+      cwd, embedded UI/Doctor, state, headers/CSP, persistence, and bounded cleanup.
+      Original failed attempts remain non-authoritative diagnostics.
     refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
     - Dockerfile
     depends_on:
-    - rf-bug-v2-publish-immutable-oci-v2-verification
+    - rf-bug-v2-publish-immutable-oci
     agent: integration-verifier
   - id: rf-bug-v2-tailnet-caddy-proof
     name: Deploy authorized digest and verify authenticated Tailnet/Caddy runtime
