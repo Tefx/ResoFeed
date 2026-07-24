@@ -280,6 +280,7 @@ export const PENDING_PROFILE_PAIRS = [
       'PROCEDURE_DETACHED_MATRIX=green',
       'PROCEDURE_IDENTITY=source_commit_and_sha256',
       'PROCEDURE_RECOVERY=prior_bytes',
+      'PROCEDURE_ORBSTACK_DOCKER_PATH=verified',
       'PROCEDURE_SIDE_EFFECTS=none',
       'PROBE_HARNESS=tracked_read_only',
       'PROBE_TRANSPORT=one_ssh_stdin',
@@ -637,6 +638,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'trap on_probe_error ERR',
     'trap on_probe_exit EXIT',
     "printf 'PROBE_PHASE=canonical_stack\\n'",
+    'export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"',
     'com.docker.compose.volume',
     'resofeed-data',
     'TCP/HTTPS 443 -> 127.0.0.1:8443',
@@ -650,6 +652,9 @@ export function verifyImmutableDeploymentSources(sources) {
     'Tracked read-only probe harness',
     'PROBE_PHASE=canonical_stack',
     'one SSH process and never retries',
+    'macOS target requires OrbStack',
+    'preserves the caller PATH as the unchanged suffix',
+    'never prints or discloses PATH',
     'stable projection'
   ]);
   requireDeploymentFragments(sources, 'docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md', [
@@ -697,6 +702,24 @@ export function verifyImmutableDeploymentSources(sources) {
   if ((remoteProbe.match(/^shift$/gmu) ?? []).length !== 11
       || !remoteProbe.includes("expected_manifest_sha256=$(printf 'schema_version=resofeed.procedure-backup.v1\\nbackup_id=%s\\ndeploy.sh=%s mode=%s\\ncompose.yml=%s mode=%s\\n'")) {
     throw new AdapterFailure('tracked read-only probe missed exact positional consumption or internal manifest derivation');
+  }
+  const orbStackPathLine = 'export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"';
+  const orbStackPathIndex = remoteProbe.indexOf(orbStackPathLine);
+  const finalScalarValidationIndex = remoteProbe.indexOf('[ "$EXPECTED_PRIOR_COMPOSE_MODE" = 644 ]');
+  const dockerIdentityPhaseIndex = remoteProbe.indexOf('\nprobe_phase=docker_identity\n');
+  if ((remoteProbe.match(/export PATH="\/Applications\/OrbStack\.app\/Contents\/MacOS\/xbin:\$PATH"/gu) ?? []).length !== 1
+      || finalScalarValidationIndex < 0
+      || orbStackPathIndex <= finalScalarValidationIndex
+      || dockerIdentityPhaseIndex <= orbStackPathIndex) {
+    throw new AdapterFailure('immutable deployment tracked read-only probe missed the exact single post-validation OrbStack Docker PATH prefix');
+  }
+  if (/(?:printf|echo)[^\n]*\$\{?PATH\}?/u.test(remoteProbe)) {
+    throw new AdapterFailure('immutable deployment tracked read-only probe can disclose PATH');
+  }
+  for (const forbidden of ['DOCKER_HOST', 'CONTAINER_HOST', 'docker.sock', '/usr/local/bin/docker', '/opt/homebrew/bin/docker', '/Applications/Docker.app', '--host', ' -H ']) {
+    if (remoteProbe.includes(forbidden)) {
+      throw new AdapterFailure(`immutable deployment tracked read-only probe retained alternate Docker resolution: ${forbidden}`);
+    }
   }
   for (const forbidden of ['eval ', 'bash -c', 'scp ', 'rsync ', 'StrictHostKeyChecking=no', 'accept-new', 'ProxyCommand', 'ProxyJump']) {
     if (`${probeWrapper}\n${remoteProbe}`.includes(forbidden)) {
@@ -807,6 +830,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_DETACHED_MATRIX=green',
     'PROCEDURE_IDENTITY=source_commit_and_sha256',
     'PROCEDURE_RECOVERY=prior_bytes',
+    'PROCEDURE_ORBSTACK_DOCKER_PATH=verified',
     'PROCEDURE_SIDE_EFFECTS=none',
     'PROBE_HARNESS=tracked_read_only',
     'PROBE_TRANSPORT=one_ssh_stdin',

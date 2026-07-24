@@ -727,6 +727,8 @@ test('immutable OCI and Tailnet deployment procedure', () => {
 
   const deployPath = 'deploy/resofeed-caddy/deploy.sh';
   const composePath = 'deploy/resofeed-caddy/compose.yml';
+  const remoteProbePath = 'deploy/resofeed-caddy/verify-remote.sh';
+  const orbStackPathLine = 'export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"';
   const movingTag = ['late', 'st'].join('');
   const clearData = ['--clear', '-data'].join('');
   const resetToken = ['--reset', '-token'].join('');
@@ -759,6 +761,10 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replace('PROCEDURE_ROLLBACK=prior_bytes_restored', 'PROCEDURE_ROLLBACK=unavailable')),
     mutation(deployPath, (body) => `${body}\ndocker manifest rm unauthorized\n`),
     mutation(deployPath, (body) => `${body}\nprintf '%s\\n' "$OPENROUTER_KEY"\n`),
+    mutation(remoteProbePath, (body) => body.replace(orbStackPathLine, 'export PATH="$PATH"')),
+    mutation(remoteProbePath, (body) => body.replace(orbStackPathLine, `${orbStackPathLine}\n${orbStackPathLine}`)),
+    mutation(remoteProbePath, (body) => `${body}\nexport DOCKER_HOST=unix:///alternate/docker.sock\n`),
+    mutation(remoteProbePath, (body) => `${body}\nprintf '%s\\n' "$PATH"\n`),
     mutation(deployPath, (body) => `${body}\n${clearData}\n`),
     mutation(deployPath, (body) => `${body}\n${resetToken}\n`)
   ];
@@ -824,8 +830,9 @@ test('RF-BUG-V2 tracked read-only probe harness', () => {
     const remoteHome = path.join(root, 'remote-home');
     const remoteStack = path.join(remoteHome, 'Projects', 'resofeed-caddy');
     const fakeBin = path.join(root, 'fake-bin');
+    const orbStackBin = path.join(root, 'orbstack-xbin');
     const evidence = path.join(root, 'evidence');
-    for (const directory of [sourceStack, remoteStack, fakeBin, evidence]) fs.mkdirSync(directory, { recursive: true });
+    for (const directory of [sourceStack, remoteStack, fakeBin, orbStackBin, evidence]) fs.mkdirSync(directory, { recursive: true });
 
     for (const name of ['deploy.sh', 'compose.yml']) {
       fs.copyFileSync(path.join(repoRoot, 'deploy', 'resofeed-caddy', name), path.join(sourceStack, name));
@@ -891,10 +898,12 @@ test('RF-BUG-V2 tracked read-only probe harness', () => {
     const curlLogPath = path.join(evidence, 'curl-arguments');
     const curlCountPath = path.join(evidence, 'curl-count');
     const surfaceLogPath = path.join(evidence, 'surfaces');
+    const dockerPathChecksPath = path.join(evidence, 'docker-path-checks');
     fs.writeFileSync(sshAttemptsPath, '');
     fs.writeFileSync(curlLogPath, '');
     fs.writeFileSync(curlCountPath, '0\n');
     fs.writeFileSync(surfaceLogPath, '');
+    fs.writeFileSync(dockerPathChecksPath, '');
 
     executable(path.join(fakeBin, 'ssh'), `#!/usr/bin/env bash
 set -Eeuo pipefail
@@ -910,16 +919,19 @@ done
 [[ "$#" -eq 11 ]]
 for transported in "$@"; do [[ "$transported" != *=* ]]; done
 set +e
-remote_output=$(HOME="$FAKE_REMOTE_HOME" PATH="$FAKE_REMOTE_BIN:$REAL_PATH" /bin/bash -s -- "$@" < "$FAKE_SSH_STDIN" 2>> "$FAKE_SURFACE_LOG")
+remote_output=$(/usr/bin/sed "s|/Applications/OrbStack.app/Contents/MacOS/xbin|$FAKE_ORBSTACK_BIN|g" "$FAKE_SSH_STDIN" | HOME="$FAKE_REMOTE_HOME" PATH="$FAKE_REMOTE_BIN:$REAL_PATH" /bin/bash -s -- "$@" 2>> "$FAKE_SURFACE_LOG")
 remote_status=$?
 set -e
 printf '%s\\n' "$remote_output" > "$FAKE_REMOTE_OUTPUT"
 printf '%s\\n' "$remote_output"
 exit "$remote_status"
 `);
-    executable(path.join(fakeBin, 'docker'), `#!/usr/bin/env bash
+    executable(path.join(orbStackBin, 'docker'), `#!/usr/bin/env bash
 set -Eeuo pipefail
-printf 'docker %s\\n' "$*" >> "$FAKE_SURFACE_LOG"
+[[ "$PATH" == "$FAKE_ORBSTACK_BIN:$FAKE_REMOTE_BIN:$REAL_PATH" ]] || exit 43
+[[ "$(command -v docker)" == "$FAKE_ORBSTACK_BIN/docker" ]] || exit 44
+printf 'verified\\n' >> "$FAKE_DOCKER_PATH_CHECKS"
+printf 'orbstack-docker %s\\n' "$*" >> "$FAKE_SURFACE_LOG"
 if [[ "\${FAKE_DOCKER_FAIL:-0}" == 1 ]]; then exit 41; fi
 if [[ "$1 $2" == 'container inspect' ]]; then
   format=$4
@@ -989,6 +1001,8 @@ exec "$REAL_SHASUM" "$@"
       TMPDIR: root,
       FAKE_REMOTE_HOME: remoteHome,
       FAKE_REMOTE_BIN: fakeBin,
+      FAKE_ORBSTACK_BIN: orbStackBin,
+      FAKE_DOCKER_PATH_CHECKS: dockerPathChecksPath,
       FAKE_SSH_ARGUMENTS: sshArgumentsPath,
       FAKE_SSH_STDIN: sshStdinPath,
       FAKE_SSH_ATTEMPTS: sshAttemptsPath,
@@ -1023,7 +1037,9 @@ exec "$REAL_SHASUM" "$@"
       remoteOutputPath,
       curlLogPath,
       curlCountPath,
-      surfaceLogPath
+      surfaceLogPath,
+      dockerPathChecksPath,
+      orbStackBin
     };
   }
 
@@ -1050,13 +1066,24 @@ exec "$REAL_SHASUM" "$@"
     assert.notEqual(happy.sourceCommit, happy.integratedCommit);
     assert.equal(fs.readFileSync(happy.sshAttemptsPath, 'utf8'), 'attempt\n');
     assert.equal(fs.readFileSync(happy.curlCountPath, 'utf8'), '2\n');
+    assert.equal(fs.existsSync(path.join(happy.environment.FAKE_REMOTE_BIN, 'docker')), false);
+    const dockerPathChecks = fs.readFileSync(happy.dockerPathChecksPath, 'utf8').trim().split('\n');
+    assert.equal(dockerPathChecks.length, 21);
+    assert.equal(dockerPathChecks.every((row) => row === 'verified'), true);
+    const surfaceLog = fs.readFileSync(happy.surfaceLogPath, 'utf8');
+    const dockerObservations = surfaceLog.split('\n').filter((row) => row.startsWith('orbstack-docker '));
+    assert.equal(dockerObservations.length, 21);
+    assert.equal(surfaceLog.split('\n').some((row) => row.startsWith('docker ')), false);
+    const disclosedSurfaces = [result.stdout, result.stderr, fs.readFileSync(happy.remoteOutputPath, 'utf8'), surfaceLog].join('\n');
+    assert.doesNotMatch(disclosedSurfaces, /\/Applications\/OrbStack\.app\/Contents\/MacOS\/xbin/u);
+    assert.equal(disclosedSurfaces.includes(`${happy.orbStackBin}:${happy.environment.FAKE_REMOTE_BIN}:${happy.environment.REAL_PATH}`), false);
     const curlArguments = fs.readFileSync(happy.curlLogPath).toString();
     assert.match(curlArguments, /resofeed\.example\.test:443:127\.0\.0\.1:8443/u);
     assert.doesNotMatch(curlArguments, /tefx-mbp-personal\.platy-atlas\.ts\.net/u);
     assert.doesNotMatch(result.stdout, /resofeed\.example\.test|peer-session-volatile|sqlite|\.env|token|secret/iu);
-    assert.match(fs.readFileSync(happy.surfaceLogPath, 'utf8'), /docker container inspect/u);
-    assert.match(fs.readFileSync(happy.surfaceLogPath, 'utf8'), /docker volume inspect/u);
-    assert.match(fs.readFileSync(happy.surfaceLogPath, 'utf8'), /tailscale serve status/u);
+    assert.match(surfaceLog, /orbstack-docker container inspect/u);
+    assert.match(surfaceLog, /orbstack-docker volume inspect/u);
+    assert.match(surfaceLog, /tailscale serve status/u);
     const procedurePaths = [
       wrapperSource.match(/SOURCE_DEPLOY_PATH="([^"]+)"/u)?.[1],
       wrapperSource.match(/SOURCE_COMPOSE_PATH="([^"]+)"/u)?.[1]
@@ -1177,7 +1204,12 @@ exec "$REAL_SHASUM" "$@"
   assert.doesNotMatch(wrapperSource, /ssh -F none|--backup-manifest-sha256|RESOFEED_PROBE_/u);
   assert.equal((remoteSource.match(/^shift$/gmu) ?? []).length, 11);
   assert.match(remoteSource, /expected_manifest_sha256=\$\(printf 'schema_version=resofeed\.procedure-backup\.v1\\nbackup_id=%s\\ndeploy\.sh=%s mode=%s\\ncompose\.yml=%s mode=%s\\n'/u);
-  assert.doesNotMatch(remoteSource, /EXPECTED_BACKUP_MANIFEST_SHA256|RESOFEED_PROBE_/u);
+  const orbStackPathLine = 'export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"';
+  assert.equal(remoteSource.split(orbStackPathLine).length - 1, 1);
+  assert.ok(remoteSource.indexOf(orbStackPathLine) > remoteSource.indexOf('[ "$EXPECTED_PRIOR_COMPOSE_MODE" = 644 ]'));
+  assert.ok(remoteSource.indexOf(orbStackPathLine) < remoteSource.indexOf('\nprobe_phase=docker_identity\n'));
+  assert.doesNotMatch(remoteSource, /EXPECTED_BACKUP_MANIFEST_SHA256|RESOFEED_PROBE_|DOCKER_HOST|CONTAINER_HOST|docker\.sock|\/usr\/local\/bin\/docker|\/opt\/homebrew\/bin\/docker|\/Applications\/Docker\.app|--host| -H /u);
+  assert.doesNotMatch(remoteSource, /(?:printf|echo)[^\n]*\$\{?PATH\}?/u);
   assert.equal((remoteSource.match(/\bcurl\b/gu) ?? []).length, 2);
   assert.match(remoteSource, /com\.docker\.compose\.volume/u);
   assert.match(remoteSource, /DATA_VOLUME_LABEL.*resofeed-data/su);
@@ -1188,6 +1220,7 @@ exec "$REAL_SHASUM" "$@"
   console.log('PROBE_HARNESS=tracked_read_only');
   console.log('PROBE_TRANSPORT=one_ssh_stdin');
   console.log('PROBE_PROTECTED_STATE=stable_projection');
+  console.log('PROCEDURE_ORBSTACK_DOCKER_PATH=verified');
 });
 
 test('RF-BUG-010 runtime isolation adapter contract', () => {

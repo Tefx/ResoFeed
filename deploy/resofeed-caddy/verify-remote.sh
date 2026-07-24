@@ -183,6 +183,7 @@ done
 [ "$EXPECTED_BACKUP_MANIFEST_MODE" = 600 ]
 [ "$EXPECTED_PRIOR_DEPLOY_MODE" = 755 ]
 [ "$EXPECTED_PRIOR_COMPOSE_MODE" = 644 ]
+export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
 readonly CANONICAL_HOME=$(CDPATH= cd -P -- "$HOME" && pwd -P)
 readonly STACK_DIR="${CANONICAL_HOME}/Projects/${STACK_NAME}"
 readonly BACKUP_DIR=".resofeed-procedure-backups/${BACKUP_ID#sha256:}"
