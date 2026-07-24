@@ -192575,7 +192575,7 @@ phases:
       remains immutable remediation evidence. No external operation occurred.
   - id: rf-bug-v2-tracked-read-only-probe-harness-remediation
     name: Track, test, and document the immutable read-only probe harness
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nImplement\
       \ one repository-owned, tracked, read-only verification harness after repeated\
@@ -192739,6 +192739,8 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-24T08:18:43.754775Z'
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v11
     name: Verify the tracked immutable read-only procedure probe (semantic v11)
     status: pending
