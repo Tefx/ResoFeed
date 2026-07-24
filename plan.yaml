@@ -193652,6 +193652,188 @@ phases:
       PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop, PROCEDURE_SIDE_EFFECTS=none,
       and VECTL_GENERIC_EVIDENCE=valid. No SSH/runtime operation occurred in this
       repository step. Unrelated user-owned working-tree changes remained untouched.'
+  - id: rf-bug-v2-container-build-context-remediation
+    name: Repair container web-build context and trusted identity pipeline
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDispatch\
+      \ and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
+      \ Cross-domain justification: the inseparable repair spans the Docker build\
+      \ context, its JavaScript developer regression, and container documentation,\
+      \ while no narrower registered mutation specialist owns all three; `general`\
+      \ is the compatible v2 worker.\n\nDeliver `RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR`.\
+      \ Preserve the stopped old-source publication history unchanged, including mode-0600\
+      \ attempt-2 log SHA-256 `a46303ce5bac510f91fb22570ff3b9c9b88d9bf217ac8000a84f04688818433c`,\
+      \ classification SHA-256 `51702864fbdb5c16cd85564cb175fd8a94bb1d634efaa809696067365e931b6c`,\
+      \ and receipt SHA-256 `03ffb7837c738b0eb910321785566e239236c1cab67b019258f41254dfb8c873`.\
+      \ Repair only the container web-builder contract so `web/vite.config.ts` and\
+      \ `web/svelte.config.js` can import the canonical `scripts/resofeed-svelte-build-identity.mjs`,\
+      \ its manifest input `scripts/build-resofeed.sh` is available before derivation,\
+      \ and `npm --prefix web run build` receives only the helper-derived `RESOFEED_SVELTE_BUILD_IDENTITY`\
+      \ through a sanitized environment. Keep both helper inputs byte-identical and\
+      \ preserve their rejection of ambient/private identity overrides.\n\nExtend\
+      \ the focused current developer test to execute a real no-push, no-load dual-platform\
+      \ `linux/amd64,linux/arm64` build against the current selected Docker context/daemon.\
+      \ The check may create one uniquely named transient `docker-container` builder\
+      \ and attributable BuildKit container without `--use`; it must use no registry\
+      \ credential or secret input, publish/tag/load nothing, retain no raw secret/PATH/config\
+      \ output, clean the builder/container on every post-create exit, and prove source\
+      \ cleanliness plus unchanged context, daemon, and active/default-builder fingerprints\
+      \ before and after. A build failure, identity mismatch, cleanup/residue defect,\
+      \ fingerprint drift, suspect output, or unavailable Docker boundary fails the\
+      \ check and stops; no retry is authorized by this implementation step. Local\
+      \ build cache writes are incidental and may remain; registry, deployment, Tailnet,\
+      \ credential/account/trust, daemon/context/default-builder, unrelated container,\
+      \ Git-history, and other external/runtime mutations are forbidden.\n\nSynchronize\
+      \ `docs/CONTAINER.md` with the canonical helper inputs, trusted derivation,\
+      \ sanitized web-build environment, and no-push dual-platform developer proof.\
+      \ Allowed repository changes are exactly `Dockerfile`, `scripts/vectl-check.test.mjs`,\
+      \ and `docs/CONTAINER.md`; rollback reverts those three paths as one unit. Do\
+      \ not change the helper, canonical build script, adapter, package manifests,\
+      \ Svelte/Vite config, generated UI, deploy procedure, product source, protected\
+      \ acceptance, architecture/design docs, or retained artifacts.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [Dockerfile, scripts/vectl-check.test.mjs,\
+      \ docs/CONTAINER.md]\n  blocked_paths: [scripts/vectl-check.mjs, scripts/build-resofeed.sh,\
+      \ scripts/resofeed-svelte-build-identity.mjs, web/package.json, web/package-lock.json,\
+      \ web/svelte.config.js, web/vite.config.ts, web/src/**, web/static/**, internal/**,\
+      \ cmd/**, tests/**, deploy/**, .agents/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md]\n  ignored_runtime_paths:\
+      \ [.git/, .vectl/, .agent/, .venv/, node_modules/]\nclaims: [RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR]\n\
+      checks:\n  - id: rf_bug_v2_container_build_context_green\n    run:\n      command:\
+      \ [node, --test, '--test-name-pattern=RF-BUG-V2 container build context derives\
+      \ trusted identity in dual-platform no-push build', scripts/vectl-check.test.mjs]\n\
+      \      timeout_seconds: 1800\n    evidence:\n      mode: command_outcome\n \
+      \     path_bindings:\n        - {path: Dockerfile, access: read, availability:\
+      \ produced_by_step}\n        - {path: scripts/vectl-check.test.mjs, access:\
+      \ read, availability: produced_by_step}\n        - {path: docs/CONTAINER.md,\
+      \ access: read, availability: produced_by_step}\n        - {path: scripts/build-resofeed.sh,\
+      \ access: execute, availability: current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs,\
+      \ access: execute, availability: current}\n        - {path: web/package.json,\
+      \ access: read, availability: current}\n        - {path: web/package-lock.json,\
+      \ access: read, availability: current}\n        - {path: web/svelte.config.js,\
+      \ access: read, availability: current}\n        - {path: web/vite.config.ts,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: developer, availability: produced_by_step}\n\
+      \    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: 'RF-BUG-V2 container build context derives\
+      \ trusted identity in dual-platform no-push build'}, {literal: BUILD_IDENTITY=trusted_canonical_derivation},\
+      \ {literal: 'PLATFORMS=linux/amd64,linux/arm64'}, {literal: PUBLISH=none}, {literal:\
+      \ SECRETS=absent}, {literal: RESIDUE=none}]\n        contains_any: []\n    \
+      \    forbids: [{literal: --push}, {literal: --load}, {literal: 'RESOFEED_SVELTE_BUILD_IDENTITY\
+      \ is private'}, {literal: no tests to run}, {literal: skipped}, {literal: retry}]\n\
+      \    proves: [RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"release_container_build_context\"\
+      ,\"trusted_svelte_build_identity_derivation\",\"real_dual_platform_docker_cleanup\"\
+      ],\"primary_outcome\":\"RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR\"\
+      ,\"atom\":\"the container web builder has both canonical helper inputs and derives\
+      \ the trusted Svelte build identity under a sanitized environment\",\"modality\"\
+      :\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_container_build_context_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review\"\
+      },{\"requirement_id\":\"RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR\",\"atom\"\
+      :\"a real linux/amd64 plus linux/arm64 no-push build succeeds without secret\
+      \ input, registry mutation, context/default-builder drift, or transient builder\
+      \ residue\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_container_build_context_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The focused project-native developer test passes from a clean worker
+      checkout and proves both canonical helper inputs, helper-derived private identity
+      under a sanitized environment, an exact dual-platform no-push/no-load build,
+      no credential/secret use or disclosure, cleanup on every path, unchanged Docker
+      context/daemon/default-builder fingerprints, no transient residue, exact three-path
+      repository scope, synchronized container documentation, and preserved old-source
+      failure artifacts.
+    refs:
+    - Dockerfile
+    - scripts/vectl-check.test.mjs
+    - scripts/build-resofeed.sh
+    - scripts/resofeed-svelte-build-identity.mjs
+    - web/package.json
+    - web/package-lock.json
+    - web/svelte.config.js
+    - web/vite.config.ts
+    - docs/CONTAINER.md
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-complete.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
+    depends_on:
+    - rf-bug-v2-deployment-authorization-review
+    agent: general
+  - id: rf-bug-v2-renewed-source-publication-authorization-review
+    name: Renew integrated-source and immutable-publication authority
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      A fresh `spec-verifier` independently reviews `RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR`
+      and renews only the source/publication authority invalidated by the deterministic
+      old-source build failure. Preserve every completed definition/evidence and all
+      old-source failure artifacts. Confirm old commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      tree `36bc981e5a01c14a6355162a6679ec8c144d5313`, tag `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      and its attempts remain stopped, absent, non-authoritative, and prohibited from
+      retry.
+
+
+      Consume the implementation''s admitted `vectl.worker.execution.v2` receipt,
+      integrated Git commit, exact three-path diff, and real developer-check evidence.
+      Verify the integrated source is one clean 40-character commit; the Docker web
+      builder has both byte-identical canonical helper inputs; only the helper derives
+      the private identity under a sanitized environment; the real no-push `linux/amd64,linux/arm64`
+      build succeeded on the same reviewed Docker context/daemon with no secret/credential
+      input, publication, load, tag, drift, or residue; and documentation is synchronized.
+      Any broader diff, helper/build-script mutation, mock/static substitution for
+      the real build, missing raw command evidence, cleanup uncertainty, identity
+      drift, or disclosure returns `FAIL` or `BLOCKED` and authorizes no publication.
+
+
+      Re-observe that `deploy/resofeed-caddy/deploy.sh` remains SHA-256 `5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
+      mode `755` and `deploy/resofeed-caddy/compose.yml` remains SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      mode `644`. When those bytes and the completed semantic-v14 strict-FQDN/Tailscale-route
+      evidence remain exact, reuse the completed staging/deployment-procedure evidence
+      without restaging or duplicating route, endpoint, security, deployment, or runtime
+      review.
+
+
+      On PASS, bind the sole new publication source to the implementation''s full
+      integrated commit and authorize exactly `docker.io/tefx/resofeed:git-<same-full-integrated-commit>`
+      for `linux/amd64,linux/arm64` with matching `org.opencontainers.image.revision`.
+      Preserve the existing repository-scoped credential/account, Docker context/daemon,
+      no-paid/cloud-builder cost boundary, bounded retry/cleanup/log/stop policy,
+      and prohibition on moving aliases, alternate repositories, registry deletion,
+      deployment, Tailnet mutation, credential/trust changes, or other side effects.
+      This review executes no publication, deployment, repository mutation, or staging
+      operation; missing exact source, byte, provider, credential/account, cost, cleanup,
+      or recovery evidence blocks.'
+    verification: A production-admissible spec-verifier receipt proves the exact integrated
+      commit and three-path repair, real sanitized dual-platform no-push evidence,
+      helper/build-script immutability, same Docker context/daemon, zero residue/disclosure,
+      unchanged deploy.sh/compose.yml bytes and reusable completed staging evidence,
+      old-source retry prohibition, and exact renewed immutable tag/platform/revision
+      authority with no broader operation.
+    refs:
+    - Dockerfile
+    - scripts/vectl-check.test.mjs
+    - scripts/build-resofeed.sh
+    - scripts/resofeed-svelte-build-identity.mjs
+    - web/svelte.config.js
+    - web/vite.config.ts
+    - docs/CONTAINER.md
+    - deploy/resofeed-caddy/deploy.sh
+    - deploy/resofeed-caddy/compose.yml
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-complete.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
+    depends_on:
+    - rf-bug-v2-container-build-context-remediation
+    agent: spec-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
