@@ -193257,6 +193257,137 @@ phases:
     depends_on:
     - rf-bug-v2-tailnet-route-state-remediation
     agent: integration-verifier
+  - id: rf-bug-v2-tailscale-198-route-harness-remediation
+    name: Repair Tailscale 1.98.8 route verification harness
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
+      \ repository remediation for the false `tailnet_route` failure exposed after\
+      \ the canonical Tailnet TCP/443 route was directly restored under explicit human\
+      \ authority. Preserve semantic v13 unchanged and diagnostic-only: raw rejected\
+      \ receipt SHA-256 `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`,\
+      \ production canonical semantic receipt SHA-256 `sha256:fbe2f0847ae59f9751e79626936f5321dfb27a26cc106ff176e45a7b1e0b9084`,\
+      \ context hash `sha256:5b020c1cc69ee7f2b6de29d7dd8cdc41d3d0b3f97f526a3ae68485dc2da3856f`,\
+      \ verdict `FAIL`, and `gate_open_allowed=false`. Preserve `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/runtime-receipt-blocked.json`\
+      \ SHA-256 `0912f035667d299eaee782e216952be3e1518d0836da43b11680e4a6c5be7a25`\
+      \ and `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/direct-debug-evidence.json`\
+      \ SHA-256 `5bc4ffd48f165f2b5426010a76e4ceface3d6bb8939681dfc3f594c7e74338fa`\
+      \ unchanged. These artifacts prove diagnostics only; do not retry, correct,\
+      \ resume, complete, or execute v13 or the superseded runtime remediation, and\
+      \ do not execute SSH or mutate Tailnet/runtime state.\n\nThis is one shell-harness,\
+      \ Node adapter/acceptance-test, and deployment-documentation rollback unit,\
+      \ so `general` owns the indivisible cross-domain mutation. Execute it through\
+      \ exactly one admitted `vectl.worker.dispatch.v2` and return only `vectl.worker.execution.v2`.\
+      \ Modify only `deploy/resofeed-caddy/verify-remote.sh`, `scripts/vectl-check.test.mjs`,\
+      \ `scripts/vectl-check.mjs` when needed for selected-evidence projection, `.agents/skills/resofeed-tailnet-deploy/SKILL.md`,\
+      \ `deploy/resofeed-caddy/README.md`, `docs/CONTAINER.md`, and `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`.\n\
+      \nReplace the legacy human-output equality check with deterministic validation\
+      \ of `tailscale serve status --json`. Accept the route only when the parsed\
+      \ JSON shape contains exactly the canonical scalar `TCP.443.TCPForward = 127.0.0.1:8443`;\
+      \ retain only the normalized nonsecret projection `TCP/HTTPS 443 -> 127.0.0.1:8443`.\
+      \ Reject malformed JSON, missing/wrong-type/duplicate or ambiguous TCP/443 ownership,\
+      \ another target, the obsolete exact row `TCP 443 -> tcp://127.0.0.1:8443`,\
+      \ and the Tailscale 1.98.8 human tree form as authority. Do not retain or print\
+      \ raw Serve JSON, peer/session telemetry, addresses, paths, config, or secret\
+      \ values. Preserve the existing bounded phase ledger, stable-projection equality,\
+      \ closed read-only command authority, one tracked-wrapper/no-retry behavior,\
+      \ strict endpoint transport, OrbStack PATH nondisclosure, and every Docker,\
+      \ volume, public-host, readiness, and protected-state invariant.\n\nContract-lock\
+      \ the current release route boundary without changing the already staged two-file\
+      \ procedure identity: semantic v14 and downstream publication/deployment admission\
+      \ require the existing canonical route as a no-op precondition and authorize\
+      \ no Serve mutation. Synchronized operational documentation and acceptance coverage\
+      \ must record that any separately and explicitly authorized noninteractive route\
+      \ creation uses exact `tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443`;\
+      \ absence or drift blocks this release chain before deployment rather than invoking\
+      \ that command. Do not modify `deploy.sh`, `compose.yml`, `verify.sh`, or `stop.sh`;\
+      \ their current staged source commit, hashes, modes, and recovery identity remain\
+      \ unchanged.\n\nExtend the existing exact acceptance identity `RF-BUG-V2 immutable\
+      \ OCI and Tailnet deployment procedure` with deterministic fake-surface cases\
+      \ for canonical JSON success, malformed/missing/wrong-target/ambiguous JSON\
+      \ failure at `tailnet_route`, legacy line and 1.98.8 tree-output non-authority,\
+      \ normalized stable projection, no Serve mutation, exact separately-authorized\
+      \ `--yes` documentation, no retry, no raw JSON disclosure, and all retained\
+      \ harness cases. Keep the current project-native adapter/profile identity and\
+      \ source mapping, project `PROCEDURE_TAILSCALE_ROUTE_JSON=verified` and `PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop`,\
+      \ and preserve every prior observation. Update the deployment skill, README,\
+      \ Container guide, and harness contract in the same change. Rollback reverts\
+      \ only the seven authorized paths to the integrated OrbStack-path-remediation\
+      \ state.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [.agents/skills/resofeed-tailnet-deploy/SKILL.md, deploy/resofeed-caddy/README.md,\
+      \ deploy/resofeed-caddy/verify-remote.sh, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n  blocked_paths: [deploy/resofeed-caddy/verify.sh,\
+      \ deploy/resofeed-caddy/deploy.sh, deploy/resofeed-caddy/stop.sh, deploy/resofeed-caddy/compose.yml,\
+      \ deploy/resofeed-caddy/Caddyfile, deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example,\
+      \ internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ plan.yaml]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims:\
+      \ [RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION]\nchecks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n\
+      \    run:\n      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n      timeout_seconds: 300\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: .agents/skills/resofeed-tailnet-deploy/SKILL.md, access: read,\
+      \ availability: current}\n        - {path: deploy/resofeed-caddy/.env.example,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/README.md,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/deploy.sh,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/verify.sh,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/verify-remote.sh,\
+      \ access: read, availability: current}\n        - {path: docs/CONTAINER.md,\
+      \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: acceptance, availability: current}\n\
+      \        - {path: internal/resofeed/playwright_fixture_test.go, classification:\
+      \ developer, availability: current}\n      selection:\n        command: [node,\
+      \ scripts/vectl-check.mjs, select, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n        timeout_seconds:\
+      \ 30\n        cardinality: {exact: 1}\n        required_ids: [RF-BUG-V2 immutable\
+      \ OCI and Tailnet deployment procedure]\n        forbidden_ids: []\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: PROCEDURE_TAILSCALE_ROUTE_JSON=verified}, {literal:\
+      \ PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop}, {literal: PROCEDURE_SIDE_EFFECTS=none},\
+      \ {literal: VECTL_GENERIC_EVIDENCE=valid}]\n        contains_any: []\n     \
+      \   forbids: [{literal: ERROR collecting}, {literal: no tests to run}, {literal:\
+      \ skipped}, {literal: retry}, {literal: OPENROUTER_KEY=}]\n    proves: [RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION]\n\
+      bindings:\n  expected_red: {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"cross_component_verification_infrastructure\"\
+      ,\"remote_tailscale_json_contract\",\"shared_project_native_adapter\"],\"primary_outcome\"\
+      :\"RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION\",\"rollback_class\":\"\
+      NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION\"\
+      ,\"atom\":\"the tracked read-only probe validates the canonical Tailscale 1.98.8\
+      \ TCP/443 route from the JSON TCP.443.TCPForward shape, rejects human-output\
+      \ parsing, retains only the normalized stable projection, and keeps this release\
+      \ on a no-mutation route precondition with explicit --yes reserved for separately\
+      \ authorized repair\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\"\
+      :\"rf_bug_v2_immutable_deployment_procedure_green\",\"independent_step\":\"\
+      rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"deploy/resofeed-caddy/verify-remote.sh\"\
+      ,\"scripts/vectl-check.mjs\",\"internal/resofeed/playwright_fixture_test.go\"\
+      ],\"acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_v2_immutable_deployment_procedure_green\"],\"acceptance_mutation\"\
+      :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-v2-tailscale-198-route-harness-remediation\"\
+      ,\"path\":\"scripts/vectl-check.test.mjs\",\"purpose\":\"Add only deterministic\
+      \ Tailscale 1.98.8 Serve JSON-shape, legacy-output rejection, normalized projection,\
+      \ canonical-route no-op, explicit separately-authorized --yes documentation,\
+      \ nondisclosure, no-retry, and retained immutable-procedure harness coverage\"\
+      ,\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\",\"actor_id\"\
+      :\"spec-verifier\"}]}}\n</vectl_step_policy>"
+    verification: The current project-native immutable-deployment profile still selects
+      exactly `RF-BUG-V2 immutable OCI and Tailnet deployment procedure`; after the
+      one v2 worker change it runs green with both new Tailscale observations and
+      all retained observations. Deterministic acceptance/developer coverage proves
+      JSON-shape routing, legacy-output rejection, normalized projection, canonical
+      no-op admission, separately authorized `--yes` documentation, no mutation/retry/disclosure,
+      and synchronized deployment docs. No SSH or runtime operation occurs.
+    evidence_template: Record the admitted v2 dispatch/execution hashes, integrated
+      commit, exact seven-path diff, selected/executed identity parity, new observations,
+      focused test outcome, and confirmation that no SSH/runtime mutation occurred.
+    depends_on:
+    - rf-bug-v2-tracked-probe-orbstack-path-remediation
+    agent: general
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
