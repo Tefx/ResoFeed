@@ -193194,7 +193194,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-tailscale-198-route-harness-remediation
     name: Repair Tailscale 1.98.8 route verification harness
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nAppend-only\
       \ repository remediation for the false `tailnet_route` failure exposed after\
@@ -193325,6 +193325,19 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-24T16:28:59.473304Z'
+    done_at: '2026-07-24T16:53:51.634411+00:00'
+    evidence: 'Central intent-closure Gate admitted exact v2 execution: worker_execution_admissible=true,
+      status=CONFORMANT, context_hash=sha256:369a178a48cb31623ec2b7e73a21b897c1e99fd8e93234dfab2ad23e25f2b668,
+      canonical dispatch_sha256=sha256:9cf571609ba267b92f8247c66f55be8b120779e694dbb1f77c23b29ab04fd829,
+      canonical worker_receipt_sha256=sha256:12a3924c105770b825946618a45b5b922855d9f45922b8958110d63d4a0271ba.
+      Exact artifacts persisted at /tmp/larva-agent-artifacts/rf-bug-v2-tailscale-198-route-harness-remediation/{dispatch.json,worker-receipt.json}.
+      Integrated the exact seven authorized paths as commit e6ee05ea977b1ee1ed84fe233380e7fa86f69f62.
+      Replayed `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green`: exit 0, outcome green, selected_ids=executed_ids=[RF-BUG-V2
+      immutable OCI and Tailnet deployment procedure], with PROCEDURE_TAILSCALE_ROUTE_JSON=verified,
+      PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop, PROCEDURE_SIDE_EFFECTS=none,
+      and VECTL_GENERIC_EVIDENCE=valid. No SSH/runtime operation occurred in this
+      repository step. Unrelated user-owned working-tree changes remained untouched.'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
