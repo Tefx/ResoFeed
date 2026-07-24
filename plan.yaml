@@ -190663,81 +190663,62 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently review the completed local evidence, preserved inverted detached-head
-      remediation history, integrated polarity remediation, authenticated-endpoint
-      staging review, procedure staging, immutable-image publication, dual-platform
-      container proof, and Tailnet evidence for RF-BUG-003/004/005/010, `RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF`,
-      `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD`, and `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY`.
-      Cover embed.FS traversal/fallback, no external UI root, four outer headers,
-      embedded CSP without unsafe-inline, streaming/cancellation, Owner Token, import-only
-      OPML and atomic minimal State, case-local E2E state and cleanup, live-provider
-      opt-in, secret redaction, exact deployed digest, authorization, and rollback.
+      Independently review completed local evidence, repository remediations, authenticated-endpoint
+      staging, immutable publication, dual-platform container proof, and Tailnet deployment
+      for RF-BUG-003/004/005/010 plus the release-boundary requirements. Cover embed.FS
+      traversal/fallback, no external UI root, four outer headers, embedded CSP without
+      unsafe-inline, streaming/cancellation, Owner Token, import-only OPML and atomic
+      minimal State, case-local E2E cleanup, live-provider opt-in, secret redaction,
+      exact deployed digest, authorization, and rollback.
 
 
-      For the source/endpoint boundary, preserve every exhausted staging and invalid-review
-      artifact plus coherent `REJECTED` polarity evidence as diagnostic-only history.
-      Prove staging accepts only a clean detached checkout at exact polarity-remediation
-      commit `1e49621c6b44ac2e55cd82f87960972d571bad64`, treats `git symbolic-ref
-      -q HEAD` success as attached, rejects an attached clean branch inside the maintained
-      script before SSH or target mutation, authenticates only literal `tefx-mbp-personal.platy-atlas.ts.net`
-      through strict existing host-key trust, never uses the unknown internal hostname
-      as authority, never changes host-key trust or credentials/accounts, stages only
-      the reviewed two-file hashes to `~/Projects/resofeed-caddy`, keeps deterministic
-      local Git metadata equal, and deploys only after current authorization. Prior-procedure
-      restoration and prior-digest readiness recovery remain distinct, complete, and
-      secret-safe.
+      Preserve completed staged-procedure authority as a distinct ancestor-byte identity:
+      clean detached staging commit `1e49621c6b44ac2e55cd82f87960972d571bad64`, deploy.sh
+      SHA-256 `5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6` mode
+      `755`, and compose.yml SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      mode `644`. Prove the renewed integrated source leaves those bytes unchanged,
+      so completed semantic-v14 strict literal-FQDN transport, route no-op, protected-state,
+      and procedure-staging evidence remains valid without restaging. Preserve every
+      exhausted staging/review/v13/runtime-debug artifact as diagnostic-only; do not
+      retry or promote it.
 
 
-      For publication, preserve the original FAIL receipt, report, and Buildx diagnostic
-      at SHA-256 `c2d2555897d8ce0320cc57f4a1fdcb45e11006dec53931debe459775cb4b28d6`,
-      `9310051b31740cc843480e957986a4a8922ebfb89dc1b0cce9b3ce7175bd5612`, and `de5da35b399a30b72413672155835d8e377b65bf51eae750779f6569c5108342`
-      as non-completion evidence. Confirm the three implicit active `orbstack` docker-driver
-      commands remain separate diagnostic-only history and were never replayed. Preserve
-      mode-0600 zero-command corrected preflight receipt SHA-256 `b4489129b3b50b50d65f4111d521524979396e25515305d38603fdee05dec36b`
-      and corrected build/push attempt-1 receipt SHA-256 `e3601edf0c53c36c6f03f5a37f567d715003cc3ac8508489aeae6e690632ff7d`;
-      confirm attempt 1 exited 1 with no retained complete build output or knowable
-      failure class, the tag remained absent, cleanup completed, builder/BuildKit
-      state was absent, the active/default builder was unchanged, and exact clean
-      detached commit/tree remained intact.
+      For publication, preserve all implicit-builder diagnostics, zero-command preflight,
+      old-source attempt-1, and old-source attempt-2 log/classification/receipt at
+      SHA-256 `a46303ce5bac510f91fb22570ff3b9c9b88d9bf217ac8000a84f04688818433c`,
+      `51702864fbdb5c16cd85564cb175fd8a94bb1d634efaa809696067365e931b6c`, and `03ffb7837c738b0eb910321785566e239236c1cab67b019258f41254dfb8c873`.
+      Confirm attempt 2 deterministically stopped the old commit/tag after cleanup
+      and no old-source retry occurred. Require the renewed authorization review to
+      bind one exact clean integrated commit, exact derived immutable tag, two platforms,
+      revision labels, same Docker context/daemon, repository-scoped credential/account,
+      and no-paid/cloud-builder boundary.
 
 
-      Require the corrected same-step publication history to contain one to three
-      total build/push attempts and no more than two attempts after the recorded first.
-      Confirm attempt 2 began without further human confirmation only after exact
-      source commit `1e49621c6b44ac2e55cd82f87960972d571bad64` and tree `36bc981e5a01c14a6355162a6679ec8c144d5313`,
-      tag absence, prior cleanup, builder/BuildKit absence, unchanged active/default
-      builder, and unchanged Docker context/daemon, repository/tag/platform/revision,
-      credential/account, and cost boundary were proven. Require each additional attempt
-      to retain complete local command output in a new non-overwriting mode-0600 artifact,
-      emit a sanitized classification containing no secret, PATH, credential path/value,
-      `.env`, response body, or raw registry/config content, and perform at most one
-      exact named `docker-container` builder create, one explicit-builder bootstrap,
-      one explicit-builder push, and one cleanup attempt. Admit attempt 3 only after
-      the immediately preceding retained log classifies a transient non-mutating transport,
-      registry, or network failure and every invariant is re-proven. Confirm deterministic
-      source/build/toolchain failure, authentication/authorization failure, unknown
-      remote state, incomplete/orphan chain, cleanup failure/residue, default-builder/source/credential/account
-      drift, or missing/suspect log stopped further execution. A complete exact index/amd64/arm64/revision
-      chain after a nonzero command is the publication result and must have no later
-      push. Require builder and BuildKit residue absence, unchanged active/default
-      builder, no alias/deletion/temp-tag/credential/account/daemon/context/other-container
-      mutation, and no disclosure. Registry or cleanup uncertainty remains blocking.
+      Review the renewed one-to-three attempt series for complete mode-0600 logs,
+      sanitized classifications, exact per-attempt create/bootstrap/build-push/cleanup
+      cardinality, later-attempt transient-only admission with complete invariant
+      re-proof, every deterministic/auth/unknown-state/orphan/cleanup/drift/suspect-log
+      stop, no push after a complete chain, exact index/amd64/arm64/revision identity,
+      builder/BuildKit absence, unchanged context/daemon/default-builder and clean
+      source, no alias/deletion/temp-tag/credential/account mutation, and no disclosure.
+      Registry or cleanup uncertainty remains blocking.
 
 
-      Require the integrated source commit and deploy hash to differ from inverted
-      commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5` and inverted SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`.
-      Preserve coherent `REJECTED` semantic receipt `sha256:aa91082199abf409e67c8832df204b5ebda3a282f05bd6ad9fee31af3545bfc8`,
-      receipt-file SHA-256 `f1dbd2f87c98aeb1d17f64672e70a7f49d338f8e966d0c27183ff66533904c19`,
-      and production-validator SHA-256 `7e1e4a26c9f1b01d3ca49894e9bd4aceb496cea99ccd8bf485a31d80bf847e6f`
-      as non-authoritative remediation history. Findings route to the owning pending
-      step and block closure.'
-    verification: Fresh security review finds no unresolved embed, CSP/header, streaming/cancellation,
-      token, OPML/state, E2E cleanup, secret, symbolic-ref polarity, detached-source
-      pre-SSH, strict endpoint, staged-byte, bounded one-to-three same-step Buildx
-      history, retained-log classification, retry admission, lifecycle/cleanup, immutable
-      digest, deployment, host-key/credential, or rollback defect. It proves all stop
-      conditions and no-push-after-complete-chain behavior; all failed/rejected diagnostics
-      remain non-authoritative.
+      For deployment, require only the independently verified renewed index digest
+      through the existing strict literal-FQDN `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      procedure and unchanged credential/host-key trust. Verify prior-digest readiness
+      rollback, SQLite/owner-token preservation, masked-only runtime-secret presence,
+      canonical Tailscale route as no-op, and no Serve/restart/reauthentication/trust/account
+      mutation. Findings route to the owning pending step and block closure; this
+      review mutates no repository, registry, deployment, route, credential, or runtime
+      state.'
+    verification: Fresh security review finds no unresolved product, source/build-context,
+      trusted-identity, staged-byte, strict-endpoint, bounded renewed Buildx-history,
+      log/classification, retry/stop, cleanup/default-builder, immutable-digest, deployment,
+      secret, credential/trust, route, or rollback defect. It proves old-source stop/no-retry,
+      reusable completed procedure evidence by exact byte identity, exact renewed
+      integrated source/tag/index/platform/revision/deployed-digest bindings, no push
+      after completion, and preservation of all rejected diagnostics.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - AGENTS.md
@@ -190750,6 +190731,9 @@ phases:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-complete.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
