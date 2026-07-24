@@ -193135,7 +193135,7 @@ phases:
       \ {literal: PROCEDURE_ORBSTACK_DOCKER_PATH=verified}, {literal: PROCEDURE_SIDE_EFFECTS=none},\
       \ {literal: VECTL_GENERIC_EVIDENCE=valid}]\n        contains_any: []\n     \
       \   forbids: [{literal: ERROR collecting}, {literal: no tests to run}, {literal:\
-      \ skipped}, {literal: retry}, {literal: OPENROUTER_KEY=}, {literal: /Applications/OrbStack.app/Contents/MacOS/xbin:}]\n\
+      \ skipped}, {literal: retry}, {literal: OPENROUTER_KEY=}, {literal: /Applications/OrbStack.app/Contents/MacOS/xbin}]\n\
       \    proves: [RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION]\nbindings:\n\
       \  expected_red: {items: []}\n  closes_expected_red: []\n</intent_closure_contract>\n\
       <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
