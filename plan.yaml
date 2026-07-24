@@ -190314,33 +190314,40 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      After completed repository remediations, the bounded Tailnet route-state remediation,
-      and fresh semantic v14 verification pass, perform the pre-operation R3 review
-      for immutable OCI publication and authenticated digest deployment. V14 must
-      prove the exact route-remediation authority and outcome, clean-detached integrated
-      helper identity distinct from ancestor staged source commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
-      exact current/staged procedure identity, tracked helper identity, one strict
-      literal-FQDN probe with exact `-Fnone` and positional argv, byte-identical stdin,
-      internal manifest derivation, exact OrbStack Docker CLI PATH resolution, canonical
-      Tailnet TCP/443 route, bounded phase/readiness markers through `PROBE_OK`, corrected
-      volume identity, stable protected-state equality, and closed-command nonmutation.
-      The completed harness, repository remediations, route-state remediation, and
-      v14 verification authorize no publication, deployment, registry, service, credential,
-      trust, data, or additional persistent-state operation.
+      After the repository harness remediation and fresh semantic v14 pass, perform
+      the pre-operation R3 review for immutable OCI publication and authenticated
+      digest deployment. V14 must prove a clean detached integrated helper HEAD, unchanged
+      ancestor staged-procedure identity, exact strict literal-FQDN transport and
+      stdin, OrbStack PATH, internal manifest derivation, Docker and corrected volume
+      identity, the real Tailscale 1.98.8 JSON shape `TCP.443.TCPForward = 127.0.0.1:8443`,
+      canonical route no-op, bounded ledger through `PROBE_OK`, stable protected-state
+      equality, and closed-command nonmutation.
 
 
-      Preserve semantic v13 unchanged and diagnostic-only; do not retry, correct,
-      resume, complete, execute, or use it as operation authority. Its raw receipt
-      artifact `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v13/semantic-receipt-fail.json`
-      has SHA-256 `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`;
-      production Gate canonical semantic receipt SHA-256 is `sha256:fbe2f0847ae59f9751e79626936f5321dfb27a26cc106ff176e45a7b1e0b9084`;
-      context hash is `sha256:5b020c1cc69ee7f2b6de29d7dd8cdc41d3d0b3f97f526a3ae68485dc2da3856f`;
-      verdict is `FAIL`; `gate_open_allowed=false`. Its clean detached helper HEAD
-      `73a399cd1be9de4cccb491b2439d124178bcfdeb`, three green local commands, exact
-      wrapper transport, OrbStack PATH, Docker identity, volume identity, no-retry,
-      and nonmutation facts remain diagnostics; `PROBE_FAIL phase=tailnet_route status=1`
-      disproved the immutable procedure at that seam. V12 and all earlier failed,
-      invalid, or rejected artifacts remain immutable non-authoritative history.
+      Preserve semantic v13 unchanged and diagnostic-only: raw rejected receipt SHA-256
+      `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`, production
+      canonical semantic receipt SHA-256 `sha256:fbe2f0847ae59f9751e79626936f5321dfb27a26cc106ff176e45a7b1e0b9084`,
+      context hash `sha256:5b020c1cc69ee7f2b6de29d7dd8cdc41d3d0b3f97f526a3ae68485dc2da3856f`,
+      verdict `FAIL`, and `gate_open_allowed=false`. Preserve blocked runtime receipt
+      `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/runtime-receipt-blocked.json`
+      SHA-256 `0912f035667d299eaee782e216952be3e1518d0836da43b11680e4a6c5be7a25` and
+      direct debug evidence `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/direct-debug-evidence.json`
+      SHA-256 `5bc4ffd48f165f2b5426010a76e4ceface3d6bb8939681dfc3f594c7e74338fa` unchanged
+      and diagnostic-only. Do not retry, correct, resume, complete, execute, or use
+      v13, the superseded runtime step, or the direct debug operation as publication/deployment
+      authority.
+
+
+      Treat the canonical Tailnet route as a current mandatory no-op precondition
+      for this release chain. Recheck the exact JSON shape through the maintained
+      read-only contract immediately before admitting deployment. If TCP/443 is absent,
+      ambiguous, malformed, or points elsewhere, return `BLOCKED` before build, publication,
+      deployment, or service mutation. This accepted chain authorizes no `tailscale
+      serve` mutation. The synchronized repository contract may document exact `tailscale
+      serve --yes --bg --tcp=443 tcp://127.0.0.1:8443` only for a separate current
+      explicit human authorization; do not infer or execute it here. `EncryptState`
+      changes, Tailscale restart/reauthentication, Keychain repair, alternate route/host/account/trust,
+      and automatic rollback of a pre-existing route remain forbidden.
 
 
       For immutable publication, verify current accepted-plan authority names the
@@ -190361,44 +190368,38 @@ phases:
       policy, host-key update/enrollment disabled, no alias/effective-host rewrite,
       and the existing credential/account. The target''s internal hostname has no
       authority. Require staged procedure bytes and v14 target-readiness evidence
-      to match the integrated helper commit and exact source/staged identities. Deployment
-      consumes only the digest chain produced by `rf-bug-v2-publish-immutable-oci`
-      and proven by `rf-bug-v2-docker-runtime-proof`; masked-only `CF_API_TOKEN`,
+      to match source commit `1e49621c6b44ac2e55cd82f87960972d571bad64`, `deploy.sh`
+      SHA-256 `sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
+      mode `755`, and `compose.yml` SHA-256 `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      mode `644`.
+
+
+      Deployment consumes only the digest chain produced by `rf-bug-v2-publish-immutable-oci`
+      and proven by `rf-bug-v2-docker-runtime-proof`. Masked-only `CF_API_TOKEN`,
       `OPENROUTER_KEY`, and `TAVILY_API_KEY` runtime injection remains available;
-      the current running image has one exact prior repository digest for rollback;
-      the SQLite volume and owner-token state remain preserved; and rollback restores
-      only that prior digest followed by root `200` and unauthenticated Doctor `401`
-      readiness.
+      raw secrets, `.env`, host-key material, PATH, public-host values, response bodies,
+      or configuration are never retained. Require the current running image''s exact
+      prior repository digest for rollback, preserve the SQLite named volume and owner-token
+      state, and limit rollback to that prior digest followed by root `200` and unauthenticated
+      Doctor `401` readiness. No registry deletion, moving tag, credential/account/trust
+      change, token rotation, data clear, alternate target, route mutation, restart
+      outside the maintained procedure, or undeclared operation is authorized.
 
 
-      Admit only v14''s deterministic projection: current deploy/Compose hashes and
-      modes; internal backup-manifest hash/mode and prior procedure hashes/modes;
-      running ResoFeed/Caddy container and image IDs; `/data` mount Type/Destination,
-      internal actual volume identity, and logical `com.docker.compose.volume=resofeed-data`;
-      canonical `TCP/HTTPS 443 -> 127.0.0.1:8443`; and internal validated-public-host
-      hash. Require exact PATH nondisclosure, identical helpers, canonical sorting,
-      approved markers, tracked closed read-only command allowlist, one probe, and
-      no retry. Exclude volatile SQLite/WAL/SHM, logs, counters, health/PID/exec/network
-      timestamps, Tailscale telemetry, atime, output order, timestamps, and all sensitive/config
-      values. Future OCI identity remains deferred.
-
-
-      Confirm each accepted operation, target, input/source identity, execution context,
-      route ownership, host-key/credential boundary, preconditions, cost boundary,
-      rollback/recovery, and evidence topology matches the maintained procedure. Missing,
-      stale, mismatched, broader, host-key-bypassed, rollback-incomplete, or materially
-      costly authority returns `BLOCKED` and permits no build, push, tag, delete,
-      pull, deploy, restart, route change, host-key change, token reset, data clear,
-      credential/account change, secret inspection, mutable-tag substitution, alternate
-      target, or undeclared operation.'
+      Confirm every accepted operation, target, source/produced identity, execution
+      context, route ownership, host-key/credential boundary, precondition, cost boundary,
+      rollback/recovery path, and evidence edge against current refs and v14. Missing,
+      stale, mismatched, broader, host-key-bypassed, route-mutating, rollback-incomplete,
+      or materially costly authority returns `BLOCKED` before side effects.'
     verification: Current R3 review binds publication and deployment only after semantic
-      v14 proves the bounded Tailnet-route remediation and complete tracked read-only
-      procedure through `PROBE_OK`; it verifies exact operations, targets, source/produced
-      identities, strict endpoint and credential boundaries, immutable digest chain,
-      rollback/readiness, costs, exclusions, and evidence topology. V13 and earlier
-      rejected material remain unchanged diagnostics.
+      v14 proves the integrated JSON-route harness, unchanged staged procedure, strict
+      endpoint transport, canonical route no-op, full read-only ledger, and protected-state
+      equality. It verifies exact operation/target/source/digest identities, credentials
+      and cost bounds, prior-digest readiness recovery, secret/data preservation,
+      no Serve mutation, and the separate explicit-`--yes` authority boundary.
     refs:
-    - /tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v13/semantic-receipt-fail.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/runtime-receipt-blocked.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/direct-debug-evidence.json
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
     - .agents/skills/resofeed-tailnet-deploy/SKILL.md
