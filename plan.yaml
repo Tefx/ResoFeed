@@ -192595,23 +192595,24 @@ phases:
       \ reaches readiness.\n\nCreate executable `deploy/resofeed-caddy/verify.sh`\
       \ as the local wrapper and executable `deploy/resofeed-caddy/verify-remote.sh`\
       \ as the literal stdin-fed remote program. `verify.sh` must validate exact nonsecret\
-      \ 40-lowercase-hex source commit, current deploy/Compose SHA-256 and modes,\
-      \ backup identity and manifest mode, and prior deploy/Compose SHA-256 and modes;\
-      \ require a clean detached local checkout at the supplied commit; prove the\
-      \ source procedure still consists of exactly `deploy/resofeed-caddy/deploy.sh`\
-      \ and `deploy/resofeed-caddy/compose.yml`; and invoke exactly one SSH process\
-      \ with separate literal argv: `ssh`, `-Fnone`, `-T`, then the existing strict\
-      \ literal-FQDN options and destination `tefx-mbp-personal.platy-atlas.ts.net`,\
-      \ ending with separate `bash`, `-s`. Feed the tracked bytes of `verify-remote.sh`\
-      \ only through stdin. Forbid `eval`, generated shell, `bash -c`, remote-command\
-      \ argv, alternate interpreter, target, account, host alias, trust store, stack,\
-      \ retry, or second probe. The wrapper must emit only bounded approved markers\
-      \ and transport/construction failure status.\n\n`verify-remote.sh` installs\
-      \ cooperating phase state and ERR/EXIT traps before its first assertion and\
-      \ immediately emits `PROBE_PHASE=canonical_stack`. Preserve the exact phase/success\
-      \ ledger: `canonical_stack`/`CANONICAL_STACK=verified`; `procedure_current`/`PROCEDURE_CURRENT=verified`;\
-      \ `backup`/`BACKUP=verified`; `docker_identity`/`DOCKER_IDENTITY=verified`;\
-      \ `volume`/`VOLUME=verified`; `tailnet_route`/`TAILNET_ROUTE=verified`; `public_url`/`PUBLIC_URL_HOST=validated`;\
+      \ 40-lowercase-hex staged procedure source commit, current deploy/Compose SHA-256\
+      \ and modes, backup identity and manifest mode, and prior deploy/Compose SHA-256\
+      \ and modes; require its current repository checkout to be clean and detached\
+      \ at the integrated HEAD; prove the current integrated deploy/Compose bytes\
+      \ equal the supplied staged hashes and the supplied source commit contains that\
+      \ exact two-file procedure identity; and invoke exactly one SSH process with\
+      \ separate literal argv: `ssh`, `-Fnone`, `-T`, then the existing strict literal-FQDN\
+      \ options and destination `tefx-mbp-personal.platy-atlas.ts.net`, ending with\
+      \ separate `bash`, `-s`. Feed the tracked bytes of `verify-remote.sh` only through\
+      \ stdin. Forbid `eval`, generated shell, `bash -c`, remote-command argv, alternate\
+      \ interpreter, target, account, host alias, trust store, stack, retry, or second\
+      \ probe. The wrapper must emit only bounded approved markers and transport/construction\
+      \ failure status.\n\n`verify-remote.sh` installs cooperating phase state and\
+      \ ERR/EXIT traps before its first assertion and immediately emits `PROBE_PHASE=canonical_stack`.\
+      \ Preserve the exact phase/success ledger: `canonical_stack`/`CANONICAL_STACK=verified`;\
+      \ `procedure_current`/`PROCEDURE_CURRENT=verified`; `backup`/`BACKUP=verified`;\
+      \ `docker_identity`/`DOCKER_IDENTITY=verified`; `volume`/`VOLUME=verified`;\
+      \ `tailnet_route`/`TAILNET_ROUTE=verified`; `public_url`/`PUBLIC_URL_HOST=validated`;\
       \ `readiness`/`READINESS=verified`; `protected_after`/`PROTECTED_STATE=unchanged`;\
       \ final `PROBE_OK`. A failure emits exactly one `PROBE_FAIL phase=<last_phase>\
       \ status=<status>`; markerless/non-stdout exits remain transport failures and\
