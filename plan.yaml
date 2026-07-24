@@ -192607,7 +192607,7 @@ phases:
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v5
     name: Verify authenticated-endpoint immutable procedure and target readiness (bounded-marker
       semantic v5)
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -192875,8 +192875,6 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-24T00:27:36.824685Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
