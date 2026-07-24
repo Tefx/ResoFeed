@@ -190314,57 +190314,55 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      After the detached-head polarity remediation, fresh no-SSH staging authorization,
-      exact v2 two-file staging, completed tracked probe harness, integrated-HEAD/transport
-      remediation, OrbStack PATH remediation, and fresh independent v13 verification
-      pass, perform the pre-operation R3 review for immutable OCI publication and
-      authenticated Tailnet digest deployment. V13 must provide clean-detached integrated
+      After completed repository remediations, the bounded Tailnet route-state remediation,
+      and fresh semantic v14 verification pass, perform the pre-operation R3 review
+      for immutable OCI publication and authenticated digest deployment. V14 must
+      prove the exact route-remediation authority and outcome, clean-detached integrated
       helper identity distinct from ancestor staged source commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
-      exact current/staged deploy and Compose identity, tracked helper identity from
-      integrated HEAD, one strict literal-FQDN probe with exact `-Fnone` and validated
-      positional argv, byte-identical tracked stdin, internally derived exact manifest
-      identity, exact macOS OrbStack Docker CLI PATH resolution before every Docker
-      observation with caller suffix preserved and undisclosed, bounded phase/readiness
-      markers, corrected volume identity, stable protected-state equality with explicit
-      volatile-state exclusions, and closed-command nonmutation proof. The completed
-      harness, remediations, and v13 authorize no publication, deployment, registry,
-      service, credential, trust, data, or persistent-state operation.
+      exact current/staged procedure identity, tracked helper identity, one strict
+      literal-FQDN probe with exact `-Fnone` and positional argv, byte-identical stdin,
+      internal manifest derivation, exact OrbStack Docker CLI PATH resolution, canonical
+      Tailnet TCP/443 route, bounded phase/readiness markers through `PROBE_OK`, corrected
+      volume identity, stable protected-state equality, and closed-command nonmutation.
+      The completed harness, repository remediations, route-state remediation, and
+      v14 verification authorize no publication, deployment, registry, service, credential,
+      trust, data, or additional persistent-state operation.
 
 
-      Preserve v12 unchanged and do not retry, correct, resume, complete, or use it
-      as operation authority: receipt file `sha256:19a033a426f5915382ce1c738ac663186159645c970c2b5be45f2798977c5705`,
-      validator `sha256:c478e23ea5a00a518cc3c1afabd3af99ded09f9e8a9b87952b043584ab511345`,
-      canonical valid `REJECTED` receipt `sha256:164684b7966d26fc9a8da818abd5eaa04f614028a8064506129c07ca0e69814c`.
-      Its passed local and transport/procedure/backup evidence and actual `PROBE_FAIL
-      phase=docker_identity status=127` remain diagnostic only. The superseded v11
-      node, v10 receipt file `sha256:ecf06ad1a71013da0e7794dd9c7e2780ff8d035b67a22568f260e22383506e3d`
-      / validator `sha256:ea40abf245650b9381533bbcf5a5ad86a461a2f458c5a7666a059a42aba906d8`
-      / canonical valid `REJECTED` receipt `sha256:316c931845a094a7cbdc4a6dfbe415309428502a88231467e81d593d08d6cbb0`,
-      v9, and all earlier failed, invalid, or rejected artifacts remain immutable
-      non-authoritative history.
+      Preserve semantic v13 unchanged and diagnostic-only; do not retry, correct,
+      resume, complete, execute, or use it as operation authority. Its raw receipt
+      artifact `/tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v13/semantic-receipt-fail.json`
+      has SHA-256 `dcf30783590aa79998911e8cc59f6014d22ac96ace990f734839e07005ecf5ab`;
+      production Gate canonical semantic receipt SHA-256 is `sha256:fbe2f0847ae59f9751e79626936f5321dfb27a26cc106ff176e45a7b1e0b9084`;
+      context hash is `sha256:5b020c1cc69ee7f2b6de29d7dd8cdc41d3d0b3f97f526a3ae68485dc2da3856f`;
+      verdict is `FAIL`; `gate_open_allowed=false`. Its clean detached helper HEAD
+      `73a399cd1be9de4cccb491b2439d124178bcfdeb`, three green local commands, exact
+      wrapper transport, OrbStack PATH, Docker identity, volume identity, no-retry,
+      and nonmutation facts remain diagnostics; `PROBE_FAIL phase=tailnet_route status=1`
+      disproved the immutable procedure at that seam. V12 and all earlier failed,
+      invalid, or rejected artifacts remain immutable non-authoritative history.
 
 
-      For immutable publication, verify current accepted-plan orchestration authority
-      names the exact build-and-push operation and sole registry `docker.io/tefx/resofeed`;
+      For immutable publication, verify current accepted-plan authority names the
+      exact build-and-push operation and sole registry `docker.io/tefx/resofeed`;
       the clean locally verified 40-character integrated commit is the sole source;
-      the only tag is `git-<same-commit>`; repository-scoped registry credentials
-      are available without disclosure or account change; no moving alias is published;
-      and partial publication either uses separately explicit temporary-tag deletion
-      authority or records the complete orphan tag/index/platform chain. Before publication,
-      index and platform digests do not exist. Bind them only to `rf-bug-v2-publish-immutable-oci`,
-      require one exact index digest and exact linux/amd64 plus linux/arm64 manifest
-      digests with commit-label equality, and forbid placeholders, fabricated values,
-      pre-authorized digest values, or mutable/incomplete chains.
+      the only tag is `git-<same-commit>`; repository-scoped credentials are available
+      without disclosure or account change; no moving alias is published; and partial
+      publication either uses separately explicit temporary-tag deletion authority
+      or records the complete orphan tag/index/platform chain. Bind the exact OCI
+      index and linux/amd64 plus linux/arm64 manifest digests only to `rf-bug-v2-publish-immutable-oci`,
+      with commit-label equality and no placeholders, fabricated/pre-authorized values,
+      mutable aliases, alternate repositories, or incomplete chains.
 
 
-      For Tailnet deployment, verify current accepted-plan orchestration authority
-      names the exact digest deployment operation and sole endpoint/target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
-      all SSH entry uses the literal FQDN with strict existing host-key verification,
-      host-key update/enrollment disabled, no alias/effective-host rewrite, and only
-      the existing credential/account. The target''s internal hostname is unknown
-      and cannot be authority. Require staged procedure bytes and v13 target-readiness
-      evidence to match the integrated detached helper commit plus exact source/staged
-      identities. Deployment consumes only the digest chain produced by `rf-bug-v2-publish-immutable-oci`
+      For Tailnet deployment, verify current accepted-plan authority names the exact
+      digest deployment operation and sole endpoint/target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
+      every SSH entry uses the literal FQDN with the exact existing strict host-key
+      policy, host-key update/enrollment disabled, no alias/effective-host rewrite,
+      and the existing credential/account. The target''s internal hostname has no
+      authority. Require staged procedure bytes and v14 target-readiness evidence
+      to match the integrated helper commit and exact source/staged identities. Deployment
+      consumes only the digest chain produced by `rf-bug-v2-publish-immutable-oci`
       and proven by `rf-bug-v2-docker-runtime-proof`; masked-only `CF_API_TOKEN`,
       `OPENROUTER_KEY`, and `TAVILY_API_KEY` runtime injection remains available;
       the current running image has one exact prior repository digest for rollback;
@@ -190373,42 +190371,34 @@ phases:
       readiness.
 
 
-      Admit v13''s exact deterministic projection only: current deploy/Compose hashes
-      and modes; internally derived backup manifest hash and observed mode plus backup
-      deploy/Compose hashes/modes; running resofeed/Caddy container IDs and exact
-      image IDs; `/data` mount Type/Destination plus internal actual volume identity
-      and logical `com.docker.compose.volume=resofeed-data`; canonical `TCP/HTTPS
-      443 -> 127.0.0.1:8443`; and internal validated-public-host hash. Require the
-      exact OrbStack prefix contract without PATH disclosure or alternate path/socket/fallback/install/configuration
-      behavior, identical helpers, canonical sorting, final-digest-only comparison,
-      approved-marker-only output, and the tracked closed read-only command allowlist.
-      Explicitly exclude volatile background-ingest SQLite/WAL/SHM, logs, counters,
-      health/PID/exec/network timestamps, Tailscale telemetry, atime, output order,
-      timestamps, and all sensitive/config values. Future OCI deferral stays outside
-      the runtime fingerprint.
+      Admit only v14''s deterministic projection: current deploy/Compose hashes and
+      modes; internal backup-manifest hash/mode and prior procedure hashes/modes;
+      running ResoFeed/Caddy container and image IDs; `/data` mount Type/Destination,
+      internal actual volume identity, and logical `com.docker.compose.volume=resofeed-data`;
+      canonical `TCP/HTTPS 443 -> 127.0.0.1:8443`; and internal validated-public-host
+      hash. Require exact PATH nondisclosure, identical helpers, canonical sorting,
+      approved markers, tracked closed read-only command allowlist, one probe, and
+      no retry. Exclude volatile SQLite/WAL/SHM, logs, counters, health/PID/exec/network
+      timestamps, Tailscale telemetry, atime, output order, timestamps, and all sensitive/config
+      values. Future OCI identity remains deferred.
 
 
-      Confirm each accepted operation, target, source/produced-input identity, execution
-      context, script-local detached-source polarity, tracked verification input identity,
-      OrbStack command-resolution boundary, host-key/credential boundary, preconditions,
-      cost boundary, rollback/recovery, and evidence topology matches the maintained
-      procedure. Procedure staging, repository harness mutation, v12 diagnostics,
-      v13 read-only probing, plan definition, acceptance-test mutation, masked credential
-      presence, publication authority, or host-key evidence cannot imply another operation
-      or target. Missing, stale, mismatched, broader, host-key-bypassed, rollback-incomplete,
-      or materially costly authority returns BLOCKED and permits no build, push, tag,
-      delete, pull, deploy, restart, host-key change, token reset, data clear, credential/account
-      change, secret inspection, mutable-tag substitution, alternate target, or undeclared
-      operation.'
-    verification: Current R3 authorization binds immutable publication and digest-only
-      deployment to the independently verified v13 tracked harness and OrbStack PATH
-      remediation, clean detached integrated helper commit, ancestor staged two-file
-      identity, exact positional transport and internal manifest derivation, stable
-      projection and exclusions, closed-command nonmutation proof, strict literal-FQDN
-      host-key boundary, produced OCI digest chain, rollback/readiness, scoped credentials,
-      costs, and exclusions. V12 and earlier rejected material remain diagnostic and
-      non-authoritative.
+      Confirm each accepted operation, target, input/source identity, execution context,
+      route ownership, host-key/credential boundary, preconditions, cost boundary,
+      rollback/recovery, and evidence topology matches the maintained procedure. Missing,
+      stale, mismatched, broader, host-key-bypassed, rollback-incomplete, or materially
+      costly authority returns `BLOCKED` and permits no build, push, tag, delete,
+      pull, deploy, restart, route change, host-key change, token reset, data clear,
+      credential/account change, secret inspection, mutable-tag substitution, alternate
+      target, or undeclared operation.'
+    verification: Current R3 review binds publication and deployment only after semantic
+      v14 proves the bounded Tailnet-route remediation and complete tracked read-only
+      procedure through `PROBE_OK`; it verifies exact operations, targets, source/produced
+      identities, strict endpoint and credential boundaries, immutable digest chain,
+      rollback/readiness, costs, exclusions, and evidence topology. V13 and earlier
+      rejected material remain unchanged diagnostics.
     refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-immutable-deployment-procedure-verification-v13/semantic-receipt-fail.json
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
     - .agents/skills/resofeed-tailnet-deploy/SKILL.md
@@ -190419,7 +190409,7 @@ phases:
     - deploy/resofeed-caddy/verify.sh
     - deploy/resofeed-caddy/verify-remote.sh
     depends_on:
-    - rf-bug-v2-immutable-deployment-procedure-verification-v13
+    - rf-bug-v2-immutable-deployment-procedure-verification-v14
     agent: spec-verifier
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
