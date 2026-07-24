@@ -192585,7 +192585,7 @@ phases:
   - id: rf-bug-v2-immutable-deployment-procedure-verification-v9
     name: Verify authenticated-endpoint immutable procedure through stdin-fed bash
       -s (semantic v9)
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -192912,8 +192912,6 @@ phases:
     - rf-bug-v2-local-verification-matrix
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     agent: integration-verifier
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-24T07:22:09.976499Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
