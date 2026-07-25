@@ -190908,54 +190908,55 @@ phases:
 
 
       Terminal `gate-reviewer` Full Gate for RF-BUG Assurance v2. Require direct evidence
-      for every integrated branch listed in `vectl.gate.scope.v2`, including the new
-      `RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE` producer, the sole renewed source/publication
-      review, bounded immutable publication, both-platform OCI runtime proof, strict-FQDN
-      digest deployment, security and black-box review, and defect-report closure.
-      Item-deep-links work remains out of scope.
+      for every integrated branch listed in `vectl.gate.scope.v2`, including the clean-source
+      dual-platform runtime evidence producer, its fresh independent consumer, the
+      existing container-build raw-evidence producer, sole renewed source/publication
+      review, bounded immutable publication, strict-FQDN digest deployment, security
+      and black-box review, and defect-report closure. Item-deep-links work remains
+      out of scope.
 
 
       Preserve completed history and all stopped old-source diagnostics unchanged.
       Require the old commit/tree/tag and attempts to remain absent, permanently stopped,
       never retried or counted in renewed-source attempts. Admit the container repair
-      only from its conformant exact three-path integrated receipt. Admit the new
-      evidence outcome only from a conformant bounded exact-commit runtime-state-only
-      receipt plus a sanitized receipt that hash-binds a complete non-overwriting
-      mode-0600 raw local log; the gate may inspect the local log but must never copy
-      raw content into plan evidence. Require exact Docker argv/output, reviewed context/daemon/default-builder
-      fingerprints before/after, `linux/amd64,linux/arm64`, helper-derived identity
-      under sanitized configuration, no credential/secret input or disclosure, no
-      push/load/tag/publication, cleanup on all post-create paths, unchanged protected
-      boundaries, and zero attributable residue. Require the fresh `spec-verifier`
-      review to consume this evidence and bind only integrated commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
-      to `docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`, exact
-      platforms, and matching revision labels. Missing/incomplete/insecure raw evidence,
-      hash mismatch, broader authority, drift, residue, or disclosure blocks.
+      only from its conformant exact three-path integrated receipt. Admit `RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE`
+      only from its completed bounded exact-commit runtime-state evidence and independent
+      publication review. Admit `RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE` only from
+      the Orchestrator producer''s clean detached commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`/tree
+      `7c471cd4b6fa88c603001e9a9748c1a15d7c8066`, sanitized receipt, hash-bound complete
+      mode-0600 raw log, and fresh conformant `integration-verifier` receipt. Require
+      exact tag/index/amd64/arm64/revision identity; unique containers/volumes; deterministic
+      port binding; bounded readiness with running/health/log observations; complete
+      both-platform binary/data/non-root/cwd/embedded-UI/Doctor/OPML/state/headers-CSP/persistence
+      assertions; nondisclosure; cleanup on every exit; zero residue; valid retry/stop
+      classification; and absence of forbidden registry/builder/publication/deployment/Tailnet/credential/account/repository/Git/unrelated
+      mutation. Preserve the prior runtime verifier''s rejected receipt and supplied
+      raw/Gate hashes as immutable non-authoritative history.
 
 
       Retain existing semantic-v14 staging and strict Tailscale route authority, exact
       staged deploy bytes, renewed publication retry/stop/cleanup policy, exact manifest/digest/revision
-      observations, both-platform runtime proof, deployment readiness/rollback/data/secret
-      protections, formal security review, independent runtime/UI proof, and defect-report
-      closure. Immediately before closure require structural/ref validation, assurance
-      lint, modifying-step preflight, expected-red applicability/bindings, roster
-      compatibility, complete proof topology, exact source/staged/helper identities,
-      current authority for every effect, cleanup/recovery evidence, current report
-      hashes, clean controlled execution worktrees, and no unresolved in-scope finding.
-      Gate review mutates no repository, Docker, registry, deployment, route, credential,
-      or runtime state.
+      observations, deployment readiness/rollback/data/secret protections, formal
+      security review, independent runtime/UI proof, and defect-report closure. Immediately
+      before closure require structural/ref validation, assurance lint, modifying-step
+      preflight, expected-red applicability/bindings, roster compatibility, complete
+      proof topology, exact source/staged/helper identities, current authority for
+      every effect, cleanup/recovery evidence, current report hashes, clean controlled
+      execution worktrees, and no unresolved in-scope finding. Gate review mutates
+      no repository, Docker, registry, deployment, route, credential, or runtime state.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR","RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-raw-evidence-capture","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR","RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE","RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-raw-evidence-capture","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-evidence-producer","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate proves exhaustive integrated coverage including the independently
-      consumed complete raw Docker evidence boundary; sole renewed semantic authorization;
-      exact immutable source/tag/platform/revision and bounded publication; both-platform
-      runtime proof; strict-FQDN digest deployment and rollback/data/secret protections;
-      formal security, black-box, and defect-report closure; current refs, assurance/preflight/expected-red/roster/proof-topology
+    verification: Full Gate proves exhaustive integrated coverage including clean
+      detached dual-platform runtime evidence and its fresh independent consumer;
+      exact immutable source/tag/index/platform/revision; bounded readiness and complete
+      runtime assertions; cleanup, zero residue, nondisclosure and retry/stop conformance;
+      strict-FQDN digest deployment and rollback/data/secret protections; formal security,
+      black-box and defect closure; current refs, assurance/preflight/expected-red/roster/proof-topology
       validation; and no undeclared effect or blocker.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-route-state-remediation/runtime-receipt-blocked.json
@@ -190985,6 +190986,7 @@ phases:
     - rf-bug-v2-close-defect-report
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-container-build-raw-evidence-capture
+    - rf-bug-v2-docker-runtime-evidence-producer
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
