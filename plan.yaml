@@ -193728,7 +193728,7 @@ phases:
     agent: spec-verifier
   - id: rf-bug-v2-container-build-raw-evidence-capture
     name: Capture complete raw no-push container build evidence
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -193853,6 +193853,22 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-25T11:49:42.603222Z'
+    done_at: '2026-07-25T11:55:56.528449+00:00'
+    evidence: 'Orchestrator-owned runtime_state_only evidence capture on clean detached
+      source abf3cb6c545f9c0f3c605760a5325875c61fc83f/tree 7c471cd4b6fa88c603001e9a9748c1a15d7c8066.
+      Attempt 1 failed before any Docker invocation because the initial recorder transport
+      could not execute the selected context probe; raw log SHA-256 1c10d26ae24e26d5c0c7168920f4d9cec95799dfb7374fcc20f9299d62ebeca3,
+      boundary unchanged, cleanup complete, zero residue, and no publication-capable
+      argv, satisfying the single retry predicate. Attempt 2 used non-overwriting
+      mode-0600 artifacts and passed: raw log /tmp/larva-agent-artifacts/rf-bug-v2-container-build-raw-evidence-capture/attempt-2-container-build-complete.log
+      SHA-256 36484f633e5ca577ad6c6e20a811e5eb3aa5d75c1a86d92803072a4affd82a6f, 37488
+      bytes; sanitized receipt /tmp/larva-agent-artifacts/rf-bug-v2-container-build-raw-evidence-capture/attempt-2-runtime-receipt-container-build-raw-evidence.json,
+      mode 0600. Receipt classification pass, Node exit 0, 23 recorded Docker invocations,
+      docker-container builder without --use, exact linux/amd64,linux/arm64 build
+      with output type=cacheonly, no push/load/tag/secret/ssh argv, credential/secret
+      inputs absent, boundary fingerprints unchanged, recorder removed, cleanup complete,
+      zero residue, zero paid/cloud builder spend. Worktree remained clean/detached
+      and no repository/Git/registry/deployment/Tailnet mutation occurred.'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
