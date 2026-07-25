@@ -190548,7 +190548,7 @@ phases:
       deployment, Tailnet, credential/trust, data, repository, or Git mutation.'
   - id: rf-bug-v2-docker-runtime-proof
     name: Verify immutable OCI image on both platforms
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190648,6 +190648,23 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-25T15:07:41.411958Z'
+    done_at: '2026-07-25T15:16:58.079113+00:00'
+    evidence: Fresh integration-verifier independently consumed exact clean detached
+      source and the published OCI/runtime producer evidence. Production Gate admitted
+      the corrected unchanged receipt as CONFORMANT with semantic SHA-256 6195360fe8f7f085de47d394001987f78c1758dddd951a2fe5286c6f4a482c21;
+      raw receipt artifact SHA-256 2918a9ccb51d3235cae0d3dd19dc683dfec85ad155e270f2d0017ca0644a55cf.
+      It proved exact index sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b,
+      amd64 sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0,
+      arm64 sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff,
+      matching revision labels, publication receipt SHA 0abd78c11b08611508b5761d867e11c22ad95b12889d7288e16eb6f41dc91648,
+      runtime receipt SHA 4a7493f0afbdcb43dc89fb68697c67cf615944c9a61b0cb18633c0bad8715a1f,
+      and mode-0600 raw runtime log SHA fe09fc895fd30d53a9ee5a683d2ac7c6bf410ab3b1c8c36d3db9df88f952fa0d.
+      Both platforms have 21 true assertions covering readiness, /app/resofeed, nonroot,
+      arbitrary cwd, binary-only embedded UI/no Node/external UI, root and authoritative
+      /source-ledger byte/hash equality, Doctor masked redaction, OPML import-only,
+      State export/import, four headers/CSP, A-to-B persistence, cleanup and zero
+      residue. Prior blocked/schema-invalid receipts remain diagnostic only. No runtime
+      residue or undeclared mutation remains.
   - id: rf-bug-v2-tailnet-caddy-proof
     name: Deploy authorized digest and verify authenticated Tailnet/Caddy runtime
     status: pending
