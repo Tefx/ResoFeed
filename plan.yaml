@@ -195065,28 +195065,51 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Perform an R3 read-only review before external mutation. Verify that current
-      orchestration authority covers publishing the integrated commit as an immutable
-      multi-architecture image only under `docker.io/tefx/resofeed` and deploying
-      that exact digest through the maintained `resofeed-caddy` stack on `tefx-mbp-personal`
-      to `https://resofeed.tefx.one`; verify explicit `--public-url https://resofeed.tefx.one`,
-      bounded registry/Tailnet credentials, no runtime-secret output, prior-digest
-      rollback, partial-publication orphan recovery, database backup/restore readiness,
-      target/source/commit identity, and evidence topology. Fail closed on missing
-      authority, credential/account expansion, unsafe rollback, source drift, target
-      drift, material unplanned cost, or incomplete local integration. Do not request
-      renewed consent when accepted orchestration authority already covers the declared
-      operations.'
-    verification: The review binds the exact integrated commit, docker.io/tefx/resofeed
-      publication, tefx-mbp-personal resofeed-caddy deployment, production PublicURL,
-      credential bounds, rollback/recovery, and local evidence with no unresolved
-      R3 finding.
+      Deliver: Produce `ITEM-DEEP-LINK-DEPLOYMENT-AUTHORITY` before persistent effects.
+      Bind the exact clean integrated commit and derived `git-<commit>` tag, current
+      Docker context/daemon, `docker.io/tefx/resofeed` repository/account boundary,
+      two-platform Buildx procedure, strict-FQDN `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      target, `https://resofeed.tefx.one` PublicURL, maintained procedure hashes/modes,
+      current deployed prior digest, database backup and named-volume recovery readiness,
+      credentials/trust, route ownership, secret redaction, zero paid/cloud-builder
+      authority, and the publication/deployment evidence consumers.
+
+
+      Boundary: `spec-verifier` is read-only. It may inspect current source, tracked
+      contracts, sanitized local Docker/SSH/registry identity, and the admitted local-integration
+      receipt. It may not build, push, pull, tag, delete, login, stage, deploy, restart,
+      change route/Caddy/trust/account/credentials, read secret values, or mutate
+      repository/runtime/external state. Missing credential/account, source, target,
+      rollback, or cost authority is blocking.
+
+
+      Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
+      object with `verifier_id=spec-verifier`, `step_id=item-deep-links-deployment-authorization-review`,
+      ordered scope [`integrated source and immutable tag`, `registry context account
+      credential and cost boundary`, `Tailnet endpoint procedure PublicURL and route`,
+      `prior digest database volume and rollback`, `effect topology and nondisclosure`],
+      and exactly three coverage rows for `ITEM-DEEP-LINK-DEPLOYMENT-AUTHORITY`, `ITEM-DEEP-LINK-OCI-PUBLICATION`,
+      and `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT`.
+
+
+      Recovery: Any missing or conflicting identity, account/credential expansion,
+      material unplanned cost, unsafe rollback, source/target/procedure drift, secret
+      exposure, or incomplete local proof returns BLOCKED without attempting either
+      effect.'
+    verification: A production-admitted spec-verifier receipt binds the exact integrated
+      source/tag, registry and Docker context/account, strict Tailnet target/PublicURL/procedure,
+      prior digest/database/volume recovery, credentials/trust/cost boundaries, and
+      independent consumers with no unresolved R3 finding or mutation.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - Dockerfile
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/deploy.sh
+    - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/caddy/Caddyfile
     depends_on:
     - item-deep-links-local-integration-verification
