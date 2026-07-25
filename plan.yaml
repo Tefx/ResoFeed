@@ -193700,7 +193700,7 @@ phases:
       CONFORMANT with only four preserved historical missing-ref warnings.'
   - id: rf-bug-v2-renewed-source-publication-authorization-review
     name: Renew integrated-source and immutable-publication authority
-    status: claimed
+    status: pending
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -193768,8 +193768,6 @@ phases:
     depends_on:
     - rf-bug-v2-container-build-context-remediation
     agent: spec-verifier
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-25T11:29:27.862740Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
