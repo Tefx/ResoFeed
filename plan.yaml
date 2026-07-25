@@ -193915,7 +193915,7 @@ phases:
       and no repository/Git/registry/deployment/Tailnet mutation occurred.'
   - id: rf-bug-v2-docker-runtime-evidence-producer
     name: Produce clean-source dual-platform container runtime evidence
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -194118,6 +194118,23 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-25T14:48:05.454072Z'
+    done_at: '2026-07-25T14:50:35.338048+00:00'
+    evidence: 'Route-contract-corrected Orchestrator runtime proof passed on exact
+      clean detached source abf3cb6c545f9c0f3c605760a5325875c61fc83f/tree 7c471cd4b6fa88c603001e9a9748c1a15d7c8066
+      and exact OCI chain index sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b,
+      amd64 sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0,
+      arm64 sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff.
+      Mode-0600 raw log SHA-256 fe09fc895fd30d53a9ee5a683d2ac7c6bf410ab3b1c8c36d3db9df88f952fa0,
+      10821 bytes; sanitized receipt raw SHA-256 4a7493f0afbdcb43dc89fb68697c67cf615944c9a61b0cb18633c0bad8715a1f,
+      mode 0600. Both platforms passed all 21 boolean assertions: exact running/nonroot/entrypoint/port,
+      bounded readiness, embedded root and generated asset, binary-only no Node/external
+      UI, canonical masked Doctor plus unauth 401, OPML import-only, State export/import,
+      four headers/CSP, arbitrary cwd, and A-to-B volume persistence. Authoritative
+      /source-ledger returned 200 and byte/hash equality with embedded root on both
+      platforms (3057 bytes, SHA-256 2a61ac133f6d5ad9ceca0d1eac7f00f039cb087a854b7b9c7e8f63e209bfb082).
+      Per-platform containers and volumes were removed; final residue zero; source
+      remained clean/detached; no registry/builder/publication/deployment/Tailnet/credential/repository/Git/unrelated
+      mutation occurred. Prior invalid-harness artifacts remain preserved as diagnostics.'
   - id: rf-bug-v2-container-build-evidence-runtime-admission
     name: Admit completed container-build evidence into runtime proof chain
     status: done
