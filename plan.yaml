@@ -193575,7 +193575,7 @@ phases:
       repository step. Unrelated user-owned working-tree changes remained untouched.'
   - id: rf-bug-v2-container-build-context-remediation
     name: Repair container web-build context and trusted identity pipeline
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDispatch\
       \ and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
@@ -193687,6 +193687,17 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-25T11:19:10.528805Z'
+    done_at: '2026-07-25T11:28:55.466224+00:00'
+    evidence: 'Integrated commit abf3cb6c545f9c0f3c605760a5325875c61fc83f (parent
+      fa0716ea509166f41af57e17b9d42abeea19a688) changes exactly Dockerfile, docs/CONTAINER.md,
+      and scripts/vectl-check.test.mjs. Production Gate admitted dispatch sha256:a8e92ff3bc8abbd2c126914d65fd95371dee448c03917efd76f3f3f8dc8cd562
+      and corrected worker receipt sha256:d68f4059d8928ee7f70f9bc7df07a1c81ad152efaf0273e5e87895e233c0fd93
+      as CONFORMANT. Exact declared check passed on clean integrated detached HEAD:
+      BUILD_IDENTITY=trusted_canonical_derivation; PLATFORMS=linux/amd64,linux/arm64;
+      PUBLISH=none; SECRETS=absent; RESIDUE=none; tests 1/pass 1/fail 0. Protected
+      helper/config hashes match parent, no attributable builder/container residue
+      remains, diff check passes, and structural/assurance/preflight validation is
+      CONFORMANT with only four preserved historical missing-ref warnings.'
   - id: rf-bug-v2-renewed-source-publication-authorization-review
     name: Renew integrated-source and immutable-publication authority
     status: pending
