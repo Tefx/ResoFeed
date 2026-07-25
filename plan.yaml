@@ -194424,6 +194424,106 @@ phases:
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-docker-runtime-proof
     agent: vectl-orchestrator
+  - id: rf-bug-v2-prior-runtime-identity-readiness
+    name: Resolve prior runtime digest and recovery readiness read-only
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Deliver `RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS`. Fresh `integration-verifier`
+      owns one genuine read-only precondition outcome for the existing `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      deployment boundary. Consume the preserved BLOCKED receipt `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deployment-receipt-blocked.json`
+      at SHA-256 `8ffcc724717740f5bafd7f31066ebd015b53720bf471334702be11b16b62d44d`,
+      mode `0600`; the strict-FQDN preflight raw-log SHA-256 `8072740ef0e3d39adaf9cc82f3edbd944b67f651aace87657cc60316d9b45542`;
+      the prior Config.Image identity hash `2ba0aa986f4f087637dfe829d96ada7f0fc1903ba82b37364473d92dc8949ff7`;
+      and the empty exact RepoDigests observation SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+      Preserve formal deployment invocation count `0`, remote mutation count `0`,
+      and unexecuted recovery. No repository, Git, container, image, registry, credential,
+      trust, route, secret, volume, service, deployment, or other runtime mutation
+      is authorized.
+
+
+      Boundary: use only literal-FQDN SSH with `-F none`, exact existing-key `HostName`/`HostKeyAlias`,
+      `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, the unchanged existing credential/account/default
+      trust, the canonical physical stack, and its OrbStack Docker context. Inspect
+      only current `resofeed` container/image metadata, exact `docker.io/tefx/resofeed`
+      repository registry metadata, direct readiness, and the named volume `resofeed-caddy_resofeed-data`
+      mounted at `/data`. Never read or emit `.env` values, runtime secrets, owner-token
+      values, credential paths, host-key material, PATH, raw Serve JSON, public-host
+      values, configuration, or response bodies. Registry access is read-only through
+      the existing repository-scoped identity; no login, trust/account change, pull,
+      push, tag, delete, manifest mutation, local image mutation, container change,
+      restart, route change, or deployment invocation.
+
+
+      Admit: create one new non-overwriting local mode-0600 raw command log and one
+      sanitized receipt. Derive exactly one rollback digest only through a documented
+      deterministic chain: (A) normalize current Config.Image only if it is exactly
+      `tefx/resofeed:git-<40 lowercase hex>` or `docker.io/tefx/resofeed:git-<40 lowercase
+      hex>`, then read-only resolve that immutable tag through exact repository registry
+      metadata to one `docker.io/tefx/resofeed@sha256:<64 lowercase hex>` digest and
+      bind the running container''s local image ID/config to that same repository
+      object; or (B) bind the running container''s local image ID and immutable image
+      config to exactly one `docker.io/tefx/resofeed@sha256:<64 lowercase hex>` row
+      from exact repository registry metadata. Reject moving tags, bare/local IDs
+      without the complete chain, unknown or unrelated repositories, mutable aliases,
+      noncanonical digest forms, multiple candidate digests, conflicting platform/index
+      identity, missing links, registry/credential/trust drift, or any response-body
+      disclosure. The receipt records only nonsecret target/procedure identities,
+      selected chain, normalized immutable tag when applicable, exact rollback digest
+      when proven, local image/config binding hashes, direct root `200`, unauthenticated
+      Doctor `401`, exact named-volume mount identity, route no-op observation, commands/attempt
+      counts, raw-log hash/mode/bytes, nondisclosure, and zero mutation. If no exact
+      digest is derivable, emit outcome-consistent BLOCKED evidence with the preserved
+      current runtime, direct readiness and volume identity, zero deployment/recovery
+      invocation, and the smallest separately authorized reconciliation need; do not
+      invent a digest or fallback.
+
+
+      Recovery: all probes are non-mutating. Retry a demonstrably transient read-only
+      SSH or registry observation at most twice after retaining each observation and
+      re-proving unchanged literal target, current container/image ID, route, and
+      volume. Deterministic ambiguity, missing chain, identity/trust/credential drift,
+      disclosure, observed mutation, unknown state, or readiness/volume mismatch stops
+      immediately. Cleanup is limited to local mode-0600 evidence finalization; no
+      remote cleanup or reconciliation is authorized because no remote effect may
+      occur. The sanitized receipt is the sole prior-digest/recovery-readiness input
+      consumed by `rf-bug-v2-tailnet-caddy-deployment-producer`; deployment remains
+      blocked unless the receipt proves exactly one recoverable prior digest plus
+      direct readiness and volume identity.
+
+
+      Production semantic admission is mandatory. Emit exactly one `vectl.verifier.semantic.v1`
+      object with `verifier_id=integration-verifier`, `step_id=rf-bug-v2-prior-runtime-identity-readiness`,
+      ordered `scope`: [`preserved zero-mutation blocked preflight evidence`, `strict
+      literal-FQDN current container and image identity`, `exact repository registry
+      digest derivation`, `direct readiness named-volume route and nondisclosure`,
+      `rollback readiness or outcome-consistent blocked stop`], and exactly one coverage
+      row for `RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS`.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness","risk_tier":"R3","risk_reasons":["read_only_remote_runtime_identity","registry_identity_and_credential_boundary","rollback_digest_precondition","secret_safe_evidence"],"primary_outcome":"RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS","atom":"the
+      current resofeed runtime is bound through a deterministic read-only chain to
+      exactly one recoverable docker.io/tefx/resofeed digest with direct readiness,
+      named-volume identity, strict endpoint identity, route no-op, nondisclosure,
+      and zero mutation, or deployment remains blocked with outcome-consistent evidence","modality":"runtime","seam":"real","check_id":"rf_bug_v2_prior_runtime_identity_readiness","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+
+      </vectl_step_policy>'
+    verification: A production-admitted fresh integration-verifier receipt and mode-0600
+      raw log preserve the zero-mutation blocked preflight, then prove through one
+      allowed deterministic chain exactly one canonical prior repository digest, current
+      local image/config binding, literal-FQDN trust, direct 200/401 readiness, exact
+      `resofeed-caddy_resofeed-data` `/data` mount, route no-op, nondisclosure, and
+      zero mutation; otherwise they keep deployment BLOCKED with the current runtime
+      preserved and no invented or destructive fallback.
+    depends_on:
+    - rf-bug-v2-stage-immutable-deployment-procedure-v2
+    - rf-bug-v2-docker-runtime-proof
+    agent: integration-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
