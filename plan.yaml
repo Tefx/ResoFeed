@@ -194795,10 +194795,21 @@ phases:
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
-  gate: The frozen item deep-link contract is implemented across browser, HTTP, MCP,
-    SQLite, real browser history/authentication, immutable OCI, Tailnet/Caddy, and
-    external-client surfaces with read-only navigation, exact canonical codecs, rollback
-    readiness, and one integrated Full Gate.
+  gate: One terminal gate admits the protected item deep-link contract, parallel backend/frontend
+    implementation, independent local proof, separately authorized immutable OCI publication
+    and verification, separately authorized Tailnet/Caddy deployment and proof, and
+    the complete witnessed external-client matrix.
+  context: The tracked canonical authority is docs/ITEM_DEEP_LINKS.md plus the item
+    deep-link deltas in docs/ARCHITECTURE.md and docs/DESIGN.md at authority commit
+    6ce3cc5a22fa4d795b5181018ad449f1dedef104. The existing generic adapter/profile
+    is current. Protected expected-red ownership and the parallel backend/frontend
+    frontier remain unchanged. Publication and deployment are separate runtime_state_only
+    implementation effects owned by vectl-orchestrator, each followed by read-only
+    independent verification. External-client verification is a startup blocker until
+    exact nonsecret provider, device/application, and account/profile bindings are
+    witnessed for Safari, Chrome, Telegram iOS, Telegram Android, Telegram Desktop,
+    email-client opening, and a Codex-or-equivalent MCP app_url consumer; substitution
+    or inferred availability is forbidden.
   depends_on:
   - rf-bug-assurance-v2-closure
   steps:
