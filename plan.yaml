@@ -195289,3 +195289,47 @@ phases:
     depends_on:
     - item-deep-links-external-client-verification
     agent: gate-reviewer
+  - id: item-deep-links-oci-verification
+    name: Independently Verify the Published Immutable OCI Identity
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Deliver: Produce `ITEM-DEEP-LINK-OCI-VERIFICATION` by independently reading
+      the publication receipt and `docker.io/tefx/resofeed` registry metadata. Prove
+      the exact `git-<integrated commit>` tag and `@sha256:<index>` resolve to one
+      index containing exactly linux/amd64 and linux/arm64 manifests, each with the
+      exact authorized commit revision label; bind source tree, tag, index, platform
+      digests, and no moving alias or conflicting publication.
+
+
+      Boundary: `integration-verifier` has read-only access to the exact existing
+      repository through the already authorized repository-scoped identity. It may
+      inspect manifests and sanitized producer evidence; it may not login, build,
+      pull, push, tag, delete, mutate credentials/accounts/builders, deploy, or read
+      secret values. A transient non-mutating registry read may be retried twice after
+      retaining the observation and re-proving the same repository/tag/source identity.
+
+
+      Admit: Require the exact mode-0600 log identity and sanitized receipt from `item-deep-links-publish-immutable-oci`.
+      Production semantic admission emits one `vectl.verifier.semantic.v1` object
+      with `verifier_id=integration-verifier`, `step_id=item-deep-links-oci-verification`,
+      ordered scope [`publication producer receipt`, `tag and index equality`, `exact
+      amd64 and arm64 manifests`, `revision and source identity`, `registry nondisclosure
+      and zero verifier mutation`], and exactly two coverage rows for `ITEM-DEEP-LINK-OCI-PUBLICATION`
+      and `ITEM-DEEP-LINK-OCI-VERIFICATION`.
+
+
+      Recovery: Missing or conflicting manifests, wrong revision/source, tag/index
+      drift, unknown partial publication, credential/account drift, disclosure, or
+      observed mutation stops BLOCKED/FAIL. Do not clean orphan objects or authorize
+      deployment.'
+    verification: A production-admitted integration-verifier receipt independently
+      binds the producer receipt and proves exact tag/index/platform/revision/source
+      identity, no moving alias or conflicting publication, registry nondisclosure,
+      and zero verifier mutation.
+    depends_on:
+    - item-deep-links-publish-immutable-oci
+    agent: integration-verifier
