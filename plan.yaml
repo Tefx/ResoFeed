@@ -195182,39 +195182,68 @@ phases:
     - item-deep-links-deployment-authorization-review
     agent: vectl-orchestrator
   - id: item-deep-links-tailnet-runtime-proof
-    name: Deploy the Immutable Digest and Prove Tailnet/Caddy Runtime Semantics
+    name: Independently Prove Tailnet/Caddy Deep-Link Runtime Semantics
     status: pending
     description: 'step_type: verification
 
-      repo_change_policy: runtime_state_only
+      repo_change_policy: no_repo_change
 
 
-      External operation: use the maintained ResoFeed Tailnet deployment path to deploy
-      only the reviewed immutable digest through the existing `resofeed-caddy` stack
-      on `tefx-mbp-personal`, with effective `--public-url https://resofeed.tefx.one`.
-      Preserve the prior database and digest for rollback; stop on target, source,
-      digest, execution-context, credential, Caddy-ownership, health, or postcondition
-      drift. After deployment, exercise the real Caddy/Tailnet route with raw item
-      ID `~slash/%?hash#雪`, canonical dot sentinels, one dispatchable invalid route,
-      and raw `/items/%ZZ`; prove no proxy/address normalization, SPA/static dispatch
-      correctness, byte-identical authenticated API lookup, exact MCP app_url, explicit-versus-derived
-      PublicURL separation, read-only state traces, and direct/public security-header
-      parity. Unknown partial outcomes stop before further mutation. Roll back to
-      the prior verified digest and database on failed health or contract probes.
-      Do not edit repository files.'
-    verification: The exact immutable digest is healthy at https://resofeed.tefx.one
-      and passes production Caddy/Tailnet codec, static dispatch, authenticated API,
-      MCP app_url, malformed-percent, header, and read-only-state probes with prior-digest/database
-      rollback ready.
+      Deliver: Produce `ITEM-DEEP-LINK-TAILNET-RUNTIME` by independently consuming
+      the deployment receipt and re-observing the exact integrated source/tag/index/platform/revision
+      and configured running digest at `https://resofeed.tefx.one`. Prove strict-FQDN
+      direct/public root and Doctor readiness, Go-owned security-header parity and
+      Caddy non-ownership, named-volume/route/PublicURL/recovery identity, and the
+      canonical production deep-link seam: raw ID `~slash/%?hash#雪`, dot sentinels,
+      one dispatchable invalid route, raw `/items/%ZZ` server `400`, unchanged browser
+      address, SPA fallback, byte-identical authenticated API lookup, exact MCP app_url,
+      explicit-versus-derived PublicURL separation, and zero read-lifecycle state
+      writes.
+
+
+      Boundary: `integration-verifier` is read-only against the exact deployed stack
+      and registry identity. It may enter the owner token only for authenticated read
+      probes and use isolated nonpersistent fixtures if the admitted deployment receipt
+      authorizes them without changing durable product state. It may not deploy, roll
+      back, restart, stage, repair Caddy/Serve, mutate routes/data/item state/registry/credentials/accounts/trust/secrets,
+      or expose token, secret, host-key, config, or response-body values. At most
+      three retries are allowed only for demonstrably transient non-mutating observations
+      after retaining failures and re-proving unchanged target/digest/volume/route.
+
+
+      Admit: Require the exact sanitized receipt and secret-safe raw-log identity
+      from `item-deep-links-tailnet-deployment` plus the admitted OCI-verification
+      receipt. Production semantic admission emits one `vectl.verifier.semantic.v1`
+      object with `verifier_id=integration-verifier`, `step_id=item-deep-links-tailnet-runtime-proof`,
+      ordered scope [`deployment and immutable identity`, `strict-FQDN readiness headers
+      and Caddy ownership`, `volume route PublicURL and recovery`, `production codec
+      static API and MCP round trip`, `read-only state and nondisclosure`], and exactly
+      three coverage rows for `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT`, `ITEM-DEEP-LINK-TAILNET-RUNTIME`,
+      and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`.
+
+
+      Recovery: Any identity/readiness/header/Caddy/volume/route/PublicURL/codec/API/MCP/state
+      defect, unavailable producer evidence, disclosure, observed mutation, or unknown
+      state stops FAIL/BLOCKED. If producer evidence reports successful prior-digest/database
+      restoration, verify reconciliation and return outcome-consistent failure; do
+      not treat rollback as release success or attempt repair.'
+    verification: A production-admitted integration-verifier receipt independently
+      binds the OCI/deployment receipts and proves exact deployed identity, strict
+      direct/public readiness and header ownership, volume/route/PublicURL/recovery,
+      production codec/static/API/MCP round trip including malformed percent, zero
+      read-state writes, nondisclosure, and zero verifier mutation.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
-    - Dockerfile
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/deploy.sh
+    - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/caddy/Caddyfile
     depends_on:
-    - item-deep-links-publish-immutable-oci
+    - item-deep-links-tailnet-deployment
     agent: integration-verifier
   - id: item-deep-links-external-client-verification
     name: Independently Verify Browser and External-Client Deep-Link Behavior
