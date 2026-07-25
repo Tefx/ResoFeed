@@ -195006,32 +195006,53 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Run a fresh Full Audit against the integrated head using the real `cmd/resofeed`
-      binary, real SQLite, HTTP routing, Streamable HTTP MCP, and isolated Chromium
-      lanes. Prove canonical browser and API codecs remain separate; escaped `/items/`
-      dispatch precedes cleaning; raw malformed percent receives server-level 400;
-      canonical, legacy, dispatchable-invalid, dot-sentinel, encoded slash/dot, and
-      Unicode IDs reach the correct boundary without redirect or asset substitution;
-      all item operations reject noncanonical API tokens before lookup; duplicate/broken/ordinary
-      ItemReadResult fields and effective mutation targets are exact; read lifecycle
-      traces change no inspected/delivered/resonated state; all three MCP projections
-      expose credential-free nonpersisted app_url from explicit and derived PublicURL;
-      startup rejects excluded addr/PublicURL forms before bind. Exercise at least
-      one high-risk invalid path and record exact commands, process liveness, selected/executed
-      identities, network traces, and SQLite before/after evidence. Do not modify
-      repository files.'
-    verification: Fresh L2/L3 evidence proves the complete local backend/browser integration
-      on real seams, including malformed-percent server handling, no normalization
-      drift, exact relation envelopes, effective mutation targets, PublicURL/app_url,
-      and zero read-lifecycle state mutation.
+      Deliver: Produce `ITEM-DEEP-LINK-LOCAL-INTEGRATION` on integrated HEAD through
+      the real `cmd/resofeed` binary, real SQLite, HTTP/static routing, Streamable
+      HTTP MCP, and isolated Chromium. Prove application/API codec separation; escaped
+      `/items/` dispatch before cleaning; raw malformed-percent server `400`; canonical/legacy/dot/encoded-slash/Unicode/dispatchable-invalid
+      routing without redirect or asset substitution; pre-lookup API-token rejection;
+      exact ordinary/duplicate/broken envelopes and effective mutation targets; explicit/derived
+      PublicURL and all three credential-free nonpersisted MCP app_url projections;
+      startup rejection before bind; history/auth/error/focus/scroll/read-only lifecycle;
+      and SQLite before/after invariance.
+
+
+      Boundary: `integration-verifier` is read-only and may create only ephemeral
+      isolated runtime/database/browser evidence outside the repository. It may not
+      edit repository files, protected acceptance, credentials, persistent data, registry,
+      deployment, or Tailnet state. At most two retries are allowed only for a demonstrably
+      transient isolated process/browser startup after retaining the failed observation
+      and re-proving the same HEAD, adapter identity, binary, and clean fixture.
+
+
+      Admit: Consume production-admitted backend/frontend worker receipts and their
+      exact selected/executed identities. Production semantic admission emits one
+      `vectl.verifier.semantic.v1` object with `verifier_id=integration-verifier`,
+      `step_id=item-deep-links-local-integration-verification`, ordered scope [`HTTP
+      and static route boundary`, `SQLite relation and read-only state`, `MCP PublicURL
+      app_url projection`, `real-browser history authentication errors focus and scroll`,
+      `integrated identity and nondisclosure`], and exactly three coverage rows for
+      `ITEM-DEEP-LINK-BACKEND`, `ITEM-DEEP-LINK-FRONTEND`, and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`.
+
+
+      Recovery: Any deterministic route/token/envelope/PublicURL/browser/state defect,
+      identity mismatch, test skip, repository mutation, fixture leakage, or unknown
+      state stops FAIL/BLOCKED. Clean ephemeral processes and fixtures; do not mutate
+      product code or acceptance.'
+    verification: A production-admitted integration-verifier receipt binds integrated
+      HEAD and the admitted branch receipts, then proves all five scopes on real binary/SQLite/HTTP/MCP/Chromium
+      seams with exact state before/after evidence, no skipped case, no repository
+      mutation, and no fixture residue.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
+    - docs/CONTAINER.md
     - go.mod
     - web/package.json
-    - docs/CONTAINER.md
+    - scripts/vectl-check.mjs
+    - scripts/resofeed-svelte-build-identity.mjs
     depends_on:
     - item-deep-links-backend-api-mcp
     - item-deep-links-frontend-browser
