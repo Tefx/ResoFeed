@@ -190991,6 +190991,7 @@ phases:
     - rf-bug-v2-remote-procedure-staging-authorization-review
     - rf-bug-v2-stage-immutable-deployment-procedure
     - rf-bug-v2-ssh-endpoint-identity-remediation
+    - rf-bug-v2-publish-immutable-oci
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
