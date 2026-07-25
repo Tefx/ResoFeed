@@ -190433,7 +190433,7 @@ phases:
       for this guarded execution path.'
   - id: rf-bug-v2-publish-immutable-oci
     name: Publish authorized immutable amd64 and arm64 OCI image
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -190529,6 +190529,23 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-25T13:19:15.840541Z'
+    done_at: '2026-07-25T13:27:12.730185+00:00'
+    evidence: 'Renewed-source attempt 1 succeeded and was not retried. Exact clean
+      detached source abf3cb6c545f9c0f3c605760a5325875c61fc83f/tree 7c471cd4b6fa88c603001e9a9748c1a15d7c8066
+      published only docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f
+      for linux/amd64,linux/arm64 with matching revision labels. Final chain: index
+      sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b; amd64
+      sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0; arm64
+      sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff. Both
+      platform label probes returned org.opencontainers.image.revision=abf3cb6c545f9c0f3c605760a5325875c61fc83f.
+      Mode-0600 complete log SHA-256 079564c5280633d3f990175e721161f9172a36d8faf27364c37142ecb517224b;
+      sanitized attempt classification SHA-256 a84f3bfb7ee5e4a6970872edb7526c24db43e85470c08c4c0b8dd7eb73a98b72;
+      final receipt SHA-256 0abd78c11b08611508b5761d867e11c22ad95b12889d7288e16eb6f41dc91648.
+      Source remained clean/detached; Docker context/daemon/active/default-builder
+      fingerprints unchanged; builder and attributable container absent; suspect log
+      false; registry account reported configured without disclosure; paid/cloud builder
+      spend zero; old source retry count zero; no moving aliases, alternate repository,
+      deployment, Tailnet, credential/trust, data, repository, or Git mutation.'
   - id: rf-bug-v2-docker-runtime-proof
     name: Verify immutable OCI image on both platforms
     status: pending
