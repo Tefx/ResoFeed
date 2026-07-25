@@ -194405,14 +194405,20 @@ phases:
       mutation, data loss, or undeclared effect","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: The Orchestrator-owned mode-0600 raw log and sanitized receipt prove
-      one exact maintained strict-FQDN formal deployment invocation; exact source/tag/index/amd64/arm64/revision
-      and unchanged staged procedure hashes; current prior digest and maintained recovery
-      readiness; final configured index digest; direct 200/401 readiness; unchanged
-      canonical route, SQLite volume, owner-token state, existing credential/account/trust,
+    verification: The Orchestrator-owned mode-0600 raw log and sanitized receipt consume
+      the production-admitted `rf-bug-v2-prior-runtime-identity-readiness` receipt
+      and proceed only when it proves exactly one canonical recoverable prior `docker.io/tefx/resofeed@sha256:<64
+      lowercase hex>` digest, current local image/config binding, direct 200/401 readiness,
+      exact `resofeed-caddy_resofeed-data` `/data` mount, strict literal-FQDN identity,
+      route no-op, nondisclosure, and zero prior mutation. They then prove one exact
+      maintained strict-FQDN formal deployment invocation; exact source/tag/index/amd64/arm64/revision
+      and unchanged staged procedure hashes; final configured index digest; preserved
+      prior digest, SQLite volume, owner-token state, canonical route, existing credential/account/trust,
       masked-only secret injection, builder/default-builder state, repository/Git
       state, and nondisclosure; or a fully observed prior-digest recovery and BLOCKED
-      stop with no replay or alternate effect.
+      stop with no replay or alternate effect. An outcome-consistent BLOCKED identity-readiness
+      receipt, ambiguity, or missing exact digest forbids the deployment invocation
+      and keeps this step BLOCKED.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -194420,9 +194426,11 @@ phases:
     - deploy/resofeed-caddy/README.md
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
+    - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deployment-receipt-blocked.json
     depends_on:
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-docker-runtime-proof
+    - rf-bug-v2-prior-runtime-identity-readiness
     agent: vectl-orchestrator
   - id: rf-bug-v2-prior-runtime-identity-readiness
     name: Resolve prior runtime digest and recovery readiness read-only
