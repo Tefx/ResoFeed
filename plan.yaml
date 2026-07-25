@@ -193728,7 +193728,7 @@ phases:
     agent: spec-verifier
   - id: rf-bug-v2-container-build-raw-evidence-capture
     name: Capture complete raw no-push container build evidence
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -193851,6 +193851,8 @@ phases:
     depends_on:
     - rf-bug-v2-container-build-context-remediation
     agent: vectl-orchestrator
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-25T11:49:42.603222Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
