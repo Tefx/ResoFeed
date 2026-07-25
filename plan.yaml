@@ -190993,7 +190993,8 @@ phases:
       for every integrated branch listed in `vectl.gate.scope.v2`, including the clean-source
       dual-platform runtime evidence producer, its fresh independent consumer, the
       existing container-build raw-evidence producer, sole renewed source/publication
-      review, bounded immutable publication, the Orchestrator-owned strict-FQDN persistent
+      review, bounded immutable publication, the fresh read-only prior-runtime identity
+      and recovery-readiness boundary, the Orchestrator-owned strict-FQDN persistent
       digest deployment producer and its independent Tailnet/Caddy runtime consumer,
       security and black-box review, and defect-report closure. Item-deep-links work
       remains out of scope.
@@ -191017,19 +191018,25 @@ phases:
       raw/Gate hashes as immutable non-authoritative history.
 
 
-      For remote release admission, require `rf-bug-v2-tailnet-caddy-deployment-producer`
-      to prove its single exact maintained formal-deploy invocation, exact staged
-      source/procedure hashes, strict literal-FQDN existing-key/account/trust boundary,
-      exact index/platform/revision deployment, prior-digest readiness recovery, SQLite
-      volume and owner-token preservation, masked-only existing secrets, canonical
-      route no-op, mode-0600 raw log plus sanitized receipt, no restaging, no replay,
-      and no Serve/credential/trust/data/repository/builder mutation. Require `rf-bug-v2-tailnet-caddy-proof`
-      to independently prove direct/public equality of all four Go-owned headers across
-      HTML/JSON/MCP/unauthorized/error responses, Caddy non-ownership, browser/CSP/assets/routes/titles/token
-      behavior, OPML import-only and JSON State contracts without mutation, exact
-      configured digest, readiness, named volume, recovery reconciliation, nondisclosure,
-      and zero verifier mutation. Retain existing semantic-v14 staging and strict
-      Tailscale route authority, exact staged deploy bytes, renewed publication retry/stop/cleanup
+      For remote release admission, require `rf-bug-v2-prior-runtime-identity-readiness`
+      to preserve the zero-mutation blocked preflight and prove through one documented
+      allowed chain exactly one canonical prior repository digest, current local image/config
+      binding, direct readiness, exact named-volume identity, strict endpoint identity,
+      route no-op, nondisclosure, and zero mutation; an outcome-consistent BLOCKED
+      receipt keeps deployment blocked and cannot satisfy release admission. Require
+      `rf-bug-v2-tailnet-caddy-deployment-producer` to consume that receipt and prove
+      its single exact maintained formal-deploy invocation, exact staged source/procedure
+      hashes, strict literal-FQDN existing-key/account/trust boundary, exact index/platform/revision
+      deployment, prior-digest readiness recovery, SQLite volume and owner-token preservation,
+      masked-only existing secrets, canonical route no-op, mode-0600 raw log plus
+      sanitized receipt, no restaging, no replay, and no Serve/credential/trust/data/repository/builder
+      mutation. Require `rf-bug-v2-tailnet-caddy-proof` to independently prove direct/public
+      equality of all four Go-owned headers across HTML/JSON/MCP/unauthorized/error
+      responses, Caddy non-ownership, browser/CSP/assets/routes/titles/token behavior,
+      OPML import-only and JSON State contracts without mutation, exact configured
+      digest, readiness, named volume, recovery reconciliation, nondisclosure, and
+      zero verifier mutation. Retain existing semantic-v14 staging and strict Tailscale
+      route authority, exact staged deploy bytes, renewed publication retry/stop/cleanup
       policy, formal security review, independent runtime/UI proof, and defect-report
       closure.
 
@@ -191044,13 +191051,14 @@ phases:
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR","RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE","RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE","RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY","RF-BUG-V2-TAILNET-CADDY-BROWSER-ROUTES-TOKENS","RF-BUG-V2-TAILNET-CADDY-OPML-STATE","RF-BUG-V2-TAILNET-CADDY-RECOVERY-NONDISCLOSURE","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-raw-evidence-capture","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-evidence-producer","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-ssh-endpoint-identity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR","RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE","RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE","RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS","RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY","RF-BUG-V2-TAILNET-CADDY-BROWSER-ROUTES-TOKENS","RF-BUG-V2-TAILNET-CADDY-OPML-STATE","RF-BUG-V2-TAILNET-CADDY-RECOVERY-NONDISCLOSURE","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-raw-evidence-capture","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-evidence-producer","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness","rf-bug-assurance-v2-closure.rf-bug-v2-publish-immutable-oci","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-ssh-endpoint-identity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure-v2","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
     verification: Full Gate proves exhaustive integrated coverage including clean
       detached dual-platform runtime evidence and its fresh independent consumer;
       exact immutable source/tag/index/platform/revision; bounded readiness and complete
       runtime assertions; cleanup, zero residue, nondisclosure and retry/stop conformance;
+      fresh read-only exact prior-runtime rollback-digest identity and recovery readiness;
       Orchestrator-owned strict-FQDN persistent digest deployment and its independent
       direct/public headers, Caddy, browser/CSP/routes/tokens/OPML/State/digest/volume/recovery
       consumer; formal security, black-box and defect closure; current refs, assurance/preflight/expected-red/roster/proof-topology
@@ -191090,6 +191098,7 @@ phases:
     - rf-bug-v2-stage-immutable-deployment-procedure
     - rf-bug-v2-ssh-endpoint-identity-remediation
     - rf-bug-v2-publish-immutable-oci
+    - rf-bug-v2-prior-runtime-identity-readiness
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
