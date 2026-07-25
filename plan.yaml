@@ -190817,26 +190817,43 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Fresh black-box verification uses only public interfaces, docs, protected acceptance,
-      the built binary, the independently verified immutable index/platform chain
-      from `rf-bug-v2-publish-immutable-oci`, and the deployed Tailnet UI. Require
-      container and deployed runtime identity to resolve to that exact index digest.
-      The original three failed implicit-builder attempts and their FAIL artifacts
-      remain diagnostic-only and cannot supply an image or deployed identity.
+      Deliver: Perform full blind RF-BUG-001–010 product/browser verification on the
+      built binary and the exact independently verified deployed digest. Cover Inspector
+      pending/failure/stale selection, opaque routes/history, EN/ZH titles and Steer
+      errors, embedded UI/Doctor, import-only OPML and portable State, CSP/streaming/cancellation,
+      Source Ledger controls and states at the five required viewports with keyboard/overflow/44px
+      evidence, Prompting v2.2, and E2E isolation/cleanup. Record exact viewport,
+      interaction, console/network, accessibility, and immutable-runtime identity
+      evidence.
 
 
-      Cover RF-BUG-001–010: Inspector pending/failure/stale selection; opaque routes/history;
-      titles; EN/ZH Steer alerts; embedded UI/Doctor; import-only OPML/State; headers/CSP/streaming/cancellation;
-      Source Ledger controls/states at five viewports with grouping, overflow, keyboard
-      and 44px evidence; Prompting v2.2; and E2E isolation/cleanup. Confirm public
-      evidence exposes no credential values, transient-builder residue, mutable image
-      aliases, or alternate deployment identity. Any inaccessible required surface,
-      digest mismatch, unresolved vulnerability, or stale publication identity blocks
-      closure.'
-    verification: Fresh public-surface proof covers RF-BUG-001–010 on the built binary,
-      exact immutable digest, and deployed Tailnet UI with five viewport screenshots,
-      digest equality, no stale publication authority, no sensitive builder/credential
-      leakage, and no unresolved finding.
+      Boundary: `blind-tester` uses only public interfaces, canonical docs, protected
+      acceptance, the built binary, and deployed Tailnet UI. Browser actions are read-only
+      except reversible in-memory navigation and token entry; do not import/restore,
+      steer, ingest, re-ingest, mutate sources, mark inspection, report delivery,
+      or change resonance. No repository, registry, deployment, route, credential/account,
+      secret, data, or runtime mutation is authorized. A transient read-only observation
+      may be retried twice after retaining the failure and re-proving unchanged deployed
+      digest.
+
+
+      Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
+      object with `verifier_id=blind-tester`, `step_id=rf-bug-v2-independent-runtime-ui`,
+      ordered scope [`RF-BUG-001 Inspector selection`, `RF-BUG-002 routes and opaque
+      IDs`, `RF-BUG-003 embedded UI and Doctor`, `RF-BUG-004 OPML and State`, `RF-BUG-005
+      headers CSP streaming cancellation`, `RF-BUG-006-010 titles Steer ledger prompting
+      and isolation`], and exactly ten outcome-consistent coverage rows `RF-BUG-001`
+      through `RF-BUG-010`. The receipt binds the exact Tailnet proof digest and five
+      viewport artifacts.
+
+
+      Recovery: Any inaccessible required surface, deterministic behavior/accessibility
+      defect, digest drift, stale identity, disclosure, or observed mutation stops
+      FAIL/BLOCKED without workaround or product mutation.'
+    verification: A production-admitted blind-tester receipt covers RF-BUG-001–010
+      on the real binary and exact deployed digest at all five viewports, with route/UI/accessibility/console/network
+      evidence, no stale publication identity, no disclosure, and zero product or
+      runtime mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
