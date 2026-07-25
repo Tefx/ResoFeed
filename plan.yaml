@@ -190204,8 +190204,20 @@ phases:
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: in_progress
-  gate: Local, OCI, dual-platform container, Tailnet/Caddy, security, black-box, defect-report,
-    authority-hash, and rollback predicates pass under one canonical v2 gate scope.
+  gate: One terminal gate admits RF-BUG-001–010 closure from tracked local proof,
+    immutable OCI/runtime identity, authorized Tailnet/Caddy deployment, security
+    review, blind product verification, report closure, and executable rollback evidence;
+    any unresolved prior-digest identity blocker keeps the phase open.
+  context: The digest-bound rf-bug-v2-prior-runtime-identity-readiness attempt and
+    its BLOCKED receipt are immutable historical attempt state. Its two authorized
+    read-only derivation chains did not establish one canonical rollback digest, and
+    another identical read-only run is unauthorized. No pull, tag, export, login,
+    registry mutation, deployment, or alternate-target operation is implied. Orchestrator
+    or the human must supply exact current authority for a genuinely distinct recovery-identity
+    operation, or reconcile one canonical recoverable prior digest, before deployment
+    can proceed. The terminal gate re-establishes the still-required first-run SQLite
+    outcome through current tracked adapter/check evidence; the four missing completed-step
+    temporary refs remain historical warnings and are not current gate inputs.
   depends_on:
   - rf-bug-assurance-v2-ledger-prompting
   steps:
