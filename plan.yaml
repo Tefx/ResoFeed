@@ -193915,7 +193915,7 @@ phases:
       and no repository/Git/registry/deployment/Tailnet mutation occurred.'
   - id: rf-bug-v2-docker-runtime-evidence-producer
     name: Produce clean-source dual-platform container runtime evidence
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -194025,6 +194025,8 @@ phases:
     - rf-bug-v2-publish-immutable-oci
     - rf-bug-v2-container-build-evidence-runtime-admission
     agent: vectl-orchestrator
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-25T14:23:09.482749Z'
   - id: rf-bug-v2-container-build-evidence-runtime-admission
     name: Admit completed container-build evidence into runtime proof chain
     status: done
