@@ -194458,27 +194458,28 @@ phases:
 
       Deliver `RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS`. Fresh `integration-verifier`
       owns one genuine read-only precondition outcome for the existing `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
-      deployment boundary. Consume the production-admitted `rf-bug-v2-current-runtime-readiness-diagnosis`
-      receipt as the current runtime-readiness diagnosis, while preserving `/tmp/larva-agent-artifacts/rf-bug-v2-prior-runtime-identity-readiness/semantic-receipt-blocked-corrected.json`
+      deployment boundary after the admitted Caddy reconciliation. Consume the production-admitted
+      `rf-bug-v2-current-runtime-readiness-diagnosis` and the Orchestrator-owned `rf-bug-v2-caddy-service-reconciliation`
+      receipt, while preserving `/tmp/larva-agent-artifacts/rf-bug-v2-prior-runtime-identity-readiness/semantic-receipt-blocked-corrected.json`
       at SHA-256 `2f147707329e9a186f85d3cd5197c0977ab1d96538125a8497171399a7ce9c02`,
       mode `0600`, its Gate semantic SHA-256 `f512cb14a71f1c93c3962b18c70f6e4b0741a4838640b33f4799e7ef997d6ba4`,
       and raw observation SHA-256 `d397afc13f174bc88e5f44077ce84dcdd80e0eff772724aeb5afb658418c9fb7`,
-      380 bytes, mode `0600`, as immutable historical evidence of strict-FQDN reachability,
-      direct-root non-200, and zero mutation. Also preserve the earlier deployment
-      BLOCKED receipt `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deployment-receipt-blocked.json`
+      380 bytes, mode `0600`, as immutable historical evidence. Also preserve the
+      earlier deployment BLOCKED receipt `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deployment-receipt-blocked.json`
       at SHA-256 `8ffcc724717740f5bafd7f31066ebd015b53720bf471334702be11b16b62d44d`,
-      mode `0600`, the prior Config.Image identity hash `2ba0aa986f4f087637dfe829d96ada7f0fc1903ba82b37364473d92dc8949ff7`,
+      mode `0600`, prior Config.Image identity hash `2ba0aa986f4f087637dfe829d96ada7f0fc1903ba82b37364473d92dc8949ff7`,
       and empty RepoDigests observation SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
-      Formal deployment invocation count and remote mutation count remain zero; recovery
-      remains unexecuted.
+      Formal deployment invocation count remains zero; the separately authorized Caddy
+      reconciliation does not count as deployment.
 
 
       Boundary: use only literal-FQDN SSH with `-F none`, exact existing-key `HostName`/`HostKeyAlias`,
       `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, unchanged existing credential/account/default
-      trust, the canonical physical stack, and its OrbStack Docker context. Inspect
-      only current `resofeed` container/image metadata, exact `docker.io/tefx/resofeed`
-      repository registry metadata, direct readiness, and named volume `resofeed-caddy_resofeed-data`
-      mounted at `/data`. Never read or emit `.env`, runtime secrets, owner-token
+      trust, canonical physical stack, and OrbStack Docker context. Rerun read-only
+      inspection of current `resofeed` container/image metadata, exact `docker.io/tefx/resofeed`
+      repository registry metadata, direct Caddy/root and app readiness, unauthenticated
+      Doctor classification, named volume `resofeed-caddy_resofeed-data` mounted at
+      `/data`, and route projection. Never read or emit `.env`, runtime secrets, owner-token
       values, credential paths, host-key material, PATH, raw Serve JSON, public-host
       values, configuration, response bodies, or raw logs. Registry access is read-only
       through the existing repository-scoped identity. No login, trust/account change,
@@ -194487,37 +194488,35 @@ phases:
       volume/data mutation, or other persistent effect is authorized.
 
 
-      Admit: require a production-admitted PASS diagnosis receipt proving complete
-      authorized observation and exactly one supported classification. `ready` permits
-      digest derivation. A non-ready classification permits continuation only when
-      the diagnosis proves the exact current direct root `200`, unauthenticated Doctor
-      `401`, and unchanged required identities by a bounded later read-only observation
-      already authorized here; otherwise emit outcome-consistent BLOCKED evidence
-      and preserve the diagnosed smallest recovery authority need without executing
-      or inventing it. Create one new non-overwriting local mode-0600 raw command
-      log and sanitized receipt. Derive exactly one rollback digest only through a
-      documented deterministic chain: (A) normalize current Config.Image only when
-      exactly `tefx/resofeed:git-<40 lowercase hex>` or `docker.io/tefx/resofeed:git-<40
-      lowercase hex>`, resolve that immutable tag through exact repository registry
-      metadata to one canonical repository digest, and bind running local image ID/config
-      to the same object; or (B) bind running local image ID and immutable image config
-      to exactly one canonical repository digest row from exact repository registry
-      metadata. Reject moving tags, bare/local IDs without the complete chain, unrelated
-      repositories, mutable aliases, noncanonical digest forms, multiple candidates,
-      conflicting platform/index identity, missing links, registry/credential/trust
-      drift, or disclosure.
+      Admit: require production-admitted diagnosis and reconciliation receipts, then
+      independently rerun read-only identity and readiness observations. Create one
+      new non-overwriting local mode-0600 raw command log and sanitized receipt. Require
+      direct Caddy/root `200`, maintained app readiness, unauthenticated Doctor `401`,
+      unchanged ResoFeed container/image identity from reconciliation pre/post evidence,
+      exact named-volume identity, unchanged route projection, and no undeclared effect.
+      Derive exactly one rollback digest only through a documented deterministic chain:
+      (A) normalize current Config.Image only when exactly `tefx/resofeed:git-<40
+      lowercase hex>` or `docker.io/tefx/resofeed:git-<40 lowercase hex>`, resolve
+      that immutable tag through exact repository registry metadata to one canonical
+      repository digest, and bind running local image ID/config to the same object;
+      or (B) bind running local image ID and immutable image config to exactly one
+      canonical repository digest row from exact repository registry metadata. Reject
+      moving tags, bare/local IDs without the complete chain, unrelated repositories,
+      mutable aliases, noncanonical digest forms, multiple candidates, conflicting
+      platform/index identity, missing links, registry/credential/trust drift, or
+      disclosure.
 
 
       The receipt records only nonsecret target/procedure identities, consumed diagnosis
-      receipt hash/classification, selected derivation chain, normalized immutable
-      tag when applicable, exact rollback digest when proven, local image/config binding
-      hashes, direct root `200`, unauthenticated Doctor `401`, exact named-volume
-      mount identity, route no-op observation, commands/attempt counts, raw-log hash/mode/bytes,
-      nondisclosure, and zero mutation. If no exact digest is derivable or readiness
-      remains non-ready, emit outcome-consistent BLOCKED evidence with current runtime
-      preserved, zero deployment/recovery invocation, and the diagnosis-owned smallest
-      separately authorized recovery need; do not invent a digest or effect. The sanitized
-      receipt is the sole prior-digest/recovery-readiness input consumed by `rf-bug-v2-tailnet-caddy-deployment-producer`.
+      and reconciliation receipt hashes/classifications, selected derivation chain,
+      normalized immutable tag when applicable, exact rollback digest when proven,
+      local image/config binding hashes, direct Caddy/root `200`, app readiness, unauthenticated
+      Doctor `401`, exact named-volume mount identity, route no-op, commands/attempt
+      counts, raw-log hash/mode/bytes, nondisclosure, and zero mutation by this verification.
+      If no exact digest is derivable or readiness remains non-ready, emit outcome-consistent
+      BLOCKED evidence with current runtime preserved, zero deployment invocation,
+      and no invented effect. The sanitized receipt is the sole prior-digest/recovery-readiness
+      input consumed by `rf-bug-v2-tailnet-caddy-deployment-producer`.
 
 
       Recovery: all probes are non-mutating. Retry a demonstrably transient read-only
@@ -194525,47 +194524,46 @@ phases:
       re-proving unchanged literal target, current container/image identity hash,
       route projection hash, and volume identity. Deterministic ambiguity, non-ready
       state, missing chain, identity/trust/credential drift, disclosure, observed
-      mutation, unknown state, or readiness/volume mismatch stops immediately. Cleanup
-      is local mode-0600 evidence finalization only. No remote cleanup, reconciliation,
-      restart, or repair is authorized. Deployment remains blocked unless this receipt
-      proves exactly one recoverable prior digest plus direct readiness and volume
-      identity.
+      mutation, unknown state, or readiness/volume mismatch stops immediately. No
+      remote cleanup, reconciliation, restart, or repair is authorized. Deployment
+      remains blocked unless this receipt proves exactly one recoverable prior digest
+      plus independently rerun readiness and volume/route identity.
 
 
       Production semantic admission is mandatory. Emit exactly one `vectl.verifier.semantic.v1`
       object with `verifier_id=integration-verifier`, `step_id=rf-bug-v2-prior-runtime-identity-readiness`,
-      ordered `scope`: [`preserved blocked history and current diagnosis evidence`,
+      ordered `scope`: [`preserved blocked history diagnosis and reconciliation evidence`,
       `strict literal-FQDN current container and image identity`, `exact repository
-      registry digest derivation`, `direct readiness named-volume route and nondisclosure`,
+      registry digest derivation`, `rerun Caddy app Doctor volume and route readiness`,
       `rollback readiness or outcome-consistent blocked stop`], and exactly one coverage
       row for `RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS`.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness","risk_tier":"R3","risk_reasons":["read_only_remote_runtime_identity","registry_identity_and_credential_boundary","rollback_digest_precondition","secret_safe_evidence"],"primary_outcome":"RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS","atom":"the
-      current runtime diagnosis is consumed and the resofeed runtime is bound through
-      a deterministic read-only chain to exactly one recoverable docker.io/tefx/resofeed
-      digest with direct readiness, named-volume identity, strict endpoint identity,
-      route no-op, nondisclosure, and zero mutation, or deployment remains blocked
-      with outcome-consistent evidence","modality":"runtime","seam":"real","check_id":"rf_bug_v2_prior_runtime_identity_readiness","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness","risk_tier":"R3","risk_reasons":["read_only_post_reconciliation_runtime_identity","registry_identity_and_credential_boundary","rollback_digest_precondition","secret_safe_evidence"],"primary_outcome":"RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-PRIOR-RUNTIME-IDENTITY-READINESS","atom":"the
+      admitted diagnosis and Caddy reconciliation are consumed, readiness is rerun
+      read-only, and the unchanged ResoFeed runtime is bound through a deterministic
+      chain to exactly one recoverable docker.io/tefx/resofeed digest with Caddy/app/Doctor
+      readiness, named-volume identity, route no-op, nondisclosure, and zero verification
+      mutation, or deployment remains blocked","modality":"runtime","seam":"real","check_id":"rf_bug_v2_prior_runtime_identity_readiness","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
     verification: A production-admitted fresh integration-verifier receipt and mode-0600
-      raw log consume the production-admitted current-runtime diagnosis, preserve
-      the exact historical BLOCKED receipt/raw identities and zero mutation, then
-      prove exactly one canonical prior repository digest through an allowed deterministic
-      chain, current local image/config binding, literal-FQDN trust, direct 200/401
-      readiness, exact named-volume mount, route no-op, nondisclosure, and zero mutation;
-      otherwise they keep deployment BLOCKED with the diagnosis-owned smallest recovery
-      authority need and no invented or destructive fallback.
+      raw log consume the admitted diagnosis and Caddy-reconciliation receipts, preserve
+      historical BLOCKED identities, rerun read-only Caddy/app/Doctor readiness, and
+      prove unchanged ResoFeed container/image identity, exactly one canonical prior
+      repository digest through an allowed deterministic chain, direct 200/401 readiness,
+      exact named-volume mount, route no-op, nondisclosure, and zero verification
+      mutation; otherwise deployment stays BLOCKED with no invented fallback.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-prior-runtime-identity-readiness/semantic-receipt-blocked-corrected.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-prior-runtime-identity-readiness/raw-observation.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deployment-receipt-blocked.json
     depends_on:
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-docker-runtime-proof
-    - rf-bug-v2-current-runtime-readiness-diagnosis
+    - rf-bug-v2-caddy-service-reconciliation
     agent: integration-verifier
   - id: rf-bug-v2-current-runtime-readiness-diagnosis
     name: Diagnose current Tailnet/Caddy runtime readiness read-only
