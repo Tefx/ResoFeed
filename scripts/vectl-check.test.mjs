@@ -1854,6 +1854,313 @@ test('RF-BUG-010 deterministic adapter identity integration contract', () => {
   assert.doesNotMatch(fixtureSource, /spawnSync\(\s*['"]go['"]|\['build', '-tags', 'resofeed_e2e'/u);
 });
 
+test('RF-BUG-V2 container build context derives trusted identity in dual-platform no-push build', { timeout: 1_780_000 }, () => {
+  const sha256 = (value) => createHash('sha256').update(value).digest('hex');
+  const commandOutput = (result) => `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+  const outputSHA256 = (result) => sha256(commandOutput(result));
+  const runCommand = (command, args, {
+    cwd = repoRoot,
+    env,
+    timeout = 120_000
+  } = {}) => spawnSync(command, args, {
+    cwd,
+    env,
+    timeout,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024
+  });
+  const requireGreen = (label, result) => {
+    assert.equal(
+      result.error,
+      undefined,
+      `${label} could not execute (output_sha256=${outputSHA256(result)})`
+    );
+    assert.equal(
+      result.status,
+      0,
+      `${label} failed (exit=${String(result.status)}, signal=${String(result.signal)}, output_sha256=${outputSHA256(result)})`
+    );
+  };
+  const safeError = (error) => sha256(error instanceof Error ? `${error.name}\0${error.message}` : String(error));
+
+  const dockerfilePath = path.join(repoRoot, 'Dockerfile');
+  const dockerfileSource = fs.readFileSync(dockerfilePath, 'utf8');
+  const helperCopy = 'COPY scripts/resofeed-svelte-build-identity.mjs scripts/build-resofeed.sh ./scripts/';
+  const deriveCommand = 'build_identity="$(env -i PATH="$PATH" node ./scripts/resofeed-svelte-build-identity.mjs derive /src)"';
+  const buildCommand = 'env -i PATH="$PATH" RESOFEED_SVELTE_BUILD_IDENTITY="$build_identity" npm --prefix web run build';
+  const helperCopyIndex = dockerfileSource.indexOf(helperCopy);
+  const webCopyIndex = dockerfileSource.indexOf('COPY web ./web');
+  const deriveIndex = dockerfileSource.indexOf(deriveCommand);
+  const buildIndex = dockerfileSource.indexOf(buildCommand);
+  assert.notEqual(helperCopyIndex, -1, 'the web builder must copy both canonical identity helper inputs');
+  assert.notEqual(webCopyIndex, -1, 'the web build context must be copied');
+  assert.notEqual(deriveIndex, -1, 'the web builder must derive its private identity in a clean environment');
+  assert.notEqual(buildIndex, -1, 'the web build must receive only the helper-derived private identity');
+  assert.ok(helperCopyIndex < deriveIndex, 'canonical identity helper inputs must exist before derivation');
+  assert.ok(webCopyIndex < deriveIndex, 'the complete web manifest must exist before derivation');
+  assert.ok(deriveIndex < buildIndex, 'trusted derivation must precede the web build');
+  const webBuilderSource = dockerfileSource.slice(
+    0,
+    dockerfileSource.indexOf('FROM --platform=$BUILDPLATFORM golang:1.22-bookworm AS go-builder')
+  );
+  assert.match(webBuilderSource, /RUN set -eu;/u);
+  assert.doesNotMatch(webBuilderSource, /RUN set -eux;/u);
+  assert.doesNotMatch(webBuilderSource, /(?:ARG|ENV)\s+(?:VITE_GIT_COMMIT|RESOFEED_SVELTE_BUILD_IDENTITY)\b/u);
+
+  const identity = deriveSvelteBuildIdentity(repoRoot);
+  assert.match(identity, /^rf-[a-f0-9]{64}$/u);
+  assert.equal(
+    canonicalBuildManifest(repoRoot).some(([relativePath]) => relativePath === 'scripts/build-resofeed.sh'),
+    true,
+    'the canonical build script must remain an identity manifest input'
+  );
+  const identityResult = runCommand(
+    process.execPath,
+    [path.join(repoRoot, 'scripts', 'resofeed-svelte-build-identity.mjs'), 'derive', repoRoot],
+    { env: { PATH: process.env.PATH ?? '' } }
+  );
+  requireGreen('sanitized trusted identity derivation', identityResult);
+  assert.equal(identityResult.stdout, identity);
+  assert.equal(identityResult.stderr, '');
+
+  const repositoryEnvironment = {
+    PATH: process.env.PATH ?? '',
+    HOME: process.env.HOME ?? '',
+    TMPDIR: process.env.TMPDIR ?? '/tmp',
+    LANG: 'C',
+    LC_ALL: 'C'
+  };
+  const allowedDirtyPaths = new Set(['Dockerfile', 'docs/CONTAINER.md', 'scripts/vectl-check.test.mjs']);
+  function sourceFingerprint() {
+    const status = runCommand('git', ['status', '--porcelain=v1', '-z', '--untracked-files=all'], {
+      env: repositoryEnvironment
+    });
+    requireGreen('source cleanliness probe', status);
+    for (const row of status.stdout.split('\0').filter(Boolean)) {
+      assert.equal(row.slice(0, 2), ' M', 'source may contain only unstaged modifications in the admitted scope');
+      assert.equal(allowedDirtyPaths.has(row.slice(3)), true, 'source modification escaped the admitted scope');
+    }
+    const head = runCommand('git', ['rev-parse', 'HEAD'], { env: repositoryEnvironment });
+    requireGreen('source HEAD probe', head);
+    const allowedContent = [...allowedDirtyPaths]
+      .sort()
+      .map((relativePath) => `${relativePath}\0${sha256(fs.readFileSync(path.join(repoRoot, relativePath)))}`)
+      .join('\0');
+    return sha256(`${head.stdout}\0${status.stdout}\0${allowedContent}`);
+  }
+
+  const inspectionEnvironment = { ...repositoryEnvironment, NO_COLOR: '1' };
+  for (const name of ['DOCKER_CONFIG', 'DOCKER_CONTEXT', 'DOCKER_HOST', 'DOCKER_TLS_VERIFY', 'DOCKER_CERT_PATH']) {
+    if (process.env[name] !== undefined) inspectionEnvironment[name] = process.env[name];
+  }
+  const runDocker = (args, env = inspectionEnvironment, timeout = 120_000) => runCommand(
+    'docker',
+    args,
+    { env, timeout }
+  );
+  const daemonIdentity = (env) => {
+    const result = runDocker([
+      'info',
+      '--format',
+      '{{.ID}}\\n{{.Name}}\\n{{.ServerVersion}}\\n{{.OperatingSystem}}\\n{{.Architecture}}\\n{{.DockerRootDir}}'
+    ], env);
+    requireGreen('Docker daemon identity probe', result);
+    return sha256(result.stdout);
+  };
+  function captureDockerBoundary() {
+    const currentContext = runDocker(['context', 'show']);
+    requireGreen('selected Docker context probe', currentContext);
+    const contextName = currentContext.stdout.trim();
+    assert.match(contextName, /^[^\r\n]+$/u, 'selected Docker context must be singular');
+    const contextInspect = runDocker(['context', 'inspect', contextName]);
+    requireGreen('selected Docker context inspection', contextInspect);
+    const rows = JSON.parse(contextInspect.stdout);
+    assert.equal(rows.length, 1, 'selected Docker context inspection must return one row');
+    const endpoint = rows[0]?.Endpoints?.docker?.Host;
+    assert.equal(typeof endpoint, 'string', 'selected Docker context must expose one Docker endpoint');
+    assert.match(endpoint, /^(?:unix|npipe|tcp):\/\//u, 'selected Docker endpoint must not require SSH or another credential transport');
+    const tlsMaterial = rows[0]?.TLSMaterial?.docker ?? [];
+    assert.equal(Array.isArray(tlsMaterial), true, 'selected Docker TLS material must be explicit');
+    assert.equal(tlsMaterial.length, 0, 'the no-secret build boundary cannot consume Docker TLS credentials');
+
+    const activeBuilder = runDocker(['buildx', 'inspect']);
+    requireGreen('active buildx builder probe', activeBuilder);
+    const defaultBuilder = runDocker(['buildx', 'inspect', 'default']);
+    requireGreen('default buildx builder probe', defaultBuilder);
+    const containers = runDocker([
+      'ps', '-a', '--no-trunc', '--format', '{{.ID}}\\t{{.State}}\\t{{.Names}}'
+    ]);
+    requireGreen('unrelated container fingerprint probe', containers);
+    const containerRows = containers.stdout.split(/\r?\n/u).filter(Boolean).sort().join('\n');
+    return {
+      endpoint,
+      fingerprints: {
+        context: sha256(`${contextName}\0${contextInspect.stdout}`),
+        daemon: daemonIdentity(inspectionEnvironment),
+        activeBuilder: sha256(activeBuilder.stdout),
+        defaultBuilder: sha256(defaultBuilder.stdout),
+        unrelatedContainers: sha256(containerRows)
+      }
+    };
+  }
+
+  const sourceBefore = sourceFingerprint();
+  const boundaryBefore = captureDockerBoundary();
+  const temporaryRoot = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-rf-bug-v2-container-'));
+  const dockerConfig = path.join(temporaryRoot, 'docker');
+  const buildxConfig = path.join(temporaryRoot, 'buildx');
+  const isolatedTmp = path.join(temporaryRoot, 'tmp');
+  fs.mkdirSync(dockerConfig, { recursive: true });
+  fs.mkdirSync(buildxConfig, { recursive: true });
+  fs.mkdirSync(isolatedTmp, { recursive: true });
+  fs.writeFileSync(path.join(dockerConfig, 'config.json'), '{}\n', { mode: 0o600 });
+  assert.equal(fs.readFileSync(path.join(dockerConfig, 'config.json'), 'utf8'), '{}\n');
+  const pluginInventory = runDocker(['info', '--format', '{{json .ClientInfo.Plugins}}']);
+  requireGreen('Docker client plugin inventory', pluginInventory);
+  const buildxPlugin = JSON.parse(pluginInventory.stdout).find(({ Name, Err }) => Name === 'buildx' && !Err);
+  assert.equal(typeof buildxPlugin?.Path, 'string', 'the current Docker client must expose a healthy buildx plugin');
+  assert.equal(path.basename(buildxPlugin.Path), 'docker-buildx');
+  const isolatedPluginDirectory = path.join(dockerConfig, 'cli-plugins');
+  fs.mkdirSync(isolatedPluginDirectory);
+  fs.symlinkSync(buildxPlugin.Path, path.join(isolatedPluginDirectory, 'docker-buildx'));
+
+  const uniquePart = sha256(`${process.pid}\0${Date.now()}\0${repoRoot}`).slice(0, 12);
+  const builderName = `rfv2-${process.pid}-${uniquePart}`;
+  const nodeName = `${builderName}-node`;
+  const isolatedEnvironment = {
+    PATH: process.env.PATH ?? '',
+    HOME: temporaryRoot,
+    TMPDIR: isolatedTmp,
+    LANG: 'C',
+    LC_ALL: 'C',
+    NO_COLOR: '1',
+    DOCKER_CONFIG: dockerConfig,
+    BUILDX_CONFIG: buildxConfig,
+    DOCKER_HOST: boundaryBefore.endpoint
+  };
+  assert.equal('DOCKER_AUTH_CONFIG' in isolatedEnvironment, false);
+  assert.deepEqual(
+    Object.keys(isolatedEnvironment).filter((name) => /(?:AUTH|TOKEN|SECRET|PASSWORD|CREDENTIAL|_KEY$)/u.test(name)),
+    []
+  );
+  assert.equal(daemonIdentity(isolatedEnvironment), boundaryBefore.fingerprints.daemon);
+
+  const attributableContainers = () => {
+    const result = runDocker([
+      'ps', '-a', '--no-trunc', '--filter', `name=${builderName}`, '--format', '{{.ID}}\\t{{.Names}}'
+    ], isolatedEnvironment);
+    requireGreen('transient BuildKit container probe', result);
+    return result.stdout.split(/\r?\n/u).filter(Boolean).map((row) => {
+      const [id, name] = row.split('\t');
+      assert.match(id, /^[a-f0-9]{64}$/u, 'attributable BuildKit container ID must be canonical');
+      assert.equal(name.includes(builderName), true, 'transient container must be attributable to the unique builder');
+      return { id, name };
+    });
+  };
+
+  let operationFailure;
+  let operationPhase = 'pre-create';
+  let createAttempted = false;
+  const cleanupFailures = [];
+  try {
+    const missingBuilder = runDocker(['buildx', 'inspect', builderName], isolatedEnvironment);
+    assert.notEqual(missingBuilder.status, 0, 'the transient builder name must start unused');
+    assert.deepEqual(attributableContainers(), []);
+
+    const createArguments = [
+      'buildx', 'create',
+      '--name', builderName,
+      '--driver', 'docker-container',
+      '--node', nodeName,
+      boundaryBefore.endpoint
+    ];
+    assert.equal(createArguments.includes('--use'), false);
+    operationPhase = 'create';
+    createAttempted = true;
+    const created = runDocker(createArguments, isolatedEnvironment);
+    requireGreen('transient docker-container builder creation', created);
+    const builderInspect = runDocker(['buildx', 'inspect', builderName], isolatedEnvironment);
+    requireGreen('transient builder inspection', builderInspect);
+
+    const buildArguments = [
+      'buildx', 'build',
+      '--builder', builderName,
+      '--platform', 'linux/amd64,linux/arm64',
+      '--progress=plain',
+      '--provenance=false',
+      '--sbom=false',
+      '--output', 'type=cacheonly',
+      '.'
+    ];
+    for (const forbidden of ['--push', '--load', '--tag', '-t', '--secret', '--ssh', '--build-arg']) {
+      assert.equal(buildArguments.includes(forbidden), false, `${forbidden} is outside the no-publication proof`);
+    }
+    assert.deepEqual(buildArguments.slice(-3), ['--output', 'type=cacheonly', '.']);
+    operationPhase = 'build';
+    const built = runDocker(buildArguments, isolatedEnvironment, 1_500_000);
+    const rawBuildOutput = commandOutput(built);
+    const suspectOutput = [
+      /RESOFEED_SVELTE_BUILD_IDENTITY is private/u,
+      /OPENROUTER_KEY\s*=/iu,
+      /DOCKER_AUTH_CONFIG\s*=/iu,
+      /(?:authorization|password|passwd|token|secret)\s*[:=]\s*\S+/iu
+    ].some((pattern) => pattern.test(rawBuildOutput));
+    if (suspectOutput) {
+      throw new Error(`suspect build output rejected (output_sha256=${sha256(rawBuildOutput)})`);
+    }
+    for (const privateValue of [process.env.PATH ?? '', dockerConfig, buildxConfig]) {
+      if (privateValue !== '' && rawBuildOutput.includes(privateValue)) {
+        throw new Error(`private environment output rejected (output_sha256=${sha256(rawBuildOutput)})`);
+      }
+    }
+    requireGreen('dual-platform cache-only container build', built);
+    assert.equal(rawBuildOutput.includes('resofeed-svelte-build-identity.mjs derive /src'), true);
+    assert.equal(rawBuildOutput.includes('RESOFEED_SVELTE_BUILD_IDENTITY'), true);
+    assert.equal(rawBuildOutput.includes('npm --prefix web run build'), true);
+    operationPhase = 'post-build';
+    const buildkitContainers = attributableContainers();
+    assert.equal(buildkitContainers.length, 1, 'the build must use exactly one attributable BuildKit container');
+  } catch (error) {
+    operationFailure = { phase: operationPhase, error_sha256: safeError(error) };
+  } finally {
+    if (createAttempted) {
+      runDocker(['buildx', 'rm', '--force', builderName], isolatedEnvironment);
+    }
+    try {
+      const residue = attributableContainers();
+      if (residue.length > 0) {
+        const removed = runDocker(['rm', '--force', ...residue.map(({ id }) => id)], isolatedEnvironment);
+        if (removed.status !== 0 || removed.error !== undefined) {
+          cleanupFailures.push(`container-removal:${outputSHA256(removed)}`);
+        }
+      }
+      const remaining = attributableContainers();
+      if (remaining.length !== 0) cleanupFailures.push(`container-residue:${remaining.length}`);
+    } catch (error) {
+      cleanupFailures.push(`container-probe:${safeError(error)}`);
+    }
+    try {
+      fs.rmSync(temporaryRoot, { recursive: true, force: true });
+    } catch (error) {
+      cleanupFailures.push(`local-config:${safeError(error)}`);
+    }
+  }
+
+  const boundaryAfter = captureDockerBoundary();
+  assert.equal(sha256(boundaryAfter.endpoint), sha256(boundaryBefore.endpoint));
+  assert.deepEqual(boundaryAfter.fingerprints, boundaryBefore.fingerprints);
+  assert.equal(sourceFingerprint(), sourceBefore);
+  if (operationFailure !== undefined || cleanupFailures.length > 0) {
+    throw new Error(JSON.stringify({ operationFailure, cleanupFailures }));
+  }
+
+  console.log('BUILD_IDENTITY=trusted_canonical_derivation');
+  console.log('PLATFORMS=linux/amd64,linux/arm64');
+  console.log('PUBLISH=none');
+  console.log('SECRETS=absent');
+  console.log('RESIDUE=none');
+});
+
 test('RF-BUG-002 token parity harness adapter contract', () => {
   const profile = findProfile('rf-bug-v2-go-token-parity', 'rf_bug_v2_go_token_parity_green');
   const strict = findProfile('rf-bug-v2-prompting-harness', 'rf_bug_v2_prompting_harness_remediation_green');

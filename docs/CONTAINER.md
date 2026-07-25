@@ -73,6 +73,22 @@ Rationale: these cover common Intel/AMD hosts, ARM edge devices, and Apple Silic
 
 ## Image Build Contract
 
+The web builder copies `scripts/resofeed-svelte-build-identity.mjs` and its canonical manifest input `scripts/build-resofeed.sh` byte-for-byte before identity derivation. The complete `web/` manifest is present at the same point. Identity derivation runs in a cleared environment that restores only the builder's `PATH`:
+
+```text
+env -i PATH="$PATH" node ./scripts/resofeed-svelte-build-identity.mjs derive /src
+```
+
+The resulting `rf-<sha256>` value is then the sole identity input to the web build's sanitized initial environment:
+
+```text
+env -i PATH="$PATH" \
+  RESOFEED_SVELTE_BUILD_IDENTITY="<helper-derived-value>" \
+  npm --prefix web run build
+```
+
+The Dockerfile exposes no build argument for this identity. SvelteKit and Vite resolve the same canonical manifest during the build and reject missing, ambient, or mismatched identity values.
+
 The image must be built with three stages:
 
 1. Build the static web UI in a Node builder stage:
@@ -297,6 +313,22 @@ docker run -d \
 ```
 
 ## Multi-architecture Build Command
+
+The focused developer proof uses the current selected Docker context and daemon through one uniquely named transient `docker-container` builder. It never selects that builder as the active builder. The build produces cache only:
+
+```text
+docker buildx build \
+  --builder <unique-transient-builder> \
+  --platform linux/amd64,linux/arm64 \
+  --progress=plain \
+  --provenance=false \
+  --sbom=false \
+  --output type=cacheonly \
+  .
+```
+
+The proof runs with a temporary empty Docker configuration and no registry authentication, secret, SSH, build-argument, tag, push, load, or publish input. It hashes source state, selected context, daemon identity, active/default builders, and unrelated container state before the build and compares those fingerprints after cleanup. Every post-create path removes the transient builder and its attributable BuildKit container. Build cache writes may remain.
+
 Tailnet staging, recovery, inspection, and deployment authenticate `tefx-mbp-personal.platy-atlas.ts.net` through the literal FQDN as both effective HostName and host-key lookup identity. The maintained Bash transport uses `-F none`, `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, disabled DNS host-key trust/canonicalization, public-key-only batch authentication, no forwarding or multiplexing, and the default existing OpenSSH known-host files. It never enrolls or updates trust, loads aliases, rewrites the hostname, chooses another trust store/account/endpoint, or accepts an unknown/changed key. After connection it validates the canonical physical home-relative `Projects/resofeed-caddy` path, stack basename/project identity, regular non-symlink two-file procedure, exact `755`/`644` modes, and Compose shape. The internal short hostname is unknown and irrelevant.
 Release publication targets exactly `docker.io/tefx/resofeed`. It starts from a caller-supplied verified commit, binds the tag `git-${VERIFIED_COMMIT}`, labels both platform images with that commit, and publishes exactly `linux/amd64` plus `linux/arm64`:
 
@@ -411,6 +443,7 @@ Before opening the production listener, Go validates the embedded UI and derives
 
 Caddy and other reverse proxies must pass these application-owned values unchanged. The policy must boot the embedded UI and preserve ordinary authenticated product operations, including OPML import and JSON State export, import, and download. Container and browser evidence must redact owner tokens, provider keys, authorization values, cookies, provider bodies, and `.env` contents.
 ## Verification Checklist
+
 Before accepting the containerization or immutable release procedure:
 
 - Build succeeds for `linux/amd64` and `linux/arm64`.
@@ -441,3 +474,4 @@ Before accepting the containerization or immutable release procedure:
 - Every maintained SSH path uses one noninteractive strict-existing-key option set with the literal FQDN as destination, effective `HostName`, and host-key lookup identity; unknown/changed keys fail before remote preparation or transfer, no trust/credential/endpoint override is accepted, and the internal short hostname has no authority.
 - Authenticated staging, recovery, inspection, and deployment validate the canonical physical home-relative stack path, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh`/`compose.yml`, exact `755`/`644` modes, and Compose shape before their respective operations.
 - Repository rollback of SSH endpoint identity is one repository-only unit covering `deploy.sh`, the selected-execution adapter/developer test, Tailnet skill, deployment README, this Container guide, and the harness contract; it does not authorize or perform remote recovery or runtime mutation.
+- The focused container developer proof derives `RESOFEED_SVELTE_BUILD_IDENTITY` from the canonical helper under `env -i`, completes one cache-only `linux/amd64,linux/arm64` build with a unique unselected builder and credential-free Docker configuration, removes its builder/container residue on every path, and leaves source, selected context, daemon, active/default builders, and unrelated containers unchanged.

@@ -7,10 +7,11 @@ WORKDIR /src
 COPY web/package.json web/package-lock.json ./web/
 RUN npm --prefix web ci
 
+COPY scripts/resofeed-svelte-build-identity.mjs scripts/build-resofeed.sh ./scripts/
 COPY web ./web
-ARG VITE_GIT_COMMIT="unknown"
-ENV VITE_GIT_COMMIT=${VITE_GIT_COMMIT}
-RUN npm --prefix web run build
+RUN set -eu; \
+    build_identity="$(env -i PATH="$PATH" node ./scripts/resofeed-svelte-build-identity.mjs derive /src)"; \
+    env -i PATH="$PATH" RESOFEED_SVELTE_BUILD_IDENTITY="$build_identity" npm --prefix web run build
 
 FROM --platform=$BUILDPLATFORM golang:1.22-bookworm AS go-builder
 
