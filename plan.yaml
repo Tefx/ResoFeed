@@ -194558,32 +194558,30 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Deliver `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. Fresh `integration-verifier`
-      owns exactly one schema-conformant independent review of the preserved zero-mutation
-      diagnosis evidence; no remote rerun is required, except a read-only freshness
-      observation within the existing strict literal-FQDN authority when the preserved
-      facts cannot be admitted as current. Preserve without rewriting `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log`,
+      Deliver `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. One fresh `integration-verifier`
+      owns exactly one schema-conformant independent re-admission of the preserved,
+      completed zero-mutation diagnosis after the original receipt and same-child
+      correction were retained but rejected for semantic-receipt formatting. Consume
+      without rewriting `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log`,
       mode `0600`, SHA-256 `cb1aa5fafc37e6dfabe52d3d62ba87354925739c7c47b842e028a921722ef5e4`,
       1485 bytes, and `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/semantic-receipt-corrected.json`,
-      mode `0600`, SHA-256 `106a1652a206c51da019e2df9d6c49f3dc7e91c559efe8a869d102b5dae08efd`.
-      These historical observations record zero mutation, ResoFeed running, retained
-      named volume and route, observed procedure hashes/modes, and a substantive `caddy_down`
-      classification; the production Gate rejected only the receipt headline because
-      warnings require `PASS_WITH_DEBT` rather than `PASS`. The fresh reviewer must
-      independently evaluate the evidence and must not inherit or prescribe that substantive
-      classification.
+      mode `0600`, SHA-256 `106a1652a206c51da019e2df9d6c49f3dc7e91c559efe8a869d102b5dae08efd`;
+      preserve every prior schema-invalid diagnosis receipt as immutable provenance.
+      The preserved evidence records zero mutation, ResoFeed running, retained named
+      volume and route, observed procedure hashes/modes, and completed `caddy_down`
+      diagnosis evidence. No new runtime observation is needed. The fresh reviewer
+      independently evaluates whether the preserved evidence supports the diagnosis
+      and chooses an outcome-consistent semantic headline; this contract does not
+      require `PASS`.
 
 
-      Boundary: review only the preserved artifacts and current admitted contracts.
-      Any optional freshness probe remains read-only under strict SSH `-F none` to
-      `tefx-mbp-personal.platy-atlas.ts.net`, exact existing-key `HostName`/`HostKeyAlias`,
-      `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, unchanged credential/account/default
-      trust, canonical `~/Projects/resofeed-caddy`, and OrbStack Docker context. Never
-      emit response bodies, raw Tailscale Serve JSON, `.env`, PATH, secrets, credentials
-      or paths, host-key material, public-host values, raw configuration, raw logs,
-      or unsanitized image names. No runtime, remote, route, credential, trust, data,
-      container, image, registry, repository, Git, or evidence mutation is authorized;
-      do not rewrite either preserved child artifact.
+      Boundary: review only the preserved local artifacts and current admitted contracts.
+      No SSH, network, registry, remote, runtime, route, credential, trust, data,
+      container, image, repository, Git, child-artifact rewrite, or other persistent
+      effect is authorized. The only new artifact authorized is one non-overwriting
+      local mode-0600 semantic receipt. Never emit response bodies, raw Tailscale
+      Serve JSON, `.env`, PATH, secrets, credentials or paths, host-key material,
+      public-host values, raw configuration, raw logs, or unsanitized image names.
 
 
       Admit: emit exactly one new non-overwriting mode-0600 `vectl.verifier.semantic.v1`
@@ -194592,42 +194590,51 @@ phases:
       compose and image classification`, `direct Caddy app and Doctor status classification`,
       `bounded redacted logs volume route and procedure identity`, `zero-mutation
       diagnosis and smallest recovery authority need`], and exactly one coverage row
-      for `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. Every protocol/schema field
-      must validate. A passing receipt with any warning uses headline `PASS_WITH_DEBT`;
-      headline `PASS` is allowed only when no warnings remain, and warnings may be
-      removed only when the same facts are represented in another schema-valid field.
-      Preserve target/procedure identities, observation attempts, raw-log hash/mode/bytes,
-      nondisclosure, zero mutation, exactly one evidence-supported classification,
-      and the smallest separately authorized recovery need. Production semantic admission
-      consumes the new reviewer receipt while the two child artifacts remain immutable
-      provenance.
+      for `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. Every protocol and schema
+      field must validate. If warnings are present, `headline` is `PASS_WITH_DEBT`,
+      the warnings array contains exactly one entry, and that entry''s entire string
+      is exactly `owner=vectl-orchestrator; follow_up=perform the plan-defined bounded
+      Caddy service reconciliation, then rerun prior-runtime identity/readiness verification`,
+      with no prefix or suffix prose. Put all explanatory debt and provenance prose
+      in `notes`, never in `warnings`. `PASS` is allowed only with no warnings; an
+      evidence-supported `BLOCKED` or `FAIL` remains allowed, so conclusion independence
+      is preserved. Preserve target and procedure identities, observation attempts,
+      raw-log hash/mode/bytes, nondisclosure, zero mutation, exactly one evidence-supported
+      classification, the smallest separately authorized recovery need, and every
+      other previously required schema constraint. Production semantic admission consumes
+      only the new reviewer receipt while all prior diagnosis evidence and invalid
+      receipts remain immutable provenance.
 
 
-      Recovery: review and optional freshness probes are non-mutating. Retry only
-      a demonstrably transient read-only freshness observation at most twice after
-      retaining each observation and re-proving unchanged target, container identity
-      class/hash, route projection hash, and volume identity classification. Deterministic
-      classification, schema invalidity, trust/credential/identity drift, disclosure,
-      observed mutation, or unknown state stops immediately. No remote reconciliation
+      Recovery: the former same-child correction path is exhausted. This contract
+      grants one fresh re-admission attempt and no runtime probe. A schema-invalid
+      receipt, artifact identity mismatch, disclosure, unsupported classification,
+      observed mutation, or unknown state is retained and stops the step without correction
+      or replay; further admission requires new planning authority. No remote reconciliation
       is authorized by this step.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","risk_tier":"R3","risk_reasons":["preserved_remote_runtime_evidence_admission","strict_endpoint_and_existing_credential_boundary","secret_safe_schema_conformant_semantic_review","independently_consumed_recovery_precondition"],"primary_outcome":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","atom":"a
-      fresh integration-verifier independently reviews the immutable diagnosis evidence
-      into one production-schema-valid semantic receipt, uses PASS_WITH_DEBT when
-      warnings remain, preserves nondisclosure and zero mutation, and admits exactly
-      one evidence-supported readiness classification plus the smallest separately
-      authorized recovery need","modality":"runtime","seam":"real","check_id":"rf_bug_v2_current_runtime_readiness_diagnosis","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-caddy-service-reconciliation"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","risk_tier":"R3","risk_reasons":["preserved_remote_runtime_evidence_admission","strict_warning_string_semantic_schema","secret_safe_schema_conformant_semantic_review","independently_consumed_recovery_precondition"],"primary_outcome":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","atom":"one
+      fresh integration-verifier independently re-admits the immutable completed diagnosis
+      evidence into one production-schema-valid semantic receipt, preserves conclusion
+      independence, uses the exact warning string with no prefix or suffix whenever
+      warning debt remains, puts explanatory prose only in notes, preserves nondisclosure
+      and zero mutation, and records exactly one evidence-supported readiness classification
+      plus the smallest separately authorized recovery need","modality":"runtime","seam":"real","check_id":"rf_bug_v2_current_runtime_readiness_diagnosis","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-caddy-service-reconciliation"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
     verification: A fresh integration-verifier emits one production-admitted, schema-valid
-      semantic receipt that independently consumes the two immutable preserved artifacts
-      at their exact hashes/modes/size, retains zero-mutation and nondisclosure evidence,
-      records exactly one supported classification without planner-prescribed substantive
-      judgment, and uses PASS_WITH_DEBT whenever warnings remain; no child receipt
-      is rewritten and no remote mutation occurs.
+      semantic receipt that independently consumes the preserved artifacts at their
+      exact hashes/modes/size, retains all invalid receipts as immutable provenance,
+      preserves zero mutation, nondisclosure, and conclusion independence, and records
+      exactly one evidence-supported classification. Any warning is the entire exact
+      string `owner=vectl-orchestrator; follow_up=perform the plan-defined bounded
+      Caddy service reconciliation, then rerun prior-runtime identity/readiness verification`
+      with no prefix or suffix; explanatory prose appears only in notes. No child
+      artifact is rewritten, no remote probe or mutation occurs, and `PASS` is not
+      required.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log
     - /tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/semantic-receipt-corrected.json
