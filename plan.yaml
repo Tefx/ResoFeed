@@ -194436,7 +194436,7 @@ phases:
     agent: vectl-orchestrator
   - id: rf-bug-v2-prior-runtime-identity-readiness
     name: Resolve prior runtime digest and recovery readiness read-only
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -194561,8 +194561,6 @@ phases:
     - rf-bug-v2-docker-runtime-proof
     - rf-bug-v2-current-runtime-readiness-diagnosis
     agent: integration-verifier
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-25T16:44:15.071198Z'
   - id: rf-bug-v2-current-runtime-readiness-diagnosis
     name: Diagnose current Tailnet/Caddy runtime readiness read-only
     status: done
