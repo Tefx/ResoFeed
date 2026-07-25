@@ -190760,77 +190760,52 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Independently review completed local evidence, repository remediations, authenticated-endpoint
-      staging, immutable publication, dual-platform container proof, and Tailnet deployment
-      for RF-BUG-003/004/005/010 plus the release-boundary requirements. Cover embed.FS
-      traversal/fallback, no external UI root, four outer headers, embedded CSP without
-      unsafe-inline, streaming/cancellation, Owner Token, import-only OPML and atomic
-      minimal State, case-local E2E cleanup, live-provider opt-in, secret redaction,
-      exact deployed digest, authorization, and rollback.
+      Deliver: Independently judge RF-BUG release security and rollback boundaries
+      after Tailnet/Caddy proof. Cover embed.FS traversal/fallback and no external
+      UI root, outer security headers and CSP, streaming/cancellation, Owner Token,
+      import-only OPML and atomic minimal State, case-local E2E cleanup, live-provider
+      opt-in, runtime-secret redaction, clean-source immutable publication identity,
+      strict endpoint trust, exact deployed digest, Caddy non-ownership, SQLite/owner-token
+      preservation, and prior-digest recovery. Preserve stopped publication/staging
+      failures as provenance without promoting them to current authority.
 
 
-      Preserve completed staged-procedure authority as a distinct ancestor-byte identity:
-      clean detached staging commit `1e49621c6b44ac2e55cd82f87960972d571bad64`, deploy.sh
-      SHA-256 `5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6` mode
-      `755`, and compose.yml SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
-      mode `644`. Prove the renewed integrated source leaves those bytes unchanged,
-      so completed semantic-v14 strict literal-FQDN transport, route no-op, protected-state,
-      and procedure-staging evidence remains valid without restaging. Preserve every
-      exhausted staging/review/v13/runtime-debug artifact as diagnostic-only; do not
-      retry or promote it.
+      Boundary: `spec-verifier` is read-only. It consumes current tracked docs and
+      admitted receipts from the completed publication/runtime chain and `rf-bug-v2-tailnet-caddy-proof`;
+      it may not mutate repository, Git, Docker/builders, registry, deployment, route,
+      credential/account/trust, secrets, data, or runtime state. Historical temporary
+      diagnostics are lifecycle provenance, not current refs or executable authority.
 
 
-      For publication, preserve all implicit-builder diagnostics, zero-command preflight,
-      old-source attempt-1, and old-source attempt-2 log/classification/receipt at
-      SHA-256 `a46303ce5bac510f91fb22570ff3b9c9b88d9bf217ac8000a84f04688818433c`,
-      `51702864fbdb5c16cd85564cb175fd8a94bb1d634efaa809696067365e931b6c`, and `03ffb7837c738b0eb910321785566e239236c1cab67b019258f41254dfb8c873`.
-      Confirm attempt 2 deterministically stopped the old commit/tag after cleanup
-      and no old-source retry occurred. Require the renewed authorization review to
-      bind one exact clean integrated commit, exact derived immutable tag, two platforms,
-      revision labels, same Docker context/daemon, repository-scoped credential/account,
-      and no-paid/cloud-builder boundary.
+      Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
+      object with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-formal-security-review`,
+      ordered scope [`embedded runtime and HTTP security`, `owner-token OPML State
+      and secret boundaries`, `clean-source immutable publication`, `strict endpoint
+      deployment and Caddy ownership`, `rollback recovery and retained failure provenance`],
+      and exactly five coverage rows for `RF-BUG-003`, `RF-BUG-004`, `RF-BUG-005`,
+      `RF-BUG-010`, and `RF-BUG-V2-RELEASE-SECURITY-RECOVERY`. Every row cites substantive
+      current command/process evidence or an admitted producer receipt.
 
 
-      Review the renewed one-to-three attempt series for complete mode-0600 logs,
-      sanitized classifications, exact per-attempt create/bootstrap/build-push/cleanup
-      cardinality, later-attempt transient-only admission with complete invariant
-      re-proof, every deterministic/auth/unknown-state/orphan/cleanup/drift/suspect-log
-      stop, no push after a complete chain, exact index/amd64/arm64/revision identity,
-      builder/BuildKit absence, unchanged context/daemon/default-builder and clean
-      source, no alias/deletion/temp-tag/credential/account mutation, and no disclosure.
-      Registry or cleanup uncertainty remains blocking.
-
-
-      For deployment, require only the independently verified renewed index digest
-      through the existing strict literal-FQDN `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
-      procedure and unchanged credential/host-key trust. Verify prior-digest readiness
-      rollback, SQLite/owner-token preservation, masked-only runtime-secret presence,
-      canonical Tailscale route as no-op, and no Serve/restart/reauthentication/trust/account
-      mutation. Findings route to the owning pending step and block closure; this
-      review mutates no repository, registry, deployment, route, credential, or runtime
-      state.'
-    verification: Fresh security review finds no unresolved product, source/build-context,
-      trusted-identity, staged-byte, strict-endpoint, bounded renewed Buildx-history,
-      log/classification, retry/stop, cleanup/default-builder, immutable-digest, deployment,
-      secret, credential/trust, route, or rollback defect. It proves old-source stop/no-retry,
-      reusable completed procedure evidence by exact byte identity, exact renewed
-      integrated source/tag/index/platform/revision/deployed-digest bindings, no push
-      after completion, and preservation of all rejected diagnostics.
+      Recovery: Any unresolved source/build/registry/deployment/security/trust/secret/route/volume/rollback
+      defect routes to its owning pending step and blocks report closure. This review
+      performs no remediation or retry-bearing effect.'
+    verification: A production-admitted fresh spec-verifier receipt covers all five
+      declared security/recovery scopes, binds current tracked authority and admitted
+      producer evidence, preserves rejected history as provenance, and reports no
+      unresolved in-scope defect or undeclared effect.
     refs:
-    - docs/BUG_FIX_PLAN_2026-07-12.md
     - AGENTS.md
+    - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - .agents/skills/resofeed-tailnet-deploy/SKILL.md
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/buildx-driver-diagnostic.txt
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-corrected-publication.json
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/runtime-receipt-publication-execution.json
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-complete.log
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
-    - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
+    - Dockerfile
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - deploy/resofeed-caddy/caddy/Caddyfile
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
