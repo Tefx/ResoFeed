@@ -194023,6 +194023,88 @@ phases:
     depends_on:
     - rf-bug-v2-publish-immutable-oci
     agent: vectl-orchestrator
+  - id: rf-bug-v2-container-build-evidence-runtime-admission
+    name: Admit completed container-build evidence into runtime proof chain
+    status: done
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Genuine runtime-chain admission of the already completed independent `spec-verifier`
+      review for `RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE`. It preserves every completed
+      producer/review byte and exact receipt hash while making the completed attempt
+      lifecycle an explicit independently consumed input to the pending dual-platform
+      runtime producer.
+
+
+      The admitted history is exact: producer attempt 1 stopped before any Docker
+      invocation, proved cleanup and zero residue, and met the sole retry predicate;
+      attempt 2 passed the complete declared dual-platform no-push contract and was
+      independently admitted by `rf-bug-v2-renewed-source-publication-authorization-review`.
+      The lexical failed-test token is closed same-step retry provenance. This admission
+      grants no runtime, repository, registry, publication, deployment, Tailnet, credential/account,
+      or lifecycle mutation authority and cannot satisfy the pending runtime producer.
+
+
+      Boundary: `spec-verifier` review authority; no repository or runtime effects.
+      Admit only the existing production-conformant semantic receipt and exact hash
+      chain already recorded by the completed renewed-source review. Recovery is preservation
+      of all existing evidence and refusal on any hash or lifecycle mismatch.'
+    verification: The existing production-admissible spec-verifier PASS and exact
+      hashes prove the completed raw-evidence producer's attempt-1 transient pre-Docker
+      stop was fully cleaned and superseded by the sole authorized attempt-2 PASS.
+      Evidence records verdict/headline PASS, proof gap NONE, blocking status CLOSED,
+      empty blockers, gate_open_allowed=true, and explicit owner/lifecycle/gate-intersection
+      disposition while leaving the new runtime producer pending.
+    depends_on:
+    - rf-bug-v2-container-build-raw-evidence-capture
+    - rf-bug-v2-renewed-source-publication-authorization-review
+    agent: spec-verifier
+    evidence: 'verdict: PASS
+
+      headline: PASS
+
+      proof_gap_status: NONE
+
+      blocking_status: CLOSED
+
+      blockers: []
+
+      gate_open_allowed=true
+
+
+      This append-only admission binds the already completed genuine `RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE`
+      review outcome into the runtime-proof consumer chain; it creates no new runtime
+      assertion and changes no completed evidence bytes.
+
+
+      Exact source evidence remains the completed `rf-bug-v2-renewed-source-publication-authorization-review`
+      production-admissible spec-verifier PASS: Gate semantic receipt SHA-256 44c32724d9138c023f999de968f3d344f5a132c2b74e4aacc0e6a3e0345846d6,
+      raw receipt SHA-256 688ea53b11c1d1008d6a5872bae803dba55e0fc57eb305ca6e248f3ac57c7305,
+      mode-0600 raw log SHA-256 36484f633e5ca577ad6c6e20a811e5eb3aa5d75c1a86d92803072a4affd82a6f,
+      sanitized receipt SHA-256 75a8b59cd2e6abca9fdcacfc02eb9a8a83e1e532a3f5b7bd42d88094b128aac8.
+
+
+      disposition: expected-red/non-blocking owner/lifecycle/gate-intersection disposition
+
+      owner: vectl-orchestrator owned the completed runtime-state producer; spec-verifier
+      independently admitted its evidence in rf-bug-v2-renewed-source-publication-authorization-review.
+
+      lifecycle: attempt 1 stopped before any Docker invocation and was fully cleaned
+      with zero residue; the sole authorized same-step retry, attempt 2, passed every
+      declared requirement and completed the producer. The attempt-1 `1 failed` token
+      is closed transient history superseded by attempt-2 PASS, not an open outcome.
+
+      gate-intersection proof: this closed attempt-1 history does not intersect any
+      remaining gate blocker. `rf-bug-v2-assurance-closure-gate` independently consumes
+      the completed raw-evidence PASS chain and still requires the pending `rf-bug-v2-docker-runtime-evidence-producer`
+      plus fresh `rf-bug-v2-docker-runtime-proof`; no future green evidence or gate
+      opening is asserted here.
+
+
+      No repository, Docker, registry, deployment, Tailnet, credential/account, plan
+      lifecycle, or external state operation occurred for this append-only admission.'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
