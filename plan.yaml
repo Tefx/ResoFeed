@@ -193928,41 +193928,70 @@ phases:
       predecessor `rf-bug-v2-container-build-raw-evidence-capture`: `expected-red/non-blocking
       owner/lifecycle/gate-intersection disposition`; `gate_open_allowed=true` applies
       only to that closed predecessor history, never to this pending runtime outcome.
-      The predecessor''s attempt 1 stopped before any Docker invocation, cleanup and
-      zero residue were proven, and its sole authorized same-step retry completed
-      PASS with the exact required dual-platform no-push evidence. Owner is `vectl-orchestrator`;
-      lifecycle is completed predecessor attempt-1 transient history superseded by
-      same-step attempt-2 PASS; gate intersection is `rf-bug-v2-assurance-closure-gate`,
-      which consumes the completed predecessor evidence and this producer independently
+      The predecessor''s attempt 1 stopped before Docker invocation with cleanup and
+      zero residue, and its sole authorized same-step retry completed PASS with the
+      exact dual-platform no-push evidence. Owner is `vectl-orchestrator`; lifecycle
+      is completed predecessor attempt-1 transient history superseded by same-step
+      attempt-2 PASS; gate intersection is `rf-bug-v2-assurance-closure-gate`, which
+      consumes the completed predecessor evidence and this producer independently
       and keeps this producer plus downstream verification blocking until their future
       evidence passes. This disposition neither fabricates future evidence nor weakens
       any current gate.
 
 
-      Preserve producer execution 1 as immutable diagnostic history. Its mode-0600
-      raw log `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/runtime-proof-complete.log`
+      Preserve producer executions 1 and 2 as immutable diagnostic history. Execution
+      1''s mode-0600 raw log `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/runtime-proof-complete.log`
       is 5135 bytes with SHA-256 `518b52799a39dce0202f04402d2920e2ec7750024d5948bc787725a3c72de4a1`;
       its mode-0600 sanitized receipt `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/runtime-receipt.json`
-      has SHA-256 `39d2710d13a30f8969113ccf7f46b993a1cfe3f86cf0c671d3aad00db3dc09c0`.
-      Execution 1 reached amd64 readiness and the full assertions, removed container
-      A, started container B, reached B readiness, then stopped at deterministic harness
-      aggregate `runtime assertion false`, whose exact message has SHA-256 `a2b8a19b025d9886ccea4070538c17d18f43f99e77ea58d0e13678ced5813cb8`.
-      Source remained exact, clean and detached; cleanup completed with zero attributable
-      residue. The finding is diagnostic of the old harness predicate: it rejected
-      the literal allowed field name `OPENROUTER_KEY` even when the value was a canonical
-      masked-presence marker. It is not current product-runtime evidence and must
-      never be overwritten, deleted, retried under the old contract, or counted as
-      a current PASS.
+      is 1051 bytes with SHA-256 `39d2710d13a30f8969113ccf7f46b993a1cfe3f86cf0c671d3aad00db3dc09c0`.
+      Execution 1 reached amd64 readiness and assertions, A-to-B recreation and B
+      readiness, then stopped at aggregate `runtime assertion false`, whose exact
+      message has SHA-256 `a2b8a19b025d9886ccea4070538c17d18f43f99e77ea58d0e13678ced5813cb8`,
+      because the old harness predicate rejected canonical masked presence for the
+      literal allowed field name `OPENROUTER_KEY`. Execution 2 corrected only that
+      predicate. Its mode-0600 raw log `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/corrected-runtime-proof-complete.log`
+      is 6248 bytes with SHA-256 `36eb3dfdffe3ce8d955e3cd79b3971441551d5cca484bb702809e25897ad103a`;
+      its mode-0600 sanitized receipt `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/corrected-runtime-receipt.json`
+      is 1147 bytes with SHA-256 `54afece31c250ba4baf934815eca7d72315cd4d4872db6fd2ecc1ce2d618310d`.
+      Execution 2 reached amd64 A readiness, every A assertion, A-to-B recreation
+      and B readiness. Doctor canonical masked presence passed and every recorded
+      boolean assertion was true except `deep=false`; the aggregate stopped with the
+      same exact failure-message hash because the Orchestrator used guessed path `/today/deep-link`,
+      which has no authority in the product route contract. Both executions left the
+      exact clean detached source unchanged, completed cleanup and proved zero attributable
+      residue. Neither execution is current product-runtime PASS evidence; neither
+      artifact may be overwritten, deleted, retried under its old contract, or counted
+      as a current PASS.
 
 
-      Authorize exactly one renewed harness-contract execution under this corrected
-      contract. This is a new execution after the old predicate exhausted its authority,
-      not a retry of execution 1. Before any container or volume creation, prove the
-      execution-1 artifacts still match the exact paths, modes, byte count and hashes
-      above; prove no attributable old container or volume exists; prove fixed ports
-      `127.0.0.1:38481` and `127.0.0.1:38482` are available; prove the artifact directory
-      remains mode 0700; and prove corrected artifact basenames do not exist. Any
-      failed prerequisite stops without runtime mutation.
+      The authoritative deep-link contract is the tracked repository evidence at current
+      plan-repair HEAD `492cc4e32b3903971b5d3024cb51de908b15faf0`: `internal/resofeed/rf_bug_runtime_contract_expected_red_test.go`
+      (SHA-256 `1dd38ddea18bb57d2b7ec808869a5d17d70b42c9fb923da675ce78d936cd4d33`)
+      explicitly admits `/today`, `/source-ledger`, `/search`, and `/items/opaque-item-id`;
+      `internal/resofeed/http_static_test.go` (SHA-256 `eae694485a64f0937c337fd9cf5a3b70a790df3686ca3df8fb640f296217e6a7`)
+      requires those four GETs to return HTTP 200 with bytes equal to the embedded
+      root and independently probes `/source-ledger` against the running binary. Bind
+      the runtime deep-link assertion to `/source-ledger` only: after readiness, GET
+      `/` and `/source-ledger` from the exact observed platform port, require HTTP
+      200 for both, nonempty root, exact response-body byte equality, equal byte counts
+      and equal SHA-256 hashes. Record only route, status, byte count, equality classification
+      and hashes; never record either body. `/today/deep-link` and every other invented
+      or inferred path are forbidden. Adding any runtime route probe beyond the four
+      explicitly admitted paths also stops; this execution needs only `/source-ledger`.
+
+
+      Execution-2 authority is exhausted. Authorize exactly one new route-contract-corrected
+      execution. It is a new execution under the authoritative-route contract, not
+      a retry under either invalid predicate contract. Before container or volume
+      creation, prove all five retained history artifacts still match their exact
+      paths, modes, bytes and hashes: both execution-1 artifacts, both execution-2
+      artifacts, and mode-0600 `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-blocked-corrected.json`,
+      5444 bytes, raw SHA-256 `560a482d1ae7ae7e874443b135993f4aff9c701848ada459be94f2b51acbfc3b`
+      with canonical Gate semantic SHA `ec7403c746656dce3a0aef7e53060a4cf8c7b0bd6fdf9320d5dc5deb3c810799`.
+      Also prove no attributable prior container or volume exists, fixed ports `127.0.0.1:38481`
+      and `127.0.0.1:38482` are available, the artifact directory remains mode 0700,
+      and new basenames `route-corrected-runtime-proof-complete.log` and `route-corrected-runtime-receipt.json`
+      do not exist. Any failed prerequisite stops without runtime mutation.
 
 
       From a newly created clean detached checkout of exact commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
@@ -193976,91 +194005,101 @@ phases:
       drift before container creation.
 
 
-      Create only step-and-execution-prefixed containers and named data volumes for
-      those two exact platform manifests. Publish amd64 only to `127.0.0.1:38481`
+      Create only step-and-route-corrected-execution-prefixed containers and named
+      data volumes for those exact platform manifests. Publish amd64 only to `127.0.0.1:38481`
       and arm64 only to `127.0.0.1:38482`. For each platform, after container creation
       observe exact container identity, platform, port binding, RUNNING state and
       health status when defined, then poll the bound host-loopback root every 1 second
-      for at most 90 seconds. Each poll records timestamp, connection result, container
-      running/health observation, and bounded new container logs with secrets and
-      response bodies excluded. Readiness succeeds only on HTTP response from the
-      observed bound port while the exact container remains running; container exit,
-      unhealthy state, identity/port drift, disclosure, or the 90-second deadline
-      stops before contract assertions. After readiness, run the full existing container
-      contract on each exact platform: `/app/resofeed`; writable persistent `/data`;
-      non-root; arbitrary cwd; embedded UI with no external UI tree or Node runtime;
-      redacted Doctor; OPML import-only; JSON State backup/restore; all four Go-owned
-      headers and CSP; and A-to-B persistence across recreation using only that platform''s
-      attributable volume.
+      for at most 90 seconds. Each poll records timestamp, connection classification,
+      container running/health observation, and bounded new container logs with secrets
+      and response bodies excluded. Readiness succeeds only on HTTP response from
+      the observed bound port while the exact container remains running; container
+      exit, unhealthy state, identity/port drift, disclosure, or the 90-second deadline
+      stops before contract assertions.
 
 
-      For the authorized Doctor body, treat a secret field name as allowed only when
-      it is a canonical project field and its entire value is exactly `[masked-empty]`
+      After readiness, run the full existing container contract on each exact platform
+      without weakening any prior assertion: executable `/app/resofeed`; writable
+      persistent `/data`; non-root; arbitrary cwd; binary-only embedded UI with no
+      external UI tree or Node runtime; the authoritative `/source-ledger` root-body-equality
+      proof; redacted Doctor; OPML import-only; JSON State backup/restore; all four
+      Go-owned headers and exact CSP; and A-to-B persistence across recreation using
+      only that platform''s attributable volume. For Doctor, an allowed canonical
+      secret field name is conformant only when its entire value is exactly `[masked-empty]`
       or `[masked-present]`; `OPENROUTER_KEY=[masked-empty]` and `OPENROUTER_KEY=[masked-present]`
-      are explicitly conformant. Presence of an allowed field name inside that exact
-      whole-field masked form must not fail the harness. Fail closed on any raw, unmasked,
-      partially masked, differently masked, or otherwise noncanonical value, and on
-      any owner-token, bearer/token, credential, authorization header, cookie, `.env`
-      content or path, provider request/response body, raw header, secret-source metadata,
-      or other protected disclosure. The assertion records only canonical-form classifications
-      and hashes, never protected values or bodies.
+      are explicitly conformant. Fail closed on any raw, unmasked, partially masked,
+      differently masked or otherwise noncanonical value, and on any owner-token,
+      bearer/token, credential, authorization header, cookie, `.env` content or path,
+      provider request/response body, raw header, secret-source metadata or other
+      protected disclosure. Assertion evidence records only classifications and hashes,
+      never protected values, headers, bodies or configuration.
 
 
       Boundary: local Docker runtime state plus local evidence files only. Exclusively
-      create a complete mode-0600 raw log and sanitized receipt at `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/corrected-runtime-proof-complete.log`
-      and `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/corrected-runtime-receipt.json`;
-      fail closed on either name collision. The corrected raw log records exact source/tree/status,
-      preserved execution-1 artifact observations, image identity observations, Docker
-      argv, container/volume/port identities, readiness observations, assertion outcomes,
-      cleanup observations and exit statuses. The corrected sanitized receipt hash-binds
-      the corrected raw log and records mode, bytes, source and immutable identity,
-      per-platform readiness/assertion results, renewed-execution classification,
-      cleanup/residue, Doctor canonical-masking classification and nondisclosure without
-      raw logs, secrets, credentials, environment values, protected response bodies,
-      or secret-bearing configuration. Preserve the valid rejected receipt `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-blocked-corrected.json`,
-      raw SHA-256 `560a482d1ae7ae7e874443b135993f4aff9c701848ada459be94f2b51acbfc3b`,
-      and canonical Gate semantic SHA `ec7403c746656dce3a0aef7e53060a4cf8c7b0bd6fdf9320d5dc5deb3c810799`
-      as non-authoritative history.
+      create a complete mode-0600 raw log and sanitized receipt at `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/route-corrected-runtime-proof-complete.log`
+      and `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/route-corrected-runtime-receipt.json`;
+      fail closed on either collision. The raw log records exact source/tree/status,
+      preserved-history observations, authoritative route-source bindings, image identity,
+      Docker argv, container/volume/port identities, readiness observations, assertion
+      outcomes, route statuses/counts/equality/hashes, cleanup observations and exit
+      statuses. The sanitized receipt hash-binds the raw log and records mode, bytes,
+      source and immutable image identity, per-platform readiness/assertion results,
+      new-execution classification, authoritative `/source-ledger` proof, cleanup/residue,
+      Doctor canonical-masking classification and nondisclosure without raw logs,
+      secrets, credentials, environment values, protected response bodies or secret-bearing
+      configuration. Preserve the semantic receipt above as non-authoritative history.
 
 
       No registry/buildx builder/publication/deployment/Tailnet/credential/account/repository/Git-history
       or unrelated Docker/runtime state mutation is authorized. No registry credential,
-      `.env`, secret, paid service, remote builder, alternate image, moving tag, or
-      external target may be read or used. Cleanup runs on every exit and removes
-      only the uniquely attributable corrected-execution containers and volumes, then
-      proves their absence; the clean detached checkout may be removed only after
-      evidence capture and source re-observation.
+      `.env`, secret, paid service, remote builder, alternate image, moving tag or
+      external target may be read or used. Cleanup runs after success or failure and
+      removes only the uniquely attributable route-corrected-execution containers
+      and volumes, then proves their absence; the clean detached checkout may be removed
+      only after evidence capture and source re-observation. Post-attempt observation
+      must prove both new evidence files'' modes/hashes/bytes when created, retained-history
+      integrity, cleanup completion, zero attributable residue, exact source preservation
+      and forbidden-effect absence.
 
 
-      There is no retry authority. Any corrected-execution deterministic or runtime
-      failure, readiness transport or port failure, source/image/identity drift, container
-      exit/unhealthy state, suspect/incomplete evidence, artifact collision, cleanup
-      residue, disclosure, forbidden effect, unknown or partial state, or subsequent
-      harness failure stops. Recovery authority is limited to removing attributable
-      corrected-execution containers/volumes and the reconciled detached checkout
-      while preserving both executions'' artifacts; unknown state remains blocked
-      for manual reconciliation.'
-    verification: The predecessor closure binding still records `expected-red/non-blocking
+      The execution budget is exactly one. Repetition is unsafe because it would exceed
+      the user-authorized runtime-effect budget and make the authoritative evidence
+      lineage ambiguous. Any deterministic or runtime failure, readiness transport
+      or port failure, source/image/identity/route-contract drift, container exit/unhealthy
+      state, suspect or incomplete evidence, artifact collision, cleanup residue,
+      disclosure, forbidden effect, unknown or partial state, or harness failure stops
+      without another execution. Recovery authority is limited to removing attributable
+      route-corrected-execution containers/volumes and the reconciled detached checkout
+      while preserving every history and new evidence artifact; unknown state remains
+      blocked for manual reconciliation.'
+    verification: 'The predecessor closure binding still records `expected-red/non-blocking
       owner/lifecycle/gate-intersection disposition`, owner `vectl-orchestrator`,
       completed same-step retry lifecycle, gate intersection at `rf-bug-v2-assurance-closure-gate`,
       and `gate_open_allowed=true` only for closed predecessor attempt-1 history superseded
-      by predecessor attempt-2 PASS. For this producer, execution 1 remains unchanged
-      and diagnostic-only at its exact paths, modes, byte count and hashes, with exact
-      failure-message hash, clean detached source and zero residue. The sole authoritative
-      producer evidence is the non-overwriting corrected sanitized receipt and hash-bound
-      mode-0600 `corrected-runtime-proof-complete.log` from exactly one renewed harness-contract
-      execution. It must prove pre-execution absence of old containers/volumes and
-      corrected artifact collisions; clean detached exact source commit/tree; exact
-      tag/index/amd64/arm64/revision; unique per-platform containers and volumes;
-      fixed loopback ports `38481`/`38482`; bounded 1-second/90-second readiness with
-      running/health/log stop observations; the complete both-platform binary/data/non-root/cwd/embedded-UI/Doctor/OPML/state/headers-CSP/A-to-B
-      contract; Doctor acceptance only for canonical whole-field `[masked-empty]`
-      or `[masked-present]` values on allowed secret field names, including `OPENROUTER_KEY`,
+      by predecessor attempt-2 PASS. Producer executions 1 and 2 remain unchanged
+      and diagnostic-only at their exact paths, modes, bytes and hashes, with the
+      exact aggregate failure-message hash, clean detached source and zero residue.
+      The route contract is witnessed by the two exact tracked test refs: the admitted
+      four routes are `/today`, `/source-ledger`, `/search`, and `/items/opaque-item-id`,
+      and the sole runtime deep-link probe is `/source-ledger`; `/today/deep-link`
+      and all invented paths are forbidden. The sole authoritative producer evidence
+      is the non-overwriting sanitized receipt and hash-bound mode-0600 `route-corrected-runtime-proof-complete.log`
+      from exactly one new route-contract-corrected execution. It must prove retained-history
+      integrity; pre-execution absence of old containers/volumes and new artifact
+      collisions; clean detached exact source commit/tree; exact tag/index/amd64/arm64/revision;
+      unique per-platform containers and volumes; fixed loopback ports `38481`/`38482`;
+      bounded 1-second/90-second readiness with running/health/log stop observations;
+      the complete both-platform binary/data/non-root/cwd/embedded-UI/Doctor/OPML/State/headers-CSP/A-to-B
+      contract; per-platform GET `/` and `/source-ledger` HTTP 200 with nonempty root
+      and exact byte equality, equal counts and SHA-256 hashes while retaining no
+      bodies; Doctor acceptance only for canonical whole-field `[masked-empty]` or
+      `[masked-present]` values on allowed field names including `OPENROUTER_KEY`,
       with rejection of raw/unmasked/noncanonical values and token/credential/authorization/cookie/`.env`/provider-body
-      disclosure; nondisclosure; cleanup on every exit; zero residue; forbidden-effect
-      absence; and no retry. The downstream `rf-bug-v2-docker-runtime-proof` integration-verifier
-      independently consumes the corrected artifacts, immutable target, and execution-1
-      diagnostic history without rerunning runtime commands.
+      disclosure; nondisclosure; cleanup on every exit; zero residue; exact source/history
+      preservation; forbidden-effect absence; and no second execution. Downstream
+      `rf-bug-v2-docker-runtime-proof` independently consumes the route-corrected
+      artifacts, immutable target and both prior diagnostic executions without rerunning
+      runtime commands.'
     evidence_template: 'Orchestrator direct runtime evidence: exact detached source/tree;
       immutable tag/index/platform/revision observations; per-platform ports/readiness/assertions;
       mode-0600 raw-log hash and sanitized receipt; cleanup/zero-residue/nondisclosure;
@@ -194068,6 +194107,11 @@ phases:
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/runtime-proof-complete.log
     - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/runtime-receipt.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/corrected-runtime-proof-complete.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer/corrected-runtime-receipt.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-blocked-corrected.json
+    - internal/resofeed/rf_bug_runtime_contract_expected_red_test.go
+    - internal/resofeed/http_static_test.go
     depends_on:
     - rf-bug-v2-publish-immutable-oci
     - rf-bug-v2-container-build-evidence-runtime-admission
