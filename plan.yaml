@@ -190986,6 +190986,7 @@ phases:
     - rf-bug-v2-close-defect-report
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-container-build-raw-evidence-capture
+    - rf-bug-v2-container-build-evidence-runtime-admission
     - rf-bug-v2-docker-runtime-evidence-producer
     - rf-bug-v2-immutable-procedure-staging-remediation
     - rf-bug-v2-remote-procedure-staging-authorization-review
