@@ -194789,35 +194789,31 @@ phases:
     name: Implement Backend, HTTP API, MCP, and PublicURL Deep-Link Semantics
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
-      \ ITEM-DEEP-LINK-BACKEND. Implement the Go application/read boundary after the\
-      \ protected contract lock: visibly canonical `~{unpadded RFC4648 base64url(item_id)}`\
-      \ tokens reject raw, padded, malformed, noncanonical, or invalid-UTF-8 input\
-      \ before lookup for every item HTTP operation; static `/items/` dispatch uses\
-      \ the escaped request path before cleaning; ordinary, resolved-direct-duplicate,\
-      \ and broken-target reads return the exact four-field ItemReadResult matrix;\
-      \ the returned item ID is the sole effective mutation target; GET/read paths\
-      \ mutate no inspection, delivery, resonance, item_state, or FTS row. Add required\
-      \ MCP item-level `app_url` projections derived only from the validated effective\
-      \ PublicURL, including explicit/derived origin normalization and startup rejection\
-      \ before bind. Keep browser application paths separate from API token helpers,\
-      \ preserve storage-level direct reads, never persist or log app_url or credentials,\
-      \ and synchronize API/MCP/PublicURL usage documentation without changing the\
-      \ frozen references. Rollback reverts this Go/test/usage unit and restores the\
-      \ prior API/MCP projection atomically.\n\nWitnessed current profile: existing\
-      \ `scripts/vectl-check.mjs` suite/check `item-deep-links-backend` / `item_deep_links_backend_green`\
-      \ provides both `select` and `run`; current `scripts/vectl-check.test.mjs` proves\
-      \ its exact identity, and the current profile's Go command maps that identity\
-      \ to the bound internal and command-package tests. `internal/resofeed/item_route_token_test.go`\
-      \ and `internal/resofeed/http_impl_test.go` are current sources. Exact producer\
-      \ ownership: step `item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts`,\
-      \ check `item_deep_links_expected_red`, produces `internal/resofeed/item_deep_links_expected_red_test.go`,\
-      \ and this step depends directly on that producer. This step `item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp`,\
-      \ check `item_deep_links_backend_green`, produces exactly `internal/resofeed/item_deep_links_test.go`\
-      \ and `cmd/resofeed/item_deep_links_test.go`; its `allowed_paths` and developer-test\
-      \ authority own them. Downstream consumer `item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification`\
-      \ depends directly on this step. The already-current adapter/profile is immutable\
-      \ in this step.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
+      \ Implement `ITEM-DEEP-LINK-BACKEND` after the protected contract lock: canonical\
+      \ API item tokens reject raw/padded/malformed/noncanonical/invalid-UTF-8 input\
+      \ before lookup; escaped `/items/` static dispatch precedes cleaning; item reads\
+      \ return the exact ordinary/resolved-duplicate/broken-target four-field envelope;\
+      \ returned `item.id` is the only effective mutation target; reads mutate no\
+      \ inspection/delivery/resonance/item_state/FTS state. Add credential-free nonpersisted\
+      \ MCP `app_url` projections from validated explicit or derived `MCPConfig.PublicURL`,\
+      \ rejecting excluded origins before bind. Keep application and API codecs separate\
+      \ and synchronize HTTP/MCP/PublicURL usage docs.\n\nBoundary: `golang-developer`\
+      \ owns the bounded Go, developer-test, command-package, and usage-doc paths\
+      \ in the contract. Dispatch and completion use `vectl.worker.dispatch.v2` and\
+      \ `vectl.worker.execution.v2`. Protected acceptance, adapter/profile, frozen\
+      \ canonical docs, frontend, deployment, runtime state, credentials, and secrets\
+      \ are immutable. Rollback reverts this backend/test/docs unit atomically.\n\n\
+      Admit: Current suite/check `item-deep-links-backend` / `item_deep_links_backend_green`\
+      \ selects the exact backend identity through the tracked adapter. It consumes\
+      \ the expected-red Go file from `item-deep-links-expected-red-contracts`, current\
+      \ token/HTTP tests, and this step's two produced developer tests. Selected execution\
+      \ must emit all six `ITEM_DEEP_LINK_*` backend markers. `item-deep-links-local-integration-verification`\
+      \ is the independent consumer.\n\nRecovery: A producer mismatch, noncanonical-token\
+      \ acceptance, state mutation, app_url persistence/leak, startup-bind ordering\
+      \ defect, selected/executed identity drift, or out-of-scope change stops this\
+      \ step. Fix only within the authorized backend unit; do not mutate acceptance\
+      \ or frontend paths.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
       matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/item_route_token.go, internal/resofeed/item_route_token_test.go,\
       \ internal/resofeed/types.go, internal/resofeed/search.go, internal/resofeed/http.go,\
