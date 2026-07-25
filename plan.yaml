@@ -194675,40 +194675,31 @@ phases:
     name: Freeze Item Deep-Link Expected-Red Contracts
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
-      \ ITEM-DEEP-LINK-CONTRACT. Define one protected expected-red contract unit for\
-      \ the frozen browser application codec/history/authentication contract and the\
-      \ separate HTTP/MCP/duplicate/PublicURL contract. The cross-domain `general`\
-      \ owner is justified because the three protected acceptance files share one\
-      \ acceptance authority, one expected-red receipt, one rollback, and two specialist\
-      \ consumers; splitting would duplicate check identity and reciprocal ownership.\
-      \ Create tests only; do not implement product behavior, mutate the frozen docs,\
-      \ or change the already-current adapter/profile.\n\nWitnessed current profile:\
-      \ existing `scripts/vectl-check.mjs` suite/check `item-deep-links-contract`\
-      \ / `item_deep_links_expected_red` provides both `select` and `run`, and current\
-      \ `scripts/vectl-check.test.mjs` proves its exact three identities. The current\
-      \ profile maps `ITEM-DEEP-LINK duplicate read envelope and MCP app_url` to the\
-      \ Go command consuming `internal/resofeed/item_deep_links_expected_red_test.go`,\
-      \ `ITEM-DEEP-LINK app codec and API domain separation` to the Vitest command\
-      \ consuming `web/src/lib/__tests__/item-deep-links.expected-red.test.ts`, and\
-      \ `ITEM-DEEP-LINK browser history auth error read-only lifecycle` to the Playwright\
-      \ command consuming `web/tests/e2e/item-deep-links.browser-contract.spec.ts`.\
-      \ The Playwright command uses the current CI-safe/base config chain, trusted\
-      \ Svelte build-identity derivation, and real-binary runtime fixture named below;\
-      \ ambient private build identity is forbidden.\n\nExact producer ownership:\
-      \ step `item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts`,\
-      \ check `item_deep_links_expected_red`, produces exactly the three absent acceptance\
-      \ paths in `test_bindings`. This step's `allowed_paths` and acceptance authority\
-      \ own them. Consumer steps `item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp`\
-      \ and `item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser`\
-      \ each depend directly on this producer and close the reciprocal fingerprints.\
-      \ Fail only at the named contract fingerprints, never collection, compile, web-server\
-      \ startup, authentication setup, timeout, missing-test infrastructure, or trusted-environment\
-      \ derivation. Rollback reverts the three protected tests together.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: expected_red_definition\nscope:\n  allowed_paths: [internal/resofeed/item_deep_links_expected_red_test.go,\
-      \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, web/tests/e2e/item-deep-links.browser-contract.spec.ts]\n\
-      \  blocked_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/resofeed-svelte-build-identity.mjs,\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
+      \ Create exactly three protected expected-red acceptance files for `ITEM-DEEP-LINK-CONTRACT`:\
+      \ Go HTTP/MCP/duplicate/PublicURL, frontend application-codec/API-domain separation,\
+      \ and real-browser history/auth/error/read-only lifecycle. The current adapter\
+      \ must fail only at `IDL-BACKEND-READ-PROJECTION-GAP` and `IDL-FRONTEND-APP-HISTORY-GAP`;\
+      \ product code, frozen docs, adapter/profile, configs, and runtime fixtures\
+      \ remain unchanged.\n\nBoundary: `general` owns this indivisible cross-domain\
+      \ contract unit because one acceptance authority, one expected-red receipt,\
+      \ one rollback, and two reciprocal implementation consumers span Go, Vitest,\
+      \ and Playwright. Dispatch and completion use `vectl.worker.dispatch.v2` and\
+      \ `vectl.worker.execution.v2`. Only the three authorized acceptance paths may\
+      \ change. Rollback reverts them together.\n\nAdmit: Current tracked suite/check\
+      \ `item-deep-links-contract` / `item_deep_links_expected_red` selects exactly\
+      \ the three named identities through `scripts/vectl-check.mjs`; current adapter\
+      \ tests, Go/npm configs, trusted Svelte identity derivation, CI-safe Playwright\
+      \ chain, and real-binary fixture provide the witnessed execution path. Backend\
+      \ and frontend steps depend directly on this producer and close the two reciprocal\
+      \ expected-red fingerprints.\n\nRecovery: Collection/compile/startup/auth/setup/timeout\
+      \ or missing-test failures are false-red and stop this step. Do not repair infrastructure,\
+      \ product code, frozen docs, adapter/configs, or downstream implementation here.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
+      \ [internal/resofeed/item_deep_links_expected_red_test.go, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
+      \ web/tests/e2e/item-deep-links.browser-contract.spec.ts]\n  blocked_paths:\
+      \ [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/resofeed-svelte-build-identity.mjs,\
       \ web/playwright.ci-safe.config.ts, web/playwright.config.ts, web/playwright.base.config.ts,\
       \ web/tests/e2e/fixtures/**, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
       \ docs/DESIGN.md, internal/resofeed/item_route_token.go, internal/resofeed/http.go,\
