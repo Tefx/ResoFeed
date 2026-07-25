@@ -194292,103 +194292,63 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Deliver `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`. Owner `vectl-orchestrator` directly
-      performs exactly one declared persistent remote deployment operation; no repository-changing
-      worker contract applies. Consume only completed `rf-bug-v2-stage-immutable-deployment-procedure-v2`,
-      `rf-bug-v2-publish-immutable-oci`, and `rf-bug-v2-docker-runtime-proof` evidence
-      when their exact identities still match current tracked bytes: source commit
-      `abf3cb6c545f9c0f3c605760a5325875c61fc83f`, tag `docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
-      index `sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`,
-      linux/amd64 `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`,
-      linux/arm64 `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`,
-      both matching revision labels, staged source commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
-      deploy.sh `sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
-      mode `755`, compose.yml `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      Deliver: Perform `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT` once by deploying `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
+      for source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`, immutable tag `git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
+      amd64 `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`,
+      and arm64 `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`
+      through the maintained formal-deploy interface. Final state must bind the configured
+      running image to that index, preserve direct `200`/Doctor `401` readiness, named
+      SQLite volume, owner-token state, masked runtime secrets, route, credentials/trust,
+      and a recoverable prior digest.
+
+
+      Boundary: `vectl-orchestrator` alone owns the persistent operation against `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
+      Use literal-FQDN SSH with `-F none`, matching HostName/HostKeyAlias, strict
+      existing host-key trust, the existing account/credential, exact staged deploy
+      SHA-256 `5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6` mode
+      `755`, compose SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
       mode `644`, and backup ID `sha256:97058a9435f10cb4c7a69e20bb6de89f9b77da56caa8bf05eb18729c3089fcc0`.
-      Current HEAD and staging commit contain byte-identical procedure files, so restaging
-      is forbidden. Reject inverted commit `d37b6ff6b100cd1b3a33a43b596ae6cd6aa58df5`,
-      inverted deploy SHA-256 `acd0863daf51da721f434158498aa715ee3194933126ed651f2804c257cd62d1`,
-      old publication attempts, moving aliases, placeholders, and mismatched identities.
+      The only persistent mutation is the image-digest deployment; repository/Git,
+      registry, builders, procedure bytes, Caddy, route, credentials/accounts/trust,
+      secrets, data, owner token, and alternate targets are forbidden. Existing-stack
+      SSH/registry transfer is the only cost; any paid builder/service or material
+      unplanned charge stops.
 
 
-      Boundary: the sole target is existing `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`;
-      the sole persistent mutation is deployment of `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
-      through the exact maintained remote `./deploy.sh` formal-deploy interface and
-      canonical stack. Authenticate only the literal FQDN with `-F none`, matching
-      `HostName` and `HostKeyAlias`, `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`,
-      no alias/effective-host rewrite, and the unchanged existing credential/account/default
-      trust. Use existing masked runtime secrets only. Before mutation capture the
-      current repository digest, require recoverable prior-digest readiness, preserve
-      `resofeed-caddy_resofeed-data` at `/data` and owner-token state, confirm procedure
-      hashes/modes, stack identity, exact OCI chain, builder cleanup and unchanged
-      active/default builder evidence, canonical route no-op, and negligible existing-stack
-      SSH/registry transfer cost. Do not mutate repository/Git, builders, registry
-      objects/tags, credentials/accounts/trust, Tailnet Serve/routing, Caddy configuration,
-      runtime secrets, owner token, or data; do not inspect another host or stack.
+      Admit: Consume the production-admitted `rf-bug-v2-prior-runtime-identity-readiness`
+      receipt only if it proves exactly one canonical recoverable prior `docker.io/tefx/resofeed@sha256:<64
+      lowercase hex>` digest, unchanged current image/config binding, direct `200/401`,
+      exact named volume, strict endpoint identity, route no-op, nondisclosure, and
+      zero verifier mutation. Before the invocation revalidate exact OCI/procedure/source
+      identities. Retain a new non-overwriting mode-0600 raw log and sanitized receipt
+      with operation, target, identities, prior digest, attempt count, post-attempt
+      digest/readiness/volume/route/recovery observations, and no secret values. `rf-bug-v2-tailnet-caddy-proof`
+      independently consumes the receipt.
 
 
-      Admit: create a new non-overwriting local mode-0600 raw command log before the
-      single invocation and retain a sanitized receipt containing exact nonsecret
-      operation/target/source/procedure/digest identities, prior digest identity,
-      attempt count, exit/classification, readiness/recovery, volume/token preservation,
-      strict endpoint result, and nondisclosure. Never expose raw log contents, `.env`,
-      secret values, host-key material, authentication paths, PATH, raw Serve JSON,
-      public-host values, configuration, or response bodies. The invocation must use
-      the documented maintained SSH option array, canonical physical stack checks,
-      OrbStack Docker PATH, and exact `./deploy.sh --verified-commit abf3cb6c545f9c0f3c605760a5325875c61fc83f
-      --immutable-tag git-abf3cb6c545f9c0f3c605760a5325875c61fc83f --index-digest
-      sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b --amd64-digest
-      sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0 --arm64-digest
-      sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff --procedure-deploy-sha256
-      sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6 --procedure-compose-sha256
-      sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`. Completion
-      requires the running container configured to the exact index digest, maintained
-      direct root `200` plus unauthenticated Doctor `401` readiness, preserved prior
-      digest/SQLite volume/owner-token state, canonical route unchanged, no undeclared
-      effect, and a sanitized producer receipt consumable by `rf-bug-v2-tailnet-caddy-proof`.
-
-
-      Recovery: budget exactly one formal deployment invocation. Repetition is unsafe
-      after any remote mutation because it could obscure partial persistent state;
-      there is no second deployment attempt. The maintained script may perform only
-      its bounded internal readiness sequence and automatic prior-digest recovery.
-      On pull, replacement, route, image-identity, or readiness failure after mutation
-      begins, restore only the captured prior digest through that maintained recovery
-      path, reuse the same named volume, and require direct root `200` plus unauthenticated
-      Doctor `401`. After every nonzero or ambiguous return, observe exact deployed
-      digest, service readiness, volume identity, and recovery outcome before classification.
-      Unknown/partial state, unavailable or mismatched rollback identity, strict endpoint
-      failure, failed recovery readiness, route drift, procedure/digest/source drift,
-      disclosure, or any forbidden mutation stops BLOCKED with no alternate host,
-      target, copy, restaging, Serve repair, destructive fallback, or replay.
+      Recovery: Budget exactly one formal deployment invocation. Repetition is unsafe
+      once pull/replacement may have mutated remote state, so no replay is authorized.
+      The maintained script may perform only its bounded readiness sequence and automatic
+      prior-digest recovery using the same named volume. After every nonzero or ambiguous
+      return, observe deployed digest, direct `200/401`, volume, route, and recovery
+      outcome. Unknown/partial state, absent or mismatched rollback identity, failed
+      recovery, trust/identity drift, disclosure, or forbidden mutation stops BLOCKED
+      without alternate host, restaging, Serve repair, destructive fallback, or another
+      invocation.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","risk_tier":"R3","risk_reasons":["persistent_remote_digest_deployment","strict_endpoint_and_existing_credential_boundary","prior_digest_readiness_recovery","sqlite_owner_token_secret_preservation"],"primary_outcome":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","atom":"the
-      exact independently verified immutable index digest is deployed once through
-      the staged maintained strict-FQDN procedure to the existing resofeed-caddy stack
-      while prior digest, SQLite volume, owner-token state, route, credential, trust,
-      secrets, and nondisclosure boundaries are preserved","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"},{"requirement_id":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","atom":"any
-      failed or ambiguous deployment is reconciled by the maintained prior-digest
-      readiness recovery or stops BLOCKED without replay, alternate target, Serve
-      mutation, data loss, or undeclared effect","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","risk_tier":"R3","risk_reasons":["persistent_remote_digest_deployment","strict_endpoint_existing_credential_boundary","prior_digest_recovery","sqlite_owner_token_secret_preservation"],"primary_outcome":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","atom":"the
+      exact independently verified immutable index is deployed once through the maintained
+      strict-FQDN procedure while prior digest, SQLite volume, owner token, route,
+      credentials, trust, secrets, and recovery readiness remain preserved","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: The Orchestrator-owned mode-0600 raw log and sanitized receipt consume
-      the production-admitted `rf-bug-v2-prior-runtime-identity-readiness` receipt
-      and proceed only when it proves exactly one canonical recoverable prior `docker.io/tefx/resofeed@sha256:<64
-      lowercase hex>` digest, current local image/config binding, direct 200/401 readiness,
-      exact `resofeed-caddy_resofeed-data` `/data` mount, strict literal-FQDN identity,
-      route no-op, nondisclosure, and zero prior mutation. They then prove one exact
-      maintained strict-FQDN formal deployment invocation; exact source/tag/index/amd64/arm64/revision
-      and unchanged staged procedure hashes; final configured index digest; preserved
-      prior digest, SQLite volume, owner-token state, canonical route, existing credential/account/trust,
-      masked-only secret injection, builder/default-builder state, repository/Git
-      state, and nondisclosure; or a fully observed prior-digest recovery and BLOCKED
-      stop with no replay or alternate effect. An outcome-consistent BLOCKED identity-readiness
-      receipt, ambiguity, or missing exact digest forbids the deployment invocation
-      and keeps this step BLOCKED.
+    verification: A mode-0600 raw log and sanitized receipt prove the exact admitted
+      prior-digest precondition, one maintained strict-FQDN deployment invocation,
+      final exact digest/readiness/volume/route preservation, and nondisclosure, or
+      fully observed prior-digest recovery with a BLOCKED stop and no replay.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -194396,10 +194356,7 @@ phases:
     - deploy/resofeed-caddy/README.md
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
-    - /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deployment-receipt-blocked.json
     depends_on:
-    - rf-bug-v2-stage-immutable-deployment-procedure-v2
-    - rf-bug-v2-docker-runtime-proof
     - rf-bug-v2-prior-runtime-identity-readiness
     agent: vectl-orchestrator
   - id: rf-bug-v2-prior-runtime-identity-readiness
