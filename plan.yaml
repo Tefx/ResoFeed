@@ -195314,33 +195314,58 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Run one Full Gate for the distinct integrated outcome: the frozen deep-link
-      contract is protected, implemented, independently observed locally and in deployed
-      clients, and released by immutable digest without weakening RF-BUG Assurance
-      v2 history. Re-run structural/contract gates, consume the local integration,
-      R3 authorization, OCI, Tailnet, and external-client receipts, obtain independent
-      architecture and design conformance assessments required by the gate-reviewer
-      role, verify frozen-reference immutability, documentation/test parity, exact
-      expected-red reciprocal closure, no orphan requirement, no hidden browser/API
-      codec coupling, no persisted app_url, no read-lifecycle state writes, and executable
-      rollback/recovery. Block only on the declared scope.
+      Deliver: Admit one integrated item deep-link release only when the protected
+      expected-red contract, parallel backend/frontend implementations, real local
+      seams, R3 effect authorization, immutable OCI publication and independent registry
+      verification, Tailnet/Caddy deployment and independent production proof, and
+      all seven external-client environments satisfy `vectl.gate.scope.v2`. Independently
+      assess architecture, design, security, documentation/test parity, browser/API
+      codec separation, nonpersisted app_url, read-only lifecycle, effective mutation
+      targets, and executable rollback/recovery.
+
+
+      Boundary: `gate-reviewer` is read-only and mutates no repository, Git, registry,
+      Docker/builder, deployment, route, credential/account, secret, data, device,
+      or client state. The gate cannot waive or substitute a missing Safari/Chrome/Telegram/email/MCP
+      provider binding and cannot authorize cleanup or replay of an external effect.
+
+
+      Admit: Re-run structural ref validation, assurance policy lint, pending modifying-step
+      preflight, expected-red reciprocal/applicability checks, live-roster owner compatibility,
+      proof topology, and gate-scope validation. Consume only production-admitted
+      worker, verifier, review, publication, deployment, and client receipts bound
+      to the exact integrated commit and deployed index. Production semantic admission
+      emits one `vectl.verifier.semantic.v1` object with `verifier_id=gate-reviewer`,
+      `step_id=item-deep-links-final-gate`, ordered scope equal to the integrated
+      steps below, and outcome-consistent coverage for every listed requirement ID.
+
+
+      Recovery: A missing witnessed link, unavailable client, expected-red mismatch,
+      frozen-doc drift, source/digest/target drift, security/design/architecture defect,
+      orphan effect, unsafe rollback, persisted app_url, read-state write, or out-of-scope
+      blocker keeps the phase BLOCKED. The gate performs no remediation or external
+      effect.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"item-summary-deep-links-assurance-v2","requirement_ids":["ITEM-DEEP-LINK-CONTRACT","ITEM-DEEP-LINK-BACKEND","ITEM-DEEP-LINK-FRONTEND","ITEM-DEEP-LINK-LOCAL-INTEGRATION","ITEM-DEEP-LINK-OCI","ITEM-DEEP-LINK-TAILNET","ITEM-DEEP-LINK-EXTERNAL-CLIENTS"],"integrated_steps":["item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts","item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp","item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser","item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification","item-summary-deep-links-assurance-v2.item-deep-links-deployment-authorization-review","item-summary-deep-links-assurance-v2.item-deep-links-publish-immutable-oci","item-summary-deep-links-assurance-v2.item-deep-links-tailnet-runtime-proof","item-summary-deep-links-assurance-v2.item-deep-links-external-client-verification"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"item-summary-deep-links-assurance-v2","requirement_ids":["ITEM-DEEP-LINK-CONTRACT","ITEM-DEEP-LINK-BACKEND","ITEM-DEEP-LINK-FRONTEND","ITEM-DEEP-LINK-LOCAL-INTEGRATION","ITEM-DEEP-LINK-DEPLOYMENT-AUTHORITY","ITEM-DEEP-LINK-OCI-PUBLICATION","ITEM-DEEP-LINK-OCI-VERIFICATION","ITEM-DEEP-LINK-TAILNET-DEPLOYMENT","ITEM-DEEP-LINK-TAILNET-RUNTIME","ITEM-DEEP-LINK-EXTERNAL-SAFARI","ITEM-DEEP-LINK-EXTERNAL-CHROME","ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-IOS","ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-ANDROID","ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-DESKTOP","ITEM-DEEP-LINK-EXTERNAL-EMAIL","ITEM-DEEP-LINK-EXTERNAL-MCP-CONSUMER"],"integrated_steps":["item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts","item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp","item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser","item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification","item-summary-deep-links-assurance-v2.item-deep-links-deployment-authorization-review","item-summary-deep-links-assurance-v2.item-deep-links-publish-immutable-oci","item-summary-deep-links-assurance-v2.item-deep-links-oci-verification","item-summary-deep-links-assurance-v2.item-deep-links-tailnet-deployment","item-summary-deep-links-assurance-v2.item-deep-links-tailnet-runtime-proof","item-summary-deep-links-assurance-v2.item-deep-links-external-client-verification"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: Full Gate proves every declared requirement with direct contract,
-      real-seam, deployed-runtime, rendered-client, immutable-release, rollback, architecture,
-      design, and documentation evidence; zero orphan requirements, out-of-scope blockers,
-      frozen-doc mutations, or unresolved findings remain.
+    verification: A production-admitted gate-reviewer receipt proves every listed
+      requirement and integrated step from exact current source, protected contract,
+      real local/deployed/client evidence, separate external-effect receipts, rollback/recovery,
+      architecture/design/security, and documentation/test parity, with no orphan,
+      waiver, substitution, or out-of-scope blocker.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/CONTAINER.md
+    - Dockerfile
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
     depends_on:
     - item-deep-links-external-client-verification
     agent: gate-reviewer
