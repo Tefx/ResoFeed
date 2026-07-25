@@ -193905,6 +193905,98 @@ phases:
       inputs absent, boundary fingerprints unchanged, recorder removed, cleanup complete,
       zero residue, zero paid/cloud builder spend. Worktree remained clean/detached
       and no repository/Git/registry/deployment/Tailnet mutation occurred.'
+  - id: rf-bug-v2-docker-runtime-evidence-producer
+    name: Produce clean-source dual-platform container runtime evidence
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Deliver `RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE`. Owner `vectl-orchestrator`
+      directly performs the declared local Docker runtime operation because zero-repository-change
+      evidence artifacts do not use worker receipt admission. From a newly created
+      clean detached checkout of exact commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
+      and tree `7c471cd4b6fa88c603001e9a9748c1a15d7c8066`, first prove detached HEAD,
+      exact commit/tree, empty status, and unchanged tracked Dockerfile/docs inputs.
+      Bind only `docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
+      index `sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`,
+      linux/amd64 manifest `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`,
+      linux/arm64 manifest `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`,
+      and revision label equal to that full commit; reject any tag/index/platform/revision/source
+      drift before container creation.
+
+
+      Create only step-and-attempt-prefixed containers and named data volumes for
+      those two exact platform manifests. Attempt 1 publishes container port 8080
+      to `127.0.0.1:38481` for amd64 and `127.0.0.1:38482` for arm64; the sole eligible
+      retry uses the predeclared alternate pair `127.0.0.1:39481` and `127.0.0.1:39482`.
+      For each platform, after container creation observe exact container identity,
+      platform, port binding, RUNNING state and health status when defined, then poll
+      the bound host-loopback root every 1 second for at most 90 seconds. Each poll
+      records timestamp, connection result, container running/health observation,
+      and bounded new container logs with secrets and response bodies excluded. Readiness
+      succeeds only on HTTP response from the observed bound port while the exact
+      container remains running; container exit, unhealthy state, identity/port drift,
+      disclosure, or the 90-second deadline stops before contract assertions. After
+      readiness, run the full existing container contract on each exact platform:
+      `/app/resofeed`; writable persistent `/data`; non-root; arbitrary cwd; embedded
+      UI with no external UI tree or Node runtime; redacted Doctor; OPML import-only;
+      JSON State backup/restore; all four Go-owned headers and CSP; and A-to-B persistence
+      across recreation using only that platform''s attributable volume.
+
+
+      Boundary: local Docker runtime state plus local evidence files only. Before
+      execution create `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-evidence-producer`
+      mode 0700 and fail closed on artifact-name collision. Exclusively create a complete
+      mode-0600 raw log and sanitized receipt at `runtime-proof-complete.log` and
+      `runtime-receipt.json`; an admitted retry uses non-overwriting `attempt-2-`
+      basenames. The raw log records exact source/tree/status, image identity observations,
+      Docker argv, container/volume/port identities, readiness observations, assertion
+      outcomes, cleanup observations and exit statuses. The sanitized receipt hash-binds
+      the raw log and records mode, bytes, source and immutable identity, per-platform
+      readiness/assertion results, attempt classification, cleanup/residue, and nondisclosure
+      without raw logs, secrets, credentials, environment values, protected response
+      bodies, or secret-bearing configuration. Preserve the valid rejected receipt
+      `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-blocked-corrected.json`,
+      raw SHA-256 `560a482d1ae7ae7e874443b135993f4aff9c701848ada459be94f2b51acbfc3b`,
+      and canonical Gate semantic SHA `ec7403c746656dce3a0aef7e53060a4cf8c7b0bd6fdf9320d5dc5deb3c810799`
+      as non-authoritative history.
+
+
+      No registry/buildx builder/publication/deployment/Tailnet/credential/account/repository/Git-history
+      or unrelated Docker/runtime state mutation is authorized. No registry credential,
+      `.env`, secret, paid service, remote builder, alternate image, moving tag, or
+      external target may be read or used. Cleanup runs on every exit and removes
+      only the uniquely attributable containers and volumes, then proves their absence;
+      the clean detached checkout may be removed only after evidence capture and source
+      re-observation.
+
+
+      Admit one retry only for a proven transient failure before any runtime assertion:
+      readiness observation transport failure or predeclared host-port allocation
+      failure, with unchanged source/image/contract inputs, complete attempt-1 evidence,
+      full cleanup, zero residue, no disclosure, and no deterministic runtime finding.
+      Deterministic runtime or assertion failure, source/image/identity drift, container
+      exit/unhealthy state, unknown or partial state, suspect/incomplete evidence,
+      cleanup residue, disclosure, or any forbidden effect stops without retry. Recovery
+      authority is limited to removing attributable containers/volumes and the reconciled
+      detached checkout; unknown state remains blocked for manual reconciliation.'
+    verification: A sanitized receipt and hash-bound mode-0600 complete raw log prove
+      clean detached exact source commit/tree; exact tag/index/amd64/arm64/revision;
+      unique per-platform containers and volumes; deterministic observed loopback
+      ports; bounded 1-second/90-second readiness with running/health/log stop observations;
+      the complete both-platform binary/data/non-root/cwd/embedded-UI/Doctor/OPML/state/headers-CSP/A-to-B
+      contract; nondisclosure; cleanup on every exit; zero residue; and compliant
+      retry/stop classification. The downstream integration-verifier independently
+      consumes these artifacts and immutable target.
+    evidence_template: 'Orchestrator direct runtime evidence: exact detached source/tree;
+      immutable tag/index/platform/revision observations; per-platform ports/readiness/assertions;
+      mode-0600 raw-log hash and sanitized receipt; cleanup/zero-residue/nondisclosure;
+      attempt classification.'
+    depends_on:
+    - rf-bug-v2-publish-immutable-oci
+    agent: vectl-orchestrator
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
