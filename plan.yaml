@@ -193643,7 +193643,7 @@ phases:
       CONFORMANT with only four preserved historical missing-ref warnings.'
   - id: rf-bug-v2-renewed-source-publication-authorization-review
     name: Renew integrated-source and immutable-publication authority
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -193726,6 +193726,8 @@ phases:
     depends_on:
     - rf-bug-v2-container-build-raw-evidence-capture
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-25T11:56:29.492565Z'
   - id: rf-bug-v2-container-build-raw-evidence-capture
     name: Capture complete raw no-push container build evidence
     status: done
