@@ -193706,50 +193706,65 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      A fresh `spec-verifier` independently reviews `RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR`
-      and renews only the source/publication authority invalidated by the deterministic
-      old-source build failure. Preserve every completed definition/evidence and all
-      old-source failure artifacts. Confirm old commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
+      A fresh `spec-verifier` remains the sole semantic source/publication authority.
+      Independently review `RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR` and the new
+      `RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE` outcome. Preserve every completed definition/evidence
+      and all old-source failure artifacts. Preserve the valid rejected receipt at
+      `/tmp/larva-agent-artifacts/rf-bug-v2-renewed-source-publication-authorization-review/semantic-receipt.json`,
+      raw SHA-256 `4223e8e56e6abb3f342ba4170a5f8ead0815eb7e5a2f04c8d336a9072b314300`,
+      Gate canonical semantic SHA `d1a77ce0856ccef9a6727a872aac500f9c9041c8f79deb79eb2820f076f90b1e`;
+      it proves the prior 347-byte test-runner summary SHA-256 `642fe4fd7c6c09ad651b96dafc7d935eb56081737120123f740f0665c73b24eb`
+      cannot authorize publication. Confirm old commit `1e49621c6b44ac2e55cd82f87960972d571bad64`,
       tree `36bc981e5a01c14a6355162a6679ec8c144d5313`, tag `docker.io/tefx/resofeed:git-1e49621c6b44ac2e55cd82f87960972d571bad64`,
       and its attempts remain stopped, absent, non-authoritative, and prohibited from
       retry.
 
 
-      Consume the implementation''s admitted `vectl.worker.execution.v2` receipt,
-      integrated Git commit, exact three-path diff, and real developer-check evidence.
-      Verify the integrated source is one clean 40-character commit; the Docker web
-      builder has both byte-identical canonical helper inputs; only the helper derives
-      the private identity under a sanitized environment; the real no-push `linux/amd64,linux/arm64`
-      build succeeded on the same reviewed Docker context/daemon with no secret/credential
-      input, publication, load, tag, drift, or residue; and documentation is synchronized.
-      Any broader diff, helper/build-script mutation, mock/static substitution for
-      the real build, missing raw command evidence, cleanup uncertainty, identity
-      drift, or disclosure returns `FAIL` or `BLOCKED` and authorizes no publication.
+      Consume the completed implementation''s admitted `vectl.worker.execution.v2`
+      receipt, integrated commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`, exact
+      three-path diff, and the evidence producer''s sanitized receipt. Independently
+      open the receipt''s hash-bound mode-0600 raw local log; never copy its raw content
+      into Vectl evidence. Verify the raw log is complete and proves exact test and
+      Docker/buildx argv/output, clean detached exact source, selected Docker context/daemon/default-builder
+      fingerprints before and after, one explicit transient builder without `--use`,
+      exact `linux/amd64,linux/arm64`, explicit no-push/no-load/no-tag/no-publication
+      invocation, no registry credential/secret input or disclosure, helper-derived
+      canonical identity, cleanup on every post-create path, protected boundary fingerprints
+      unchanged, and zero attributable builder/container residue. Verify the Docker
+      web builder has both byte-identical canonical helper inputs, only the helper
+      derives the private identity under a sanitized environment, and documentation
+      remains synchronized. Any broader diff, helper/build-script mutation, mock/static
+      substitution, missing/incomplete or mode-insecure raw command evidence, receipt/hash
+      mismatch, cleanup uncertainty, identity/fingerprint drift, disclosure, or publication-capable
+      argv returns `FAIL` or `BLOCKED` and authorizes no publication.
 
 
-      Re-observe that `deploy/resofeed-caddy/deploy.sh` remains SHA-256 `5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
-      mode `755` and `deploy/resofeed-caddy/compose.yml` remains SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
-      mode `644`. When those bytes and the completed semantic-v14 strict-FQDN/Tailscale-route
-      evidence remain exact, reuse the completed staging/deployment-procedure evidence
+      Re-observe `deploy/resofeed-caddy/deploy.sh` SHA-256 `5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`
+      mode `755` and `deploy/resofeed-caddy/compose.yml` SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      mode `644`. When exact and the completed semantic-v14 strict-FQDN/Tailscale-route
+      evidence remains exact, reuse completed staging/deployment-procedure evidence
       without restaging or duplicating route, endpoint, security, deployment, or runtime
       review.
 
 
-      On PASS, bind the sole new publication source to the implementation''s full
-      integrated commit and authorize exactly `docker.io/tefx/resofeed:git-<same-full-integrated-commit>`
+      On PASS, bind the sole new publication source to full integrated commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
+      and authorize exactly `docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`
       for `linux/amd64,linux/arm64` with matching `org.opencontainers.image.revision`.
-      Preserve the existing repository-scoped credential/account, Docker context/daemon,
-      no-paid/cloud-builder cost boundary, bounded retry/cleanup/log/stop policy,
-      and prohibition on moving aliases, alternate repositories, registry deletion,
-      deployment, Tailnet mutation, credential/trust changes, or other side effects.
-      This review executes no publication, deployment, repository mutation, or staging
-      operation; missing exact source, byte, provider, credential/account, cost, cleanup,
-      or recovery evidence blocks.'
-    verification: A production-admissible spec-verifier receipt proves the exact integrated
-      commit and three-path repair, real sanitized dual-platform no-push evidence,
-      helper/build-script immutability, same Docker context/daemon, zero residue/disclosure,
-      unchanged deploy.sh/compose.yml bytes and reusable completed staging evidence,
-      old-source retry prohibition, and exact renewed immutable tag/platform/revision
+      Preserve the existing repository-scoped credential/account, reviewed Docker
+      context/daemon, no-paid/cloud-builder cost boundary, bounded retry/cleanup/log/stop
+      policy, and prohibition on moving aliases, alternate repositories, registry
+      deletion, deployment, Tailnet mutation, credential/trust changes, or other side
+      effects. This review executes no Docker build, publication, deployment, repository
+      mutation, or staging operation; missing exact source, bytes, raw evidence, provider,
+      credential/account, cost, cleanup, or recovery evidence blocks.'
+    verification: A production-admissible spec-verifier receipt proves exact integrated
+      commit abf3cb6c545f9c0f3c605760a5325875c61fc83f and three-path repair; independently
+      validates the sanitized receipt and complete hash-bound mode-0600 raw local
+      log without exposing raw content in plan evidence; proves exact Docker argv/output,
+      selected context/daemon/default builder, sanitized credential-free dual-platform
+      no-push/no-load/no-tag build, helper/build-script immutability, unchanged protected/deploy
+      fingerprints, cleanup and zero residue; preserves the rejected receipt and old-source
+      retry prohibition; and grants only the exact renewed immutable tag/platform/revision
       authority with no broader operation.
     refs:
     - Dockerfile
@@ -193766,7 +193781,7 @@ phases:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
     depends_on:
-    - rf-bug-v2-container-build-context-remediation
+    - rf-bug-v2-container-build-raw-evidence-capture
     agent: spec-verifier
   - id: rf-bug-v2-container-build-raw-evidence-capture
     name: Capture complete raw no-push container build evidence
