@@ -194652,6 +194652,97 @@ phases:
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-docker-runtime-proof
     agent: integration-verifier
+  - id: rf-bug-v2-caddy-service-reconciliation
+    name: Reconcile existing Caddy service without touching ResoFeed
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Deliver `RF-BUG-V2-CADDY-SERVICE-RECONCILIATION`. Owner `vectl-orchestrator`
+      directly performs exactly one declared persistent remote reconciliation operation
+      after consuming the production-admitted `rf-bug-v2-current-runtime-readiness-diagnosis`;
+      no repository-changing worker contract applies. The sole target is the canonical
+      existing Caddy Compose service in `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`,
+      reached only by strict literal-FQDN existing-key SSH. Before mutation, inspect
+      the current maintained Compose file/procedure and service/container state to
+      bind the existing Caddy service name and smallest maintained service-only operation.
+      When those current maintained artifacts confirm service `caddy` and its supported
+      Compose interface, the sole authorized invocation is `docker compose --project-name
+      resofeed-caddy --env-file .env -f compose.yml up -d --no-deps caddy`; otherwise
+      invoke exactly once only the equivalently narrow maintained Compose command
+      proved by those artifacts to reconcile the existing Caddy service. Existing
+      `.env` runtime injection may be consumed by Compose but its contents must never
+      be read or printed.
+
+
+      Boundary: use SSH `-F none` to literal `tefx-mbp-personal.platy-atlas.ts.net`,
+      matching existing-key `HostName`/`HostKeyAlias`, `StrictHostKeyChecking=yes`,
+      `UpdateHostKeys=no`, unchanged credential/account/default trust, canonical physical
+      stack, and OrbStack Docker context. Before mutation capture sanitized hashes/classifications
+      for Caddy container/image/config state, ResoFeed container/image state, exact
+      named-volume identity, route projection, maintained procedure files/modes, and
+      direct app/Caddy plus unauthenticated Doctor readiness. The one operation may
+      start, recreate, or restart only the existing Caddy service as required by observed
+      state. It must not touch the ResoFeed container or image, named volume/data,
+      owner token, `.env` bytes, route, credentials/account/trust, registry, repository/Git,
+      another service, or any alternate host/stack. Broad Compose `up`, `down`, deployment,
+      route repair, credential/trust mutation, data change, image publication/pull
+      for ResoFeed, and destructive cleanup are forbidden.
+
+
+      Admit: create one non-overwriting local mode-0600 raw command log before mutation
+      and one sanitized receipt. Record exact target, selected maintained service
+      and operation, Compose/procedure identity, pre-state classifications/hashes,
+      invocation count, exit/classification, mandatory post-attempt observations,
+      raw-log hash/mode/bytes, nondisclosure, and undeclared-effect check. Budget
+      exactly one reconciliation invocation. Completion requires direct Caddy/root
+      readiness and unauthenticated Doctor classification, unchanged ResoFeed container/image
+      identity, unchanged named-volume identity and route projection, unchanged protected
+      identities, and no undeclared effect. Never expose response bodies, `.env`,
+      secret values, raw Tailscale Serve JSON, public-host values, host-key material,
+      credential paths, PATH, raw configuration, raw logs, or unsanitized image names.
+      The receipt is independently consumed by `rf-bug-v2-prior-runtime-identity-readiness`.
+
+
+      Recovery: no replay after any attempted mutation. On nonzero, ambiguity, or
+      partial state, observe current Caddy and ResoFeed container/image/config identities,
+      direct app/Caddy and unauthenticated Doctor readiness, volume, route, and protected
+      identities before classification. If a prior Caddy container identity existed
+      and the maintained Compose procedure proves an exact service-only restoration
+      that cannot touch ResoFeed or data, that exact restoration is the declared recovery
+      path; otherwise stop BLOCKED with current runtime preserved and no recovery
+      invocation. Unknown state, missing recovery proof, identity drift, route/volume
+      drift, disclosure, or any forbidden effect stops immediately. No alternate host/stack,
+      route repair, credential/trust mutation, data mutation, broad Compose operation,
+      deployment, or second reconciliation attempt is authorized.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-caddy-service-reconciliation","risk_tier":"R3","risk_reasons":["persistent_remote_caddy_service_reconciliation","strict_endpoint_and_existing_credential_boundary","service_only_identity_preservation","single_attempt_nontrivial_recovery"],"primary_outcome":"RF-BUG-V2-CADDY-SERVICE-RECONCILIATION","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-CADDY-SERVICE-RECONCILIATION","atom":"the
+      existing canonical Caddy Compose service is reconciled by exactly one smallest
+      maintained service-only invocation after complete pre-state capture, producing
+      Caddy/root and unauthenticated Doctor readiness while preserving ResoFeed container/image,
+      volume, route, secrets, credential/trust, data, repository, registry, and every
+      other service","modality":"runtime","seam":"real","check_id":"rf_bug_v2_caddy_service_reconciliation","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness"},{"requirement_id":"RF-BUG-V2-CADDY-SERVICE-RECONCILIATION","atom":"a
+      failed or partial single invocation is fully observed and follows only a proved
+      exact Caddy-service restoration path or stops BLOCKED without replay, destructive
+      fallback, alternate target, or undeclared effect","modality":"runtime","seam":"real","check_id":"rf_bug_v2_caddy_service_reconciliation","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+
+      </vectl_step_policy>'
+    verification: The Orchestrator-owned mode-0600 raw log and sanitized receipt consume
+      the admitted diagnosis, bind the current maintained Caddy service and exact
+      smallest service-only Compose operation, capture all required pre-state hashes/classifications,
+      prove exactly one invocation, and after that attempt prove Caddy/root plus unauthenticated
+      Doctor readiness, unchanged ResoFeed container/image identity, unchanged volume/route
+      and protected boundaries, and no undeclared effect; failure or partial state
+      is fully observed and either exactly restored through a pre-proved Caddy-only
+      path or stops BLOCKED without replay.
+    depends_on:
+    - rf-bug-v2-current-runtime-readiness-diagnosis
+    agent: vectl-orchestrator
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
