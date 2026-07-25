@@ -190551,55 +190551,54 @@ phases:
     status: pending
     description: 'step_type: verification
 
-      repo_change_policy: runtime_state_only
+      repo_change_policy: no_repo_change
 
 
-      Independently consume the exact index, linux/amd64 manifest, and linux/arm64
-      manifest produced by `rf-bug-v2-publish-immutable-oci` for `docker.io/tefx/resofeed:git-<renewed-review-integrated-commit>`.
-      Re-observe exactly those two platforms, tag/index equality, and `org.opencontainers.image.revision=<same-full-integrated-commit>`
-      on both images. Reject placeholders, extra/missing platforms, mutable aliases,
-      alternate repository/tag, incomplete chains, source mismatch, builder residue,
-      or context/daemon/default-builder drift.
+      Fresh `integration-verifier` independently consumes the immutable target and
+      the sanitized receipt plus locally opened hash-bound mode-0600 raw log produced
+      by `rf-bug-v2-docker-runtime-evidence-producer`; it does not synthesize, guess,
+      or rerun runtime commands and has no container, volume, registry, builder, repository,
+      Git, deployment, Tailnet, credential, account, or external-effect authority.
 
 
-      Preserve and independently classify all old-source history as non-authoritative:
-      the three implicit-builder diagnostics; zero-command corrected preflight; attempt-1
-      receipt with unknown failure class; and mode-0600 attempt-2 complete log/classification/receipt
-      SHA-256 `a46303ce5bac510f91fb22570ff3b9c9b88d9bf217ac8000a84f04688818433c`,
-      `51702864fbdb5c16cd85564cb175fd8a94bb1d634efaa809696067365e931b6c`, and `03ffb7837c738b0eb910321785566e239236c1cab67b019258f41254dfb8c873`.
-      Confirm attempt 2 deterministically stopped commit `1e49621c6b44ac2e55cd82f87960972d571bad64`
-      and its absent old tag after complete cleanup; no old-source command appears
-      in the renewed attempt series.
+      Re-observe read-only that the producer ran from clean detached commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
+      and tree `7c471cd4b6fa88c603001e9a9748c1a15d7c8066`, bound only `docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
+      index `sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`,
+      linux/amd64 `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`,
+      linux/arm64 `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`,
+      exactly those two platforms, and matching full revision labels. Verify the evidence
+      proves unique attributable containers and volumes, deterministic published host-loopback
+      ports, the 1-second/90-second bounded readiness sequence with running/health/log
+      observations and stop criteria before assertions, and no source/image/port/identity
+      drift.
 
 
-      Cross-check the renewed same-step series: one to three build/push attempts;
-      at most one exact-builder create, explicit bootstrap, explicit build/push, and
-      cleanup per attempt; a new non-overwriting mode-0600 complete log and secret-safe
-      classification per attempt; admission of a later attempt only after transient
-      non-mutating transport/registry/network classification, tag absence, and complete
-      invariant re-proof; stop on every deterministic/auth/unknown-state/orphan/cleanup/drift/suspect-log
-      condition; and no push after a complete chain. Confirm exact clean detached
-      integrated source and tree, unchanged reviewed Docker context/daemon/default-builder,
-      builder/BuildKit absence, no credential/account/cost drift, no disclosure, and
-      no undeclared side effect.
+      Independently evaluate every producer observation for the full existing container
+      contract on both exact platforms: `/app/resofeed`, writable persistent `/data`,
+      non-root, arbitrary cwd, embedded UI without external UI tree or Node runtime,
+      redacted Doctor, OPML import-only, JSON State backup/restore, four Go-owned
+      headers and CSP, and A-to-B persistence. Verify mode-0600 raw-log hash/mode/byte
+      equality, sanitized receipt completeness, nondisclosure, cleanup on every exit,
+      zero attributable container/volume residue, forbidden-effect absence, and retry/stop
+      conformance. Preserve and classify the prior valid rejected receipt `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-blocked-corrected.json`,
+      raw SHA-256 `560a482d1ae7ae7e874443b135993f4aff9c701848ada459be94f2b51acbfc3b`,
+      and Gate semantic SHA `ec7403c746656dce3a0aef7e53060a4cf8c7b0bd6fdf9320d5dc5deb3c810799`
+      as immutable non-authoritative history proving the earlier dirty/wrong checkout
+      and premature ECONNREFUSED blockers; do not overwrite, retry, or count it as
+      current proof.
 
 
-      Run the existing container contract against the exact successful immutable identity
-      on both platforms. Prove `/app/resofeed`, writable persistent `/data`, non-root
-      runtime, arbitrary cwd, embedded UI without external UI tree or Node runtime,
-      redacted Doctor, import-only OPML, JSON State backup/restore, four headers,
-      CSP, and A-to-B persistence. Recovery removes only verification containers/volumes
-      created by this step; it cannot mutate builders, registry objects, deployment,
-      credentials/accounts, or unrelated state. Any identity, history, runtime, cleanup,
-      nondisclosure, or recovery defect blocks deployment.'
-    verification: Fresh independent evidence binds the renewed review's integrated
-      commit to the exact tag/index/amd64/arm64/revision chain and one successful
-      attempt within a one-to-three renewed series; proves every old-source attempt
-      stayed stopped and separate; validates complete logs, classifications, retry/stop
-      rules, cleanup and unchanged source/context/daemon/default-builder; and passes
-      the both-platform non-root binary-only runtime, writable data, arbitrary cwd,
-      embedded UI/Doctor, state, headers/CSP, persistence, nondisclosure, and bounded
-      cleanup contract.
+      Any missing, incomplete, non-independent, mismatched, disclosed, deterministic-failure,
+      unknown-state, cleanup-residue, source/identity/readiness/assertion, retry-policy,
+      or forbidden-effect defect returns REJECTED/BLOCKED and leaves deployment locked.
+      A conformant fresh semantic receipt is the sole current independent consumer
+      evidence for downstream deployment.'
+    verification: Fresh semantic evidence independently consumes the producer's sanitized
+      receipt and hash-bound complete raw log, re-observes the exact clean source
+      and immutable tag/index/two-platform/revision chain, and proves the bounded
+      readiness sequence, complete both-platform runtime contract, nondisclosure,
+      cleanup/zero residue, retry/stop policy, forbidden-effect absence, and preserved
+      prior rejected history without executing runtime mutation.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
@@ -190612,8 +190611,9 @@ phases:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-complete.log
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-blocked-corrected.json
     depends_on:
-    - rf-bug-v2-publish-immutable-oci
+    - rf-bug-v2-docker-runtime-evidence-producer
     agent: integration-verifier
   - id: rf-bug-v2-tailnet-caddy-proof
     name: Deploy authorized digest and verify authenticated Tailnet/Caddy runtime
