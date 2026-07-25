@@ -190548,7 +190548,7 @@ phases:
       deployment, Tailnet, credential/trust, data, repository, or Git mutation.'
   - id: rf-bug-v2-docker-runtime-proof
     name: Verify immutable OCI image on both platforms
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190615,6 +190615,8 @@ phases:
     depends_on:
     - rf-bug-v2-docker-runtime-evidence-producer
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-25T14:51:21.800196Z'
   - id: rf-bug-v2-tailnet-caddy-proof
     name: Deploy authorized digest and verify authenticated Tailnet/Caddy runtime
     status: pending
