@@ -69,12 +69,35 @@ Required/recognized flags:
 
 | Flag | Required? | Default | Purpose |
 |---|---:|---|---|
-| `--addr` | No | `127.0.0.1:8080` | Bind address for web UI, HTTP API, and MCP endpoint. |
-| `--public-url` | No | derived from `--addr` for local use | Base URL external agents should use. If omitted and `--addr` is `HOST:PORT`, default to `http://HOST:PORT`; if host is `0.0.0.0`, default to `http://127.0.0.1:PORT`. |
+| `--addr` | No | `127.0.0.1:8080` | Bind address for web UI, HTTP API, and MCP endpoint. Accepted host/address classes and normalization are closed below. |
+| `--public-url` | No | derived from `--addr` for local use | Effective base URL used for MCP `app_url`. Explicit values and omitted-value derivation both populate the authoritative normalized `MCPConfig.PublicURL` before MCP wiring. |
 | `--db` | No | `./data/resofeed.sqlite3` | SQLite database path. |
 | `--openrouter-model` | No | empty / account default | Optional OpenRouter model. Empty or omitted means use the OpenRouter account default. Provided values are passed through unchanged with no startup network model validation. |
 | `--owner-token` | No | reuse or auto-generate | Explicit owner token; omitted means reuse or auto-generate. |
 | `--first-fetch-limit` | No | `50` or `RESOFEED_FIRST_FETCH_LIMIT` when the flag is omitted | Maximum items to store on a brand-new source's first fetch; `0` means unlimited; maximum `500`. Incremental fetches after any item exists are uncapped. |
+
+Bind-address and Public URL contract:
+
+- `--addr` accepts exactly `HOST:PORT` for `localhost`, a syntactically valid ASCII DNS hostname, or a dotted-decimal IPv4 literal, and `[IPV6]:PORT` for an IPv6 literal without a zone identifier. DNS labels are `1..63` ASCII letters/digits with interior hyphens allowed, cannot begin or end with a hyphen, have total length at most `253`, and have no trailing dot. `PORT` is decimal with numeric value `1..65535`.
+- Empty hosts, `*`, Unicode hostnames, malformed DNS/IPv4/IPv6 literals, unbracketed IPv6, IPv6 zone identifiers, non-decimal/out-of-range ports, and values containing a scheme, path, query, fragment, or userinfo are invalid and exit before binding.
+- When `--public-url` is omitted, derivation is total for every accepted `--addr`:
+
+| Accepted `--addr` host class | Effective normalized `MCPConfig.PublicURL` host |
+|---|---|
+| `localhost` or specific ASCII DNS hostname | lowercased hostname |
+| specific IPv4 literal | canonical dotted-decimal IPv4 literal |
+| wildcard IPv4 `0.0.0.0` | loopback `127.0.0.1` |
+| specific bracketed IPv6 literal | canonical compressed lowercase IPv6 literal, bracketed in URL form |
+| wildcard IPv6 `[::]` | loopback `[::1]` |
+
+- The derived origin is `http://HOST:PORT` with the port emitted as canonical decimal and no trailing slash. Wildcard derivation deliberately produces a local loopback URL; a remotely reachable or production deployment must supply explicit `--public-url`.
+- Explicit `--public-url` must be an absolute `http` or `https` origin. Its host is accepted only when written directly as `localhost`, a valid ASCII DNS hostname under the same label/length rules as `--addr`, a canonical dotted-decimal IPv4 literal, or a bracketed IPv6 literal without a zone identifier.
+- Explicit dotted-decimal IPv4 has exactly four decimal components in `0..255`; each component is `0` or begins with `1..9`. A host containing only ASCII digits and dots must satisfy this IPv4 grammar and cannot fall back to DNS. Leading-zero and out-of-range IPv4 forms are rejected.
+- Explicit DNS hosts are lowercased. Explicit IPv4 remains canonical dotted decimal. Explicit IPv6 is compressed, lowercased, and bracketed.
+- Explicit wildcard/unspecified hosts `0.0.0.0` and `[::]`, `*`, Unicode host spelling, trailing-dot DNS, percent-encoded hosts, malformed literals, unbracketed IPv6, IPv6 zones, IPvFuture, empty hosts, and input with leading/trailing whitespace are rejected before binding. Startup performs no Unicode-to-IDNA conversion; an already-ASCII `xn--` A-label is accepted only when it satisfies the ordinary ASCII DNS grammar.
+- An explicit port may be omitted or contain only ASCII decimal digits with numeric value `1..65535`. Leading zeros are accepted and normalized to canonical decimal. Empty, signed, non-decimal, zero, and out-of-range ports are rejected.
+- Credentials/userinfo, paths other than empty or `/`, query, and fragment are rejected. Normalization lowercases the scheme, removes a sole `/` path, omits explicit `:80` for `http` and `:443` for `https`, preserves every other normalized port, and emits no trailing slash.
+- Successful startup always sets one non-null effective normalized `MCPConfig.PublicURL`; this value, rather than raw flags, is the sole authority for MCP `app_url`. It is runtime-only and is never written to SQLite, state bundles, receipts, logs, or item metadata.
 
 When `--openrouter-model` is omitted or empty, diagnostics and startup/runtime status should refer to the configured model as `account_default`. If OpenRouter later returns a concrete resolved model in a response, `/doctor` may include that resolved model; absence of a resolved model is not a startup failure.
 
@@ -141,9 +164,9 @@ Startup validation matrix:
 
 | Input | Invalid when | Exit code | Stderr code/message | Binds socket? |
 |---|---|---:|---|---|
-| `--addr` | not `HOST:PORT`, missing host/port, port outside `1..65535` | `2` | `err: invalid_addr: expected HOST:PORT` | No |
-| `--public-url` | not absolute `http`/`https`, missing host, has query/fragment, path not empty or `/` | `2` | `err: invalid_public_url: expected absolute http(s) URL without path/query/fragment` | No |
-| omitted `--public-url` | N/A | N/A | derive from `--addr`; `0.0.0.0:PORT` derives to `http://127.0.0.1:PORT`; remove trailing slash | N/A |
+| `--addr` | outside the accepted ASCII DNS/IPv4 `HOST:PORT` or zone-free bracketed IPv6 `[IPV6]:PORT` classes above; includes empty host, `*`, Unicode hostname, malformed host literal, unbracketed/zone-bearing IPv6, scheme/path/query/fragment/userinfo contamination, non-decimal port, or port outside `1..65535` | `2` | `err: invalid_addr: expected HOST:PORT` | No |
+| `--public-url` | not an absolute `http`/`https` origin under the closed grammar above; includes missing host, wildcard/unspecified host, Unicode host spelling or percent-encoded host, trailing-dot/malformed DNS, non-canonical or malformed IPv4, unbracketed/zone-bearing/malformed IPv6 or IPvFuture, invalid port, credentials/userinfo, surrounding whitespace, query/fragment, or path other than empty or `/` | `2` | `err: invalid_public_url: expected absolute http(s) origin` | No |
+| omitted `--public-url` | N/A for every accepted `--addr` | N/A | set effective normalized `MCPConfig.PublicURL` by the total mapping above: specific DNS/IP remains specific, `0.0.0.0` -> `127.0.0.1`, `[::]` -> `[::1]`, canonical decimal port, no trailing slash | N/A |
 | `--db` | parent directory cannot be created, path cannot be opened as SQLite | `2` | `err: invalid_db: cannot open sqlite database` | No |
 | `--first-fetch-limit` / `RESOFEED_FIRST_FETCH_LIMIT` | non-integer, negative, or greater than `500`; flag value takes precedence over environment fallback | `2` | `err: invalid_first_fetch_limit: expected integer 0..500` | No |
 | explicit OpenRouter API key value | empty or all whitespace after applying OS environment `OPENROUTER_KEY` > `.env` fallback precedence | `2` | `err: invalid_openrouter_key: value required` | No |
@@ -1089,7 +1112,7 @@ Concurrency and background ingest:
 
 
 ### 5.7 Inspector Item Re-ingest
-Inspector item re-ingest is a selected-item operation, not a library job and not a source-fetch control. It exists to let the owner retry or refine processing for the article currently open in the Inspector. Product/UI language says "re-ingest"; backend implementation may reuse the item-scoped reprocess machinery, but the transport operation is `item_reingest`.
+Inspector item re-ingest is a selected-item operation, not a library job and not a source-fetch control. It exists to let the owner retry or refine processing for the article currently open in the Inspector. Product/UI language says "re-ingest"; backend implementation may reuse the item-scoped reprocess machinery, but the transport operation is `item_reingest`. When the Inspector was populated from `ItemReadResult`, the selected item ID is the returned `item.id` from the Item Detail Read Projection mutation-target matrix; a resolved duplicate therefore re-ingests only the authoritative row, while a broken duplicate re-ingests only the returned requested row.
 
 Responsibilities:
 
@@ -1631,7 +1654,7 @@ Endpoint contracts:
 | Method/path | Request | Success | Response |
 |---|---|---:|---|
 | `GET /api/feed/today` | optional query params listed in the feed/today query rules | `200` | `{ "items": [ItemSummary] }` |
-| `GET /api/items/~{unpadded RFC4648 base64url(item_id)}` | canonical route token | `200` | `{ "item": ItemDetail }` including `extraction_source`, source-backed `source_evidence_text`, generated `extracted_text`, and provenance |
+| `GET /api/items/~{unpadded RFC4648 base64url(item_id)}` | canonical `~base64url` path token | `200` | `ItemReadResult` including `ItemDetail`, required nullable duplicate-relation fields, `extraction_source`, source-backed `source_evidence_text`, generated `extracted_text`, and provenance |
 | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/inspect` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "human_inspected_at": "...", "already_applied": false }` |
 | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/resonance` | JSON `{ "resonated": true, "actor_kind": "human"|"agent", "actor_id": "owner", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "is_resonated": true, "already_applied": false }` |
 | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/delivery` | JSON `{ "actor_kind": "human"|"agent", "actor_id": "owner", "delivered_at": "2026-05-09T00:00:00Z", "idempotency_key": "..." }` | `200` | `{ "item_id": "...", "external_surfaced_at": "...", "already_applied": false }` |
@@ -1708,6 +1731,48 @@ Idempotency rules:
 - retrying the same mutation with the same live `idempotency_key` and same request fingerprint returns the stored result and `already_applied: true` when applicable;
 - retrying with the same live `idempotency_key` but a different request fingerprint returns `400 bad_request`;
 - new idempotency keys represent new intended operations.
+
+### Item Detail Read Projection
+
+The browser application route and item API route have separate grammars. Browser URLs use `/items/{percent-encoded raw item_id}`. The canonical path grammar for every HTTP item operation is `/api/items/~{unpadded RFC4648 base64url(item_id)}`, followed by the documented mutation suffix when applicable. Detail, inspect, resonance, delivery, and re-ingest reject raw item IDs, tokens without the leading `~`, malformed or padded base64url, non-canonical encodings, and decoded invalid UTF-8 before item lookup or operation-specific processing.
+
+`GET /api/items/~{unpadded RFC4648 base64url(item_id)}` returns `ItemReadResult`:
+
+```json
+{
+  "item": {},
+  "resolved_from_item_id": null,
+  "duplicate_target_item_id": null,
+  "duplicate_target_available": null
+}
+```
+
+| Field | Type | Required | Nullable | Notes |
+|---|---|---:|---:|---|
+| `item` | `ItemDetail` | Yes | No | requested detail, or authoritative target detail after valid direct-duplicate resolution |
+| `resolved_from_item_id` | string | Yes | Yes | requested duplicate ID after successful resolution; otherwise `null` |
+| `duplicate_target_item_id` | string | Yes | Yes | authoritative target ID for a valid duplicate, missing target ID for a broken duplicate, otherwise `null` |
+| `duplicate_target_available` | boolean | Yes | Yes | `true` for a resolved direct duplicate, `false` for a broken target, `null` for an ordinary item |
+
+Outcome matrix:
+
+| Outcome | `item` | `resolved_from_item_id` | `duplicate_target_item_id` | `duplicate_target_available` |
+|---|---|---|---|---|
+| Ordinary | requested detail | `null` | `null` | `null` |
+| Resolved direct duplicate | authoritative target detail | requested duplicate ID | authoritative target ID | `true` |
+| Broken target | requested duplicate detail | `null` | missing target ID | `false` |
+
+Mutation-target outcome matrix:
+
+| Read outcome | Effective mutation item ID | Deliberate `mark_inspected` | `resonate_item` | `reingest_item` |
+|---|---|---|---|---|
+| Ordinary | returned `item.id` (the requested ID) | effective mutation item ID | effective mutation item ID | effective mutation item ID |
+| Resolved direct duplicate | returned authoritative `item.id` (equal to `duplicate_target_item_id`) | effective mutation item ID | effective mutation item ID | effective mutation item ID |
+| Broken target | returned `item.id` (the requested duplicate ID) | effective mutation item ID | effective mutation item ID | effective mutation item ID |
+
+The read envelope's returned `item.id` is the sole item target for these existing mutations. A deliberate Feed/Search inspection marker must wait for the read outcome when necessary and write that row at most once. Resolved duplicates never also mutate the requested duplicate row; broken targets never mutate the absent target row. Tests must assert the exact changed item or `item_state`/`search_fts` row and prove that no other row changed.
+
+All item-detail reads remain owner-token authenticated and read-only. They do not mark inspection, delivery, or resonance. The requested browser URL remains stable for resolved and broken duplicates.
 
 ### Processing Language and Reprocess HTTP Addendum
 
@@ -2038,9 +2103,9 @@ Tools:
 
 | Tool | Input schema | Output schema | Mutation? | Equivalent operation |
 |---|---|---|---|---|
-| `list_candidate_items` | `{ "limit": 20 }`, default `20`, max `50` | `{ "items": [ItemSummary] }` | No | feed candidate query |
-| `search_items` | `{ "query": "sqlite", "source": null, "from": null, "to": null, "resonated": null, "limit": 20 }` | `{ "items": [ItemSummary], "query": SearchQueryEcho }` | No | `GET /api/search` |
-| `read_item` | `{ "item_id": "item_01" }` | `{ "item": ItemDetail }` | No | `GET /api/items/~{unpadded RFC4648 base64url(item_id)}` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
+| `list_candidate_items` | `{ "limit": 20 }`, default `20`, max `50` | `{ "items": [MCPItemSummary] }` with required non-null `items[n].app_url` | No | feed candidate query |
+| `search_items` | `{ "query": "sqlite", "source": null, "from": null, "to": null, "resonated": null, "limit": 20 }` | `{ "items": [MCPItemSummary], "query": SearchQueryEcho }` with required non-null `items[n].app_url` | No | `GET /api/search` |
+| `read_item` | `{ "item_id": "item_01" }` | `MCPItemReadResult` with required non-null `item.app_url`, required nullable duplicate-relation fields, and optional top-level `fallback_reason` | No | `GET /api/items/~{unpadded RFC4648 base64url(item_id)}` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
 | `mark_inspected` | `{ "item_id": "item_01", "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "human_inspected_at": "...", "already_applied": false }` | Yes | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/inspect` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
 | `resonate_item` | `{ "item_id": "item_01", "resonated": true, "actor_id": "agent-name", "idempotency_key": "..." }` | `{ "item_id": "item_01", "is_resonated": true, "already_applied": false }` | Yes | `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/resonance` after HTTP token decoding; MCP accepts the direct raw opaque `item_id` |
 | `preview_steer` | `{ "command": "find sqlite", "actor_id": "agent-name" }`; no `idempotency_key` | `{ "preview": SteerPreview }` | No | `POST /api/steer/preview` |
@@ -2087,6 +2152,33 @@ MCP invariants:
 - mutating calls require idempotency keys;
 - tool responses include enough provenance for agents to avoid duplicate loops;
 - MCP does not add delivery-channel ownership such as Telegram, Slack, or email.
+
+### Item Deep-Link MCP Read Projections
+
+The three MCP item-read tools use transport-specific projections while preserving the shared product read semantics:
+
+| Tool | Exact output projection |
+|---|---|
+| `list_candidate_items` | `{ "items": [MCPItemSummary] }` |
+| `search_items` | `{ "items": [MCPItemSummary], "query": SearchQueryEcho }` |
+| `read_item` | `MCPItemReadResult`, with optional top-level `fallback_reason` compatibility described below |
+
+`MCPItemSummary` is `ItemSummary` plus required non-null string `app_url`. `MCPItemDetail` is `ItemDetail` plus required non-null string `app_url`. The field is nested at `list_candidate_items.items[n].app_url`, `search_items.items[n].app_url`, and `read_item.item.app_url`; it never appears as a top-level URL field.
+
+`MCPItemReadResult` has the same four required envelope fields and outcome matrix as HTTP `ItemReadResult`, except `item` is `MCPItemDetail`:
+
+```json
+{
+  "item": { "app_url": "https://resofeed.tefx.one/items/item_01" },
+  "resolved_from_item_id": null,
+  "duplicate_target_item_id": null,
+  "duplicate_target_available": null
+}
+```
+
+The existing optional top-level `fallback_reason` remains compatible: when present, it is a sibling of `item` and the three relation fields. It never moves inside `item`, replaces a relation field, or changes any required-field/nullability rule.
+
+`app_url` is derived from the effective normalized `MCPConfig.PublicURL` and the canonical percent-encoded browser application path. Explicit `--public-url` supplies that effective value; omission derives a local HTTP origin from `--addr`, so live `resofeed serve` outputs remain non-null. The value contains no credentials, bearer token, query, or fragment and is never persisted.
 
 ### Processing Language MCP Parity
 
@@ -2252,6 +2344,26 @@ Inspector item re-ingest frontend responsibilities:
 - show running, completion, conflict, and failure states as inline text replacement/live-region feedback; no spinner, toast, modal retry, progress dashboard, or operation history;
 - render source text/source evidence as collapsed by default for each newly opened Inspector item while preserving accessible disclosure semantics and the fallback/source-evidence contract.
 
+## 8A. Item Summary Deep-Link Contract
+The accepted item deep-link contract is defined in full by `docs/ITEM_DEEP_LINKS.md`. This section is the canonical architecture delta and supersedes RF-BUG route clauses only where they require `~base64url` as the browser-visible item URL or couple browser and API item paths.
+
+Browser application URLs use `/items/{percent-encoded raw item_id}`. The accepted item-ID domain is a non-empty sequence of Unicode scalar values excluding Unicode General Category `Cc` code points U+0000–U+001F and U+007F–U+009F. Literal `.` and `..` remain valid opaque IDs and are generated canonically as the reserved segments `!.` and `!..`, never as literal or percent-encoded dot segments; the structural `!` prevents browser, proxy, and server dot-segment normalization. A raw ID beginning with literal `!` encodes that leading byte as `%21`, so it cannot collide with the sentinels. The frontend encodes one UTF-8 path segment exactly once, escapes a leading literal `~` as `%7E`, and rejects empty, malformed-percent, invalid-UTF-8, out-of-domain, extra-segment, or malformed legacy-token parser inputs before any item request. Every generated application path must parse back to the byte-identical raw ID. Valid legacy `/items/~{unpadded RFC4648 base64url}` routes remain readable and are canonicalized with `replaceState`.
+
+A raw HTTP cold-load request target with a malformed percent triplet, such as `/items/%ZZ`, is rejected by the existing Go server/request parser with `400 Bad Request` before static SPA dispatch; the SPA cannot render an Inspector state for that request. For every other well-formed raw request target in the escaped `/items/` namespace, the single Go serving boundary selects SPA dispatch before percent-decoding, path cleaning, redirect normalization, or filesystem lookup. Canonical, legacy, and dispatchable-invalid item paths return the embedded SPA index; encoded slash/dot bytes remain opaque item data and cannot redirect or resolve to an embedded asset. Dispatchable invalid item routes retain the invalid URL, render the localized invalid-link Inspector state, and issue no item API request. No additional serving component is permitted.
+
+HTTP item operations retain `/api/items/~{unpadded RFC4648 base64url(item_id)}`. MCP inputs retain raw `item_id`. Browser application-path helpers and API-path helpers are separate; the API client must never derive an API URL from `itemAppPath`.
+
+Cold load, refresh, owner-token recovery, Back, Forward, automatic layout selection, and retry are read-only. They call only the authenticated item read and never call inspect, delivery, or resonance mutations. A deliberate Feed/Search activation may retain one existing human-inspection mutation, but URL synchronization and subsequent route lifecycle events must not duplicate it.
+
+HTTP `GET /api/items/~{unpadded RFC4648 base64url(item_id)}` and MCP `read_item` return the required four-field `ItemReadResult` relation envelope defined in §§6–7: `item`, nullable `resolved_from_item_id`, nullable `duplicate_target_item_id`, and nullable `duplicate_target_available`. Ordinary, resolved-direct-duplicate, and broken-target outcomes use the exact nesting and nullability matrix in §6. The returned `item.id` is also the sole effective target for deliberate `mark_inspected`, `resonate_item`, and `reingest_item`: requested ID for ordinary and broken-target reads, authoritative target ID for resolved duplicates. No other requested, target, item-state, or FTS row changes. Storage-level direct reads remain addressable by the original item ID. MCP's optional top-level `fallback_reason` remains a sibling of those fields.
+
+MCP `list_candidate_items`, `search_items`, and `read_item` add required non-null item-level `app_url` at `items[n].app_url`, `items[n].app_url`, and `item.app_url` respectively. The value is derived only from the effective normalized `MCPConfig.PublicURL` and the canonical application path. `MCPConfig.PublicURL` is populated before MCP wiring from either validated explicit `--public-url` or the total accepted-`--addr` mapping in §2; it is the authoritative absolute-link origin and is never null after successful startup. Credential-bearing Public URLs and excluded bind-address forms are rejected before binding. `app_url` is transport metadata and must not enter SQLite, FTS, state bundles, receipts, item metadata, or logs.
+
+The exact browser location is the authentication return target. Missing or rejected owner-token state keeps the item URL in place; successful authentication re-resolves the current location and retries. Owner tokens and return targets must not be copied into query parameters, fragments, static HTML, API responses, MCP output, or logs. Before hydration, every canonical, legacy, or dispatchable invalid item route owns the Inspector first surface and exact `RESOFEED · INSPECTOR` title; TODAY or Search must not flash first. Successful authentication on an Inspector item route focuses the Inspector heading or current route error state. This route-specific target governs over the generic Owner Token Prompt target; on non-Inspector routes, accepted authentication focuses the Steer input or first Feed item as defined by `docs/DESIGN.md`.
+
+Browser history stores only versioned route, item ID, origin surface, scroll coordinates, and return-focus ID. Search filters use the canonical `/?q={query}[&source=...][&from=...][&to=...][&resonated=true|false][&limit=1..100]` grammar in `docs/ITEM_DEEP_LINKS.md` §7.1: `q` is always present, optional keys are ordered and omitted when null, default `limit=50` is omitted, and decoded fields round-trip exactly through HTTP `SearchQueryEcho`. Every Search cold load, refresh, Back, Forward, or visible-Close restoration re-runs lexical retrieval from that URL; restored query/filter state is stable, but the current SQLite/FTS corpus governs result membership, order, and count. Item payloads and result rows/arrays are never stored in history. Recorded Search selection and originating-focus IDs are restored only when both remain in the current results; if either disappeared, Search restores no selection and focuses the query control after retrieval and layout. Stored Search scroll is clamped to the current result-region bounds for the active scroll owner. Recorded Feed selection and originating-focus IDs are likewise best-effort references into the current Feed. After Feed data and layout are ready, restore both only when both remain. If either is absent and Feed is non-empty, desktop selects the first current Feed item, narrow clears selection, and both layouts focus the first current Feed item; if Feed is empty, both clear selection and focus the Steer input. Recorded Feed-pane and window scroll coordinates are clamped to current bounds, and the active owner's clamped coordinate is applied without resetting a valid coordinate solely because a referenced item disappeared. Saved searches, reading history, tokens, and activity records are forbidden. Opening an item replaces the current list entry with restoration state and pushes one item entry. Visible Close traverses Back when a ResoFeed Feed/Search origin entry exists. For an external/cold item entry, visible Close replaces the current item entry with `/` and uses a fresh Feed fallback rather than background Feed state: after Feed data/layout, both Feed-pane and window scroll coordinates are `0`; with items, desktop selects and both layouts focus the first Feed item while narrow retains no selection until deliberate activation; without items, both layouts clear selection and focus the Steer input. Later Back cannot reopen the closed Inspector. Native mobile edge-swipe remains ordinary browser Back. The distinct narrow-route `Escape` shortcut may return directly to TODAY as specified by `docs/DESIGN.md` and does not claim Close/Back parity.
+
+The existing public static SPA fallback remains the only unauthenticated response for dispatchable item deep links and must not contain item content; server-level malformed request-target rejection remains outside SPA dispatch. Every item read remains owner-token authenticated. Real Go and production Tailnet/Caddy verification must round-trip `/`, `%`, `?`, `#`, Unicode, and a leading `~` without address normalization and must prove the authenticated lookup receives the byte-identical raw ID.
 ## 9. Minimal File Shape
 
 Start with this shape and split only after file size, test locality, or repeated change pressure justifies it:
@@ -2353,7 +2465,7 @@ Tavily external extraction checks:
 ```bash
 # With TAVILY_API_KEY available from OS environment or local .env, re-ingest a URL
 # that local readable extraction and RSS excerpt fallback cannot recover.
-curl -i -X POST http://127.0.0.1:8080/api/items/<ITEM_ID>/reingest \
+curl -i -X POST http://127.0.0.1:8080/api/items/~aXRlbV8wMQ/reingest \
   -H "Authorization: Bearer <OWNER_TOKEN>" \
   -H "Content-Type: application/json" \
   --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"tavily-smoke-1"}'
@@ -2472,6 +2584,24 @@ curl -i -X POST http://127.0.0.1:8080/api/runtime/reprocess-library \
 ```
 
 
+### Item deep-link verification additions
+- codec tests enforce one exact encoder/parser domain: non-empty Unicode scalar sequences excluding U+0000–U+001F and U+007F–U+009F; every accepted generated path parses to the byte-identical raw ID; `.` / `..` use exact canonical `!.` / `!..` sentinels and ordinary leading-`!` IDs encode as `%21...` without collision;
+- browser application path tests and API token tests are independent and prove that no UI/API shared-token requirement remains;
+- browser Search route tests assert the exact `/` pathname, mandatory `q` key, ordered optional `source`/`from`/`to`/`resonated`/`limit` keys, canonical UTF-8 query encoding, null/default omission, validation, and bidirectional field equality with HTTP `SearchQueryEcho`;
+- real Go HTTP tests use raw ID `~slash/%?hash#雪`, serve its exact percent-encoded application path through the static SPA fallback without redirect/path cleaning, and prove the authenticated opaque-token detail lookup receives that byte-identical raw ID;
+- real-server fixtures for raw IDs `.` and `..`, plus one encoded slash/dot ID whose decoded-and-cleaned form names an existing embedded asset, each return exact SPA index bytes with no `Location` header, redirect, or asset substitution and deliver the byte-identical raw ID to the authenticated detail read;
+- a raw `/items/%ZZ` cold-load request returns server-level HTTP `400` before the static handler; browser coverage separately proves a dispatchable invalid route renders the localized Inspector state without an item request;
+- HTTP detail and mutation tests assert all four required `ItemReadResult` fields for ordinary, resolved-direct-duplicate, and broken-target rows, including exact nullability; read-only lifecycle events mutate no item state, while deliberate inspection, resonance, and re-ingest each change exactly the documented effective item or `item_state`/`search_fts` row and no other row;
+- MCP tests assert required non-null `app_url` at `list_candidate_items.items[n]`, `search_items.items[n]`, and `read_item.item`; `read_item` also asserts the same relation envelope and optional sibling `fallback_reason` compatibility;
+- explicit `--public-url https://resofeed.tefx.one` produces exact production links; accepted explicit-origin tests cover scheme/DNS case, `localhost`, ASCII DNS including a valid `xn--` A-label, canonical IPv4, bracketed non-zone IPv6, omitted/leading-zero/default/non-default ports, and empty or `/` path, asserting exact normalized origins and emitted links; rejected explicit-origin tests cover wildcard/unspecified, Unicode host spelling without IDNA conversion, trailing-dot, percent-encoded, numeric-dotted non-IPv4, leading-zero/out-of-range IPv4, malformed/bracketless/zone-bearing IPv6, IPvFuture, invalid ports, credentials, path/query/fragment, and surrounding whitespace, and exit before binding; omitted `--public-url` derives the exact documented normalized origin for every accepted DNS, IPv4, wildcard IPv4, bracketed IPv6, and wildcard IPv6 `--addr` class; every excluded host/address class exits before binding; all successful cases expose the same non-null effective `MCPConfig.PublicURL` to MCP projections;
+- browser tests prove the exact route-owned first surface and functional title before token hydration for canonical, legacy, and dispatchable invalid item routes; authentication recovery and direct/Back/Forward transitions must never expose an intermediate TODAY/Search identity;
+- accessibility/browser tests separately assert accepted-token focus after data/layout: non-Inspector routes target the Steer input or first Feed item, while Inspector item routes target the Inspector heading or current route error state;
+- browser tests prove exact canonical Search URL, decoded filters, `SearchQueryEcho`, scroll, and focus through item open, visible Close, Back, and Forward;
+- a browser history-mutation fixture changes the indexed Search result set before Back so the recorded selected/origin item disappears and the current result region shrinks; it proves canonical-URL lexical re-retrieval, no history-stored result rows/arrays, preserved query/filter echo, no restored selection, query-control focus, and scroll clamped to current result-region bounds;
+- recorded-Feed history-mutation matrices change current Feed membership before Back and visible Close so the recorded selection or originating-focus item is separately absent and scroll bounds shrink. Non-empty cases prove clamped active-owner scroll, first-current-item selection on desktop only, and first-current-item focus on both desktop and narrow; empty cases prove clamped scroll, no selection on either layout, and Steer-input focus;
+- browser tests prove visible Close and Back/Forward restore the recorded Feed/Search origin; external direct-entry Close matrices cover desktop/narrow and non-empty/empty Feed outcomes after data/layout: replacement with `/`, Feed-pane and window scroll `0`, first-item selection on desktop non-empty Feed only, first-item focus in both non-empty layouts, no narrow selection, no selection plus Steer focus for empty Feed, and subsequent Back cannot reopen the Inspector; native narrow/mobile Back remains ordinary browser history without custom swipe behavior;
+- narrow-route `Escape` separately returns to TODAY and does not claim Close/Back parity;
+- production Tailnet/Caddy evidence opens the canonical encoded path for raw ID `~slash/%?hash#雪` at `https://resofeed.tefx.one`, proves no proxy normalization or address drift, renders the correct authenticated item, and verifies MCP returns the same credential-free canonical `app_url`.
 ### Source title and bounded source-fetch parallelism verification additions
 
 - successful manual source fetch updates `sources.title` from the RSS/Atom feed title when the parsed title is non-empty and increments the source `revision`;
@@ -2513,7 +2643,6 @@ curl -i -X POST http://127.0.0.1:8080/api/ingest \
 ```
 
 ### Inspector item re-ingest verification additions
-
 - canonical `GET /api/runtime/openrouter-models` and compatibility `GET /api/runtime/openrouter/models` require owner-token authorization, reject query parameters, return OpenRouter model-list response data, and never leak API keys, secret source metadata, `.env` paths, raw provider JSON, or provider account configuration;
 - model-list provider failure produces a safe unavailable state that still allows default-model re-ingest in the Inspector;
 - `POST /api/items/~{unpadded RFC4648 base64url(item_id)}/reingest` requires owner-token authorization, strict JSON body validation, `actor_kind`, `actor_id`, and `idempotency_key`;
@@ -2534,22 +2663,22 @@ curl -i http://127.0.0.1:8080/api/runtime/openrouter-models \
   -H "Authorization: Bearer <OWNER_TOKEN>"
 # expect 200 JSON body: {"models":[{"id":"...","name":"..."}]}; no resolved key or a successful provider response with no usable models may return {"models":[]}; provider failures after a key is configured return a standard 503 provider_unavailable error body
 
-curl -i -X POST http://127.0.0.1:8080/api/items/item_01/reingest \
+# Canonical API token for raw item ID "item_01": "~" + base64url("item_01") without padding.
+curl -i -X POST http://127.0.0.1:8080/api/items/~aXRlbV8wMQ/reingest \
   -H "Authorization: Bearer <OWNER_TOKEN>" \
   -H "Content-Type: application/json" \
   --data '{"actor_kind":"human","actor_id":"owner","idempotency_key":"item-reingest-smoke-1","model":null,"prompt":"Prefer concrete source facts."}'
 # expect 200 JSON body: {"already_applied":false,"reingest":{"item_id":"item_01",...}}
 # captured evidence must not echo prompt text, API keys, provider raw payloads, or secret-source metadata
 ```
-
 ## RF-BUG Canonical Runtime Contract
-The following requirements are active product contracts:
+The following requirements are active product contracts. The item-route clause below incorporates and supersedes the earlier shared browser/API token wording.
 
 - `cmd/resofeed` validates and embeds the production UI before binding; the built binary serves root, generated assets, and valid deep links independently of the process working directory. `/doctor` adds only `ui_assets=ready` and `ui_asset_source=embedded` for packaged-asset readiness.
 - Before binding, Go derives one effective `Content-Security-Policy` from every executable inline script body in the embedded `index.html`, using Chromium CR/LF normalization and ordered unique SHA-256 sources. One outer middleware sets that CSP plus `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, and `X-Frame-Options: DENY` on static, API, MCP, authorization-error, not-found, and internal-error responses. For response writers that support `http.Flusher`, the middleware forwards each nontrivial downstream write as two direct segments with a flush between them, retaining no response bytes or staged completion state. It forwards explicit flushes, exposes the underlying writer through `Unwrap`, and passes the original request context, so static/MCP output remains observable across multiple writes and cancellation reaches handlers directly; writers without flush support pass through unchanged. Reverse proxies pass these application-owned values unchanged; `unsafe-inline`, duplicate header owners, and response buffering are forbidden.
-- Initial route resolution controls the first visible surface and document title before token hydration or shell API work. Functional titles are `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor`; processing language does not translate them.
-- Browser item routes and all five item HTTP operations (`detail`, `inspect`, `resonance`, `delivery`, and `reingest`) carry opaque item IDs as `~` plus unpadded RFC4648 base64url of the UTF-8 bytes. Go rejects malformed, padded, non-canonical, or invalid-UTF-8 tokens before item lookup; decoded IDs round-trip byte-identically and are never parsed as path syntax.
-- Search uses canonical `/?q=...&source=...&from=...&to=...&resonated=...&limit=...` URLs. The browser applies the same documented bounds and calendar validation before API or history mutation, stores only bounded ephemeral route state, and re-executes lexical search from the URL on cold load, refresh, Back, and Forward. This state is not a saved search, reading history, or portable state.
+- Initial route resolution controls the first visible surface and document title before token hydration or shell API work. Functional titles are `RESOFEED · TODAY`, `RESOFEED · SOURCE LEDGER`, `RESOFEED · SEARCH`, `RESOFEED · INSPECTOR`, and `RESOFEED · /doctor`; processing language does not translate them. Browser proof must observe the exact route-owned surface/title before hydration and through canonical, legacy, dispatchable-invalid, authentication-recovery, Back, and Forward transitions, with no intermediate wrong identity.
+- Browser item routes use `/items/{percent-encoded raw item_id}` under §8A's exact Unicode-scalar domain. All five item HTTP operations (`detail`, `inspect`, `resonance`, `delivery`, and `reingest`) independently use `~` plus unpadded RFC4648 base64url of the UTF-8 item-ID bytes. Each operation rejects any path token without the leading `~`—including a raw item ID such as `item_01`—and rejects malformed, padded, non-canonical, or invalid-UTF-8 API tokens before item lookup. Decoded IDs round-trip byte-identically and are never parsed as path syntax. UI navigation must not reuse the API token grammar.
+- Search uses the canonical `/?q={query}[&source=...][&from=...][&to=...][&resonated=true|false][&limit=1..100]` grammar in `docs/ITEM_DEEP_LINKS.md` §7.1. `q` is always present, optional keys are emitted once in that order, null filters and default `limit=50` are omitted, and UTF-8 query components use canonical uppercase percent escapes with space `%20` and literal plus `%2B`. The browser validates before API or history mutation, re-executes lexical search from the URL on cold load/refresh/Back/Forward, and requires decoded browser state to equal HTTP `SearchQueryEcho` field-for-field. This state is not a saved search, reading history, or portable state.
 - Feed and Search selection immediately render a readable Inspector preview. Detail and inspection-marker requests complete independently, and responses for a prior selection cannot replace the current selection. Pending or failed enhancement requests preserve the selected item, direct route, URL, content, and focus behavior.
 - File-backed databases opened by the runtime use SQLite WAL journal mode before serving requests. This permits a large first-run Inspector detail read and concurrent receipt-backed inspection writes to complete without `SQLITE_BUSY`; the runtime must not mask this path with sleeps, retries, skipped inspection state, or broad busy-error suppression. Both inspection mutations and their idempotency receipts remain durable.
 - Idle Steer exposes no missing-URL error. Only a matching invalid submission creates one localized accessible error; it retains input and focus, sends no mutation, clears on edit, and stays distinct from stale-preview or transport failures.
