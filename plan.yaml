@@ -190588,17 +190588,46 @@ phases:
       current proof.
 
 
+      Receipt-conformance recovery preserves two later PASS observations unchanged
+      and non-authoritative: `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-pass.json`,
+      raw SHA-256 `a1feba61e239ccdd0fd7cadc5671687025dd36c7b43b8b968759f18c2f704bbb`,
+      was production-invalid because `specialist_receipt.protocols[7].status` used
+      unsupported `N/A`; `/tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-pass-corrected.json`,
+      raw SHA-256 `bbcc993d54ae93f27f48d461c040ff1d398059784802f59813cf39c317b0587f`,
+      was production-invalid because `specialist_receipt.protocols[7].evidence_refs`
+      was not a non-empty `list[str]`. The prior attempt and its same-verifier correction
+      produced no admitted semantic outcome, and that correction opportunity is exhausted.
+      Under the unchanged target, inputs, requirements, scope, evidence, owner, and
+      read-only authority, authorize exactly one fresh `integration-verifier` review.
+      Every returned `specialist_receipt.protocols` row must use production-supported
+      status `PASS` or `BLOCKED`—never `N/A`—and contain non-empty caller-authorized
+      `evidence_refs`. For a non-applicable protocol such as P7, omit the row when
+      the production schema permits omission; otherwise include a supported status
+      only when the existing authorized evidence supports that classification. Do
+      not prescribe PASS, fabricate evidence, alter either retained receipt, or weaken
+      the semantic judgment. Before return, the verifier must preflight the complete
+      JSON against the installed production schema/validator when available. The Orchestrator
+      admits the returned receipt unchanged and has no authority to repair receipt
+      fields. This fresh-review authority is consumed by one return; another schema-invalid
+      return stops BLOCKED without parent repair, correction, or silent redispatch.
+
+
       Any missing, incomplete, non-independent, mismatched, disclosed, deterministic-failure,
       unknown-state, cleanup-residue, source/identity/readiness/assertion, retry-policy,
-      or forbidden-effect defect returns REJECTED/BLOCKED and leaves deployment locked.
-      A conformant fresh semantic receipt is the sole current independent consumer
-      evidence for downstream deployment.'
-    verification: Fresh semantic evidence independently consumes the producer's sanitized
-      receipt and hash-bound complete raw log, re-observes the exact clean source
-      and immutable tag/index/two-platform/revision chain, and proves the bounded
+      forbidden-effect, or receipt-schema defect returns REJECTED/BLOCKED and leaves
+      deployment locked. A conformant fresh semantic receipt is the sole current independent
+      consumer evidence for downstream deployment.'
+    verification: 'Fresh semantic evidence independently consumes the producer''s
+      sanitized receipt and hash-bound complete raw log, re-observes the exact clean
+      source and immutable tag/index/two-platform/revision chain, and proves the bounded
       readiness sequence, complete both-platform runtime contract, nondisclosure,
       cleanup/zero residue, retry/stop policy, forbidden-effect absence, and preserved
-      prior rejected history without executing runtime mutation.
+      prior rejected and schema-invalid history without executing runtime mutation.
+      Production admission accepts the verifier-returned JSON unchanged: every present
+      `specialist_receipt.protocols` row uses only `PASS` or `BLOCKED` and has non-empty
+      caller-authorized `evidence_refs`; non-applicable rows are omitted when permitted
+      or classified only from actual authorized evidence, with installed-validator
+      preflight when available and no parent repair.'
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/semantic-receipt-fail.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/publication-evidence.md
@@ -190612,6 +190641,8 @@ phases:
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-classification.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-publish-immutable-oci/attempt-2-receipt.json
     - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-blocked-corrected.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-pass.json
+    - /tmp/larva-agent-artifacts/rf-bug-v2-docker-runtime-proof/semantic-receipt-pass-corrected.json
     depends_on:
     - rf-bug-v2-docker-runtime-evidence-producer
     agent: integration-verifier
