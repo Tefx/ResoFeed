@@ -193922,8 +193922,23 @@ phases:
 
       Deliver `RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE`. Owner `vectl-orchestrator`
       directly performs the declared local Docker runtime operation because zero-repository-change
-      evidence artifacts do not use worker receipt admission. From a newly created
-      clean detached checkout of exact commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
+      evidence artifacts do not use worker receipt admission. This pending producer
+      also carries the validator-supported later same-phase closure binding for completed
+      predecessor `rf-bug-v2-container-build-raw-evidence-capture`: `expected-red/non-blocking
+      owner/lifecycle/gate-intersection disposition`; `gate_open_allowed=true` applies
+      only to that closed predecessor history, never to this pending runtime outcome.
+      The predecessor''s attempt 1 stopped before any Docker invocation, cleanup and
+      zero residue were proven, and its sole authorized same-step retry completed
+      PASS with the exact required dual-platform no-push evidence. Owner is `vectl-orchestrator`;
+      lifecycle is completed predecessor attempt-1 transient history superseded by
+      same-step attempt-2 PASS; gate intersection is `rf-bug-v2-assurance-closure-gate`,
+      which consumes the completed predecessor evidence and this producer independently
+      and keeps this producer plus downstream verification blocking until their future
+      evidence passes. This disposition neither fabricates future evidence nor weakens
+      any current gate.
+
+
+      From a newly created clean detached checkout of exact commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
       and tree `7c471cd4b6fa88c603001e9a9748c1a15d7c8066`, first prove detached HEAD,
       exact commit/tree, empty status, and unchanged tracked Dockerfile/docs inputs.
       Bind only `docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
@@ -193989,11 +194004,15 @@ phases:
       cleanup residue, disclosure, or any forbidden effect stops without retry. Recovery
       authority is limited to removing attributable containers/volumes and the reconciled
       detached checkout; unknown state remains blocked for manual reconciliation.'
-    verification: A sanitized receipt and hash-bound mode-0600 complete raw log prove
-      clean detached exact source commit/tree; exact tag/index/amd64/arm64/revision;
-      unique per-platform containers and volumes; deterministic observed loopback
-      ports; bounded 1-second/90-second readiness with running/health/log stop observations;
-      the complete both-platform binary/data/non-root/cwd/embedded-UI/Doctor/OPML/state/headers-CSP/A-to-B
+    verification: The predecessor closure binding explicitly records `expected-red/non-blocking
+      owner/lifecycle/gate-intersection disposition`, owner `vectl-orchestrator`,
+      completed same-step retry lifecycle, gate intersection at `rf-bug-v2-assurance-closure-gate`,
+      and `gate_open_allowed=true` only for closed attempt-1 history superseded by
+      attempt-2 PASS. This pending outcome still requires a sanitized receipt and
+      hash-bound mode-0600 complete raw log proving clean detached exact source commit/tree;
+      exact tag/index/amd64/arm64/revision; unique per-platform containers and volumes;
+      deterministic observed loopback ports; bounded 1-second/90-second readiness
+      with running/health/log stop observations; the complete both-platform binary/data/non-root/cwd/embedded-UI/Doctor/OPML/state/headers-CSP/A-to-B
       contract; nondisclosure; cleanup on every exit; zero residue; and compliant
       retry/stop classification. The downstream integration-verifier independently
       consumes these artifacts and immutable target.
