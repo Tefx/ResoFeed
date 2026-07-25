@@ -194316,7 +194316,7 @@ phases:
       lifecycle, or external state operation occurred for this append-only admission.'
   - id: rf-bug-v2-tailnet-caddy-deployment-producer
     name: Deploy exact immutable digest to authenticated Tailnet/Caddy stack
-    status: claimed
+    status: pending
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -194424,8 +194424,6 @@ phases:
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-docker-runtime-proof
     agent: vectl-orchestrator
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-25T15:34:13.173007Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
