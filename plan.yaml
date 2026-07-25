@@ -194563,7 +194563,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-current-runtime-readiness-diagnosis
     name: Diagnose current Tailnet/Caddy runtime readiness read-only
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -194660,6 +194660,19 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-25T16:32:40.167176Z'
+    done_at: '2026-07-25T16:43:56.943827+00:00'
+    evidence: Fresh integration-verifier corrected the prior false-positive caddy_down
+      diagnosis using the source-of-truth scope and correct probes. Production Gate
+      admitted the unchanged corrected receipt as CONFORMANT with semantic SHA-256
+      6596cc3bd70b4f12a2ad24b7796fe5bf05f0cb759b65eda6e610f3cc732bfe27; raw receipt
+      SHA-256 c94f6a2e3c21193b733e4bd5d48bd51b3d7f89a60c05b965d01e3e29cd7d5d60. Strict
+      literal-FQDN SSH and Compose service lookup proved caddy and resofeed running;
+      public root/Doctor statuses were 200/401; SNI-bound remote-local Caddy root/Doctor
+      statuses were 200/401. New source-sanitized mode-0600 raw observation SHA-256
+      d07ba7cf2c2795957fbe5a4cb983091caf75ba62ffac248e470ba17d3fbb4950, 634 bytes.
+      Old caddy_down artifacts remain immutable false-positive provenance caused by
+      non-SNI loopback, assumed host-published upstream, and hardcoded container-name
+      probes. No runtime mutation or reconciliation occurred.
   - id: rf-bug-v2-caddy-service-reconciliation
     name: Reconcile existing Caddy service without touching ResoFeed
     status: skipped
