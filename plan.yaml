@@ -194888,45 +194888,33 @@ phases:
     name: Implement Browser Routes, Inspector Lifecycle, History, and Accessibility
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
-      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nOutcome:\
-      \ ITEM-DEEP-LINK-FRONTEND. Implement the frozen browser contract directly from\
-      \ the admitted contract lock while the independent backend branch implements\
-      \ the same authoritative envelope. `workbench-route.ts` owns canonical `/items/{percent-encoded\
-      \ raw item_id}`, dot sentinels, leading-`!`/`~` collision rules, legacy `~base64url`\
-      \ parsing plus replaceState canonicalization, canonical Search URL/history validation,\
-      \ and itemAppPath/itemAppUrl. `api-client.ts` keeps the independent canonical\
-      \ API token path. `+page.svelte` owns route-first Inspector identity, stored-token\
-      \ cold load, 401 recovery, retry generations, deliberate-at-most-once inspection,\
-      \ Back/Forward, route-aware Close, external-entry replacement fallback, Search/Feed\
-      \ re-retrieval, bounded history state, clamped scroll, deterministic selection/focus\
-      \ restoration, and stale-generation exclusion. `Inspector.svelte` remains the\
-      \ sole detail renderer with exact localized invalid/not-found/temporary/duplicate/broken-target\
-      \ states, relation line, copy link, effective mutation target, loading status,\
-      \ alert semantics, and route-aware return labels. Cold load, refresh, recovery,\
-      \ retry, Back/Forward, and automatic selection remain read-only. Synchronize\
-      \ user-facing README behavior while keeping the frozen docs and protected acceptance\
-      \ unchanged. Rollback reverts the frontend/tests/README unit without coupling\
-      \ browser and API codecs.\n\nWitnessed current profile: existing `scripts/vectl-check.mjs`\
-      \ suite/check `item-deep-links-frontend` / `item_deep_links_frontend_green`\
-      \ provides both `select` and `run`; current `scripts/vectl-check.test.mjs` proves\
-      \ its exact two identities. The current profile maps the application-codec identity\
-      \ to its Vitest sources and the browser history/auth identity to the Playwright\
-      \ acceptance source. Its npm commands receive only the current trusted derivation\
-      \ from `scripts/resofeed-svelte-build-identity.mjs`; Vitest loads the current\
-      \ Vite/Svelte config chain, and Playwright loads the current CI-safe/base config\
-      \ plus real-binary runtime fixture. Ambient `RESOFEED_SVELTE_BUILD_IDENTITY`\
-      \ or private environment reconstruction is forbidden.\n\nExact producer ownership:\
-      \ step `item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts`,\
-      \ check `item_deep_links_expected_red`, produces `web/src/lib/__tests__/item-deep-links.expected-red.test.ts`\
-      \ and `web/tests/e2e/item-deep-links.browser-contract.spec.ts`; this step depends\
-      \ directly on that producer. `web/src/lib/api-client.test.ts` and `web/src/lib/__tests__/workbench-route.test.ts`\
-      \ are current sources. This step `item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser`,\
-      \ check `item_deep_links_frontend_green`, produces exactly `web/src/routes/components/__tests__/item-deep-links.test.ts`;\
-      \ its `allowed_paths` and developer-test authority own it. Downstream consumer\
-      \ `item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification`\
-      \ depends directly on both this frontend branch and the backend branch. The\
-      \ already-current adapter, configs, trusted derivation, runtime fixture, and\
-      \ protected acceptance are immutable in this step.\n\n<intent_closure_contract>\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
+      \ Implement `ITEM-DEEP-LINK-FRONTEND` from the protected contract: canonical\
+      \ application paths and dot/leading-`!`/leading-`~` rules; legacy parsing with\
+      \ `replaceState`; separate API-token helpers; route-first Inspector identity/title;\
+      \ token recovery and retry generations; deliberate-at-most-once inspection;\
+      \ Back/Forward and route-aware Close; canonical Search re-retrieval; current-corpus\
+      \ Feed/Search restoration; bounded history, clamped scroll, focus/origin fallback,\
+      \ stale-response exclusion; localized invalid/not-found/temporary/duplicate/broken\
+      \ states; effective mutation targets; copy link; accessibility; and read-only\
+      \ cold-load/refresh/recovery/retry/navigation lifecycle. Synchronize README\
+      \ behavior without changing frozen docs.\n\nBoundary: `frontend-engineer` owns\
+      \ only the frontend, developer-test, and README paths in the contract. Dispatch\
+      \ and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
+      \ The adapter/config/fixture chain, protected acceptance, backend, canonical\
+      \ docs, deployment, runtime state, credentials, and secrets are immutable. Rollback\
+      \ reverts the frontend/test/README unit without coupling browser and API codecs.\n\
+      \nAdmit: Current suite/check `item-deep-links-frontend` / `item_deep_links_frontend_green`\
+      \ selects exactly the codec and real-browser identities through the tracked\
+      \ adapter, trusted Svelte identity derivation, current Vite/Svelte and CI-safe\
+      \ Playwright configs, and real-binary fixture. It consumes the two expected-red\
+      \ files from the contract producer plus current and produced developer tests.\
+      \ Selected execution must emit all seven frontend markers with no route interception\
+      \ or skipped case. `item-deep-links-local-integration-verification` is the independent\
+      \ consumer.\n\nRecovery: A producer/config identity mismatch, TODAY/Search first-surface\
+      \ flash, duplicate write, stale navigation, app/API codec coupling, skipped\
+      \ browser case, accessibility/history/focus defect, or out-of-scope change stops\
+      \ this step. Fix only within the authorized frontend unit.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
       profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
       \ web/src/lib/api-client.ts, web/src/lib/api-client.test.ts, web/src/lib/__tests__/workbench-route.test.ts,\
@@ -194984,7 +194972,7 @@ phases:
       \ preserve Inspector-first identity, auth recovery, history, error labels, focus,\
       \ scroll, origin, read-only lifecycle, and effective mutation targets\",\"modality\"\
       :\"rendered_runtime\",\"seam\":\"real\",\"check_id\":\"item_deep_links_frontend_green\"\
-      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-external-client-verification\"\
+      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"web/src/lib/api-client.test.ts\"\
       ,\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/components/__tests__/item-deep-links.test.ts\"\
       ],\"acceptance_test_paths\":[\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\"\
