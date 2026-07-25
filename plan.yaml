@@ -193643,7 +193643,7 @@ phases:
       CONFORMANT with only four preserved historical missing-ref warnings.'
   - id: rf-bug-v2-renewed-source-publication-authorization-review
     name: Renew integrated-source and immutable-publication authority
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -193728,6 +193728,21 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-25T11:56:29.492565Z'
+    done_at: '2026-07-25T13:18:27.767890+00:00'
+    evidence: Fresh spec-verifier PASS against claim-bound plan SHA-256 ffbd27887ee7275af2dbcb1be7fd44267fa53258db7adfd0fbea6ac4854737e3
+      and clean detached implementation commit abf3cb6c545f9c0f3c605760a5325875c61fc83f/tree
+      7c471cd4b6fa88c603001e9a9748c1a15d7c8066. Production Gate admitted the unchanged
+      receipt as CONFORMANT with semantic receipt SHA-256 44c32724d9138c023f999de968f3d344f5a132c2b74e4aacc0e6a3e0345846d6;
+      raw receipt artifact SHA-256 688ea53b11c1d1008d6a5872bae803dba55e0fc57eb305ca6e248f3ac57c7305.
+      It proves both RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR and RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE,
+      including mode-0600 raw log SHA-256 36484f633e5ca577ad6c6e20a811e5eb3aa5d75c1a86d92803072a4affd82a6f
+      and sanitized receipt SHA-256 75a8b59cd2e6abca9fdcacfc02eb9a8a83e1e532a3f5b7bd42d88094b128aac8.
+      Authorization is limited to source abf3cb6c545f9c0f3c605760a5325875c61fc83f,
+      docker.io/tefx/resofeed:git-abf3cb6c545f9c0f3c605760a5325875c61fc83f, linux/amd64
+      and linux/arm64, matching org.opencontainers.image.revision, current repository-scoped
+      Docker boundary, zero paid/cloud cost, and existing bounded retry/cleanup policy.
+      No moving tag, alternate repository, deletion, deployment, Tailnet, credential/trust,
+      data, or broader side-effect authority.
   - id: rf-bug-v2-container-build-raw-evidence-capture
     name: Capture complete raw no-push container build evidence
     status: done
