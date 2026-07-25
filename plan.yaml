@@ -194660,7 +194660,7 @@ phases:
     agent: integration-verifier
   - id: rf-bug-v2-caddy-service-reconciliation
     name: Reconcile existing Caddy service without touching ResoFeed
-    status: pending
+    status: skipped
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -194749,6 +194749,7 @@ phases:
     depends_on:
     - rf-bug-v2-current-runtime-readiness-diagnosis
     agent: vectl-orchestrator
+    skipped_reason: irrelevant
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
