@@ -194374,6 +194374,7 @@ phases:
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
+    - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-docker-runtime-proof
     agent: vectl-orchestrator
   - id: rf-bug-v2-tailnet-caddy-proof-v2
