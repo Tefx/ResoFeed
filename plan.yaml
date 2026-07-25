@@ -195253,25 +195253,51 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Launch and inspect the deployed web surface without repository mutation. Cover
-      Safari and Chrome plus the required available Telegram iOS, Telegram Android,
-      Telegram Desktop, email-client link opening, and Codex-or-equivalent MCP app_url
-      consumer evidence. On desktop and narrow/mobile, prove canonical cold load/refresh,
-      legacy replaceState, route-owned Inspector first surface/title before token
-      hydration, missing/rejected/later-401 token recovery, invalid/not-found/network/500/503
-      states and exact localized labels, Retry, Feed/Search open-Close-Back-Forward,
-      canonical Search URL re-retrieval, changed-corpus and changed-Feed restoration,
-      clamped scroll, focus/origin fallback, external-entry Close replacement with
-      later Back not reopening, native Back behavior, distinct narrow Escape semantics,
-      rapid A-to-B stale-response exclusion, duplicate/broken/ordinary effective mutation
-      targets, and network traces with no read-lifecycle inspect/delivery/resonance
-      writes. Capture meaningful rendered content, accessibility state, interactions,
-      console/network failures, and exact client/environment gaps; any required unavailable
-      client is blocking rather than silently substituted.'
-    verification: Fresh client-runtime evidence covers every required browser/client
-      environment and frozen navigation/auth/error/accessibility matrix against the
-      deployed production target, with credential-free URLs, exact focus/scroll/history
-      behavior, and no read-lifecycle writes.
+      Deliver: Produce the complete required deployed-client matrix against the exact
+      admitted digest at `https://resofeed.tefx.one`: Safari, Chrome, Telegram iOS,
+      Telegram Android, Telegram Desktop, email-client link opening, and a Codex-or-equivalent
+      MCP app_url consumer. Across required desktop/narrow origins, prove canonical
+      cold load/refresh and legacy replacement; Inspector-first title before auth;
+      missing/rejected/later-401 recovery; exact localized invalid/not-found/network/500/503
+      states and Retry; Feed/Search Close/Back/Forward; current-corpus search/feed
+      restoration; clamped scroll/focus/origin fallback; external-entry replacement;
+      stale A-to-B exclusion; duplicate/broken/ordinary mutation targets; readable/accessibility
+      state; credential-free URLs; and zero read-lifecycle writes.
+
+
+      Boundary: `client-runtime-verifier` is read-only. Before claim, Orchestrator
+      must witness exact nonsecret provider, device/application version, and account/profile
+      bindings for all seven environments, including a real Telegram account on each
+      Telegram client and the exact email/MCP consumer identity. The current plan
+      contains no such witnessed availability. No browser substitution, device emulation
+      presented as a required real client, shared account inference, unavailable-client
+      waiver, repository mutation, product-state mutation, deployment, credential/account
+      change, or secret/token capture is authorized. Token entry is allowed only in
+      the bound client and must be redacted from evidence.
+
+
+      Admit: Require the admitted Tailnet runtime receipt and a startup provider-binding
+      record covering every required environment. Production semantic admission emits
+      one `vectl.verifier.semantic.v1` object with `verifier_id=client-runtime-verifier`,
+      `step_id=item-deep-links-external-client-verification`, ordered scope [`Safari`,
+      `Chrome`, `Telegram iOS`, `Telegram Android`, `Telegram Desktop`, `email client`,
+      `MCP app_url consumer`], and exactly seven coverage rows for `ITEM-DEEP-LINK-EXTERNAL-SAFARI`,
+      `ITEM-DEEP-LINK-EXTERNAL-CHROME`, `ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-IOS`, `ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-ANDROID`,
+      `ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-DESKTOP`, `ITEM-DEEP-LINK-EXTERNAL-EMAIL`,
+      and `ITEM-DEEP-LINK-EXTERNAL-MCP-CONSUMER`.
+
+
+      Recovery: Any missing provider/device/account binding returns BLOCKED before
+      interaction. A deterministic client defect, target/digest drift, secret exposure,
+      read-state write, or unknown account/device state stops without substitution
+      or product/runtime mutation. Only a demonstrably transient read-only launch/navigation
+      failure may be retried once in the same bound environment after retaining the
+      observation and re-proving target and account/device identity.'
+    verification: A production-admitted client-runtime-verifier receipt binds all
+      seven witnessed provider/device/account environments and covers the complete
+      canonical navigation/auth/error/accessibility matrix against the exact deployed
+      digest, with credential-free evidence and zero read-lifecycle state writes;
+      any unavailable required environment is outcome-consistent BLOCKED.
     refs:
     - docs/ITEM_DEEP_LINKS.md
     - docs/ARCHITECTURE.md
