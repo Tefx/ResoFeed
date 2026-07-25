@@ -195115,33 +195115,72 @@ phases:
     - item-deep-links-local-integration-verification
     agent: spec-verifier
   - id: item-deep-links-publish-immutable-oci
-    name: Publish the Integrated Deep-Link Image by Immutable Digest
+    name: Publish the Integrated Deep-Link Image as an Immutable OCI Index
     status: pending
-    description: 'step_type: verification
+    description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
 
 
-      External operation: build and publish the reviewed integrated commit as one
-      multi-architecture OCI image under the existing `docker.io/tefx/resofeed` repository,
-      recording the immutable OCI index plus amd64 and arm64 digests and binding them
-      to the reviewed commit/tag. Use only existing bounded registry credentials;
-      do not print runtime secrets, owner tokens, OpenRouter keys, or credential-bearing
-      URLs. Stop on source/commit drift, partial unknown outcome, unexpected repository/account,
-      or digest mismatch. Recovery records any partial-publish orphan and leaves the
-      previously deployed digest unchanged; rollback is the previously verified immutable
-      digest. This step changes registry runtime state only and does not edit the
-      repository or deploy Tailnet.'
-    verification: The exact reviewed commit is represented by one immutable docker.io/tefx/resofeed
-      OCI index with verified amd64/arm64 digests, redacted evidence, and explicit
-      orphan/rollback records; repository and Tailnet state remain unchanged.
+      Deliver: Perform `ITEM-DEEP-LINK-OCI-PUBLICATION` by publishing the exact clean
+      integrated commit authorized by `item-deep-links-deployment-authorization-review`
+      as `docker.io/tefx/resofeed:git-<40 lowercase commit>` with exactly `linux/amd64`
+      and `linux/arm64`, matching `org.opencontainers.image.revision` labels, one
+      immutable index digest, and two platform digests. Publish no moving alias and
+      leave the previously deployed Tailnet digest unchanged.
+
+
+      Boundary: `vectl-orchestrator` alone owns one persistent registry operation.
+      Use the current selected Docker context/daemon and the documented `docker buildx
+      build --platform linux/amd64,linux/arm64 --label org.opencontainers.image.revision=<commit>
+      --provenance=false --sbom=false --tag docker.io/tefx/resofeed:git-<commit> --push
+      .` procedure with the existing repository-scoped Docker credential/account authorized
+      for `docker.io/tefx/resofeed`. Repository/Git, active/default builder selection,
+      unrelated builders/images/tags, credentials/accounts, Tailnet/deployment/data,
+      runtime secrets, and alternate repositories are immutable. No cloud builder
+      or paid service is authorized; any material unplanned charge or billing expansion
+      stops.
+
+
+      Admit: Revalidate the authorization receipt, exact clean commit/tree, Dockerfile/context,
+      selected context/daemon, account/repository, absence of an existing conflicting
+      tag, and two-platform procedure immediately before execution. Retain one non-overwriting
+      mode-0600 raw log and a sanitized receipt containing source/tag/index/platform/revision
+      identities, command cardinality, exit/classification, context/builder before/after
+      hashes, partial-publication observation, and no credential/secret values. `item-deep-links-oci-verification`
+      is the independent consumer.
+
+
+      Recovery: Budget exactly one build-and-push invocation. Repetition is unsafe
+      once `--push` may have persisted a partial index or platform manifest, so no
+      replay is authorized. After every nonzero or ambiguous return, perform read-only
+      registry observation of the exact tag and attributable digests, record any complete
+      orphan chain for separately authorized cleanup, restore no registry object,
+      and leave the prior deployed digest unchanged. Source/context/account drift,
+      credential failure, digest conflict, cleanup uncertainty, disclosure, or unknown
+      partial state stops BLOCKED.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v2","step_id":"item-summary-deep-links-assurance-v2.item-deep-links-publish-immutable-oci","risk_tier":"R3","risk_reasons":["persistent_registry_publication","repository_scoped_credential_account_boundary","partial_publication_orphan_recovery","multi_platform_immutable_identity"],"primary_outcome":"ITEM-DEEP-LINK-OCI-PUBLICATION","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"ITEM-DEEP-LINK-OCI-PUBLICATION","atom":"the
+      exact authorized clean commit is published once under docker.io/tefx/resofeed
+      as one immutable two-platform index with matching revision labels, bounded credential/account/cost
+      authority, complete partial-state observation, and no moving alias","modality":"runtime","seam":"real","check_id":"item_deep_links_publish_immutable_oci","independent_step":"item-summary-deep-links-assurance-v2.item-deep-links-oci-verification"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+
+      </vectl_step_policy>'
+    verification: The Orchestrator-owned mode-0600 log and sanitized receipt prove
+      one authorized Buildx push for the exact clean commit, exact tag/index/amd64/arm64/revision
+      identities, unchanged context/default builder and Tailnet deployment, bounded
+      account/credential/cost, and complete partial-publication classification with
+      no replay or disclosure.
     refs:
     - docs/ITEM_DEEP_LINKS.md
     - docs/CONTAINER.md
     - Dockerfile
     depends_on:
     - item-deep-links-deployment-authorization-review
-    agent: integration-verifier
+    agent: vectl-orchestrator
   - id: item-deep-links-tailnet-runtime-proof
     name: Deploy the Immutable Digest and Prove Tailnet/Caddy Runtime Semantics
     status: pending
