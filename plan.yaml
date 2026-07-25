@@ -193734,54 +193734,72 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      [REQUIRES_SKILL: vectl-assurance-worker]
-
-      [VECTL_WORKER_PROTOCOL:v2]
-
-
-      Dispatch and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.
-      Owner `general` performs one bounded local evidence-capture operation; it has
-      mutation-capable worker authority for temporary runtime artifacts while this
-      contract forbids repository, Git, registry, deployment, Tailnet, credential/trust,
-      and unrelated Docker mutation.
+      Owner `vectl-orchestrator` performs one bounded deterministic local evidence-capture
+      operation directly. No worker dispatch, worker receipt, repository mutation,
+      Git mutation, registry, deployment, Tailnet, credential/trust, or unrelated
+      Docker authority exists.
 
 
       Deliver `RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE`. From a clean detached checkout
-      of exact integrated commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`, rerun
-      the completed contract''s exact project-native command `node --test --test-name-pattern=RF-BUG-V2
-      container build context derives trusted identity in dual-platform no-push build
-      scripts/vectl-check.test.mjs` against the currently selected local Docker context/daemon
-      and default builder. Capture a new non-overwriting mode-0600 complete raw local
-      command log and a separate sanitized evidence receipt. The raw log binds the
-      exact test argv, every Docker/buildx argv and complete stdout/stderr, exact
-      `linux/amd64,linux/arm64` selection, explicit absence of push/load/tag/publication
-      arguments, credential-free and secret-free configuration, cleanup on every post-create
-      path, and before/after nonsecret fingerprints for source commit/tree/clean-detached
-      state, Docker context/daemon, active/default builder, exact transient builder/attributable
-      BuildKit container, protected boundary files, and zero attributable builder/container
-      residue. The sanitized receipt records only artifact SHA-256, byte count, mode,
-      command/result metadata, nonsecret fingerprints, cleanup/residue result, and
-      pass/fail classification; it must not embed or expose the raw log through Vectl
-      evidence.
+      of exact integrated commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`, run exactly
+      `node --test --test-name-pattern=RF-BUG-V2 container build context derives trusted
+      identity in dual-platform no-push build scripts/vectl-check.test.mjs` against
+      the local Docker context/daemon selected at operation start and the default
+      builder observed at that start. The repository-native test fixes the Docker/buildx
+      operation sequence: inspect selected context and daemon; inspect active and
+      `default` builders; inventory containers; create one uniquely named transient
+      `docker-container` builder without `--use`; inspect it; execute `docker buildx
+      build --builder <unique-builder> --platform linux/amd64,linux/arm64 --progress=plain
+      --provenance=false --sbom=false --output type=cacheonly .`; remove that builder;
+      remove only a remaining uniquely attributable BuildKit container if required;
+      and re-observe context, daemon, builders, containers, source, and protected
+      boundaries. Do not substitute another test, build command, platform set, builder
+      driver, output type, or command order.
+
+
+      Before launch, create `/tmp/larva-agent-artifacts/rf-bug-v2-container-build-raw-evidence-capture`
+      with mode `0700`; fail closed if either output already exists. Exclusively create
+      mode-0600 `/tmp/larva-agent-artifacts/rf-bug-v2-container-build-raw-evidence-capture/container-build-complete.log`
+      and `/tmp/larva-agent-artifacts/rf-bug-v2-container-build-raw-evidence-capture/runtime-receipt-container-build-raw-evidence.json`.
+      Prepend a temporary local `docker` recorder to `PATH` for this one Node process;
+      bind it to the absolute real Docker CLI selected before launch. The recorder
+      must append each exact Docker/buildx argv plus complete separated stdout/stderr
+      and exit status to the raw log, forward stdout/stderr byte-for-byte to the test,
+      preserve the real exit status, and execute no command of its own other than
+      the exact forwarded Docker argv. Append the exact Node argv, complete Node stdout/stderr,
+      exit status, source/tree/clean-detached fingerprint, protected-boundary fingerprints,
+      and before/after nonsecret Docker context/daemon/active-builder/default-builder/container
+      fingerprints to that same log. Remove the recorder and its temporary directory
+      after observation. Write the separate sanitized JSON receipt only after cleanup
+      and final observations; it records the two fixed artifact paths, raw-log SHA-256,
+      byte count, mode, exact Node argv/result, nonsecret source and boundary fingerprints,
+      cleanup/residue result, attempt classification, and pass/fail. It must contain
+      no raw command output, secret, credential, environment value, or raw-log content.
+      Keep the raw log local and absent from Vectl evidence.
 
 
       Boundary: exact source is commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`;
-      exact operation is a real no-push/no-load/no-tag dual-platform evidence-capture
-      rerun using one uniquely named transient local `docker-container` builder without
-      `--use`; exact target is the reviewed local Docker context/daemon selected at
-      start. No registry credential, secret, `.env`, registry config, paid/cloud/remote
-      builder, push, load, tag, publication, deployment, Tailnet, source/product/repository/Git-history,
-      context/daemon/default-builder, unrelated container/service, data, credential/account/trust,
-      or network authority is granted. Local build-cache writes and new local mode-0600
-      evidence artifacts are the only durable incidental effects. Material cost must
-      remain local with zero paid/cloud-builder spend.
+      exact operation is the command and repository-native Docker sequence above;
+      exact target is the reviewed local Docker context/daemon selected at start.
+      The temporary recorder is observation-only and may exist only under the operation''s
+      local temporary directory. No registry credential, secret, `.env`, registry
+      config, paid/cloud/remote builder, push, load, tag, publication, deployment,
+      Tailnet, source/product/repository/Git-history, context/daemon/default-builder,
+      unrelated container/service, data, credential/account/trust, or network authority
+      is granted. Local build-cache writes and the two new local mode-0600 evidence
+      artifacts are the only durable incidental effects. Material cost remains local
+      with zero paid/cloud-builder spend.
 
 
       Admit only a complete raw log plus sanitized receipt proving the exact source,
-      command chain, platform set, trusted canonical identity result, no secret/credential
-      input or disclosure, no publication-capable argv, unchanged boundary fingerprints,
-      cleanup on all post-create exits, and zero attributable residue. Preserve the
-      rejected semantic receipt at `/tmp/larva-agent-artifacts/rf-bug-v2-renewed-source-publication-authorization-review/semantic-receipt.json`
+      Node command, every forwarded Docker/buildx argv and complete stdout/stderr,
+      exact `linux/amd64,linux/arm64` selection, trusted canonical identity result,
+      credential-free and secret-free configuration, explicit absence of push/load/tag/publication
+      arguments, unchanged source/protected/Docker boundary fingerprints, cleanup
+      on every post-create exit, recorder removal, and zero attributable builder/container
+      residue. The downstream `spec-verifier` independently consumes the sanitized
+      receipt and locally opens the hash-bound raw log. Preserve the rejected semantic
+      receipt at `/tmp/larva-agent-artifacts/rf-bug-v2-renewed-source-publication-authorization-review/semantic-receipt.json`
       with raw SHA-256 `4223e8e56e6abb3f342ba4170a5f8ead0815eb7e5a2f04c8d336a9072b314300`
       and canonical semantic SHA `d1a77ce0856ccef9a6727a872aac500f9c9041c8f79deb79eb2820f076f90b1e`,
       and preserve completed implementation history including the 347-byte summary
@@ -193793,13 +193811,16 @@ phases:
       attempt fails before transient-builder creation or is classified as a transient
       non-mutating local Docker transport/daemon observation failure, all source/boundary
       fingerprints remain exact, no publication-capable command ran, cleanup and zero
-      residue are proven, and the retry uses unchanged inputs. A deterministic build/test
-      failure, unknown or partial Docker state, suspect/incomplete raw log, fingerprint
-      drift, secret/credential exposure, publication-capable argv, cleanup failure,
-      residue, source drift, or unavailable reconciliation stops without retry. On
-      every post-create exit attempt builder/container cleanup and observe absence;
+      residue are proven, the first attempt''s raw log and sanitized receipt remain
+      preserved, and the retry uses unchanged inputs with new non-overwriting `attempt-2-`
+      artifact basenames in the same directory. A deterministic build/test failure,
+      unknown or partial Docker state, suspect/incomplete raw log, recorder forwarding
+      mismatch, fingerprint drift, secret/credential exposure, publication-capable
+      argv, cleanup failure, residue, source drift, or unavailable reconciliation
+      stops without retry. On every post-create exit, attempt removal of only the
+      unique builder and attributable BuildKit container and then observe absence;
       unknown state remains blocked for manual reconciliation. Rollback removes only
-      the new local evidence artifacts after preserving their sanitized hashes and
+      newly created recorder temporary files after preserving evidence hashes and
       reconciles the uniquely attributable builder/container; it never changes repository
       or external state.
 
@@ -193814,22 +193835,22 @@ phases:
       while the complete raw log remains local and absent from plan evidence","modality":"runtime","seam":"real","check_id":"rf_bug_v2_container_build_raw_evidence_capture","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review"}],"test_authority":{"developer_test_globs":["scripts/vectl-check.test.mjs"],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: A conformant worker receipt reports one bounded exact-commit local
-      evidence-capture execution, a non-overwriting complete mode-0600 raw log retained
-      only locally, and a sanitized receipt whose hashes/mode/result/fingerprints
-      prove exact Docker argv and full output, selected context/daemon/default builder,
-      linux/amd64 plus linux/arm64, no push/load/tag/publication or credential/secret
-      input, cleanup on all post-create exits, unchanged protected boundaries, and
-      zero attributable residue. The downstream spec-verifier independently consumes
-      the sanitized receipt and locally reads the hash-bound raw log; Vectl evidence
-      contains no raw log content.
+    verification: The Orchestrator's sanitized runtime receipt reports one bounded
+      exact-commit local evidence-capture operation, fixed non-overwriting mode-0600
+      artifact paths, and hashes/mode/result/fingerprints for a complete local raw
+      log proving the exact Node argv, every Docker/buildx argv and complete output,
+      selected context/daemon/default builder, linux/amd64 plus linux/arm64, no push/load/tag/publication
+      or credential/secret input, recorder removal, cleanup on all post-create exits,
+      unchanged protected boundaries, and zero attributable residue. The downstream
+      spec-verifier independently consumes the sanitized receipt and locally reads
+      the hash-bound raw log; Vectl evidence contains no raw log content.
     evidence_template: Sanitized receipt path/SHA-256/mode/bytes and raw-log path/SHA-256/mode/bytes;
       exact source commit; attempt count/classification; command result; before/after
       fingerprint equality; cleanup and zero-residue result; explicit statement that
       raw log content was not copied into plan evidence.
     depends_on:
     - rf-bug-v2-container-build-context-remediation
-    agent: general
+    agent: vectl-orchestrator
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
