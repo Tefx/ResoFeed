@@ -193642,10 +193642,10 @@ phases:
       \ {literal: 'PLATFORMS=linux/amd64,linux/arm64'}, {literal: PUBLISH=none}, {literal:\
       \ SECRETS=absent}, {literal: RESIDUE=none}]\n        contains_any: []\n    \
       \    forbids: [{literal: --push}, {literal: --load}, {literal: 'RESOFEED_SVELTE_BUILD_IDENTITY\
-      \ is private'}, {literal: no tests to run}, {literal: skipped}, {literal: retry}]\n\
-      \    proves: [RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR]\nbindings: {expected_red:\
-      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
-      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation\"\
+      \ is private'}, {literal: no tests to run}, {literal: retry}]\n    proves: [RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"release_container_build_context\"\
       ,\"trusted_svelte_build_identity_derivation\",\"real_dual_platform_docker_cleanup\"\
       ],\"primary_outcome\":\"RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR\",\"rollback_class\"\
