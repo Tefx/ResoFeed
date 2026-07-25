@@ -194576,83 +194576,78 @@ phases:
 
 
       Deliver `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. Fresh `integration-verifier`
-      owns one independently consumed L3 read-only diagnosis of the current canonical
-      `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy` runtime after
-      the production-admitted prior-runtime precondition stopped BLOCKED. Preserve
-      and consume `/tmp/larva-agent-artifacts/rf-bug-v2-prior-runtime-identity-readiness/semantic-receipt-blocked-corrected.json`
-      at SHA-256 `2f147707329e9a186f85d3cd5197c0977ab1d96538125a8497171399a7ce9c02`,
-      mode `0600`; its production Gate semantic SHA-256 `f512cb14a71f1c93c3962b18c70f6e4b0741a4838640b33f4799e7ef997d6ba4`;
-      and `/tmp/larva-agent-artifacts/rf-bug-v2-prior-runtime-identity-readiness/raw-observation.log`
-      at SHA-256 `d397afc13f174bc88e5f44077ce84dcdd80e0eff772724aeb5afb658418c9fb7`,
-      380 bytes, mode `0600`. They prove strict literal-FQDN reachability, zero mutation,
-      and a non-200 direct root stop before digest, volume, and route derivation;
-      retain them unchanged as historical observations.
+      owns exactly one schema-conformant independent review of the preserved zero-mutation
+      diagnosis evidence; no remote rerun is required, except a read-only freshness
+      observation within the existing strict literal-FQDN authority when the preserved
+      facts cannot be admitted as current. Preserve without rewriting `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log`,
+      mode `0600`, SHA-256 `cb1aa5fafc37e6dfabe52d3d62ba87354925739c7c47b842e028a921722ef5e4`,
+      1485 bytes, and `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/semantic-receipt-corrected.json`,
+      mode `0600`, SHA-256 `106a1652a206c51da019e2df9d6c49f3dc7e91c559efe8a869d102b5dae08efd`.
+      These historical observations record zero mutation, ResoFeed running, retained
+      named volume and route, observed procedure hashes/modes, and a substantive `caddy_down`
+      classification; the production Gate rejected only the receipt headline because
+      warnings require `PASS_WITH_DEBT` rather than `PASS`. The fresh reviewer must
+      independently evaluate the evidence and must not inherit or prescribe that substantive
+      classification.
 
 
-      Boundary: use only strict literal-FQDN SSH with `-F none`, exact existing-key
-      `HostName`/`HostKeyAlias`, `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`,
-      unchanged existing credential/account/default trust, the canonical physical
-      stack, and its OrbStack Docker context. Read only: exact `resofeed` container
-      existence, running/health/restart-count/exit metadata; configured image identity
-      emitted only as sanitized identity class/hash; exact port bindings; direct loopback
-      Caddy and app-port HTTP status classifications; unauthenticated Doctor status;
-      bounded redacted `resofeed` container and Caddy log classifications/hashes;
-      Compose `ps` classification; exact named-volume mount identity; canonical route
-      projection; and staged procedure hashes/modes. Never emit response bodies, raw
-      Tailscale Serve JSON, `.env`, PATH, secrets, credentials or paths, host-key
-      material, public-host values, raw configuration, raw logs, or unsanitized image
-      names. No restart, start, stop, pull, deploy, route, credential, trust, data,
-      container, image, registry, volume, Caddy, service, repository, or Git mutation
-      is authorized.
+      Boundary: review only the preserved artifacts and current admitted contracts.
+      Any optional freshness probe remains read-only under strict SSH `-F none` to
+      `tefx-mbp-personal.platy-atlas.ts.net`, exact existing-key `HostName`/`HostKeyAlias`,
+      `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, unchanged credential/account/default
+      trust, canonical `~/Projects/resofeed-caddy`, and OrbStack Docker context. Never
+      emit response bodies, raw Tailscale Serve JSON, `.env`, PATH, secrets, credentials
+      or paths, host-key material, public-host values, raw configuration, raw logs,
+      or unsanitized image names. No runtime, remote, route, credential, trust, data,
+      container, image, registry, repository, Git, or evidence mutation is authorized;
+      do not rewrite either preserved child artifact.
 
 
-      Admit: create one non-overwriting local mode-0600 raw command log and one sanitized
-      receipt. The receipt preserves target/procedure identities, exact observation
-      attempts, raw-log hash/mode/bytes, nondisclosure, and zero mutation; records
-      only sanitized classifications/hashes; and deterministically distinguishes `service_down`,
-      `caddy_down`, `wrong_port`, `runtime_crash`, `readiness_wait`, `identity_ambiguity`,
-      or `ready`. A PASS proves that the complete authorized diagnostic ran and produced
-      exactly one supported classification; it does not assert runtime readiness.
-      For every non-ready class, name the smallest separately authorized recovery
-      need by owner, operation class, exact target, and required rollback/reconciliation
-      facts already proved; if those facts are incomplete, state `human/new authority
-      required` and do not add, infer, or execute an effect. The receipt is an independent
-      runtime-evidence input to `rf-bug-v2-prior-runtime-identity-readiness`; no diagnosis
-      may itself satisfy digest/readiness admission.
+      Admit: emit exactly one new non-overwriting mode-0600 `vectl.verifier.semantic.v1`
+      receipt with `verifier_id=integration-verifier`, `step_id=rf-bug-v2-current-runtime-readiness-diagnosis`,
+      ordered `scope`: [`preserved diagnosis artifact identity and integrity`, `container
+      compose and image classification`, `direct Caddy app and Doctor status classification`,
+      `bounded redacted logs volume route and procedure identity`, `zero-mutation
+      diagnosis and smallest recovery authority need`], and exactly one coverage row
+      for `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. Every protocol/schema field
+      must validate. A passing receipt with any warning uses headline `PASS_WITH_DEBT`;
+      headline `PASS` is allowed only when no warnings remain, and warnings may be
+      removed only when the same facts are represented in another schema-valid field.
+      Preserve target/procedure identities, observation attempts, raw-log hash/mode/bytes,
+      nondisclosure, zero mutation, exactly one evidence-supported classification,
+      and the smallest separately authorized recovery need. Production semantic admission
+      consumes the new reviewer receipt while the two child artifacts remain immutable
+      provenance.
 
 
-      Recovery: probes are non-mutating. Retry only a demonstrably transient read-only
-      observation at most twice after retaining each observation and re-proving unchanged
-      literal target, container identity class/hash, route projection hash, and volume
-      identity classification. Deterministic classification, trust/credential/identity
-      drift, disclosure, observed mutation, or unknown state stops immediately. Cleanup
-      is local evidence finalization only. No remote reconciliation is authorized.
-
-
-      Production semantic admission is mandatory. Emit exactly one `vectl.verifier.semantic.v1`
-      object with `verifier_id=integration-verifier`, `step_id=rf-bug-v2-current-runtime-readiness-diagnosis`,
-      ordered `scope`: [`preserved production blocked precondition`, `strict literal-FQDN
-      container compose and image classification`, `direct Caddy app and Doctor status
-      classification`, `bounded redacted logs volume route and procedure identity`,
-      `zero-mutation diagnosis and smallest recovery authority need`], and exactly
-      one coverage row for `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`.
+      Recovery: review and optional freshness probes are non-mutating. Retry only
+      a demonstrably transient read-only freshness observation at most twice after
+      retaining each observation and re-proving unchanged target, container identity
+      class/hash, route projection hash, and volume identity classification. Deterministic
+      classification, schema invalidity, trust/credential/identity drift, disclosure,
+      observed mutation, or unknown state stops immediately. No remote reconciliation
+      is authorized by this step.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","risk_tier":"R3","risk_reasons":["read_only_remote_runtime_diagnosis","strict_endpoint_and_existing_credential_boundary","secret_safe_logs_and_configuration_classification","independently_consumed_recovery_precondition"],"primary_outcome":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","atom":"the
-      canonical current runtime is diagnosed read-only into exactly one supported
-      readiness failure class or ready state using container Compose ports direct
-      Caddy/app/Doctor bounded redacted logs volume route and procedure observations,
-      with nondisclosure, zero mutation, and the smallest separately authorized recovery
-      need","modality":"runtime","seam":"real","check_id":"rf_bug_v2_current_runtime_readiness_diagnosis","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","risk_tier":"R3","risk_reasons":["preserved_remote_runtime_evidence_admission","strict_endpoint_and_existing_credential_boundary","secret_safe_schema_conformant_semantic_review","independently_consumed_recovery_precondition"],"primary_outcome":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","atom":"a
+      fresh integration-verifier independently reviews the immutable diagnosis evidence
+      into one production-schema-valid semantic receipt, uses PASS_WITH_DEBT when
+      warnings remain, preserves nondisclosure and zero mutation, and admits exactly
+      one evidence-supported readiness classification plus the smallest separately
+      authorized recovery need","modality":"runtime","seam":"real","check_id":"rf_bug_v2_current_runtime_readiness_diagnosis","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-caddy-service-reconciliation"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: A production-admitted fresh integration-verifier receipt and mode-0600
-      raw log preserve the exact prior BLOCKED receipt/raw identities, perform every
-      authorized strict-FQDN read-only observation, emit exactly one supported runtime
-      classification plus the smallest separately authorized recovery need, prove
-      nondisclosure and zero mutation, and are independently consumed by rf-bug-v2-prior-runtime-identity-readiness.
+    verification: A fresh integration-verifier emits one production-admitted, schema-valid
+      semantic receipt that independently consumes the two immutable preserved artifacts
+      at their exact hashes/modes/size, retains zero-mutation and nondisclosure evidence,
+      records exactly one supported classification without planner-prescribed substantive
+      judgment, and uses PASS_WITH_DEBT whenever warnings remain; no child receipt
+      is rewritten and no remote mutation occurs.
+    refs:
+    - /tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log
+    - /tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/semantic-receipt-corrected.json
     depends_on:
     - rf-bug-v2-stage-immutable-deployment-procedure-v2
     - rf-bug-v2-docker-runtime-proof
