@@ -194559,82 +194559,87 @@ phases:
 
 
       Deliver `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. One fresh `integration-verifier`
-      owns exactly one schema-conformant independent re-admission of the preserved,
-      completed zero-mutation diagnosis after the original receipt and same-child
-      correction were retained but rejected for semantic-receipt formatting. Consume
-      without rewriting `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log`,
+      owns exactly one schema-conformant independent review that reruns read-only
+      current-state observations against the canonical existing `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      stack and independently classifies readiness; this contract does not prescribe
+      `PASS`. Preserve `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log`,
       mode `0600`, SHA-256 `cb1aa5fafc37e6dfabe52d3d62ba87354925739c7c47b842e028a921722ef5e4`,
       1485 bytes, and `/tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/semantic-receipt-corrected.json`,
-      mode `0600`, SHA-256 `106a1652a206c51da019e2df9d6c49f3dc7e91c559efe8a869d102b5dae08efd`;
-      preserve every prior schema-invalid diagnosis receipt as immutable provenance.
-      The preserved evidence records zero mutation, ResoFeed running, retained named
-      volume and route, observed procedure hashes/modes, and completed `caddy_down`
-      diagnosis evidence. No new runtime observation is needed. The fresh reviewer
-      independently evaluates whether the preserved evidence supports the diagnosis
-      and chooses an outcome-consistent semantic headline; this contract does not
-      require `PASS`.
+      mode `0600`, SHA-256 `106a1652a206c51da019e2df9d6c49f3dc7e91c559efe8a869d102b5dae08efd`,
+      plus every earlier schema-invalid receipt, as immutable diagnostic provenance.
+      Their `caddy_down` conclusion is a retained false positive: the old probes assumed
+      a host-published ResoFeed listener, omitted the configured virtual-host SNI/Host
+      on local Caddy TLS, and used a hardcoded Caddy container name instead of Compose
+      service resolution. Do not use that stale conclusion as current-state evidence.
 
 
-      Boundary: review only the preserved local artifacts and current admitted contracts.
-      No SSH, network, registry, remote, runtime, route, credential, trust, data,
-      container, image, repository, Git, child-artifact rewrite, or other persistent
-      effect is authorized. The only new artifact authorized is one non-overwriting
-      local mode-0600 semantic receipt. Never emit response bodies, raw Tailscale
-      Serve JSON, `.env`, PATH, secrets, credentials or paths, host-key material,
-      public-host values, raw configuration, raw logs, or unsanitized image names.
+      Boundary: read-only runtime verification only. Use literal-FQDN SSH with `-F
+      none`, exact existing-key `HostName`/`HostKeyAlias`, `StrictHostKeyChecking=yes`,
+      `UpdateHostKeys=no`, unchanged existing credential/account/default trust, canonical
+      physical stack, and OrbStack Docker context. Resolve Caddy only through the
+      maintained Compose service interface, including `docker compose ... ps -q caddy`,
+      then classify the resolved container state and the running service set. Observe
+      the canonical public root and unauthenticated Doctor status pair. For remote-local
+      Caddy readiness, use the maintained host-published Caddy TLS listener with the
+      canonical virtual-host identity as SNI/Host, derived transiently from maintained
+      stack configuration; never probe TLS by loopback IP identity and never assume
+      the ResoFeed service is host-published. No SSH, Compose, container, image, registry,
+      route, credential, trust, data, volume, repository, Git, service, configuration,
+      or other mutation is authorized.
 
 
-      Admit: emit exactly one new non-overwriting mode-0600 `vectl.verifier.semantic.v1`
-      receipt with `verifier_id=integration-verifier`, `step_id=rf-bug-v2-current-runtime-readiness-diagnosis`,
-      ordered `scope`: [`preserved diagnosis artifact identity and integrity`, `container
-      compose and image classification`, `direct Caddy app and Doctor status classification`,
-      `bounded redacted logs volume route and procedure identity`, `zero-mutation
-      diagnosis and smallest recovery authority need`], and exactly one coverage row
-      for `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`. Every protocol and schema
-      field must validate. If warnings are present, `headline` is `PASS_WITH_DEBT`,
-      the warnings array contains exactly one entry, and that entry''s entire string
-      is exactly `owner=vectl-orchestrator; follow_up=perform the plan-defined bounded
-      Caddy service reconciliation, then rerun prior-runtime identity/readiness verification`,
-      with no prefix or suffix prose. Put all explanatory debt and provenance prose
-      in `notes`, never in `warnings`. `PASS` is allowed only with no warnings; an
-      evidence-supported `BLOCKED` or `FAIL` remains allowed, so conclusion independence
-      is preserved. Preserve target and procedure identities, observation attempts,
-      raw-log hash/mode/bytes, nondisclosure, zero mutation, exactly one evidence-supported
-      classification, the smallest separately authorized recovery need, and every
-      other previously required schema constraint. Production semantic admission consumes
-      only the new reviewer receipt while all prior diagnosis evidence and invalid
-      receipts remain immutable provenance.
+      Admit: before observation create one non-overwriting local mode-0600 raw log
+      whose command output is sanitized at source, then emit exactly one non-overwriting
+      mode-0600 `vectl.verifier.semantic.v1` receipt with `verifier_id=integration-verifier`,
+      `step_id=rf-bug-v2-current-runtime-readiness-diagnosis`, ordered `scope`: [`preserved
+      false-positive diagnosis provenance`, `strict-FQDN Compose service identity
+      and running state`, `public root and unauthenticated Doctor status classification`,
+      `SNI-bound remote-local Caddy root and Doctor classification`, `zero-mutation
+      current readiness conclusion`], and exactly one coverage row for `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`.
+      Production semantic admission consumes only this fresh receipt. Retain only
+      the public root/Doctor status pair, remote SNI root/Doctor status pair, running
+      service names `caddy` and `resofeed`, hashes of the resolved Caddy container
+      identity and port projection, procedure/target hashes, attempt classifications,
+      raw-log hash/mode/bytes, nondisclosure, and zero mutation. Do not retain response
+      bodies, the public-host value or configuration, raw ports, raw container IDs,
+      `.env`, PATH, secrets, credentials or credential paths, host-key material, raw
+      Tailscale Serve JSON, raw configuration, raw logs, or unsanitized image names.
+      The receipt records exactly one evidence-supported readiness classification
+      and an outcome-consistent headline; no warning text or recovery debt may prescribe
+      Caddy reconciliation.
 
 
-      Recovery: the former same-child correction path is exhausted. This contract
-      grants one fresh re-admission attempt and no runtime probe. A schema-invalid
-      receipt, artifact identity mismatch, disclosure, unsupported classification,
-      observed mutation, or unknown state is retained and stops the step without correction
-      or replay; further admission requires new planning authority. No remote reconciliation
-      is authorized by this step.
+      Recovery: all probes are non-mutating. A demonstrably transient SSH, Compose,
+      or HTTP observation may be retried at most twice after retaining a sanitized
+      failed-attempt classification and re-proving unchanged literal target, Compose
+      project/service identity hashes, route projection hash, and volume identity
+      hash. Deterministic service mismatch, SNI/Host mismatch, non-ready status, identity
+      drift, disclosure, observed mutation, or unknown state stops the review with
+      outcome-consistent evidence. No restart, reconciliation, deployment, route repair,
+      alternate target, child-artifact rewrite, or other persistent effect is authorized.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","risk_tier":"R3","risk_reasons":["preserved_remote_runtime_evidence_admission","strict_warning_string_semantic_schema","secret_safe_schema_conformant_semantic_review","independently_consumed_recovery_precondition"],"primary_outcome":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","atom":"one
-      fresh integration-verifier independently re-admits the immutable completed diagnosis
-      evidence into one production-schema-valid semantic receipt, preserves conclusion
-      independence, uses the exact warning string with no prefix or suffix whenever
-      warning debt remains, puts explanatory prose only in notes, preserves nondisclosure
-      and zero mutation, and records exactly one evidence-supported readiness classification
-      plus the smallest separately authorized recovery need","modality":"runtime","seam":"real","check_id":"rf_bug_v2_current_runtime_readiness_diagnosis","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-caddy-service-reconciliation"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","risk_tier":"R3","risk_reasons":["remote_read_only_runtime_reclassification","strict_endpoint_compose_service_and_sni_identity","secret_safe_schema_conformant_semantic_review","independently_consumed_deployment_precondition"],"primary_outcome":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","rollback_class":"NONE","observation_ledger":[{"requirement_id":"RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","atom":"one
+      fresh integration-verifier preserves the old caddy_down receipts as immutable
+      false-positive provenance, reruns strict-FQDN Compose-service and SNI-bound
+      public/remote-local readiness observations without mutation, retains only approved
+      sanitized status and identity hashes, and emits exactly one production-schema-valid
+      independent current-state classification","modality":"runtime","seam":"real","check_id":"rf_bug_v2_current_runtime_readiness_diagnosis","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-prior-runtime-identity-readiness"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: A fresh integration-verifier emits one production-admitted, schema-valid
-      semantic receipt that independently consumes the preserved artifacts at their
-      exact hashes/modes/size, retains all invalid receipts as immutable provenance,
-      preserves zero mutation, nondisclosure, and conclusion independence, and records
-      exactly one evidence-supported classification. Any warning is the entire exact
-      string `owner=vectl-orchestrator; follow_up=perform the plan-defined bounded
-      Caddy service reconciliation, then rerun prior-runtime identity/readiness verification`
-      with no prefix or suffix; explanatory prose appears only in notes. No child
-      artifact is rewritten, no remote probe or mutation occurs, and `PASS` is not
-      required.
+    verification: A fresh integration-verifier creates one source-sanitized mode-0600
+      raw log and one production-admitted schema-valid semantic receipt, preserves
+      all prior caddy_down artifacts as immutable false-positive provenance, resolves
+      Caddy through the Compose service interface, reruns public and SNI-bound remote-local
+      root/Doctor readiness, and independently records exactly one current-state classification.
+      Evidence contains only public and remote SNI status pairs, `caddy`/`resofeed`
+      running classifications, Caddy container/port hashes, procedure identities,
+      nondisclosure, and zero mutation; it contains no body, public-host configuration/value,
+      raw port or container ID, secret, PATH, `.env`, credential, host-key material,
+      Serve JSON, configuration, or raw-log content. No reconciliation or deployment
+      is performed or prescribed.
     refs:
     - /tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/raw-observation-20260725T155503Z.log
     - /tmp/larva-agent-artifacts/rf-bug-v2-current-runtime-readiness-diagnosis/semantic-receipt-corrected.json
