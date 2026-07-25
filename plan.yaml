@@ -195333,3 +195333,71 @@ phases:
     depends_on:
     - item-deep-links-publish-immutable-oci
     agent: integration-verifier
+  - id: item-deep-links-tailnet-deployment
+    name: Deploy the Verified Deep-Link Digest to the Tailnet/Caddy Stack
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Deliver: Perform `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT` once by deploying only
+      the independently verified `docker.io/tefx/resofeed@sha256:<index>` for the
+      integrated deep-link commit through the maintained remote `./deploy.sh` formal-deploy
+      interface. The existing `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      stack must run that exact digest with explicit `--public-url https://resofeed.tefx.one`,
+      direct root `200`, unauthenticated Doctor `401`, unchanged named SQLite volume
+      and owner-token state, masked runtime secrets, canonical route, and a recoverable
+      captured prior digest/database backup.
+
+
+      Boundary: `vectl-orchestrator` alone owns the persistent deployment operation.
+      Authenticate the literal FQDN with `-F none`, matching HostName/HostKeyAlias,
+      strict unchanged host-key trust, the existing SSH account/credential, current
+      physical stack identity, OrbStack Docker context, and the exact tracked/staged
+      procedure hashes and modes admitted by the review. The only persistent mutation
+      is the ResoFeed image/PublicURL deployment. Repository/Git, registry objects,
+      builders, procedure files, Caddy ownership/configuration, Tailnet route/Serve,
+      credentials/accounts/trust, runtime secret values, owner token, database contents,
+      named volume, and alternate targets are immutable. Existing-stack transfer is
+      the only cost; paid services or material unplanned charges are unauthorized.
+
+
+      Admit: Consume the production-admitted authorization and OCI-verification receipts;
+      immediately revalidate source/tag/index/platform/revision, procedure, endpoint,
+      current prior digest, database backup/readiness, named volume, route, credential/account,
+      and secret-safe environment. Retain one non-overwriting mode-0600 raw log and
+      sanitized receipt with exact operation/target/input identities, attempt count,
+      prior/final digest, PublicURL presence without secret/config disclosure, direct
+      readiness, volume/owner-token/route preservation, and recovery observations.
+      `item-deep-links-tailnet-runtime-proof` is the independent consumer.
+
+
+      Recovery: Budget exactly one formal deployment invocation. Repetition is unsafe
+      after pull/replacement may mutate persistent remote state, so no replay is authorized.
+      The maintained procedure may perform only its bounded readiness checks and prior-digest/database
+      recovery using the same named volume. After every nonzero or ambiguous return,
+      observe final digest, direct `200/401`, volume, route, PublicURL binding, and
+      recovery result. Unknown/partial state, unavailable prior digest/backup, failed
+      recovery, source/procedure/target/trust drift, disclosure, or forbidden mutation
+      stops BLOCKED without alternate host, restaging, Serve/Caddy repair, data deletion,
+      or another invocation.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v2","step_id":"item-summary-deep-links-assurance-v2.item-deep-links-tailnet-deployment","risk_tier":"R3","risk_reasons":["persistent_remote_digest_deployment","strict_endpoint_existing_credential_boundary","database_and_prior_digest_recovery","public_url_volume_owner_token_secret_preservation"],"primary_outcome":"ITEM-DEEP-LINK-TAILNET-DEPLOYMENT","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"ITEM-DEEP-LINK-TAILNET-DEPLOYMENT","atom":"the
+      independently verified deep-link index is deployed once through the maintained
+      strict-FQDN stack with explicit production PublicURL while prior digest/database,
+      named volume, owner token, route, credentials, trust, secrets, and recovery
+      readiness remain preserved","modality":"runtime","seam":"real","check_id":"item_deep_links_tailnet_deployment","independent_step":"item-summary-deep-links-assurance-v2.item-deep-links-tailnet-runtime-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+
+      </vectl_step_policy>'
+    verification: The Orchestrator-owned mode-0600 log and sanitized receipt prove
+      one maintained strict-FQDN deployment of the independently verified digest,
+      explicit production PublicURL, final exact digest/readiness, prior-digest/database
+      recovery readiness, volume/owner-token/route/credential/trust/secret preservation,
+      and no replay or disclosure.
+    depends_on:
+    - item-deep-links-oci-verification
+    agent: vectl-orchestrator
