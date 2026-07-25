@@ -10,23 +10,38 @@ version: 1
 project: ResoFeed
 strategy_ref: docs/BUG_FIX_PLAN_2026-07-12.md@sha256:185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464;
   docs/BUG_REPORT_2026-07-11.md@sha256:017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27;
-  authority_commit:29c3d711ad83d4f58ffdce69ada3b2403c81326e
-context: RF-BUG-001–010 pending-plan repair authority is docs/BUG_FIX_PLAN_2026-07-12.md
-  SHA-256 185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464 and docs/BUG_REPORT_2026-07-11.md
-  SHA-256 017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27 at authority
-  commit 29c3d711ad83d4f58ffdce69ada3b2403c81326e. Completed history is immutable;
-  only the six pending rf-bug-20260712 phases may change.
-project_guidance: Read docs/BUG_FIX_PLAN_2026-07-12.md and cited canonical references
-  before work. Preserve the single-binary, SQLite-only, lexical-search, owner-token,
-  import-only OPML, and no-sync/no-merge boundaries. Contract-lock owners create each
-  protected acceptance artifact under its exact authority; implementation owners must
-  not mutate those artifacts. Check each RF-BUG requirement independently from intentional
-  red to green. Use platform URL/history primitives, package-local embed.FS, small
-  outer middleware, existing fallback fonts, case-local E2E isolation, ordinary redacted
-  command evidence, and synchronous code/test/docs updates. Local verification excludes
-  OCI, container, Tailnet, and live-provider rows; publish and verify the immutable
-  two-platform image before Tailnet deployment. Do not add permanent registries, custom
-  wire/evidence protocols, or phase Full Gate steps.
+  docs/ITEM_DEEP_LINKS.md@sha256:cfd51662b98542d51a3efc8cd896159ba8ba5a150b63dc0d2a21438331771f8e;
+  docs/ARCHITECTURE.md@sha256:7d8d09cad1c02bd9d61097f16ca4bef17b7d4a500caafd83c445ebb5fb24962b;
+  docs/DESIGN.md@sha256:0dd125551c731e33d8169662f7aabc0a60aa475cc19ce2c4139e88ba56c9b3ba;
+  authority_commit:6ce3cc5a22fa4d795b5181018ad449f1dedef104
+context: Current admitted authority covers pending definitions in rf-bug-assurance-v2-closure
+  and item-summary-deep-links-assurance-v2 at main commit 6ce3cc5a22fa4d795b5181018ad449f1dedef104.
+  The tracked RF-BUG documents and canonical item deep-link documents named by strategy_ref
+  govern those outcomes. Completed definitions, evidence, dependencies, and lifecycle
+  history remain immutable. This approved Stage-2 batch changes plan metadata and
+  quiescent pending definitions only; it grants no claim, dispatch, repository, Git,
+  registry, deployment, credential, account, or external-client authority. The digest-bound
+  rf-bug-v2-prior-runtime-identity-readiness attempt remains outcome-consistent BLOCKED
+  because neither authorized read-only chain established one canonical rollback digest;
+  an identical read-only rerun has no authority. Deep-link release admission also
+  remains blocked until the required Safari, Chrome, Telegram iOS, Telegram Android,
+  Telegram Desktop, email-client, and MCP-consumer provider/device/account bindings
+  are witnessed.
+project_guidance: Read docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md,
+  docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md, docs/DESIGN.md, and cited runtime/deployment
+  contracts before work. Preserve the single Go deployable, SQLite/FTS5-only storage,
+  lexical search, owner-token boundary, import-only OPML, minimal portable state,
+  runtime-only secrets, and no-sync/no-merge rules. Accepted Vectl orchestration is
+  the single confirmation for every effect and bounded retry declared by the admitted
+  plan; no per-step reconfirmation is needed. Repository-changing implementation uses
+  the installed worker-v2 dispatch/execution contract, keeps protected acceptance
+  immutable except where the expected-red authority explicitly permits it, and synchronizes
+  tests and user-facing documentation within each authorized mutation unit. Persistent
+  publication and deployment occur only in their runtime_state_only steps; verification
+  and review remain read-only. Never claim the digest-bound RF prior-runtime readiness
+  step again without exact authority for a genuinely distinct recovery-identity operation,
+  and never claim deep-link external-client verification until every required provider/device/account
+  binding is witnessed.
 phases:
 - id: contract-foundation-and-expected-red-tests
   name: Contract Foundation and Expected-Red Tests
