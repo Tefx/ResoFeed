@@ -194266,7 +194266,7 @@ phases:
       lifecycle, or external state operation occurred for this append-only admission.'
   - id: rf-bug-v2-tailnet-caddy-deployment-producer
     name: Deploy exact immutable image in admitted no-rollback mode
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -194333,6 +194333,93 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T09:59:28.537025Z'
+    done_at: '2026-07-26T10:02:50.863696+00:00'
+    evidence: 'Exact renewed no-rollback deployment succeeded on the sole remaining
+      invocation.
+
+
+      Attempt/budget:
+
+      - Attempt 2 invoked the maintained staged procedure exactly once; exit 0; producer
+      and post-attempt classification `success`.
+
+      - Total invocation budget 2 is exhausted: Attempt 1 remains consumed `no_effect`
+      non-green history; Attempt 2 succeeded; invocations remaining 0; no stale replay
+      or third invocation.
+
+      - No prior image digest was discovered/retained and no old-image rollback was
+      attempted.
+
+
+      Renewed procedure chain:
+
+      - Procedure source `0127273a56a6e757757a0f9419a4990f5041aa8a`, distinct from
+      OCI source.
+
+      - deploy.sh SHA/mode `sha256:e27bc178546bdc0e0410a18a55d6501bc38ff3122b5782db9c7e94754380ff27`
+      / 755.
+
+      - compose.yml SHA/mode `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`
+      / 644.
+
+      - Renewed backup ID `sha256:729e81ff6a765a375afb7e734227dbbe0e1b4df6187f4e186b5bf8ff2e07af2f`;
+      staging receipt SHA-256 `750cca434b13e0031441640ca081df2c41ebc0de8138ee42702460065e726082`.
+
+
+      OCI chain:
+
+      - OCI source/revision `abf3cb6c545f9c0f3c605760a5325875c61fc83f`.
+
+      - Immutable tag `git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`.
+
+      - Index `sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`.
+
+      - amd64 `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`;
+      arm64 `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`.
+
+      - Runtime-proof semantic SHA `6195360fe8f7f085de47d394001987f78c1758dddd951a2fe5286c6f4a482c21`.
+
+      - Immediate preflight semantically revalidated both platform revision labels
+      in the actual remote Buildx environment.
+
+
+      Post-attempt observations:
+
+      - Configured and running image both exactly `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`;
+      ResoFeed running.
+
+      - Direct root 200; unauthenticated Doctor 401.
+
+      - SQLite volume `resofeed-caddy_resofeed-data` preserved.
+
+      - Duplicate-aware Serve JSON route remains `127.0.0.1:8443`; Serve mutation
+      none.
+
+      - Caddy remains running under Compose project `resofeed-caddy`.
+
+      - CF_API_TOKEN, OPENROUTER_KEY, TAVILY_API_KEY each masked-present; no secret
+      values retained.
+
+      - Forbidden effects none; exact target and strict literal-FQDN existing trust/account/credential
+      preserved.
+
+
+      Artifacts (all mode 0600):
+
+      - Preflight index SHA `3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`.
+
+      - Preflight OCI receipt SHA `25693380aff0b6c4b8c24a33a4dee9b9a71746130b21f586b0f91868260601fc`.
+
+      - Preflight remote log SHA `0aa3e38f29932e5778fcce7bb1ac0fee0d5d2b1716a7b6a48047a827a22f5f28`.
+
+      - Raw deployment log `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deploy-attempt-2-raw.log`,
+      SHA `a7d483d3f5040083ebd959f23f45bb93c70aedc6e0084f94217de6b4ef329279`.
+
+      - Post-observation log `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deploy-attempt-2-post.log`,
+      SHA `85f06d239cde386a9a7929699d2a023f5e8c9d3d87ba4325e5ad39db67ba2771`.
+
+      - Sanitized receipt `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deploy-attempt-2-receipt.json`,
+      SHA `ffbcb6a06d6c2fc44f0dbbe82d1fa969a340f52e96d4fca4636cbfbe2d27ebb9`.'
   - id: rf-bug-v2-prior-runtime-identity-readiness
     name: Resolve prior runtime digest and recovery readiness read-only
     status: skipped
