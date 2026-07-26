@@ -194295,14 +194295,17 @@ phases:
 
 
       Deliver: Perform `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT` through the independently
-      admitted and staged explicit `--no-rollback` mode, deploying only `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
-      for source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`, immutable tag `git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
-      amd64 `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`,
-      and arm64 `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`
-      to the existing stack. Success requires the configured/running image to bind
-      that index with direct root `200`, Doctor `401`, named SQLite volume, owner-token/data,
-      masked secrets, route, Caddy ownership, credentials, and trust preserved. No
-      prior image digest is required or discovered, and no automatic old-image rollback
+      admitted and staged explicit `--no-rollback` mode. Invoke the maintained procedure
+      with required `--procedure-source-commit <exact staged 40-lowercase-hex integrated
+      commit>` and OCI `--verified-commit abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
+      keeping those identities distinct. Deploy only `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
+      for immutable tag `git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`, amd64 `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`,
+      arm64 `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`,
+      and revision `abf3cb6c545f9c0f3c605760a5325875c61fc83f` to the existing stack.
+      Success requires configured and running image digests to bind that index with
+      direct root `200`, Doctor `401`, named SQLite volume, owner-token/data, masked
+      secrets, route, Caddy ownership, credentials, and trust preserved. No prior
+      image digest is required or discovered, and no automatic old-image rollback
       is performed.
 
 
@@ -194310,24 +194313,31 @@ phases:
       `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Use the literal
       FQDN with `-F none`, matching HostName/HostKeyAlias, strict existing host-key
       trust, existing account/credential, and the exact staged procedure-source commit,
-      deploy/compose SHA-256 values, modes, and backup ID from `rf-bug-v2-stage-no-rollback-procedure`.
-      The only authorized image mutation is the exact immutable-index deployment.
-      Repository/Git, registry/tag/image publication, builders, procedure bytes, SQLite
-      volume deletion/recreation, data, owner token, secrets, Caddy reconciliation/restart,
-      route mutation/Serve repair, credentials/accounts/trust, alternate host/stack,
-      moving tags, and secret disclosure are forbidden. Existing-stack SSH/registry
-      transfer is the only cost.
+      deploy/compose SHA-256 values and modes, backup ID, and final bytes from `rf-bug-v2-stage-no-rollback-procedure`.
+      The procedure-source commit is a later integrated repository identity and must
+      never be inferred equal to the OCI application source or used as its revision.
+      The only authorized image mutation is the exact immutable-index deployment through
+      the maintained invocation; ad hoc SSH/Compose bypass is forbidden. Repository/Git,
+      registry/tag/image publication, builders, procedure bytes, SQLite volume deletion/recreation,
+      data, owner token, secrets, Caddy reconciliation/restart, route mutation/Serve
+      repair, credentials/accounts/trust, alternate host/stack, moving tags, and secret
+      disclosure are forbidden. Existing-stack SSH/registry transfer is the only cost.
 
 
-      Admit: Consume the production-admitted no-rollback authorization, successful
+      Admit: Consume the production-admitted no-rollback review receipt, successful
       procedure-staging receipt, current runtime-readiness diagnosis, and dual-platform
       immutable-image proof. Immediately before each authorized invocation, revalidate
-      exact image/procedure/source identities, strict endpoint identity, named volume,
-      route no-op, masked secret presence, and forbidden-effect absence. Retain a
-      new non-overwriting mode-0600 raw log and sanitized receipt containing operation,
-      target, all immutable identities, user-waiver binding, attempt number, process
-      result, and required post-attempt observations/classification without secret
-      values. `rf-bug-v2-tailnet-caddy-proof` independently consumes the receipt.
+      the complete procedure chain (procedure-source commit to tracked deploy/compose
+      hashes and modes to staging backup ID and final bytes), the complete OCI application
+      chain (source to immutable tag/index/amd64/arm64/revision), strict endpoint
+      identity, named volume, route no-op, masked secret presence, and forbidden-effect
+      absence. The maintained command line must carry the exact separate `--procedure-source-commit`
+      and `--verified-commit` values. Retain a new non-overwriting mode-0600 raw log
+      and sanitized receipt containing operation, target, both independently labeled
+      identity chains, staged byte/backup identity, configured/running digest observations,
+      user-waiver binding, attempt number, process result, and required post-attempt
+      observations/classification without secret values. `rf-bug-v2-tailnet-caddy-proof`
+      independently consumes the receipt.
 
 
       Recovery: Budget at most two maintained deploy invocations total. Invoke once
@@ -194339,25 +194349,29 @@ phases:
       unchanged admitted procedure/image/target authority. Unknown partial effects
       stop for read-only reconciliation. A failed deployment may remain failed or
       partial with evidence preserved; there is no prior-digest discovery or old-image
-      rollback obligation. Trust/identity drift, disclosure, forbidden mutation, exhausted
-      budget, or unsafe reconciliation stops BLOCKED without alternate host, restaging,
-      Serve/Caddy repair, destructive fallback, or undeclared registry/image mutation.
+      rollback obligation. Source-chain conflation, trust/identity drift, disclosure,
+      forbidden mutation, exhausted budget, or unsafe reconciliation stops BLOCKED
+      without alternate host, restaging, Serve/Caddy repair, destructive fallback,
+      or undeclared registry/image mutation.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","risk_tier":"R3","risk_reasons":["persistent_remote_digest_deployment","strict_endpoint_existing_credential_boundary","explicit_no_old_image_rollback","sqlite_owner_token_secret_preservation"],"primary_outcome":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","atom":"the
-      exact independently verified immutable index is deployed through the admitted
-      explicit no-rollback mode while the SQLite volume, owner token, route, Caddy
-      ownership, credentials, trust, and secrets remain preserved and every attempt
-      receives a forward-only state classification","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","risk_tier":"R3","risk_reasons":["persistent_remote_digest_deployment","strict_endpoint_existing_credential_boundary","explicit_no_old_image_rollback","sqlite_owner_token_secret_preservation","independent_procedure_and_application_identity_chains"],"primary_outcome":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","atom":"the
+      exact immutable index is deployed through the staged admitted no-rollback procedure
+      with an explicit procedure-source commit distinct from the OCI verified application
+      source, configured/running digest convergence, preserved volume/owner-token/route/Caddy/trust
+      state, and a forward-only classification for every attempt","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: A mode-0600 raw log and sanitized receipt prove the exact admitted
-      no-rollback procedure and immutable image identities, one invocation per safely
-      reconciled attempt within the two-attempt budget, post-attempt digest/readiness/volume/route/Caddy/protected-state
-      observations and classification, nondisclosure, and either successful exact
-      deployment or a forward-only BLOCKED stop with no old-image rollback.
+    verification: A mode-0600 raw log and sanitized receipt prove the exact maintained
+      invocation carries separate procedure-source and OCI verified-commit bindings;
+      the procedure commit resolves through staged deploy/compose hashes, modes, backup
+      ID, and final bytes; the OCI source resolves through immutable tag/index/platform/revision
+      to configured/running digest; each safely reconciled attempt stays within the
+      two-attempt budget with required readiness/volume/route/Caddy/protected-state
+      observations, nondisclosure, and either successful exact deployment or a forward-only
+      BLOCKED stop with no old-image rollback.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
