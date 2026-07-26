@@ -194835,28 +194835,32 @@ phases:
   - id: rf-bug-v2-no-rollback-procedure-authorization
     name: Independently authorize no-rollback procedure and accepted risk
     status: pending
-    description: 'step_type: verification
+    description: 'step_type: review
 
       repo_change_policy: no_repo_change
 
 
-      Deliver: Independently verify `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE` and
-      authorize its narrow runtime use under the exact human waiver: prior image digest
+      Deliver: Independently review `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE` and
+      authorize its narrow runtime use under the exact human waiver: prior image-digest
       discovery and automatic image rollback are waived only for deployment of `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
-      from source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
-      Confirm default rollback behavior remains available and the opt-in mode preserves
-      the SQLite named volume, route, Caddy ownership, credentials/trust, owner token,
-      secrets, and immutable image identity while allowing a failed known or unknown
-      partial deployment to remain for forward diagnosis.
+      from OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
+      Bind the later clean integrated procedure-source commit separately to tracked
+      `deploy.sh`/`compose.yml` hashes and modes; require the public no-rollback invocation
+      to carry both `--procedure-source-commit <40 lowercase hex>` and OCI `--verified-commit
+      <40 lowercase hex>`, and never infer equality or substitute one identity for
+      the other. Confirm default rollback behavior remains available and the opt-in
+      mode preserves the SQLite named volume, route, Caddy ownership, credentials/trust,
+      owner token, secrets, and immutable image identity while allowing a failed known
+      or unknown partial deployment to remain for forward diagnosis.
 
 
-      Boundary: A fresh `spec-verifier` is read-only. It may run only the current
-      project-native selection, execution, and focused deterministic Node test from
-      a clean detached integrated HEAD. It may not modify repository/Git, SSH, Docker,
-      registry, Tailnet, Caddy, credential/account/trust, secret, volume, data, owner-token,
-      or runtime state. The waiver grants no deletion/recreation, route repair, Caddy
-      reconciliation/restart, alternate target, moving tag, registry mutation, secret
-      disclosure, or unbounded retry.
+      Boundary: A fresh `spec-verifier` is read-only and owns the exact user-risk
+      and safety judgment. It may run only the current project-native selection, execution,
+      and focused deterministic Node test from a clean detached integrated HEAD. It
+      may not modify repository/Git, SSH, Docker, registry, Tailnet, Caddy, credential/account/trust,
+      secret, volume, data, owner-token, or runtime state. The waiver grants no deletion/recreation,
+      route repair, Caddy reconciliation/restart, alternate target, moving tag, registry
+      mutation, secret disclosure, identity conflation, or unbounded retry.
 
 
       Admit: Execute exactly once each: `node scripts/vectl-check.mjs select rf-bug-v2-immutable-deployment-procedure
@@ -194864,26 +194868,31 @@ phases:
       run rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`;
       and `node --test --test-name-pattern=immutable\ OCI\ and\ Tailnet\ deployment\
       procedure scripts/vectl-check.test.mjs`. Require selected/executed identity
-      parity, retained default rollback, explicit `--no-rollback`, absent-prior-digest
-      acceptance only in that mode, no automatic old-image recovery, secret-safe success/no-effect/known-partial/unknown-partial
-      classification, named-volume preservation, strict endpoint identity, no runtime
-      side effects in tests, and synchronized docs. Emit one production-admitted `vectl.verifier.semantic.v1`
+      parity, retained default rollback, explicit `--no-rollback`, strict required
+      parser/output binding for `--procedure-source-commit`, separate OCI `--verified-commit`,
+      rejected missing/duplicate/malformed/equality-assumed inputs, absent-prior-digest
+      acceptance only in no-rollback mode, no automatic old-image recovery, secret-safe
+      success/no-effect/known-partial/unknown-partial classification, named-volume
+      preservation, strict endpoint identity, no runtime side effects in tests, and
+      synchronized docs. Emit one production-admitted `vectl.verifier.semantic.v1`
       with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-no-rollback-procedure-authorization`,
       ordered scope [`integrated procedure and project-native evidence`, `default
-      rollback retained`, `explicit no-prior-digest no-rollback semantics`, `narrow
-      human risk waiver and forbidden effects`, `staging and deployment producer authorization`],
-      and outcome-consistent coverage for `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE`
+      rollback retained`, `separate procedure-source and OCI-application source identity`,
+      `explicit no-prior-digest no-rollback semantics`, `narrow human risk waiver
+      and forbidden effects`, `staging and deployment producer authorization`], and
+      outcome-consistent coverage for `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE`
       and `RF-BUG-V2-NO-ROLLBACK-RISK-ACCEPTANCE`.
 
 
-      Recovery: Any check, identity, documentation, waiver-boundary, nondisclosure,
+      Recovery: Any check, source-identity, documentation, waiver-boundary, nondisclosure,
       or clean-tree defect returns FAIL/BLOCKED to the implementation owner. Do not
       repair, stage, deploy, retry, or mutate external state.'
-    verification: A production-admitted spec-verifier semantic receipt binds the integrated
-      seven-file procedure contract, exact selected execution and focused Node test,
-      proves retained default rollback plus explicit no-prior-digest no-rollback behavior
-      and volume/nondisclosure invariants, and authorizes only the declared staging
-      and exact immutable deployment boundary.
+    verification: A production-admitted spec-verifier semantic v1 review receipt binds
+      the integrated seven-file procedure contract and exact selected execution/focused
+      Node test; proves retained default rollback, required separate procedure-source
+      and OCI verified-commit bindings, explicit no-prior-digest/no-rollback behavior,
+      volume/nondisclosure invariants, and authorizes only the declared staging and
+      exact immutable deployment boundary.
     refs:
     - .agents/skills/resofeed-tailnet-deploy/SKILL.md
     - deploy/resofeed-caddy/.env.example
