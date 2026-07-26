@@ -272,6 +272,11 @@ export const PENDING_PROFILE_PAIRS = [
       'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
       'MUTABLE_LATEST=forbidden',
       'ROLLBACK=prior_digest_and_readiness',
+      'NO_ROLLBACK=explicit_forward_only',
+      'PROCEDURE_SOURCE_COMMIT=required_distinct_from_oci_source',
+      'OCI_APPLICATION_SOURCE=verified_commit',
+      'SQLITE_VOLUME=preserved',
+      'RESULT_CLASSIFICATION=success_no_effect_known_partial_unknown_partial',
       'SECRETS=masked_presence_only',
       'SSH_ENDPOINT_IDENTITY=literal_fqdn_strict_known_key',
       'PROCEDURE_STAGE=clean_commit_two_file_atomic',
@@ -494,7 +499,7 @@ const STAGED_PROCEDURE_FILES = Object.freeze([
   Object.freeze({
     path: 'deploy/resofeed-caddy/deploy.sh',
     mode: 0o755,
-    sha256: 'sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6'
+    sha256: 'sha256:31125a8d31fac3f600b169ad98341fbd6d63fa37bdb0818556a475d757714cf7'
   }),
   Object.freeze({
     path: 'deploy/resofeed-caddy/compose.yml',
@@ -574,6 +579,10 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_STAGE=verified',
     'PROCEDURE_ROLLBACK=prior_bytes_restored',
     'verify_staged_procedure_identity',
+    '--no-rollback',
+    '--procedure-source-commit',
+    'validate_procedure_source_commit',
+    '[[ "$PROCEDURE_SOURCE_COMMIT" =~ ^[a-f0-9]{40}$ ]]',
     'expected_tag="git-${VERIFIED_COMMIT}"',
     'verify_oci_descriptor "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"',
     'verify_oci_descriptor "${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"',
@@ -584,6 +593,16 @@ export function verifyImmutableDeploymentSources(sources) {
     'resolve_previous_image',
     'resofeed-caddy_resofeed-data',
     'rollback_previous_digest',
+    'forward_only_failure',
+    'trap forward_only_failure ERR',
+    'Default deployment requires a recoverable prior image digest',
+    'Prior image digest was neither required nor derived.',
+    'RESULT_CLASSIFICATION_STATE="known_partial"',
+    'RESULT_CLASSIFICATION_STATE="unknown_partial"',
+    'RESULT_CLASSIFICATION=%s',
+    'OCI_APPLICATION_SOURCE_COMMIT=${VERIFIED_COMMIT}',
+    'PROCEDURE_SOURCE_COMMIT=${PROCEDURE_SOURCE_COMMIT}',
+    'SQLITE_VOLUME=preserved',
     'wait_for_readiness',
     '--record-orphan',
     'Registry tag deletion is outside this script',
@@ -616,6 +635,10 @@ export function verifyImmutableDeploymentSources(sources) {
     '--recover-procedure',
     '--index-digest sha256:<index-64-hex>',
     'restores the captured prior digest',
+    '`--no-rollback`',
+    '--procedure-source-commit <tracked-procedure-source-40-lowercase-hex>',
+    'OCI application source',
+    '`RESULT_CLASSIFICATION`',
     'literal FQDN as the effective SSH HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
     'attached `HEAD` before any SSH invocation',
@@ -632,7 +655,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_DEPLOY_SHA256',
     'PROCEDURE_COMPOSE_SHA256',
     'INDEX_DIGEST=sha256:<64 lowercase hex>',
-    'preserves the prior digest and SQLite volume',
+    'preserves the named SQLite volume',
+    '`--no-rollback`',
+    '`--procedure-source-commit`',
+    'OCI application source',
+    '`RESULT_CLASSIFICATION`',
     'literal FQDN as the effective SSH HostName and host-key lookup identity',
     'StrictHostKeyChecking=yes',
     'attached `HEAD` before any SSH invocation',
@@ -657,7 +684,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'TCP.443.TCPForward',
     'tailscale serve status --json',
     SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
-    'Failure restores the prior digest'
+    'Default deployment requires and captures a recoverable prior digest',
+    '`--no-rollback`',
+    '`--procedure-source-commit`',
+    'OCI application source',
+    '`RESULT_CLASSIFICATION`'
   ]);
   requireDeploymentFragments(sources, 'deploy/resofeed-caddy/verify.sh', [
     'status --porcelain=v1 --untracked-files=all',
@@ -711,7 +742,7 @@ export function verifyImmutableDeploymentSources(sources) {
     'RF-BUG-V2 immutable OCI and Tailnet deployment procedure',
     'clean-commit two-file procedure staging',
     'target-local atomic replacement and prior-byte recovery',
-    'prior-digest capture',
+    'default prior-digest success',
     'strict existing host-key trust for the literal Tailnet FQDN',
     'attached `HEAD` refusal before any SSH attempt',
     'PROCEDURE_SOURCE_CHECKOUT=clean_detached_head',
@@ -722,7 +753,10 @@ export function verifyImmutableDeploymentSources(sources) {
     'tailscale serve status --json',
     'TCP.443.TCPForward',
     SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
-    'masked-presence boundary markers'
+    'masked-presence boundary markers',
+    'explicit forward-only no-rollback',
+    'separate procedure-source and OCI application-source identities',
+    'success`, `no_effect`, `known_partial`, or `unknown_partial`'
   ]);
 
   const procedure = IMMUTABLE_DEPLOYMENT_PATHS.map((relativePath) => sources[relativePath]).join('\n');
@@ -879,6 +913,32 @@ export function verifyImmutableDeploymentSources(sources) {
       || deployProcedure.indexOf('verify_staged_procedure_identity') > deployProcedure.indexOf('load_env')) {
     throw new AdapterFailure('immutable deployment procedure identity is not verified before runtime configuration');
   }
+  for (const conflation of [
+    'PROCEDURE_SOURCE_COMMIT=$VERIFIED_COMMIT',
+    'PROCEDURE_SOURCE_COMMIT="${VERIFIED_COMMIT}"',
+    '[ "$PROCEDURE_SOURCE_COMMIT" = "$VERIFIED_COMMIT" ]',
+    '[ "$PROCEDURE_SOURCE_COMMIT" != "$VERIFIED_COMMIT" ]'
+  ]) {
+    if (deployScript.includes(conflation)) {
+      throw new AdapterFailure(`immutable deployment source identities were conflated: ${conflation}`);
+    }
+  }
+  const forwardOnlyStart = deployScript.indexOf('forward_only_failure()');
+  const rollbackStart = deployScript.indexOf('rollback_previous_digest()');
+  const forwardOnlyFailure = deployScript.slice(forwardOnlyStart, rollbackStart);
+  if (forwardOnlyStart < 0 || rollbackStart <= forwardOnlyStart
+      || forwardOnlyFailure.includes('rollback_previous_digest')
+      || !forwardOnlyFailure.includes('ROLLBACK=suppressed_by_explicit_no_rollback')) {
+    throw new AdapterFailure('explicit no-rollback failure path can invoke or omit old-image recovery');
+  }
+  if (!deployProcedure.includes('if [ "$NO_ROLLBACK" -eq 1 ]; then')
+      || !deployProcedure.includes('trap forward_only_failure ERR')
+      || !deployProcedure.includes('trap rollback_previous_digest ERR')) {
+    throw new AdapterFailure('deployment did not keep explicit forward-only and default rollback traps separate');
+  }
+  if ((deployScript.match(/docker compose --env-file "\$ENV_FILE" -f "\$COMPOSE_FILE" up -d resofeed/gu) ?? []).length !== 1) {
+    throw new AdapterFailure('default recovery must retain exactly one prior-service replacement command');
+  }
 
   return [
     'OCI_REPOSITORY=docker.io/tefx/resofeed',
@@ -886,6 +946,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
     'MUTABLE_LATEST=forbidden',
     'ROLLBACK=prior_digest_and_readiness',
+    'NO_ROLLBACK=explicit_forward_only',
+    'PROCEDURE_SOURCE_COMMIT=required_distinct_from_oci_source',
+    'OCI_APPLICATION_SOURCE=verified_commit',
+    'SQLITE_VOLUME=preserved',
+    'RESULT_CLASSIFICATION=success_no_effect_known_partial_unknown_partial',
     'SECRETS=masked_presence_only',
     'SSH_ENDPOINT_IDENTITY=literal_fqdn_strict_known_key',
     'PROCEDURE_STAGE=clean_commit_two_file_atomic',

@@ -39,7 +39,9 @@ readonly RESOFEED_VOLUME="resofeed-caddy_resofeed-data"
 readonly ORPHAN_LEDGER=".resofeed-oci-orphans.log"
 
 MODE="deploy"
+NO_ROLLBACK=0
 VERIFIED_COMMIT=""
+PROCEDURE_SOURCE_COMMIT=""
 IMMUTABLE_TAG=""
 OCI_INDEX_DIGEST=""
 AMD64_MANIFEST_DIGEST=""
@@ -68,6 +70,20 @@ PREVIOUS_INDEX_DIGEST=""
 PREVIOUS_AMD64_DIGEST=""
 PREVIOUS_ARM64_DIGEST=""
 REPLACEMENT_STARTED=0
+RESULT_CLASSIFICATION_STATE="no_effect"
+
+classify_exit() {
+  local status=$?
+  local classification=$RESULT_CLASSIFICATION_STATE
+  trap - EXIT
+  if [ "$status" -eq 0 ]; then
+    classification="success"
+    printf 'RESULT_CLASSIFICATION=%s\n' "$classification"
+  else
+    printf 'RESULT_CLASSIFICATION=%s\n' "$classification" >&2
+  fi
+}
+trap classify_exit EXIT
 
 usage() {
   cat <<'EOF'
@@ -80,7 +96,10 @@ Usage:
   ./deploy/resofeed-caddy/deploy.sh --recover-procedure \
     --backup-id <sha256:64-hex>
 
-  ./deploy.sh --verified-commit <40-hex> --immutable-tag <git-40-hex> \
+  ./deploy.sh [--no-rollback] \
+    --verified-commit <40-hex> \
+    --procedure-source-commit <40-hex> \
+    --immutable-tag <git-40-hex> \
     --index-digest <sha256:64-hex> \
     --amd64-digest <sha256:64-hex> \
     --arm64-digest <sha256:64-hex> \
@@ -101,12 +120,16 @@ It does not read runtime configuration or publish, deploy, stop, or restart.
 The recover-procedure mode restores one reported content-addressed backup through
 the same fixed interface. Downstream operators must not substitute copy commands.
 
-The deploy mode first verifies the staged procedure commit and both caller-bound
-SHA-256 identities, then verifies the OCI chain and updates only the existing
-tefx-mbp-personal resofeed-caddy stack. Failure restores the prior digest and
-verifies readiness. The record-orphan mode appends the complete non-secret chain
-to the local orphan ledger. Registry tag deletion is outside this script and
-requires separate, explicit registry authorization.
+The deploy mode independently validates the tracked procedure-source commit and
+OCI application-source commit, then verifies both caller-bound procedure SHA-256
+identities and the OCI chain before updating only the existing tefx-mbp-personal
+resofeed-caddy stack. By default, a recoverable prior digest is mandatory and a
+failure restores that digest and verifies readiness. Explicit --no-rollback is a
+forward-only deployment mode: it does not require or derive a prior digest and
+never attempts old-image recovery. Every exit reports success, no_effect,
+known_partial, or unknown_partial without disclosing secrets. The record-orphan
+mode appends the complete non-secret chain to the local orphan ledger.
+Registry tag deletion is outside this script and requires separate authorization.
 EOF
 }
 
@@ -158,9 +181,18 @@ parse_arguments() {
   while [ "$#" -gt 0 ]; do
     mark_argument "$1"
     case "$1" in
+      --no-rollback)
+        NO_ROLLBACK=1
+        shift
+        ;;
       --verified-commit)
         [ "$#" -ge 2 ] || fatal "--verified-commit requires a value."
         VERIFIED_COMMIT=$2
+        shift 2
+        ;;
+      --procedure-source-commit)
+        [ "$#" -ge 2 ] || fatal "--procedure-source-commit requires a value."
+        PROCEDURE_SOURCE_COMMIT=$2
         shift 2
         ;;
       --immutable-tag)
@@ -214,6 +246,11 @@ validate_verified_commit() {
   [[ "$VERIFIED_COMMIT" =~ ^[a-f0-9]{40}$ ]] || fatal "Verified commit must be exactly 40 lowercase hexadecimal characters."
 }
 
+validate_procedure_source_commit() {
+  [[ "$PROCEDURE_SOURCE_COMMIT" =~ ^[a-f0-9]{40}$ ]] \
+    || fatal "Procedure source commit must be exactly 40 lowercase hexadecimal characters."
+}
+
 validate_identity_arguments() {
   validate_verified_commit
   expected_tag="git-${VERIFIED_COMMIT}"
@@ -235,7 +272,8 @@ validate_procedure_identity_arguments() {
 }
 
 require_empty_deployment_arguments() {
-  [ -z "$IMMUTABLE_TAG$OCI_INDEX_DIGEST$AMD64_MANIFEST_DIGEST$ARM64_MANIFEST_DIGEST$PROCEDURE_DEPLOY_SHA256$PROCEDURE_COMPOSE_SHA256$PROCEDURE_BACKUP_ID" ] \
+  [ "$NO_ROLLBACK" -eq 0 ] \
+    && [ -z "$PROCEDURE_SOURCE_COMMIT$IMMUTABLE_TAG$OCI_INDEX_DIGEST$AMD64_MANIFEST_DIGEST$ARM64_MANIFEST_DIGEST$PROCEDURE_DEPLOY_SHA256$PROCEDURE_COMPOSE_SHA256$PROCEDURE_BACKUP_ID" ] \
     || fatal "Procedure staging accepts only one verified commit identity."
 }
 
@@ -648,7 +686,12 @@ stage_procedure() {
       remote_procedure_helper cleanup "$stage_name" >/dev/null 2>&1 || true
     fi
   }
-  trap cleanup_stage EXIT
+  stage_cleanup_exit() {
+    local status=$?
+    cleanup_stage
+    return "$status"
+  }
+  trap 'stage_cleanup_exit; classify_exit' EXIT
   remote_procedure_helper prepare "$stage_name" "$prior_deploy_hash" "$prior_compose_hash" >/dev/null \
     || fatal "Target-local procedure stage preparation failed."
   stage_prepared=1
@@ -670,7 +713,7 @@ stage_procedure() {
     "$prior_deploy_hash" "$prior_compose_hash" "$prior_deploy_mode" "$prior_compose_mode") \
     || fatal "Atomic procedure replacement failed."
   stage_prepared=0
-  trap - EXIT
+  trap classify_exit EXIT
 
   printf 'PROCEDURE_SOURCE_COMMIT=%s\n' "$VERIFIED_COMMIT"
   printf 'PROCEDURE_DEPLOY_SHA256=%s\n' "$source_deploy_hash"
@@ -679,7 +722,8 @@ stage_procedure() {
 }
 
 recover_procedure() {
-  [ -z "$VERIFIED_COMMIT$IMMUTABLE_TAG$OCI_INDEX_DIGEST$AMD64_MANIFEST_DIGEST$ARM64_MANIFEST_DIGEST$PROCEDURE_DEPLOY_SHA256$PROCEDURE_COMPOSE_SHA256" ] \
+  [ "$NO_ROLLBACK" -eq 0 ] \
+    && [ -z "$VERIFIED_COMMIT$PROCEDURE_SOURCE_COMMIT$IMMUTABLE_TAG$OCI_INDEX_DIGEST$AMD64_MANIFEST_DIGEST$ARM64_MANIFEST_DIGEST$PROCEDURE_DEPLOY_SHA256$PROCEDURE_COMPOSE_SHA256" ] \
     || fatal "Procedure recovery accepts only one backup identity."
   is_digest "$PROCEDURE_BACKUP_ID" || fatal "Procedure backup identity is missing or malformed."
   command -v ssh >/dev/null 2>&1 || fatal "Required recovery command is unavailable: ssh"
@@ -693,7 +737,8 @@ verify_staged_procedure_identity() {
     || fatal "Installed deploy.sh does not match the caller-bound procedure SHA-256."
   [ "$(sha256_file "$SCRIPT_DIR/$COMPOSE_FILE")" = "$PROCEDURE_COMPOSE_SHA256" ] \
     || fatal "Installed compose.yml does not match the caller-bound procedure SHA-256."
-  ok "PROCEDURE_SOURCE_COMMIT=${VERIFIED_COMMIT}"
+  ok "PROCEDURE_SOURCE_COMMIT=${PROCEDURE_SOURCE_COMMIT}"
+  ok "OCI_APPLICATION_SOURCE_COMMIT=${VERIFIED_COMMIT}"
   ok "PROCEDURE_DEPLOY_SHA256=${PROCEDURE_DEPLOY_SHA256}"
   ok "PROCEDURE_COMPOSE_SHA256=${PROCEDURE_COMPOSE_SHA256}"
 }
@@ -856,9 +901,13 @@ EOF
 }
 
 validate_existing_state() {
-  resolve_previous_image
-  if [ -z "$PREVIOUS_IMAGE" ]; then
-    ok "No prior ResoFeed container; first immutable deployment will retain the named SQLite volume."
+  if [ "$NO_ROLLBACK" -eq 0 ]; then
+    resolve_previous_image
+    [ -n "$PREVIOUS_IMAGE" ] \
+      || fatal "Default deployment requires a recoverable prior image digest; use explicit --no-rollback for a forward-only deployment."
+  elif ! docker container inspect resofeed >/dev/null 2>&1; then
+    ok "No prior ResoFeed container; explicit no-rollback deployment retains the named SQLite volume."
+    ok "Prior image digest was neither required nor derived."
     return
   fi
 
@@ -868,7 +917,11 @@ validate_existing_state() {
     || fatal "Existing ResoFeed does not use the preserved SQLite volume."
   docker container inspect resofeed-caddy >/dev/null 2>&1 \
     || fatal "Existing ResoFeed deployment is missing the resofeed-caddy container."
-  ok "Prior immutable digest captured for readiness rollback."
+  if [ "$NO_ROLLBACK" -eq 0 ]; then
+    ok "Prior immutable digest captured for readiness rollback."
+  else
+    ok "Explicit no-rollback deployment did not inspect or derive a prior image digest."
+  fi
   ok "SQLite volume preservation verified."
 }
 
@@ -972,9 +1025,18 @@ run_quiet() {
   return 1
 }
 
+forward_only_failure() {
+  set +e
+  trap - ERR
+  fail "Immutable deployment failed; explicit no-rollback suppresses old-image recovery."
+  fail "ROLLBACK=suppressed_by_explicit_no_rollback"
+  exit 1
+}
+
 rollback_previous_digest() {
   set +e
   trap - ERR
+  RESULT_CLASSIFICATION_STATE="unknown_partial"
   fail "Immutable deployment failed; starting bounded recovery."
 
   write_image_chain \
@@ -994,8 +1056,10 @@ rollback_previous_digest() {
   fi
 
   if [ "$restore_env_status" -eq 0 ] && [ "$rollback_status" -eq 0 ]; then
+    RESULT_CLASSIFICATION_STATE="no_effect"
     fail "ROLLBACK=prior_digest_and_readiness restored"
   else
+    RESULT_CLASSIFICATION_STATE="unknown_partial"
     fail "ROLLBACK=manual_intervention_required; SQLite volume was not removed"
   fi
   exit 1
@@ -1043,17 +1107,25 @@ deploy_immutable_image() {
   validate_runtime_configuration
   verify_oci_identity
   validate_existing_state
-  capture_previous_chain
+  if [ "$NO_ROLLBACK" -eq 0 ]; then
+    capture_previous_chain
+  fi
   validate_tailscale_boundary
 
-  trap rollback_previous_digest ERR
+  if [ "$NO_ROLLBACK" -eq 1 ]; then
+    trap forward_only_failure ERR
+  else
+    trap rollback_previous_digest ERR
+  fi
   write_image_chain \
     "$RESOFEED_IMAGE" "$VERIFIED_COMMIT" "$IMMUTABLE_TAG" \
     "$OCI_INDEX_DIGEST" "$AMD64_MANIFEST_DIGEST" "$ARM64_MANIFEST_DIGEST"
+  RESULT_CLASSIFICATION_STATE="known_partial"
 
   run_quiet "Compose contract validated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet
-  REPLACEMENT_STARTED=1
   run_quiet "Immutable ResoFeed digest pulled" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull resofeed
+  REPLACEMENT_STARTED=1
+  RESULT_CLASSIFICATION_STATE="unknown_partial"
   run_quiet "Existing resofeed-caddy stack updated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build
   ensure_tailscale_serve
   wait_for_readiness 30 || false
@@ -1067,7 +1139,15 @@ deploy_immutable_image() {
   ok "OCI_IDENTITY=index_and_platform_digests"
   ok "TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy"
   ok "MUTABLE_LATEST=forbidden"
-  ok "ROLLBACK=prior_digest_and_readiness"
+  if [ "$NO_ROLLBACK" -eq 1 ]; then
+    ok "NO_ROLLBACK=explicit_forward_only"
+    ok "ROLLBACK=explicit_forward_only"
+  else
+    ok "ROLLBACK=prior_digest_and_readiness"
+  fi
+  ok "PROCEDURE_SOURCE_COMMIT=${PROCEDURE_SOURCE_COMMIT}"
+  ok "OCI_APPLICATION_SOURCE_COMMIT=${VERIFIED_COMMIT}"
+  ok "SQLITE_VOLUME=preserved"
   ok "SECRETS=masked_presence_only"
   ok "READINESS=root_200_doctor_401"
   printf 'Open from a Tailnet-connected device: https://%s\n' "$RESOFEED_DOMAIN"
@@ -1082,14 +1162,16 @@ case "$MODE" in
     recover_procedure
     ;;
   record-orphan)
-    [ -z "$PROCEDURE_DEPLOY_SHA256$PROCEDURE_COMPOSE_SHA256$PROCEDURE_BACKUP_ID" ] \
-      || fatal "Orphan recording does not accept procedure identities."
+    [ "$NO_ROLLBACK" -eq 0 ] \
+      && [ -z "$PROCEDURE_SOURCE_COMMIT$PROCEDURE_DEPLOY_SHA256$PROCEDURE_COMPOSE_SHA256$PROCEDURE_BACKUP_ID" ] \
+      || fatal "Orphan recording does not accept procedure or rollback-mode identities."
     validate_identity_arguments
     record_orphan
     ;;
   deploy)
     [ -z "$PROCEDURE_BACKUP_ID" ] || fatal "Deployment does not accept a procedure backup identity."
     validate_identity_arguments
+    validate_procedure_source_commit
     validate_procedure_identity_arguments
     deploy_immutable_image
     ;;

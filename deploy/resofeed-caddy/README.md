@@ -146,9 +146,9 @@ Deployment authority does not authorize that repair. Route absence or drift must
 Repository rollback of this JSON-route harness remediation reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/verify-remote.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs` to the integrated OrbStack-path-remediation state. It performs no SSH, Serve repair, procedure recovery, deployment, publication, or runtime mutation.
 
 ## Deploy the verified digest
-Perform the broader read-only runtime target inspection only after the separately authorized staging operation reports `PROCEDURE_STAGE=verified`. Through the fixed `TAILNET_SSH_OPTIONS`, confirm the canonical physical home-relative directory, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, OrbStack Docker CLI, Compose config, current `resofeed`/`resofeed-caddy` containers, named `/data` volume, Tailnet TCP/443 route, and masked secret presence. Never compare the internal short hostname.
+Perform the broader read-only runtime target inspection only after the separately authorized staging operation reports `PROCEDURE_STAGE=verified`. Through the fixed `TAILNET_SSH_OPTIONS`, confirm the canonical physical home-relative directory, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, OrbStack Docker CLI, Compose config, current containers, named `/data` volume, Tailnet TCP/443 route, and masked secret presence. Never compare the internal short hostname.
 
-The deployment authorization must bind the same full commit and both exact SHA-256 values emitted by staging. Then run only:
+The deployment authorization binds `PROCEDURE_SOURCE_COMMIT` for the integrated tracked procedure independently from the OCI application source passed through `--verified-commit`. Each must be exactly 40 lowercase hexadecimal characters. The procedure never derives either value from the other and accepts equal or unequal values without changing their distinct meanings. Run the default prior-digest rollback mode only as:
 
 ```bash
 ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_SSH_HOST" 'set -Eeuo pipefail
@@ -163,8 +163,9 @@ cd "$canonical_stack"
 [ -f compose.yml ] && [ ! -L compose.yml ] && [ "$(stat -f "%Lp" compose.yml 2>/dev/null || stat -c "%a" compose.yml)" = 644 ]
 export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
 ./deploy.sh \
-  --verified-commit <40-lowercase-hex> \
-  --immutable-tag git-<same-40-lowercase-hex> \
+  --verified-commit <OCI-application-source-40-lowercase-hex> \
+  --procedure-source-commit <tracked-procedure-source-40-lowercase-hex> \
+  --immutable-tag git-<OCI-application-source-40-lowercase-hex> \
   --index-digest sha256:<index-64-hex> \
   --amd64-digest sha256:<amd64-64-hex> \
   --arm64-digest sha256:<arm64-64-hex> \
@@ -172,9 +173,11 @@ export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
   --procedure-compose-sha256 sha256:<staged-compose-yml-64-hex>'
 ```
 
-`deploy.sh` validates its own bytes and `compose.yml` against the caller-bound procedure identities before reading runtime configuration or invoking Docker, OCI, Compose, Caddy, Tailscale, or readiness work. A mismatch fails before deployment mutation. It then verifies both the immutable tag and digest reference against the supplied index/platform chain, derives `RESOFEED_IMAGE=docker.io/tefx/resofeed@sha256:<index-digest>`, captures the currently deployed repository digest, verifies the existing SQLite volume, writes only non-secret identity fields, pulls the digest, updates the existing stack, and retains all named volumes.
+Default mode requires and captures a recoverable prior digest, verifies `resofeed-caddy_resofeed-data`, deploys the immutable index, and restores the captured prior digest plus direct readiness on failure.
 
-Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, moving-tag substitution, host-key trust mutation, and ad hoc procedure copying are outside this procedure and are refused.
+For an explicitly authorized forward-only deployment, add `--no-rollback`. It still requires the two independent commit identities, immutable index/platform/revision chain, and procedure hashes. It accepts a target with no prior digest, never derives one, never invokes old-image recovery, and does not retry. The script writes only non-secret identity fields, pulls the supplied digest, updates the existing stack once, preserves the named SQLite volume, configuration, owner token, masked secrets, route ownership, and Caddy ownership, and emits `PROCEDURE_SOURCE_COMMIT`, `OCI_APPLICATION_SOURCE_COMMIT`, plus `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial`.
+
+Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, moving-tag substitution, host-key trust mutation, ad hoc procedure copying, route repair, and Caddy reconciliation are outside this procedure and are refused.
 ## Tracked read-only probe harness
 Invoke the wrapper from the repository root with the complete nonsecret staging receipt except for a caller-supplied manifest hash:
 
@@ -278,9 +281,11 @@ A staging failure before replacement removes only the target-local transaction d
   --backup-id sha256:<reported-backup-64-hex>
 ```
 
-Recovery has no host or path override. It validates the fixed target, backup manifest, both backup hashes/modes, shell syntax, and Compose shape before target-local atomic renames. A recovery failure restores the procedure bytes present when recovery began when that rescue remains safely available. Do not invent direct SSH copy, `scp`, `rsync`, or manual rename steps.
+Recovery has no host or path override. It validates the fixed target, backup manifest, both backup hashes/modes, shell syntax, and Compose shape before target-local atomic renames. Do not invent direct SSH copy, `scp`, `rsync`, or manual rename steps.
 
-If image replacement or readiness fails, `deploy.sh` restores the captured prior digest in `.env`, recreates only the `resofeed` service against the same named volume, and requires root `200` plus unauthenticated Doctor `401`. It never removes the SQLite volume. A first deployment without a prior digest stops for manual recovery and still leaves data intact.
+Default image deployment refuses to begin without a recoverable prior digest. If replacement or readiness fails, `deploy.sh` restores that digest in `.env`, recreates only the `resofeed` service against the same named volume, and requires root `200` plus unauthenticated Doctor `401`. A verified restoration reports `RESULT_CLASSIFICATION=no_effect`; an unverified final state reports `unknown_partial`.
+
+Explicit `--no-rollback` provides the no-prior-digest path. It never invokes `rollback_previous_digest` or old-image recovery. It reports `no_effect` before persistent deployment mutation, `known_partial` after identity configuration changes but before service replacement, `unknown_partial` after replacement begins without complete verification, and `success` only after exact image identity and readiness pass. It never retries, removes the SQLite volume, prints secrets, rotates the owner token, repairs the route, or reconciles Caddy.
 
 When a publication leaves a complete unreferenced index/platform chain, record it on the authorized stack for later review:
 
@@ -293,9 +298,9 @@ When a publication leaves a complete unreferenced index/platform chain, record i
   --arm64-digest sha256:<arm64-64-hex>
 ```
 
-The fixed local orphan ledger contains only commit, tag, and digests. The script has no registry-deletion operation. Deleting an authorized temporary tag requires a separate registry-specific approval and must never be inferred from deployment authority.
+The fixed local orphan ledger contains only commit, tag, and digests. The script has no registry-deletion operation. Deleting an authorized temporary tag requires separate registry-specific approval and must never be inferred from deployment authority.
 The source-side recovery interface applies the same fixed strict-known-key SSH transport before any remote recovery command. Unknown or changed FQDN keys fail before lock or rescue creation; no internal hostname, alternate target, or trust override is accepted.
-Repository rollback of the SSH endpoint-identity remediation reverts only `deploy.sh`, the selected-execution adapter/developer test, Tailnet skill, this README, Container guide, and harness contract together. It performs no remote procedure recovery or runtime operation.
+Repository rollback of this deployment-procedure remediation reverts only `deploy.sh`, the selected-execution adapter/acceptance test, Tailnet skill, this README, Container guide, and harness contract together. It performs no remote procedure recovery or runtime operation.
 ## Stop
 
 `./stop.sh` stops the stack while preserving named volumes. Data-destruction modes are outside the immutable deployment and rollback procedure.

@@ -313,7 +313,6 @@ docker run -d \
 ```
 
 ## Multi-architecture Build Command
-
 The focused developer proof uses the current selected Docker context and daemon through one uniquely named transient `docker-container` builder. It never selects that builder as the active builder. The build produces cache only:
 
 ```text
@@ -330,6 +329,7 @@ docker buildx build \
 The proof runs with a temporary empty Docker configuration and no registry authentication, secret, SSH, build-argument, tag, push, load, or publish input. It hashes source state, selected context, daemon identity, active/default builders, and unrelated container state before the build and compares those fingerprints after cleanup. Every post-create path removes the transient builder and its attributable BuildKit container. Build cache writes may remain.
 
 Tailnet staging, recovery, inspection, and deployment authenticate `tefx-mbp-personal.platy-atlas.ts.net` through the literal FQDN as both effective HostName and host-key lookup identity. The maintained Bash transport uses `-F none`, `StrictHostKeyChecking=yes`, `UpdateHostKeys=no`, disabled DNS host-key trust/canonicalization, public-key-only batch authentication, no forwarding or multiplexing, and the default existing OpenSSH known-host files. It never enrolls or updates trust, loads aliases, rewrites the hostname, chooses another trust store/account/endpoint, or accepts an unknown/changed key. After connection it validates the canonical physical home-relative `Projects/resofeed-caddy` path, stack basename/project identity, regular non-symlink two-file procedure, exact `755`/`644` modes, and Compose shape. The internal short hostname is unknown and irrelevant.
+
 Release publication targets exactly `docker.io/tefx/resofeed`. It starts from a caller-supplied verified commit, binds the tag `git-${VERIFIED_COMMIT}`, labels both platform images with that commit, and publishes exactly `linux/amd64` plus `linux/arm64`:
 
 ```text
@@ -373,9 +373,11 @@ The only production Tailnet consumer is `tefx-mbp-personal.platy-atlas.ts.net:~/
   --verified-commit <caller-supplied-40-lowercase-hex>
 ```
 
-It stages exactly the verified commit's `deploy.sh` and `compose.yml`, reports `PROCEDURE_DEPLOY_SHA256`, `PROCEDURE_COMPOSE_SHA256`, and a content-addressed backup identity, and performs no publication, deployment, runtime, data, credential, or secret mutation. It does not read remote `.env`. Partial replacement restores both prior procedure files. The only manual recovery interface is `./deploy/resofeed-caddy/deploy.sh --recover-procedure --backup-id sha256:<reported-backup-64-hex>`; ad hoc copy or rename commands are outside the contract.
+It stages exactly the verified commit's `deploy.sh` and `compose.yml`, reports `PROCEDURE_SOURCE_COMMIT`, `PROCEDURE_DEPLOY_SHA256`, `PROCEDURE_COMPOSE_SHA256`, and a content-addressed backup identity, and performs no publication, deployment, runtime, data, credential, or secret mutation. It does not read remote `.env`. Partial replacement restores both prior procedure files. The only manual recovery interface is `./deploy/resofeed-caddy/deploy.sh --recover-procedure --backup-id sha256:<reported-backup-64-hex>`; ad hoc copy or rename commands are outside the contract.
 
-Formal deployment must bind the same full commit and both procedure SHA-256 values before runtime configuration is read. Its Compose input is `RESOFEED_IMAGE=docker.io/tefx/resofeed@${INDEX_DIGEST}`. The deployment procedure captures the prior repository digest, preserves `resofeed-caddy_resofeed-data`, verifies direct readiness, and restores the prior digest/readiness pair on failure. Credential rotation, data deletion, alternate targets, and registry deletion are outside deployment authority. A complete orphan index/platform chain is recorded for separately authorized cleanup.
+Formal deployment passes the OCI application source as `--verified-commit` and the later integrated tracked procedure source as independent `--procedure-source-commit`. Both are strict 40-lowercase-hex inputs; neither is inferred from the other, and equality is neither required nor forbidden. Its Compose input is `RESOFEED_IMAGE=docker.io/tefx/resofeed@${INDEX_DIGEST}`. Default deployment requires and captures a recoverable prior digest, preserves `resofeed-caddy_resofeed-data`, verifies direct readiness, and restores the prior digest/readiness pair on failure.
+
+Explicit `--no-rollback` is the only no-prior-digest path. It never derives a prior image, invokes `rollback_previous_digest`, or retries deployment. It preserves the named volume, configuration, owner token, masked secret boundary, Tailnet route ownership, and Caddy ownership. It emits the procedure source and OCI application source separately and reports `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial`. Credential rotation, data deletion, alternate targets, route repair, Caddy reconciliation, and registry deletion remain outside deployment authority. A complete orphan index/platform chain is recorded for separately authorized cleanup.
 
 For local current-host testing, build and load one explicitly local tag:
 
@@ -443,7 +445,6 @@ Before opening the production listener, Go validates the embedded UI and derives
 
 Caddy and other reverse proxies must pass these application-owned values unchanged. The policy must boot the embedded UI and preserve ordinary authenticated product operations, including OPML import and JSON State export, import, and download. Container and browser evidence must redact owner tokens, provider keys, authorization values, cookies, provider bodies, and `.env` contents.
 ## Verification Checklist
-
 Before accepting the containerization or immutable release procedure:
 
 - Build succeeds for `linux/amd64` and `linux/arm64`.
@@ -465,13 +466,17 @@ Before accepting the containerization or immutable release procedure:
 - `--stage-procedure` runs only from a detached `HEAD` at the exact clean full commit, rejects an attached `HEAD` before any SSH attempt, and binds only `deploy.sh` (`100755`) and `compose.yml` (`100644`) to source SHA-256 identities.
 - Procedure staging fixes the host and stack path, verifies both prior files before mutation, transfers exactly two files through target-local temporaries, and never reads remote `.env` or mutates publication, runtime, data, credential, secret, container, image, volume, Caddy, or Tailscale state.
 - Procedure replacement preserves a content-addressed prior-byte backup, uses target-local atomic renames, verifies final hashes/mode, restores both prior files after a partial failure, and exposes only `--recover-procedure --backup-id <sha256>` for deliberate recovery.
-- Formal deployment binds `PROCEDURE_DEPLOY_SHA256` and `PROCEDURE_COMPOSE_SHA256` to the same full verified commit and rejects mismatches before runtime configuration or Docker/OCI operations.
-- Tailnet deployment targets only `tefx-mbp-personal:resofeed-caddy`, uses `docker.io/tefx/resofeed@sha256:<index-digest>`, and retains `resofeed-caddy_resofeed-data`.
+- Formal deployment validates `--verified-commit` as the OCI application source and `--procedure-source-commit` as the integrated tracked procedure source independently; each is strict 40-lowercase-hex, neither is inferred from the other, and equality is neither required nor forbidden.
+- Procedure SHA-256 identities are rejected before runtime configuration or Docker/OCI operations when they do not match the installed tracked procedure bytes.
+- Default deployment requires a recoverable prior digest, retains `resofeed-caddy_resofeed-data`, and restores the prior digest/readiness pair on failure.
+- Explicit `--no-rollback` is the only admitted no-prior-digest path; it never derives a prior image, invokes `rollback_previous_digest`, retries deployment, removes/recreates a volume, prints a secret, rotates the owner token, repairs the route, or reconciles Caddy.
+- Forward-only evidence records the procedure source and OCI application source separately and emits `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial` on every exit.
+- Tailnet deployment targets only `tefx-mbp-personal:resofeed-caddy` and uses `docker.io/tefx/resofeed@sha256:<index-digest>`.
 - Before publication or replacement, the tracked read-only probe requires duplicate-free `tailscale serve status --json` with `TCP.443.TCPForward = 127.0.0.1:8443`; absence or drift blocks, and this release invokes no Serve mutation.
-- Passing readiness is root `200` plus unauthenticated `/api/doctor` `401`. Failure restores the prior digest against the same named volume and proves the same readiness pair.
-- Evidence contains the verified commit, immutable tag, index/platform digests, target identity, readiness outcomes, and masked secret presence only. It contains no token, credential, provider key, `.env` value, or secret-source path.
+- Passing readiness is root `200` plus unauthenticated `/api/doctor` `401`. Default-mode failure restores the prior digest against the same named volume and proves the same readiness pair.
+- Evidence contains the verified OCI commit, procedure-source commit, immutable tag, index/platform digests, target identity, readiness outcomes, classifications, and masked secret presence only. It contains no token, credential, provider key, `.env` value, or secret-source path.
 - Publication recovery records a complete orphan digest chain. Registry deletion occurs only under separate explicit authorization and is never inferred from deploy authority.
 - Every maintained SSH path uses one noninteractive strict-existing-key option set with the literal FQDN as destination, effective `HostName`, and host-key lookup identity; unknown/changed keys fail before remote preparation or transfer, no trust/credential/endpoint override is accepted, and the internal short hostname has no authority.
 - Authenticated staging, recovery, inspection, and deployment validate the canonical physical home-relative stack path, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh`/`compose.yml`, exact `755`/`644` modes, and Compose shape before their respective operations.
-- Repository rollback of SSH endpoint identity is one repository-only unit covering `deploy.sh`, the selected-execution adapter/developer test, Tailnet skill, deployment README, this Container guide, and the harness contract; it does not authorize or perform remote recovery or runtime mutation.
+- Repository rollback is one repository-only unit covering `deploy.sh`, the selected-execution adapter/acceptance test, Tailnet skill, deployment README, this Container guide, and the harness contract; it does not authorize or perform remote recovery or runtime mutation.
 - The focused container developer proof derives `RESOFEED_SVELTE_BUILD_IDENTITY` from the canonical helper under `env -i`, completes one cache-only `linux/amd64,linux/arm64` build with a unique unselected builder and credential-free Docker configuration, removes its builder/container residue on every path, and leaves source, selected context, daemon, active/default builders, and unrelated containers unchanged.

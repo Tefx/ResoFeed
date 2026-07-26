@@ -211,6 +211,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
   assert.deepEqual(parseSelectionOutput(selected.stdout, profile), selectionEnvelope(profile));
 
   const commit = 'a'.repeat(40);
+  const procedureCommit = 'c'.repeat(40);
   const indexDigest = `sha256:${'1'.repeat(64)}`;
   const amd64Digest = `sha256:${'2'.repeat(64)}`;
   const arm64Digest = `sha256:${'3'.repeat(64)}`;
@@ -257,7 +258,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
 
   const stagedDeployPath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'deploy.sh');
   const stagedComposePath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'compose.yml');
-  assert.equal(fileSHA256(stagedDeployPath), 'sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6');
+  assert.equal(fileSHA256(stagedDeployPath), 'sha256:31125a8d31fac3f600b169ad98341fbd6d63fa37bdb0818556a475d757714cf7');
   assert.equal(fileSHA256(stagedComposePath), 'sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c');
   assert.equal(fs.statSync(stagedDeployPath).mode & 0o777, 0o755);
   assert.equal(fs.statSync(stagedComposePath).mode & 0o777, 0o644);
@@ -571,7 +572,14 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     }
   }
 
-  function deploymentFixture(failReplacementReadiness, invalidProcedureIdentity = false) {
+  function deploymentFixture({
+    failReplacementReadiness = false,
+    invalidProcedureIdentity = false,
+    noRollback = false,
+    hasPrior = true,
+    failComposeCommand = '',
+    procedureSourceCommit = procedureCommit
+  } = {}) {
     const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-immutable-deploy-'));
     const home = path.join(root, 'home');
     const stack = path.join(home, 'Projects', 'resofeed-caddy');
@@ -605,7 +613,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     const statePath = path.join(root, 'current-image');
     const dockerLog = path.join(root, 'docker.log');
     const tailscaleLog = path.join(root, 'tailscale.log');
-    fs.writeFileSync(statePath, `${priorImage}\n`);
+    fs.writeFileSync(statePath, hasPrior ? `${priorImage}\n` : '');
     fs.writeFileSync(dockerLog, '');
     fs.writeFileSync(tailscaleLog, '');
 
@@ -652,6 +660,8 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       'if [[ "$1 $2" == "container inspect" ]]; then',
       '  target=${@: -1}',
       '  if [[ "$target" == "resofeed-caddy" ]]; then exit 0; fi',
+      '  current=$(cat "$FAKE_STATE")',
+      '  [[ -n "$current" ]] || exit 1',
       '  if [[ " $* " == *" --format "* ]]; then',
       '    if [[ "$*" == *".Config.Image"* ]]; then cat "$FAKE_STATE"; exit 0; fi',
       '    if [[ "$*" == *".Image"* ]]; then printf "%s\\n" sha256:fixture-image-id; exit 0; fi',
@@ -661,6 +671,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       'fi',
       'if [[ "$1 $2" == "image inspect" ]]; then printf "%s\\n" "$FAKE_PRIOR_IMAGE"; exit 0; fi',
       'if [[ "$1" == "compose" ]]; then',
+      '  if [[ -n "${FAKE_FAIL_COMPOSE_COMMAND:-}" && " $* " == *" $FAKE_FAIL_COMPOSE_COMMAND "* ]]; then exit 88; fi',
       '  if [[ " $* " == *" up "* ]]; then awk -F= \'$1=="RESOFEED_IMAGE" {print substr($0, index($0,"=")+1)}\' "$FAKE_ENV" > "$FAKE_STATE"; fi',
       '  exit 0',
       'fi',
@@ -681,19 +692,27 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       FAKE_ARM64_DIGEST: arm64Digest,
       FAKE_PRIOR_IMAGE: priorImage,
       FAKE_TARGET_IMAGE: targetImage,
-      FAKE_FAIL_READINESS: failReplacementReadiness ? '1' : '0'
+      FAKE_FAIL_READINESS: failReplacementReadiness ? '1' : '0',
+      FAKE_FAIL_COMPOSE_COMMAND: failComposeCommand
     };
     const procedureDeployHash = fileSHA256(path.join(stack, 'deploy.sh'));
     const procedureComposeHash = fileSHA256(path.join(stack, 'compose.yml'));
     const procedureArguments = [
+      '--procedure-source-commit', procedureSourceCommit,
       '--procedure-deploy-sha256', invalidProcedureIdentity ? `sha256:${'f'.repeat(64)}` : procedureDeployHash,
       '--procedure-compose-sha256', procedureComposeHash
     ];
-    const result = spawnSync(path.join(stack, 'deploy.sh'), [...ociArguments, ...procedureArguments], {
+    const deploymentArguments = [
+      ...(noRollback ? ['--no-rollback'] : []),
+      ...ociArguments,
+      ...procedureArguments
+    ];
+    const run = (args = deploymentArguments) => spawnSync(path.join(stack, 'deploy.sh'), args, {
       cwd: stack,
       encoding: 'utf8',
       env: environment
     });
+    const result = run();
     return {
       root,
       stack,
@@ -706,11 +725,13 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       targetImage,
       procedureDeployHash,
       procedureComposeHash,
+      deploymentArguments,
+      run,
       result
     };
   }
 
-  const identityRejected = deploymentFixture(false, true);
+  const identityRejected = deploymentFixture({ invalidProcedureIdentity: true });
   try {
     assert.equal(identityRejected.result.status, 1);
     assert.match(identityRejected.result.stderr, /caller-bound procedure SHA-256/u);
@@ -720,7 +741,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     fs.rmSync(identityRejected.root, { recursive: true, force: true });
   }
 
-  const successful = deploymentFixture(false);
+  const successful = deploymentFixture();
   try {
     assert.equal(successful.result.status, 0, successful.result.stderr);
     assert.equal(fs.readFileSync(successful.statePath, 'utf8').trim(), successful.targetImage);
@@ -728,6 +749,10 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.match(deployedEnv, new RegExp(`^RESOFEED_IMAGE=${successful.targetImage}$`, 'mu'));
     assert.match(deployedEnv, /^CF_API_TOKEN=fixture-present$/mu);
     assert.match(successful.result.stdout, /READINESS=root_200_doctor_401/u);
+    assert.match(successful.result.stdout, new RegExp(`PROCEDURE_SOURCE_COMMIT=${procedureCommit}`, 'u'));
+    assert.match(successful.result.stdout, new RegExp(`OCI_APPLICATION_SOURCE_COMMIT=${commit}`, 'u'));
+    assert.match(successful.result.stdout, /RESULT_CLASSIFICATION=success/u);
+    assert.doesNotMatch(successful.result.stdout + successful.result.stderr, /fixture-present/u);
     assert.doesNotMatch(fs.readFileSync(successful.dockerLog, 'utf8'), /(?:down|volume rm|--volumes)/u);
     assert.deepEqual(
       fs.readFileSync(successful.tailscaleLog, 'utf8').trim().split('\n'),
@@ -747,16 +772,129 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     fs.rmSync(successful.root, { recursive: true, force: true });
   }
 
-  const failed = deploymentFixture(true);
+  const failed = deploymentFixture({ failReplacementReadiness: true });
   try {
     assert.equal(failed.result.status, 1);
     assert.equal(fs.readFileSync(failed.statePath, 'utf8').trim(), failed.priorImage);
     assert.match(fs.readFileSync(failed.envPath, 'utf8'), new RegExp(`^RESOFEED_IMAGE=${failed.priorImage}$`, 'mu'));
     assert.match(failed.result.stderr, /ROLLBACK=prior_digest_and_readiness restored/u);
+    assert.match(failed.result.stderr, /RESULT_CLASSIFICATION=no_effect/u);
     assert.doesNotMatch(fs.readFileSync(failed.dockerLog, 'utf8'), /(?:down|volume rm|--volumes)/u);
     assert.doesNotMatch(fs.readFileSync(failed.tailscaleLog, 'utf8'), /--yes|--bg|--tcp/u);
   } finally {
     fs.rmSync(failed.root, { recursive: true, force: true });
+  }
+
+  const defaultWithoutPrior = deploymentFixture({ hasPrior: false });
+  try {
+    assert.equal(defaultWithoutPrior.result.status, 1);
+    assert.match(defaultWithoutPrior.result.stderr, /Default deployment requires a recoverable prior image digest/u);
+    assert.match(defaultWithoutPrior.result.stderr, /RESULT_CLASSIFICATION=no_effect/u);
+    assert.equal(fs.readFileSync(defaultWithoutPrior.statePath, 'utf8'), '');
+    assert.doesNotMatch(fs.readFileSync(defaultWithoutPrior.dockerLog, 'utf8'), /compose .* (?:pull|up) /u);
+  } finally {
+    fs.rmSync(defaultWithoutPrior.root, { recursive: true, force: true });
+  }
+
+  const forwardOnly = deploymentFixture({ noRollback: true, hasPrior: false });
+  try {
+    assert.equal(forwardOnly.result.status, 0, forwardOnly.result.stderr);
+    assert.equal(fs.readFileSync(forwardOnly.statePath, 'utf8').trim(), forwardOnly.targetImage);
+    assert.match(forwardOnly.result.stdout, /NO_ROLLBACK=explicit_forward_only/u);
+    assert.match(forwardOnly.result.stdout, /ROLLBACK=explicit_forward_only/u);
+    assert.match(forwardOnly.result.stdout, /SQLITE_VOLUME=preserved/u);
+    assert.match(forwardOnly.result.stdout, new RegExp(`PROCEDURE_SOURCE_COMMIT=${procedureCommit}`, 'u'));
+    assert.match(forwardOnly.result.stdout, new RegExp(`OCI_APPLICATION_SOURCE_COMMIT=${commit}`, 'u'));
+    assert.match(forwardOnly.result.stdout, /RESULT_CLASSIFICATION=success/u);
+    assert.doesNotMatch(forwardOnly.result.stdout + forwardOnly.result.stderr, /fixture-present/u);
+    const dockerEvidence = fs.readFileSync(forwardOnly.dockerLog, 'utf8');
+    assert.doesNotMatch(dockerEvidence, /image inspect/u);
+    assert.doesNotMatch(dockerEvidence, /(?:down|volume rm|--volumes)/u);
+    assert.equal((dockerEvidence.match(/compose .* up -d --build/gu) ?? []).length, 1);
+  } finally {
+    fs.rmSync(forwardOnly.root, { recursive: true, force: true });
+  }
+
+  const forwardKnownPartial = deploymentFixture({
+    noRollback: true,
+    hasPrior: false,
+    failComposeCommand: 'pull'
+  });
+  try {
+    assert.equal(forwardKnownPartial.result.status, 1);
+    assert.match(forwardKnownPartial.result.stderr, /ROLLBACK=suppressed_by_explicit_no_rollback/u);
+    assert.match(forwardKnownPartial.result.stderr, /RESULT_CLASSIFICATION=known_partial/u);
+    assert.equal(fs.readFileSync(forwardKnownPartial.statePath, 'utf8'), '');
+    assert.doesNotMatch(fs.readFileSync(forwardKnownPartial.dockerLog, 'utf8'), /compose .* up /u);
+  } finally {
+    fs.rmSync(forwardKnownPartial.root, { recursive: true, force: true });
+  }
+
+  const forwardUnknownPartial = deploymentFixture({
+    noRollback: true,
+    hasPrior: false,
+    failReplacementReadiness: true
+  });
+  try {
+    assert.equal(forwardUnknownPartial.result.status, 1);
+    assert.equal(fs.readFileSync(forwardUnknownPartial.statePath, 'utf8').trim(), forwardUnknownPartial.targetImage);
+    assert.match(forwardUnknownPartial.result.stderr, /ROLLBACK=suppressed_by_explicit_no_rollback/u);
+    assert.match(forwardUnknownPartial.result.stderr, /RESULT_CLASSIFICATION=unknown_partial/u);
+    const dockerEvidence = fs.readFileSync(forwardUnknownPartial.dockerLog, 'utf8');
+    assert.equal((dockerEvidence.match(/compose .* up -d --build/gu) ?? []).length, 1);
+    assert.doesNotMatch(dockerEvidence, new RegExp(priorIndexDigest, 'u'));
+    assert.doesNotMatch(dockerEvidence, /(?:down|volume rm|--volumes)/u);
+  } finally {
+    fs.rmSync(forwardUnknownPartial.root, { recursive: true, force: true });
+  }
+
+  const equalSourceIdentities = deploymentFixture({
+    noRollback: true,
+    hasPrior: false,
+    procedureSourceCommit: commit
+  });
+  try {
+    assert.equal(equalSourceIdentities.result.status, 0, equalSourceIdentities.result.stderr);
+    assert.match(equalSourceIdentities.result.stdout, new RegExp(`PROCEDURE_SOURCE_COMMIT=${commit}`, 'u'));
+    assert.match(equalSourceIdentities.result.stdout, new RegExp(`OCI_APPLICATION_SOURCE_COMMIT=${commit}`, 'u'));
+  } finally {
+    fs.rmSync(equalSourceIdentities.root, { recursive: true, force: true });
+  }
+
+  const parserFixture = deploymentFixture({ noRollback: true, hasPrior: false });
+  try {
+    const withoutPair = (args, option) => {
+      const index = args.indexOf(option);
+      return index < 0 ? [...args] : [...args.slice(0, index), ...args.slice(index + 2)];
+    };
+    const replaceValue = (args, option, value) => {
+      const copy = [...args];
+      copy[copy.indexOf(option) + 1] = value;
+      return copy;
+    };
+    const invalidArguments = [
+      withoutPair(parserFixture.deploymentArguments, '--verified-commit'),
+      withoutPair(parserFixture.deploymentArguments, '--procedure-source-commit'),
+      replaceValue(parserFixture.deploymentArguments, '--verified-commit', 'A'.repeat(40)),
+      replaceValue(parserFixture.deploymentArguments, '--procedure-source-commit', 'C'.repeat(40)),
+      [...parserFixture.deploymentArguments, '--verified-commit', commit],
+      [...parserFixture.deploymentArguments, '--procedure-source-commit', procedureCommit],
+      [...parserFixture.deploymentArguments, '--no-rollback'],
+      ['--stage-procedure', '--no-rollback', '--verified-commit', commit],
+      ['--recover-procedure', '--no-rollback', '--backup-id', `sha256:${'9'.repeat(64)}`],
+      ['--record-orphan', ...ociArguments, '--procedure-source-commit', procedureCommit]
+    ];
+    const beforeDocker = fs.readFileSync(parserFixture.dockerLog, 'utf8');
+    const beforeState = fs.readFileSync(parserFixture.statePath, 'utf8');
+    for (const args of invalidArguments) {
+      const result = parserFixture.run(args);
+      assert.equal(result.status, 1, args.join(' '));
+      assert.match(result.stderr, /RESULT_CLASSIFICATION=no_effect/u);
+    }
+    assert.equal(fs.readFileSync(parserFixture.dockerLog, 'utf8'), beforeDocker);
+    assert.equal(fs.readFileSync(parserFixture.statePath, 'utf8'), beforeState);
+  } finally {
+    fs.rmSync(parserFixture.root, { recursive: true, force: true });
   }
 
   function mutation(relativePath, mutate) {
@@ -783,6 +921,10 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/amd64'", "inspect_manifest_digest 'linux/386'")),
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/arm64'", "inspect_manifest_digest 'linux/arm/v7'")),
     mutation(deployPath, (body) => body.replaceAll('rollback_previous_digest', 'rollback_without_readiness')),
+    mutation(deployPath, (body) => body.replace('[[ "$PROCEDURE_SOURCE_COMMIT" =~ ^[a-f0-9]{40}$ ]]', '[[ "$PROCEDURE_SOURCE_COMMIT" =~ ^[a-f0-9]{7,40}$ ]]')),
+    mutation(deployPath, (body) => body.replace('validate_procedure_source_commit', 'PROCEDURE_SOURCE_COMMIT=$VERIFIED_COMMIT #')),
+    mutation(deployPath, (body) => body.replace('trap forward_only_failure ERR', 'trap rollback_previous_digest ERR')),
+    mutation(deployPath, (body) => body.replace('RESULT_CLASSIFICATION_STATE="known_partial"', 'RESULT_CLASSIFICATION_STATE="success"')),
     mutation(deployPath, (body) => body.replace('status --porcelain=v1 --untracked-files=all', 'status --short')),
     mutation(deployPath, (body) => body.replace(
       'if git -C "$repo_root" symbolic-ref -q HEAD >/dev/null 2>&1; then',
