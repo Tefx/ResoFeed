@@ -195129,45 +195129,95 @@ phases:
       \ route target `127.0.0.1:8443`, and exact image `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`.\
       \ Retain independent `--procedure-source-commit` and OCI `--verified-commit`\
       \ identities, forward-only `success`/`no_effect`/`known_partial_reconciled`/`unknown_partial`\
-      \ classifications, no retry, procedure-byte recovery, and unchanged default\
-      \ prior-digest rollback behavior. Synchronize the shell procedure, deterministic\
-      \ Node adapter and acceptance assertions, deployment skill, README, Container\
-      \ guide, and Playwright harness contract.\n\nBoundary: `general` owns this indivisible\
-      \ seven-path shell/Node/docs repository rollback unit through one admitted `vectl.worker.dispatch.v2`\
-      \ and one `vectl.worker.execution.v2`. No SSH, Docker, Compose, registry, Tailnet,\
-      \ Tailscale Serve, Caddy, credential/account/trust, secret, volume, data, owner-token,\
-      \ or other runtime/external mutation is authorized. `deploy/resofeed-caddy/compose.yml`\
+      \ classifications, procedure/runtime no-retry behavior, procedure-byte recovery,\
+      \ and unchanged default prior-digest rollback behavior. Synchronize the shell\
+      \ procedure, deterministic Node adapter and acceptance assertions, deployment\
+      \ skill, README, Container guide, and Playwright harness contract.\n\nRenew\
+      \ this pending contract in place after one terminal worker-v2 dispatch whose\
+      \ sole declared check returned red. Preserve that dispatch, both production-INVALID\
+      \ FAIL receipts, the red check, the later focused native 2/2 result, and the\
+      \ unadmitted WIP as immutable non-green history; none supports PASS. This renewed\
+      \ contract authorizes exactly one fresh worker-v2 claim and dispatch rooted\
+      \ in the then-current main and claim after this Planner batch. The fresh worker\
+      \ may inspect WIP commit `f315b5b33a6002ce43d512b547644f2a87116b5e` or its preserved\
+      \ patch as implementation input, but must reproduce or adapt the seven-path\
+      \ change in its own fresh canonical worktree and must not import their evidence\
+      \ as admitted green proof. This is the sole repository-execution retry authorized\
+      \ by this repair and does not add a durable attempt ledger or any runtime/external-effect\
+      \ retry.\n\nBoundary: `general` owns this indivisible seven-path shell/Node/docs\
+      \ repository rollback unit through one fresh admitted `vectl.worker.dispatch.v2`\
+      \ and one fresh `vectl.worker.execution.v2`. No SSH, Docker, Compose, registry,\
+      \ Tailnet, Tailscale Serve, Caddy, credential/account/trust, secret, volume,\
+      \ data, owner-token, or other runtime/external mutation is authorized. `deploy/resofeed-caddy/compose.yml`\
       \ is read-only and blocked. Do not add route repair authority, Caddy reconciliation\
       \ authority, alternate targets, moving tags, image publication, secret flags,\
       \ destructive fallback, retries, or new runtime concepts. The future integrated\
-      \ procedure-source commit remains distinct from OCI source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`.\n\
-      \nAdmit: Reuse the current generic project-native profile `rf-bug-v2-immutable-deployment-procedure`\
-      \ only with exact selected identity `RF-BUG-V2 immutable OCI and Tailnet deployment\
-      \ procedure` and check `rf_bug_v2_immutable_deployment_procedure_green`. Deterministic\
-      \ fake-surface tests must prove: missing, malformed, duplicate, or drifted canonical\
-      \ route state exits before every Compose/service call; route repair is unreachable\
-      \ and neither `ensure_tailscale_serve` nor `tailscale serve` is invoked in no-rollback\
-      \ mode; the no-rollback Compose argv targets only `resofeed` and contains no\
-      \ build, recreate, restart, project-wide, Caddy, or reconciliation action; default\
-      \ prior-digest rollback behavior is unchanged; procedure-source and OCI application-source\
-      \ identities remain independent; the exact target, image, named volume, route\
-      \ target, Caddy ownership, configuration, owner token, secrets, credentials/account/trust,\
-      \ and procedure-byte recovery are preserved; every exit is secret-safe and classified;\
-      \ and tests cause zero external effect. `rf-bug-v2-no-rollback-procedure-authorization`\
-      \ independently consumes the renewed integrated files and selected execution.\n\
-      \nRecovery: Any route fail-closed gap, reachable Serve repair, Caddy or project-wide\
-      \ Compose effect, default-mode regression, source-identity conflation, classification\
-      \ or nondisclosure defect, undeclared path, acceptance-authority drift, or check\
-      \ failure stops this step. Revert only the seven allowed paths to the integrated\
-      \ baseline; perform no remote operation, retry, deployment, rollback, or compensating\
-      \ topology.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
-      \ [.agents/skills/resofeed-tailnet-deploy/SKILL.md, deploy/resofeed-caddy/README.md,\
-      \ deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n  blocked_paths: [deploy/resofeed-caddy/compose.yml,\
-      \ deploy/resofeed-caddy/verify.sh, deploy/resofeed-caddy/verify-remote.sh, deploy/resofeed-caddy/stop.sh,\
-      \ deploy/resofeed-caddy/caddy/**, deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example,\
-      \ Dockerfile, internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ procedure-source commit remains distinct from OCI source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`.\
+      \ The fresh worker must use its canonical current-main worktree, may read but\
+      \ must not modify, check out, merge, cherry-pick, reset, rebase, or otherwise\
+      \ treat branch `work/rf-bug-v2-no-rollback-route-caddy-effect-repair`, WIP commit\
+      \ `f315b5b33a6002ce43d512b547644f2a87116b5e`, or the preserved patch as lifecycle\
+      \ state.\n\nAdmit: Bind retry authority to terminal dispatch `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-route-caddy-effect-repair/dispatch.json`\
+      \ (file SHA-256 `7692c7a39b1268be32b46f8ce28b0aa59eb1fe602c94ce74a913c1436c725898`,\
+      \ admitted semantic SHA `sha256:d052e5bdca3946b629c42130f646097e8b06d2acfbea8600dd2a133a3d481747`),\
+      \ production-INVALID initial FAIL receipt `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-route-caddy-effect-repair/receipt-fail.json`\
+      \ (SHA-256 `28f808c00da7cd1df310be95a87fc44adf13c32559fada563db12d0ff3a7794c`),\
+      \ production-INVALID corrected FAIL receipt `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-route-caddy-effect-repair/receipt-fail-corrected.json`\
+      \ (SHA-256 `249bc793fba91b8d5a4cff0e885f0eeabdfa907fab18d9d857dbe6786b20c6dd`),\
+      \ and non-ancestor WIP commit `f315b5b33a6002ce43d512b547644f2a87116b5e` with\
+      \ parent `76fa7e5b2cc47d9a9e65824bcc9bc1b18d0ed48f` plus mode-0600 patch `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-route-caddy-effect-repair/failed-worktree.patch`\
+      \ (SHA-256 `ac5848a4e262e1f722cd71e776ca6bd8c257952046d1652c7107c98e212b112e`).\
+      \ These observations remain historical and non-green.\n\nBefore consuming the\
+      \ fresh dispatch's single authoritative declared-check invocation, require deterministic\
+      \ zero-external-effect preflight in the fresh canonical worktree: the changed-path\
+      \ inventory is exactly the seven allowed paths and contains no blocked path;\
+      \ `git diff --check` is clean; the Tailnet deployment skill contains the restored\
+      \ compatibility fragment required by the maintained adapter; deterministic route-invalid\
+      \ cases assert zero Compose/service calls; Serve repair is unreachable; no-rollback\
+      \ Compose argv asserts `resofeed` only with no build, recreate, restart, project-wide\
+      \ reconciliation, or Caddy action; and any focused native test needed to establish\
+      \ that the adapter can reach the declared check is green. Preflight results\
+      \ establish readiness only: they cannot satisfy the claim, replace selected\
+      \ execution, or be reconstructed as authoritative green evidence.\n\nOnly after\
+      \ those preflights pass, reuse the current generic project-native profile `rf-bug-v2-immutable-deployment-procedure`\
+      \ with exact selected identity `RF-BUG-V2 immutable OCI and Tailnet deployment\
+      \ procedure` and consume exactly one fresh invocation of `node scripts/vectl-check.mjs\
+      \ run rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`.\
+      \ Only that invocation's genuine green selected-execution result may support\
+      \ PASS. Deterministic fake-surface tests must prove: missing, malformed, duplicate,\
+      \ or drifted canonical route state exits before every Compose/service call;\
+      \ route repair is unreachable and neither `ensure_tailscale_serve` nor `tailscale\
+      \ serve` is invoked in no-rollback mode; the no-rollback Compose argv targets\
+      \ only `resofeed` and contains no build, recreate, restart, project-wide, Caddy,\
+      \ or reconciliation action; default prior-digest rollback behavior is unchanged;\
+      \ procedure-source and OCI application-source identities remain independent;\
+      \ the exact target, image, named volume, route target, Caddy ownership, configuration,\
+      \ owner token, secrets, credentials/account/trust, and procedure-byte recovery\
+      \ are preserved; every exit is secret-safe and classified; and tests cause zero\
+      \ external effect. `rf-bug-v2-no-rollback-procedure-authorization` independently\
+      \ consumes the renewed integrated files and this fresh selected execution. The\
+      \ fresh worker may submit one initial receipt and at most one corrected receipt\
+      \ after a production validator rejection; an invalid corrected receipt cannot\
+      \ be retried or replaced.\n\nRecovery: The preserved historical dispatch is\
+      \ terminal and cannot be replayed. If any preflight fails, stop before the authoritative\
+      \ check. If the fresh authoritative check is red, or the fresh receipt remains\
+      \ invalid after its one allowed correction, stop with no further claim, dispatch,\
+      \ check invocation, integration, or external effect. Any route fail-closed gap,\
+      \ reachable Serve repair, Caddy or project-wide Compose effect, default-mode\
+      \ regression, source-identity conflation, classification or nondisclosure defect,\
+      \ undeclared path, acceptance-authority drift, or check failure also stops this\
+      \ step. Revert only the fresh canonical worktree's seven allowed paths to its\
+      \ integrated baseline; preserve all historical artifacts and the WIP branch/commit/patch\
+      \ untouched; perform no remote operation, deployment, rollback, compensating\
+      \ topology, or runtime/external retry.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [.agents/skills/resofeed-tailnet-deploy/SKILL.md,\
+      \ deploy/resofeed-caddy/README.md, deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n\
+      \  blocked_paths: [deploy/resofeed-caddy/compose.yml, deploy/resofeed-caddy/verify.sh,\
+      \ deploy/resofeed-caddy/verify-remote.sh, deploy/resofeed-caddy/stop.sh, deploy/resofeed-caddy/caddy/**,\
+      \ deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example, Dockerfile,\
+      \ internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
       \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md, plan.yaml]\n\
       \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE]\n\
       checks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n    run:\n\
@@ -195225,13 +195275,20 @@ phases:
       \ nondisclosure, protected-state, and zero-external-effect coverage\",\"check_id\"\
       :\"rf_bug_v2_immutable_deployment_procedure_green\",\"actor_id\":\"spec-verifier\"\
       }]}}\n</vectl_step_policy>"
-    verification: The project-native profile selects exactly one maintained procedure
-      identity and passes with deterministic evidence that non-canonical route states
-      cause zero Compose calls, Serve repair is unreachable, no-rollback targets only
-      resofeed without build/Caddy effects, default rollback is unchanged, source
-      identities and protected state remain intact, every outcome is classified and
-      secret-safe, acceptance authority is respected, and tests perform zero external
-      effect.
+    verification: 'A fresh canonical current-main worker first passes the declared
+      zero-external-effect readiness preflight: exact seven-path inventory with no
+      blocked path, clean `git diff --check`, restored Tailnet-skill compatibility
+      fragment, route-invalid zero-Compose assertions, unreachable Serve-repair assertions,
+      resofeed-only/no-build/no-Caddy Compose argv assertions, and any focused native
+      adapter-reachability test. Those results remain non-authoritative readiness
+      evidence. The worker then invokes `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green` exactly once; only its genuine
+      green selected execution proves the maintained procedure identity. `rf-bug-v2-no-rollback-procedure-authorization`
+      independently consumes the renewed integrated files and selected execution.
+      The preserved terminal dispatch, red check, INVALID receipts, focused 2/2 command,
+      WIP commit, and patch remain non-green history. A red authoritative check or
+      a fresh receipt still invalid after one correction stops without retry, integration,
+      or external effect.'
     evidence_template: Integrated commit and exact seven-path diff; admitted worker-v2
       receipt; selected/executed profile identity and markers; deterministic route/Compose/default/source/classification/nondisclosure
       test evidence; no external effects.
