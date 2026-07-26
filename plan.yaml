@@ -195111,7 +195111,7 @@ phases:
     agent: vectl-orchestrator
   - id: rf-bug-v2-no-rollback-route-caddy-effect-repair
     name: Remove route and Caddy effects from no-rollback procedure
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Repair the maintained immutable deployment procedure after the production-admitted\
@@ -195297,6 +195297,69 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T08:39:33.131763Z'
+    done_at: '2026-07-26T08:57:02.941945+00:00'
+    evidence: 'Integrated commit and diff:
+
+      - Integrated commit `34bff6ba6a8f6a980c6c6ab7008db72741ddaa24` (`fix(deploy):
+      isolate no-rollback effects`), parent `0acbd8c48c2e9ef473021c8be4e266f9596bf3c7`.
+
+      - Exact seven paths only: .agents/skills/resofeed-tailnet-deploy/SKILL.md; deploy/resofeed-caddy/README.md;
+      deploy/resofeed-caddy/deploy.sh; docs/CONTAINER.md; docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md;
+      scripts/vectl-check.mjs; scripts/vectl-check.test.mjs.
+
+      - `git diff --check` passed; no worker untracked files; blocked compose.yml
+      remained unchanged.
+
+
+      Renewed admitted execution:
+
+      - Dispatch `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-route-caddy-effect-repair/renewed-dispatch.json`,
+      file SHA-256 `901e2ca63c49b772e5f96c1cfa006207d0a207a2a31819e5e4fd556ceb16c255`,
+      admitted semantic SHA `sha256:9aa9ac07c797cf5d821b56d0e223a08b43f1ba26e4067e347cd8070f4b751cb6`.
+
+      - Receipt `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-route-caddy-effect-repair/renewed-receipt.json`,
+      file SHA-256 `5a5e66e51ff21ec3c5253b8bc5c9824093bb6f8119aaab0af4b064fbd53be216`,
+      admitted semantic SHA `sha256:631d641b8ac0fce24e4f4ec45f959b6b5f39c98c5d81e0d8d1b91b74d29e5e42`.
+
+      - Gate receipt verdict file SHA-256 `53b91f135f7e5c5a064181a438ffe8496bd192fe998632019e8e34e3f5ad173b`;
+      status CONFORMANT; worker_execution_admissible=true.
+
+      - Fresh worker preflights passed before its single authoritative check: exact
+      path inventory, clean diff, restored skill compatibility fragment, route-invalid
+      zero-Compose assertions, unreachable Serve repair, resofeed-only/no-build/no-Caddy
+      argv, focused adapter reachability.
+
+      - Worker authoritative selected execution exited 0/green with selected/executed
+      identity `RF-BUG-V2 immutable OCI and Tailnet deployment procedure`.
+
+
+      Integrated-target verification:
+
+      - `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green` at actual integration HEAD exited
+      0.
+
+      - All required markers present: default prior-digest rollback; explicit no-rollback;
+      preexisting canonical route only; route repair forbidden; resofeed-only/no-build
+      Compose scope; Caddy untouched; independent procedure/OCI identities; named
+      volume preserved; no side effects; valid generic evidence.
+
+      - Mode-0600 integration log `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-route-caddy-effect-repair/integration-check-renewed.log`,
+      SHA-256 `a8cdf1878701d426ad9f6f4f532b029789a8ddffd63caf1392909e8fffd36ed7`;
+      secret literal hits 0.
+
+
+      Preserved history:
+
+      - Prior terminal red dispatch, both INVALID receipts, WIP commit `f315b5b33a6002ce43d512b547644f2a87116b5e`,
+      and patch SHA-256 `ac5848a4e262e1f722cd71e776ca6bd8c257952046d1652c7107c98e212b112e`
+      remain non-green and unintegrated.
+
+      - No SSH, Docker, Compose, registry, Tailnet, Serve, Caddy, credential/account/trust,
+      secret, volume, data, owner-token, route, or runtime/external mutation occurred.
+
+
+      Independent authorization remains pending in `rf-bug-v2-no-rollback-procedure-authorization`.'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
