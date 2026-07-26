@@ -196149,8 +196149,9 @@ phases:
       \ execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
       \ access: read, availability: current}\n        - {path: docs/ITEM_DEEP_LINKS.md,\
       \ access: read, availability: current}\n      test_bindings:\n        - {path:\
-      \ internal/resofeed/item_deep_links_expected_red_test.go, classification: acceptance,\
-      \ availability: produced_by_step}\n        - {path: web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
+      \ scripts/vectl-check.test.mjs, classification: developer, availability: current}\n\
+      \        - {path: internal/resofeed/item_deep_links_expected_red_test.go, classification:\
+      \ acceptance, availability: produced_by_step}\n        - {path: web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
       \ classification: acceptance, availability: produced_by_step}\n        - {path:\
       \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, classification: acceptance,\
       \ availability: produced_by_step}\n      selection:\n        command: [node,\
