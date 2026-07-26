@@ -191017,16 +191017,17 @@ phases:
       repair; independent review of the explicit no-prior-digest/no-rollback procedure
       and accepted risk; strict literal-FQDN endpoint identity and staging; bounded
       forward-only Tailnet/Caddy deployment; independent runtime/header/volume/route/protected-state
-      proof; R3 security review; blind RF-BUG-001–010 product verification; and single-file
-      defect-report closure. The Gate must independently witness two non-substitutable
-      chains: procedure-source commit to tracked deploy/compose hashes and modes,
-      staging backup ID, final bytes, and maintained invocation; and OCI application
-      source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` to immutable tag/index/amd64/arm64/revision
-      and configured/running digest. Explicit no-rollback must have failed closed
-      on any absent, malformed, duplicated, or drifted canonical route before Compose;
-      must have no route-repair or Caddy-reconciliation path; and may target only
-      `resofeed` without build while default prior-digest rollback remains unchanged.
-      Item Deep Links remains unchanged and locked behind this phase.
+      proof; R3 security review; blind RF-BUG-001–010 product verification and its
+      single-file defect-report closure; and final integration of the sibling security
+      branch. The Gate must independently witness two non-substitutable chains: procedure-source
+      commit to tracked deploy/compose hashes and modes, staging backup ID, final
+      bytes, and maintained invocation; and OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
+      to immutable tag/index/amd64/arm64/revision and configured/running digest. Explicit
+      no-rollback must have failed closed on any absent, malformed, duplicated, or
+      drifted canonical route before Compose; must have no route-repair or Caddy-reconciliation
+      path; and may target only `resofeed` without build while default prior-digest
+      rollback remains unchanged. Item Deep Links remains unchanged and locked behind
+      this phase.
 
 
       Boundary: `gate-reviewer` is read-only and mutates no repository, Git, Docker/builder,
@@ -191044,18 +191045,19 @@ phases:
       compatibility, proof topology, redundant-edge detection, and exact gate-scope
       checks on current plan bytes. Independently re-establish `RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE`
       from current tracked adapter/check evidence; four missing completed-step temporary
-      refs remain historical warnings and are not current Gate inputs. Consume `rf-bug-v2-ssh-endpoint-identity-remediation`
-      as the distinct current strict-FQDN identity branch and the report chain as
-      the integrated release branch; consume the renewed repair only through its fresh
-      no-rollback authorization and downstream staging/deployment/proof chain. Completed
-      runtime producers enter only through listed current independent consumers. Production
-      semantic admission emits one `vectl.verifier.semantic.v1` with `verifier_id=gate-reviewer`,
-      `step_id=rf-bug-v2-assurance-closure-gate`, ordered scope equal to the integrated
-      branches below, and outcome-consistent coverage for every listed requirement
-      ID. No coverage row may consume historical stopped or superseded evidence; the
-      endpoint requirement must cite current strict-FQDN producer/proof evidence,
-      and source identity coverage must keep the procedure and OCI application chains
-      separate.
+      refs remain historical warnings and are not current Gate inputs. Consume `rf-bug-v2-close-defect-report`
+      as the terminal blind-runtime/report branch and `rf-bug-v2-formal-security-review`
+      as the incomparable terminal security branch. Consume strict-FQDN identity through
+      the listed current endpoint implementation and downstream staging/deployment/proof
+      evidence; consume the renewed repair only through its fresh no-rollback authorization
+      and downstream staging/deployment/proof chain. Completed runtime producers enter
+      only through listed current independent consumers. Production semantic admission
+      emits one `vectl.verifier.semantic.v1` with `verifier_id=gate-reviewer`, `step_id=rf-bug-v2-assurance-closure-gate`,
+      ordered scope equal to the integrated branches below, and outcome-consistent
+      coverage for every listed requirement ID. No coverage row may consume historical
+      stopped or superseded evidence; the endpoint requirement must cite current strict-FQDN
+      producer/proof evidence, and source identity coverage must keep the procedure
+      and OCI application chains separate.
 
 
       Recovery: Any missing current witness, procedure/application source-chain conflation,
@@ -191073,8 +191075,8 @@ phases:
       </vectl_gate_scope>'
     verification: A production-admitted gate-reviewer receipt proves every listed
       requirement and integrated step from current tracked/admitted evidence; treats
-      the report chain and strict-FQDN endpoint identity as incomparable current branches;
-      separately witnesses procedure-source bytes and OCI application manifests/running
+      the blind-runtime/report branch and formal-security branch as incomparable current
+      heads; separately witnesses procedure-source bytes and OCI application manifests/running
       digest plus exact maintained invocation bindings; proves renewed route-invalid
       fail-closed, unreachable Serve repair, resofeed-only no-build/no-Caddy reconciliation,
       unchanged default rollback, narrow no-rollback risk/staging/deployment, forward-only
@@ -191098,7 +191100,7 @@ phases:
     - web/src/lib/api-client.test.ts
     depends_on:
     - rf-bug-v2-close-defect-report
-    - rf-bug-v2-ssh-endpoint-identity-remediation
+    - rf-bug-v2-formal-security-review
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
