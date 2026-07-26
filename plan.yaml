@@ -194708,12 +194708,17 @@ phases:
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Add an explicit `--no-rollback` mode to the maintained immutable deployment\
       \ procedure while preserving the current prior-digest rollback mode as the default.\
-      \ The opt-in mode must deploy only a caller-supplied immutable index and platform/revision\
-      \ chain without requiring or deriving a prior image digest, never invoke `rollback_previous_digest`,\
-      \ preserve `resofeed-caddy_resofeed-data`, configuration, owner token, masked\
-      \ secrets, strict literal-FQDN SSH, route and Caddy ownership, and emit a secret-safe\
-      \ outcome classification for success, no effect, known partial effect, or unknown\
-      \ partial effect. Synchronize the shell procedure, deterministic Node acceptance/adapter\
+      \ The opt-in mode must require both `--verified-commit <40 lowercase hex>` for\
+      \ the OCI application source and `--procedure-source-commit <40 lowercase hex>`\
+      \ for the later integrated tracked procedure source; reject missing, duplicate,\
+      \ malformed, or incompatible values and never infer either value from the other\
+      \ or require equality. It must deploy only the caller-supplied immutable index\
+      \ and platform/revision chain without requiring or deriving a prior image digest,\
+      \ never invoke `rollback_previous_digest`, preserve `resofeed-caddy_resofeed-data`,\
+      \ configuration, owner token, masked secrets, strict literal-FQDN SSH, route\
+      \ and Caddy ownership, and emit secret-safe output that records the two source\
+      \ identities separately plus a success, no-effect, known-partial, or unknown-partial\
+      \ classification. Synchronize the shell procedure, deterministic Node acceptance/adapter\
       \ assertions, deployment skill, README, Container guide, and Playwright harness\
       \ contract.\n\nBoundary: `general` owns this indivisible shell/Node/docs repository\
       \ rollback unit through one admitted `vectl.worker.dispatch.v2` and one `vectl.worker.execution.v2`.\
@@ -194722,27 +194727,34 @@ phases:
       \ Keep the existing long-option parser and default deployment behavior; do not\
       \ add moving tags, alternate targets, secret flags, route repair, data deletion/recreation,\
       \ Caddy restart/reconciliation, registry mutation, or automatic retry. The exact\
-      \ seven allowed paths are the entire mutation surface.\n\nAdmit: The current\
-      \ generic adapter/profile `rf-bug-v2-immutable-deployment-procedure` must select\
-      \ exactly `RF-BUG-V2 immutable OCI and Tailnet deployment procedure` and run\
-      \ `rf_bug_v2_immutable_deployment_procedure_green`. Deterministic fake-surface\
+      \ seven allowed paths are the entire mutation surface. The future procedure-source\
+      \ commit is created only after integration and must remain distinct in meaning\
+      \ from OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`.\n\n\
+      Admit: The current generic adapter/profile `rf-bug-v2-immutable-deployment-procedure`\
+      \ must select exactly `RF-BUG-V2 immutable OCI and Tailnet deployment procedure`\
+      \ and run `rf_bug_v2_immutable_deployment_procedure_green`. Deterministic fake-surface\
       \ tests must prove default prior-digest recovery remains intact; `--no-rollback`\
-      \ is explicit, deployment-only, rejects duplicates/invalid combinations, tolerates\
-      \ absent prior digest, suppresses old-image recovery, preserves the named volume\
-      \ and forbidden-effect boundaries, classifies every exit, masks secret presence,\
-      \ and authorizes no retry. `rf-bug-v2-no-rollback-procedure-authorization` independently\
-      \ consumes the integrated files and selected execution.\n\nRecovery: Any parser\
-      \ ambiguity, default-mode regression, missing classification, secret exposure,\
-      \ undeclared path, or check failure stops this step. Revert only the seven allowed\
-      \ paths to the integrated baseline; perform no remote operation or compensating\
-      \ topology.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
-      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
-      \ [.agents/skills/resofeed-tailnet-deploy/SKILL.md, deploy/resofeed-caddy/README.md,\
-      \ deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n  blocked_paths: [deploy/resofeed-caddy/compose.yml,\
-      \ deploy/resofeed-caddy/verify.sh, deploy/resofeed-caddy/verify-remote.sh, deploy/resofeed-caddy/stop.sh,\
-      \ deploy/resofeed-caddy/caddy/**, deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example,\
-      \ Dockerfile, internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ is explicit and deployment-only; `--verified-commit` and required `--procedure-source-commit`\
+      \ have strict independent lowercase-hex parser bindings; missing, duplicate,\
+      \ malformed, equality-assumed, and invalid-combination cases fail closed; absent\
+      \ prior digest is accepted only in no-rollback mode; old-image recovery is suppressed;\
+      \ named-volume and forbidden-effect boundaries are preserved; every exit is\
+      \ classified; secret presence is masked; and no retry or external effect occurs.\
+      \ Evidence output must expose separate procedure-source and OCI-application-source\
+      \ bindings without equating them. `rf-bug-v2-no-rollback-procedure-authorization`\
+      \ independently consumes the integrated files and selected execution.\n\nRecovery:\
+      \ Any parser ambiguity, source-identity conflation, default-mode regression,\
+      \ missing classification, secret exposure, undeclared path, or check failure\
+      \ stops this step. Revert only the seven allowed paths to the integrated baseline;\
+      \ perform no remote operation or compensating topology.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [.agents/skills/resofeed-tailnet-deploy/SKILL.md,\
+      \ deploy/resofeed-caddy/README.md, deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n\
+      \  blocked_paths: [deploy/resofeed-caddy/compose.yml, deploy/resofeed-caddy/verify.sh,\
+      \ deploy/resofeed-caddy/verify-remote.sh, deploy/resofeed-caddy/stop.sh, deploy/resofeed-caddy/caddy/**,\
+      \ deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example, Dockerfile,\
+      \ internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
       \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md, plan.yaml]\n\
       \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE]\n\
       checks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n    run:\n\
@@ -194769,38 +194781,41 @@ phases:
       \ OCI and Tailnet deployment procedure']\n        forbidden_ids: []\n    expect:\n\
       \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
       \    contains_all: [{literal: ROLLBACK=prior_digest_and_readiness}, {literal:\
-      \ NO_ROLLBACK=explicit_forward_only}, {literal: SQLITE_VOLUME=preserved}, {literal:\
-      \ PROCEDURE_SIDE_EFFECTS=none}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n \
-      \       contains_any: []\n        forbids: [{literal: ERROR collecting}, {literal:\
+      \ NO_ROLLBACK=explicit_forward_only}, {literal: PROCEDURE_SOURCE_COMMIT=required_distinct_from_oci_source},\
+      \ {literal: OCI_APPLICATION_SOURCE=verified_commit}, {literal: SQLITE_VOLUME=preserved},\
+      \ {literal: PROCEDURE_SIDE_EFFECTS=none}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n\
+      \        contains_any: []\n        forbids: [{literal: ERROR collecting}, {literal:\
       \ no tests to run}, {literal: skipped}, {literal: OPENROUTER_KEY=}]\n    proves:\
       \ [RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE]\nbindings: {expected_red: {items:\
       \ []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-implementation\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"deployment_recovery_semantics\",\"\
-      shell_node_docs_shared_contract\",\"future_remote_effect_safety\"],\"primary_outcome\"\
-      :\"RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE\",\"rollback_class\":\"NONTRIVIAL\"\
-      ,\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE\"\
-      ,\"atom\":\"the maintained immutable deployment procedure retains prior-digest\
-      \ rollback by default and adds an explicit no-prior-digest no-rollback mode\
-      \ with volume preservation, secret-safe outcome classification, and no undeclared\
-      \ external authority\",\"modality\":\"test_contract\",\"seam\":\"mock\",\"check_id\"\
-      :\"rf_bug_v2_immutable_deployment_procedure_green\",\"independent_step\":\"\
-      rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-authorization\"\
+      shell_node_docs_shared_contract\",\"future_remote_effect_safety\",\"independent_procedure_and_application_source_identity\"\
+      ],\"primary_outcome\":\"RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE\"\
+      ,\"atom\":\"the maintained procedure retains prior-digest rollback by default\
+      \ and adds an explicit no-prior-digest/no-rollback mode whose required procedure-source\
+      \ commit is parsed, emitted, and tested separately from the OCI verified application\
+      \ commit while preserving volume, secrets, endpoint, route, and Caddy boundaries\"\
+      ,\"modality\":\"test_contract\",\"seam\":\"mock\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-authorization\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"deploy/resofeed-caddy/deploy.sh\"\
       ,\"scripts/vectl-check.mjs\",\"internal/resofeed/playwright_fixture_test.go\"\
       ],\"acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
       :[\"rf_bug_v2_immutable_deployment_procedure_green\"],\"acceptance_mutation\"\
       :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-v2-no-rollback-procedure-implementation\"\
       ,\"path\":\"scripts/vectl-check.test.mjs\",\"purpose\":\"Add deterministic default-rollback\
-      \ retention and explicit no-prior-digest no-rollback parser, failure-classification,\
-      \ volume-preservation, nondisclosure, and forbidden-effect coverage\",\"check_id\"\
-      :\"rf_bug_v2_immutable_deployment_procedure_green\",\"actor_id\":\"spec-verifier\"\
-      }]}}\n</vectl_step_policy>"
+      \ retention and explicit no-prior-digest/no-rollback parser, separate procedure-source/OCI-application\
+      \ identity, failure-classification, volume-preservation, nondisclosure, and\
+      \ forbidden-effect coverage\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
     verification: The project-native profile selects one exact identity and passes
       with default rollback retained plus explicit forward-only no-rollback observations.
-      Deterministic acceptance/developer coverage proves parser exclusivity, absent-prior-digest
-      operation, no old-image recovery, classified failure states, named-volume preservation,
-      nondisclosure, no retry, and synchronized docs without any external effect.
+      Deterministic acceptance/developer coverage proves required `--procedure-source-commit`
+      and OCI `--verified-commit` parser exclusivity and separate evidence output,
+      absent-prior-digest operation, no old-image recovery, classified failure states,
+      named-volume preservation, nondisclosure, no retry, synchronized docs, and zero
+      external effect.
     refs:
     - .agents/skills/resofeed-tailnet-deploy/SKILL.md
     - deploy/resofeed-caddy/.env.example
