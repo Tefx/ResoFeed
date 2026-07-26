@@ -196849,7 +196849,7 @@ phases:
     agent: spec-verifier
   - id: item-deep-links-adapter-exit-remediation
     name: Repair Selected-Execution Adapter Process Exit Semantics
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Repair the project-native `scripts/vectl-check.mjs` selected-execution control\
@@ -196942,5 +196942,3 @@ phases:
     - scripts/vectl-check.test.mjs
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     agent: frontend-engineer
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-26T16:24:20.420537Z'
