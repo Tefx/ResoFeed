@@ -190977,15 +190977,8 @@ phases:
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report\"\
       ,\"risk_tier\":\"R1\",\"risk_reasons\":[\"single_tracked_defect_report_closure\"\
       ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
-      ,\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-001-010-CLOSURE\",\"atom\"\
-      :\"the single defect report records the admitted RF-BUG-001-010 local, procedure-source,\
-      \ OCI application, runtime, no-rollback deployment, security, blind-product,\
-      \ user-waiver, and forward-only recovery evidence while keeping the two source\
-      \ chains distinct and canonical docs/protected acceptance immutable\",\"modality\"\
-      :\"test_contract\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_defect_report_closure_green\"\
-      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-assurance-closure-gate\"\
-      }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
-      :[\"tests/rf_bug_canonical_contract_test.go\",\"web/src/lib/api-client.test.ts\"\
+      ,\"observation_ledger\":[],\"test_authority\":{\"developer_test_globs\":[],\"\
+      acceptance_test_paths\":[\"tests/rf_bug_canonical_contract_test.go\",\"web/src/lib/api-client.test.ts\"\
       ],\"acceptance_check_ids\":[\"rf_bug_v2_defect_report_closure_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: Pre-closure authority hashes match; only the defect report changes;
