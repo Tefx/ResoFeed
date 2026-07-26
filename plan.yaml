@@ -190716,61 +190716,38 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Deliver: Produce `RF-BUG-V2-TAILNET-CADDY-RUNTIME-PROOF` by independently consuming
-      the successful no-rollback staging and deployment receipts, then re-observing
-      two non-substitutable identity chains: (1) the later integrated procedure-source
-      commit to tracked `deploy.sh`/`compose.yml` hashes and modes, staging backup
-      ID, and final remote bytes; and (2) OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
-      to immutable tag, index, amd64/arm64 manifests, revision, and configured/running
-      digest. Prove the maintained deployment invocation carried exact separate `--procedure-source-commit`
-      and `--verified-commit` values and never inferred equality. Also prove direct
-      root `200`, unauthenticated Doctor `401`, strict literal-FQDN endpoint identity,
-      four Go-owned security headers on direct/public HTML, JSON, MCP, unauthorized,
-      and error responses, Caddy non-ownership, named `/data` SQLite volume identity,
-      canonical route no-op, protected owner-token/data state, no old-image rollback,
-      forward-only attempt classification, and nondisclosure. Product/UI RF-BUG behavior
-      remains owned by `rf-bug-v2-independent-runtime-ui`.
+      Deliver: Prove only successful renewed deployment. Consume fresh parser authorization,
+      renewed staging, Attempt 1 no-effect history, successful Attempt 2; re-observe
+      renewed procedure chain separately from exact OCI chain. Prove semantic parser
+      authorization, no stale replay, Attempt 1 consumed, Attempt 2 separate arguments,
+      no third invocation, 200/401, strict endpoint, Go headers, Caddy non-ownership,
+      named volume, route no-op, protected state, no prior-digest retention/rollback,
+      classification, nondisclosure.
 
 
-      Boundary: `integration-verifier` has read-only authority against the existing
-      `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy` stack and public
-      route. Token entry is allowed only for authenticated read probes. It may not
-      deploy, restart, restage, roll back, repair Serve/Caddy, mutate product/runtime/data/volume/route/registry/credential/account/trust
-      state, discover a prior digest, or expose secrets, host-key material, configuration,
-      response bodies, or public-host values. At most three probe attempts are allowed
-      only after retaining a demonstrably transient non-mutating failure and re-proving
-      unchanged target, procedure bytes, image digest, volume, and route.
+      Boundary: `integration-verifier` read-only; no deploy/restart/restage/replay/rollback/repair/product/runtime/protected-state/trust
+      mutation, prior-digest action, or disclosure. At most three transient read-only
+      probes after unchanged identity proof.
 
 
-      Admit: Require exact sanitized receipts and secret-safe raw-log identities from
-      `rf-bug-v2-stage-no-rollback-procedure` and `rf-bug-v2-tailnet-caddy-deployment-producer`,
-      plus current tracked source for independent hash/mode observation. Production
-      semantic admission emits one `vectl.verifier.semantic.v1` with `verifier_id=integration-verifier`,
-      `step_id=rf-bug-v2-tailnet-caddy-proof`, ordered scope [`procedure-source commit
-      through staged hashes modes backup and final bytes`, `OCI application source
-      through immutable manifests revision and configured/running digest`, `strict-FQDN
-      readiness and separate maintained invocation bindings`, `Go-header and Caddy
-      ownership parity`, `volume route protected state forward-only recovery and nondisclosure`],
-      and outcome-consistent coverage for `RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING`,
-      `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`, `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`,
-      `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY`, and `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`.
-      Each identity claim requires direct observation or exact admitted producer evidence;
-      neither source commit may satisfy the other chain.
+      Admit: Require fresh parser authorization/staging/deployment receipts and Attempt
+      1 receipt only as history. Emit semantic v1 ordered scope [`renewed semantic-parser
+      procedure source through staged hashes modes backup and final bytes`, `OCI application
+      source through immutable manifests revision and configured/running digest`,
+      `consumed no-effect Attempt 1 and single successful renewed Attempt 2`, `strict-FQDN
+      readiness and separate maintained invocation bindings`, `Go-header Caddy volume
+      route protected state forward-only recovery and nondisclosure`] with coverage
+      `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`, `RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING`,
+      and existing deployment/readiness/header/volume/nondisclosure requirements.
 
 
-      Recovery: Any deterministic identity-chain, parser/invocation, endpoint/header/readiness/volume/route/protected-state
-      defect, missing or inconsistent forward-only classification, trust drift, disclosure,
-      observed mutation, unavailable producer evidence, or unknown state stops BLOCKED/FAIL
-      without repair, replay, prior-digest discovery, old-image rollback, or alternate
+      Recovery: Any parser/source/bytes/replay/budget/readiness/security/protected-state/classification
+      defect stops without repair/replay/third invocation/prior-digest/rollback/alternate
       target.'
-    verification: A production-admitted integration-verifier receipt independently
-      binds procedure source through tracked deploy/compose hashes, modes, staging
-      backup ID, and final bytes; independently binds OCI application source through
-      immutable tag/index/platform/revision to configured/running digest; proves separate
-      maintained invocation arguments, strict-FQDN direct/public readiness, Go-header
-      parity, Caddy non-ownership, named volume, route no-op, protected state, no
-      old-image rollback, forward-only classification, nondisclosure, and zero verifier
-      mutation.
+    verification: Independent receipt consumes successful renewed deployment only,
+      treats Attempt 1 as consumed history, proves successful Attempt 2/no third invocation,
+      separate renewed procedure/OCI chains, readiness/security/protected-state/no
+      prior digest/no rollback/nondisclosure/zero mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -191010,78 +190987,40 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Deliver: Admit one RF-BUG Assurance v2 integrated outcome only when every requirement
-      and producer in `vectl.gate.scope.v2` has current outcome-consistent evidence:
-      protected local closure; first-run SQLite and streaming/CSP closure; immutable
-      procedure/publication/container evidence; the renewed no-rollback route/Caddy-effect
-      repair; independent review of the explicit no-prior-digest/no-rollback procedure
-      and accepted risk; strict literal-FQDN endpoint identity and staging; bounded
-      forward-only Tailnet/Caddy deployment; independent runtime/header/volume/route/protected-state
-      proof; R3 security review; blind RF-BUG-001–010 product verification and its
-      single-file defect-report closure; and final integration of the sibling security
-      branch. The Gate must independently witness two non-substitutable chains: procedure-source
-      commit to tracked deploy/compose hashes and modes, staging backup ID, final
-      bytes, and maintained invocation; and OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
-      to immutable tag/index/amd64/arm64/revision and configured/running digest. Explicit
-      no-rollback must have failed closed on any absent, malformed, duplicated, or
-      drifted canonical route before Compose; must have no route-repair or Caddy-reconciliation
-      path; and may target only `resofeed` without build while default prior-digest
-      rollback remains unchanged. Item Deep Links remains unchanged and locked behind
-      this phase.
+      Deliver: Admit closure only with current evidence for semantic label parser
+      repair, fresh authorization, renewed staging, exactly one successful remaining
+      deployment, runtime proof, security review, blind verification, report. Prove
+      spaced JSON passes; malformed/non-object/wrong-type/missing/wrong-value/duplicate
+      fail closed without value/secret output; deployment invariants remain; sources
+      separate; Attempt 1 consumed no effect; no stale replay; Attempt 2 succeeded;
+      no third invocation/prior-digest/rollback authority. Deep Links stays locked.
 
 
-      Boundary: `gate-reviewer` is read-only and mutates no repository, Git, Docker/builder,
-      registry, deployment, rollback, route, credential/account/trust, secret, volume/data,
-      or runtime state. Historical stopped or superseded evidence remains immutable
-      non-consumable provenance and is neither a current integrated branch, direct
-      dependency, requirement witness, nor executable authority. The Gate grants no
-      prior-digest discovery, old-image rollback, retry, repair, alternate target,
-      identity substitution, route/Serve repair, Caddy reconciliation, or external-effect
-      authority.
+      Boundary: `gate-reviewer` read-only; no repository/runtime/external mutation.
+      Stale history non-current. Gate grants no replay/third invocation/prior-digest/rollback/retry/repair/effect.
 
 
-      Admit: Re-run structural ref validation, assurance-policy lint, all pending
-      executable preflight, Deep Links expected-red reciprocal bindings, live-roster
-      compatibility, proof topology, redundant-edge detection, and exact gate-scope
-      checks on current plan bytes. Independently re-establish `RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE`
-      from current tracked adapter/check evidence; four missing completed-step temporary
-      refs remain historical warnings and are not current Gate inputs. Consume `rf-bug-v2-close-defect-report`
-      as the terminal blind-runtime/report branch and `rf-bug-v2-formal-security-review`
-      as the incomparable terminal security branch. Consume strict-FQDN identity through
-      the listed current endpoint implementation and downstream staging/deployment/proof
-      evidence; consume the renewed repair only through its fresh no-rollback authorization
-      and downstream staging/deployment/proof chain. Completed runtime producers enter
-      only through listed current independent consumers. Production semantic admission
-      emits one `vectl.verifier.semantic.v1` with `verifier_id=gate-reviewer`, `step_id=rf-bug-v2-assurance-closure-gate`,
-      ordered scope equal to the integrated branches below, and outcome-consistent
-      coverage for every listed requirement ID. No coverage row may consume historical
-      stopped or superseded evidence; the endpoint requirement must cite current strict-FQDN
-      producer/proof evidence, and source identity coverage must keep the procedure
-      and OCI application chains separate.
+      Admit: Re-run refs, unique IDs, assurance lint/preflight, expected-red, roster,
+      topology, redundant-edge, gate-scope, completed/skipped immutability. Consume
+      report/security as terminal branches; parser repair only through fresh authorization
+      and renewed chain. Semantic receipt covers every requirement/step; no stale
+      promotion.
 
 
-      Recovery: Any missing current witness, procedure/application source-chain conflation,
-      route fail-closed or no-Caddy-effect gap, no-rollback procedure/risk mismatch,
-      unsafe or unknown partial deployment state, exhausted forward-fix budget, unresolved
-      security/product defect, report mismatch, source/digest/endpoint drift, disclosure,
-      or out-of-scope dependency keeps the phase BLOCKED. The Gate performs no remediation,
-      retry, rollback, route/Caddy repair, or external effect.
+      Recovery: Missing parser case, source conflation, stale replay, invariant gap,
+      unsafe partial, unsuccessful Attempt 2, remaining/excess authority, security/product/report
+      mismatch, drift/disclosure/out-of-scope keeps BLOCKED. No remediation/effect.
 
 
       <vectl_gate_scope>
 
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR","RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE","RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE","RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE","RF-BUG-V2-NO-ROLLBACK-RISK-ACCEPTANCE","RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","RF-BUG-V2-TAILNET-CADDY-READINESS","RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY","RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY","RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE","RF-BUG-V2-RELEASE-SECURITY-FORWARD-RECOVERY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-implementation","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-route-caddy-effect-repair","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-authorization","rf-bug-assurance-v2-closure.rf-bug-v2-stage-no-rollback-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-ssh-endpoint-identity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
+      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR","RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE","RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE","RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE","RF-BUG-V2-NO-ROLLBACK-RISK-ACCEPTANCE","RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER","RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION","RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING","RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","RF-BUG-V2-TAILNET-CADDY-READINESS","RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY","RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY","RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE","RF-BUG-V2-RELEASE-SECURITY-FORWARD-RECOVERY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-implementation","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-route-caddy-effect-repair","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-authorization","rf-bug-assurance-v2-closure.rf-bug-v2-stage-no-rollback-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-buildx-label-json-parser-repair","rf-bug-assurance-v2-closure.rf-bug-v2-buildx-label-json-parser-authorization","rf-bug-assurance-v2-closure.rf-bug-v2-stage-buildx-label-json-parser-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-ssh-endpoint-identity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
 
       </vectl_gate_scope>'
-    verification: A production-admitted gate-reviewer receipt proves every listed
-      requirement and integrated step from current tracked/admitted evidence; treats
-      the blind-runtime/report branch and formal-security branch as incomparable current
-      heads; separately witnesses procedure-source bytes and OCI application manifests/running
-      digest plus exact maintained invocation bindings; proves renewed route-invalid
-      fail-closed, unreachable Serve repair, resofeed-only no-build/no-Caddy reconciliation,
-      unchanged default rollback, narrow no-rollback risk/staging/deployment, forward-only
-      classification, security, blind RF-BUG behavior, report closure, and zero undeclared
-      effect or out-of-scope blocker.
+    verification: Gate proves all listed requirements/steps, parser cases, renewed
+      authorization/staging/deployment, consumed Attempt 1, successful Attempt 2,
+      no third invocation, separate sources, exact rollback boundaries, security,
+      blind behavior, report closure, zero undeclared effect/blocker.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -194333,84 +194272,54 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Deliver: Perform `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT` through the independently
-      admitted and staged explicit `--no-rollback` mode. Invoke the maintained procedure
-      with required `--procedure-source-commit <exact staged 40-lowercase-hex integrated
-      commit>` and OCI `--verified-commit abf3cb6c545f9c0f3c605760a5325875c61fc83f`,
-      keeping those identities distinct. Deploy only `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
-      for immutable tag `git-abf3cb6c545f9c0f3c605760a5325875c61fc83f`, amd64 `sha256:e48f6a4e89e4802914f97f9a4747abb800ff6ac78320f4f0f665bcd0c45ed5d0`,
-      arm64 `sha256:0fbfed6721af55e6f6680a8346ce27c2d93dd768e3b4e611612d550032fb26ff`,
-      and revision `abf3cb6c545f9c0f3c605760a5325875c61fc83f` to the existing stack.
-      Success requires configured and running image digests to bind that index with
-      direct root `200`, Doctor `401`, named SQLite volume, owner-token/data, masked
-      secrets, route, Caddy ownership, credentials, and trust preserved. No prior
-      image digest is required or discovered, and no automatic old-image rollback
-      is performed.
+      Deliver: Deploy only through fresh authorized/staged semantic-parser procedure;
+      stale commit `34bff6ba6a8f6a980c6c6ab7008db72741ddaa24` and staging must never
+      replay. Use renewed `--procedure-source-commit` distinct from OCI `--verified-commit
+      abf3cb6c545f9c0f3c605760a5325875c61fc83f`. Deploy only index `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`,
+      exact tag/platforms/revision and runtime semantic SHA `6195360fe8f7f085de47d394001987f78c1758dddd951a2fe5286c6f4a482c21`.
+      Success requires configured/running convergence, 200/401, named volume, owner-token/data,
+      three masked secrets, route `127.0.0.1:8443`, Caddy project ownership, credentials/trust
+      preserved. No prior digest retention or old-image rollback.
 
 
-      Boundary: `vectl-orchestrator` alone owns this persistent operation against
-      `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Use the literal
-      FQDN with `-F none`, matching HostName/HostKeyAlias, strict existing host-key
-      trust, existing account/credential, and the exact staged procedure-source commit,
-      deploy/compose SHA-256 values and modes, backup ID, and final bytes from `rf-bug-v2-stage-no-rollback-procedure`.
-      The procedure-source commit is a later integrated repository identity and must
-      never be inferred equal to the OCI application source or used as its revision.
-      The only authorized image mutation is the exact immutable-index deployment through
-      the maintained invocation; ad hoc SSH/Compose bypass is forbidden. Repository/Git,
-      registry/tag/image publication, builders, procedure bytes, SQLite volume deletion/recreation,
-      data, owner token, secrets, Caddy reconciliation/restart, route mutation/Serve
-      repair, credentials/accounts/trust, alternate host/stack, moving tags, and secret
-      disclosure are forbidden. Existing-stack SSH/registry transfer is the only cost.
+      Boundary: `vectl-orchestrator` owns one remaining invocation at exact target
+      using strict literal FQDN/existing credential and renewed staged bytes/backup.
+      Only exact maintained immutable deployment. No ad hoc bypass, Git/publication/builders/restaging/protected-state/Serve/route/Caddy/trust/alternate
+      target/disclosure/prior-digest/rollback effects.
 
 
-      Admit: Consume the production-admitted no-rollback review receipt, successful
-      procedure-staging receipt, current runtime-readiness diagnosis, and dual-platform
-      immutable-image proof. Immediately before each authorized invocation, revalidate
-      the complete procedure chain (procedure-source commit to tracked deploy/compose
-      hashes and modes to staging backup ID and final bytes), the complete OCI application
-      chain (source to immutable tag/index/amd64/arm64/revision), strict endpoint
-      identity, named volume, route no-op, masked secret presence, and forbidden-effect
-      absence. The maintained command line must carry the exact separate `--procedure-source-commit`
-      and `--verified-commit` values. Retain a new non-overwriting mode-0600 raw log
-      and sanitized receipt containing operation, target, both independently labeled
-      identity chains, staged byte/backup identity, configured/running digest observations,
-      user-waiver binding, attempt number, process result, and required post-attempt
-      observations/classification without secret values. `rf-bug-v2-tailnet-caddy-proof`
-      independently consumes the receipt.
+      Admit: Consume fresh parser authorization, renewed staging, current readiness,
+      exact OCI proof. Attempt 1 receipt SHA `019032c13c38d28bbc9dbbb6bbd8fc0a8dae86e7311bae23dde1e0343a136eeb`,
+      raw SHA `34dff53f7eff4b5f9b344e3996af9b71d5018dec90e742a2bd66e49e30532289`,
+      reconciliation SHA `89529807ec7ba58f5592080f2f0818d7d3e9e290c4ffdc6afd81e3384cbfdd9c`,
+      all mode 0600, remain consumed no-effect non-green history. Revalidate renewed
+      procedure/OCI/endpoint/readiness/protected-state chains immediately before sole
+      remaining invocation. Retain new non-overwriting mode-0600 log/receipt binding
+      both chains, renewed bytes/backup, waiver, attempt `2`, process result, configured/running
+      observations, classification. Proof consumes only successful renewed chain.
 
 
-      Recovery: Budget at most two maintained deploy invocations total. Invoke once
-      per safely reconciled attempt. After every return, observe configured/running
-      digest, direct `200/401`, named volume, route, Caddy ownership, and protected-state
-      projection, then classify `success`, `no_effect`, `known_partial_reconciled`,
-      or `unknown_partial`. A second invocation is authorized only after retained
-      evidence proves `no_effect` or a fully reconciled known partial effect, with
-      unchanged admitted procedure/image/target authority. Unknown partial effects
-      stop for read-only reconciliation. A failed deployment may remain failed or
-      partial with evidence preserved; there is no prior-digest discovery or old-image
-      rollback obligation. Source-chain conflation, trust/identity drift, disclosure,
-      forbidden mutation, exhausted budget, or unsafe reconciliation stops BLOCKED
-      without alternate host, restaging, Serve/Caddy repair, destructive fallback,
-      or undeclared registry/image mutation.
+      Recovery: Existing two-invocation total budget remains; Attempt 1 consumed one,
+      leaving exactly one invocation after renewed authorization/staging. Observe
+      all required state and classify success/no_effect/known_partial_reconciled/unknown_partial.
+      No third invocation. Unknown partial stops read-only reconciliation. No stale
+      replay, prior-digest action, old-image rollback, restaging, alternate host,
+      Serve/Caddy repair, destructive fallback, or undeclared mutation.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","risk_tier":"R3","risk_reasons":["persistent_remote_digest_deployment","strict_endpoint_existing_credential_boundary","explicit_no_old_image_rollback","sqlite_owner_token_secret_preservation","independent_procedure_and_application_identity_chains"],"primary_outcome":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","atom":"the
-      exact immutable index is deployed through the staged admitted no-rollback procedure
-      with an explicit procedure-source commit distinct from the OCI verified application
-      source, configured/running digest convergence, preserved volume/owner-token/route/Caddy/trust
-      state, and a forward-only classification for every attempt","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","risk_tier":"R3","risk_reasons":["persistent_remote_digest_deployment","strict_endpoint","no_old_image_rollback","protected_state","separate_sources","one_remaining_invocation"],"primary_outcome":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","atom":"after
+      one consumed no-effect attempt, the only remaining invocation uses renewed semantic-parser
+      bytes for exact deployment with separate sources, convergence, protected state,
+      and forward-only classification without prior-digest retention or old-image
+      rollback","modality":"runtime","seam":"real","check_id":"rf_bug_v2_tailnet_caddy_deployment_producer","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: A mode-0600 raw log and sanitized receipt prove the exact maintained
-      invocation carries separate procedure-source and OCI verified-commit bindings;
-      the procedure commit resolves through staged deploy/compose hashes, modes, backup
-      ID, and final bytes; the OCI source resolves through immutable tag/index/platform/revision
-      to configured/running digest; each safely reconciled attempt stays within the
-      two-attempt budget with required readiness/volume/route/Caddy/protected-state
-      observations, nondisclosure, and either successful exact deployment or a forward-only
-      BLOCKED stop with no old-image rollback.
+    verification: Attempt 1 is consumed no-effect history. One remaining invocation
+      uses renewed authorized/staged parser bytes; evidence binds separate chains,
+      Attempt 2, convergence, protected state, nondisclosure, success or forward-only
+      BLOCKED. No stale replay, third invocation, prior-digest retention, or rollback.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -194419,7 +194328,7 @@ phases:
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
     depends_on:
-    - rf-bug-v2-stage-no-rollback-procedure
+    - rf-bug-v2-stage-buildx-label-json-parser-procedure
     - rf-bug-v2-current-runtime-readiness-diagnosis
     agent: vectl-orchestrator
   - id: rf-bug-v2-prior-runtime-identity-readiness
@@ -195482,6 +195391,244 @@ phases:
 
 
       Independent authorization remains pending in `rf-bug-v2-no-rollback-procedure-authorization`.'
+  - id: rf-bug-v2-buildx-label-json-parser-repair
+    name: Repair Buildx revision-label semantic JSON verification
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
+      \ Append-only repair after completed `rf-bug-v2-no-rollback-procedure-authorization`\
+      \ and `rf-bug-v2-stage-no-rollback-procedure` plus deployment Attempt 1 exposed\
+      \ a deterministic no-effect parser false negative in procedure-source commit\
+      \ `34bff6ba6a8f6a980c6c6ab7008db72741ddaa24`. Replace `verify_commit_label`'s\
+      \ whitespace-sensitive compact substring match over Buildx label JSON with semantic\
+      \ parsing. Accept only one JSON object whose exact `org.opencontainers.image.revision`\
+      \ member is a string equal to independently supplied OCI commit `abf3cb6c545f9c0f3c605760a5325875c61fc83f`;\
+      \ reject malformed JSON, non-object root, wrong type, missing member, wrong\
+      \ value, and duplicate member names. Never output label values, inspected JSON,\
+      \ secrets, `.env`, credentials, or protected state. Add deterministic spaced-valid\
+      \ and all rejection coverage. Preserve the complete admitted no-rollback contract:\
+      \ route exactly once to `127.0.0.1:8443` before Compose; no Serve/route/Caddy\
+      \ repair; `resofeed`-only Compose with no build/recreate/restart/project-wide/dependency/Caddy\
+      \ action; exact image/index/platform/revision; separate future procedure and\
+      \ OCI sources; named volume/configuration/owner token/secrets/credentials/trust/target/procedure-byte\
+      \ recovery/forward-only classifications; unchanged default prior-digest rollback.\
+      \ Synchronize shell source, adapter/tests, skill, README, Container guide, and\
+      \ Playwright harness contract.\n\nBoundary: `general` owns one fresh current-main\
+      \ seven-path rollback unit through exactly one admitted worker-v2 dispatch and\
+      \ receipt. `compose.yml`, runtime verification scripts, product code, canonical\
+      \ authority, plan/lifecycle state, and external state are immutable. No SSH,\
+      \ Docker/Buildx, registry, Compose, Tailnet, Serve, Caddy, image publication/deployment,\
+      \ credential/trust, secret, volume, data, owner-token, route, runtime, or external\
+      \ effect. Renewed procedure source remains distinct from OCI source. Rollback\
+      \ is seven-path worktree revert.\n\nAdmit: Attempt 1 remains non-green history:\
+      \ mode-0600 receipt `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-deployment-producer/deploy-attempt-1-receipt.json`,\
+      \ SHA `019032c13c38d28bbc9dbbb6bbd8fc0a8dae86e7311bae23dde1e0343a136eeb`; raw\
+      \ SHA `34dff53f7eff4b5f9b344e3996af9b71d5018dec90e742a2bd66e49e30532289`; reconciliation\
+      \ SHA `89529807ec7ba58f5592080f2f0818d7d3e9e290c4ffdc6afd81e3384cbfdd9c`; all\
+      \ mode 0600. Its no-effect state and unchanged runtime/staging/protected state\
+      \ prove the defect boundary but cannot support green or stale replay.\n\nBefore\
+      \ the one authoritative check require exact seven-path/no-blocked inventory,\
+      \ clean `git diff --check`, all parser fixtures without value output, retained\
+      \ no-rollback/default assertions, and focused adapter reachability green. Preflight\
+      \ is readiness only. Then invoke exactly once `node scripts/vectl-check.mjs\
+      \ run rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`;\
+      \ only genuine green selected execution with identity `RF-BUG-V2 immutable OCI\
+      \ and Tailnet deployment procedure` supports PASS. Bind exactly one fresh dispatch;\
+      \ one initial receipt and at most one correction after INVALID. Independent\
+      \ authorization consumes renewed integrated bytes and execution.\n\nRecovery:\
+      \ Stop before authoritative check on preflight red; stop after its single invocation\
+      \ on red or corrected-receipt invalidity. No second dispatch/check/integration/external\
+      \ effect/stale replay. Preserve completed history and Attempt 1 artifacts.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [.agents/skills/resofeed-tailnet-deploy/SKILL.md,\
+      \ deploy/resofeed-caddy/README.md, deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n\
+      \  blocked_paths: [deploy/resofeed-caddy/compose.yml, deploy/resofeed-caddy/verify.sh,\
+      \ deploy/resofeed-caddy/verify-remote.sh, deploy/resofeed-caddy/stop.sh, deploy/resofeed-caddy/caddy/**,\
+      \ deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example, Dockerfile,\
+      \ internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md, plan.yaml]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER]\n\
+      checks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n    run: {command:\
+      \ [node, scripts/vectl-check.mjs, run, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green], timeout_seconds: 300}\n \
+      \   evidence:\n      mode: selected_execution\n      path_bindings:\n      \
+      \  - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: .agents/skills/resofeed-tailnet-deploy/SKILL.md, access: read,\
+      \ availability: current}\n        - {path: deploy/resofeed-caddy/.env.example,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/README.md,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/deploy.sh,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/verify.sh,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/verify-remote.sh,\
+      \ access: read, availability: current}\n        - {path: docs/CONTAINER.md,\
+      \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: acceptance, availability: current}\n\
+      \        - {path: internal/resofeed/playwright_fixture_test.go, classification:\
+      \ developer, availability: current}\n      selection:\n        command: [node,\
+      \ scripts/vectl-check.mjs, select, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n        timeout_seconds:\
+      \ 30\n        cardinality: {exact: 1}\n        required_ids: ['RF-BUG-V2 immutable\
+      \ OCI and Tailnet deployment procedure']\n        forbidden_ids: []\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: REVISION_LABEL_JSON=semantic_exact}, {literal:\
+      \ REVISION_LABEL_REJECTIONS=malformed_nonobject_wrongtype_missing_wrongvalue_duplicate},\
+      \ {literal: ROLLBACK=prior_digest_and_readiness}, {literal: NO_ROLLBACK=explicit_forward_only},\
+      \ {literal: NO_ROLLBACK_ROUTE=preexisting_canonical_only}, {literal: NO_ROLLBACK_ROUTE_REPAIR=forbidden},\
+      \ {literal: NO_ROLLBACK_COMPOSE_SCOPE=resofeed_only_no_build}, {literal: NO_ROLLBACK_CADDY=untouched},\
+      \ {literal: PROCEDURE_SOURCE_COMMIT=required_distinct_from_oci_source}, {literal:\
+      \ OCI_APPLICATION_SOURCE=verified_commit}, {literal: SQLITE_VOLUME=preserved},\
+      \ {literal: PROCEDURE_SIDE_EFFECTS=none}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n\
+      \        contains_any: []\n        forbids: [{literal: ERROR collecting}, {literal:\
+      \ no tests to run}, {literal: skipped}, {literal: OPENROUTER_KEY=}]\n    proves:\
+      \ [RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER]\nbindings: {expected_red: {items:\
+      \ []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-buildx-label-json-parser-repair\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"future_remote_deployment_identity_safety\"\
+      ,\"semantic_json_duplicate_rejection\",\"shell_node_docs_shared_contract\",\"\
+      independent_source_identity\"],\"primary_outcome\":\"RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER\",\"atom\":\"Buildx labels are one\
+      \ JSON object whose exact revision member is a string equal to the independently\
+      \ verified OCI commit; malformed, non-object, wrong-type, missing, wrong-value,\
+      \ and duplicate-member JSON fail closed without value or secret output while\
+      \ deployment invariants remain unchanged\",\"modality\":\"test_contract\",\"\
+      seam\":\"mock\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-buildx-label-json-parser-authorization\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"deploy/resofeed-caddy/deploy.sh\"\
+      ,\"scripts/vectl-check.mjs\",\"internal/resofeed/playwright_fixture_test.go\"\
+      ],\"acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_v2_immutable_deployment_procedure_green\"],\"acceptance_mutation\"\
+      :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-v2-buildx-label-json-parser-repair\"\
+      ,\"path\":\"scripts/vectl-check.test.mjs\",\"purpose\":\"Add spaced-valid semantic\
+      \ label JSON and all malformed/non-object/wrong-type/missing/wrong-value/duplicate\
+      \ rejection coverage while retaining route, Compose, Caddy, rollback, source,\
+      \ protected-state, nondisclosure, zero-effect assertions\",\"check_id\":\"rf_bug_v2_immutable_deployment_procedure_green\"\
+      ,\"actor_id\":\"spec-verifier\"}]}}\n</vectl_step_policy>"
+    verification: One fresh worker-v2 dispatch after zero-effect preflight invokes
+      the authoritative procedure check exactly once. Green proves semantic parser
+      cases, nondisclosure, synchronized source/tests/docs, and all deployment invariants.
+      Red or final receipt invalidity stops without integration/effect.
+    evidence_template: Integrated seven-path diff; admitted dispatch/receipt; single
+      selected execution; parser cases; preserved deployment contract; zero effects.
+    refs:
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - internal/resofeed/playwright_fixture_test.go
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - rf-bug-v2-stage-no-rollback-procedure
+    agent: general
+  - id: rf-bug-v2-buildx-label-json-parser-authorization
+    name: Independently authorize renewed semantic label parser procedure
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Deliver: Fresh `spec-verifier` authorizes renewed integrated procedure source.
+      Re-run existing selected/executed immutable procedure and focused Node test.
+      Prove one-object semantic parsing, exact string revision equality to independent
+      OCI commit, spaced-valid acceptance, malformed/non-object/wrong-type/missing/wrong-value/duplicate
+      rejection, and no label/secret output. Re-prove no-rollback route/Compose/Caddy/protected-state/classification/source
+      invariants and unchanged default rollback. Keep procedure and OCI sources distinct;
+      authorize only renewed staging plus one remaining deployment invocation under
+      existing waiver.
+
+
+      Boundary: Read-only verifier may run only current project-native selection/execution/focused
+      test from clean detached integrated HEAD. No repository/Git/runtime/external
+      mutation. Waiver remains limited to prior-digest discovery and old-image rollback
+      for exact target/image; no stale replay, repair, alternate target, disclosure,
+      or added budget.
+
+
+      Admit: Execute exactly once each selection, run, and `node --test --test-name-pattern=immutable\
+      OCI\ and\ Tailnet\ deployment\ procedure scripts/vectl-check.test.mjs`. Require
+      identity parity, all parser cases, nondisclosure, all existing procedure invariants/docs,
+      zero effects, and renewed tracked deploy/compose hashes/modes. Emit production
+      semantic v1 with ordered scope [`renewed integrated procedure and project-native
+      evidence`, `semantic Buildx revision-label JSON acceptance and rejection`, `default
+      rollback and explicit no-rollback invariants`, `separate procedure-source and
+      OCI-application source identity`, `exact waiver and renewed staging/deployment
+      authority`] and coverage `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER`, `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`.
+
+
+      Recovery: Any parser/check/procedure/identity/docs/waiver/protected-state/clean-tree
+      defect returns FAIL/BLOCKED. Do not repair, stage, deploy, retry, or mutate
+      state. Attempt 1/stale staging remain history.'
+    verification: Fresh production-admitted spec-verifier binds renewed integrated
+      source and exact selected/executed procedure plus focused test; proves all parser
+      cases, nondisclosure, deployment invariants, separate sources, zero effects,
+      and authority only for renewed staging plus one remaining invocation.
+    refs:
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/.env.example
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - deploy/resofeed-caddy/verify.sh
+    - deploy/resofeed-caddy/verify-remote.sh
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - internal/resofeed/playwright_fixture_test.go
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - rf-bug-v2-buildx-label-json-parser-repair
+    agent: spec-verifier
+  - id: rf-bug-v2-stage-buildx-label-json-parser-procedure
+    name: Stage renewed semantic label parser procedure
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Deliver: Stage renewed authorized semantic-parser `deploy.sh` plus unchanged
+      tracked `compose.yml` to exact target through exactly one maintained `--stage-procedure`
+      invocation. Bind new procedure-source commit, tracked hashes/modes, prior/current/final
+      bytes, valid new backup ID. Keep OCI source separate. Preserve recovery. Zero
+      image/runtime/protected-state effects.
+
+
+      Boundary: `vectl-orchestrator` owns persistent procedure-byte replacement using
+      strict literal FQDN, `-F none`, matching HostName/HostKeyAlias, existing trust/account/credential,
+      maintained staging/recovery only. One staging invocation. No Docker/registry/image/Compose/protected-state/route/Serve/Caddy/trust/Git/alternate
+      transport/cost effects.
+
+
+      Admit: Consume only fresh parser authorization and clean detached source. Bind
+      tracked hashes/modes to same source, exact final bytes, and new backup distinct
+      from stale history. Retain new non-overwriting mode-0600 raw log/receipt with
+      operation, target, source, hashes/modes, prior/current/final bytes, backup,
+      count, classification, zero image/runtime effects, separate OCI source. Deployment/proof
+      consume only this receipt.
+
+
+      Recovery: One staging invocation; known partial with valid backup permits at
+      most one maintained procedure recovery and verified restoration. Unknown partial,
+      invalid backup, failed recovery, drift, disclosure, forbidden effect, or cost
+      stops without replay/alternate transport/image rollback/deployment.'
+    verification: One strict-FQDN staging invocation binds renewed source through
+      hashes/modes, prior/current/final bytes, valid new backup, separate OCI source,
+      zero image/runtime effects, and bounded procedure-byte recovery.
+    refs:
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - docs/CONTAINER.md
+    depends_on:
+    - rf-bug-v2-buildx-label-json-parser-authorization
+    agent: vectl-orchestrator
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
