@@ -190834,7 +190834,7 @@ phases:
       mutation and zero additional deployment authority.'
   - id: rf-bug-v2-formal-security-review
     name: Review v2 security and accepted no-rollback boundary
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -190902,6 +190902,8 @@ phases:
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T11:57:56.376340Z'
   - id: rf-bug-v2-independent-runtime-ui
     name: Perform fresh black-box RF-BUG verification on no-rollback deployment
     status: pending
