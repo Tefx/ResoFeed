@@ -190834,7 +190834,7 @@ phases:
       mutation and zero additional deployment authority.'
   - id: rf-bug-v2-formal-security-review
     name: Review v2 security and accepted no-rollback boundary
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -190904,6 +190904,19 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T11:57:56.376340Z'
+    done_at: '2026-07-26T12:03:25.632369+00:00'
+    evidence: 'Fresh spec-verifier semantic PASS at immutable HEAD 5be8203a6368e08580b5b10dcbc17aea46b9f86f
+      / plan SHA e1f99b6d57fa5579660edd232d20b921d0af661d274f5e1bf9799f9faf3f231e.
+      Receipt /Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T12-02-47-340Z-2026-07-26T11-59-52-155Z_019f9e4b-bf5b-7f32-8104-4147d0f8e5e9.js-2c74d178a27b0073.txt
+      SHA-256 2c74d178a27b00733ba87b9fa4185982e626b9ef73e78eb2c60953c5a5030793. Parent
+      production admission CONFORMANT: /tmp/larva-agent-artifacts/rf-bug-v2-formal-security-review/production-admission.json
+      SHA-256 915113b75048906a2774e70cb4a0c0a574f8042abb4be5e2374b7a7a33f0ba1f. Five
+      declared security/forward-recovery requirements PROVEN. Review separately traced
+      procedure source 0127273a56a6e757757a0f9419a4990f5041aa8a and OCI application
+      source abf3cb6c545f9c0f3c605760a5325875c61fc83f without equality inference,
+      confirmed narrow waiver/no-rollback/Caddy non-ownership/secret and state boundaries,
+      and preserved stopped attempts as non-current provenance. No repository, runtime,
+      registry, deployment, route, volume, trust, credential, or external effect.'
   - id: rf-bug-v2-independent-runtime-ui
     name: Perform fresh black-box RF-BUG verification on no-rollback deployment
     status: claimed
