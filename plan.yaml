@@ -195579,7 +195579,7 @@ phases:
       effect occurred.'
   - id: rf-bug-v2-buildx-label-json-parser-authorization
     name: Independently authorize renewed semantic label parser procedure
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -195638,6 +195638,70 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T09:50:14.415272Z'
+    done_at: '2026-07-26T09:57:15.838876+00:00'
+    evidence: 'Fresh independent authorization:
+
+      - Spec-verifier reviewed clean detached renewed procedure commit `0127273a56a6e757757a0f9419a4990f5041aa8a`
+      and emitted PASS/CLOSED/NONE with exact ordered five-entry scope, no blockers/warnings,
+      and authority only for renewed staging plus the single remaining deployment
+      invocation.
+
+      - Raw receipt `/tmp/larva-agent-artifacts/rf-bug-v2-buildx-label-json-parser-authorization/semantic-receipt.json`,
+      SHA-256 `44b07228edad21daf76f2d569c554114e8ec5c0afe0e4873c1c62345cdb9df52`.
+
+      - Production Gate status CONFORMANT, semantic_completion_admissible=true, zero
+      reasons; semantic SHA `sha256:4bd2abc42a600443c10d0e3e7d9befae363d21bbe84fd40a80a42510f565f983`;
+      context hash `sha256:c0edd37905fd664853a4dd9462647bb32ef0528b9eb9b1eb61ffed65a711a4e4`.
+
+      - Verdict SHA-256 `ccfbcfd9af74c31aa8338aaa04b8d01ad6e74f724a6e9fb93878a631c5edcbe4`;
+      admission-log SHA-256 `1de9ece0fb6a4167c0bc31583dd234d53456238c9ab82e883ea9e4d3523aaed3`;
+      artifacts mode 0600.
+
+
+      Verification:
+
+      - Exactly once each: project-native selection, selected execution, focused Node
+      test. All green with identity parity `RF-BUG-V2 immutable OCI and Tailnet deployment
+      procedure`.
+
+      - PROVEN coverage: `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER`, `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`.
+
+      - Proved duplicate-aware one-object semantic JSON parsing; exact independent
+      OCI revision string; spaced valid acceptance; malformed/non-object/wrong-type/missing/wrong-value/duplicate
+      rejection; no inspected label/JSON/secret disclosure.
+
+      - Re-proved default rollback, no-rollback route fail-closed, zero Serve repair,
+      resofeed-only no-build/no-deps Compose, no Caddy reconciliation, protected-state/classification/nondisclosure/docs
+      invariants, and zero review effects.
+
+
+      Renewed identities:
+
+      - Procedure source `0127273a56a6e757757a0f9419a4990f5041aa8a`.
+
+      - deploy.sh mode/blob/SHA: `100755` / `91fb74453eaf5e0d1fbf1f03f7be15cbde39f4ba`
+      / `e27bc178546bdc0e0410a18a55d6501bc38ff3122b5782db9c7e94754380ff27`.
+
+      - compose.yml unchanged mode/blob/SHA: `100644` / `363aea676a53421ff5431b67ca44783dbedddf7a`
+      / `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`.
+
+      - OCI application source remains separate: `abf3cb6c545f9c0f3c605760a5325875c61fc83f`.
+
+
+      Budget/boundary:
+
+      - Attempt 1 receipt SHA `019032c13c38d28bbc9dbbb6bbd8fc0a8dae86e7311bae23dde1e0343a136eeb`
+      remains consumed no-effect non-green history. Stale procedure replay is forbidden.
+      Exactly one deploy invocation remains after renewed staging.
+
+      - Waiver remains limited to prior-digest discovery and old-image rollback for
+      the fixed target/image. No stale replay, route/Serve repair, Caddy/project reconciliation,
+      alternate target, destructive/protected-state/credential/trust/registry mutation,
+      disclosure, identity conflation, or added budget.
+
+      - No repository, Git, staging, SSH, Docker/Buildx, registry, Compose, Tailnet,
+      Serve, Caddy, deployment, credential/trust, secret, volume, data, owner-token,
+      route, runtime, or external mutation occurred.'
   - id: rf-bug-v2-stage-buildx-label-json-parser-procedure
     name: Stage renewed semantic label parser procedure
     status: pending
