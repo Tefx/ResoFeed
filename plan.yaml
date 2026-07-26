@@ -196056,7 +196056,7 @@ phases:
   steps:
   - id: item-deep-links-expected-red-contracts
     name: Freeze Item Deep-Link Expected-Red Contracts
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ In one contract boundary, repair the project-native selected-execution adapter\
@@ -196239,6 +196239,18 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T19:36:34.480237Z'
+    done_at: '2026-07-26T19:48:27.059978+00:00'
+    evidence: 'Integrated commit effef7e88932fe0883325069cbb2e9db59642409 on main.
+      Production worker dispatch sha256:561c717f79285996c6ec697647b068cc9904b3c05e8b08d3423243982b614f0e
+      and unchanged worker receipt sha256:05d710f65361e3645b056af0867f2926c368ef209722aaeab77899a661e6db6d
+      were admitted CONFORMANT. Parent receipt admission reran both declared checks:
+      focused Node adapter regression green/0; selected-execution adapter process
+      0 with envelope outcome red/exit_code 1, exact three selected/executed identities,
+      both IDL fingerprints, and VECTL_GENERIC_EVIDENCE=valid. Clean integrated base
+      b40dc5c00fb50360efd4915ac0fc906803f2fd7c -> HEAD effef7e88932fe0883325069cbb2e9db59642409
+      passed full installed Gate with --require-contract --require-assurance-policy
+      --require-clean-final-admission; status remained unchanged and git diff --check
+      passed. Exactly seven authorized paths changed; no external/runtime effect occurred.'
   - id: item-deep-links-backend-api-mcp
     name: Implement Backend, HTTP API, MCP, and PublicURL Deep-Link Semantics
     status: pending
