@@ -364,7 +364,7 @@ AMD64_DIGEST=sha256:<linux/amd64 manifest 64 hex>
 ARM64_DIGEST=sha256:<linux/arm64 manifest 64 hex>
 ```
 
-Publication fails closed unless the immutable tag and `docker.io/tefx/resofeed@${INDEX_DIGEST}` resolve to the same index, the index contains exactly the supplied two platform descriptors, and each platform image reports `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. Do not publish a moving alias.
+Publication fails closed unless the immutable tag and `docker.io/tefx/resofeed@${INDEX_DIGEST}` resolve to the same index, the index contains exactly the supplied two platform descriptors, and each platform image reports `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. The Buildx labels response must be exactly one duplicate-free JSON object whose exact revision member is a string equal to the independently supplied OCI verified commit. Malformed JSON, a non-object root, a missing or wrong-type revision, a wrong value, or duplicate members fails closed without retaining or emitting inspected JSON or label values. Do not publish a moving alias.
 
 The only production Tailnet consumer is `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Before any deployment authorization, a separately authorized operator runs the maintained clean-checkout producer:
 

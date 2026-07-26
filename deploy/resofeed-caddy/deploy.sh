@@ -840,10 +840,32 @@ verify_oci_descriptor() {
 
 verify_commit_label() {
   digest=$1
-  labels=$(docker buildx imagetools inspect "${OCI_REPOSITORY}@${digest}" \
-    --format '{{json .Image.Config.Labels}}' 2>/dev/null) \
-    || fatal "OCI platform commit-label inspection failed."
-  printf '%s' "$labels" | grep -Fq "\"org.opencontainers.image.revision\":\"${VERIFIED_COMMIT}\"" \
+  docker buildx imagetools inspect "${OCI_REPOSITORY}@${digest}" \
+    --format '{{json .Image.Config.Labels}}' 2>/dev/null |
+    /usr/bin/python3 -c '
+import json
+import sys
+
+
+def reject_duplicate_members(pairs):
+    value = {}
+    for key, member in pairs:
+        if key in value:
+            raise ValueError("duplicate JSON member")
+        value[key] = member
+    return value
+
+
+try:
+    document = json.load(sys.stdin, object_pairs_hook=reject_duplicate_members)
+    if type(document) is not dict:
+        raise ValueError("label document is not an object")
+    revision = document["org.opencontainers.image.revision"]
+    if type(revision) is not str or revision != sys.argv[1]:
+        raise ValueError("revision label mismatch")
+except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+    raise SystemExit(1)
+' "$VERIFIED_COMMIT" 2>/dev/null \
     || fatal "OCI platform image is not bound to the verified commit."
 }
 

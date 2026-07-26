@@ -74,7 +74,7 @@ AMD64_DIGEST=sha256:<linux/amd64 manifest 64 lowercase hex>
 ARM64_DIGEST=sha256:<linux/arm64 manifest 64 lowercase hex>
 ```
 
-The index must contain exactly `linux/amd64` and `linux/arm64`. Each platform image must expose `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. An absent, duplicate, additional, incomplete, or mismatched descriptor stops publication/deployment evidence.
+The index must contain exactly `linux/amd64` and `linux/arm64`. Each platform image must expose `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. Buildx label output is parsed as exactly one JSON object with duplicate-member rejection; the exact revision member must be a string equal to the independently supplied OCI verified commit. Malformed JSON, a non-object root, a missing or wrong-type revision, a wrong value, or duplicate members fails closed without retaining or emitting inspected JSON or label values. An absent, duplicate, additional, incomplete, or mismatched descriptor stops publication/deployment evidence.
 
 ## Authenticate the SSH endpoint
 

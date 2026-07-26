@@ -271,6 +271,8 @@ export const PENDING_PROFILE_PAIRS = [
       'OCI_IDENTITY=index_and_platform_digests',
       'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
       'MUTABLE_LATEST=forbidden',
+      'REVISION_LABEL_JSON=semantic_exact',
+      'REVISION_LABEL_REJECTIONS=malformed_nonobject_wrongtype_missing_wrongvalue_duplicate',
       'ROLLBACK=prior_digest_and_readiness',
       'NO_ROLLBACK=explicit_forward_only',
       'PROCEDURE_SOURCE_COMMIT=required_distinct_from_oci_source',
@@ -503,7 +505,7 @@ const STAGED_PROCEDURE_FILES = Object.freeze([
   Object.freeze({
     path: 'deploy/resofeed-caddy/deploy.sh',
     mode: 0o755,
-    sha256: 'sha256:6f26b22155d9a738f6da0745c3997b8ca67929722e860e530e474dc87271f539'
+    sha256: 'sha256:e27bc178546bdc0e0410a18a55d6501bc38ff3122b5782db9c7e94754380ff27'
   }),
   Object.freeze({
     path: 'deploy/resofeed-caddy/compose.yml',
@@ -591,7 +593,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'verify_oci_descriptor "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"',
     'verify_oci_descriptor "${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"',
     'application/vnd.oci.image.index.v1+json',
-    'org.opencontainers.image.revision',
+    'verify_commit_label() {',
+    'json.load(sys.stdin, object_pairs_hook=reject_duplicate_members)',
+    'if type(document) is not dict:',
+    'revision = document["org.opencontainers.image.revision"]',
+    'if type(revision) is not str or revision != sys.argv[1]:',
     "inspect_manifest_digest 'linux/amd64'",
     "inspect_manifest_digest 'linux/arm64'",
     'resolve_previous_image',
@@ -637,6 +643,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'docker.io/tefx/resofeed@sha256:<index-digest>',
     '--platform linux/amd64,linux/arm64',
     '--label "org.opencontainers.image.revision=${VERIFIED_COMMIT}"',
+    'exactly one JSON object with duplicate-member rejection',
+    'without retaining or emitting inspected JSON or label values',
     'tefx-mbp-personal.platy-atlas.ts.net',
     '--stage-procedure',
     '--procedure-deploy-sha256',
@@ -664,6 +672,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_DEPLOY_SHA256',
     'PROCEDURE_COMPOSE_SHA256',
     'INDEX_DIGEST=sha256:<64 lowercase hex>',
+    'exactly one JSON object with duplicate-member rejection',
+    'without retaining or emitting inspected JSON or label values',
     'preserves the named SQLite volume',
     '`--no-rollback`',
     '`--procedure-source-commit`',
@@ -682,6 +692,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'INDEX_DIGEST=sha256:<OCI index 64 hex>',
     'AMD64_DIGEST=sha256:<linux/amd64 manifest 64 hex>',
     'ARM64_DIGEST=sha256:<linux/arm64 manifest 64 hex>',
+    'exactly one duplicate-free JSON object',
+    'without retaining or emitting inspected JSON or label values',
     '--stage-procedure',
     '--recover-procedure',
     'PROCEDURE_DEPLOY_SHA256',
@@ -767,7 +779,9 @@ export function verifyImmutableDeploymentSources(sources) {
     'duplicate-free canonical Serve JSON route before every persistent deployment effect',
     'resofeed-only `--no-build --no-deps` Compose update',
     'separate procedure-source and OCI application-source identities',
-    'success`, `no_effect`, `known_partial`, or `unknown_partial`'
+    'success`, `no_effect`, `known_partial`, or `unknown_partial`',
+    'spaced-valid semantic Buildx label JSON',
+    'without emitting inspected JSON or label values'
   ]);
 
   const procedure = IMMUTABLE_DEPLOYMENT_PATHS.map((relativePath) => sources[relativePath]).join('\n');
@@ -851,6 +865,19 @@ export function verifyImmutableDeploymentSources(sources) {
   }
 
   const deployScript = sources['deploy/resofeed-caddy/deploy.sh'];
+  const labelParserStart = deployScript.indexOf('verify_commit_label() {');
+  const labelParserEnd = deployScript.indexOf('\n}\n\nverify_oci_identity()', labelParserStart);
+  const labelParser = deployScript.slice(labelParserStart, labelParserEnd);
+  if (labelParserStart < 0 || labelParserEnd <= labelParserStart
+      || !labelParser.includes('json.load(sys.stdin, object_pairs_hook=reject_duplicate_members)')
+      || !labelParser.includes('if type(document) is not dict:')
+      || !labelParser.includes('revision = document["org.opencontainers.image.revision"]')
+      || !labelParser.includes('if type(revision) is not str or revision != sys.argv[1]:')
+      || !labelParser.includes("' \"$VERIFIED_COMMIT\" 2>/dev/null")
+      || labelParser.includes('grep -Fq')
+      || labelParser.includes('sys.stdout')) {
+    throw new AdapterFailure('immutable deployment revision-label JSON parser drifted');
+  }
   const strictSSHInvocation = 'ssh "${TAILNET_SSH_OPTIONS[@]}" "$TAILNET_TARGET_HOST"';
   if ((deployScript.match(new RegExp(strictSSHInvocation.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'gu')) ?? []).length !== 2) {
     throw new AdapterFailure('immutable deployment procedure did not apply one SSH endpoint policy to every remote helper');
@@ -982,6 +1009,8 @@ export function verifyImmutableDeploymentSources(sources) {
     'OCI_IDENTITY=index_and_platform_digests',
     'TAILNET_TARGET=tefx-mbp-personal:resofeed-caddy',
     'MUTABLE_LATEST=forbidden',
+    'REVISION_LABEL_JSON=semantic_exact',
+    'REVISION_LABEL_REJECTIONS=malformed_nonobject_wrongtype_missing_wrongvalue_duplicate',
     'ROLLBACK=prior_digest_and_readiness',
     'NO_ROLLBACK=explicit_forward_only',
     'PROCEDURE_SOURCE_COMMIT=required_distinct_from_oci_source',

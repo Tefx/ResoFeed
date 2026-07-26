@@ -258,7 +258,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
 
   const stagedDeployPath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'deploy.sh');
   const stagedComposePath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'compose.yml');
-  assert.equal(fileSHA256(stagedDeployPath), 'sha256:6f26b22155d9a738f6da0745c3997b8ca67929722e860e530e474dc87271f539');
+  assert.equal(fileSHA256(stagedDeployPath), 'sha256:e27bc178546bdc0e0410a18a55d6501bc38ff3122b5782db9c7e94754380ff27');
   assert.equal(fileSHA256(stagedComposePath), 'sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c');
   assert.equal(fs.statSync(stagedDeployPath).mode & 0o777, 0o755);
   assert.equal(fs.statSync(stagedComposePath).mode & 0o777, 0o644);
@@ -579,6 +579,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     hasPrior = true,
     failComposeCommand = '',
     routeState = 'canonical',
+    labelState = 'spaced-valid',
     procedureSourceCommit = procedureCommit
   } = {}) {
     const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-immutable-deploy-'));
@@ -654,7 +655,16 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       'printf "%s\\n" "$*" >> "$FAKE_DOCKER_LOG"',
       'if [[ "$1 $2 $3" == "buildx imagetools inspect" ]]; then',
       '  if [[ " $* " == *" --format "* ]]; then',
-      '    printf "{\\"org.opencontainers.image.revision\\":\\"%s\\"}\\n" "$FAKE_COMMIT"',
+      '    case "$FAKE_LABEL_STATE" in',
+      '      spaced-valid) printf \'{ "fixture.other" : "retained", "org.opencontainers.image.revision" : "%s" }\\n\' "$FAKE_COMMIT" ;;',
+      '      malformed) printf \'{ "org.opencontainers.image.revision" : \' ;;',
+      '      nonobject) printf \'["fixture-label-value"]\\n\' ;;',
+      '      wrongtype) printf \'{ "org.opencontainers.image.revision" : 8675309 }\\n\' ;;',
+      '      missing) printf \'{ "fixture.other" : "fixture-label-value" }\\n\' ;;',
+      '      wrongvalue) printf \'{ "org.opencontainers.image.revision" : "sensitive-wrong-revision" }\\n\' ;;',
+      '      duplicate) printf \'{ "org.opencontainers.image.revision" : "%s", "org.opencontainers.image.revision" : "%s" }\\n\' "$FAKE_COMMIT" "$FAKE_COMMIT" ;;',
+      '      *) exit 95 ;;',
+      '    esac',
       '  else',
       '    cat <<EOF',
       'Name: $4',
@@ -706,7 +716,8 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       FAKE_TARGET_IMAGE: targetImage,
       FAKE_FAIL_READINESS: failReplacementReadiness ? '1' : '0',
       FAKE_FAIL_COMPOSE_COMMAND: failComposeCommand,
-      FAKE_ROUTE_STATE: routeState
+      FAKE_ROUTE_STATE: routeState,
+      FAKE_LABEL_STATE: labelState
     };
     const procedureDeployHash = fileSHA256(path.join(stack, 'deploy.sh'));
     const procedureComposeHash = fileSHA256(path.join(stack, 'compose.yml'));
@@ -742,6 +753,22 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       run,
       result
     };
+  }
+
+  for (const labelState of ['malformed', 'nonobject', 'wrongtype', 'missing', 'wrongvalue', 'duplicate']) {
+    const labelRejected = deploymentFixture({ labelState });
+    try {
+      assert.equal(labelRejected.result.status, 1, labelState);
+      assert.match(labelRejected.result.stderr, /OCI platform image is not bound to the verified commit/u);
+      assert.equal(fs.readFileSync(labelRejected.statePath, 'utf8').trim(), labelRejected.priorImage);
+      assert.doesNotMatch(fs.readFileSync(labelRejected.dockerLog, 'utf8'), /^compose /mu);
+      assert.doesNotMatch(
+        labelRejected.result.stdout + labelRejected.result.stderr,
+        /(?:org\.opencontainers\.image\.revision|fixture-label-value|8675309|sensitive-wrong-revision)/u
+      );
+    } finally {
+      fs.rmSync(labelRejected.root, { recursive: true, force: true });
+    }
   }
 
   const identityRejected = deploymentFixture({ invalidProcedureIdentity: true });
@@ -958,6 +985,10 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replace('expected_tag="git-${VERIFIED_COMMIT}"', 'expected_tag="$IMMUTABLE_TAG"')),
     mutation(deployPath, (body) => body.replace('verify_oci_descriptor "${OCI_REPOSITORY}@${OCI_INDEX_DIGEST}"', 'true')),
     mutation(deployPath, (body) => body.replace('application/vnd.oci.image.index.v1+json', 'application/vnd.docker.distribution.manifest.list.v2+json')),
+    mutation(deployPath, (body) => body.replace('json.load(sys.stdin, object_pairs_hook=reject_duplicate_members)', 'json.load(sys.stdin)')),
+    mutation(deployPath, (body) => body.replace('if type(document) is not dict:', 'if False:')),
+    mutation(deployPath, (body) => body.replace('if type(revision) is not str or revision != sys.argv[1]:', 'if revision != sys.argv[1]:')),
+    mutation(deployPath, (body) => body.replace('revision != sys.argv[1]', 'revision != VERIFIED_COMMIT')),
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/amd64'", "inspect_manifest_digest 'linux/386'")),
     mutation(deployPath, (body) => body.replace("inspect_manifest_digest 'linux/arm64'", "inspect_manifest_digest 'linux/arm/v7'")),
     mutation(deployPath, (body) => body.replaceAll('rollback_previous_digest', 'rollback_without_readiness')),

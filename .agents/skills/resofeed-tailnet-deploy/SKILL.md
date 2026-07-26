@@ -67,7 +67,7 @@ docker buildx build \
 docker buildx imagetools inspect "${OCI_REPOSITORY}:${IMMUTABLE_TAG}"
 ```
 
-Do not publish any moving alias. Accept the publication only when the tag resolves to the supplied index digest, the index has exactly the two required platforms, each platform digest matches, and both platform images carry `org.opencontainers.image.revision=${VERIFIED_COMMIT}`.
+Do not publish any moving alias. Accept the publication only when the tag resolves to the supplied index digest, the index has exactly the two required platforms, each platform digest matches, and both platform images carry `org.opencontainers.image.revision=${VERIFIED_COMMIT}`. Parse each Buildx labels response as exactly one JSON object with duplicate-member rejection; the exact revision member must be a string equal to the independently supplied OCI verified commit. Malformed JSON, a non-object root, a missing or wrong-type revision, a wrong value, or duplicate members fails closed without retaining or emitting inspected JSON or label values.
 
 If publication fails after a complete chain exists, record the orphan chain with the repository procedure below. A separately authorized registry workflow may delete an authorized temporary tag; this skill does not infer or execute that authority.
 
