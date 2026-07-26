@@ -190717,14 +190717,19 @@ phases:
 
 
       Deliver: Produce `RF-BUG-V2-TAILNET-CADDY-RUNTIME-PROOF` by independently consuming
-      the successful no-rollback deployment and procedure-staging receipts, then re-observing
-      the exact source/tag/index/amd64/arm64/revision chain, configured and running
-      digest, direct root `200`, unauthenticated Doctor `401`, strict literal-FQDN
-      endpoint identity, four Go-owned security headers on direct/public HTML, JSON,
-      MCP, unauthorized, and error responses, Caddy non-ownership, named `/data` SQLite
-      volume identity, canonical route no-op, protected owner-token/data state, no
-      old-image rollback, forward-only attempt classification, and nondisclosure.
-      Product/UI RF-BUG behavior remains owned by `rf-bug-v2-independent-runtime-ui`.
+      the successful no-rollback staging and deployment receipts, then re-observing
+      two non-substitutable identity chains: (1) the later integrated procedure-source
+      commit to tracked `deploy.sh`/`compose.yml` hashes and modes, staging backup
+      ID, and final remote bytes; and (2) OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
+      to immutable tag, index, amd64/arm64 manifests, revision, and configured/running
+      digest. Prove the maintained deployment invocation carried exact separate `--procedure-source-commit`
+      and `--verified-commit` values and never inferred equality. Also prove direct
+      root `200`, unauthenticated Doctor `401`, strict literal-FQDN endpoint identity,
+      four Go-owned security headers on direct/public HTML, JSON, MCP, unauthorized,
+      and error responses, Caddy non-ownership, named `/data` SQLite volume identity,
+      canonical route no-op, protected owner-token/data state, no old-image rollback,
+      forward-only attempt classification, and nondisclosure. Product/UI RF-BUG behavior
+      remains owned by `rf-bug-v2-independent-runtime-ui`.
 
 
       Boundary: `integration-verifier` has read-only authority against the existing
@@ -190734,31 +190739,38 @@ phases:
       state, discover a prior digest, or expose secrets, host-key material, configuration,
       response bodies, or public-host values. At most three probe attempts are allowed
       only after retaining a demonstrably transient non-mutating failure and re-proving
-      unchanged target, digest, volume, and route.
+      unchanged target, procedure bytes, image digest, volume, and route.
 
 
       Admit: Require exact sanitized receipts and secret-safe raw-log identities from
-      `rf-bug-v2-stage-no-rollback-procedure` and `rf-bug-v2-tailnet-caddy-deployment-producer`.
-      Production semantic admission emits one `vectl.verifier.semantic.v1` with `verifier_id=integration-verifier`,
-      `step_id=rf-bug-v2-tailnet-caddy-proof`, ordered scope [`no-rollback procedure
-      staging and deployment producer`, `immutable identity and strict-FQDN readiness`,
-      `Go-header and Caddy ownership parity`, `digest volume route and forward-only
-      classification`, `protected state and nondisclosure`], and outcome-consistent
-      coverage for `RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING`, `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`,
-      `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`,
+      `rf-bug-v2-stage-no-rollback-procedure` and `rf-bug-v2-tailnet-caddy-deployment-producer`,
+      plus current tracked source for independent hash/mode observation. Production
+      semantic admission emits one `vectl.verifier.semantic.v1` with `verifier_id=integration-verifier`,
+      `step_id=rf-bug-v2-tailnet-caddy-proof`, ordered scope [`procedure-source commit
+      through staged hashes modes backup and final bytes`, `OCI application source
+      through immutable manifests revision and configured/running digest`, `strict-FQDN
+      readiness and separate maintained invocation bindings`, `Go-header and Caddy
+      ownership parity`, `volume route protected state forward-only recovery and nondisclosure`],
+      and outcome-consistent coverage for `RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING`,
+      `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`, `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`,
       `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY`, and `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`.
+      Each identity claim requires direct observation or exact admitted producer evidence;
+      neither source commit may satisfy the other chain.
 
 
-      Recovery: Any deterministic identity/header/readiness/volume/route/protected-state
+      Recovery: Any deterministic identity-chain, parser/invocation, endpoint/header/readiness/volume/route/protected-state
       defect, missing or inconsistent forward-only classification, trust drift, disclosure,
       observed mutation, unavailable producer evidence, or unknown state stops BLOCKED/FAIL
       without repair, replay, prior-digest discovery, old-image rollback, or alternate
       target.'
     verification: A production-admitted integration-verifier receipt independently
-      binds the exact staging/deployment receipts and immutable image identity; proves
-      strict-FQDN direct/public readiness, Go-header parity and Caddy non-ownership,
-      configured/running digest, named volume, route no-op, protected state, no old-image
-      rollback, forward-only classification, nondisclosure, and zero verifier mutation.
+      binds procedure source through tracked deploy/compose hashes, modes, staging
+      backup ID, and final bytes; independently binds OCI application source through
+      immutable tag/index/platform/revision to configured/running digest; proves separate
+      maintained invocation arguments, strict-FQDN direct/public readiness, Go-header
+      parity, Caddy non-ownership, named volume, route no-op, protected state, no
+      old-image rollback, forward-only classification, nondisclosure, and zero verifier
+      mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
