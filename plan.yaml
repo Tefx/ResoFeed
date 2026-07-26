@@ -194266,7 +194266,7 @@ phases:
       lifecycle, or external state operation occurred for this append-only admission.'
   - id: rf-bug-v2-tailnet-caddy-deployment-producer
     name: Deploy exact immutable image in admitted no-rollback mode
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -194331,6 +194331,8 @@ phases:
     - rf-bug-v2-stage-buildx-label-json-parser-procedure
     - rf-bug-v2-current-runtime-readiness-diagnosis
     agent: vectl-orchestrator
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T09:59:28.537025Z'
   - id: rf-bug-v2-prior-runtime-identity-readiness
     name: Resolve prior runtime digest and recovery readiness read-only
     status: skipped
