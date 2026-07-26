@@ -191090,6 +191090,8 @@ phases:
     depends_on:
     - rf-bug-v2-close-defect-report
     - rf-bug-v2-formal-security-review
+    - rf-bug-v2-stage-buildx-label-json-parser-procedure
+    - rf-bug-v2-tailnet-caddy-deployment-producer
     agent: gate-reviewer
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
