@@ -190204,36 +190204,37 @@ phases:
 - id: rf-bug-assurance-v2-closure
   name: RF-BUG Assurance v2 Release and Defect Closure
   status: in_progress
-  gate: One terminal gate admits RF-BUG-001–010 closure from tracked local proof,
-    immutable OCI/runtime identity, independently authorized explicit no-prior-digest/no-rollback
-    procedure, strict-FQDN staging and bounded forward-only Tailnet/Caddy deployment,
-    security review, blind product verification, and report closure; unknown partial
-    state, waiver drift, or undeclared recovery authority keeps the phase open.
+  gate: A terminal no-repo semantic review admits RF-BUG-001–010 closure from tracked
+    local proof, immutable OCI/runtime identity, independently authorized explicit
+    no-prior-digest/no-rollback procedure, strict-FQDN staging and bounded forward-only
+    Tailnet/Caddy deployment, security review, blind product verification, and report
+    closure; unknown partial state, waiver drift, or undeclared recovery authority
+    keeps the phase open.
   context: 'Orchestrator has recorded `rf-bug-v2-prior-runtime-identity-readiness`
     as skipped/superseded. Its definition, refs, BLOCKED receipts, evidence, and lifecycle
     history remain immutable non-consumable provenance; it is neither current authority
-    nor a current Gate branch. Current human authority waives prior image-digest discovery
-    and automatic old-image rollback only for the existing immutable OCI index. The
-    current five-boundary chain is repository implementation, independent risk/safety
-    review, persistent strict-FQDN procedure staging, persistent exact-image deployment,
-    and independent Tailnet/runtime proof, followed by the existing security, UI,
-    report, and Gate consumers. Procedure identity and application identity remain
-    separate: a later integrated procedure-source commit binds tracked `deploy.sh`/`compose.yml`
-    hashes and modes through the staging backup ID and final bytes, while OCI application
-    source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` binds the immutable tag, index,
-    amd64/arm64 manifests, revision, and configured/running digest; neither identity
-    may be inferred from the other. Deployment permits at most two maintained invocations,
-    with a required post-attempt `success`/`no_effect`/`known_partial_reconciled`/`unknown_partial`
+    nor a current terminal-review input. Current human authority waives prior image-digest
+    discovery and automatic old-image rollback only for the existing immutable OCI
+    index. The current five-boundary chain is repository implementation, independent
+    risk/safety review, persistent strict-FQDN procedure staging, persistent exact-image
+    deployment, and independent Tailnet/runtime proof, followed by the existing security,
+    UI, report, and terminal semantic-review consumers. Procedure identity and application
+    identity remain separate: a later integrated procedure-source commit binds tracked
+    `deploy.sh`/`compose.yml` hashes and modes through the staging backup ID and final
+    bytes, while OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`
+    binds the immutable tag, index, amd64/arm64 manifests, revision, and configured/running
+    digest; neither identity may be inferred from the other. Deployment permits at
+    most two maintained invocations, with a required post-attempt `success`/`no_effect`/`known_partial_reconciled`/`unknown_partial`
     classification; a second invocation requires observed no effect or fully reconciled
     known partial effect, and unknown partial state stops for read-only reconciliation.
     Procedure staging retains bounded prior-byte recovery. No old-image rollback is
     required. SQLite volume deletion/recreation, data loss, route mutation, Caddy
     reconciliation/restart beyond the maintained operation, credential/account/trust
     change, alternate host/stack, moving tag, secret disclosure, and undeclared registry/image
-    mutation remain forbidden. The terminal Gate re-establishes the still-required
+    mutation remain forbidden. The terminal semantic review re-establishes the still-required
     first-run SQLite outcome through current tracked adapter/check evidence; the four
     missing completed-step temporary refs remain historical warnings and are not current
-    Gate inputs.'
+    terminal-review inputs.'
   depends_on:
   - rf-bug-assurance-v2-ledger-prompting
   steps:
@@ -190979,9 +190980,9 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Close RF-BUG-001–010 only in `docs/BUG_REPORT_2026-07-11.md` after the independent\
-      \ blind-runtime receipt passes; the terminal Gate independently integrates the\
-      \ sibling formal-security review before phase admission. Preserve pre-closure\
-      \ report SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`,\
+      \ blind-runtime receipt passes; the terminal no-repo semantic review independently\
+      \ consumes the report and the sibling formal-security review before phase admission.\
+      \ Preserve pre-closure report SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`,\
       \ repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,\
       \ all canonical docs, protected acceptance, completed evidence, and stopped\
       \ historical failures. Record two separate exact chains: the later integrated\
@@ -191005,9 +191006,10 @@ phases:
       \ closure contract`. Selected execution must report all required closure markers\
       \ from the current protected Go/web authorities, including separate procedure-source\
       \ and OCI-application identity-chain closure; the repair plan and acceptance\
-      \ files remain byte-unchanged. The terminal Gate independently consumes the\
-      \ report, the sibling formal-security review, and the admitted no-rollback release\
-      \ receipts.\n\nRecovery: A prehash mismatch, failed blind-runtime receipt, identity-chain\
+      \ files remain byte-unchanged. The independent terminal review `rf-bug-v2-final-semantic-review`\
+      \ consumes this exact check outcome, the sibling formal-security review, the\
+      \ admitted blind-runtime receipt, and the admitted no-rollback release receipts.\n\
+      \nRecovery: A prehash mismatch, failed blind-runtime receipt, identity-chain\
       \ conflation, adapter identity drift, check failure, unrelated file change,\
       \ or inability to distinguish superseded/rejected history from admitted no-rollback\
       \ evidence stops the same step. Revert only the report; do not add adapter/test/doc\
@@ -191042,18 +191044,24 @@ phases:
       \ no tests to run}]\n    proves: [RF-BUG-001-010-CLOSURE]\nbindings: {expected_red:\
       \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report\"\
-      ,\"risk_tier\":\"R1\",\"risk_reasons\":[\"single_tracked_defect_report_closure\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"release_defect_closure_authority\"\
+      ,\"procedure_and_application_identity_separation\",\"accepted_no_rollback_boundary\"\
       ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
-      ,\"observation_ledger\":[],\"test_authority\":{\"developer_test_globs\":[],\"\
-      acceptance_test_paths\":[\"tests/rf_bug_canonical_contract_test.go\",\"web/src/lib/api-client.test.ts\"\
+      ,\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-001-010-CLOSURE\",\"atom\"\
+      :\"the defect report closes RF-BUG-001–010 from admitted blind, security, and\
+      \ no-rollback release evidence while keeping procedure-source and OCI-application\
+      \ identities separate\",\"modality\":\"static\",\"seam\":\"real\",\"check_id\"\
+      :\"rf_bug_v2_defect_report_closure_green\",\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review\"\
+      }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
+      :[\"tests/rf_bug_canonical_contract_test.go\",\"web/src/lib/api-client.test.ts\"\
       ],\"acceptance_check_ids\":[\"rf_bug_v2_defect_report_closure_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: Pre-closure authority hashes match; only the defect report changes;
       it records the procedure-source-to-staged-bytes chain and OCI-application-to-running-digest
       chain separately, exact maintained invocation bindings, narrow waiver and forward-only
       disposition, and post-closure hash/commit; it separates superseded/rejected
-      history from current release evidence; and the exact current closure adapter
-      identities pass.
+      history from current release evidence; the exact current closure adapter identities
+      pass; and the independent terminal semantic review consumes the result.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -191067,48 +191075,78 @@ phases:
     depends_on:
     - rf-bug-v2-independent-runtime-ui
     agent: general
-  - id: rf-bug-v2-assurance-closure-gate
-    name: RF-BUG Assurance v2 no-rollback release Gate
+  - id: rf-bug-v2-final-semantic-review
+    name: Review RF-BUG Assurance v2 no-rollback release closure
     status: pending
-    description: 'step_type: gate
+    description: 'step_type: review
 
       repo_change_policy: no_repo_change
 
 
-      Deliver: Admit closure only with current evidence for semantic label parser
-      repair, fresh authorization, renewed staging, exactly one successful remaining
-      deployment, runtime proof, security review, blind verification, report. Prove
-      spaced JSON passes; malformed/non-object/wrong-type/missing/wrong-value/duplicate
-      fail closed without value/secret output; deployment invariants remain; sources
-      separate; Attempt 1 consumed no effect; no stale replay; Attempt 2 succeeded;
-      no third invocation/prior-digest/rollback authority. Deep Links stays locked.
+      Deliver: Independently decide final RF-BUG Assurance v2 release closure from
+      current admitted evidence after the defect report closes. Cover RF-BUG-001–010,
+      first-run SQLite closure, streaming determinism, both frontend CSP repairs,
+      closure-selector authority, immutable deployment procedure and tracked probe
+      repairs, strict SSH/detached staging safeguards, container build and dual-platform
+      runtime evidence, current runtime readiness, the explicit no-prior-digest/no-old-image-rollback
+      procedure and risk acceptance, renewed parser authorization and staging, exact
+      no-rollback Tailnet/Caddy deployment and proof, formal security review, blind
+      runtime/UI verification, and defect-report closure. Preserve procedure-source
+      and OCI-application identity chains as separate meanings; preserve Attempt 1
+      as consumed no effect and Attempt 2 as the single success; reject stale replay,
+      a third deployment invocation, prior-digest discovery, rollback, Caddy/route/volume
+      mutation, secret disclosure, or new product meaning. Deep Links remains locked.
 
 
-      Boundary: `gate-reviewer` read-only; no repository/runtime/external mutation.
-      Stale history non-current. Gate grants no replay/third invocation/prior-digest/rollback/retry/repair/effect.
+      Boundary: `spec-verifier` is a read-only semantic consumer. It may inspect current
+      tracked docs and admitted lifecycle receipts only. It has zero repository, Git,
+      browser, product, runtime, registry, deployment, route, volume, credential/account/trust,
+      secret, rollback, retry, remediation, or external-effect authority. Completed
+      and skipped definitions, evidence, and history remain immutable; stopped and
+      superseded attempts remain non-current provenance.
 
 
-      Admit: Re-run refs, unique IDs, assurance lint/preflight, expected-red, roster,
-      topology, redundant-edge, gate-scope, completed/skipped immutability. Consume
-      report/security as terminal branches; parser repair only through fresh authorization
-      and renewed chain. Semantic receipt covers every requirement/step; no stale
-      promotion.
+      Admit: Re-run structural refs and global unique IDs, assurance lint with required
+      policy, phase preflight, roster/proof topology, redundant-edge checks, and completed/skipped
+      semantic immutability. Production semantic admission emits one `vectl.verifier.semantic.v1`
+      with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-final-semantic-review`,
+      ordered scope [`RF-BUG-001–010 product closure`, `first-run SQLite streaming
+      CSP and closure-selector repairs`, `separate procedure-source and OCI-application
+      identities`, `strict staging parser deployment and Tailnet/Caddy proof`, `security
+      blind-runtime and defect-report closure`], and one outcome-consistent coverage
+      row for every requirement in this exact set: [`RF-BUG-001`, `RF-BUG-002`, `RF-BUG-003`,
+      `RF-BUG-004`, `RF-BUG-005`, `RF-BUG-006`, `RF-BUG-007`, `RF-BUG-008`, `RF-BUG-009`,
+      `RF-BUG-010`, `RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE`, `RF-BUG-005-STREAMING-DETERMINISM`,
+      `RF-BUG-005-FRONTEND-CSP-INLINE-STYLE`, `RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC`,
+      `RF-BUG-V2-CLOSURE-SELECTOR`, `RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE`, `RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS`,
+      `RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION`, `RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION`,
+      `RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION`, `RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF`,
+      `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD`, `RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY`,
+      `RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR`, `RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE`,
+      `RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE`, `RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS`,
+      `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE`, `RF-BUG-V2-NO-ROLLBACK-RISK-ACCEPTANCE`,
+      `RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING`, `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER`,
+      `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`, `RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING`,
+      `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`, `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`,
+      `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY`, `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`,
+      `RF-BUG-V2-RELEASE-SECURITY-FORWARD-RECOVERY`, `RF-BUG-001-010-CLOSURE`]. Every
+      row cites a current tracked artifact or admitted producer/reviewer receipt;
+      the report-closure row independently consumes `rf_bug_v2_defect_report_closure_green`;
+      no stale or skipped evidence becomes current authority.
 
 
-      Recovery: Missing parser case, source conflation, stale replay, invariant gap,
-      unsafe partial, unsuccessful Attempt 2, remaining/excess authority, security/product/report
-      mismatch, drift/disclosure/out-of-scope keeps BLOCKED. No remediation/effect.
-
-
-      <vectl_gate_scope>
-
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"rf-bug-assurance-v2-closure","requirement_ids":["RF-BUG-001","RF-BUG-002","RF-BUG-003","RF-BUG-004","RF-BUG-005","RF-BUG-006","RF-BUG-007","RF-BUG-008","RF-BUG-009","RF-BUG-010","RF-BUG-001-FIRST-RUN-SQLITE-CLOSURE","RF-BUG-005-STREAMING-DETERMINISM","RF-BUG-005-FRONTEND-CSP-INLINE-STYLE","RF-BUG-005-FRONTEND-CSP-RUNTIME-GENERATED-SYNC","RF-BUG-V2-CLOSURE-SELECTOR","RF-BUG-V2-IMMUTABLE-DEPLOYMENT-PROCEDURE","RF-BUG-V2-TRACKED-READ-ONLY-PROBE-HARNESS","RF-BUG-V2-TRACKED-PROBE-INTEGRATED-HEAD-TRANSPORT-REMEDIATION","RF-BUG-V2-TRACKED-PROBE-ORBSTACK-PATH-REMEDIATION","RF-BUG-V2-TAILSCALE-198-ROUTE-HARNESS-REMEDIATION","RF-BUG-V2-SSH-ENDPOINT-IDENTITY-PROOF","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD","RF-BUG-V2-DETACHED-STAGING-SOURCE-GUARD-POLARITY","RF-BUG-V2-CONTAINER-BUILD-CONTEXT-REPAIR","RF-BUG-V2-CONTAINER-BUILD-RAW-EVIDENCE","RF-BUG-V2-DUAL-PLATFORM-RUNTIME-EVIDENCE","RF-BUG-V2-CURRENT-RUNTIME-READINESS-DIAGNOSIS","RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE","RF-BUG-V2-NO-ROLLBACK-RISK-ACCEPTANCE","RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER","RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION","RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING","RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT","RF-BUG-V2-TAILNET-CADDY-READINESS","RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY","RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY","RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE","RF-BUG-V2-RELEASE-SECURITY-FORWARD-RECOVERY","RF-BUG-001-010-CLOSURE"],"integrated_steps":["rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-closure-selector-verification","rf-bug-assurance-v2-closure.rf-bug-v2-container-build-context-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-current-runtime-readiness-diagnosis","rf-bug-assurance-v2-closure.rf-bug-v2-deployment-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-guard-polarity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-detached-head-staging-guard-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-docker-runtime-proof","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-first-run-sqlite-verification","rf-bug-assurance-v2-closure.rf-bug-v2-formal-security-review","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-inline-style-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-frontend-csp-runtime-generated-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-deployment-procedure-verification-v14","rf-bug-assurance-v2-closure.rf-bug-v2-immutable-procedure-staging-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","rf-bug-assurance-v2-closure.rf-bug-v2-local-verification-matrix","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-implementation","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-route-caddy-effect-repair","rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-authorization","rf-bug-assurance-v2-closure.rf-bug-v2-buildx-label-json-parser-repair","rf-bug-assurance-v2-closure.rf-bug-v2-buildx-label-json-parser-authorization","rf-bug-assurance-v2-closure.rf-bug-v2-stage-buildx-label-json-parser-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-remote-procedure-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-renewed-source-publication-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-replacement-staging-authorization-review","rf-bug-assurance-v2-closure.rf-bug-v2-ssh-endpoint-identity-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-stage-immutable-deployment-procedure","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-streaming-contract-verification","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-deployment-producer","rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof","rf-bug-assurance-v2-closure.rf-bug-v2-tailscale-198-route-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-read-only-probe-harness-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-integrated-head-transport-remediation","rf-bug-assurance-v2-closure.rf-bug-v2-tracked-probe-orbstack-path-remediation"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
-
-      </vectl_gate_scope>'
-    verification: Gate proves all listed requirements/steps, parser cases, renewed
-      authorization/staging/deployment, consumed Attempt 1, successful Attempt 2,
-      no third invocation, separate sources, exact rollback boundaries, security,
-      blind behavior, report closure, zero undeclared effect/blocker.
+      Recovery: Any missing requirement row, browser BLOCKED/FAIL outcome, report/security
+      mismatch, parser-case gap, source-identity conflation, stale replay, deployment
+      invariant gap, unknown partial state, excess invocation or recovery authority,
+      disclosure, drift, or out-of-scope effect keeps the review BLOCKED/FAIL. The
+      reviewer performs no remediation, retry, browser proof, deployment, rollback,
+      or external effect.'
+    verification: A production-admitted spec-verifier receipt proves every listed
+      requirement from current tracked authority and admitted evidence, independently
+      consumes the closure check and sibling security/blind-runtime receipts, keeps
+      procedure and application source identities separate, preserves the exact no-rollback/no-third-deployment
+      boundaries and stopped history, reports no unresolved in-scope defect, and performs
+      no repository, browser, runtime, deployment, rollback, or external effect.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
@@ -191128,9 +191166,7 @@ phases:
     depends_on:
     - rf-bug-v2-close-defect-report
     - rf-bug-v2-formal-security-review
-    - rf-bug-v2-stage-buildx-label-json-parser-procedure
-    - rf-bug-v2-tailnet-caddy-deployment-producer
-    agent: gate-reviewer
+    agent: spec-verifier
   - id: rf-bug-v2-first-run-sqlite-remediation
     name: Repair RF-BUG-001 first-run SQLite inspection failure
     status: done
