@@ -195704,7 +195704,7 @@ phases:
       route, runtime, or external mutation occurred.'
   - id: rf-bug-v2-stage-buildx-label-json-parser-procedure
     name: Stage renewed semantic label parser procedure
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -195749,6 +195749,53 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T09:57:35.414802Z'
+    done_at: '2026-07-26T09:59:05.797534+00:00'
+    evidence: 'Renewed staging succeeded:
+
+      - Exactly one maintained invocation from clean detached commit `0127273a56a6e757757a0f9419a4990f5041aa8a`:
+      `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit 0127273a56a6e757757a0f9419a4990f5041aa8a`.
+
+      - Exit 0; `PROCEDURE_STAGE=verified`; `RESULT_CLASSIFICATION=success`; staging
+      count 1; recovery count 0; image deployment count 0.
+
+      - Strict fixed target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      through maintained literal-FQDN `-F none`, HostName/HostKeyAlias, existing strict
+      trust/account/credential boundary.
+
+
+      Identity chain:
+
+      - Procedure source `0127273a56a6e757757a0f9419a4990f5041aa8a`; separate OCI
+      source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`; no substitution.
+
+      - Source/final deploy.sh: mode 100755/755; SHA `sha256:e27bc178546bdc0e0410a18a55d6501bc38ff3122b5782db9c7e94754380ff27`.
+
+      - Source/final compose.yml: mode 100644/644; SHA `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`.
+
+      - Prior deploy SHA `sha256:6f26b22155d9a738f6da0745c3997b8ca67929722e860e530e474dc87271f539`;
+      prior compose SHA unchanged `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`.
+
+      - New backup ID `sha256:729e81ff6a765a375afb7e734227dbbe0e1b4df6187f4e186b5bf8ff2e07af2f`,
+      distinct from stale backup; prior-byte recovery ready.
+
+
+      Artifacts:
+
+      - Mode-0600 raw log `/tmp/larva-agent-artifacts/rf-bug-v2-stage-buildx-label-json-parser-procedure/stage-raw.log`,
+      SHA-256 `29dc147bdf2209bfd4e9b8e2eb4ee6ab2ae08b42e29cdca4c1a677df0fac45f5`.
+
+      - Mode-0600 sanitized receipt `/tmp/larva-agent-artifacts/rf-bug-v2-stage-buildx-label-json-parser-procedure/stage-receipt.json`,
+      SHA-256 `750cca434b13e0031441640ca081df2c41ebc0de8138ee42702460065e726082`.
+
+
+      Boundaries:
+
+      - No Docker/registry/image/Compose runtime, route/Serve/Caddy, volume/data,
+      owner-token, secret, credential/trust, repository/Git, alternate transport/target,
+      or other protected-state effect occurred.
+
+      - Attempt 1 and stale staged procedure remain history; deployment may consume
+      only this renewed receipt and exactly one remaining invocation.'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
