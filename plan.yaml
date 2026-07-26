@@ -190716,96 +190716,68 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Deliver: Close only the remaining `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY` evidence
-      gap for the already-successful renewed deployment of procedure source `0127273a56a6e757757a0f9419a4990f5041aa8a`
-      and immutable index `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`.
-      Authorize one new clean-context `integration-verifier` to prove an exact non-empty
-      Go-owned Content-Security-Policy on hostname-SNI loopback and public root plus
-      unauthenticated Doctor, with exact CSP equality across all four responses and
-      equality to the canonical Go CSP derived from tracked `internal/resofeed/http_security.go`,
-      `internal/resofeed/http_security_test.go`, and `internal/resofeed/rf_bug_runtime_contract_expected_red_test.go`
-      at current HEAD. Preserve the existing valid Production-rejected negative receipt
-      and its conclusion that deployment, readiness, the three non-CSP security headers,
-      volume/route/forward recovery, and nondisclosure requirements are already proven;
-      the empty CSP hashes are evidence of a case-sensitive BSD-awk parser defect
-      against HTTP/2 lowercase header names, not runtime or transport failure.
-
-
-      Boundary: Authorize exactly one fresh `integration-verifier` and at most one
-      primary read-only CSP-closure probe covering both hostname-SNI loopback and
-      public root/unauthenticated Doctor headers. One additional probe is permitted
-      only after the verifier classifies the primary attempt as transport-only failure
-      and re-observes unchanged endpoint, target, procedure, image, and credential
-      identities and the identical read-only procedure; any endpoint response or parser/assertion
-      defect is not transport-only. Loopback must use the configured hostname as SNI
-      with `curl --resolve` to `127.0.0.1:8443`; IP-SNI is forbidden. The probe must
-      match header names case-insensitively with `tolower($1)` or an equivalent mechanism,
-      remove CR safely, reject absent, empty, or duplicate Content-Security-Policy
-      fields, and compare exact values without retaining response bodies. Retain only
-      safe status/header markers and CSP SHA/equality markers in mode-0600 artifacts;
-      retain no body, cookie, token, path, credential, or secret value. No deploy,
-      restage, restart, replay, repair, rollback, prior-digest action, third deployment
-      invocation, Serve/Caddy/Compose mutation, product/runtime/protected-state/trust
-      mutation, alternate target, disclosure, or deployment/recovery budget is authorized;
-      the deployment invocation budget remains zero.
-
-
-      Admit: Consume as immutable negative authorization/history `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/retry/semantic-receipt-corrected.json`
-      SHA `1c2ad108436daa8f64109aed8000741a1a9c58536172fe6002af1518425d63b9`, Production
-      Gate result `REJECTED` exit 2 with exact reason `SEMANTIC_RECEIPT_NOT_ADMISSIBLE:
-      Semantic receipt does not authorize completion`, `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/retry/production-gate-negative-corrected.json`
-      SHA `ef31af3aebedbf06a325fdb2984276754ffffb87dd46cb5a72d43f9e4a2b227b`, context
+      Deliver: Independently close the remaining `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`
+      gap for procedure source `0127273a56a6e757757a0f9419a4990f5041aa8a` and the
+      already-successful deployment of `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`.
+      Consume the exact successful deployment producer and the production-valid REJECTED
+      receipt `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/retry/semantic-receipt-corrected.json`
+      SHA `1c2ad108436daa8f64109aed8000741a1a9c58536172fe6002af1518425d63b9`, context
       hash `sha256:c4b1e09a6f7b7ff8efa635bc16e793c56a2db721f944cb0ef2440c94743b6fd0`,
-      report SHA `2467fec751701e505a8ed66e188df667fa3094c798842de72d9ce2774d2fed30`,
-      Probe 1 SHA `2672f9f3e49cc565b9fb30d6ed40e0ac9b9b14919a35c58b5ac8909e3cd570c7`,
-      and Probe 2 SHA `fd6dfc26d2e55ca8876bf6fbe5219d276e0ebba45e577880e634d5c64e972a62`;
-      verify every path, SHA, mode, receipt identity, ordered scope, requirement status,
-      Gate result, and context binding before carrying any prior `PROVEN` row forward.
-      Also preserve the earlier INVALID receipts and exhausted probe histories as
-      non-admitted diagnostics. Emit one fresh semantic v1 receipt with the unchanged
-      ordered scope [`renewed semantic-parser procedure source through staged hashes
-      modes backup and final bytes`, `OCI application source through immutable manifests
-      revision and configured/running digest`, `consumed no-effect Attempt 1 and single
-      successful renewed Attempt 2`, `strict-FQDN readiness and separate maintained
-      invocation bindings`, `Go-header Caddy volume route protected state forward-only
-      recovery and nondisclosure`] and full coverage in this order: `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`,
+      which already proves the other six release requirements. Fresh evidence must
+      prove that hostname-SNI loopback and public root plus unauthenticated Doctor
+      return `200/401` and each exposes exactly one non-empty byte-identical Content-Security-Policy
+      equal to the canonical policy derived from current tracked Go and embedded-UI
+      authority. Preserve Caddy non-ownership and the full seven-requirement release
+      scope.
+
+
+      Boundary: Authorize exactly one fresh `integration-verifier` for read-only observation
+      of the literal target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      and public/SNI hostname `resofeed.tefx.one`. At most two total no-effect attempts
+      are authorized. A retry is allowed only after the prior attempt retained secret-safe
+      evidence, classified zero mutation, and failed in transport, probe mechanics,
+      parser mechanics, or receipt formatting while target, procedure, image, endpoint,
+      credential, route, volume, and runtime identities remain unchanged. The verifier
+      chooses the private read-only probe implementation. No deploy, restage, restart,
+      replay, repair, rollback, prior-digest action, third deployment invocation,
+      Serve/Caddy/Compose mutation, product/runtime/protected-state/trust mutation,
+      alternate target, body/cookie/token/path retention, or disclosure is authorized;
+      deployment invocation budget remains zero.
+
+
+      Admit: Revalidate the successful producer receipt and the valid-negative receipt/hash/context
+      before carrying forward `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`,
       `RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING`, `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`,
-      `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`,
-      `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY`, `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`.
-      Only the CSP gap may use fresh runtime evidence; previously proven rows may
-      be carried forward only from the exact immutable negative artifacts. Before
-      return, run Production Gate schema preflight against the candidate with exact
-      verifier, step, ordered scope, all seven requirements, and evidence authorities.
-      `specialist_receipt.commands` must contain substantive actual argv reproducing
-      execution; SSH argv must use attached forms such as `-Fnone`, `-oHostName=...`,
-      `-oHostKeyAlias=...`, and `-oControlPath=none`, with no standalone `none` or
-      schema placeholders. Permit one initial receipt and at most one same-child format-only
-      JSON correction after Production Gate `INVALID`, with no new probe; a second
-      `INVALID` terminates.
+      `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY`,
+      and `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`. Retain later parser/domain-discovery
+      failures, including receipt SHA `a96935be1dd16b8b2183c15ab4dcb2dda403d9f74344cc4b14926eedb7134ad5`,
+      as nonblocking provenance only. Fresh mode-0600 evidence for `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`
+      must record only safe status, single/non-empty CSP, byte-length, digest, equality,
+      tracked-authority, Caddy non-ownership, identity, and zero-mutation markers.
+      Emit one `vectl.verifier.semantic.v1` receipt with the unchanged ordered scope
+      [`renewed semantic-parser procedure source through staged hashes modes backup
+      and final bytes`, `OCI application source through immutable manifests revision
+      and configured/running digest`, `consumed no-effect Attempt 1 and single successful
+      renewed Attempt 2`, `strict-FQDN readiness and separate maintained invocation
+      bindings`, `Go-header Caddy volume route protected state forward-only recovery
+      and nondisclosure`] and all seven requirement rows. Production semantic admission
+      must be schema-valid and completion-grade.
 
 
-      Recovery: Stop without mutation or further probing on any changed artifact/hash/context/HEAD/endpoint/target/procedure/image/credential
-      identity, absent/empty/duplicate/mismatched/noncanonical CSP, parser defect,
-      non-transport failure, attempted forbidden effect, unsafe retention, exhausted
-      primary-plus-conditional-transport retry budget, or second Production Gate `INVALID`.
-      Preserve all observations and return the exact blocker. Do not repair, deploy,
-      restage, restart, replay, roll back, inspect or act on a prior digest, invoke
-      deployment, mutate Serve/Caddy/Compose, switch target, or correct a receipt
-      again; downstream security, UI, report, and Gate consumers remain blocked until
-      a Production-admitted PASS receipt covers the full unchanged scope.'
-    verification: One Production-admitted semantic PASS receipt from the single fresh
-      clean-context `integration-verifier` must verify the immutable valid-negative
-      artifact chain, preserve all previously proven rows and full ordered scope,
-      and close only `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY` with at most one primary
-      read-only probe across hostname-SNI `curl --resolve` loopback and public root/unauthenticated
-      Doctor plus one retry only after a classified transport-only failure with unchanged
-      identities. The probe must parse names case-insensitively, normalize CR, reject
-      absent/empty/duplicate CSP, prove exact CSP equality across all four responses
-      and against the canonical tracked Go CSP, retain only mode-0600 secret-safe
-      status/header and CSP SHA/equality evidence, emit substantive actual argv, pass
-      Production Gate schema admission after at most one format-only correction, and
-      prove zero deployment/restage/restart/replay/repair/rollback/prior-digest/Serve/Caddy/Compose
-      mutation or deployment authority.
+      Recovery: An observed runtime/security/Caddy ownership defect, identity drift,
+      disclosure, unsafe retention, attempted mutation, unknown partial state, or
+      two exhausted no-effect attempts stops BLOCKED/FAIL without repair or further
+      probing. Ordinary transport, probe, parser, or receipt failure stays on this
+      step and may consume the one safe retry; it creates no Plan node and grants
+      no external effect.'
+    verification: One production-admitted PASS receipt from the authorized `integration-verifier`
+      consumes the exact successful deployment and valid-negative evidence, closes
+      `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY` on fixed hostname-SNI loopback and public
+      root/Doctor with one non-empty canonical byte-identical CSP across all four
+      responses, preserves all seven requirement rows and the full ordered scope,
+      uses no more than two no-effect attempts, retains only mode-0600 secret-safe
+      evidence, and proves zero deployment/runtime mutation or additional deployment
+      authority.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
@@ -195948,21 +195920,22 @@ phases:
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
-  gate: One terminal gate admits the protected item deep-link contract, parallel backend/frontend
-    implementation, independent local proof, separately authorized immutable OCI publication
-    and verification, separately authorized Tailnet/Caddy deployment and proof, and
-    the complete witnessed external-client matrix.
-  context: The tracked canonical authority is docs/ITEM_DEEP_LINKS.md plus the item
-    deep-link deltas in docs/ARCHITECTURE.md and docs/DESIGN.md at authority commit
-    6ce3cc5a22fa4d795b5181018ad449f1dedef104. The existing generic adapter/profile
-    is current. Protected expected-red ownership and the parallel backend/frontend
-    frontier remain unchanged. Publication and deployment are separate runtime_state_only
-    implementation effects owned by vectl-orchestrator, each followed by read-only
-    independent verification. External-client verification is a startup blocker until
-    exact nonsecret provider, device/application, and account/profile bindings are
-    witnessed for Safari, Chrome, Telegram iOS, Telegram Android, Telegram Desktop,
-    email-client opening, and a Codex-or-equivalent MCP app_url consumer; substitution
-    or inferred availability is forbidden.
+  gate: Terminal release admission requires the corrected item deep-link contract,
+    parallel backend/frontend implementation, independent local proof, separately
+    authorized immutable OCI publication and verification, separately authorized Tailnet/Caddy
+    deployment and runtime proof, and one final read-only architecture/design/security/documentation/recovery
+    review. No real-client device/account matrix or terminal Gate is required.
+  context: Current user authority removes the ungrounded mandatory Safari/Chrome/Telegram
+    iOS/Telegram Android/Telegram Desktop/email-client/Codex real-client release matrix
+    and device/account binding requirement. `item-deep-links-expected-red-contracts`
+    produces the corresponding correction to `docs/ITEM_DEEP_LINKS.md` before implementation
+    while retaining generic Telegram, email, bookmark, browser, production Tailnet,
+    and MCP `app_url` consumer behavior. The item deep-link deltas in `docs/ARCHITECTURE.md`
+    and `docs/DESIGN.md` remain canonical. Protected expected-red ownership and the
+    parallel backend/frontend frontier remain. Publication and deployment are separate
+    `runtime_state_only` implementation effects owned by `vectl-orchestrator`, each
+    followed by independent read-only verification. One terminal `spec-verifier` review
+    consumes the complete single-chain release evidence; no terminal Gate is warranted.
   depends_on:
   - rf-bug-assurance-v2-closure
   steps:
@@ -195971,39 +195944,49 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
-      \ Create exactly three protected expected-red acceptance files for `ITEM-DEEP-LINK-CONTRACT`:\
-      \ Go HTTP/MCP/duplicate/PublicURL, frontend application-codec/API-domain separation,\
-      \ and real-browser history/auth/error/read-only lifecycle. The current adapter\
-      \ must fail only at `IDL-BACKEND-READ-PROJECTION-GAP` and `IDL-FRONTEND-APP-HISTORY-GAP`;\
-      \ product code, frozen docs, adapter/profile, configs, and runtime fixtures\
-      \ remain unchanged.\n\nBoundary: `general` owns this indivisible cross-domain\
-      \ contract unit because one acceptance authority, one expected-red receipt,\
-      \ one rollback, and two reciprocal implementation consumers span Go, Vitest,\
-      \ and Playwright. Dispatch and completion use `vectl.worker.dispatch.v2` and\
-      \ `vectl.worker.execution.v2`. Only the three authorized acceptance paths may\
-      \ change. Rollback reverts them together.\n\nAdmit: Current tracked suite/check\
-      \ `item-deep-links-contract` / `item_deep_links_expected_red` selects exactly\
-      \ the three named identities through `scripts/vectl-check.mjs`; current adapter\
-      \ tests, Go/npm configs, trusted Svelte identity derivation, CI-safe Playwright\
-      \ chain, and real-binary fixture provide the witnessed execution path. Backend\
-      \ and frontend steps depend directly on this producer and close the two reciprocal\
-      \ expected-red fingerprints.\n\nRecovery: Collection/compile/startup/auth/setup/timeout\
-      \ or missing-test failures are false-red and stop this step. Do not repair infrastructure,\
-      \ product code, frozen docs, adapter/configs, or downstream implementation here.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
-      \ intent_closure.matchers.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
-      \ [internal/resofeed/item_deep_links_expected_red_test.go, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
+      \ Correct `docs/ITEM_DEEP_LINKS.md` to remove the ungrounded mandatory Safari/Chrome/Telegram\
+      \ iOS/Telegram Android/Telegram Desktop/email-client/Codex real-client release\
+      \ matrix and device/account binding language while retaining generic Telegram,\
+      \ email, bookmark, browser, production Tailnet, and MCP `app_url` consumer behavior.\
+      \ In the same contract unit, create exactly three protected expected-red acceptance\
+      \ files for `ITEM-DEEP-LINK-CONTRACT`: Go HTTP/MCP/duplicate/PublicURL, frontend\
+      \ application-codec/API-domain separation, and real-browser history/auth/error/read-only\
+      \ lifecycle. The current adapter must fail only at `IDL-BACKEND-READ-PROJECTION-GAP`\
+      \ and `IDL-FRONTEND-APP-HISTORY-GAP`; product code, `docs/ARCHITECTURE.md`,\
+      \ `docs/DESIGN.md`, adapter/profile, configs, and runtime fixtures remain unchanged.\n\
+      \nBoundary: `general` owns this indivisible documentation-and-contract unit\
+      \ because the user-authorized scope correction, one acceptance authority, one\
+      \ expected-red receipt, one rollback, and two reciprocal implementation consumers\
+      \ share the same contract boundary. Dispatch and completion use `vectl.worker.dispatch.v2`\
+      \ and `vectl.worker.execution.v2`. Only `docs/ITEM_DEEP_LINKS.md` and the three\
+      \ authorized acceptance paths may change. Rollback reverts those four paths\
+      \ together.\n\nAdmit: Current tracked suite/check `item-deep-links-contract`\
+      \ / `item_deep_links_expected_red` selects exactly the three named identities\
+      \ through `scripts/vectl-check.mjs`; current adapter tests, Go/npm configs,\
+      \ trusted Svelte identity derivation, CI-safe Playwright chain, and real-binary\
+      \ fixture provide the witnessed execution path. The selected contract tests\
+      \ must reject stale real-client authority with `IDL-DOC-AUTHORITY-DRIFT`; accepted\
+      \ red output contains only the two product-gap fingerprints. Backend and frontend\
+      \ steps depend directly on this producer and close the reciprocal expected-red\
+      \ fingerprints. `item-deep-links-local-integration-verification` independently\
+      \ consumes `ITEM-DEEP-LINK-CONTRACT`.\n\nRecovery: Collection/compile/startup/auth/setup/timeout,\
+      \ missing-test failure, `IDL-DOC-AUTHORITY-DRIFT`, retained mandatory real-client\
+      \ binding, or unrelated documentation/product/config change is false-red and\
+      \ stops this step. Do not repair infrastructure, product code, canonical architecture/design\
+      \ docs, adapter/configs, or downstream implementation here.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: expected_red_definition\nscope:\n  allowed_paths: [docs/ITEM_DEEP_LINKS.md,\
+      \ internal/resofeed/item_deep_links_expected_red_test.go, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
       \ web/tests/e2e/item-deep-links.browser-contract.spec.ts]\n  blocked_paths:\
       \ [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/resofeed-svelte-build-identity.mjs,\
       \ web/playwright.ci-safe.config.ts, web/playwright.config.ts, web/playwright.base.config.ts,\
-      \ web/tests/e2e/fixtures/**, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
-      \ docs/DESIGN.md, internal/resofeed/item_route_token.go, internal/resofeed/http.go,\
-      \ internal/resofeed/http_static.go, internal/resofeed/search.go, internal/resofeed/types.go,\
-      \ internal/resofeed/mcp.go, cmd/resofeed/main.go, web/src/lib/workbench-route.ts,\
-      \ web/src/lib/api-client.ts, web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte,\
-      \ README.md, docs/USAGE.md, docs/CONTAINER.md]\n  ignored_runtime_paths: [.git/,\
-      \ .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND,\
-      \ ITEM-DEEP-LINK-FRONTEND]\nchecks:\n  - id: item_deep_links_expected_red\n\
+      \ web/tests/e2e/fixtures/**, docs/ARCHITECTURE.md, docs/DESIGN.md, internal/resofeed/item_route_token.go,\
+      \ internal/resofeed/http.go, internal/resofeed/http_static.go, internal/resofeed/search.go,\
+      \ internal/resofeed/types.go, internal/resofeed/mcp.go, cmd/resofeed/main.go,\
+      \ web/src/lib/workbench-route.ts, web/src/lib/api-client.ts, web/src/routes/+page.svelte,\
+      \ web/src/routes/components/Inspector.svelte, README.md, docs/USAGE.md, docs/CONTAINER.md]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-CONTRACT,\
+      \ ITEM-DEEP-LINK-BACKEND, ITEM-DEEP-LINK-FRONTEND]\nchecks:\n  - id: item_deep_links_expected_red\n\
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-contract,\
       \ item_deep_links_expected_red], timeout_seconds: 1800}\n    evidence:\n   \
       \   mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
@@ -196015,9 +195998,10 @@ phases:
       \ read, availability: current}\n        - {path: web/playwright.base.config.ts,\
       \ access: read, availability: current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs,\
       \ access: execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
-      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
-      \ internal/resofeed/item_deep_links_expected_red_test.go, classification: acceptance,\
-      \ availability: produced_by_step}\n        - {path: web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
+      \ access: read, availability: current}\n        - {path: docs/ITEM_DEEP_LINKS.md,\
+      \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
+      \    - {path: internal/resofeed/item_deep_links_expected_red_test.go, classification:\
+      \ acceptance, availability: produced_by_step}\n        - {path: web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
       \ classification: acceptance, availability: produced_by_step}\n        - {path:\
       \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, classification: acceptance,\
       \ availability: produced_by_step}\n      selection:\n        command: [node,\
@@ -196028,13 +196012,14 @@ phases:
       \ and MCP app_url']\n        forbidden_ids: []\n    expect:\n      outcome:\
       \ red\n      exit_codes: [1]\n      stdout_or_stderr:\n        contains_all:\
       \ [{literal: IDL-BACKEND-READ-PROJECTION-GAP}, {literal: IDL-FRONTEND-APP-HISTORY-GAP}]\n\
-      \        contains_any: []\n        forbids: [{literal: No tests found}, {literal:\
-      \ ERROR collecting}, {literal: compile error}, {literal: webServer failed},\
-      \ {literal: timeout}, {literal: setup failed}]\n    proves: [ITEM-DEEP-LINK-CONTRACT,\
-      \ ITEM-DEEP-LINK-BACKEND, ITEM-DEEP-LINK-FRONTEND]\nbindings:\n  expected_red:\n\
-      \    items:\n      - {requirement_id: ITEM-DEEP-LINK-BACKEND, fingerprint: IDL-BACKEND-READ-PROJECTION-GAP,\
-      \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
-      \ duplicate read envelope and MCP app_url'], downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp,\
+      \        contains_any: []\n        forbids: [{literal: IDL-DOC-AUTHORITY-DRIFT},\
+      \ {literal: No tests found}, {literal: ERROR collecting}, {literal: compile\
+      \ error}, {literal: webServer failed}, {literal: timeout}, {literal: setup failed}]\n\
+      \    proves: [ITEM-DEEP-LINK-CONTRACT, ITEM-DEEP-LINK-BACKEND, ITEM-DEEP-LINK-FRONTEND]\n\
+      bindings:\n  expected_red:\n    items:\n      - {requirement_id: ITEM-DEEP-LINK-BACKEND,\
+      \ fingerprint: IDL-BACKEND-READ-PROJECTION-GAP, source_check: item_deep_links_expected_red,\
+      \ selection_ids: ['ITEM-DEEP-LINK duplicate read envelope and MCP app_url'],\
+      \ downstream_step: item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp,\
       \ downstream_check: item_deep_links_backend_green, owner_policy: {mode: single}}\n\
       \      - {requirement_id: ITEM-DEEP-LINK-FRONTEND, fingerprint: IDL-FRONTEND-APP-HISTORY-GAP,\
       \ source_check: item_deep_links_expected_red, selection_ids: ['ITEM-DEEP-LINK\
@@ -196044,12 +196029,14 @@ phases:
       \  closes_expected_red: []\n</intent_closure_contract>\n<vectl_step_policy>\n\
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts\"\
       ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"protected_acceptance_definition\"\
-      ,\"public_browser_http_mcp_contract\",\"cross_domain_contract_lock\"],\"primary_outcome\"\
-      :\"ITEM-DEEP-LINK-CONTRACT\",\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\"\
-      :[{\"requirement_id\":\"ITEM-DEEP-LINK-CONTRACT\",\"atom\":\"protected expected-red\
-      \ identities cover the frozen browser and backend deep-link contract without\
-      \ infrastructure false-reds\",\"modality\":\"test_contract\",\"seam\":\"static\"\
-      ,\"check_id\":\"item_deep_links_expected_red\",\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-final-gate\"\
+      ,\"public_browser_http_mcp_contract\",\"documentation_authority_correction\"\
+      ,\"cross_domain_contract_lock\"],\"primary_outcome\":\"ITEM-DEEP-LINK-CONTRACT\"\
+      ,\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\"\
+      :\"ITEM-DEEP-LINK-CONTRACT\",\"atom\":\"corrected feature authority and protected\
+      \ expected-red identities cover the browser and backend deep-link contract without\
+      \ ungrounded real-client scope or infrastructure false-reds\",\"modality\":\"\
+      test_contract\",\"seam\":\"static\",\"check_id\":\"item_deep_links_expected_red\"\
+      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
       :[\"internal/resofeed/item_deep_links_expected_red_test.go\",\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\"\
       ,\"web/tests/e2e/item-deep-links.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
@@ -196067,10 +196054,12 @@ phases:
       :\"Freeze the accepted real-browser authentication, navigation, error, focus,\
       \ scroll, and read-only lifecycle contract\",\"check_id\":\"item_deep_links_expected_red\"\
       ,\"actor_id\":\"software-architect\"}]}}\n</vectl_step_policy>"
-    verification: The adapter selects exactly three frozen contract identities; the
-      new Go, TypeScript, and real-browser acceptance files fail only with IDL-BACKEND-READ-PROJECTION-GAP
-      and IDL-FRONTEND-APP-HISTORY-GAP while product/runtime/frozen-doc paths remain
-      unchanged.
+    verification: Only `docs/ITEM_DEEP_LINKS.md` and the three protected acceptance
+      files change. The document removes mandatory real-client/account bindings while
+      retaining generic URL consumers and automated browser/Tailnet/MCP proof. The
+      adapter selects exactly three contract identities and fails only with `IDL-BACKEND-READ-PROJECTION-GAP`
+      and `IDL-FRONTEND-APP-HISTORY-GAP`, with no `IDL-DOC-AUTHORITY-DRIFT`, infrastructure
+      false-red, product/runtime change, or canonical architecture/design-doc change.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
@@ -196303,8 +196292,9 @@ phases:
 
       Deliver: Produce `ITEM-DEEP-LINK-LOCAL-INTEGRATION` on integrated HEAD through
       the real `cmd/resofeed` binary, real SQLite, HTTP/static routing, Streamable
-      HTTP MCP, and isolated Chromium. Prove application/API codec separation; escaped
-      `/items/` dispatch before cleaning; raw malformed-percent server `400`; canonical/legacy/dot/encoded-slash/Unicode/dispatchable-invalid
+      HTTP MCP, and isolated Chromium. Independently consume the corrected `ITEM-DEEP-LINK-CONTRACT`
+      and prove application/API codec separation; escaped `/items/` dispatch before
+      cleaning; raw malformed-percent server `400`; canonical/legacy/dot/encoded-slash/Unicode/dispatchable-invalid
       routing without redirect or asset substitution; pre-lookup API-token rejection;
       exact ordinary/duplicate/broken envelopes and effective mutation targets; explicit/derived
       PublicURL and all three credential-free nonpersisted MCP app_url projections;
@@ -196320,24 +196310,28 @@ phases:
       and re-proving the same HEAD, adapter identity, binary, and clean fixture.
 
 
-      Admit: Consume production-admitted backend/frontend worker receipts and their
-      exact selected/executed identities. Production semantic admission emits one
-      `vectl.verifier.semantic.v1` object with `verifier_id=integration-verifier`,
-      `step_id=item-deep-links-local-integration-verification`, ordered scope [`HTTP
-      and static route boundary`, `SQLite relation and read-only state`, `MCP PublicURL
-      app_url projection`, `real-browser history authentication errors focus and scroll`,
-      `integrated identity and nondisclosure`], and exactly three coverage rows for
-      `ITEM-DEEP-LINK-BACKEND`, `ITEM-DEEP-LINK-FRONTEND`, and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`.
+      Admit: Consume production-admitted expected-red, backend, and frontend worker
+      receipts and their exact selected/executed identities. Confirm the corrected
+      `docs/ITEM_DEEP_LINKS.md` authority contains no mandatory real-client/account
+      matrix and retains generic URL-consumer, automated browser, Tailnet, and MCP
+      `app_url` requirements. Production semantic admission emits one `vectl.verifier.semantic.v1`
+      object with `verifier_id=integration-verifier`, `step_id=item-deep-links-local-integration-verification`,
+      ordered scope [`contract and authority correction`, `HTTP and static route boundary`,
+      `SQLite relation and read-only state`, `MCP PublicURL app_url projection`, `real-browser
+      history authentication errors focus and scroll`, `integrated identity and nondisclosure`],
+      and exactly four coverage rows for `ITEM-DEEP-LINK-CONTRACT`, `ITEM-DEEP-LINK-BACKEND`,
+      `ITEM-DEEP-LINK-FRONTEND`, and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`.
 
 
-      Recovery: Any deterministic route/token/envelope/PublicURL/browser/state defect,
-      identity mismatch, test skip, repository mutation, fixture leakage, or unknown
-      state stops FAIL/BLOCKED. Clean ephemeral processes and fixtures; do not mutate
-      product code or acceptance.'
+      Recovery: Any retained ungrounded client mandate, deterministic route/token/envelope/PublicURL/browser/state
+      defect, identity mismatch, test skip, repository mutation, fixture leakage,
+      or unknown state stops FAIL/BLOCKED. Clean ephemeral processes and fixtures;
+      do not mutate product code, documentation, or acceptance.'
     verification: A production-admitted integration-verifier receipt binds integrated
-      HEAD and the admitted branch receipts, then proves all five scopes on real binary/SQLite/HTTP/MCP/Chromium
-      seams with exact state before/after evidence, no skipped case, no repository
-      mutation, and no fixture residue.
+      HEAD and the admitted contract/backend/frontend receipts, covers all six scopes
+      and exactly four requirement rows, proves corrected authority plus real binary/SQLite/HTTP/MCP/Chromium
+      behavior with exact state before/after evidence, and reports no skipped case,
+      repository mutation, fixture residue, or ungrounded real-client requirement.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
@@ -196540,130 +196534,6 @@ phases:
     depends_on:
     - item-deep-links-tailnet-deployment
     agent: integration-verifier
-  - id: item-deep-links-external-client-verification
-    name: Independently Verify Browser and External-Client Deep-Link Behavior
-    status: pending
-    description: 'step_type: verification
-
-      repo_change_policy: no_repo_change
-
-
-      Deliver: Produce the complete required deployed-client matrix against the exact
-      admitted digest at `https://resofeed.tefx.one`: Safari, Chrome, Telegram iOS,
-      Telegram Android, Telegram Desktop, email-client link opening, and a Codex-or-equivalent
-      MCP app_url consumer. Across required desktop/narrow origins, prove canonical
-      cold load/refresh and legacy replacement; Inspector-first title before auth;
-      missing/rejected/later-401 recovery; exact localized invalid/not-found/network/500/503
-      states and Retry; Feed/Search Close/Back/Forward; current-corpus search/feed
-      restoration; clamped scroll/focus/origin fallback; external-entry replacement;
-      stale A-to-B exclusion; duplicate/broken/ordinary mutation targets; readable/accessibility
-      state; credential-free URLs; and zero read-lifecycle writes.
-
-
-      Boundary: `client-runtime-verifier` is read-only. Before claim, Orchestrator
-      must witness exact nonsecret provider, device/application version, and account/profile
-      bindings for all seven environments, including a real Telegram account on each
-      Telegram client and the exact email/MCP consumer identity. The current plan
-      contains no such witnessed availability. No browser substitution, device emulation
-      presented as a required real client, shared account inference, unavailable-client
-      waiver, repository mutation, product-state mutation, deployment, credential/account
-      change, or secret/token capture is authorized. Token entry is allowed only in
-      the bound client and must be redacted from evidence.
-
-
-      Admit: Require the admitted Tailnet runtime receipt and a startup provider-binding
-      record covering every required environment. Production semantic admission emits
-      one `vectl.verifier.semantic.v1` object with `verifier_id=client-runtime-verifier`,
-      `step_id=item-deep-links-external-client-verification`, ordered scope [`Safari`,
-      `Chrome`, `Telegram iOS`, `Telegram Android`, `Telegram Desktop`, `email client`,
-      `MCP app_url consumer`], and exactly seven coverage rows for `ITEM-DEEP-LINK-EXTERNAL-SAFARI`,
-      `ITEM-DEEP-LINK-EXTERNAL-CHROME`, `ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-IOS`, `ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-ANDROID`,
-      `ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-DESKTOP`, `ITEM-DEEP-LINK-EXTERNAL-EMAIL`,
-      and `ITEM-DEEP-LINK-EXTERNAL-MCP-CONSUMER`.
-
-
-      Recovery: Any missing provider/device/account binding returns BLOCKED before
-      interaction. A deterministic client defect, target/digest drift, secret exposure,
-      read-state write, or unknown account/device state stops without substitution
-      or product/runtime mutation. Only a demonstrably transient read-only launch/navigation
-      failure may be retried once in the same bound environment after retaining the
-      observation and re-proving target and account/device identity.'
-    verification: A production-admitted client-runtime-verifier receipt binds all
-      seven witnessed provider/device/account environments and covers the complete
-      canonical navigation/auth/error/accessibility matrix against the exact deployed
-      digest, with credential-free evidence and zero read-lifecycle state writes;
-      any unavailable required environment is outcome-consistent BLOCKED.
-    refs:
-    - docs/ITEM_DEEP_LINKS.md
-    - docs/ARCHITECTURE.md
-    - docs/DESIGN.md
-    - docs/CONTAINER.md
-    depends_on:
-    - item-deep-links-tailnet-runtime-proof
-    agent: client-runtime-verifier
-  - id: item-deep-links-final-gate
-    name: Admit the Integrated Item Deep-Link Release
-    status: pending
-    description: 'step_type: gate
-
-      repo_change_policy: no_repo_change
-
-
-      Deliver: Admit one integrated item deep-link release only when the protected
-      expected-red contract, parallel backend/frontend implementations, real local
-      seams, R3 effect authorization, immutable OCI publication and independent registry
-      verification, Tailnet/Caddy deployment and independent production proof, and
-      all seven external-client environments satisfy `vectl.gate.scope.v2`. Independently
-      assess architecture, design, security, documentation/test parity, browser/API
-      codec separation, nonpersisted app_url, read-only lifecycle, effective mutation
-      targets, and executable rollback/recovery.
-
-
-      Boundary: `gate-reviewer` is read-only and mutates no repository, Git, registry,
-      Docker/builder, deployment, route, credential/account, secret, data, device,
-      or client state. The gate cannot waive or substitute a missing Safari/Chrome/Telegram/email/MCP
-      provider binding and cannot authorize cleanup or replay of an external effect.
-
-
-      Admit: Re-run structural ref validation, assurance policy lint, pending modifying-step
-      preflight, expected-red reciprocal/applicability checks, live-roster owner compatibility,
-      proof topology, and gate-scope validation. Consume only production-admitted
-      worker, verifier, review, publication, deployment, and client receipts bound
-      to the exact integrated commit and deployed index. Production semantic admission
-      emits one `vectl.verifier.semantic.v1` object with `verifier_id=gate-reviewer`,
-      `step_id=item-deep-links-final-gate`, ordered scope equal to the integrated
-      steps below, and outcome-consistent coverage for every listed requirement ID.
-
-
-      Recovery: A missing witnessed link, unavailable client, expected-red mismatch,
-      frozen-doc drift, source/digest/target drift, security/design/architecture defect,
-      orphan effect, unsafe rollback, persisted app_url, read-state write, or out-of-scope
-      blocker keeps the phase BLOCKED. The gate performs no remediation or external
-      effect.
-
-
-      <vectl_gate_scope>
-
-      {"schema_version":"vectl.gate.scope.v2","phase_id":"item-summary-deep-links-assurance-v2","requirement_ids":["ITEM-DEEP-LINK-CONTRACT","ITEM-DEEP-LINK-BACKEND","ITEM-DEEP-LINK-FRONTEND","ITEM-DEEP-LINK-LOCAL-INTEGRATION","ITEM-DEEP-LINK-DEPLOYMENT-AUTHORITY","ITEM-DEEP-LINK-OCI-PUBLICATION","ITEM-DEEP-LINK-OCI-VERIFICATION","ITEM-DEEP-LINK-TAILNET-DEPLOYMENT","ITEM-DEEP-LINK-TAILNET-RUNTIME","ITEM-DEEP-LINK-EXTERNAL-SAFARI","ITEM-DEEP-LINK-EXTERNAL-CHROME","ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-IOS","ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-ANDROID","ITEM-DEEP-LINK-EXTERNAL-TELEGRAM-DESKTOP","ITEM-DEEP-LINK-EXTERNAL-EMAIL","ITEM-DEEP-LINK-EXTERNAL-MCP-CONSUMER"],"integrated_steps":["item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts","item-summary-deep-links-assurance-v2.item-deep-links-backend-api-mcp","item-summary-deep-links-assurance-v2.item-deep-links-frontend-browser","item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification","item-summary-deep-links-assurance-v2.item-deep-links-deployment-authorization-review","item-summary-deep-links-assurance-v2.item-deep-links-publish-immutable-oci","item-summary-deep-links-assurance-v2.item-deep-links-oci-verification","item-summary-deep-links-assurance-v2.item-deep-links-tailnet-deployment","item-summary-deep-links-assurance-v2.item-deep-links-tailnet-runtime-proof","item-summary-deep-links-assurance-v2.item-deep-links-external-client-verification"],"admitted_future_expected_red":[],"forbid_out_of_scope_blockers":true}
-
-      </vectl_gate_scope>'
-    verification: A production-admitted gate-reviewer receipt proves every listed
-      requirement and integrated step from exact current source, protected contract,
-      real local/deployed/client evidence, separate external-effect receipts, rollback/recovery,
-      architecture/design/security, and documentation/test parity, with no orphan,
-      waiver, substitution, or out-of-scope blocker.
-    refs:
-    - AGENTS.md
-    - docs/ITEM_DEEP_LINKS.md
-    - docs/ARCHITECTURE.md
-    - docs/DESIGN.md
-    - docs/CONTAINER.md
-    - Dockerfile
-    - scripts/vectl-check.mjs
-    - scripts/vectl-check.test.mjs
-    depends_on:
-    - item-deep-links-external-client-verification
-    agent: gate-reviewer
   - id: item-deep-links-oci-verification
     name: Independently Verify the Published Immutable OCI Identity
     status: pending
@@ -196776,3 +196646,66 @@ phases:
     depends_on:
     - item-deep-links-oci-verification
     agent: vectl-orchestrator
+  - id: item-deep-links-final-release-review
+    name: Review Integrated Item Deep-Link Release
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Deliver: Independently judge the integrated item deep-link release after production
+      Tailnet runtime proof. Cover corrected feature authority, protected expected-red
+      ownership, parallel backend/frontend implementation, real local HTTP/SQLite/MCP/browser
+      seams, immutable OCI publication and independent identity verification, Tailnet/Caddy
+      deployment and production proof, architecture/design conformance, security and
+      owner-token boundaries, documentation/test parity, browser/API codec separation,
+      nonpersisted credential-free `app_url`, read-only navigation lifecycle, effective
+      mutation targets, and executable rollback/recovery. No real Safari/Chrome/Telegram/email/Codex
+      device or account matrix is a release requirement.
+
+
+      Boundary: `spec-verifier` is read-only and consumes current tracked authority
+      plus production-admitted worker, verification, review, publication, and deployment
+      receipts bound to the exact integrated commit and deployed index. It may not
+      mutate repository, Git, registry, Docker/builders, deployment, route, Caddy/Serve,
+      credential/account/trust, secrets, data, browser state, or external services.
+      It grants no replay, cleanup, rollback, or external-effect authority.
+
+
+      Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
+      receipt with `verifier_id=spec-verifier`, `step_id=item-deep-links-final-release-review`,
+      ordered scope [`corrected contract architecture and design authority`, `backend
+      frontend and local runtime conformance`, `immutable OCI publication and identity`,
+      `Tailnet deployment runtime security and recovery`, `documentation test parity
+      and release disposition`], and exactly nine outcome-consistent coverage rows
+      for `ITEM-DEEP-LINK-CONTRACT`, `ITEM-DEEP-LINK-BACKEND`, `ITEM-DEEP-LINK-FRONTEND`,
+      `ITEM-DEEP-LINK-LOCAL-INTEGRATION`, `ITEM-DEEP-LINK-DEPLOYMENT-AUTHORITY`, `ITEM-DEEP-LINK-OCI-PUBLICATION`,
+      `ITEM-DEEP-LINK-OCI-VERIFICATION`, `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT`, and
+      `ITEM-DEEP-LINK-TAILNET-RUNTIME`. Each behavioral claim requires its existing
+      independent runtime receipt; static review cannot substitute.
+
+
+      Recovery: A stale or conflicting authority, expected-red mismatch, source/digest/target
+      drift, architecture/design/security defect, orphan external effect, unsafe rollback,
+      persisted or credential-bearing `app_url`, read-state write, missing documentation/test
+      parity, disclosure, or unproven requirement returns BLOCKED/FAIL and routes
+      to the owning pending boundary. This review performs no remediation or external
+      effect.'
+    verification: A production-admitted `spec-verifier` receipt covers all five review
+      scopes and exactly nine requirements from corrected current authority and exact
+      admitted local/OCI/deployment/runtime evidence, reports architecture/design/security/documentation/test/recovery
+      conformance with no orphan or unproven required behavior, and authorizes no
+      repository, runtime, or external effect.
+    refs:
+    - AGENTS.md
+    - docs/ITEM_DEEP_LINKS.md
+    - docs/ARCHITECTURE.md
+    - docs/DESIGN.md
+    - docs/CONTAINER.md
+    - Dockerfile
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - item-deep-links-tailnet-runtime-proof
+    agent: spec-verifier
