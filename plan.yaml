@@ -191000,7 +191000,9 @@ phases:
       \ use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`. Product code,\
       \ adapters, developer/acceptance tests, canonical docs, deployment files, runtime\
       \ artifacts, secrets, registry, and external state are immutable. Rollback is\
-      \ a one-file revert.\n\nAdmit: The current tracked `scripts/vectl-check.mjs`\
+      \ nontrivial because the report carries release-closure authority: revert only\
+      \ the report and keep the terminal semantic review blocked until the closure\
+      \ check and independent review pass again.\n\nAdmit: The current tracked `scripts/vectl-check.mjs`\
       \ profile `rf-bug-v2-closure-report` selects and runs `rf_bug_v2_defect_report_closure_green`\
       \ with exact identities `RF-BUG-001-010 active source scans` and `RF-BUG-001-010\
       \ closure contract`. Selected execution must report all required closure markers\
@@ -191012,20 +191014,22 @@ phases:
       \nRecovery: A prehash mismatch, failed blind-runtime receipt, identity-chain\
       \ conflation, adapter identity drift, check failure, unrelated file change,\
       \ or inability to distinguish superseded/rejected history from admitted no-rollback\
-      \ evidence stops the same step. Revert only the report; do not add adapter/test/doc\
-      \ remediation or external effects.\n\n<intent_closure_contract>\nschema_version:\
-      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md]\n\
-      \  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
-      \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ README.md, Dockerfile, scripts/**, tests/**, internal/**, cmd/**, web/**,\
-      \ deploy/**, docs/audits/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
-      \ .venv/]\nclaims: [RF-BUG-001-010-CLOSURE]\nchecks:\n  - id: rf_bug_v2_defect_report_closure_green\n\
-      \    run: {command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-closure-report,\
-      \ rf_bug_v2_defect_report_closure_green], timeout_seconds: 600}\n    evidence:\n\
-      \      mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
-      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
-      \ access: read, availability: current}\n        - {path: docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ evidence stops the same step. Revert only the report, invalidate its release-closure\
+      \ authority, and keep the terminal semantic review blocked until the exact closure\
+      \ check and independent review pass again; do not add adapter/test/doc remediation\
+      \ or external effects.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [docs/BUG_REPORT_2026-07-11.md]\n  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md,\
+      \ docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, README.md, Dockerfile,\
+      \ scripts/**, tests/**, internal/**, cmd/**, web/**, deploy/**, docs/audits/**]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-001-010-CLOSURE]\n\
+      checks:\n  - id: rf_bug_v2_defect_report_closure_green\n    run: {command: [node,\
+      \ scripts/vectl-check.mjs, run, rf-bug-v2-closure-report, rf_bug_v2_defect_report_closure_green],\
+      \ timeout_seconds: 600}\n    evidence:\n      mode: selected_execution\n   \
+      \   path_bindings:\n        - {path: scripts/vectl-check.mjs, access: execute,\
+      \ availability: current}\n        - {path: scripts/vectl-check.test.mjs, access:\
+      \ read, availability: current}\n        - {path: docs/BUG_FIX_PLAN_2026-07-12.md,\
       \ access: read, availability: current}\n        - {path: docs/BUG_REPORT_2026-07-11.md,\
       \ access: read, availability: current}\n        - {path: go.mod, access: read,\
       \ availability: current}\n        - {path: web/package.json, access: read, availability:\
@@ -191046,7 +191050,7 @@ phases:
       {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report\"\
       ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"release_defect_closure_authority\"\
       ,\"procedure_and_application_identity_separation\",\"accepted_no_rollback_boundary\"\
-      ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
+      ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"NONTRIVIAL\"\
       ,\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-001-010-CLOSURE\",\"atom\"\
       :\"the defect report closes RF-BUG-001–010 from admitted blind, security, and\
       \ no-rollback release evidence while keeping procedure-source and OCI-application\
