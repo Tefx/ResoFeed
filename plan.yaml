@@ -191055,7 +191055,29 @@ phases:
       state, discover a prior digest, roll back, or add another plan node. Retain
       the new outcome and all prior blocked provenance; only a production-admitted
       completion-grade PASS makes the exhausted attachment and runner failures causally
-      nonblocking.'
+      nonblocking.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","risk_tier":"R2","risk_reasons":["headed_public_runtime_browser_observation","manual_owner_token_entry_with_strict_nondisclosure","five_viewport_cross_surface_acceptance","independently_consumed_release_evidence"],"primary_outcome":"RF-BUG-001-010-INDEPENDENT-RUNTIME-UI","rollback_class":"TRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-001","atom":"Inspector
+      pending failure and stale-selection behavior is proven on the exact deployed
+      runtime without production mutation","modality":"runtime","seam":"real","check_id":"rf_bug_001_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-002","atom":"opaque
+      routes and browser history behavior are proven on the exact deployed runtime","modality":"runtime","seam":"real","check_id":"rf_bug_002_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-003","atom":"embedded
+      UI and Doctor public surfaces are proven on the exact deployed runtime","modality":"runtime","seam":"real","check_id":"rf_bug_003_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-004","atom":"OPML
+      import-only and portable State read-only contracts are proven without invoking
+      mutation","modality":"runtime","seam":"real","check_id":"rf_bug_004_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-005","atom":"headers
+      CSP streaming and cancellation public behavior is proven on the exact deployed
+      runtime","modality":"runtime","seam":"real","check_id":"rf_bug_005_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-006","atom":"EN
+      and ZH title behavior is proven on the exact deployed runtime","modality":"runtime","seam":"real","check_id":"rf_bug_006_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-007","atom":"Steer
+      errors are proven through nonmutating public observations","modality":"runtime","seam":"real","check_id":"rf_bug_007_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-008","atom":"Source
+      Ledger controls states keyboard overflow and 44px behavior are proven without
+      invoking mutation","modality":"runtime","seam":"real","check_id":"rf_bug_008_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-009","atom":"Prompting
+      v2.2 public behavior is proven without re-ingest or other production mutation","modality":"runtime","seam":"real","check_id":"rf_bug_009_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-010","atom":"five-viewport
+      real-browser isolation and complete profile process and evidence cleanup are
+      proven","modality":"runtime","seam":"real","check_id":"rf_bug_010_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+
+      </vectl_step_policy>'
     verification: One renewed no-retry blind-tester attempt first preflights immutable
       HEAD `7d2eab0543de6040326ba025f46210fa2084fd21`, tracked HEAD-matching Playwright
       package/lock/base-config bindings, executable Playwright 1.59.1, its one-worker/zero-retry
