@@ -190877,7 +190877,7 @@ phases:
     - rf-bug-v2-tailnet-caddy-proof
     agent: blind-tester
   - id: rf-bug-v2-close-defect-report
-    name: Close RF-BUG-001–010 report with v2 evidence
+    name: Close RF-BUG defect report from admitted no-rollback release evidence
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
@@ -190887,11 +190887,13 @@ phases:
       \ SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,\
       \ all canonical docs, protected acceptance, completed evidence, and stopped\
       \ historical failures. Record the exact current source/tag/index/platform/revision/deployed-digest\
-      \ chain, rollback disposition, `post_closure_report_sha256=<64 lowercase hex>`,\
-      \ and `closure_commit=<40 lowercase hex>` without treating rejected attempts\
-      \ as authority.\n\nBoundary: `general` owns this single-file documentation mutation\
-      \ because the registered documentation persona lacks worker-v2 execution support.\
-      \ Dispatch and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
+      \ chain, the explicit user waiver of prior-digest discovery and automatic image\
+      \ rollback, the bounded forward-only deployment disposition, `post_closure_report_sha256=<64\
+      \ lowercase hex>`, and `closure_commit=<40 lowercase hex>` without treating\
+      \ the superseded prior-runtime attempt or rejected attempts as current authority.\n\
+      \nBoundary: `general` owns this single-file documentation mutation because the\
+      \ registered documentation persona lacks worker-v2 execution support. Dispatch\
+      \ and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
       \ Product code, adapters, developer/acceptance tests, canonical docs, deployment\
       \ files, runtime artifacts, secrets, registry, and external state are immutable.\
       \ Rollback is a one-file revert.\n\nAdmit: The current tracked `scripts/vectl-check.mjs`\
@@ -190899,11 +190901,12 @@ phases:
       \ with exact identities `RF-BUG-001-010 active source scans` and `RF-BUG-001-010\
       \ closure contract`. Selected execution must report all required closure markers\
       \ from the current protected Go/web authorities; the repair plan and acceptance\
-      \ files remain byte-unchanged. The terminal gate is the independent consumer.\n\
-      \nRecovery: A prehash mismatch, failed independent receipt, adapter identity\
-      \ drift, check failure, unrelated file change, or inability to distinguish rejected\
-      \ from admitted evidence stops the same step. Revert only the report; do not\
-      \ add adapter/test/doc remediation or external effects.\n\n<intent_closure_contract>\n\
+      \ files remain byte-unchanged. The terminal gate independently consumes the\
+      \ report and admitted no-rollback release receipts.\n\nRecovery: A prehash mismatch,\
+      \ failed independent receipt, adapter identity drift, check failure, unrelated\
+      \ file change, or inability to distinguish superseded/rejected history from\
+      \ admitted no-rollback evidence stops the same step. Revert only the report;\
+      \ do not add adapter/test/doc remediation or external effects.\n\n<intent_closure_contract>\n\
       schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
       profile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md]\n\
       \  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
@@ -190937,28 +190940,30 @@ phases:
       :\"R1\",\"risk_reasons\":[\"single_tracked_defect_report_closure\"],\"primary_outcome\"\
       :\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\",\"observation_ledger\"\
       :[{\"requirement_id\":\"RF-BUG-001-010-CLOSURE\",\"atom\":\"the single defect\
-      \ report records the admitted RF-BUG-001-010 source, runtime, deployment, security,\
-      \ blind-product, and rollback evidence while canonical docs and protected acceptance\
-      \ remain immutable\",\"modality\":\"test_contract\",\"seam\":\"real\",\"check_id\"\
-      :\"rf_bug_v2_defect_report_closure_green\",\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-assurance-closure-gate\"\
+      \ report records the admitted RF-BUG-001-010 source, runtime, no-rollback deployment,\
+      \ security, blind-product, user-waiver, and forward-only recovery evidence while\
+      \ canonical docs and protected acceptance remain immutable\",\"modality\":\"\
+      test_contract\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_defect_report_closure_green\"\
+      ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-assurance-closure-gate\"\
       }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
       :[\"tests/rf_bug_canonical_contract_test.go\",\"web/src/lib/api-client.test.ts\"\
       ],\"acceptance_check_ids\":[\"rf_bug_v2_defect_report_closure_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: Pre-closure authority hashes match; only the defect report changes;
-      the report separates rejected history from the admitted source/publication/deployment/security/UI
-      chain, records rollback plus post-closure hash/commit, and the exact current
-      closure adapter identities pass.
+      it separates superseded/rejected history from the admitted source/publication/no-rollback
+      deployment/security/UI chain, records the narrow waiver and forward-only disposition
+      plus post-closure hash/commit, and the exact current closure adapter identities
+      pass.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
     - docs/PROMPTING_SYSTEM.md
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
-    - tests/rf_bug_canonical_contract_test.go
-    - web/src/lib/api-client.test.ts
     depends_on:
     - rf-bug-v2-formal-security-review
     - rf-bug-v2-independent-runtime-ui
