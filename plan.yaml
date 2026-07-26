@@ -196296,10 +196296,9 @@ phases:
       \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
       \ access: read, availability: current}\n        - {path: go.mod, access: read,\
       \ availability: current}\n      test_bindings:\n        - {path: internal/resofeed/item_deep_links_expected_red_test.go,\
-      \ classification: acceptance, availability: produced_by_step}\n        - {path:\
-      \ internal/resofeed/item_route_token_test.go, classification: developer, availability:\
-      \ current}\n        - {path: internal/resofeed/http_impl_test.go, classification:\
-      \ developer, availability: current}\n        - {path: internal/resofeed/item_deep_links_test.go,\
+      \ classification: acceptance, availability: current}\n        - {path: internal/resofeed/item_route_token_test.go,\
+      \ classification: developer, availability: current}\n        - {path: internal/resofeed/http_impl_test.go,\
+      \ classification: developer, availability: current}\n        - {path: internal/resofeed/item_deep_links_test.go,\
       \ classification: developer, availability: produced_by_step}\n        - {path:\
       \ cmd/resofeed/item_deep_links_test.go, classification: developer, availability:\
       \ produced_by_step}\n      selection:\n        command: [node, scripts/vectl-check.mjs,\
@@ -196408,11 +196407,10 @@ phases:
       \ execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
       \ access: read, availability: current}\n      test_bindings:\n        - {path:\
       \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, classification:\
-      \ acceptance, availability: produced_by_step}\n        - {path: web/tests/e2e/item-deep-links.browser-contract.spec.ts,\
-      \ classification: acceptance, availability: produced_by_step}\n        - {path:\
-      \ web/src/lib/api-client.test.ts, classification: developer, availability: current}\n\
-      \        - {path: web/src/lib/__tests__/workbench-route.test.ts, classification:\
-      \ developer, availability: current}\n        - {path: web/src/routes/components/__tests__/item-deep-links.test.ts,\
+      \ acceptance, availability: current}\n        - {path: web/tests/e2e/item-deep-links.browser-contract.spec.ts,\
+      \ classification: acceptance, availability: current}\n        - {path: web/src/lib/api-client.test.ts,\
+      \ classification: developer, availability: current}\n        - {path: web/src/lib/__tests__/workbench-route.test.ts,\
+      \ classification: developer, availability: current}\n        - {path: web/src/routes/components/__tests__/item-deep-links.test.ts,\
       \ classification: developer, availability: produced_by_step}\n      selection:\n\
       \        command: [node, scripts/vectl-check.mjs, select, item-deep-links-frontend,\
       \ item_deep_links_frontend_green]\n        timeout_seconds: 30\n        cardinality:\
