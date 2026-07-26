@@ -190710,7 +190710,7 @@ phases:
       residue or undeclared mutation remains.
   - id: rf-bug-v2-tailnet-caddy-proof
     name: Independently verify no-rollback Tailnet/Caddy deployment
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190815,6 +190815,23 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T11:47:21.970121Z'
+    done_at: '2026-07-26T11:57:03.928450+00:00'
+    evidence: 'Production-admitted semantic PASS from integration-verifier at immutable
+      HEAD 0d78240ff2d8f20eec722ce6d49f26f48d9c0506 / plan SHA 591759229f0b3b3e0d7edaf15b327ecdc6223f75a3ec068758ed6b0561af0aa8.
+      Receipt: /Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T11-56-07-718Z-2026-07-26T11-50-42-473Z_019f9e43-5c29-72fe-addf-b74a48cf6f0d.js-3832f8f585c0b034.txt,
+      SHA-256 3832f8f585c0b034c79f5ce5dfa5007db5cdb668bac68906cc2961a8d6f2d2c2. Parent
+      production admission CONFORMANT: /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/recovery/production-admission.json,
+      SHA-256 eabdc02020e28cc531e2208a0110077d1dc126d47a416ca957386f9e0e1859ac. One
+      newly authorized no-effect target-local/direct-public probe proved root=200
+      and unauthenticated Doctor=401 across both seams; each returned exactly one
+      non-empty 309-byte CSP with SHA-256 ca477668596bc95273af188994d300636420d4853b59f6d8af2798d84718f186,
+      byte-identical to tracked Go+embedded UI authority. Report /tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/recovery/integration-verifier_report.md
+      SHA-256 3885df57c6a03b1ef07b51e0fddd7ff8e22c42ebe84d1b292721396a4bb14d6c; safe
+      log SHA-256 617cf925211586925424876bd92ebbc6132c9cbdcfb4855c4180df1a70b7562d;
+      canonical artifact SHA-256 ca477668596bc95273af188994d300636420d4853b59f6d8af2798d84718f186.
+      All files mode 0600; transient headers deleted; no body/secret/raw-header retention.
+      Seven requirements PROVEN; Caddy non-owner; zero deployment/runtime/protected-state/trust/route/volume
+      mutation and zero additional deployment authority.'
   - id: rf-bug-v2-formal-security-review
     name: Review v2 security and accepted no-rollback boundary
     status: pending
