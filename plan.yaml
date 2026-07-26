@@ -194750,7 +194750,7 @@ phases:
     skipped_reason: irrelevant
   - id: rf-bug-v2-no-rollback-procedure-implementation
     name: Implement explicit no-prior-digest no-rollback deployment mode
-    status: claimed
+    status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Add an explicit `--no-rollback` mode to the maintained immutable deployment\
@@ -194879,8 +194879,6 @@ phases:
     depends_on:
     - rf-bug-v2-immutable-deployment-procedure-verification-v14
     agent: general
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-26T06:27:08.154272Z'
   - id: rf-bug-v2-no-rollback-procedure-authorization
     name: Independently authorize no-rollback procedure and accepted risk
     status: pending
