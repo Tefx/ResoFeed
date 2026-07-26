@@ -587,38 +587,19 @@ Desktop and narrow/mobile matrices must cover:
 - explicit Feed/Search activation produces at most one intended inspection write;
 - ordinary, resolved-direct-duplicate, and broken-target fixtures prove deliberate inspection, resonance, and re-ingest each mutate exactly the §4.5 effective item row and no other item, `item_state`, or `search_fts` row.
 
-Use a Telegram-WebView-equivalent mobile viewport and user agent in automated coverage. Automation complements the required real-client release checks.
+Use a Telegram-WebView-equivalent mobile viewport and user agent in automated coverage. The automated browser matrix is release proof for generic narrow URL consumers; production routing is proved separately through Tailnet/Caddy.
 ### 11.6 Release verification
+Release verification is capability-based and covers URL consumers without a named client matrix.
 
-Required environments:
-
-- Safari;
-- Chrome;
-- Telegram iOS;
-- Telegram Android;
-- Telegram Desktop;
-- email-client link opening;
-- Codex or equivalent external automation consuming MCP `app_url`;
-- the production Tailnet/Caddy route at `https://resofeed.tefx.one`.
-
-For each Telegram client, capture:
-
-1. link opens the canonical percent-encoded `https://resofeed.tefx.one/items/{segment}` address;
-2. the first SPA surface is Inspector with exact title `RESOFEED · INSPECTOR`, including before missing-authentication recovery; TODAY or Search never appears first;
-3. missing authentication shows the token prompt without changing that URL, surface, or title;
-4. successful token entry returns to the same item URL and moves focus to the Inspector heading or current route error state;
-5. Inspector content is readable in the client viewport;
-6. refresh/reopen preserves the item and Inspector identity;
-7. item state remains unchanged unless the user invokes an explicit action.
-
-Safari and Chrome evidence must also capture accepted authentication on a non-Inspector route and prove focus moves to the Steer input or first Feed item, separate from the Inspector-route focus case above.
-
-Desktop and narrow/mobile release evidence must separately capture Feed-origin and canonical Search-origin item entry, native browser Back, visible Close, Forward where the platform exposes it, external direct entry, external visible Close to `/`, and Back after that Close. Feed/Search origins restore their exact URL, filters, scroll owner, and focus; external native Back follows pre-existing browser history. External-Close evidence uses both non-empty and empty Feed fixtures in each layout and waits for Feed data/layout before asserting outcomes: Feed-pane and window scroll coordinates are `0`; with items, desktop selects and both layouts focus the first Feed item while narrow has no selection; without items, both layouts have no selection and focus the Steer input. The replaced external item entry cannot reopen on later Back. No custom edge-swipe implementation is permitted.
+- Generic browser navigation opens the canonical credential-free `https://resofeed.tefx.one/items/{segment}` URL, keeps the Inspector-owned first surface and exact `RESOFEED · INSPECTOR` title through authentication recovery, preserves the item across refresh/reopen, and performs no implicit item-state mutation.
+- Links surfaced through Telegram, email, bookmarks, and equivalent URL consumers preserve that same canonical address and authentication return target. A Telegram-WebView-equivalent mobile viewport and user agent remain part of automated narrow-browser coverage.
+- Automated desktop and narrow/mobile browser matrices prove canonical and legacy entry, dispatchable invalid links, authentication recovery, route-aware Close, Back/Forward, focus, scroll, current-corpus Feed/Search restoration, and read-only lifecycle behavior.
+- Automated production Tailnet/Caddy verification opens the canonical encoded path through `https://resofeed.tefx.one` and proves that the proxy, static SPA fallback, authenticated API lookup, and browser address preserve the byte-identical item ID.
+- External automation consumes the required item-level MCP `app_url`; the emitted URL equals the same credential-free canonical application URL verified through the browser and Tailnet route.
 
 Tailnet/Caddy evidence must seed or fixture the raw ID `~slash/%?hash#雪`, open its exact canonical application URL through `https://resofeed.tefx.one`, and prove all of the following without proxy normalization: the browser address is unchanged, the static SPA fallback succeeds, the authenticated API lookup receives the byte-identical raw ID, the Inspector renders that item, and the returned MCP `app_url` equals the same credential-free canonical URL. Capture explicit and omitted/local-derived Public URL checks separately; production uses explicit `https://resofeed.tefx.one`.
 
 Malformed-percent evidence is separate: send a raw `/items/%ZZ` cold-load request through the real serving boundary and capture HTTP `400` before SPA dispatch. Do not classify that server-level response as the SPA invalid-link screen; separately capture one dispatchable invalid item route rendering the localized Inspector error.
-
 ## 12. Documentation sync
 
 Implementation completion requires synchronized updates to:

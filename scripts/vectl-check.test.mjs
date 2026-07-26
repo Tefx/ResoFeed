@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   PENDING_PROFILE_PAIRS,
@@ -2755,6 +2755,76 @@ test('VECTL-ADAPTER run-envelope-parity', () => {
     () => parseEvidenceOutput(JSON.stringify(mismatched), greenProfile, 'green'),
     /did not match the requested profile/u
   );
+});
+
+test('selected-execution adapter separates process exit from evidence result', () => {
+  const moduleURL = pathToFileURL(adapterPath).href;
+  const runCase = (caseName) => {
+    const script = `
+import { PROFILES, emitSelectedExecution } from ${JSON.stringify(moduleURL)};
+const caseName = ${JSON.stringify(caseName)};
+const profile = [...PROFILES.values()].find((candidate) => caseName === 'green'
+  ? candidate.suite === 'rf-bug-v2-frontend-runtime' && candidate.checkID === 'rf_bug_v2_frontend_runtime_green'
+  : candidate.suite === 'item-deep-links-contract' && candidate.checkID === 'item_deep_links_expected_red');
+if (!profile) throw new Error('selected execution fixture profile missing');
+emitSelectedExecution(profile, () => caseName === 'green'
+  ? { outcome: 'green', exitCode: 0, observations: ['fixture=green'], artifacts: [] }
+  : {
+      outcome: 'red',
+      exitCode: 1,
+      observations: ['IDL-BACKEND-READ-PROJECTION-GAP', 'IDL-FRONTEND-APP-HISTORY-GAP', 'VECTL_GENERIC_EVIDENCE=valid'],
+      artifacts: []
+    });
+`;
+    return spawnSync(process.execPath, ['--input-type=module', '--eval', script], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      env: childEnvironment()
+    });
+  };
+
+  const greenResult = runCase('green');
+  const redResult = runCase('red');
+  assert.equal(greenResult.status, 0, greenResult.stderr);
+  assert.equal(redResult.status, 0, redResult.stderr);
+
+  const greenProfile = findProfile('rf-bug-v2-frontend-runtime', 'rf_bug_v2_frontend_runtime_green');
+  const redProfile = findProfile('item-deep-links-contract', 'item_deep_links_expected_red');
+  assert.ok(greenProfile);
+  assert.ok(redProfile);
+  const greenEnvelope = parseEvidenceOutput(greenResult.stdout, greenProfile, 'green');
+  const redEnvelope = parseEvidenceOutput(redResult.stdout, redProfile, 'red');
+  assert.equal(greenResult.stdout.trim().split(/\r?\n/u).length, 1);
+  assert.equal(redResult.stdout.trim().split(/\r?\n/u).length, 1);
+  assert.equal(greenEnvelope.exit_code, 0);
+  assert.equal(redEnvelope.exit_code, 1);
+  assert.deepEqual(redEnvelope.selected_ids, [
+    'ITEM-DEEP-LINK app codec and API domain separation',
+    'ITEM-DEEP-LINK browser history auth error read-only lifecycle',
+    'ITEM-DEEP-LINK duplicate read envelope and MCP app_url'
+  ]);
+  assert.deepEqual(redEnvelope.selected_ids, redEnvelope.executed_ids);
+  assert.deepEqual(redEnvelope.observations, [
+    'IDL-BACKEND-READ-PROJECTION-GAP',
+    'IDL-FRONTEND-APP-HISTORY-GAP',
+    'VECTL_GENERIC_EVIDENCE=valid'
+  ]);
+
+  const refusal = invoke('run', 'unknown-suite', 'unknown-check');
+  assert.notEqual(refusal.status, 0);
+  assert.equal(refusal.stdout, '');
+  assert.match(refusal.stderr, /refused: unknown or mismatched suite\/check pair/u);
+
+  console.info('VECTL_ADAPTER_KNOWN_GREEN_PROCESS_EXIT=0');
+  console.info('VECTL_ADAPTER_KNOWN_RED_PROCESS_EXIT=0');
+  console.info('VECTL_ADAPTER_GREEN_ENVELOPE_RESULT=green:0');
+  console.info('VECTL_ADAPTER_RED_ENVELOPE_RESULT=red:1');
+  console.info('VECTL_ADAPTER_ONE_ENVELOPE=valid');
+  console.info('VECTL_ADAPTER_PRE_ENVELOPE_REFUSAL=nonzero');
+  console.info('VECTL_ADAPTER_ITEM_DEEP_LINK_PROFILE=preserved');
+  console.info('IDL-BACKEND-READ-PROJECTION-GAP');
+  console.info('IDL-FRONTEND-APP-HISTORY-GAP');
+  console.info('VECTL_GENERIC_EVIDENCE=valid');
 });
 
 test('VECTL-ADAPTER unknown-pair-fail-closed', () => {

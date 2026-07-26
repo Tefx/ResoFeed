@@ -2383,23 +2383,46 @@ export function runClosureReport(profile, run = execute) {
 }
 
 function runNative(profile) {
-  const outputs = [];
-  for (const commandRow of profile.commands) {
-    const command = Array.isArray(commandRow) ? commandRow : commandRow.argv;
-    outputs.push(execute(profile, command[0], command.slice(1), {
-      expectedStatus: Array.isArray(commandRow) ? 0 : commandRow.expectedStatus,
-      timeout: commandRow.timeout
-    }));
-  }
-  const combined = outputs.join('\n');
-  const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
-  if (missing.length > 0) throw new AdapterFailure('native profile output missed required contract markers', missing);
-  return {
-    outcome: profile.expectedOutcome,
-    exitCode: profile.expectedOutcome === 'green' ? 0 : 1,
-    observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
-    artifacts: []
+  const operation = () => {
+    const outputs = [];
+    for (const commandRow of profile.commands) {
+      const command = Array.isArray(commandRow) ? commandRow : commandRow.argv;
+      outputs.push(execute(profile, command[0], command.slice(1), {
+        expectedStatus: Array.isArray(commandRow) ? 0 : commandRow.expectedStatus,
+        timeout: commandRow.timeout
+      }));
+    }
+    const combined = outputs.join('\n');
+    const missing = profile.requiredOutput.filter((marker) => !combined.includes(marker));
+    if (missing.length > 0) throw new AdapterFailure('native profile output missed required contract markers', missing);
+    return {
+      outcome: profile.expectedOutcome,
+      exitCode: profile.expectedOutcome === 'green' ? 0 : 1,
+      observations: [...profile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid'],
+      artifacts: []
+    };
   };
+  return profile.suite === 'item-deep-links-contract'
+    ? withGeneratedTreeRestoration(repoRoot, operation)
+    : operation();
+}
+
+export function emitSelectedExecution(profile, operation, output = process.stdout) {
+  let envelope;
+  try {
+    const result = operation();
+    envelope = evidenceEnvelope({ profile, ...result });
+    parseEvidenceOutput(JSON.stringify(envelope), profile, result.outcome);
+  } catch (error) {
+    const observations = [
+      redact(error instanceof Error ? error.message : error),
+      ...((error instanceof AdapterFailure ? error.observations : []).map(redact))
+    ];
+    envelope = evidenceEnvelope({ profile, outcome: 'red', exitCode: 1, observations, artifacts: [] });
+    parseEvidenceOutput(JSON.stringify(envelope), profile, 'red');
+  }
+  output.write(`${JSON.stringify(envelope)}\n`);
+  return envelope;
 }
 
 function refuse(message) {
@@ -2427,49 +2450,35 @@ async function main() {
     return;
   }
 
-  try {
-    const result = profile.runner === 'foundation'
-      ? runFoundation(profile)
-      : profile.runner === 'generic-adapter'
-        ? runGenericAdapter(profile)
-        : profile.runner === 'runtime-doc-contract'
-          ? runRuntimeDocContract(profile)
-          : profile.runner === 'runtime-isolation'
-            ? runRuntimeIsolation(profile)
-            : profile.runner === 'canonical-build'
-              ? runCanonicalBuild(profile)
-              : profile.runner === 'deterministic-build'
-                ? runDeterministicBuild(profile)
-                : profile.runner === 'deterministic-self-restoration'
-                  ? runDeterministicSelfRestoration(profile)
-                  : profile.runner === 'identity-integration'
-                    ? runIdentityIntegration(profile)
-                    : profile.runner === 'generated-webui-baseline'
-                      ? runGeneratedWebUIBaseline(profile)
-                      : profile.runner === 'immutable-deployment'
-                        ? runImmutableDeploymentProcedure(profile)
-                        : profile.runner === 'closure-report'
-                          ? runClosureReport(profile)
-          : profile.runner === 'prompting-v22'
-            ? runPromptingV22(profile)
-            : profile.runner === 'token-parity'
-              ? runTokenParityHarness(profile)
-              : profile.runner === 'prompting-harness'
-                ? runPromptingHarness(profile)
-                : runNative(profile);
-    const envelope = evidenceEnvelope({ profile, ...result });
-    parseEvidenceOutput(JSON.stringify(envelope), profile, result.outcome);
-    process.stdout.write(`${JSON.stringify(envelope)}\n`);
-    process.exitCode = result.exitCode;
-  } catch (error) {
-    const observations = [
-      redact(error instanceof Error ? error.message : error),
-      ...((error instanceof AdapterFailure ? error.observations : []).map(redact))
-    ];
-    const envelope = evidenceEnvelope({ profile, outcome: 'red', exitCode: 1, observations, artifacts: [] });
-    process.stdout.write(`${JSON.stringify(envelope)}\n`);
-    process.exitCode = 1;
-  }
+  emitSelectedExecution(profile, () => profile.runner === 'foundation'
+    ? runFoundation(profile)
+    : profile.runner === 'generic-adapter'
+      ? runGenericAdapter(profile)
+      : profile.runner === 'runtime-doc-contract'
+        ? runRuntimeDocContract(profile)
+        : profile.runner === 'runtime-isolation'
+          ? runRuntimeIsolation(profile)
+          : profile.runner === 'canonical-build'
+            ? runCanonicalBuild(profile)
+            : profile.runner === 'deterministic-build'
+              ? runDeterministicBuild(profile)
+              : profile.runner === 'deterministic-self-restoration'
+                ? runDeterministicSelfRestoration(profile)
+                : profile.runner === 'identity-integration'
+                  ? runIdentityIntegration(profile)
+                  : profile.runner === 'generated-webui-baseline'
+                    ? runGeneratedWebUIBaseline(profile)
+                    : profile.runner === 'immutable-deployment'
+                      ? runImmutableDeploymentProcedure(profile)
+                      : profile.runner === 'closure-report'
+                        ? runClosureReport(profile)
+        : profile.runner === 'prompting-v22'
+          ? runPromptingV22(profile)
+          : profile.runner === 'token-parity'
+            ? runTokenParityHarness(profile)
+            : profile.runner === 'prompting-harness'
+              ? runPromptingHarness(profile)
+              : runNative(profile));
 }
 
 if (path.resolve(process.argv[1] ?? '') === adapterPath) {
