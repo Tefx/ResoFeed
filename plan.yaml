@@ -191052,7 +191052,6 @@ phases:
     - scripts/vectl-check.test.mjs
     - tests/rf_bug_canonical_contract_test.go
     - web/src/lib/api-client.test.ts
-    - web/src/routes/item_route_token.test.ts
     depends_on:
     - rf-bug-v2-close-defect-report
     - rf-bug-v2-ssh-endpoint-identity-remediation
