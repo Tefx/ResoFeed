@@ -377,7 +377,7 @@ It stages exactly the verified commit's `deploy.sh` and `compose.yml`, reports `
 
 Formal deployment passes the OCI application source as `--verified-commit` and the later integrated tracked procedure source as independent `--procedure-source-commit`. Both are strict 40-lowercase-hex inputs; neither is inferred from the other, and equality is neither required nor forbidden. Its Compose input is `RESOFEED_IMAGE=docker.io/tefx/resofeed@${INDEX_DIGEST}`. Default deployment requires and captures a recoverable prior digest, preserves `resofeed-caddy_resofeed-data`, verifies direct readiness, and restores the prior digest/readiness pair on failure.
 
-Explicit `--no-rollback` is the only no-prior-digest path. It never derives a prior image, invokes `rollback_previous_digest`, or retries deployment. It preserves the named volume, configuration, owner token, masked secret boundary, Tailnet route ownership, and Caddy ownership. It emits the procedure source and OCI application source separately and reports `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial`. Credential rotation, data deletion, alternate targets, route repair, Caddy reconciliation, and registry deletion remain outside deployment authority. A complete orphan index/platform chain is recorded for separately authorized cleanup.
+Explicit `--no-rollback` is the only no-prior-digest path. Before persistent effect it requires duplicate-free canonical Serve JSON and rejects absent, malformed, duplicate, ambiguous, or drifted route state. It never derives a prior image, invokes `rollback_previous_digest`, calls `ensure_tailscale_serve` or `tailscale serve`, or retries. Compose is limited to the `resofeed` service with `config --quiet resofeed`, `pull resofeed`, and `up -d --no-build --no-deps resofeed`; no project-wide, build, recreate, restart, Caddy, or dependency effect is admitted. It preserves the named volume, configuration, owner token, masked secret boundary, Tailnet route, and Caddy state, emits separate source identities, and reports `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial`.
 
 For local current-host testing, build and load one explicitly local tag:
 
@@ -391,9 +391,9 @@ docker buildx build \
 
 Local tags are not release, deployment, verification, or rollback identities.
 ## Tailnet Route Admission
-The current Tailnet release chain admits publication and deployment only while the existing Tailscale 1.98.8 route is canonical. The maintained read-only helper consumes `tailscale serve status --json` through a duplicate-aware parser and requires the string `TCP.443.TCPForward` to equal `127.0.0.1:8443`. Its stable projection keeps only `TCP/HTTPS 443 -> 127.0.0.1:8443`. Raw Serve JSON, human tree output, peer/session telemetry, addresses, paths, configuration, and secret values are excluded from evidence.
+The Tailnet release chain admits publication and explicit forward-only deployment only while the existing Tailscale 1.98.8 route is canonical. Both the maintained read-only helper and `deploy.sh --no-rollback` consume `tailscale serve status --json` through a duplicate-aware parser and require the string `TCP.443.TCPForward` to equal `127.0.0.1:8443`. Evidence retains only the normalized route and excludes raw Serve JSON, human output, peer/session telemetry, addresses, paths, configuration, and secrets.
 
-Malformed JSON, a missing or wrong-type route, duplicate members, ambiguous TCP/443 ownership, or another target blocks before publication, deployment, or service mutation. The old exact text row and the Tailscale 1.98.8 tree view are non-authoritative. The release wrapper uses one SSH attempt without retry and invokes no Serve mutation. Current `deploy.sh`, `compose.yml`, `verify.sh`, and `stop.sh` bytes remain unchanged; the required canonical route keeps the staged procedure on its no-op path.
+Malformed JSON, missing or wrong-type route members, duplicate members, extra TCP/443 ownership fields, or another target blocks `--no-rollback` before identity-file, Compose, container, Serve, Caddy, volume, data, or owner-token mutation. The old exact row and Tailscale tree view are non-authoritative. Forward-only deployment never invokes `ensure_tailscale_serve` or `tailscale serve` and never retries.
 
 A separately and explicitly authorized operator may create the route with this exact noninteractive command:
 
@@ -403,8 +403,7 @@ tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443
 
 That command is outside publication and deployment authority. Absence or drift returns a blocker until separate current human authorization exists.
 
-Repository rollback of this JSON-route harness remediation reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/verify-remote.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs` to the integrated OrbStack-path-remediation state. It performs no SSH, Serve repair, recovery, publication, deployment, or runtime mutation.
-
+Repository rollback reverts only the admitted seven-file repository change set and performs no SSH, Serve repair, recovery, publication, deployment, or runtime mutation.
 ## Expected Image Size
 
 Image size target: aim for tens of MB, not hundreds.
@@ -469,7 +468,7 @@ Before accepting the containerization or immutable release procedure:
 - Formal deployment validates `--verified-commit` as the OCI application source and `--procedure-source-commit` as the integrated tracked procedure source independently; each is strict 40-lowercase-hex, neither is inferred from the other, and equality is neither required nor forbidden.
 - Procedure SHA-256 identities are rejected before runtime configuration or Docker/OCI operations when they do not match the installed tracked procedure bytes.
 - Default deployment requires a recoverable prior digest, retains `resofeed-caddy_resofeed-data`, and restores the prior digest/readiness pair on failure.
-- Explicit `--no-rollback` is the only admitted no-prior-digest path; it never derives a prior image, invokes `rollback_previous_digest`, retries deployment, removes/recreates a volume, prints a secret, rotates the owner token, repairs the route, or reconciles Caddy.
+- Explicit `--no-rollback` requires duplicate-free canonical Serve JSON before `.env` or Compose mutation; absent, malformed, duplicate, ambiguous, or drifted state reports `no_effect`; Compose targets only `resofeed` with `--no-build --no-deps`; and the mode never derives a prior image, invokes rollback or Serve repair, retries, removes a volume, prints a secret, rotates the owner token, or affects Caddy.
 - Forward-only evidence records the procedure source and OCI application source separately and emits `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial` on every exit.
 - Tailnet deployment targets only `tefx-mbp-personal:resofeed-caddy` and uses `docker.io/tefx/resofeed@sha256:<index-digest>`.
 - Before publication or replacement, the tracked read-only probe requires duplicate-free `tailscale serve status --json` with `TCP.443.TCPForward = 127.0.0.1:8443`; absence or drift blocks, and this release invokes no Serve mutation.

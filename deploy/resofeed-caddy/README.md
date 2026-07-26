@@ -131,9 +131,9 @@ PROCEDURE_STAGE=verified
 Do not substitute `scp`, `rsync`, ad hoc SSH copy commands, alternate paths, or manual renames.
 The producer uses that exact embedded transport for inspect, prepare, both file transfers, finalize, cleanup, and recovery. After FQDN host-key authentication it verifies the canonical physical home-relative path, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, and Compose shape. An unknown/changed key fails before target-local preparation or transfer; an internal hostname mismatch has no effect.
 ## Canonical Tailscale 1.98.8 route precondition
-This release requires an existing canonical route before publication or deployment. The tracked read-only helper obtains `tailscale serve status --json`, rejects duplicate JSON members, and accepts only the string at `TCP.443.TCPForward` when it equals `127.0.0.1:8443`. The stable protected-state projection retains only `TCP/HTTPS 443 -> 127.0.0.1:8443`; raw Serve JSON, human output, peer/session telemetry, addresses, paths, configuration, and parser diagnostics never enter retained output.
+This release requires an existing canonical route before publication or deployment. The tracked read-only helper and explicit `--no-rollback` deployment both obtain `tailscale serve status --json`, reject duplicate JSON members, and accept only the string at `TCP.443.TCPForward` when it equals `127.0.0.1:8443`. Retained evidence contains only `TCP/HTTPS 443 -> 127.0.0.1:8443`; raw Serve JSON, human output, peer/session telemetry, addresses, paths, configuration, and parser diagnostics are excluded.
 
-Malformed, missing, wrong-type, duplicate, ambiguous, or wrong-target TCP/443 state blocks before deployment. The obsolete exact row and Tailscale 1.98.8 tree output are display text without route authority. The current release performs no Serve mutation and does not retry the tracked SSH wrapper. The existing `deploy.sh`, `compose.yml`, `verify.sh`, and `stop.sh` remain unchanged; a canonical route keeps the staged deployment route branch on its no-op path.
+Malformed, missing, wrong-type, duplicate, ambiguous, or wrong-target TCP/443 state blocks explicit forward-only deployment before every persistent deployment effect, including identity-file writes and Compose commands. The obsolete exact row and Tailscale 1.98.8 tree output have no route authority. Explicit `--no-rollback` never calls `ensure_tailscale_serve`, `tailscale serve`, or any repair path. Its accepted route remains read-only and no retry occurs.
 
 A separate, current, explicit human authorization may use this exact noninteractive repair:
 
@@ -141,10 +141,9 @@ A separate, current, explicit human authorization may use this exact noninteract
 tailscale serve --yes --bg --tcp=443 tcp://127.0.0.1:8443
 ```
 
-Deployment authority does not authorize that repair. Route absence or drift must return a blocker before build, publication, deployment, restart, or other service mutation.
+Deployment authority does not authorize that repair. Route absence or drift returns a blocker before build, publication, deployment, restart, or other service mutation.
 
-Repository rollback of this JSON-route harness remediation reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/verify-remote.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs` to the integrated OrbStack-path-remediation state. It performs no SSH, Serve repair, procedure recovery, deployment, publication, or runtime mutation.
-
+Repository rollback of this repair reverts only `.agents/skills/resofeed-tailnet-deploy/SKILL.md`, `deploy/resofeed-caddy/README.md`, `deploy/resofeed-caddy/deploy.sh`, `docs/CONTAINER.md`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`, `scripts/vectl-check.mjs`, and `scripts/vectl-check.test.mjs`. It performs no SSH, Serve repair, procedure recovery, deployment, publication, or runtime mutation.
 ## Deploy the verified digest
 Perform the broader read-only runtime target inspection only after the separately authorized staging operation reports `PROCEDURE_STAGE=verified`. Through the fixed `TAILNET_SSH_OPTIONS`, confirm the canonical physical home-relative directory, `resofeed-caddy` basename/project identity, regular non-symlink `deploy.sh` and `compose.yml`, exact `755`/`644` modes, OrbStack Docker CLI, Compose config, current containers, named `/data` volume, Tailnet TCP/443 route, and masked secret presence. Never compare the internal short hostname.
 
@@ -175,7 +174,7 @@ export PATH="/Applications/OrbStack.app/Contents/MacOS/xbin:$PATH"
 
 Default mode requires and captures a recoverable prior digest, verifies `resofeed-caddy_resofeed-data`, deploys the immutable index, and restores the captured prior digest plus direct readiness on failure.
 
-For an explicitly authorized forward-only deployment, add `--no-rollback`. It still requires the two independent commit identities, immutable index/platform/revision chain, and procedure hashes. It accepts a target with no prior digest, never derives one, never invokes old-image recovery, and does not retry. The script writes only non-secret identity fields, pulls the supplied digest, updates the existing stack once, preserves the named SQLite volume, configuration, owner token, masked secrets, route ownership, and Caddy ownership, and emits `PROCEDURE_SOURCE_COMMIT`, `OCI_APPLICATION_SOURCE_COMMIT`, plus `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial`.
+For an explicitly authorized forward-only deployment, add `--no-rollback`. It still requires the two independent commit identities, immutable index/platform/revision chain, and procedure hashes. It accepts a target with no prior digest, never derives one, never invokes old-image recovery, and does not retry. Before `.env` identity replacement or any Compose call, it requires the duplicate-free canonical Serve JSON route. It then runs only service-scoped Compose argv: `config --quiet resofeed`, `pull resofeed`, and `up -d --no-build --no-deps resofeed`. It does not build, force recreation, restart, reconcile the project, target Caddy, start dependencies, call `ensure_tailscale_serve`, or invoke `tailscale serve`. The named SQLite volume, configuration, owner token, masked secrets, route ownership, and Caddy identity remain protected. Output records `PROCEDURE_SOURCE_COMMIT`, `OCI_APPLICATION_SOURCE_COMMIT`, and `RESULT_CLASSIFICATION` as `success`, `no_effect`, `known_partial`, or `unknown_partial`.
 
 Owner-token rotation, data clearing, registry credentials, account changes, alternate targets, moving-tag substitution, host-key trust mutation, ad hoc procedure copying, route repair, and Caddy reconciliation are outside this procedure and are refused.
 ## Tracked read-only probe harness
@@ -285,7 +284,7 @@ Recovery has no host or path override. It validates the fixed target, backup man
 
 Default image deployment refuses to begin without a recoverable prior digest. If replacement or readiness fails, `deploy.sh` restores that digest in `.env`, recreates only the `resofeed` service against the same named volume, and requires root `200` plus unauthenticated Doctor `401`. A verified restoration reports `RESULT_CLASSIFICATION=no_effect`; an unverified final state reports `unknown_partial`.
 
-Explicit `--no-rollback` provides the no-prior-digest path. It never invokes `rollback_previous_digest` or old-image recovery. It reports `no_effect` before persistent deployment mutation, `known_partial` after identity configuration changes but before service replacement, `unknown_partial` after replacement begins without complete verification, and `success` only after exact image identity and readiness pass. It never retries, removes the SQLite volume, prints secrets, rotates the owner token, repairs the route, or reconciles Caddy.
+Explicit `--no-rollback` provides the no-prior-digest path. Invalid Serve JSON route state exits with `no_effect` before `.env` or Compose mutation. After canonical route admission, identity-file or pull failures report `known_partial`; failures after the one service-scoped replacement begins report `unknown_partial`; `success` requires exact image identity and readiness. This mode never retries, invokes old-image recovery, removes the SQLite volume, prints secrets, rotates the owner token, repairs Serve, or reconciles Caddy.
 
 When a publication leaves a complete unreferenced index/platform chain, record it on the authorized stack for later review:
 
@@ -300,7 +299,7 @@ When a publication leaves a complete unreferenced index/platform chain, record i
 
 The fixed local orphan ledger contains only commit, tag, and digests. The script has no registry-deletion operation. Deleting an authorized temporary tag requires separate registry-specific approval and must never be inferred from deployment authority.
 The source-side recovery interface applies the same fixed strict-known-key SSH transport before any remote recovery command. Unknown or changed FQDN keys fail before lock or rescue creation; no internal hostname, alternate target, or trust override is accepted.
-Repository rollback of this deployment-procedure remediation reverts only `deploy.sh`, the selected-execution adapter/acceptance test, Tailnet skill, this README, Container guide, and harness contract together. It performs no remote procedure recovery or runtime operation.
+Repository rollback of this deployment-procedure repair reverts only the exact seven synchronized files in the admitted change set. It performs no remote procedure recovery or runtime operation.
 ## Stop
 
 `./stop.sh` stops the stack while preserving named volumes. Data-destruction modes are outside the immutable deployment and rollback procedure.

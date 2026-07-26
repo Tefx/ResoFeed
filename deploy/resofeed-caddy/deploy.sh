@@ -125,10 +125,14 @@ OCI application-source commit, then verifies both caller-bound procedure SHA-256
 identities and the OCI chain before updating only the existing tefx-mbp-personal
 resofeed-caddy stack. By default, a recoverable prior digest is mandatory and a
 failure restores that digest and verifies readiness. Explicit --no-rollback is a
-forward-only deployment mode: it does not require or derive a prior digest and
-never attempts old-image recovery. Every exit reports success, no_effect,
-known_partial, or unknown_partial without disclosing secrets. The record-orphan
-mode appends the complete non-secret chain to the local orphan ledger.
+forward-only deployment mode: it does not require or derive a prior digest,
+never attempts old-image recovery, and requires the existing duplicate-free
+Tailscale Serve JSON route TCP.443.TCPForward=127.0.0.1:8443 before any
+persistent deployment effect. It never repairs Serve and updates only the
+resofeed Compose service without build or dependency reconciliation. Every exit
+reports success, no_effect, known_partial, or unknown_partial without disclosing
+secrets. The record-orphan mode appends the complete non-secret chain to the
+local orphan ledger.
 Registry tag deletion is outside this script and requires separate authorization.
 EOF
 }
@@ -939,6 +943,44 @@ validate_tailscale_boundary() {
   fi
 }
 
+validate_no_rollback_tailscale_route() {
+  local route
+  route=$(
+    tailscale serve status --json 2>/dev/null |
+      /usr/bin/python3 -c '
+import json
+import sys
+
+
+def reject_duplicate_members(pairs):
+    value = {}
+    for key, member in pairs:
+        if key in value:
+            raise ValueError("duplicate JSON member")
+        value[key] = member
+    return value
+
+
+try:
+    document = json.load(sys.stdin, object_pairs_hook=reject_duplicate_members)
+    tcp_routes = document.get("TCP") if type(document) is dict else None
+    listener = tcp_routes.get("443") if type(tcp_routes) is dict else None
+    if type(listener) is not dict or set(listener) != {"TCPForward"}:
+        raise ValueError("ambiguous TCP/443 listener")
+    target = listener["TCPForward"]
+    if type(target) is not str or target != "127.0.0.1:8443":
+        raise ValueError("noncanonical TCP/443 target")
+except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+    raise SystemExit(1)
+
+sys.stdout.write("TCP/HTTPS 443 -> 127.0.0.1:8443")
+' 2>/dev/null
+  ) || fatal "Explicit no-rollback requires the canonical duplicate-free Tailscale Serve JSON route."
+  [ "$route" = 'TCP/HTTPS 443 -> 127.0.0.1:8443' ] \
+    || fatal "Explicit no-rollback requires the canonical duplicate-free Tailscale Serve JSON route."
+  ok "Explicit no-rollback canonical Tailnet route verified without Serve mutation."
+}
+
 ensure_tailscale_serve() {
   target="tcp://127.0.0.1:${CADDY_LOCAL_HTTPS_PORT}"
   status=$(tailscale serve status 2>&1 || true)
@@ -1109,8 +1151,11 @@ deploy_immutable_image() {
   validate_existing_state
   if [ "$NO_ROLLBACK" -eq 0 ]; then
     capture_previous_chain
+    validate_tailscale_boundary
+  else
+    require_command /usr/bin/python3
+    validate_no_rollback_tailscale_route
   fi
-  validate_tailscale_boundary
 
   if [ "$NO_ROLLBACK" -eq 1 ]; then
     trap forward_only_failure ERR
@@ -1122,12 +1167,20 @@ deploy_immutable_image() {
     "$OCI_INDEX_DIGEST" "$AMD64_MANIFEST_DIGEST" "$ARM64_MANIFEST_DIGEST"
   RESULT_CLASSIFICATION_STATE="known_partial"
 
-  run_quiet "Compose contract validated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet
+  if [ "$NO_ROLLBACK" -eq 1 ]; then
+    run_quiet "ResoFeed Compose contract validated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet resofeed
+  else
+    run_quiet "Compose contract validated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" config --quiet
+  fi
   run_quiet "Immutable ResoFeed digest pulled" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull resofeed
   REPLACEMENT_STARTED=1
   RESULT_CLASSIFICATION_STATE="unknown_partial"
-  run_quiet "Existing resofeed-caddy stack updated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build
-  ensure_tailscale_serve
+  if [ "$NO_ROLLBACK" -eq 1 ]; then
+    run_quiet "Existing ResoFeed service updated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --no-deps resofeed
+  else
+    run_quiet "Existing resofeed-caddy stack updated" docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build
+    ensure_tailscale_serve
+  fi
   wait_for_readiness 30 || false
 
   deployed_reference=$(docker container inspect --format '{{.Config.Image}}' resofeed 2>/dev/null)

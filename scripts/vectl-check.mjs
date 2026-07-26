@@ -288,6 +288,10 @@ export const PENDING_PROFILE_PAIRS = [
       'PROCEDURE_ORBSTACK_DOCKER_PATH=verified',
       'PROCEDURE_TAILSCALE_ROUTE_JSON=verified',
       'PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop',
+      'NO_ROLLBACK_ROUTE=preexisting_canonical_only',
+      'NO_ROLLBACK_ROUTE_REPAIR=forbidden',
+      'NO_ROLLBACK_COMPOSE_SCOPE=resofeed_only_no_build',
+      'NO_ROLLBACK_CADDY=untouched',
       'PROCEDURE_SIDE_EFFECTS=none',
       'PROBE_HARNESS=tracked_read_only',
       'PROBE_TRANSPORT=one_ssh_stdin',
@@ -499,7 +503,7 @@ const STAGED_PROCEDURE_FILES = Object.freeze([
   Object.freeze({
     path: 'deploy/resofeed-caddy/deploy.sh',
     mode: 0o755,
-    sha256: 'sha256:31125a8d31fac3f600b169ad98341fbd6d63fa37bdb0818556a475d757714cf7'
+    sha256: 'sha256:6f26b22155d9a738f6da0745c3997b8ca67929722e860e530e474dc87271f539'
   }),
   Object.freeze({
     path: 'deploy/resofeed-caddy/compose.yml',
@@ -595,6 +599,11 @@ export function verifyImmutableDeploymentSources(sources) {
     'rollback_previous_digest',
     'forward_only_failure',
     'trap forward_only_failure ERR',
+    'validate_no_rollback_tailscale_route',
+    'tailscale serve status --json',
+    'object_pairs_hook=reject_duplicate_members',
+    'set(listener) != {"TCPForward"}',
+    'docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --no-deps resofeed',
     'Default deployment requires a recoverable prior image digest',
     'Prior image digest was neither required nor derived.',
     'RESULT_CLASSIFICATION_STATE="known_partial"',
@@ -755,6 +764,8 @@ export function verifyImmutableDeploymentSources(sources) {
     SEPARATELY_AUTHORIZED_TAILSCALE_REPAIR,
     'masked-presence boundary markers',
     'explicit forward-only no-rollback',
+    'duplicate-free canonical Serve JSON route before every persistent deployment effect',
+    'resofeed-only `--no-build --no-deps` Compose update',
     'separate procedure-source and OCI application-source identities',
     'success`, `no_effect`, `known_partial`, or `unknown_partial`'
   ]);
@@ -936,6 +947,32 @@ export function verifyImmutableDeploymentSources(sources) {
       || !deployProcedure.includes('trap rollback_previous_digest ERR')) {
     throw new AdapterFailure('deployment did not keep explicit forward-only and default rollback traps separate');
   }
+  const noRollbackRouteValidation = deployProcedure.indexOf('validate_no_rollback_tailscale_route');
+  const identityWrite = deployProcedure.indexOf('write_image_chain');
+  const noRollbackCompose = 'docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --no-build --no-deps resofeed';
+  if (noRollbackRouteValidation < 0 || identityWrite < 0 || noRollbackRouteValidation > identityWrite
+      || (deployScript.match(/tailscale serve status --json/gu) ?? []).length !== 1
+      || !deployScript.includes('object_pairs_hook=reject_duplicate_members')
+      || !deployScript.includes('set(listener) != {"TCPForward"}')
+      || (deployScript.match(new RegExp(noRollbackCompose.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'gu')) ?? []).length !== 1) {
+    throw new AdapterFailure('immutable deployment explicit no-rollback route admission or resofeed-only Compose argv drifted');
+  }
+  const noRollbackUpdateStart = deployProcedure.indexOf(
+    'if [ "$NO_ROLLBACK" -eq 1 ]; then\n    run_quiet "Existing ResoFeed service updated"'
+  );
+  const noRollbackUpdateEnd = deployProcedure.indexOf(
+    '\n  else\n    run_quiet "Existing resofeed-caddy stack updated"',
+    noRollbackUpdateStart
+  );
+  const noRollbackUpdateBranch = deployProcedure.slice(noRollbackUpdateStart, noRollbackUpdateEnd);
+  if (noRollbackUpdateStart < 0 || noRollbackUpdateEnd <= noRollbackUpdateStart) {
+    throw new AdapterFailure('immutable deployment explicit no-rollback service-only update branch is unavailable');
+  }
+  for (const forbidden of ['ensure_tailscale_serve', 'tailscale serve --', ' resofeed-caddy', ' --build', 'recreate', 'restart']) {
+    if (noRollbackUpdateBranch.includes(forbidden)) {
+      throw new AdapterFailure(`immutable deployment explicit no-rollback update retained forbidden Caddy or Compose effect: ${forbidden}`);
+    }
+  }
   if ((deployScript.match(/docker compose --env-file "\$ENV_FILE" -f "\$COMPOSE_FILE" up -d resofeed/gu) ?? []).length !== 1) {
     throw new AdapterFailure('default recovery must retain exactly one prior-service replacement command');
   }
@@ -962,6 +999,10 @@ export function verifyImmutableDeploymentSources(sources) {
     'PROCEDURE_ORBSTACK_DOCKER_PATH=verified',
     'PROCEDURE_TAILSCALE_ROUTE_JSON=verified',
     'PROCEDURE_TAILSCALE_SERVE_MUTATION=canonical_noop',
+    'NO_ROLLBACK_ROUTE=preexisting_canonical_only',
+    'NO_ROLLBACK_ROUTE_REPAIR=forbidden',
+    'NO_ROLLBACK_COMPOSE_SCOPE=resofeed_only_no_build',
+    'NO_ROLLBACK_CADDY=untouched',
     'PROCEDURE_SIDE_EFFECTS=none',
     'PROBE_HARNESS=tracked_read_only',
     'PROBE_TRANSPORT=one_ssh_stdin',

@@ -258,7 +258,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
 
   const stagedDeployPath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'deploy.sh');
   const stagedComposePath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'compose.yml');
-  assert.equal(fileSHA256(stagedDeployPath), 'sha256:31125a8d31fac3f600b169ad98341fbd6d63fa37bdb0818556a475d757714cf7');
+  assert.equal(fileSHA256(stagedDeployPath), 'sha256:6f26b22155d9a738f6da0745c3997b8ca67929722e860e530e474dc87271f539');
   assert.equal(fileSHA256(stagedComposePath), 'sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c');
   assert.equal(fs.statSync(stagedDeployPath).mode & 0o777, 0o755);
   assert.equal(fs.statSync(stagedComposePath).mode & 0o777, 0o644);
@@ -578,6 +578,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     noRollback = false,
     hasPrior = true,
     failComposeCommand = '',
+    routeState = 'canonical',
     procedureSourceCommit = procedureCommit
   } = {}) {
     const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-immutable-deploy-'));
@@ -626,6 +627,17 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       '#!/usr/bin/env bash',
       'printf "%s\\n" "$*" >> "$FAKE_TAILSCALE_LOG"',
       'if [[ "$1" == "ip" ]]; then printf "%s\\n" 100.64.0.8; exit 0; fi',
+      'if [[ "$1 $2 $3" == "serve status --json" ]]; then',
+      '  case "$FAKE_ROUTE_STATE" in',
+      '    canonical) printf \'%s\\n\' \'{"TCP":{"443":{"TCPForward":"127.0.0.1:8443"}},"Version":"fixture"}\' ;;',
+      '    absent) printf \'%s\\n\' \'{"TCP":{}}\' ;;',
+      '    malformed) printf \'%s\\n\' \'{"TCP":\' ;;',
+      '    duplicate) printf \'%s\\n\' \'{"TCP":{"443":{"TCPForward":"127.0.0.1:8443"},"443":{"TCPForward":"127.0.0.1:8443"}}}\' ;;',
+      '    drifted) printf \'%s\\n\' \'{"TCP":{"443":{"TCPForward":"127.0.0.1:9443"}}}\' ;;',
+      '    *) exit 96 ;;',
+      '  esac',
+      '  exit 0',
+      'fi',
       'if [[ "$1 $2" == "serve status" ]]; then printf "%s\\n" "TCP 443 -> tcp://127.0.0.1:8443"; exit 0; fi',
       'if [[ "$1" == "serve" ]]; then exit 97; fi',
       'exit 1'
@@ -693,7 +705,8 @@ test('immutable OCI and Tailnet deployment procedure', () => {
       FAKE_PRIOR_IMAGE: priorImage,
       FAKE_TARGET_IMAGE: targetImage,
       FAKE_FAIL_READINESS: failReplacementReadiness ? '1' : '0',
-      FAKE_FAIL_COMPOSE_COMMAND: failComposeCommand
+      FAKE_FAIL_COMPOSE_COMMAND: failComposeCommand,
+      FAKE_ROUTE_STATE: routeState
     };
     const procedureDeployHash = fileSHA256(path.join(stack, 'deploy.sh'));
     const procedureComposeHash = fileSHA256(path.join(stack, 'compose.yml'));
@@ -809,10 +822,37 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.doesNotMatch(forwardOnly.result.stdout + forwardOnly.result.stderr, /fixture-present/u);
     const dockerEvidence = fs.readFileSync(forwardOnly.dockerLog, 'utf8');
     assert.doesNotMatch(dockerEvidence, /image inspect/u);
-    assert.doesNotMatch(dockerEvidence, /(?:down|volume rm|--volumes)/u);
-    assert.equal((dockerEvidence.match(/compose .* up -d --build/gu) ?? []).length, 1);
+    assert.doesNotMatch(dockerEvidence, /(?:down|volume rm|--volumes|restart|--force-recreate|--always-recreate-deps)/u);
+    const composeArgv = dockerEvidence.split('\n').filter((line) => line.startsWith('compose '));
+    assert.deepEqual(composeArgv, [
+      'compose --env-file .env -f compose.yml config --quiet resofeed',
+      'compose --env-file .env -f compose.yml pull resofeed',
+      'compose --env-file .env -f compose.yml up -d --no-build --no-deps resofeed'
+    ]);
+    assert.ok(composeArgv.every((line) => !/(?:^| )caddy(?: |$)/u.test(line)));
+    assert.deepEqual(fs.readFileSync(forwardOnly.tailscaleLog, 'utf8').trim().split('\n'), ['serve status --json']);
   } finally {
     fs.rmSync(forwardOnly.root, { recursive: true, force: true });
+  }
+
+  for (const routeState of ['absent', 'malformed', 'duplicate', 'drifted']) {
+    const routeRejected = deploymentFixture({ noRollback: true, hasPrior: false, routeState });
+    try {
+      assert.equal(routeRejected.result.status, 1, routeState);
+      assert.match(routeRejected.result.stderr, /canonical duplicate-free Tailscale Serve JSON route/u);
+      assert.match(routeRejected.result.stderr, /RESULT_CLASSIFICATION=no_effect/u);
+      assert.equal(fs.readFileSync(routeRejected.statePath, 'utf8'), '');
+      assert.equal(
+        fs.readFileSync(routeRejected.envPath, 'utf8').includes(`RESOFEED_IMAGE=${routeRejected.targetImage}`),
+        false
+      );
+      const dockerEvidence = fs.readFileSync(routeRejected.dockerLog, 'utf8');
+      assert.doesNotMatch(dockerEvidence, /^compose /mu);
+      assert.deepEqual(fs.readFileSync(routeRejected.tailscaleLog, 'utf8').trim().split('\n'), ['serve status --json']);
+      assert.doesNotMatch(fs.readFileSync(routeRejected.tailscaleLog, 'utf8'), /(?:--yes|--bg|--tcp)/u);
+    } finally {
+      fs.rmSync(routeRejected.root, { recursive: true, force: true });
+    }
   }
 
   const forwardKnownPartial = deploymentFixture({
@@ -841,7 +881,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     assert.match(forwardUnknownPartial.result.stderr, /ROLLBACK=suppressed_by_explicit_no_rollback/u);
     assert.match(forwardUnknownPartial.result.stderr, /RESULT_CLASSIFICATION=unknown_partial/u);
     const dockerEvidence = fs.readFileSync(forwardUnknownPartial.dockerLog, 'utf8');
-    assert.equal((dockerEvidence.match(/compose .* up -d --build/gu) ?? []).length, 1);
+    assert.equal((dockerEvidence.match(/compose .* up -d --no-build --no-deps resofeed/gu) ?? []).length, 1);
     assert.doesNotMatch(dockerEvidence, new RegExp(priorIndexDigest, 'u'));
     assert.doesNotMatch(dockerEvidence, /(?:down|volume rm|--volumes)/u);
   } finally {
@@ -924,6 +964,18 @@ test('immutable OCI and Tailnet deployment procedure', () => {
     mutation(deployPath, (body) => body.replace('[[ "$PROCEDURE_SOURCE_COMMIT" =~ ^[a-f0-9]{40}$ ]]', '[[ "$PROCEDURE_SOURCE_COMMIT" =~ ^[a-f0-9]{7,40}$ ]]')),
     mutation(deployPath, (body) => body.replace('validate_procedure_source_commit', 'PROCEDURE_SOURCE_COMMIT=$VERIFIED_COMMIT #')),
     mutation(deployPath, (body) => body.replace('trap forward_only_failure ERR', 'trap rollback_previous_digest ERR')),
+    mutation(deployPath, (body) => body.replace(
+      '    validate_no_rollback_tailscale_route\n',
+      '    validate_tailscale_boundary\n'
+    )),
+    mutation(deployPath, (body) => body.replace(
+      'up -d --no-build --no-deps resofeed',
+      'up -d --build'
+    )),
+    mutation(deployPath, (body) => body.replace(
+      'run_quiet "Existing ResoFeed service updated"',
+      'ensure_tailscale_serve\n    run_quiet "Existing ResoFeed service updated"'
+    )),
     mutation(deployPath, (body) => body.replace('RESULT_CLASSIFICATION_STATE="known_partial"', 'RESULT_CLASSIFICATION_STATE="success"')),
     mutation(deployPath, (body) => body.replace('status --porcelain=v1 --untracked-files=all', 'status --short')),
     mutation(deployPath, (body) => body.replace(
