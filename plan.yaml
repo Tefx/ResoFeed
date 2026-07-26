@@ -195579,7 +195579,7 @@ phases:
       effect occurred.'
   - id: rf-bug-v2-buildx-label-json-parser-authorization
     name: Independently authorize renewed semantic label parser procedure
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -195636,6 +195636,8 @@ phases:
     depends_on:
     - rf-bug-v2-buildx-label-json-parser-repair
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T09:50:14.415272Z'
   - id: rf-bug-v2-stage-buildx-label-json-parser-procedure
     name: Stage renewed semantic label parser procedure
     status: pending
