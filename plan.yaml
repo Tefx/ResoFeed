@@ -195393,7 +195393,7 @@ phases:
       Independent authorization remains pending in `rf-bug-v2-no-rollback-procedure-authorization`.'
   - id: rf-bug-v2-buildx-label-json-parser-repair
     name: Repair Buildx revision-label semantic JSON verification
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Append-only repair after completed `rf-bug-v2-no-rollback-procedure-authorization`\
@@ -195525,6 +195525,8 @@ phases:
     depends_on:
     - rf-bug-v2-stage-no-rollback-procedure
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T09:33:44.220337Z'
   - id: rf-bug-v2-buildx-label-json-parser-authorization
     name: Independently authorize renewed semantic label parser procedure
     status: pending
