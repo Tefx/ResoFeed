@@ -190716,38 +190716,88 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Deliver: Prove only successful renewed deployment. Consume fresh parser authorization,
-      renewed staging, Attempt 1 no-effect history, successful Attempt 2; re-observe
-      renewed procedure chain separately from exact OCI chain. Prove semantic parser
-      authorization, no stale replay, Attempt 1 consumed, Attempt 2 separate arguments,
-      no third invocation, 200/401, strict endpoint, Go headers, Caddy non-ownership,
-      named volume, route no-op, protected state, no prior-digest retention/rollback,
-      classification, nondisclosure.
+      Deliver: Prove only the already-successful renewed deployment of procedure source
+      `0127273a56a6e757757a0f9419a4990f5041aa8a` and exact immutable index `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`.
+      Consume fresh parser authorization, renewed staging, Attempt 1 `no_effect` history,
+      and successful Attempt 2; re-observe renewed procedure chain separately from
+      the OCI chain. Prove semantic parser authorization, no stale replay, the full
+      two-invocation deployment budget consumed with no third invocation, configured/running
+      reference equality to that exact immutable index, strict-FQDN readiness, independent
+      Caddy-loopback and public root 200 plus unauthenticated Doctor 401, exact Go-owned
+      security headers/CSP and tracked-Caddyfile non-ownership, named volume, duplicate-aware
+      route no-op without Serve mutation, Caddy project ownership, protected state,
+      three masked-present secret names, no prior-digest retention/rollback, separate
+      identities, classification, nondisclosure, and zero mutation.
 
 
-      Boundary: `integration-verifier` read-only; no deploy/restart/restage/replay/rollback/repair/product/runtime/protected-state/trust
-      mutation, prior-digest action, or disclosure. At most three transient read-only
-      probes after unchanged identity proof.
+      Boundary: Authorize exactly one fresh `integration-verifier` for read-only production
+      proof. The old three-probe budget is exhausted and cannot be reused. The fresh
+      budget is at most two primary read-only probes plus one retry only after classifying
+      a transport-only failure and re-proving unchanged target, procedure, image,
+      endpoint, and credential identity; every attempt requires a safe post-attempt
+      observation and retained secret-safe status/header evidence. No deploy, restage,
+      restart, replay, repair, rollback, prior-digest action, third deployment invocation,
+      Serve/Caddy/Compose mutation, product/runtime/protected-state/trust mutation,
+      alternate target, disclosure, or body/cookie/token/path retention is authorized.
+      Never compare a Docker internal image ID with an OCI manifest, config, or index
+      digest; prove only configured/running reference equality to the exact immutable
+      index reference. Remote loopback TLS must discover and use the actual configured
+      hostname as SNI while resolving it to `127.0.0.1:8443` (for example, `curl --resolve
+      "${domain}:8443:127.0.0.1" "https://${domain}:8443/..."`); IP-SNI is forbidden.
+      Discover Caddy only through read-only Compose service identity using project
+      `resofeed-caddy`, env file `.env`, file `compose.yml`, and `ps -q caddy`, then
+      inspect the returned container; guessed container names are forbidden.
 
 
-      Admit: Require fresh parser authorization/staging/deployment receipts and Attempt
-      1 receipt only as history. Emit semantic v1 ordered scope [`renewed semantic-parser
-      procedure source through staged hashes modes backup and final bytes`, `OCI application
-      source through immutable manifests revision and configured/running digest`,
-      `consumed no-effect Attempt 1 and single successful renewed Attempt 2`, `strict-FQDN
-      readiness and separate maintained invocation bindings`, `Go-header Caddy volume
-      route protected state forward-only recovery and nondisclosure`] with coverage
-      `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`, `RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING`,
-      and existing deployment/readiness/header/volume/nondisclosure requirements.
+      Admit: Preserve successful producer receipts and preserve as non-admitted diagnostics
+      report `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/integration-verifier_report.md`
+      SHA `92c78b59b70170fb77ecd63fb939c062ed64013944df97d5f0a388e3f2827774`, Probe
+      2 safe-log SHA `6acd9aa0164d1fedacd0f51324464df14e74f4bc8d31903ceb8fa13972cd46cb`,
+      INVALID raw receipt SHAs `4ac3288f28febcdb5f8da0639d0124f14e94a9d14fba847ebc4794b9278e90ea`
+      and `4ccbfca96c78e9de764f40fff4d7d44b8a5f149a7067068b05d9f89f260a7abc`, and
+      the exhausted three-probe history; neither INVALID receipt is semantic evidence.
+      Independently probe both hostname-SNI loopback Caddy and public `https://resofeed.tefx.one`
+      for root 200, unauthenticated Doctor 401, and exact Go-owned security headers/CSP;
+      compare the tracked Caddyfile to prove no header ownership or override. Retain
+      only status/header markers with values redacted where they can carry cookies,
+      tokens, paths, or secrets; never retain bodies. Re-prove staged hashes/configured-running
+      immutable reference, renewed procedure bytes, named volume, duplicate-aware
+      route without Serve mutation, Caddy project ownership, separate procedure/application/SSH/runtime
+      identities, consumed attempt budget, the three required secret names as masked-present
+      only, no prior digest/rollback, nondisclosure, and zero mutation. Emit semantic
+      v1 with exact ordered scope [`renewed semantic-parser procedure source through
+      staged hashes modes backup and final bytes`, `OCI application source through
+      immutable manifests revision and configured/running digest`, `consumed no-effect
+      Attempt 1 and single successful renewed Attempt 2`, `strict-FQDN readiness and
+      separate maintained invocation bindings`, `Go-header Caddy volume route protected
+      state forward-only recovery and nondisclosure`] and coverage `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`,
+      `RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING`, and existing deployment/readiness/header/volume/nondisclosure
+      requirements. Before return, preflight the candidate receipt against the installed
+      production semantic schema with exact verifier, step, ordered scope, requirements,
+      and evidence authorities. Every actual SSH argv in `specialist_receipt.commands`
+      must reproduce actual execution and contain only substantive strings, using
+      attached forms such as `-Fnone`, `-oHostName=...`, `-oHostKeyAlias=...`, and
+      `-oControlPath=none`; standalone `none` and schema-placeholder tokens are forbidden.
+      Permit one initial receipt and at most one format-only JSON correction after
+      Production Gate `INVALID`, with no new probes; a second `INVALID` terminates.
 
 
-      Recovery: Any parser/source/bytes/replay/budget/readiness/security/protected-state/classification
-      defect stops without repair/replay/third invocation/prior-digest/rollback/alternate
-      target.'
-    verification: Independent receipt consumes successful renewed deployment only,
-      treats Attempt 1 as consumed history, proves successful Attempt 2/no third invocation,
-      separate renewed procedure/OCI chains, readiness/security/protected-state/no
-      prior digest/no rollback/nondisclosure/zero mutation.
+      Recovery: Any source/bytes/replay/budget/identity/readiness/TLS-SNI/security/header/Caddy/volume/route/protected-state/classification/nondisclosure
+      defect, unknown partial state, attempted mutation, exhausted fresh probe budget,
+      or second Production Gate `INVALID` stops without repair, replay, deployment,
+      restage, restart, third invocation, prior-digest action, rollback, alternate
+      target, or further receipt correction. Preserve all observations and return
+      the exact blocker; downstream security, UI, report, and Gate consumers remain
+      blocked until a production-admitted PASS receipt.'
+    verification: One production-admitted semantic PASS receipt from the single fresh
+      integration-verifier must consume the unchanged successful deployment, preserve
+      both INVALID receipts and exhausted old probe history as non-admitted diagnostics,
+      use no more than two primary read-only probes plus one classified transport-only
+      retry, and prove exact procedure/index identity, configured-running reference
+      equality without Docker-ID comparison, hostname-SNI loopback plus public 200/401
+      and Go headers/CSP, tracked-Caddyfile non-ownership, Compose-discovered Caddy,
+      volume/route/project/protected-state/no-prior-digest/no-rollback/nondisclosure/zero
+      mutation, substantive actual command argv, and no deployment authority.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
