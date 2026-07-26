@@ -191034,11 +191034,10 @@ phases:
 
       Boundary: `gate-reviewer` is read-only and mutates no repository, Git, Docker/builder,
       registry, deployment, rollback, route, credential/account/trust, secret, volume/data,
-      or runtime state. The skipped/superseded `rf-bug-v2-prior-runtime-identity-readiness`
-      attempt and completed legacy `rf-bug-v2-ssh-endpoint-identity-remediation` remain
-      immutable historical provenance only; neither is a current integrated branch,
-      direct dependency, requirement witness, or executable authority. The Gate grants
-      no prior-digest discovery, old-image rollback, retry, repair, alternate target,
+      or runtime state. Historical stopped or superseded evidence remains immutable
+      non-consumable provenance and is neither a current integrated branch, direct
+      dependency, requirement witness, nor executable authority. The Gate grants no
+      prior-digest discovery, old-image rollback, retry, repair, alternate target,
       identity substitution, or external-effect authority.
 
 
@@ -191052,10 +191051,10 @@ phases:
       semantic admission emits one `vectl.verifier.semantic.v1` with `verifier_id=gate-reviewer`,
       `step_id=rf-bug-v2-assurance-closure-gate`, ordered scope equal to the integrated
       branches below, and outcome-consistent coverage for every listed requirement
-      ID. No coverage row may consume the skipped prior-runtime attempt or the redundant
-      legacy SSH branch; the endpoint requirement must cite current strict-FQDN producer/proof
-      evidence, and source identity coverage must keep the procedure and OCI application
-      chains separate.
+      ID. No coverage row may consume historical stopped or superseded evidence; the
+      endpoint requirement must cite current strict-FQDN producer/proof evidence,
+      and source identity coverage must keep the procedure and OCI application chains
+      separate.
 
 
       Recovery: Any missing current witness, procedure/application source-chain conflation,
@@ -191075,10 +191074,9 @@ phases:
       requirement and integrated step from current tracked/admitted evidence; separately
       witnesses procedure-source bytes and OCI application manifests/running digest
       plus exact maintained invocation bindings; consumes strict-FQDN identity through
-      current producers; excludes the skipped prior-runtime and legacy SSH branches
-      from current coverage; proves no-rollback risk/staging/deployment, forward-only
-      classification, security, blind RF-BUG behavior, report closure, and zero undeclared
-      effect or out-of-scope blocker.
+      current producers; uses only current branches and consumers; proves no-rollback
+      risk/staging/deployment, forward-only classification, security, blind RF-BUG
+      behavior, report closure, and zero undeclared effect or out-of-scope blocker.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
