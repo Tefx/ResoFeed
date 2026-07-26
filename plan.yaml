@@ -190209,28 +190209,31 @@ phases:
     procedure, strict-FQDN staging and bounded forward-only Tailnet/Caddy deployment,
     security review, blind product verification, and report closure; unknown partial
     state, waiver drift, or undeclared recovery authority keeps the phase open.
-  context: The digest-bound `rf-bug-v2-prior-runtime-identity-readiness` attempt and
-    its BLOCKED receipt remain immutable historical provenance. It is superseded by
-    the explicit human waiver of prior image digest discovery and automatic image
-    rollback and must never be rerun or treated as current authority. Only after this
-    replacement plan boundary passes final structural refs, assurance-policy lint,
-    all pending executable preflight, expected-red, roster, proof-topology, and exact
-    gate-scope validation, Orchestrator must make its first lifecycle action exactly
-    `vectl_vectl_lifecycle({"action":"skip","target":"rf-bug-v2-prior-runtime-identity-readiness","reason":"superseded"})`;
-    retain the existing description, refs, BLOCKED receipts, and evidence unchanged.
-    The replacement chain implements and independently authorizes an explicit no-rollback
-    procedure, stages it through the strict maintained endpoint, then deploys only
-    `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
-    with at most two invocations and a required post-attempt `success`/`no_effect`/`known_partial_reconciled`/`unknown_partial`
-    classification. A second invocation is allowed only after observed no effect or
-    fully reconciled known partial effect; unknown partial state stops for read-only
-    reconciliation. No old-image rollback is required. SQLite volume deletion/recreation,
-    data loss, route mutation, Caddy reconciliation/restart beyond the maintained
-    operation, credential/account/trust change, alternate host/stack, moving tag,
-    secret disclosure, and undeclared registry/image mutation remain forbidden. The
-    terminal gate re-establishes the still-required first-run SQLite outcome through
-    current tracked adapter/check evidence; four missing completed-step temporary
-    refs remain historical warnings and are not current gate inputs.
+  context: 'Orchestrator has recorded `rf-bug-v2-prior-runtime-identity-readiness`
+    as skipped/superseded. Its definition, refs, BLOCKED receipts, evidence, and lifecycle
+    history remain immutable non-consumable provenance; it is neither current authority
+    nor a current Gate branch. Current human authority waives prior image-digest discovery
+    and automatic old-image rollback only for the existing immutable OCI index. The
+    current five-boundary chain is repository implementation, independent risk/safety
+    review, persistent strict-FQDN procedure staging, persistent exact-image deployment,
+    and independent Tailnet/runtime proof, followed by the existing security, UI,
+    report, and Gate consumers. Procedure identity and application identity remain
+    separate: a later integrated procedure-source commit binds tracked `deploy.sh`/`compose.yml`
+    hashes and modes through the staging backup ID and final bytes, while OCI application
+    source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` binds the immutable tag, index,
+    amd64/arm64 manifests, revision, and configured/running digest; neither identity
+    may be inferred from the other. Deployment permits at most two maintained invocations,
+    with a required post-attempt `success`/`no_effect`/`known_partial_reconciled`/`unknown_partial`
+    classification; a second invocation requires observed no effect or fully reconciled
+    known partial effect, and unknown partial state stops for read-only reconciliation.
+    Procedure staging retains bounded prior-byte recovery. No old-image rollback is
+    required. SQLite volume deletion/recreation, data loss, route mutation, Caddy
+    reconciliation/restart beyond the maintained operation, credential/account/trust
+    change, alternate host/stack, moving tag, secret disclosure, and undeclared registry/image
+    mutation remain forbidden. The terminal Gate re-establishes the still-required
+    first-run SQLite outcome through current tracked adapter/check evidence; the four
+    missing completed-step temporary refs remain historical warnings and are not current
+    Gate inputs.'
   depends_on:
   - rf-bug-assurance-v2-ledger-prompting
   steps:
