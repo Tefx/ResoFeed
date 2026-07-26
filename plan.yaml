@@ -190920,7 +190920,7 @@ phases:
       registry, deployment, route, volume, trust, credential, or external effect.'
   - id: rf-bug-v2-independent-runtime-ui
     name: Perform fresh black-box RF-BUG verification on no-rollback deployment
-    status: claimed
+    status: pending
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190974,8 +190974,6 @@ phases:
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: blind-tester
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-26T12:30:24.632005Z'
   - id: rf-bug-v2-close-defect-report
     name: Close RF-BUG defect report from admitted no-rollback release evidence
     status: pending
