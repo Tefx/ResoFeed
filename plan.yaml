@@ -190731,29 +190731,46 @@ phases:
       scope.
 
 
-      Boundary: Authorize exactly one fresh `integration-verifier` for read-only observation
-      of the literal target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
-      and public/SNI hostname `resofeed.tefx.one`. At most two total no-effect attempts
-      are authorized. A retry is allowed only after the prior attempt retained secret-safe
-      evidence, classified zero mutation, and failed in transport, probe mechanics,
-      parser mechanics, or receipt formatting while target, procedure, image, endpoint,
-      credential, route, volume, and runtime identities remain unchanged. The verifier
-      chooses the private read-only probe implementation. No deploy, restage, restart,
-      replay, repair, rollback, prior-digest action, third deployment invocation,
-      Serve/Caddy/Compose mutation, product/runtime/protected-state/trust mutation,
-      alternate target, body/cookie/token/path retention, or disclosure is authorized;
+      Boundary: Authorize exactly one fresh `integration-verifier` and exactly one
+      newly bounded no-effect recovery attempt for read-only observation of the literal
+      target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy` and
+      public/SNI hostname `resofeed.tefx.one`. The prior two fresh attempts are exhausted
+      and remain immutable provenance; neither may be replayed or counted as available
+      retry budget. The recovery attempt must avoid every local listener binding:
+      through the existing authenticated SSH endpoint it performs target-local HTTPS
+      requests using curl `--connect-to resofeed.tefx.one:443:127.0.0.1:8443` so URL
+      authority, Host, and TLS SNI remain `resofeed.tefx.one`, and it performs separate
+      direct public HTTPS requests to the same hostname. It may transiently parse
+      response headers only to derive safe status/CSP count, non-empty, byte-length,
+      SHA-256, and equality markers; no response body or raw header is retained. No
+      retry, deploy, restage, restart, replay, repair, rollback, prior-digest action,
+      third deployment invocation, Serve/Caddy/Compose mutation, product/runtime/protected-state/trust
+      mutation, alternate target, data/volume/route change, body/cookie/token/sensitive-path
+      retention, Docker-internal-ID/OCI-digest conflation, or disclosure is authorized;
       deployment invocation budget remains zero.
 
 
-      Admit: Revalidate the successful producer receipt and the valid-negative receipt/hash/context
-      before carrying forward `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`,
+      Admit: Before the single recovery attempt, revalidate the successful producer
+      receipt, the valid-negative receipt/hash/context, the fresh BLOCKED production
+      admission `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/fresh/production-admission-blocked.json`
+      SHA `7da983790ae9a1b743b29b0aa2011cce9b0225f669c80dde84101711d75124d5`, and
+      the two-attempt zero-mutation log `/tmp/larva-agent-artifacts/rf-bug-v2-tailnet-caddy-proof/fresh/csp-proof-safe.log`
+      SHA `2c54c657856194bb732e2fdc2c40dc0434ddd8217b4218e6deffe53a93a671c7`. The
+      same bound SSH policy must select and execute the literal target; target-local
+      preflight must prove curl exists and supports `--connect-to`, the admitted route
+      remains exactly `TCP/HTTPS 443 -> 127.0.0.1:8443`, and the public probe client
+      can execute direct HTTPS without a listener. Any unavailable binding or mismatch
+      stops before requests with zero mutation and no fallback. Carry forward `RF-BUG-V2-BUILDX-REVISION-LABEL-PARSER-AUTHORIZATION`,
       `RF-BUG-V2-RENEWED-NO-ROLLBACK-PROCEDURE-STAGING`, `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`,
       `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY`,
-      and `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`. Retain later parser/domain-discovery
-      failures, including receipt SHA `a96935be1dd16b8b2183c15ab4dcb2dda403d9f74344cc4b14926eedb7134ad5`,
-      as nonblocking provenance only. Fresh mode-0600 evidence for `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`
+      and `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE` as PROVEN. Retain all earlier binding
+      failures and the exhausted 443/8443 listener-binding failures as nonblocking
+      provenance. Fresh mode-0600 evidence for `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`
       must record only safe status, single/non-empty CSP, byte-length, digest, equality,
-      tracked-authority, Caddy non-ownership, identity, and zero-mutation markers.
+      tracked-authority, Caddy non-ownership, fixed identity, preflight availability,
+      and zero-mutation markers; transient raw headers must be mode 0600 and deleted
+      before admission, and bodies, cookies, tokens, secrets, credential values, protected
+      JSON, sensitive paths, and Docker internal image IDs must never be retained.
       Emit one `vectl.verifier.semantic.v1` receipt with the unchanged ordered scope
       [`renewed semantic-parser procedure source through staged hashes modes backup
       and final bytes`, `OCI application source through immutable manifests revision
@@ -190764,20 +190781,27 @@ phases:
       must be schema-valid and completion-grade.
 
 
-      Recovery: An observed runtime/security/Caddy ownership defect, identity drift,
-      disclosure, unsafe retention, attempted mutation, unknown partial state, or
-      two exhausted no-effect attempts stops BLOCKED/FAIL without repair or further
-      probing. Ordinary transport, probe, parser, or receipt failure stays on this
-      step and may consume the one safe retry; it creates no Plan node and grants
-      no external effect.'
+      Recovery: The fresh recovery budget is one no-effect attempt with no retry.
+      An observed identity drift, disclosure, unsafe retention, attempted mutation,
+      unknown partial state, runtime/security/Caddy ownership defect, route or binding
+      mismatch, missing `--connect-to` capability, listener-bind attempt, or exhausted
+      fresh recovery stops BLOCKED/FAIL without repair, alternate mechanism, further
+      probing, or Plan-node creation. Retain the prior two no-effect failures and
+      any fresh zero-mutation failure as provenance; unknown or potentially mutating
+      state fails closed and cannot be rebound.'
     verification: One production-admitted PASS receipt from the authorized `integration-verifier`
-      consumes the exact successful deployment and valid-negative evidence, closes
-      `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY` on fixed hostname-SNI loopback and public
-      root/Doctor with one non-empty canonical byte-identical CSP across all four
-      responses, preserves all seven requirement rows and the full ordered scope,
-      uses no more than two no-effect attempts, retains only mode-0600 secret-safe
-      evidence, and proves zero deployment/runtime mutation or additional deployment
-      authority.
+      consumes the exact successful deployment and valid-negative evidence, preserves
+      the prior two exhausted no-effect listener-binding failures as provenance, and
+      uses at most one newly authorized no-effect recovery attempt with no retry.
+      The attempt must preflight and execute target-local curl `--connect-to resofeed.tefx.one:443:127.0.0.1:8443`
+      through the fixed authenticated SSH target plus separate direct public HTTPS,
+      without binding a listener, and prove fixed hostname-SNI loopback and public
+      root/Doctor return `200/401` with one non-empty canonical byte-identical CSP
+      across all four responses. The receipt preserves all seven requirement rows
+      and the unchanged five-scope order, admits only mode-0600 secret-safe derived
+      evidence, deletes transient raw headers, proves fixed identities and Caddy non-ownership,
+      and proves zero deployment/runtime/protected-state/trust/route/volume mutation
+      and zero additional deployment authority.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
