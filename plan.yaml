@@ -190710,7 +190710,7 @@ phases:
       residue or undeclared mutation remains.
   - id: rf-bug-v2-tailnet-caddy-proof
     name: Independently verify no-rollback Tailnet/Caddy deployment
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -190809,6 +190809,8 @@ phases:
     depends_on:
     - rf-bug-v2-tailnet-caddy-deployment-producer
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T10:24:41.870172Z'
   - id: rf-bug-v2-formal-security-review
     name: Review v2 security and accepted no-rollback boundary
     status: pending
