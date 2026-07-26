@@ -194651,6 +194651,257 @@ phases:
     - rf-bug-v2-current-runtime-readiness-diagnosis
     agent: vectl-orchestrator
     skipped_reason: irrelevant
+  - id: rf-bug-v2-no-rollback-procedure-implementation
+    name: Implement explicit no-prior-digest no-rollback deployment mode
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
+      \ Add an explicit `--no-rollback` mode to the maintained immutable deployment\
+      \ procedure while preserving the current prior-digest rollback mode as the default.\
+      \ The opt-in mode must deploy only a caller-supplied immutable index and platform/revision\
+      \ chain without requiring or deriving a prior image digest, never invoke `rollback_previous_digest`,\
+      \ preserve `resofeed-caddy_resofeed-data`, configuration, owner token, masked\
+      \ secrets, strict literal-FQDN SSH, route and Caddy ownership, and emit a secret-safe\
+      \ outcome classification for success, no effect, known partial effect, or unknown\
+      \ partial effect. Synchronize the shell procedure, deterministic Node acceptance/adapter\
+      \ assertions, deployment skill, README, Container guide, and Playwright harness\
+      \ contract.\n\nBoundary: `general` owns this indivisible shell/Node/docs repository\
+      \ rollback unit through one admitted `vectl.worker.dispatch.v2` and one `vectl.worker.execution.v2`.\
+      \ No SSH, Docker, registry, Tailnet, Caddy, credential/account/trust, secret,\
+      \ volume, data, owner-token, or other runtime/external mutation is authorized.\
+      \ Keep the existing long-option parser and default deployment behavior; do not\
+      \ add moving tags, alternate targets, secret flags, route repair, data deletion/recreation,\
+      \ Caddy restart/reconciliation, registry mutation, or automatic retry. The exact\
+      \ seven allowed paths are the entire mutation surface.\n\nAdmit: The current\
+      \ generic adapter/profile `rf-bug-v2-immutable-deployment-procedure` must select\
+      \ exactly `RF-BUG-V2 immutable OCI and Tailnet deployment procedure` and run\
+      \ `rf_bug_v2_immutable_deployment_procedure_green`. Deterministic fake-surface\
+      \ tests must prove default prior-digest recovery remains intact; `--no-rollback`\
+      \ is explicit, deployment-only, rejects duplicates/invalid combinations, tolerates\
+      \ absent prior digest, suppresses old-image recovery, preserves the named volume\
+      \ and forbidden-effect boundaries, classifies every exit, masks secret presence,\
+      \ and authorizes no retry. `rf-bug-v2-no-rollback-procedure-authorization` independently\
+      \ consumes the integrated files and selected execution.\n\nRecovery: Any parser\
+      \ ambiguity, default-mode regression, missing classification, secret exposure,\
+      \ undeclared path, or check failure stops this step. Revert only the seven allowed\
+      \ paths to the integrated baseline; perform no remote operation or compensating\
+      \ topology.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths:\
+      \ [.agents/skills/resofeed-tailnet-deploy/SKILL.md, deploy/resofeed-caddy/README.md,\
+      \ deploy/resofeed-caddy/deploy.sh, docs/CONTAINER.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n  blocked_paths: [deploy/resofeed-caddy/compose.yml,\
+      \ deploy/resofeed-caddy/verify.sh, deploy/resofeed-caddy/verify-remote.sh, deploy/resofeed-caddy/stop.sh,\
+      \ deploy/resofeed-caddy/caddy/**, deploy/resofeed-caddy/.env, deploy/resofeed-caddy/.env.example,\
+      \ Dockerfile, internal/**, cmd/**, web/**, data/**, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ docs/BUG_FIX_PLAN_2026-07-12.md, docs/BUG_REPORT_2026-07-11.md, plan.yaml]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE]\n\
+      checks:\n  - id: rf_bug_v2_immutable_deployment_procedure_green\n    run:\n\
+      \      command: [node, scripts/vectl-check.mjs, run, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n      timeout_seconds: 300\n\
+      \    evidence:\n      mode: selected_execution\n      path_bindings:\n     \
+      \   - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \        - {path: .agents/skills/resofeed-tailnet-deploy/SKILL.md, access: read,\
+      \ availability: current}\n        - {path: deploy/resofeed-caddy/.env.example,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/README.md,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/compose.yml,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/deploy.sh,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/verify.sh,\
+      \ access: read, availability: current}\n        - {path: deploy/resofeed-caddy/verify-remote.sh,\
+      \ access: read, availability: current}\n        - {path: docs/CONTAINER.md,\
+      \ access: read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: acceptance, availability: current}\n\
+      \        - {path: internal/resofeed/playwright_fixture_test.go, classification:\
+      \ developer, availability: current}\n      selection:\n        command: [node,\
+      \ scripts/vectl-check.mjs, select, rf-bug-v2-immutable-deployment-procedure,\
+      \ rf_bug_v2_immutable_deployment_procedure_green]\n        timeout_seconds:\
+      \ 30\n        cardinality: {exact: 1}\n        required_ids: ['RF-BUG-V2 immutable\
+      \ OCI and Tailnet deployment procedure']\n        forbidden_ids: []\n    expect:\n\
+      \      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n    \
+      \    contains_all: [{literal: ROLLBACK=prior_digest_and_readiness}, {literal:\
+      \ NO_ROLLBACK=explicit_forward_only}, {literal: SQLITE_VOLUME=preserved}, {literal:\
+      \ PROCEDURE_SIDE_EFFECTS=none}, {literal: VECTL_GENERIC_EVIDENCE=valid}]\n \
+      \       contains_any: []\n        forbids: [{literal: ERROR collecting}, {literal:\
+      \ no tests to run}, {literal: skipped}, {literal: OPENROUTER_KEY=}]\n    proves:\
+      \ [RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE]\nbindings: {expected_red: {items:\
+      \ []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-implementation\"\
+      ,\"risk_tier\":\"R3\",\"risk_reasons\":[\"deployment_recovery_semantics\",\"\
+      shell_node_docs_shared_contract\",\"future_remote_effect_safety\"],\"primary_outcome\"\
+      :\"RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE\",\"rollback_class\":\"NONTRIVIAL\"\
+      ,\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE\"\
+      ,\"atom\":\"the maintained immutable deployment procedure retains prior-digest\
+      \ rollback by default and adds an explicit no-prior-digest no-rollback mode\
+      \ with volume preservation, secret-safe outcome classification, and no undeclared\
+      \ external authority\",\"modality\":\"test_contract\",\"seam\":\"mock\",\"check_id\"\
+      :\"rf_bug_v2_immutable_deployment_procedure_green\",\"independent_step\":\"\
+      rf-bug-assurance-v2-closure.rf-bug-v2-no-rollback-procedure-authorization\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"deploy/resofeed-caddy/deploy.sh\"\
+      ,\"scripts/vectl-check.mjs\",\"internal/resofeed/playwright_fixture_test.go\"\
+      ],\"acceptance_test_paths\":[\"scripts/vectl-check.test.mjs\"],\"acceptance_check_ids\"\
+      :[\"rf_bug_v2_immutable_deployment_procedure_green\"],\"acceptance_mutation\"\
+      :\"AUTHORIZED\",\"acceptance_authorizations\":[{\"ref\":\"authority:acceptance-mutation:rf-bug-v2-no-rollback-procedure-implementation\"\
+      ,\"path\":\"scripts/vectl-check.test.mjs\",\"purpose\":\"Add deterministic default-rollback\
+      \ retention and explicit no-prior-digest no-rollback parser, failure-classification,\
+      \ volume-preservation, nondisclosure, and forbidden-effect coverage\",\"check_id\"\
+      :\"rf_bug_v2_immutable_deployment_procedure_green\",\"actor_id\":\"spec-verifier\"\
+      }]}}\n</vectl_step_policy>"
+    verification: The project-native profile selects one exact identity and passes
+      with default rollback retained plus explicit forward-only no-rollback observations.
+      Deterministic acceptance/developer coverage proves parser exclusivity, absent-prior-digest
+      operation, no old-image recovery, classified failure states, named-volume preservation,
+      nondisclosure, no retry, and synchronized docs without any external effect.
+    refs:
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/.env.example
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - deploy/resofeed-caddy/verify.sh
+    - deploy/resofeed-caddy/verify-remote.sh
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - internal/resofeed/playwright_fixture_test.go
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - rf-bug-v2-immutable-deployment-procedure-verification-v14
+    agent: general
+  - id: rf-bug-v2-no-rollback-procedure-authorization
+    name: Independently authorize no-rollback procedure and accepted risk
+    status: pending
+    description: 'step_type: verification
+
+      repo_change_policy: no_repo_change
+
+
+      Deliver: Independently verify `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE` and
+      authorize its narrow runtime use under the exact human waiver: prior image digest
+      discovery and automatic image rollback are waived only for deployment of `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
+      from source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`.
+      Confirm default rollback behavior remains available and the opt-in mode preserves
+      the SQLite named volume, route, Caddy ownership, credentials/trust, owner token,
+      secrets, and immutable image identity while allowing a failed known or unknown
+      partial deployment to remain for forward diagnosis.
+
+
+      Boundary: A fresh `spec-verifier` is read-only. It may run only the current
+      project-native selection, execution, and focused deterministic Node test from
+      a clean detached integrated HEAD. It may not modify repository/Git, SSH, Docker,
+      registry, Tailnet, Caddy, credential/account/trust, secret, volume, data, owner-token,
+      or runtime state. The waiver grants no deletion/recreation, route repair, Caddy
+      reconciliation/restart, alternate target, moving tag, registry mutation, secret
+      disclosure, or unbounded retry.
+
+
+      Admit: Execute exactly once each: `node scripts/vectl-check.mjs select rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green`; `node scripts/vectl-check.mjs
+      run rf-bug-v2-immutable-deployment-procedure rf_bug_v2_immutable_deployment_procedure_green`;
+      and `node --test --test-name-pattern=immutable\ OCI\ and\ Tailnet\ deployment\
+      procedure scripts/vectl-check.test.mjs`. Require selected/executed identity
+      parity, retained default rollback, explicit `--no-rollback`, absent-prior-digest
+      acceptance only in that mode, no automatic old-image recovery, secret-safe success/no-effect/known-partial/unknown-partial
+      classification, named-volume preservation, strict endpoint identity, no runtime
+      side effects in tests, and synchronized docs. Emit one production-admitted `vectl.verifier.semantic.v1`
+      with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-no-rollback-procedure-authorization`,
+      ordered scope [`integrated procedure and project-native evidence`, `default
+      rollback retained`, `explicit no-prior-digest no-rollback semantics`, `narrow
+      human risk waiver and forbidden effects`, `staging and deployment producer authorization`],
+      and outcome-consistent coverage for `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE`
+      and `RF-BUG-V2-NO-ROLLBACK-RISK-ACCEPTANCE`.
+
+
+      Recovery: Any check, identity, documentation, waiver-boundary, nondisclosure,
+      or clean-tree defect returns FAIL/BLOCKED to the implementation owner. Do not
+      repair, stage, deploy, retry, or mutate external state.'
+    verification: A production-admitted spec-verifier semantic receipt binds the integrated
+      seven-file procedure contract, exact selected execution and focused Node test,
+      proves retained default rollback plus explicit no-prior-digest no-rollback behavior
+      and volume/nondisclosure invariants, and authorizes only the declared staging
+      and exact immutable deployment boundary.
+    refs:
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/.env.example
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - deploy/resofeed-caddy/verify.sh
+    - deploy/resofeed-caddy/verify-remote.sh
+    - docs/CONTAINER.md
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - internal/resofeed/playwright_fixture_test.go
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    depends_on:
+    - rf-bug-v2-no-rollback-procedure-implementation
+    agent: spec-verifier
+  - id: rf-bug-v2-stage-no-rollback-procedure
+    name: Stage admitted no-rollback procedure through strict Tailnet endpoint
+    status: pending
+    description: 'step_type: implementation
+
+      repo_change_policy: runtime_state_only
+
+
+      Deliver: Stage the integrated `deploy/resofeed-caddy/deploy.sh` that contains
+      the admitted explicit no-rollback mode, together with the unchanged `compose.yml`,
+      to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy` through
+      the maintained `--stage-procedure` operation. Bind the clean detached integrated
+      procedure-source commit, exact tracked SHA-256 values and modes, generated backup
+      ID, final target bytes, and prior-byte recovery readiness. Do not deploy an
+      image in this step.
+
+
+      Boundary: `vectl-orchestrator` alone owns this persistent procedure-byte replacement.
+      Use the literal Tailnet FQDN with `-F none`, matching HostName/HostKeyAlias,
+      strict existing host-key trust, the existing account/credential, and only the
+      maintained staging/recovery interface. Docker/builders, registry, image configuration,
+      SQLite volume/data, owner token, secrets, Caddy, route, credentials/accounts/trust,
+      alternate targets, and repository/Git mutation are forbidden. Existing-stack
+      SSH is the only cost; any paid service or material unplanned charge stops.
+
+
+      Admit: Consume the production-admitted `rf-bug-v2-no-rollback-procedure-authorization`
+      receipt and an integrated clean detached checkout. Capture the exact procedure-source
+      commit, deploy/compose hashes and modes from tracked bytes; require compose
+      to remain the admitted immutable-volume contract. Retain a new mode-0600 secret-safe
+      raw log and sanitized receipt with operation, target, source identity, prior/current/final
+      byte identities, backup ID, attempt count, and post-attempt classification.
+      `rf-bug-v2-tailnet-caddy-proof` independently consumes this receipt through
+      the deployment chain.
+
+
+      Recovery: Budget one staging invocation. After any nonzero or ambiguous return,
+      observe target byte identities before acting. If the maintained operation proves
+      a known partial replacement and a valid backup ID, authorize at most one `--recover-procedure`
+      invocation and verify prior-byte restoration; no image rollback is involved.
+      Unknown partial state, invalid backup identity, failed procedure recovery, trust
+      drift, disclosure, or forbidden mutation stops BLOCKED for read-only reconciliation
+      without replay or alternate transport.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-stage-no-rollback-procedure","risk_tier":"R3","risk_reasons":["persistent_remote_procedure_replacement","strict_endpoint_existing_credential_boundary","procedure_byte_recovery"],"primary_outcome":"RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","atom":"the
+      independently authorized integrated no-rollback deploy procedure and unchanged
+      compose contract are staged through the strict literal-FQDN endpoint with exact
+      byte identity and bounded prior-byte recovery","modality":"runtime","seam":"real","check_id":"rf_bug_v2_stage_no_rollback_procedure","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+
+      </vectl_step_policy>'
+    verification: A mode-0600 raw log and sanitized receipt prove one maintained strict-FQDN
+      staging invocation from the clean detached integrated procedure source, exact
+      final deploy/compose hashes and modes, valid backup identity, zero Docker/image/data/route/Caddy
+      mutation, and either successful staging or fully observed bounded prior-byte
+      recovery with a BLOCKED stop.
+    refs:
+    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
+    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    - docs/CONTAINER.md
+    depends_on:
+    - rf-bug-v2-no-rollback-procedure-authorization
+    agent: vectl-orchestrator
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
