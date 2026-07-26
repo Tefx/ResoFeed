@@ -194941,7 +194941,7 @@ phases:
       remains plan-owned by the next review step.'
   - id: rf-bug-v2-no-rollback-procedure-authorization
     name: Independently authorize no-rollback procedure and accepted risk
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -195029,6 +195029,8 @@ phases:
     depends_on:
     - rf-bug-v2-no-rollback-route-caddy-effect-repair
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T08:57:49.695332Z'
   - id: rf-bug-v2-stage-no-rollback-procedure
     name: Stage admitted no-rollback procedure through strict Tailnet endpoint
     status: pending
