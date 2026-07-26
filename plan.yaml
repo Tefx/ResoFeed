@@ -194941,7 +194941,7 @@ phases:
       remains plan-owned by the next review step.'
   - id: rf-bug-v2-no-rollback-procedure-authorization
     name: Independently authorize no-rollback procedure and accepted risk
-    status: claimed
+    status: done
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -195031,6 +195031,72 @@ phases:
     agent: spec-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T08:57:49.695332Z'
+    done_at: '2026-07-26T09:06:14.815250+00:00'
+    evidence: 'Independent renewed authorization:
+
+      - Fresh `spec-verifier` reviewed clean detached procedure-source commit `34bff6ba6a8f6a980c6c6ab7008db72741ddaa24`
+      and emitted PASS/CLOSED/NONE with `gate_open_allowed=true`, exact ordered six-entry
+      scope, and PROVEN coverage for `RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE`
+      plus `RF-BUG-V2-NO-ROLLBACK-RISK-ACCEPTANCE`.
+
+      - Raw semantic receipt `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-procedure-authorization/semantic-receipt-renewed.json`,
+      file SHA-256 `5c27d4bdf6773c68e71bbf04d21e6a17f5fb1cfaedcdecc289f0d61f4ab9be66`.
+
+      - Production Gate semantic SHA `sha256:308dcf01ba8a29339ea7de279f97b6fca51ac3088301589701f1163f6d00fe0c`;
+      context hash `sha256:f8c11a64c8b3e889a81bce765d1fad9f790f7ec588623ae6f56b8bece3650622`;
+      status CONFORMANT; semantic_completion_admissible=true; zero reasons.
+
+      - Verdict `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-procedure-authorization/semantic-verdict-renewed.json`,
+      SHA-256 `63f26bf718664e7df07e00de46042825ffdc6cccf2b850a4f366261e386a4dc2`;
+      admission log SHA-256 `db79790d2fee370ca4f39811967d7f444c89fe220597a76d17506de820486473`;
+      all artifacts mode 0600.
+
+
+      Exact verifier execution:
+
+      - Exactly once each on clean detached commit: selected project-native procedure
+      check; executed selected check; focused Node test `immutable OCI and Tailnet
+      deployment procedure`; all passed with exact selected/executed identity parity.
+
+      - Verified retained default prior-digest rollback, explicit forward-only no-rollback,
+      separate procedure/OCI source inputs, route-invalid failure before Compose,
+      unreachable Serve repair/zero Serve mutation, resofeed-only no-build/no-deps/no-Caddy
+      Compose scope, named-volume/protected-state/nondisclosure invariants, synchronized
+      docs, and zero runtime effects.
+
+
+      Independent source binding:
+
+      - `/tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-procedure-authorization/procedure-source-binding-renewed.json`,
+      mode 0600, SHA-256 `92c4522028d2dca9a8c1a33d632ebb5e61539802dbdb229cbededf838503bf1a`.
+
+      - Procedure source `34bff6ba6a8f6a980c6c6ab7008db72741ddaa24` remains distinct
+      from OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`.
+
+      - `deploy.sh`: Git mode 100755, blob `9ebb305d821d382ccc88e0c2c24652b6e19f1a7d`,
+      SHA-256 `6f26b22155d9a738f6da0745c3997b8ca67929722e860e530e474dc87271f539`,
+      50063 bytes.
+
+      - `compose.yml`: Git mode 100644, blob `363aea676a53421ff5431b67ca44783dbedddf7a`,
+      SHA-256 `eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`,
+      1242 bytes.
+
+
+      Authorization boundary:
+
+      - Authorizes staging/producer use only for exact target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`,
+      exact immutable image `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`,
+      procedure source above, and OCI source above.
+
+      - Waives only prior-image-digest discovery and automatic old-image rollback.
+      Does not authorize route/Serve repair, Caddy reconciliation/restart, project-wide
+      Compose actions, alternate targets, volume/data/config/owner-token/secret/credential/trust
+      mutation, registry mutation, identity conflation, disclosure, destructive recovery,
+      or unbounded retry.
+
+      - No repository, Git, SSH, Docker, registry, Tailnet, Serve, Caddy, credential/account/trust,
+      secret, volume, data, owner-token, or runtime/external state mutation occurred
+      during review.'
   - id: rf-bug-v2-stage-no-rollback-procedure
     name: Stage admitted no-rollback procedure through strict Tailnet endpoint
     status: pending
