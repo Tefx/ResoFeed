@@ -190821,7 +190821,7 @@ phases:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
   - id: rf-bug-v2-independent-runtime-ui
-    name: Perform fresh v2 black-box RF-BUG runtime and UI verification
+    name: Perform fresh black-box RF-BUG verification on no-rollback deployment
     status: pending
     description: 'step_type: verification
 
@@ -190829,42 +190829,45 @@ phases:
 
 
       Deliver: Perform full blind RF-BUG-001–010 product/browser verification on the
-      built binary and the exact independently verified deployed digest. Cover Inspector
-      pending/failure/stale selection, opaque routes/history, EN/ZH titles and Steer
-      errors, embedded UI/Doctor, import-only OPML and portable State, CSP/streaming/cancellation,
-      Source Ledger controls and states at the five required viewports with keyboard/overflow/44px
-      evidence, Prompting v2.2, and E2E isolation/cleanup. Record exact viewport,
-      interaction, console/network, accessibility, and immutable-runtime identity
-      evidence.
+      built binary and the exact digest admitted by the successful no-rollback Tailnet
+      proof. Cover Inspector pending/failure/stale selection, opaque routes/history,
+      EN/ZH titles and Steer errors, embedded UI/Doctor, import-only OPML and portable
+      State, CSP/streaming/cancellation, Source Ledger controls and states at the
+      five required viewports with keyboard/overflow/44px evidence, Prompting v2.2,
+      and E2E isolation/cleanup. Record exact viewport, interaction, console/network,
+      accessibility, immutable-runtime identity, and no-rollback proof-receipt identity;
+      no prior image digest is a product/UI prerequisite.
 
 
       Boundary: `blind-tester` uses only public interfaces, canonical docs, protected
       acceptance, the built binary, and deployed Tailnet UI. Browser actions are read-only
       except reversible in-memory navigation and token entry; do not import/restore,
       steer, ingest, re-ingest, mutate sources, mark inspection, report delivery,
-      or change resonance. No repository, registry, deployment, route, credential/account,
+      or change resonance. No repository, registry, deployment, rollback, route, credential/account,
       secret, data, or runtime mutation is authorized. A transient read-only observation
       may be retried twice after retaining the failure and re-proving unchanged deployed
       digest.
 
 
       Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
-      object with `verifier_id=blind-tester`, `step_id=rf-bug-v2-independent-runtime-ui`,
+      with `verifier_id=blind-tester`, `step_id=rf-bug-v2-independent-runtime-ui`,
       ordered scope [`RF-BUG-001 Inspector selection`, `RF-BUG-002 routes and opaque
       IDs`, `RF-BUG-003 embedded UI and Doctor`, `RF-BUG-004 OPML and State`, `RF-BUG-005
       headers CSP streaming cancellation`, `RF-BUG-006-010 titles Steer ledger prompting
       and isolation`], and exactly ten outcome-consistent coverage rows `RF-BUG-001`
-      through `RF-BUG-010`. The receipt binds the exact Tailnet proof digest and five
-      viewport artifacts.
+      through `RF-BUG-010`. The receipt binds the exact successful no-rollback Tailnet
+      proof digest and five viewport artifacts without requiring or inferring a prior
+      digest.
 
 
       Recovery: Any inaccessible required surface, deterministic behavior/accessibility
       defect, digest drift, stale identity, disclosure, or observed mutation stops
-      FAIL/BLOCKED without workaround or product mutation.'
+      FAIL/BLOCKED without workaround, product mutation, prior-digest discovery, or
+      rollback.'
     verification: A production-admitted blind-tester receipt covers RF-BUG-001–010
-      on the real binary and exact deployed digest at all five viewports, with route/UI/accessibility/console/network
-      evidence, no stale publication identity, no disclosure, and zero product or
-      runtime mutation.
+      on the real binary and exact no-rollback deployed digest at all five viewports,
+      with route/UI/accessibility/console/network evidence, no stale publication identity
+      or prior-digest dependency, no disclosure, and zero product/runtime mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
