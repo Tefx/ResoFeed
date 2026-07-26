@@ -190914,9 +190914,10 @@ phases:
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Close RF-BUG-001–010 only in `docs/BUG_REPORT_2026-07-11.md` after the independent\
-      \ security and blind-runtime receipts pass. Preserve pre-closure report SHA-256\
-      \ `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`, repair-plan\
-      \ SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,\
+      \ blind-runtime receipt passes; the terminal Gate independently integrates the\
+      \ sibling formal-security review before phase admission. Preserve pre-closure\
+      \ report SHA-256 `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`,\
+      \ repair-plan SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,\
       \ all canonical docs, protected acceptance, completed evidence, and stopped\
       \ historical failures. Record two separate exact chains: the later integrated\
       \ procedure-source commit through tracked deploy/compose hashes and modes, staging\
@@ -190940,13 +190941,14 @@ phases:
       \ from the current protected Go/web authorities, including separate procedure-source\
       \ and OCI-application identity-chain closure; the repair plan and acceptance\
       \ files remain byte-unchanged. The terminal Gate independently consumes the\
-      \ report and admitted no-rollback release receipts.\n\nRecovery: A prehash mismatch,\
-      \ failed independent receipt, identity-chain conflation, adapter identity drift,\
-      \ check failure, unrelated file change, or inability to distinguish superseded/rejected\
-      \ history from admitted no-rollback evidence stops the same step. Revert only\
-      \ the report; do not add adapter/test/doc remediation or external effects.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
-      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md]\n\
+      \ report, the sibling formal-security review, and the admitted no-rollback release\
+      \ receipts.\n\nRecovery: A prehash mismatch, failed blind-runtime receipt, identity-chain\
+      \ conflation, adapter identity drift, check failure, unrelated file change,\
+      \ or inability to distinguish superseded/rejected history from admitted no-rollback\
+      \ evidence stops the same step. Revert only the report; do not add adapter/test/doc\
+      \ remediation or external effects.\n\n<intent_closure_contract>\nschema_version:\
+      \ intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md]\n\
       \  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
       \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
       \ README.md, Dockerfile, scripts/**, tests/**, internal/**, cmd/**, web/**,\
@@ -190998,7 +191000,6 @@ phases:
     - scripts/vectl-check.mjs
     - scripts/vectl-check.test.mjs
     depends_on:
-    - rf-bug-v2-formal-security-review
     - rf-bug-v2-independent-runtime-ui
     agent: general
   - id: rf-bug-v2-assurance-closure-gate
