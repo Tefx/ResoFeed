@@ -195947,6 +195947,78 @@ phases:
 
       - Attempt 1 and stale staged procedure remain history; deployment may consume
       only this renewed receipt and exactly one remaining invocation.'
+  - id: rf-bug-v2-final-semantic-review
+    name: Review RF-BUG release disposition and accepted UI proof gap
+    status: pending
+    description: 'step_type: review
+
+      repo_change_policy: no_repo_change
+
+
+      Deliver: Independently report the current RF-BUG Assurance v2 release disposition
+      without closing RF-BUG-001–010. Confirm that completed local, SQLite, streaming,
+      frontend CSP, closure-selector, immutable OCI/runtime, strict-FQDN staging,
+      no-rollback Tailnet/Caddy, and formal-security evidence remains admitted only
+      for its observed scope; preserve procedure-source and OCI-application identities
+      as separate meanings. Confirm that `rf-bug-v2-independent-runtime-ui` is skipped
+      under explicit user authority, every prior blind-runtime BLOCKED receipt and
+      negative observation remains immutable provenance, no completion-grade UI PASS
+      or RF-BUG-001–010 PROVEN rows exist, `docs/BUG_REPORT_2026-07-11.md` remains
+      open and unchanged, and complete defect closure/assurance is unadmitted. The
+      review may admit only the truthfulness of this release disposition and accepted
+      proof gap so dependency orchestration can continue; it must not reinterpret
+      progression as missing evidence.
+
+
+      Boundary: `spec-verifier` is a read-only semantic consumer. It may inspect current
+      `plan.yaml`, current tracked docs, and already-admitted completed/skipped lifecycle
+      evidence. It has zero repository, Git, browser, product, runtime, registry,
+      deployment, route, volume, credential/account/trust, secret, retry, rollback,
+      remediation, or external-effect authority. Completed and skipped definitions,
+      evidence, and history remain immutable.
+
+
+      Admit: Re-run structural refs and global unique IDs, assurance lint with required
+      policy, and phase preflight. Production semantic admission emits one `vectl.verifier.semantic.v1`
+      with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-final-semantic-review`,
+      ordered scope [`completed release evidence and separate identities`, `formal
+      security evidence and no-rollback boundary`, `user-directed skipped blind runtime
+      UI`, `open defect report and unadmitted RF-BUG closure`, `dependency progression
+      without evidence promotion`], and exactly two outcome-consistent coverage rows:
+      `RF-BUG-V2-RELEASE-DISPOSITION` proves only that the completed release/deployment/security
+      evidence and separate procedure/application identity chains exist within their
+      recorded scopes; `RF-BUG-V2-UNVERIFIED-UI-GAP-DISPOSITION` proves only that
+      the user-directed skip, retained negative evidence, open defect report, absent
+      blind-runtime PASS, and unadmitted RF-BUG-001–010 closure are recorded consistently.
+      A PASS over these two disposition facts is not an RF-BUG-001–010 product/UI
+      PASS and is not completed assurance. Every row cites current tracked authority
+      or admitted lifecycle evidence; skipped/BLOCKED evidence remains non-current
+      for defect closure.
+
+
+      Recovery: Any attempt to mark RF-BUG-001–010 product/UI requirements PROVEN,
+      close the defect report, suppress negative evidence, conflate source identities,
+      broaden the no-rollback waiver, or treat dependency progression as assurance
+      evidence stops BLOCKED/FAIL. The reviewer performs no remediation, browser proof,
+      deployment, retry, rollback, or other effect.'
+    verification: A production-admitted spec-verifier receipt proves exactly the two
+      release-disposition facts from current plan/docs and admitted lifecycle evidence,
+      explicitly records the skipped blind-runtime verification and open RF-BUG-001–010
+      gap, preserves all prior negative evidence and separate procedure/application
+      identities, makes no RF-BUG-001–010 PROVEN or defect-closure claim, and performs
+      no repository/runtime/external effect.
+    refs:
+    - plan.yaml
+    - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - docs/ARCHITECTURE.md
+    - docs/CONTAINER.md
+    - deploy/resofeed-caddy/compose.yml
+    - deploy/resofeed-caddy/deploy.sh
+    depends_on:
+    - rf-bug-v2-formal-security-review
+    - rf-bug-v2-independent-runtime-ui
+    agent: spec-verifier
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
