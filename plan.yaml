@@ -190918,29 +190918,35 @@ phases:
       \ `017580ff159170ac65154903001982441b969b687425d4402bbd3eed94fa4f27`, repair-plan\
       \ SHA-256 `185a27df2aedc353efa607a47bf44f0d87dd61d5a457e1a2909f9dc757582464`,\
       \ all canonical docs, protected acceptance, completed evidence, and stopped\
-      \ historical failures. Record the exact current source/tag/index/platform/revision/deployed-digest\
-      \ chain, the explicit user waiver of prior-digest discovery and automatic image\
-      \ rollback, the bounded forward-only deployment disposition, `post_closure_report_sha256=<64\
-      \ lowercase hex>`, and `closure_commit=<40 lowercase hex>` without treating\
-      \ the superseded prior-runtime attempt or rejected attempts as current authority.\n\
-      \nBoundary: `general` owns this single-file documentation mutation because the\
-      \ registered documentation persona lacks worker-v2 execution support. Dispatch\
-      \ and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
-      \ Product code, adapters, developer/acceptance tests, canonical docs, deployment\
-      \ files, runtime artifacts, secrets, registry, and external state are immutable.\
-      \ Rollback is a one-file revert.\n\nAdmit: The current tracked `scripts/vectl-check.mjs`\
+      \ historical failures. Record two separate exact chains: the later integrated\
+      \ procedure-source commit through tracked deploy/compose hashes and modes, staging\
+      \ backup ID, final bytes, and maintained invocation; and OCI application source\
+      \ `abf3cb6c545f9c0f3c605760a5325875c61fc83f` through immutable tag/index/amd64/arm64/revision\
+      \ to configured/running digest. State that the two commits have different meanings\
+      \ and were neither inferred equal nor substituted. Also record the explicit\
+      \ user waiver of prior-digest discovery and automatic image rollback, bounded\
+      \ forward-only deployment disposition, `post_closure_report_sha256=<64 lowercase\
+      \ hex>`, and `closure_commit=<40 lowercase hex>` without treating the superseded\
+      \ prior-runtime attempt or rejected attempts as current authority.\n\nBoundary:\
+      \ `general` owns this single-file documentation mutation because the registered\
+      \ documentation persona lacks worker-v2 execution support. Dispatch and completion\
+      \ use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`. Product code,\
+      \ adapters, developer/acceptance tests, canonical docs, deployment files, runtime\
+      \ artifacts, secrets, registry, and external state are immutable. Rollback is\
+      \ a one-file revert.\n\nAdmit: The current tracked `scripts/vectl-check.mjs`\
       \ profile `rf-bug-v2-closure-report` selects and runs `rf_bug_v2_defect_report_closure_green`\
       \ with exact identities `RF-BUG-001-010 active source scans` and `RF-BUG-001-010\
       \ closure contract`. Selected execution must report all required closure markers\
-      \ from the current protected Go/web authorities; the repair plan and acceptance\
-      \ files remain byte-unchanged. The terminal gate independently consumes the\
+      \ from the current protected Go/web authorities, including separate procedure-source\
+      \ and OCI-application identity-chain closure; the repair plan and acceptance\
+      \ files remain byte-unchanged. The terminal Gate independently consumes the\
       \ report and admitted no-rollback release receipts.\n\nRecovery: A prehash mismatch,\
-      \ failed independent receipt, adapter identity drift, check failure, unrelated\
-      \ file change, or inability to distinguish superseded/rejected history from\
-      \ admitted no-rollback evidence stops the same step. Revert only the report;\
-      \ do not add adapter/test/doc remediation or external effects.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md]\n\
+      \ failed independent receipt, identity-chain conflation, adapter identity drift,\
+      \ check failure, unrelated file change, or inability to distinguish superseded/rejected\
+      \ history from admitted no-rollback evidence stops the same step. Revert only\
+      \ the report; do not add adapter/test/doc remediation or external effects.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: generic\nscope:\n  allowed_paths: [docs/BUG_REPORT_2026-07-11.md]\n\
       \  blocked_paths: [docs/BUG_FIX_PLAN_2026-07-12.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
       \ docs/PROMPTING_SYSTEM.md, docs/CONTAINER.md, docs/USAGE.md, docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
       \ README.md, Dockerfile, scripts/**, tests/**, internal/**, cmd/**, web/**,\
@@ -190963,29 +190969,31 @@ phases:
       \ source scans', 'RF-BUG-001-010 closure contract']\n        forbidden_ids:\
       \ []\n    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
       \        contains_all: [{literal: TestRFBugCanonicalContracts}, {literal: RF_BUG_CLOSURE_REQUIREMENTS=10},\
-      \ {literal: OPML_ACTIVE_DOCUMENTS=9}, {literal: OPML_EXCLUSIONS=2}, {literal:\
-      \ PROMPTING_V21_ACTIVE_MATCHES=0}]\n        contains_any: []\n        forbids:\
-      \ [{literal: broad exclusion}, {literal: no tests to run}]\n    proves: [RF-BUG-001-010-CLOSURE]\n\
-      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
-      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
-      :\"rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report\",\"risk_tier\"\
-      :\"R1\",\"risk_reasons\":[\"single_tracked_defect_report_closure\"],\"primary_outcome\"\
-      :\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\",\"observation_ledger\"\
-      :[{\"requirement_id\":\"RF-BUG-001-010-CLOSURE\",\"atom\":\"the single defect\
-      \ report records the admitted RF-BUG-001-010 source, runtime, no-rollback deployment,\
-      \ security, blind-product, user-waiver, and forward-only recovery evidence while\
-      \ canonical docs and protected acceptance remain immutable\",\"modality\":\"\
-      test_contract\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_defect_report_closure_green\"\
+      \ {literal: RF_BUG_RELEASE_IDENTITY_CHAINS=procedure_and_oci_separate}, {literal:\
+      \ OPML_ACTIVE_DOCUMENTS=9}, {literal: OPML_EXCLUSIONS=2}, {literal: PROMPTING_V21_ACTIVE_MATCHES=0}]\n\
+      \        contains_any: []\n        forbids: [{literal: broad exclusion}, {literal:\
+      \ no tests to run}]\n    proves: [RF-BUG-001-010-CLOSURE]\nbindings: {expected_red:\
+      \ {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n<vectl_step_policy>\n\
+      {\"schema_version\":\"vectl.step.policy.v2\",\"step_id\":\"rf-bug-assurance-v2-closure.rf-bug-v2-close-defect-report\"\
+      ,\"risk_tier\":\"R1\",\"risk_reasons\":[\"single_tracked_defect_report_closure\"\
+      ],\"primary_outcome\":\"RF-BUG-001-010-CLOSURE\",\"rollback_class\":\"TRIVIAL\"\
+      ,\"observation_ledger\":[{\"requirement_id\":\"RF-BUG-001-010-CLOSURE\",\"atom\"\
+      :\"the single defect report records the admitted RF-BUG-001-010 local, procedure-source,\
+      \ OCI application, runtime, no-rollback deployment, security, blind-product,\
+      \ user-waiver, and forward-only recovery evidence while keeping the two source\
+      \ chains distinct and canonical docs/protected acceptance immutable\",\"modality\"\
+      :\"test_contract\",\"seam\":\"real\",\"check_id\":\"rf_bug_v2_defect_report_closure_green\"\
       ,\"independent_step\":\"rf-bug-assurance-v2-closure.rf-bug-v2-assurance-closure-gate\"\
       }],\"test_authority\":{\"developer_test_globs\":[],\"acceptance_test_paths\"\
       :[\"tests/rf_bug_canonical_contract_test.go\",\"web/src/lib/api-client.test.ts\"\
       ],\"acceptance_check_ids\":[\"rf_bug_v2_defect_report_closure_green\"],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
     verification: Pre-closure authority hashes match; only the defect report changes;
-      it separates superseded/rejected history from the admitted source/publication/no-rollback
-      deployment/security/UI chain, records the narrow waiver and forward-only disposition
-      plus post-closure hash/commit, and the exact current closure adapter identities
-      pass.
+      it records the procedure-source-to-staged-bytes chain and OCI-application-to-running-digest
+      chain separately, exact maintained invocation bindings, narrow waiver and forward-only
+      disposition, and post-closure hash/commit; it separates superseded/rejected
+      history from current release evidence; and the exact current closure adapter
+      identities pass.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
