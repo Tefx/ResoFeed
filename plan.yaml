@@ -190693,7 +190693,7 @@ phases:
       residue. Prior blocked/schema-invalid receipts remain diagnostic only. No runtime
       residue or undeclared mutation remains.
   - id: rf-bug-v2-tailnet-caddy-proof
-    name: Independently verify deployed Tailnet/Caddy runtime
+    name: Independently verify no-rollback Tailnet/Caddy deployment
     status: pending
     description: 'step_type: verification
 
@@ -190701,46 +190701,48 @@ phases:
 
 
       Deliver: Produce `RF-BUG-V2-TAILNET-CADDY-RUNTIME-PROOF` by independently consuming
-      the deployment producer receipt and re-observing the exact immutable source/tag/index/amd64/arm64/revision
-      chain, configured running digest, direct root `200`, unauthenticated Doctor
-      `401`, strict literal-FQDN endpoint identity, four Go-owned security headers
-      on direct/public HTML, JSON, MCP, unauthorized, and error responses, Caddy non-ownership,
-      named `/data` volume identity, canonical route no-op, prior-digest recovery
-      readiness, owner-token/data preservation, and nondisclosure. Product/UI RF-BUG
-      behavior belongs to `rf-bug-v2-independent-runtime-ui`.
+      the successful no-rollback deployment and procedure-staging receipts, then re-observing
+      the exact source/tag/index/amd64/arm64/revision chain, configured and running
+      digest, direct root `200`, unauthenticated Doctor `401`, strict literal-FQDN
+      endpoint identity, four Go-owned security headers on direct/public HTML, JSON,
+      MCP, unauthorized, and error responses, Caddy non-ownership, named `/data` SQLite
+      volume identity, canonical route no-op, protected owner-token/data state, no
+      old-image rollback, forward-only attempt classification, and nondisclosure.
+      Product/UI RF-BUG behavior remains owned by `rf-bug-v2-independent-runtime-ui`.
 
 
       Boundary: `integration-verifier` has read-only authority against the existing
       `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy` stack and public
-      route. It may enter a token only for authenticated read probes. It may not deploy,
-      restart, restage, roll back, repair Serve/Caddy, mutate product/runtime/data/route/registry/credential/account/trust
-      state, or expose secrets, host-key material, configuration, response bodies,
-      or public-host values. At most three retries are allowed only for a demonstrably
-      transient non-mutating probe after retaining the failed observation and re-proving
+      route. Token entry is allowed only for authenticated read probes. It may not
+      deploy, restart, restage, roll back, repair Serve/Caddy, mutate product/runtime/data/volume/route/registry/credential/account/trust
+      state, discover a prior digest, or expose secrets, host-key material, configuration,
+      response bodies, or public-host values. At most three probe attempts are allowed
+      only after retaining a demonstrably transient non-mutating failure and re-proving
       unchanged target, digest, volume, and route.
 
 
-      Admit: Require the exact sanitized producer receipt and secret-safe raw-log
-      identity from `rf-bug-v2-tailnet-caddy-deployment-producer`. Production semantic
-      admission emits one `vectl.verifier.semantic.v1` object with `verifier_id=integration-verifier`,
-      `step_id=rf-bug-v2-tailnet-caddy-proof`, ordered scope [`deployment producer
-      and immutable identity`, `strict-FQDN readiness`, `Go-header and Caddy ownership
-      parity`, `digest volume route and recovery`, `nondisclosure and zero verifier
-      mutation`], and exactly five coverage rows for `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`,
+      Admit: Require exact sanitized receipts and secret-safe raw-log identities from
+      `rf-bug-v2-stage-no-rollback-procedure` and `rf-bug-v2-tailnet-caddy-deployment-producer`.
+      Production semantic admission emits one `vectl.verifier.semantic.v1` with `verifier_id=integration-verifier`,
+      `step_id=rf-bug-v2-tailnet-caddy-proof`, ordered scope [`no-rollback procedure
+      staging and deployment producer`, `immutable identity and strict-FQDN readiness`,
+      `Go-header and Caddy ownership parity`, `digest volume route and forward-only
+      classification`, `protected state and nondisclosure`], and outcome-consistent
+      coverage for `RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING`, `RF-BUG-V2-TAILNET-CADDY-DEPLOYMENT`,
       `RF-BUG-V2-TAILNET-CADDY-READINESS`, `RF-BUG-V2-TAILNET-CADDY-HEADERS-CADDY`,
-      `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-RECOVERY`, and `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`.
+      `RF-BUG-V2-TAILNET-CADDY-VOLUME-ROUTE-FORWARD-RECOVERY`, and `RF-BUG-V2-TAILNET-CADDY-NONDISCLOSURE`.
 
 
-      Recovery: A deterministic identity/header/readiness/volume/route/recovery defect,
-      trust drift, disclosure, observed mutation, unavailable producer evidence, or
-      unknown state stops BLOCKED/FAIL without repair or replay. If deployment evidence
-      records successful prior-digest restoration, verify reconciliation and return
-      outcome-consistent failure rather than deployment success.'
-    verification: A production-admitted fresh integration-verifier receipt independently
-      binds the exact deployment receipt and immutable image identity, proves strict-FQDN
-      direct/public readiness, Go-header parity and Caddy non-ownership, configured
-      digest, named volume, route no-op, recovery readiness, nondisclosure, and zero
-      verifier mutation.
+      Recovery: Any deterministic identity/header/readiness/volume/route/protected-state
+      defect, missing or inconsistent forward-only classification, trust drift, disclosure,
+      observed mutation, unavailable producer evidence, or unknown state stops BLOCKED/FAIL
+      without repair, replay, prior-digest discovery, old-image rollback, or alternate
+      target.'
+    verification: A production-admitted integration-verifier receipt independently
+      binds the exact staging/deployment receipts and immutable image identity; proves
+      strict-FQDN direct/public readiness, Go-header parity and Caddy non-ownership,
+      configured/running digest, named volume, route no-op, protected state, no old-image
+      rollback, forward-only classification, nondisclosure, and zero verifier mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/CONTAINER.md
