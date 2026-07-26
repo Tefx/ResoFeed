@@ -194750,7 +194750,7 @@ phases:
     skipped_reason: irrelevant
   - id: rf-bug-v2-no-rollback-procedure-implementation
     name: Implement explicit no-prior-digest no-rollback deployment mode
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Add an explicit `--no-rollback` mode to the maintained immutable deployment\
@@ -194881,6 +194881,58 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T06:40:32.131666Z'
+    done_at: '2026-07-26T07:20:07.688396+00:00'
+    evidence: 'Artifact:
+
+      - Integrated commit: da6d132b418c528066e27f10b7e47d316a86167c (`feat(deploy):
+      add explicit no-rollback mode`), parent 5feba401dd7ddef1965b487b2fff8b57112888e6.
+
+      - Exact changed paths: .agents/skills/resofeed-tailnet-deploy/SKILL.md; deploy/resofeed-caddy/README.md;
+      deploy/resofeed-caddy/deploy.sh; docs/CONTAINER.md; docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md;
+      scripts/vectl-check.mjs; scripts/vectl-check.test.mjs.
+
+      - Dispatch: /tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-procedure-implementation/dispatch.json,
+      file SHA-256 00c462ebfbdae7c638997b63be3e420a6b9f41229f15d19b3547e75d6c1bf3ea,
+      admitted semantic SHA-256 ddfe9b44ad3d97f8298b2b2c141e74a4c49e430df33c279412ec83f65a0e1057.
+
+      - Worker receipt: /tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-procedure-implementation/receipt.json,
+      file SHA-256 5a2d5122e85418351834c0d709de8a5956c386f1f1b43262502d26e4cd0eee7d,
+      admitted semantic SHA-256 e28d15350d3768073054125ad006a0e345081b50155c405244dd5c88342bc618.
+
+
+      Verification:
+
+      - Installed Gate `--validate-worker-dispatch` -> CONFORMANT, worker_dispatch_admissible=true.
+
+      - Installed Gate `--validate-worker-receipt` with complete acceptance authorization
+      -> CONFORMANT, worker_execution_admissible=true; production check rerun passed.
+
+      - `git diff --check 5feba401dd7ddef1965b487b2fff8b57112888e6 --` -> pass after
+      same-worker trailing-whitespace correction.
+
+      - Actual integration HEAD check: `node scripts/vectl-check.mjs run rf-bug-v2-immutable-deployment-procedure
+      rf_bug_v2_immutable_deployment_procedure_green` -> exit 0; all seven required
+      markers present; secret literal hits 0. Mode-0600 log: /tmp/larva-agent-artifacts/rf-bug-v2-no-rollback-procedure-implementation/integration-check.log,
+      SHA-256 c2d7253779c60cba11a2e94a21a53f04377edaeecdc94f723ed149d3e7413f8c.
+
+      - Worktree Git common directory matched /Users/tefx/Projects/ResoFeed/.git;
+      base/HEAD and exact seven-path mutation surface verified; no untracked worker
+      files.
+
+      - No SSH, Docker, registry, Tailnet, Caddy, credential/account/trust, secret,
+      volume, data, owner-token, route, or other runtime/external mutation executed.
+
+
+      Spec link:
+
+      - plan step rf-bug-v2-no-rollback-procedure-implementation; RF-BUG-V2-NO-ROLLBACK-DEPLOYMENT-PROCEDURE;
+      authority commit 6ce3cc5a22fa4d795b5181018ad449f1dedef104.
+
+
+      Gaps:
+
+      - None for this implementation step; independent procedure/risk authorization
+      remains plan-owned by the next review step.'
   - id: rf-bug-v2-no-rollback-procedure-authorization
     name: Independently authorize no-rollback procedure and accepted risk
     status: pending
