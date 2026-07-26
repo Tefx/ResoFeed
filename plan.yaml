@@ -190755,59 +190755,68 @@ phases:
     - rf-bug-v2-tailnet-caddy-deployment-producer
     agent: integration-verifier
   - id: rf-bug-v2-formal-security-review
-    name: Review v2 release security, endpoint identity, and recovery boundaries
+    name: Review v2 security and accepted no-rollback boundary
     status: pending
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
 
 
-      Deliver: Independently judge RF-BUG release security and rollback boundaries
-      after Tailnet/Caddy proof. Cover embed.FS traversal/fallback and no external
-      UI root, outer security headers and CSP, streaming/cancellation, Owner Token,
-      import-only OPML and atomic minimal State, case-local E2E cleanup, live-provider
+      Deliver: Independently judge RF-BUG release security and the accepted no-prior-digest/no-old-image-rollback
+      boundary after Tailnet/Caddy proof. Cover embed.FS traversal/fallback and no
+      external UI root, outer security headers/CSP, streaming/cancellation, Owner
+      Token, import-only OPML and atomic minimal State, case-local E2E cleanup, live-provider
       opt-in, runtime-secret redaction, clean-source immutable publication identity,
       strict endpoint trust, exact deployed digest, Caddy non-ownership, SQLite/owner-token
-      preservation, and prior-digest recovery. Preserve stopped publication/staging
-      failures as provenance without promoting them to current authority.
+      preservation, explicit waiver scope, bounded forward-only attempt classification,
+      and stop-on-unknown-partial behavior. Preserve stopped publication, staging,
+      readiness, and prior-digest attempts as provenance without promoting them to
+      current authority.
 
 
       Boundary: `spec-verifier` is read-only. It consumes current tracked docs and
-      admitted receipts from the completed publication/runtime chain and `rf-bug-v2-tailnet-caddy-proof`;
+      admitted receipts from the publication/runtime chain and `rf-bug-v2-tailnet-caddy-proof`;
       it may not mutate repository, Git, Docker/builders, registry, deployment, route,
-      credential/account/trust, secrets, data, or runtime state. Historical temporary
-      diagnostics are lifecycle provenance, not current refs or executable authority.
+      credential/account/trust, secrets, volume/data, or runtime state. The waiver
+      authorizes no prior-digest discovery, image rollback, volume deletion/recreation,
+      route mutation, Caddy reconciliation/restart, alternate host/stack, moving tag,
+      registry mutation, secret disclosure, or unbounded retry. Historical diagnostics
+      are provenance, not executable authority.
 
 
       Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
-      object with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-formal-security-review`,
+      with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-formal-security-review`,
       ordered scope [`embedded runtime and HTTP security`, `owner-token OPML State
       and secret boundaries`, `clean-source immutable publication`, `strict endpoint
-      deployment and Caddy ownership`, `rollback recovery and retained failure provenance`],
-      and exactly five coverage rows for `RF-BUG-003`, `RF-BUG-004`, `RF-BUG-005`,
-      `RF-BUG-010`, and `RF-BUG-V2-RELEASE-SECURITY-RECOVERY`. Every row cites substantive
-      current command/process evidence or an admitted producer receipt.
+      no-rollback deployment and Caddy ownership`, `forward-only recovery and retained
+      failure provenance`], and exactly five outcome-consistent coverage rows for
+      `RF-BUG-003`, `RF-BUG-004`, `RF-BUG-005`, `RF-BUG-010`, and `RF-BUG-V2-RELEASE-SECURITY-FORWARD-RECOVERY`.
+      Every row cites substantive current command/process evidence or an admitted
+      producer receipt and explicitly distinguishes the superseded prior-digest attempt
+      from current authority.
 
 
-      Recovery: Any unresolved source/build/registry/deployment/security/trust/secret/route/volume/rollback
-      defect routes to its owning pending step and blocks report closure. This review
-      performs no remediation or retry-bearing effect.'
+      Recovery: Any unresolved source/build/registry/deployment/security/trust/secret/route/volume/no-rollback
+      classification defect or unknown partial state blocks report closure and routes
+      to the owning pending boundary. This review performs no remediation, retry,
+      rollback, or external effect.'
     verification: A production-admitted fresh spec-verifier receipt covers all five
-      declared security/recovery scopes, binds current tracked authority and admitted
-      producer evidence, preserves rejected history as provenance, and reports no
-      unresolved in-scope defect or undeclared effect.
+      declared security/forward-recovery scopes, binds current tracked authority and
+      admitted producer evidence, proves the user waiver remained narrow, preserves
+      rejected history as provenance, and reports no unresolved in-scope defect or
+      undeclared effect.
     refs:
-    - AGENTS.md
     - docs/BUG_FIX_PLAN_2026-07-12.md
+    - docs/BUG_REPORT_2026-07-11.md
+    - AGENTS.md
     - docs/ARCHITECTURE.md
     - docs/CONTAINER.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
-    - .agents/skills/resofeed-tailnet-deploy/SKILL.md
-    - Dockerfile
-    - deploy/resofeed-caddy/README.md
+    - deploy/resofeed-caddy/caddy/Caddyfile
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
-    - deploy/resofeed-caddy/caddy/Caddyfile
+    - internal/resofeed/runtime_startup.go
+    - internal/resofeed/server.go
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
