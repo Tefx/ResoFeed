@@ -195099,7 +195099,7 @@ phases:
       during review.'
   - id: rf-bug-v2-stage-no-rollback-procedure
     name: Stage admitted no-rollback procedure through strict Tailnet endpoint
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -195179,6 +195179,58 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T09:07:11.629575Z'
+    done_at: '2026-07-26T09:08:52.528964+00:00'
+    evidence: 'Successful single maintained staging invocation:
+
+      - Ran exactly once from clean detached integrated procedure-source commit `34bff6ba6a8f6a980c6c6ab7008db72741ddaa24`:
+      `./deploy/resofeed-caddy/deploy.sh --stage-procedure --verified-commit 34bff6ba6a8f6a980c6c6ab7008db72741ddaa24`.
+
+      - Exit 0; `PROCEDURE_STAGE=verified`; `RESULT_CLASSIFICATION=success`; attempt
+      count 1; recovery invocation count 0; image deployment invocation count 0.
+
+      - Strict fixed target `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      used through the maintained producer''s `-F none`, literal HostName/HostKeyAlias,
+      strict existing host-key trust, no trust mutation interface.
+
+
+      Bound source/final identities:
+
+      - Procedure-source commit: `34bff6ba6a8f6a980c6c6ab7008db72741ddaa24`.
+
+      - Tracked/final deploy.sh: Git mode 100755 / target mode 755; SHA-256 `sha256:6f26b22155d9a738f6da0745c3997b8ca67929722e860e530e474dc87271f539`.
+
+      - Tracked/final compose.yml: Git mode 100644 / target mode 644; SHA-256 `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`.
+
+      - Prior deploy.sh SHA-256 `sha256:5f5b5b38e744781e77db4a8f26091d17b96d5e3a12767fc0151645680cde92d6`;
+      prior compose.yml SHA-256 `sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c`.
+
+      - Valid recovery backup ID `sha256:e00e4b08c1da1bdb12b6590e995bb79b9551070ed77ebd39358f8a6b9dd33b81`;
+      prior-byte recovery remains ready.
+
+      - Separately named downstream OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f`;
+      no equality inference or identity substitution.
+
+
+      Artifacts:
+
+      - Mode-0600 raw log `/tmp/larva-agent-artifacts/rf-bug-v2-stage-no-rollback-procedure/stage-raw.log`,
+      SHA-256 `af8a03e199a92728cfe1e29e3dc6924d1be88c03add58f7f0870ae8178fab2aa`.
+
+      - Mode-0600 sanitized receipt `/tmp/larva-agent-artifacts/rf-bug-v2-stage-no-rollback-procedure/stage-receipt.json`,
+      SHA-256 `adac80222f33183c4f05c4a44815d31a1485ae942b02b1d18d6633f09bb8b55a`.
+
+      - Receipt binds operation, strict target identity, source/prior/final hashes
+      and modes, backup ID, attempt count, classification, separate OCI identity,
+      recovery count, and zero image deployment count without secret values.
+
+
+      Boundaries preserved:
+
+      - No Docker/builders, registry, image configuration/deployment, SQLite volume/data,
+      owner token, secrets, Caddy, Tailscale route, credentials/accounts/trust, repository/Git,
+      alternate target, ad hoc copy, or paid-service mutation occurred.
+
+      - Detached source worktree remained clean after staging.'
   - id: rf-bug-v2-no-rollback-route-caddy-effect-repair
     name: Remove route and Caddy effects from no-rollback procedure
     status: done
