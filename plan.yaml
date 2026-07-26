@@ -194918,11 +194918,15 @@ phases:
 
 
       Deliver: Stage the integrated `deploy/resofeed-caddy/deploy.sh` that contains
-      the admitted explicit no-rollback mode, together with the unchanged `compose.yml`,
+      the admitted explicit no-rollback mode, together with unchanged tracked `compose.yml`,
       to `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy` through
-      the maintained `--stage-procedure` operation. Bind the clean detached integrated
-      procedure-source commit, exact tracked SHA-256 values and modes, generated backup
-      ID, final target bytes, and prior-byte recovery readiness. Do not deploy an
+      the maintained `--stage-procedure` operation. Bind the exact later integrated
+      procedure-source commit as 40 lowercase hex, tracked `deploy.sh`/`compose.yml`
+      SHA-256 values and modes, generated backup ID, and final target bytes. Carry
+      OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` only as a
+      separately named downstream identity from the authorization receipt; do not
+      infer it from, compare it for equality with, or substitute it for the procedure-source
+      commit. Preserve prior-byte recovery readiness. Do not deploy or configure an
       image in this step.
 
 
@@ -194931,42 +194935,51 @@ phases:
       strict existing host-key trust, the existing account/credential, and only the
       maintained staging/recovery interface. Docker/builders, registry, image configuration,
       SQLite volume/data, owner token, secrets, Caddy, route, credentials/accounts/trust,
-      alternate targets, and repository/Git mutation are forbidden. Existing-stack
-      SSH is the only cost; any paid service or material unplanned charge stops.
+      alternate targets, ad hoc SSH/Compose bypass, and repository/Git mutation are
+      forbidden. Existing-stack SSH is the only cost; any paid service or material
+      unplanned charge stops.
 
 
       Admit: Consume the production-admitted `rf-bug-v2-no-rollback-procedure-authorization`
-      receipt and an integrated clean detached checkout. Capture the exact procedure-source
-      commit, deploy/compose hashes and modes from tracked bytes; require compose
-      to remain the admitted immutable-volume contract. Retain a new mode-0600 secret-safe
-      raw log and sanitized receipt with operation, target, source identity, prior/current/final
-      byte identities, backup ID, attempt count, and post-attempt classification.
-      `rf-bug-v2-tailnet-caddy-proof` independently consumes this receipt through
-      the deployment chain.
+      review receipt and an integrated clean detached checkout. Capture the exact
+      procedure-source commit from that checkout, compute deploy/compose hashes and
+      modes from its tracked bytes, and require compose to remain the admitted immutable-volume
+      contract. The maintained staging invocation and its evidence must bind the same
+      procedure-source commit; no OCI source value may satisfy that field. Retain
+      a new mode-0600 secret-safe raw log and sanitized receipt with operation, literal-FQDN
+      target, procedure-source commit, deploy/compose source hashes and modes, prior/current/final
+      byte identities, backup ID, attempt count, post-attempt classification, and
+      the separately labeled authorized OCI application source without secret values.
+      `rf-bug-v2-tailnet-caddy-deployment-producer` consumes the exact staging receipt;
+      `rf-bug-v2-tailnet-caddy-proof` independently witnesses the full procedure-byte
+      chain.
 
 
       Recovery: Budget one staging invocation. After any nonzero or ambiguous return,
       observe target byte identities before acting. If the maintained operation proves
       a known partial replacement and a valid backup ID, authorize at most one `--recover-procedure`
       invocation and verify prior-byte restoration; no image rollback is involved.
-      Unknown partial state, invalid backup identity, failed procedure recovery, trust
-      drift, disclosure, or forbidden mutation stops BLOCKED for read-only reconciliation
-      without replay or alternate transport.
+      Unknown partial state, invalid backup identity, failed procedure recovery, source/hash/mode
+      drift, trust drift, disclosure, or forbidden mutation stops BLOCKED for read-only
+      reconciliation without replay, alternate transport, or ad hoc file replacement.
 
 
       <vectl_step_policy>
 
-      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-stage-no-rollback-procedure","risk_tier":"R3","risk_reasons":["persistent_remote_procedure_replacement","strict_endpoint_existing_credential_boundary","procedure_byte_recovery"],"primary_outcome":"RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","atom":"the
-      independently authorized integrated no-rollback deploy procedure and unchanged
-      compose contract are staged through the strict literal-FQDN endpoint with exact
-      byte identity and bounded prior-byte recovery","modality":"runtime","seam":"real","check_id":"rf_bug_v2_stage_no_rollback_procedure","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-stage-no-rollback-procedure","risk_tier":"R3","risk_reasons":["persistent_remote_procedure_replacement","strict_endpoint_existing_credential_boundary","procedure_byte_recovery","separate_procedure_and_application_source_identity"],"primary_outcome":"RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","rollback_class":"NONTRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-V2-NO-ROLLBACK-PROCEDURE-STAGING","atom":"the
+      independently authorized integrated no-rollback procedure is staged through
+      the strict literal-FQDN endpoint with a procedure-source commit bound to tracked
+      deploy/compose hashes and modes, backup ID, and final bytes while the separately
+      named OCI application source cannot substitute for that identity","modality":"runtime","seam":"real","check_id":"rf_bug_v2_stage_no_rollback_procedure","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-tailnet-caddy-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
     verification: A mode-0600 raw log and sanitized receipt prove one maintained strict-FQDN
-      staging invocation from the clean detached integrated procedure source, exact
-      final deploy/compose hashes and modes, valid backup identity, zero Docker/image/data/route/Caddy
-      mutation, and either successful staging or fully observed bounded prior-byte
-      recovery with a BLOCKED stop.
+      staging invocation from the clean detached integrated procedure-source commit;
+      bind tracked deploy/compose hashes and modes through a valid backup ID to exact
+      final bytes; retain the OCI application source as a separate non-substitutable
+      identity; prove zero Docker/image/data/route/Caddy mutation; and show either
+      successful staging or fully observed bounded prior-byte recovery with a BLOCKED
+      stop.
     refs:
     - .agents/skills/resofeed-tailnet-deploy/SKILL.md
     - deploy/resofeed-caddy/README.md
