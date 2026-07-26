@@ -195393,7 +195393,7 @@ phases:
       Independent authorization remains pending in `rf-bug-v2-no-rollback-procedure-authorization`.'
   - id: rf-bug-v2-buildx-label-json-parser-repair
     name: Repair Buildx revision-label semantic JSON verification
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Append-only repair after completed `rf-bug-v2-no-rollback-procedure-authorization`\
@@ -195527,6 +195527,56 @@ phases:
     agent: general
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-26T09:33:44.220337Z'
+    done_at: '2026-07-26T09:49:40.499566+00:00'
+    evidence: 'Integrated parser repair:
+
+      - Commit `0127273a56a6e757757a0f9419a4990f5041aa8a`, parent `6b008e34f4031880fdf95eefb945d3db11d567fe`,
+      exact seven allowed paths, 97 insertions/15 deletions; `compose.yml` and all
+      blocked paths unchanged.
+
+      - `git diff --check` passed; no worker untracked files; clean worktree.
+
+
+      Worker-v2 admission:
+
+      - Dispatch raw SHA-256 `0ee6a7b760b418060a2e42a241a2d61918ebe1fc4faa8e0f18fe182f01efe84f`;
+      admitted semantic SHA `sha256:5ae5fb75a6ecfb6a5552be6214190e70cd59aad128cf462c6baad06038ca29a0`.
+
+      - Receipt raw SHA-256 `15fe819528d475e03e0ef7afbd4f84379712e3ce7c3d62a62e2582a5c75164e1`;
+      admitted semantic SHA `sha256:9a82dd94a6c04c02e51a34bbf660540161078577d260f774b8b01e074b0dd87d`.
+
+      - Receipt Gate context hash `sha256:e02facf06762da8a8f9c0ab5c7ee2fc22a79558ea54df936fcdef821f4d45a5e`;
+      verdict file SHA-256 `752827214201674669aba4310bb30337369ce22fc31ec1f8c80ddbf1af8001fa`;
+      CONFORMANT, execution admissible, zero reasons.
+
+      - Worker preflight passed exact path inventory, `git diff --check`, spaced-valid
+      plus malformed/non-object/wrong-type/missing/wrong-value/duplicate fixtures
+      without value output, retained no-rollback/default assertions, and focused adapter
+      reachability before its single authoritative check.
+
+
+      Integrated-target verification:
+
+      - Selected procedure check at actual integration HEAD exited 0.
+
+      - Required markers present: `REVISION_LABEL_JSON=semantic_exact`; all six rejection
+      classes; default rollback; explicit no-rollback; canonical preexisting route
+      only; route repair forbidden; resofeed-only/no-build Compose; Caddy untouched;
+      separate source identities; volume preserved; zero effects; valid generic evidence.
+
+      - Mode-0600 log `/tmp/larva-agent-artifacts/rf-bug-v2-buildx-label-json-parser-repair/integration-check.log`,
+      SHA-256 `084eadccc5fe7c1f0ac2f1f3c39af1290170ea71dde317c521dac73f178efd08`;
+      secret literal hits 0.
+
+
+      History/boundaries:
+
+      - Attempt 1 receipt SHA `019032c13c38d28bbc9dbbb6bbd8fc0a8dae86e7311bae23dde1e0343a136eeb`
+      remains non-green no-effect evidence; stale procedure was not replayed.
+
+      - No SSH, Docker/Buildx, registry, Compose, Tailnet, Serve, Caddy, deployment,
+      credential/trust, secret, volume, data, owner-token, route, runtime, or external
+      effect occurred.'
   - id: rf-bug-v2-buildx-label-json-parser-authorization
     name: Independently authorize renewed semantic label parser procedure
     status: pending
