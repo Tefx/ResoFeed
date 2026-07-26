@@ -190794,12 +190794,16 @@ phases:
       boundary after Tailnet/Caddy proof. Cover embed.FS traversal/fallback and no
       external UI root, outer security headers/CSP, streaming/cancellation, Owner
       Token, import-only OPML and atomic minimal State, case-local E2E cleanup, live-provider
-      opt-in, runtime-secret redaction, clean-source immutable publication identity,
-      strict endpoint trust, exact deployed digest, Caddy non-ownership, SQLite/owner-token
-      preservation, explicit waiver scope, bounded forward-only attempt classification,
-      and stop-on-unknown-partial behavior. Preserve stopped publication, staging,
-      readiness, and prior-digest attempts as provenance without promoting them to
-      current authority.
+      opt-in, runtime-secret redaction, strict endpoint trust, Caddy non-ownership,
+      SQLite/owner-token preservation, explicit waiver scope, bounded forward-only
+      attempt classification, and stop-on-unknown-partial behavior. Separately trace
+      (1) the later integrated procedure-source commit through tracked deploy/compose
+      hashes and modes, staging backup ID, final bytes, and exact maintained invocation
+      and (2) OCI application source `abf3cb6c545f9c0f3c605760a5325875c61fc83f` through
+      immutable tag/index/amd64/arm64/revision to configured/running digest. Reject
+      any equality inference or substitution between those chains. Preserve stopped
+      publication, staging, readiness, and prior-digest attempts as provenance without
+      promoting them to current authority.
 
 
       Boundary: `spec-verifier` is read-only. It consumes current tracked docs and
@@ -190808,31 +190812,33 @@ phases:
       credential/account/trust, secrets, volume/data, or runtime state. The waiver
       authorizes no prior-digest discovery, image rollback, volume deletion/recreation,
       route mutation, Caddy reconciliation/restart, alternate host/stack, moving tag,
-      registry mutation, secret disclosure, or unbounded retry. Historical diagnostics
-      are provenance, not executable authority.
+      registry mutation, secret disclosure, source-identity conflation, or unbounded
+      retry. Historical diagnostics are provenance, not executable or acceptance authority.
 
 
       Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
       with `verifier_id=spec-verifier`, `step_id=rf-bug-v2-formal-security-review`,
       ordered scope [`embedded runtime and HTTP security`, `owner-token OPML State
-      and secret boundaries`, `clean-source immutable publication`, `strict endpoint
-      no-rollback deployment and Caddy ownership`, `forward-only recovery and retained
-      failure provenance`], and exactly five outcome-consistent coverage rows for
-      `RF-BUG-003`, `RF-BUG-004`, `RF-BUG-005`, `RF-BUG-010`, and `RF-BUG-V2-RELEASE-SECURITY-FORWARD-RECOVERY`.
-      Every row cites substantive current command/process evidence or an admitted
-      producer receipt and explicitly distinguishes the superseded prior-digest attempt
-      from current authority.
+      and secret boundaries`, `separate procedure-source and OCI-application identity
+      chains`, `strict endpoint no-rollback deployment and Caddy ownership`, `forward-only
+      recovery and retained failure provenance`], and exactly five outcome-consistent
+      coverage rows for `RF-BUG-003`, `RF-BUG-004`, `RF-BUG-005`, `RF-BUG-010`, and
+      `RF-BUG-V2-RELEASE-SECURITY-FORWARD-RECOVERY`. Every row cites substantive current
+      command/process evidence or an admitted producer receipt, the release-security
+      row witnesses both identity chains and exact maintained invocation bindings,
+      and all rows distinguish superseded prior-digest evidence from current authority.
 
 
-      Recovery: Any unresolved source/build/registry/deployment/security/trust/secret/route/volume/no-rollback
+      Recovery: Any unresolved procedure/application source-chain, build/registry/deployment/security/trust/secret/route/volume/no-rollback
       classification defect or unknown partial state blocks report closure and routes
       to the owning pending boundary. This review performs no remediation, retry,
       rollback, or external effect.'
     verification: A production-admitted fresh spec-verifier receipt covers all five
-      declared security/forward-recovery scopes, binds current tracked authority and
-      admitted producer evidence, proves the user waiver remained narrow, preserves
-      rejected history as provenance, and reports no unresolved in-scope defect or
-      undeclared effect.
+      declared security/forward-recovery scopes, independently traces procedure-source
+      bytes and OCI application manifests/digest without identity inference, binds
+      current tracked authority and admitted producer evidence, proves the user waiver
+      remained narrow, preserves rejected history as provenance, and reports no unresolved
+      in-scope defect or undeclared effect.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
