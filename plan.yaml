@@ -190938,30 +190938,54 @@ phases:
       image digest is a product/UI prerequisite.
 
 
-      Boundary: `blind-tester` owns exactly one newly authorized read-only, no-persistent-effect
-      browser attachment-and-proof attempt after the user''s fresh manual confirmation
-      that Chrome remote debugging was allowed for the currently running browser instance
-      and Chrome was kept open. Use only the installed browser-harness v3 stdin/heredoc
-      interface through `uvx browser-use`, its installed helpers and daemon auto-start,
-      the same local Chrome browser profile/instance, the existing Owner Token browser
-      state, and `https://resofeed.tefx.one`; the first navigation call must be `new_tab(url)`.
-      No retry, alternate browser, cloud browser, alternate profile, alternate attach
-      mechanism, product API substitution, or fallback is authorized. Browser actions
-      are read-only except reversible in-memory navigation and existing-token entry;
-      do not import/restore, steer, ingest, re-ingest, mutate sources, mark inspection,
-      report delivery, or change resonance. No repository, registry, deployment, rollback,
-      route, credential/account, secret, data, browser-profile, or runtime mutation
-      is authorized, and no token, cookie, request body, protected JSON, credential
-      value, or sensitive browser/profile material may be retained or disclosed.
+      Boundary: `blind-tester` owns exactly one headed, read-only, no-product-persistent-effect
+      proof attempt using only the tracked project-native Playwright dependency/config
+      family in `web/package.json`, `web/package-lock.json`, and `web/playwright.base.config.ts`,
+      Playwright 1.59.1''s managed local Chromium executable, and a new Playwright
+      persistent context. It must not attach to existing Chrome or use CDP/remote
+      debugging, browser-harness, BrowserClaw, a cloud browser, an alternate host,
+      an external paid service, an existing browser profile, or a fallback. Before
+      launch, create a unique mode-0700 authority directory under `/tmp` and an ephemeral
+      child user-data/profile directory; launch headed against that profile, open
+      only `https://resofeed.tefx.one` and same-origin/public authorized browser surfaces,
+      then close the context/process and destroy the entire ephemeral profile authority
+      after capture. Token entry and ephemeral browser-local state are the only newly
+      authorized reversible effects. The Owner Token is entered manually by the user
+      only in the visible Owner Token prompt. Automation must never read, retrieve,
+      inject, print, log, inspect through DOM/JavaScript/localStorage, screenshot
+      while visible, or retain the token; it may wait at most five minutes for a token-independent
+      authenticated UI transition and must stop BLOCKED on timeout. Do not read or
+      use project/remote `.env`, environment secret values, credentials, keychain,
+      cookies, existing profiles, or credential paths. Existing production data is
+      read-only: do not import/restore, Steer, ingest, re-ingest, mutate sources,
+      mark inspection, report delivery, change resonance, or invoke OPML/State/API
+      mutation. Where proving a capability would require mutation, observe its disabled/read-only
+      public contract without invoking it and consume only already-admitted matching
+      evidence authorized by this plan. No repository, registry, deployment, rollback,
+      route, credential/account, secret, production data, or runtime mutation is authorized.
 
 
-      Admit: Before `new_tab(url)`, verify the installed v3 daemon attaches successfully
-      to that same authorized local Chrome instance and rebind the selected public
-      target to the production-admitted Tailnet proof for exact deployed OCI digest
-      `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`;
-      any attach, target, proof-receipt, or digest-binding failure stops BLOCKED before
-      navigation with zero effect. Preserve as immutable provenance the initial BLOCKED
-      receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T12-07-23-313Z-2026-07-26T11-59-52-127Z_019f9e4b-bf3f-731f-8319-81373628dc83.js-a852d129248648e5.txt`
+      Admit: Before browser launch, fail closed unless immutable HEAD is `ca5f8e1e58d0d217a964e0f91a6156a8b905a453`,
+      each selected Playwright binding is tracked and HEAD-matching, `web/node_modules/.bin/playwright`
+      is executable, the lock-selected Playwright version is 1.59.1, `web/playwright.base.config.ts`
+      is loadable with its one-worker/zero-retry Chromium profile, and Playwright
+      reports an existing executable Playwright-managed Chromium path. This preflight
+      is read-only and must not launch a browser. Rebind `https://resofeed.tefx.one`
+      and the selected public target to the production-admitted Tailnet proof for
+      exact deployed OCI digest `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`;
+      any executable, browser, config, source, target, proof-receipt, or digest identity
+      drift stops BLOCKED before launch with zero browser effect. The attempt must
+      collect genuine evidence at all five required viewports for keyboard/overflow/44px,
+      console/network/accessibility, routes/history, Inspector states, EN/ZH titles/errors,
+      embedded UI/Doctor, CSP/streaming/cancellation, Prompting v2.2, and isolation/cleanup.
+      Retained evidence and secret-safe raw logs live only in a mode-0700 temporary
+      authority with mode-0600 files, exclude protected bodies and secret-bearing
+      headers/values, contain no screenshot of the token prompt while the token is
+      visible, and prove profile/process cleanup plus zero persistent product/runtime
+      effect.
+
+
+      Preserve as immutable provenance the initial BLOCKED receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T12-07-23-313Z-2026-07-26T11-59-52-127Z_019f9e4b-bf3f-731f-8319-81373628dc83.js-a852d129248648e5.txt`
       SHA-256 `a852d129248648e57ae119af5ba6d698542af65c02dac8e15cc8999060206eda`,
       retry-1 BLOCKED receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T12-35-10-022Z-2026-07-26T12-31-28-645Z_019f9e68-af85-7f95-8a95-0a2058cc86ea.js-d37661edebb2d58d.txt`
       SHA-256 `d37661edebb2d58d594b9fae1ce1812f86ed6e8d7fa91d587c680cb7fd777b22`,
@@ -190971,9 +190995,10 @@ phases:
       SHA-256 `8f3aee19e3617113c603a6febd72e6c6d4304902d6fde5ead0664b98f8746eb5`,
       and final production admission `/tmp/larva-agent-artifacts/rf-bug-v2-independent-runtime-ui/final-retry/production-admission-blocked.json`
       SHA-256 `4097df13926d795897d217a25c84cd4e42dbeebeaf8ec9e3a1c69591153daa91`.
-      These earlier zero-effect failures become nonblocking provenance only if the
-      new attempt produces a completion-grade PASS; otherwise no RF-BUG requirement
-      is promoted and the step remains blocked.
+      These exhausted CDP/browser-harness observations remain provenance and become
+      causally nonblocking only if the new attempt produces a production-admitted
+      completion-grade PASS; otherwise no RF-BUG requirement is promoted and the step
+      remains blocked.
 
 
       Production semantic admission emits exactly one `vectl.verifier.semantic.v1`
@@ -190984,31 +191009,66 @@ phases:
       and isolation`], and exactly ten outcome-consistent coverage rows `RF-BUG-001`
       through `RF-BUG-010`. Completion requires all ten rows PROVEN, the existing
       five viewport artifacts, blind-boundary compliance, exact deployed-digest and
-      successful no-rollback-proof identities, nondisclosure, and zero product/runtime
-      mutation.
+      successful no-rollback-proof identities, nondisclosure, cleanup proof, and zero
+      product/runtime mutation. The existing downstream defect-report closure and
+      final semantic review remain the independent consumers; no prior plan digest
+      or failed-browser binding is an acceptance dependency.
 
 
-      Recovery: This newly authorized budget is exactly one attempt with no retry.
-      Attach or identity-rebind failure before navigation stops BLOCKED with zero
-      effect. Any inaccessible required surface, deterministic behavior/accessibility
-      defect, digest drift, stale identity, disclosure, observed mutation, or unknown
-      state stops FAIL/BLOCKED without workaround, alternate mechanism, product mutation,
-      prior-digest discovery, rollback, or another Plan node. Retain the new outcome
-      and every prior blocked receipt; only a production-admitted completion-grade
-      PASS makes prior attachment failures causally nonblocking.'
-    verification: Exactly one no-retry browser-harness v3 stdin/heredoc attempt first
-      proves same-profile Chrome attachment and rebinds `https://resofeed.tefx.one`
-      to deployed OCI digest `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
-      before first navigation `new_tab(url)`, then either stops zero-effect BLOCKED
-      or emits one production-admitted completion-grade blind-tester PASS covering
-      RF-BUG-001–010 in the exact six-scope order at all five viewports with route/UI/accessibility/console/network
-      evidence, blind-boundary compliance, nondisclosure, preserved prior blocked
-      provenance, no stale/prior-digest dependency, and zero product/runtime mutation.
+      Recovery: Budget is one attempt with no retry or fallback. Any failed preflight,
+      user token-entry timeout, inaccessible required surface, identity drift, deterministic
+      behavior/accessibility defect, disclosure risk, observed mutation, unknown state,
+      browser/process residue, or profile/evidence cleanup failure stops BLOCKED/FAIL
+      after the required observation and secret-safe retention. Close the owned browser
+      context/process and remove the ephemeral profile authority when safe; cleanup
+      failure is blocking and prohibits another launch. Do not work around, replay,
+      change product/runtime/deployment state, discover a prior digest, roll back,
+      or add another plan node. Retain the new outcome and all prior blocked provenance;
+      only a production-admitted completion-grade PASS makes the exhausted attachment
+      failures causally nonblocking.
+
+
+      <vectl_step_policy>
+
+      {"schema_version":"vectl.step.policy.v2","step_id":"rf-bug-assurance-v2-closure.rf-bug-v2-independent-runtime-ui","risk_tier":"R2","risk_reasons":["headed_public_runtime_browser_observation","manual_owner_token_entry_with_strict_nondisclosure","five_viewport_cross_surface_acceptance","independently_consumed_release_evidence"],"primary_outcome":"RF-BUG-001-010-INDEPENDENT-RUNTIME-UI","rollback_class":"TRIVIAL","observation_ledger":[{"requirement_id":"RF-BUG-001","atom":"Inspector
+      pending failure and stale-selection behavior is proven on the exact deployed
+      runtime without production mutation","modality":"runtime","seam":"real","check_id":"rf_bug_001_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-002","atom":"opaque
+      routes and browser history behavior are proven on the exact deployed runtime","modality":"runtime","seam":"real","check_id":"rf_bug_002_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-003","atom":"embedded
+      UI and Doctor public surfaces are proven on the exact deployed runtime","modality":"runtime","seam":"real","check_id":"rf_bug_003_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-004","atom":"OPML
+      import-only and portable State read-only contracts are proven without invoking
+      mutation","modality":"runtime","seam":"real","check_id":"rf_bug_004_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-005","atom":"headers
+      CSP streaming and cancellation public behavior is proven on the exact deployed
+      runtime","modality":"runtime","seam":"real","check_id":"rf_bug_005_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-006","atom":"EN
+      and ZH title behavior is proven on the exact deployed runtime","modality":"runtime","seam":"real","check_id":"rf_bug_006_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-007","atom":"Steer
+      errors are proven through nonmutating public observations","modality":"runtime","seam":"real","check_id":"rf_bug_007_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-008","atom":"Source
+      Ledger controls states keyboard overflow and 44px behavior are proven without
+      invoking mutation","modality":"runtime","seam":"real","check_id":"rf_bug_008_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-009","atom":"Prompting
+      v2.2 public behavior is proven without re-ingest or other production mutation","modality":"runtime","seam":"real","check_id":"rf_bug_009_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"},{"requirement_id":"RF-BUG-010","atom":"five-viewport
+      real-browser isolation and complete profile process and evidence cleanup are
+      proven","modality":"runtime","seam":"real","check_id":"rf_bug_010_runtime_ui","independent_step":"rf-bug-assurance-v2-closure.rf-bug-v2-final-semantic-review"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
+
+      </vectl_step_policy>'
+    verification: One no-retry blind-tester attempt first preflights immutable HEAD
+      `ca5f8e1e58d0d217a964e0f91a6156a8b905a453`, tracked HEAD-matching Playwright
+      package/lock/base-config bindings, executable Playwright 1.59.1, and its available
+      managed Chromium without browser launch; then it launches headed with a unique
+      mode-0700 `/tmp` ephemeral profile, waits at most five minutes for manual visible
+      Owner Token entry without automation access or capture, and either stops safely
+      or emits one production-admitted PASS with exactly ten PROVEN RF-BUG rows in
+      the exact six-scope order. PASS binds `https://resofeed.tefx.one` to OCI digest
+      `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
+      and the successful no-rollback proof, includes genuine five-viewport route/UI/keyboard/overflow/44px/accessibility/console/network
+      evidence, preserves all prior blocked provenance without prior-digest dependency,
+      proves mode-0600 evidence plus profile/process cleanup, and proves zero production
+      product/runtime mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
     - docs/DESIGN.md
     - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    - web/package.json
+    - web/package-lock.json
+    - web/playwright.base.config.ts
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: blind-tester
