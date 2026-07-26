@@ -190828,8 +190828,6 @@ phases:
     - deploy/resofeed-caddy/caddy/Caddyfile
     - deploy/resofeed-caddy/compose.yml
     - deploy/resofeed-caddy/deploy.sh
-    - internal/resofeed/runtime_startup.go
-    - internal/resofeed/server.go
     depends_on:
     - rf-bug-v2-tailnet-caddy-proof
     agent: spec-verifier
