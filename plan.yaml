@@ -196122,12 +196122,12 @@ phases:
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-contract,\
       \ item_deep_links_expected_red], timeout_seconds: 1800}\n    evidence:\n   \
       \   mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
-      \ access: execute, availability: produced_by_step}\n        - {path: scripts/vectl-check.test.mjs,\
-      \ access: read, availability: produced_by_step}\n        - {path: go.mod, access:\
-      \ read, availability: current}\n        - {path: web/package.json, access: read,\
-      \ availability: current}\n        - {path: web/playwright.ci-safe.config.ts,\
-      \ access: read, availability: current}\n        - {path: web/playwright.config.ts,\
-      \ access: read, availability: current}\n        - {path: web/playwright.base.config.ts,\
+      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: current}\n        - {path: go.mod, access: read,\
+      \ availability: current}\n        - {path: web/package.json, access: read, availability:\
+      \ current}\n        - {path: web/playwright.ci-safe.config.ts, access: read,\
+      \ availability: current}\n        - {path: web/playwright.config.ts, access:\
+      \ read, availability: current}\n        - {path: web/playwright.base.config.ts,\
       \ access: read, availability: current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs,\
       \ access: execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
       \ access: read, availability: current}\n        - {path: docs/ITEM_DEEP_LINKS.md,\
@@ -196878,9 +196878,11 @@ phases:
       \ known green and known red runs both exit 0 after one envelope, preserve green/0\
       \ and red/1 payload results, preserve the item deep-link identities/fingerprints/generic\
       \ marker, and keep pre-envelope refusal nonzero. `item-deep-links-expected-red-contracts`\
-      \ depends directly on this producer and is the first independent selected-execution\
-      \ consumer.\n\nRecovery: Process exit 0 without exactly one valid evidence envelope,\
-      \ payload/result weakening, selected/executed drift, changed profile identity/digest/fingerprint/native\
+      \ depends directly on this producer as the first selected-execution consumer;\
+      \ existing no-repo-change `item-deep-links-local-integration-verification` independently\
+      \ consumes the downstream admitted contract/backend/frontend chain.\n\nRecovery:\
+      \ Process exit 0 without exactly one valid evidence envelope, payload/result\
+      \ weakening, selected/executed drift, changed profile identity/digest/fingerprint/native\
       \ status, pre-envelope refusal becoming zero, protected-path mutation, or candidate-worktree\
       \ mutation stops this step. Revert only the adapter/test/harness-document unit;\
       \ leave the preserved candidate and its four-path diff untouched for downstream\
@@ -196897,13 +196899,13 @@ phases:
       \ separates process exit from evidence result$', scripts/vectl-check.test.mjs]\n\
       \      timeout_seconds: 180\n    evidence:\n      mode: command_outcome\n  \
       \    path_bindings:\n        - {path: scripts/vectl-check.mjs, access: execute,\
-      \ availability: produced_by_step}\n        - {path: scripts/vectl-check.test.mjs,\
-      \ access: read, availability: produced_by_step}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
-      \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
-      \    - {path: scripts/vectl-check.test.mjs, classification: developer, availability:\
-      \ produced_by_step}\n    expect:\n      outcome: green\n      exit_codes: [0]\n\
-      \      stdout_or_stderr:\n        contains_all: [{literal: selected-execution\
-      \ adapter separates process exit from evidence result}, {literal: VECTL_ADAPTER_KNOWN_GREEN_PROCESS_EXIT=0},\
+      \ availability: current}\n        - {path: scripts/vectl-check.test.mjs, access:\
+      \ read, availability: current}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: current}\n      test_bindings:\n        - {path:\
+      \ scripts/vectl-check.test.mjs, classification: developer, availability: current}\n\
+      \    expect:\n      outcome: green\n      exit_codes: [0]\n      stdout_or_stderr:\n\
+      \        contains_all: [{literal: selected-execution adapter separates process\
+      \ exit from evidence result}, {literal: VECTL_ADAPTER_KNOWN_GREEN_PROCESS_EXIT=0},\
       \ {literal: VECTL_ADAPTER_KNOWN_RED_PROCESS_EXIT=0}, {literal: 'VECTL_ADAPTER_GREEN_ENVELOPE_RESULT=green:0'},\
       \ {literal: 'VECTL_ADAPTER_RED_ENVELOPE_RESULT=red:1'}, {literal: VECTL_ADAPTER_ONE_ENVELOPE=valid},\
       \ {literal: VECTL_ADAPTER_PRE_ENVELOPE_REFUSAL=nonzero}, {literal: VECTL_ADAPTER_ITEM_DEEP_LINK_PROFILE=preserved},\
@@ -196922,7 +196924,7 @@ phases:
       \ successfully after exactly one valid envelope while preserving green/0 or\
       \ red/1 only in the envelope, and pre-envelope refusals remain nonzero without\
       \ evidence\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"item_deep_links_adapter_process_exit_green\"\
-      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts\"\
+      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
       ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
       :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
