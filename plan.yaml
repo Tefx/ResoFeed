@@ -195111,7 +195111,7 @@ phases:
     agent: vectl-orchestrator
   - id: rf-bug-v2-no-rollback-route-caddy-effect-repair
     name: Remove route and Caddy effects from no-rollback procedure
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Repair the maintained immutable deployment procedure after the production-admitted\
@@ -195238,6 +195238,8 @@ phases:
     depends_on:
     - rf-bug-v2-no-rollback-procedure-implementation
     agent: general
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T08:02:00.412597Z'
 - id: item-summary-deep-links-assurance-v2
   name: Item Summary Deep Links — Contract, Implementation, Runtime, and Release
   status: locked
