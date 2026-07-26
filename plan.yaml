@@ -195099,7 +195099,7 @@ phases:
       during review.'
   - id: rf-bug-v2-stage-no-rollback-procedure
     name: Stage admitted no-rollback procedure through strict Tailnet endpoint
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -195177,6 +195177,8 @@ phases:
     depends_on:
     - rf-bug-v2-no-rollback-procedure-authorization
     agent: vectl-orchestrator
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-26T09:07:11.629575Z'
   - id: rf-bug-v2-no-rollback-route-caddy-effect-repair
     name: Remove route and Caddy effects from no-rollback procedure
     status: done
