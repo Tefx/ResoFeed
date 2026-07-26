@@ -196074,28 +196074,45 @@ phases:
       \ expected-red receipt, one rollback, and two reciprocal implementation consumers\
       \ share the same contract boundary. Dispatch and completion use `vectl.worker.dispatch.v2`\
       \ and `vectl.worker.execution.v2`. Only `docs/ITEM_DEEP_LINKS.md` and the three\
-      \ authorized acceptance paths may change. Rollback reverts those four paths\
-      \ together.\n\nAdmit: Current tracked suite/check `item-deep-links-contract`\
-      \ / `item_deep_links_expected_red` selects exactly the three named identities\
-      \ through `scripts/vectl-check.mjs`; current adapter tests, Go/npm configs,\
-      \ trusted Svelte identity derivation, CI-safe Playwright chain, and real-binary\
-      \ fixture provide the witnessed execution path. The selected contract tests\
-      \ must reject stale real-client authority with `IDL-DOC-AUTHORITY-DRIFT`; accepted\
-      \ red output contains only the two product-gap fingerprints. Backend and frontend\
-      \ steps depend directly on this producer and close the reciprocal expected-red\
-      \ fingerprints. `item-deep-links-local-integration-verification` independently\
-      \ consumes `ITEM-DEEP-LINK-CONTRACT`.\n\nRecovery: Collection/compile/startup/auth/setup/timeout,\
+      \ authorized acceptance paths may change. `vectl-orchestrator` has only the\
+      \ Git worktree preservation/rebase/transplant authority needed to move the existing\
+      \ four-path candidate onto the exact integrated adapter-remediation head; it\
+      \ may not alter the candidate diff. Rollback reverts those four repository paths\
+      \ together and preserves the original dirty candidate.\n\nAdmit: Producer `item-deep-links-adapter-exit-remediation`\
+      \ supplies the tracked adapter and focused regression with selected-execution\
+      \ process/payload separation. Suite/check `item-deep-links-contract` / `item_deep_links_expected_red`\
+      \ then selects exactly the same three named identities through `scripts/vectl-check.mjs`;\
+      \ current Go/npm configs, trusted Svelte identity derivation, CI-safe Playwright\
+      \ chain, and real-binary fixture provide the remaining witnessed execution path.\
+      \ The selected contract tests must reject stale real-client authority with `IDL-DOC-AUTHORITY-DRIFT`;\
+      \ the adapter process exits 0 after one valid evidence envelope whose underlying\
+      \ result remains `outcome=red`, `exit_code=1`, and whose observations contain\
+      \ only the two product-gap fingerprints plus the generic evidence marker. Backend\
+      \ and frontend steps depend directly on this producer and close the reciprocal\
+      \ expected-red fingerprints. `item-deep-links-local-integration-verification`\
+      \ independently consumes `ITEM-DEEP-LINK-CONTRACT`.\n\nRecovery: The preserved\
+      \ dirty candidate `/Users/tefx/Projects/ResoFeed-worktrees/item-deep-links-expected-red-contracts`\
+      \ is bound to base `3c9a9dfb3421e8d870591fb8f753d4aaadd64e26` and exactly `docs/ITEM_DEEP_LINKS.md`,\
+      \ `internal/resofeed/item_deep_links_expected_red_test.go`, `web/src/lib/__tests__/item-deep-links.expected-red.test.ts`,\
+      \ and `web/tests/e2e/item-deep-links.browser-contract.spec.ts`. Before dispatch,\
+      \ retain that original candidate and rebase/transplant its exact four-path diff\
+      \ onto the integrated adapter-remediation head; observe the same path set and\
+      \ diff with no conflict, untracked addition, adapter change, or partial state.\
+      \ A conflict or equivalence drift discards only the new scratch attempt and\
+      \ stops with the original candidate intact; do not clean, reset, stash, overwrite,\
+      \ or replay from unknown partial state. Collection/compile/startup/auth/setup/timeout,\
       \ missing-test failure, `IDL-DOC-AUTHORITY-DRIFT`, retained mandatory real-client\
       \ binding, or unrelated documentation/product/config change is false-red and\
-      \ stops this step. Do not repair infrastructure, product code, canonical architecture/design\
-      \ docs, adapter/configs, or downstream implementation here.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: expected_red_definition\nscope:\n  allowed_paths: [docs/ITEM_DEEP_LINKS.md,\
-      \ internal/resofeed/item_deep_links_expected_red_test.go, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
-      \ web/tests/e2e/item-deep-links.browser-contract.spec.ts]\n  blocked_paths:\
-      \ [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/resofeed-svelte-build-identity.mjs,\
-      \ web/playwright.ci-safe.config.ts, web/playwright.config.ts, web/playwright.base.config.ts,\
-      \ web/tests/e2e/fixtures/**, docs/ARCHITECTURE.md, docs/DESIGN.md, internal/resofeed/item_route_token.go,\
+      \ also stops this step. Do not repair infrastructure, product code, canonical\
+      \ architecture/design docs, adapter/configs, or downstream implementation here.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: expected_red_definition\nscope:\n  allowed_paths:\
+      \ [docs/ITEM_DEEP_LINKS.md, internal/resofeed/item_deep_links_expected_red_test.go,\
+      \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, web/tests/e2e/item-deep-links.browser-contract.spec.ts]\n\
+      \  blocked_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs, scripts/resofeed-svelte-build-identity.mjs,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md, web/playwright.ci-safe.config.ts,\
+      \ web/playwright.config.ts, web/playwright.base.config.ts, web/tests/e2e/fixtures/**,\
+      \ docs/ARCHITECTURE.md, docs/DESIGN.md, internal/resofeed/item_route_token.go,\
       \ internal/resofeed/http.go, internal/resofeed/http_static.go, internal/resofeed/search.go,\
       \ internal/resofeed/types.go, internal/resofeed/mcp.go, cmd/resofeed/main.go,\
       \ web/src/lib/workbench-route.ts, web/src/lib/api-client.ts, web/src/routes/+page.svelte,\
@@ -196105,12 +196122,12 @@ phases:
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-contract,\
       \ item_deep_links_expected_red], timeout_seconds: 1800}\n    evidence:\n   \
       \   mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
-      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
-      \ access: read, availability: current}\n        - {path: go.mod, access: read,\
-      \ availability: current}\n        - {path: web/package.json, access: read, availability:\
-      \ current}\n        - {path: web/playwright.ci-safe.config.ts, access: read,\
-      \ availability: current}\n        - {path: web/playwright.config.ts, access:\
-      \ read, availability: current}\n        - {path: web/playwright.base.config.ts,\
+      \ access: execute, availability: produced_by_step}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: produced_by_step}\n        - {path: go.mod, access:\
+      \ read, availability: current}\n        - {path: web/package.json, access: read,\
+      \ availability: current}\n        - {path: web/playwright.ci-safe.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/playwright.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/playwright.base.config.ts,\
       \ access: read, availability: current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs,\
       \ access: execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
       \ access: read, availability: current}\n        - {path: docs/ITEM_DEEP_LINKS.md,\
@@ -196169,12 +196186,16 @@ phases:
       :\"Freeze the accepted real-browser authentication, navigation, error, focus,\
       \ scroll, and read-only lifecycle contract\",\"check_id\":\"item_deep_links_expected_red\"\
       ,\"actor_id\":\"software-architect\"}]}}\n</vectl_step_policy>"
-    verification: Only `docs/ITEM_DEEP_LINKS.md` and the three protected acceptance
-      files change. The document removes mandatory real-client/account bindings while
-      retaining generic URL consumers and automated browser/Tailnet/MCP proof. The
-      adapter selects exactly three contract identities and fails only with `IDL-BACKEND-READ-PROJECTION-GAP`
-      and `IDL-FRONTEND-APP-HISTORY-GAP`, with no `IDL-DOC-AUTHORITY-DRIFT`, infrastructure
-      false-red, product/runtime change, or canonical architecture/design-doc change.
+    verification: After the preserved four-path candidate is rebased/transplanted
+      onto the exact integrated adapter-remediation head, only `docs/ITEM_DEEP_LINKS.md`
+      and the three protected acceptance files differ. The document removes mandatory
+      real-client/account bindings while retaining generic URL consumers and automated
+      browser/Tailnet/MCP proof. The adapter process exits 0 after exactly one red
+      evidence envelope with envelope `exit_code=1`, exact three selected/executed
+      identities, only `IDL-BACKEND-READ-PROJECTION-GAP` and `IDL-FRONTEND-APP-HISTORY-GAP`,
+      and `VECTL_GENERIC_EVIDENCE=valid`; no `IDL-DOC-AUTHORITY-DRIFT`, infrastructure
+      false-red, product/runtime change, canonical architecture/design-doc change,
+      adapter change, or candidate equivalence drift occurs.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
@@ -196183,6 +196204,8 @@ phases:
     - internal/resofeed/rf_bug_item_id_api_expected_red_test.go
     - web/tests/e2e/initial-route.browser-contract.spec.ts
     - web/tests/e2e/routes.browser-contract.spec.ts
+    depends_on:
+    - item-deep-links-adapter-exit-remediation
     agent: general
   - id: item-deep-links-backend-api-mcp
     name: Implement Backend, HTTP API, MCP, and PublicURL Deep-Link Semantics
@@ -196824,3 +196847,96 @@ phases:
     depends_on:
     - item-deep-links-tailnet-runtime-proof
     agent: spec-verifier
+  - id: item-deep-links-adapter-exit-remediation
+    name: Repair Selected-Execution Adapter Process Exit Semantics
+    status: pending
+    description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
+      [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
+      \ Repair the project-native `scripts/vectl-check.mjs` selected-execution control\
+      \ boundary. For every recognized `run` request, once the adapter emits exactly\
+      \ one valid `vectl.check.evidence.v1` envelope, the adapter process exits 0;\
+      \ the underlying check result remains only in envelope `outcome` and `exit_code`\
+      \ (`green`/0 or `red`/1). Pre-envelope unknown-suite, mismatched-check, private-environment,\
+      \ serialization, or refusal paths remain nonzero and emit no evidence envelope.\
+      \ Add focused Node child-process regression coverage and synchronize `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`.\
+      \ Preserve every existing suite/check mapping, selection digest, selected/executed\
+      \ identity, native command status, observation, artifact, and generic evidence\
+      \ marker, including the item deep-link profile's exact three identities, `IDL-BACKEND-READ-PROJECTION-GAP`,\
+      \ `IDL-FRONTEND-APP-HISTORY-GAP`, and `VECTL_GENERIC_EVIDENCE=valid`.\n\nBoundary:\
+      \ `frontend-engineer` owns only `scripts/vectl-check.mjs`, `scripts/vectl-check.test.mjs`,\
+      \ and `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md` for this adapter/test/documentation\
+      \ unit. Dispatch and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
+      \ Product code, protected acceptance, canonical architecture/design docs, configs,\
+      \ runtime fixtures, plan state, and the preserved dirty candidate worktree `/Users/tefx/Projects/ResoFeed-worktrees/item-deep-links-expected-red-contracts`\
+      \ are immutable. Rollback reverts these three repository paths together.\n\n\
+      Admit: The observed current item deep-link run already emits one valid red evidence\
+      \ envelope with exact selected/executed parity, envelope `exit_code=1`, both\
+      \ required fingerprints, and the generic marker, while its process status 1\
+      \ fails installed Gate admission. The focused command-outcome check invokes\
+      \ the real project-native CLI finalization seam in controlled child processes\
+      \ without executing unfinished item deep-link product semantics. It must prove\
+      \ known green and known red runs both exit 0 after one envelope, preserve green/0\
+      \ and red/1 payload results, preserve the item deep-link identities/fingerprints/generic\
+      \ marker, and keep pre-envelope refusal nonzero. `item-deep-links-expected-red-contracts`\
+      \ depends directly on this producer and is the first independent selected-execution\
+      \ consumer.\n\nRecovery: Process exit 0 without exactly one valid evidence envelope,\
+      \ payload/result weakening, selected/executed drift, changed profile identity/digest/fingerprint/native\
+      \ status, pre-envelope refusal becoming zero, protected-path mutation, or candidate-worktree\
+      \ mutation stops this step. Revert only the adapter/test/harness-document unit;\
+      \ leave the preserved candidate and its four-path diff untouched for downstream\
+      \ rebase/transplant after integration. Do not execute the unfinished deep-link\
+      \ acceptance profile or repair product semantics here.\n\n<intent_closure_contract>\n\
+      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
+      profile: generic\nscope:\n  allowed_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
+      \ docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md]\n  blocked_paths: [internal/**, cmd/**,\
+      \ web/**, deploy/**, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md, docs/DESIGN.md,\
+      \ README.md, docs/USAGE.md, docs/CONTAINER.md, scripts/resofeed-svelte-build-identity.mjs]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [VECTL-SELECTED-EXECUTION-PROCESS-EXIT]\n\
+      checks:\n  - id: item_deep_links_adapter_process_exit_green\n    run:\n    \
+      \  command: [node, --test, '--test-name-pattern=^selected-execution adapter\
+      \ separates process exit from evidence result$', scripts/vectl-check.test.mjs]\n\
+      \      timeout_seconds: 180\n    evidence:\n      mode: command_outcome\n  \
+      \    path_bindings:\n        - {path: scripts/vectl-check.mjs, access: execute,\
+      \ availability: produced_by_step}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: produced_by_step}\n        - {path: docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md,\
+      \ access: read, availability: produced_by_step}\n      test_bindings:\n    \
+      \    - {path: scripts/vectl-check.test.mjs, classification: developer, availability:\
+      \ produced_by_step}\n    expect:\n      outcome: green\n      exit_codes: [0]\n\
+      \      stdout_or_stderr:\n        contains_all: [{literal: selected-execution\
+      \ adapter separates process exit from evidence result}, {literal: VECTL_ADAPTER_KNOWN_GREEN_PROCESS_EXIT=0},\
+      \ {literal: VECTL_ADAPTER_KNOWN_RED_PROCESS_EXIT=0}, {literal: 'VECTL_ADAPTER_GREEN_ENVELOPE_RESULT=green:0'},\
+      \ {literal: 'VECTL_ADAPTER_RED_ENVELOPE_RESULT=red:1'}, {literal: VECTL_ADAPTER_ONE_ENVELOPE=valid},\
+      \ {literal: VECTL_ADAPTER_PRE_ENVELOPE_REFUSAL=nonzero}, {literal: VECTL_ADAPTER_ITEM_DEEP_LINK_PROFILE=preserved},\
+      \ {literal: IDL-BACKEND-READ-PROJECTION-GAP}, {literal: IDL-FRONTEND-APP-HISTORY-GAP},\
+      \ {literal: VECTL_GENERIC_EVIDENCE=valid}]\n        contains_any: []\n     \
+      \   forbids: [{literal: not ok}, {literal: ERR_TEST_FAILURE}, {literal: retry},\
+      \ {literal: skipped}, {literal: OPENROUTER_KEY=}]\n    proves: [VECTL-SELECTED-EXECUTION-PROCESS-EXIT]\n\
+      bindings: {expected_red: {items: []}, closes_expected_red: []}\n</intent_closure_contract>\n\
+      <vectl_step_policy>\n{\"schema_version\":\"vectl.step.policy.v2\",\"step_id\"\
+      :\"item-summary-deep-links-assurance-v2.item-deep-links-adapter-exit-remediation\"\
+      ,\"risk_tier\":\"R2\",\"risk_reasons\":[\"shared_selected_execution_adapter\"\
+      ,\"worker_receipt_admission_boundary\",\"red_result_transport_separation\"],\"\
+      primary_outcome\":\"VECTL-SELECTED-EXECUTION-PROCESS-EXIT\",\"rollback_class\"\
+      :\"NONTRIVIAL\",\"observation_ledger\":[{\"requirement_id\":\"VECTL-SELECTED-EXECUTION-PROCESS-EXIT\"\
+      ,\"atom\":\"recognized selected-execution runs terminate the adapter process\
+      \ successfully after exactly one valid envelope while preserving green/0 or\
+      \ red/1 only in the envelope, and pre-envelope refusals remain nonzero without\
+      \ evidence\",\"modality\":\"runtime\",\"seam\":\"real\",\"check_id\":\"item_deep_links_adapter_process_exit_green\"\
+      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-expected-red-contracts\"\
+      }],\"test_authority\":{\"developer_test_globs\":[\"scripts/vectl-check.test.mjs\"\
+      ],\"acceptance_test_paths\":[],\"acceptance_check_ids\":[],\"acceptance_mutation\"\
+      :\"FORBIDDEN\",\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
+    verification: The focused Node regression exercises the project-native adapter
+      as child processes and proves known green and controlled red runs exit 0 only
+      after one valid evidence envelope, preserve envelope green/0 and red/1 results,
+      exact item deep-link identities/fingerprints plus `VECTL_GENERIC_EVIDENCE=valid`,
+      and leave pre-envelope refusals nonzero without evidence. The diff is limited
+      to the adapter, its developer regression, and harness documentation; product,
+      protected acceptance, canonical docs, configs, fixtures, and the preserved candidate
+      worktree remain unchanged.
+    refs:
+    - AGENTS.md
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
+    - docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md
+    agent: frontend-engineer
