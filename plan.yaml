@@ -196072,19 +196072,33 @@ phases:
       \ application/API codec separation, and real-browser history/auth/error/read-only\
       \ lifecycle. The expected-red adapter must select the exact three admitted identities\
       \ and report only `IDL-BACKEND-READ-PROJECTION-GAP` and `IDL-FRONTEND-APP-HISTORY-GAP`\
-      \ plus `VECTL_GENERIC_EVIDENCE=valid`.\n\nBoundary: `general` owns this cohesive\
-      \ seven-path adapter, developer-regression, harness-documentation, feature-authority,\
-      \ and protected-contract unit because it has one acceptance authority, one rollback,\
-      \ two reciprocal implementation consumers, and one independent local-integration\
-      \ consumer. Dispatch and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
+      \ plus `VECTL_GENERIC_EVIDENCE=valid`.\n\nBoundary: Specialist-first comparison\
+      \ considered the three live Worker-v2-compatible implementation candidates `frontend-engineer`,\
+      \ `golang-developer`, and `general`. `frontend-engineer` covers the TypeScript/Svelte/browser\
+      \ acceptance surfaces but does not cover the Go HTTP/MCP/duplicate/PublicURL\
+      \ protected acceptance definition. `golang-developer` covers that Go acceptance\
+      \ surface but does not cover the Node selected-execution adapter, its developer\
+      \ regression, or the TypeScript and real-browser protected acceptance definitions.\
+      \ `software-architect` supplied the three acceptance mutation authorizations\
+      \ but is design-only and cannot own implementation. `general` therefore owns\
+      \ this indivisible seven-path adapter, developer-regression, harness-documentation,\
+      \ feature-authority, and protected-contract unit. Splitting would divide the\
+      \ exact `item_deep_links_expected_red` selected-execution identity/envelope\
+      \ authority and `ITEM-DEEP-LINK-CONTRACT` across writers, allow the adapter,\
+      \ three protected identities, two fingerprints, and corrected feature authority\
+      \ to drift before either reciprocal backend/frontend consumer can close its\
+      \ binding, and leave the independent local-integration consumer without one\
+      \ atomic contract artifact. The same three acceptance authorizations, one seven-path\
+      \ rollback, two reciprocal implementation consumers, and one independent local-integration\
+      \ consumer bind the unit; rollback reverts all seven repository paths together.\
+      \ Dispatch and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
       \ Only `scripts/vectl-check.mjs`, `scripts/vectl-check.test.mjs`, `docs/PLAYWRIGHT_E2E_HARNESS_CONTRACT.md`,\
       \ `docs/ITEM_DEEP_LINKS.md`, and the three authorized acceptance paths may change.\
       \ Product implementation, canonical architecture/design docs, configs, runtime\
-      \ fixtures, deployment, credentials, secrets, and external state are immutable.\
-      \ Rollback reverts the seven repository paths together.\n\nAdmit: First run\
-      \ the focused Node child-process regression and prove known green and controlled\
-      \ red runs both exit process 0 after exactly one envelope, preserve green/0\
-      \ and red/1 payload results, retain the item deep-link identities/fingerprints/generic\
+      \ fixtures, deployment, credentials, secrets, and external state are immutable.\n\
+      \nAdmit: First run the focused Node child-process regression and prove known\
+      \ green and controlled red runs both exit process 0 after exactly one envelope,\
+      \ preserve green/0 and red/1 payload results, retain the item deep-link identities/fingerprints/generic\
       \ marker, and keep pre-envelope refusal nonzero without evidence. Then suite/check\
       \ `item-deep-links-contract` / `item_deep_links_expected_red` selects exactly\
       \ the three named identities through the repaired tracked adapter, current Go/npm\
