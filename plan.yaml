@@ -190926,46 +190926,84 @@ phases:
       repo_change_policy: no_repo_change
 
 
-      Deliver: Perform full blind RF-BUG-001–010 product/browser verification on the
-      built binary and the exact digest admitted by the successful no-rollback Tailnet
-      proof. Cover Inspector pending/failure/stale selection, opaque routes/history,
-      EN/ZH titles and Steer errors, embedded UI/Doctor, import-only OPML and portable
-      State, CSP/streaming/cancellation, Source Ledger controls and states at the
-      five required viewports with keyboard/overflow/44px evidence, Prompting v2.2,
-      and E2E isolation/cleanup. Record exact viewport, interaction, console/network,
-      accessibility, immutable-runtime identity, and no-rollback proof-receipt identity;
-      no prior image digest is a product/UI prerequisite.
+      Deliver: Perform the unchanged full blind RF-BUG-001–010 product/browser verification
+      on the deployed built binary `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`,
+      bound through the production-admitted successful no-rollback Tailnet proof.
+      Cover Inspector pending/failure/stale selection, opaque routes/history, EN/ZH
+      titles and Steer errors, embedded UI/Doctor, import-only OPML and portable State,
+      CSP/streaming/cancellation, Source Ledger controls and states with the existing
+      five-viewport keyboard/overflow/44px proof obligation, Prompting v2.2, and E2E
+      isolation/cleanup. Record exact viewport, interaction, console/network, accessibility,
+      immutable-runtime identity, and no-rollback proof-receipt identity; no prior
+      image digest is a product/UI prerequisite.
 
 
-      Boundary: `blind-tester` uses only public interfaces, canonical docs, protected
-      acceptance, the built binary, and deployed Tailnet UI. Browser actions are read-only
-      except reversible in-memory navigation and token entry; do not import/restore,
-      steer, ingest, re-ingest, mutate sources, mark inspection, report delivery,
-      or change resonance. No repository, registry, deployment, rollback, route, credential/account,
-      secret, data, or runtime mutation is authorized. A transient read-only observation
-      may be retried twice after retaining the failure and re-proving unchanged deployed
-      digest.
+      Boundary: `blind-tester` owns exactly one newly authorized read-only, no-persistent-effect
+      browser attachment-and-proof attempt after the user''s fresh manual confirmation
+      that Chrome remote debugging was allowed for the currently running browser instance
+      and Chrome was kept open. Use only the installed browser-harness v3 stdin/heredoc
+      interface through `uvx browser-use`, its installed helpers and daemon auto-start,
+      the same local Chrome browser profile/instance, the existing Owner Token browser
+      state, and `https://resofeed.tefx.one`; the first navigation call must be `new_tab(url)`.
+      No retry, alternate browser, cloud browser, alternate profile, alternate attach
+      mechanism, product API substitution, or fallback is authorized. Browser actions
+      are read-only except reversible in-memory navigation and existing-token entry;
+      do not import/restore, steer, ingest, re-ingest, mutate sources, mark inspection,
+      report delivery, or change resonance. No repository, registry, deployment, rollback,
+      route, credential/account, secret, data, browser-profile, or runtime mutation
+      is authorized, and no token, cookie, request body, protected JSON, credential
+      value, or sensitive browser/profile material may be retained or disclosed.
 
 
-      Admit: Production semantic admission emits one `vectl.verifier.semantic.v1`
+      Admit: Before `new_tab(url)`, verify the installed v3 daemon attaches successfully
+      to that same authorized local Chrome instance and rebind the selected public
+      target to the production-admitted Tailnet proof for exact deployed OCI digest
+      `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`;
+      any attach, target, proof-receipt, or digest-binding failure stops BLOCKED before
+      navigation with zero effect. Preserve as immutable provenance the initial BLOCKED
+      receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T12-07-23-313Z-2026-07-26T11-59-52-127Z_019f9e4b-bf3f-731f-8319-81373628dc83.js-a852d129248648e5.txt`
+      SHA-256 `a852d129248648e57ae119af5ba6d698542af65c02dac8e15cc8999060206eda`,
+      retry-1 BLOCKED receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T12-35-10-022Z-2026-07-26T12-31-28-645Z_019f9e68-af85-7f95-8a95-0a2058cc86ea.js-d37661edebb2d58d.txt`
+      SHA-256 `d37661edebb2d58d594b9fae1ce1812f86ed6e8d7fa91d587c680cb7fd777b22`,
+      retry-1 production admission `/tmp/larva-agent-artifacts/rf-bug-v2-independent-runtime-ui/retry/retry-1-preserved/production-admission-blocked.json`
+      SHA-256 `8acbf2202459faa4bdddb42a2f4b55309a6961bdd5787e27100a876bd52387b6`,
+      final-retry BLOCKED receipt `/Users/tefx/.pi/larva/subagent-output-artifacts/2026-07-26T12-40-16-401Z-2026-07-26T12-37-03-829Z_019f9e6d-ccd5-7449-8c24-2742c16dd5c4.js-8f3aee19e3617113.txt`
+      SHA-256 `8f3aee19e3617113c603a6febd72e6c6d4304902d6fde5ead0664b98f8746eb5`,
+      and final production admission `/tmp/larva-agent-artifacts/rf-bug-v2-independent-runtime-ui/final-retry/production-admission-blocked.json`
+      SHA-256 `4097df13926d795897d217a25c84cd4e42dbeebeaf8ec9e3a1c69591153daa91`.
+      These earlier zero-effect failures become nonblocking provenance only if the
+      new attempt produces a completion-grade PASS; otherwise no RF-BUG requirement
+      is promoted and the step remains blocked.
+
+
+      Production semantic admission emits exactly one `vectl.verifier.semantic.v1`
       with `verifier_id=blind-tester`, `step_id=rf-bug-v2-independent-runtime-ui`,
       ordered scope [`RF-BUG-001 Inspector selection`, `RF-BUG-002 routes and opaque
       IDs`, `RF-BUG-003 embedded UI and Doctor`, `RF-BUG-004 OPML and State`, `RF-BUG-005
       headers CSP streaming cancellation`, `RF-BUG-006-010 titles Steer ledger prompting
       and isolation`], and exactly ten outcome-consistent coverage rows `RF-BUG-001`
-      through `RF-BUG-010`. The receipt binds the exact successful no-rollback Tailnet
-      proof digest and five viewport artifacts without requiring or inferring a prior
-      digest.
+      through `RF-BUG-010`. Completion requires all ten rows PROVEN, the existing
+      five viewport artifacts, blind-boundary compliance, exact deployed-digest and
+      successful no-rollback-proof identities, nondisclosure, and zero product/runtime
+      mutation.
 
 
-      Recovery: Any inaccessible required surface, deterministic behavior/accessibility
-      defect, digest drift, stale identity, disclosure, or observed mutation stops
-      FAIL/BLOCKED without workaround, product mutation, prior-digest discovery, or
-      rollback.'
-    verification: A production-admitted blind-tester receipt covers RF-BUG-001–010
-      on the real binary and exact no-rollback deployed digest at all five viewports,
-      with route/UI/accessibility/console/network evidence, no stale publication identity
-      or prior-digest dependency, no disclosure, and zero product/runtime mutation.
+      Recovery: This newly authorized budget is exactly one attempt with no retry.
+      Attach or identity-rebind failure before navigation stops BLOCKED with zero
+      effect. Any inaccessible required surface, deterministic behavior/accessibility
+      defect, digest drift, stale identity, disclosure, observed mutation, or unknown
+      state stops FAIL/BLOCKED without workaround, alternate mechanism, product mutation,
+      prior-digest discovery, rollback, or another Plan node. Retain the new outcome
+      and every prior blocked receipt; only a production-admitted completion-grade
+      PASS makes prior attachment failures causally nonblocking.'
+    verification: Exactly one no-retry browser-harness v3 stdin/heredoc attempt first
+      proves same-profile Chrome attachment and rebinds `https://resofeed.tefx.one`
+      to deployed OCI digest `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`
+      before first navigation `new_tab(url)`, then either stops zero-effect BLOCKED
+      or emits one production-admitted completion-grade blind-tester PASS covering
+      RF-BUG-001–010 in the exact six-scope order at all five viewports with route/UI/accessibility/console/network
+      evidence, blind-boundary compliance, nondisclosure, preserved prior blocked
+      provenance, no stale/prior-digest dependency, and zero product/runtime mutation.
     refs:
     - docs/BUG_FIX_PLAN_2026-07-12.md
     - docs/BUG_REPORT_2026-07-11.md
