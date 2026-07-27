@@ -196559,7 +196559,7 @@ phases:
       effects occurred.
   - id: item-deep-links-local-integration-verification
     name: Independently Verify Local HTTP, MCP, SQLite, and Browser Integration
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -196650,6 +196650,8 @@ phases:
     - item-deep-links-backend-api-mcp
     - item-deep-links-frontend-browser
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-27T07:45:52.981496Z'
   - id: item-deep-links-publish-immutable-oci
     name: Publish the Integrated Deep-Link Image as an Immutable OCI Index
     status: pending
