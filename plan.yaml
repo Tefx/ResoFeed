@@ -196856,7 +196856,7 @@ phases:
     agent: integration-verifier
   - id: item-deep-links-oci-verification
     name: Independently Verify the Published Immutable OCI Identity
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -196898,6 +196898,8 @@ phases:
     depends_on:
     - item-deep-links-publish-immutable-oci
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-27T08:22:40.210749Z'
   - id: item-deep-links-tailnet-deployment
     name: Deploy the Verified Deep-Link Digest to the Tailnet/Caddy Stack
     status: pending
