@@ -196869,7 +196869,7 @@ phases:
     agent: spec-verifier
   - id: item-deep-links-browser-acceptance-probe-correction
     name: Correct Protected Browser Acceptance Probe Lifecycle
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Correct only the independently authorized `web/tests/e2e/item-deep-links.browser-contract.spec.ts`\
@@ -196995,3 +196995,16 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T05:09:48.758684Z'
+    done_at: '2026-07-27T05:20:52.252993+00:00'
+    evidence: Integrated commit 44ddfa0eddd35f12884080ff3fe3a9e2ccb36b40 changes only
+      web/tests/e2e/item-deep-links.browser-contract.spec.ts. Exact independent acceptance
+      authorization authority:acceptance-mutation:item-deep-links-browser-contract
+      was preserved. Fresh Worker-v2 receipt /tmp/larva-agent-artifacts/item-deep-links-browser-acceptance-probe-correction-repair2/worker-receipt.json
+      and parent production admission worker-parent-verdict.json are CONFORMANT; direct
+      browser command exited expected red with IDL-FRONTEND-APP-HISTORY-GAP and no
+      backend/doc-authority/setup/build/skip/route-interception fingerprint. scripts/vectl-check.mjs
+      withGeneratedTreeRestoration wrapped the exact Playwright command; tracked status
+      stayed clean except the authorized path before commit and clean after commit.
+      Integrated clean Gate at actual main HEAD via the same-HEAD isolated worktree
+      is CONFORMANT in integrated-verdict.json. No product/config/fixture/adapter/doc/runtime/external
+      changes or effects occurred.
