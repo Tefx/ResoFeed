@@ -196681,35 +196681,66 @@ phases:
       leave the previously deployed Tailnet digest unchanged.
 
 
-      Boundary: `vectl-orchestrator` alone owns one persistent registry operation.
-      Use the current selected Docker context/daemon and documented two-platform Buildx
-      procedure with the existing repository-scoped Docker credential/account authorized
-      for `docker.io/tefx/resofeed`. Repository/Git, active/default builder selection,
-      unrelated builders/images/tags, credentials/accounts, Tailnet/deployment/data,
-      runtime secrets, and alternate repositories are immutable. No cloud builder
-      or paid service is authorized; any material unplanned charge or billing expansion
-      stops.
+      Boundary: `vectl-orchestrator` alone owns one fresh persistent registry build-and-push
+      operation for verified commit `5a9837e9bf8932098ef1bac0a77bc6a47a4af84c`, source
+      tree `0a03a5e6f07ded1820bb2cdaf13fc12a4e85aa78`, repository `docker.io/tefx/resofeed`,
+      and immutable tag `git-5a9837e9bf8932098ef1bac0a77bc6a47a4af84c`, plus its temporary
+      local builder lifecycle on the current selected `orbstack` context/daemon. Before
+      the fresh push, create and bootstrap exactly one unique attributable local `docker-container`
+      builder, without `--use` or any active/default builder-selection change. Use
+      it only through explicit `--builder <unique-name>` on the unchanged documented
+      two-platform build command with the exact revision label, `--provenance=false`,
+      `--sbom=false`, exact immutable tag, `--push`, and context `.`. The existing
+      repository-scoped Docker credential/account remains the sole registry authority.
+      Cloud, remote, or paid builders and material unplanned cost are forbidden. Repository/Git,
+      unrelated builders/containers/images/tags, credentials/accounts, Tailnet/deployment/data,
+      runtime secrets, and alternate repositories are immutable; build-cache writes
+      may remain. No moving alias, registry restore, or registry deletion is authorized.
 
 
-      Admit: Immediately before execution, bind the admitted local-integration receipt
-      to the exact clean commit/tree and revalidate Dockerfile/context, selected context/daemon,
-      repository/account/credential boundary, absent conflicting tag, two-platform
-      procedure, cost boundary, secret redaction, and independent OCI-verification
-      consumer. Retain one non-overwriting mode-0600 raw log and sanitized receipt
-      containing source/tag/index/platform/revision identities, invocation cardinality,
-      exit/classification, context/builder before/after hashes, partial-publication
-      observation, and no credential or secret values. `item-deep-links-oci-verification`
-      is the independent consumer.
+      Admit: Treat the prior invocation and its mode-`0600` raw log, preflight, and
+      sanitized receipt as immutable historical evidence. A fresh invocation is admitted
+      only while read-only reconciliation proves that invocation exited `1` before
+      build/push because the selected local `docker` driver lacked multi-platform
+      support, the exact tag is absent before and after with no descriptors or digests,
+      result classification is `no_effect`, no credential value was read or disclosed,
+      and the Tailnet deployment remains `docker.io/tefx/resofeed@sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`.
+      Immediately before builder creation, bind the completed local-integration evidence
+      to the exact clean commit/tree and revalidate Dockerfile/context, selected `orbstack`
+      context and daemon identity, active/default builder identities, unrelated builder/container
+      inventory, unique builder-name absence, exact-tag absence, repository/account/credential
+      and cost boundaries, the documented two-platform procedure, secret redaction,
+      and independent consumer `item-deep-links-oci-verification`. Record the unique
+      builder name, `docker-container` driver, node, attributable BuildKit container,
+      selected context, daemon, and active/default builder identities before execution
+      and after cleanup without secret values. Retain a new non-overwriting mode-`0600`
+      raw log and sanitized receipt that distinguish the one historical invocation
+      from the fresh invocation and contain source/tag/index/platform/revision identities,
+      create/bootstrap/build-push/cleanup cardinality, exit/classification, exact-tag
+      observations, builder/container cleanup, context/daemon/active/default before/after
+      identities, Tailnet digest, and no credential or secret values. Treat activity
+      or cache hash drift as harmless only when selected context, daemon, active/default
+      builder, unrelated-resource, and attributable-cleanup identities remain unchanged.
 
 
-      Recovery: Budget exactly one build-and-push invocation. Repetition is unsafe
-      once push may have persisted a partial index or platform manifest. After every
-      nonzero or ambiguous return, perform read-only registry observation of the exact
-      tag and attributable digests, record any complete orphan chain for separately
-      authorized cleanup, restore no registry object, and leave the prior deployed
-      digest unchanged. Source/context/account drift, credential failure, digest conflict,
-      material cost expansion, cleanup uncertainty, disclosure, or unknown partial
-      state stops BLOCKED.
+      Recovery: The fresh budget is exactly one builder create/bootstrap sequence
+      and one build-and-push invocation. A create or bootstrap failure before push
+      may be classified `no_effect` only after one `docker buildx rm <unique-name>`
+      cleanup attempt and proof that the builder and attributable BuildKit container
+      are absent; it is not retried. After every post-create exit, run that single
+      cleanup attempt and require attributable builder/container absence; cleanup
+      failure or uncertainty stops. Any nonzero or ambiguous push triggers read-only
+      observation of the exact tag and attributable descriptors/digests and is never
+      replayed. If the tag remains absent with no descriptors/digests, retain `no_effect`;
+      if the tag exists, retain the complete chain or observed orphan identities for
+      separately authorized cleanup and stop without registry deletion. Require selected
+      context/daemon and active/default builder selection and identities unchanged
+      after cleanup; benign activity/cache hash drift alone is nonblocking, while
+      selection or identity drift is blocking. Source/context/account/credential drift,
+      tag conflict, material cost expansion, unrelated-resource mutation, cleanup
+      residue, disclosure, or unknown partial registry state stops `BLOCKED`. Leave
+      the prior deployed Tailnet digest unchanged and perform no repository, deployment,
+      data, credential, or registry-cleanup effect.
 
 
       <vectl_step_policy>
@@ -196720,11 +196751,19 @@ phases:
       authority, complete partial-state observation, and no moving alias","modality":"runtime","seam":"real","check_id":"item_deep_links_publish_immutable_oci","independent_step":"item-summary-deep-links-assurance-v2.item-deep-links-oci-verification"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: The Orchestrator-owned mode-0600 log and sanitized receipt prove
-      one bounded Buildx push for the exact admitted clean commit, exact tag/index/amd64/arm64/revision
-      identities, unchanged context/default builder and Tailnet deployment, bounded
-      repository/account/credential/cost authority, and complete partial-publication
-      classification with no replay or disclosure.
+    verification: The immutable historical mode-`0600` failure artifacts plus the
+      fresh non-overwriting mode-`0600` log and sanitized receipt prove the prior
+      `no_effect` binding failure, exactly one fresh unique local `docker-container`
+      create/bootstrap sequence, exactly one explicit-builder Buildx push for the
+      exact admitted commit/tree/tag and two platforms, final index/amd64/arm64/revision
+      identities, exact-tag observations, `docker buildx rm <unique-name>` cleanup
+      and attributable container absence, unchanged selected `orbstack` context/daemon
+      and active/default builder identities, unchanged prior Tailnet digest, bounded
+      repository/account/credential/cost authority, no cloud/remote/paid builder,
+      no moving alias or disclosure, and no repository, deployment, data, unrelated-resource,
+      or registry-deletion effect. Completion requires the exact immutable chain and
+      remains independently consumable by `item-deep-links-oci-verification`; every
+      failed or partial outcome remains pending or `BLOCKED` under Recovery.
     refs:
     - docs/ITEM_DEEP_LINKS.md
     - docs/CONTAINER.md
