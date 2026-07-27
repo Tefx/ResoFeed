@@ -196915,7 +196915,7 @@ phases:
       repository tracked state unchanged.
   - id: item-deep-links-tailnet-deployment
     name: Deploy the Verified Deep-Link Digest to the Tailnet/Caddy Stack
-    status: claimed
+    status: pending
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -196997,8 +196997,6 @@ phases:
     depends_on:
     - item-deep-links-oci-verification
     agent: vectl-orchestrator
-    claimed_by: vectl-orchestrator
-    claimed_at: '2026-07-27T08:51:02.338899Z'
   - id: item-deep-links-final-release-review
     name: Review Integrated Item Deep-Link Release
     status: pending
