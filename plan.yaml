@@ -196802,184 +196802,176 @@ phases:
       / tree `0a03a5e6f07ded1820bb2cdaf13fc12a4e85aa78`, immutable tag `docker.io/tefx/resofeed:git-5a9837e9bf8932098ef1bac0a77bc6a47a4af84c`,
       OCI index `sha256:19dca62bdbb8fc8c22c7b72d604519023da6f9c115ed7cb1cf2d61d96b19a50d`,
       and its independently verified linux/amd64 and linux/arm64 manifests at `https://resofeed.tefx.one`.
-      Current release authority replaces only the fixture-specific production proof
-      method with an immutable-identity composition; every product behavior remains
-      required. Compose the production-admitted `ITEM-DEEP-LINK-LOCAL-INTEGRATION`
+      Keep the existing immutable composition: the production-admitted `ITEM-DEEP-LINK-LOCAL-INTEGRATION`
       proof of raw ID `~slash/%?hash#雪`, dot/legacy/invalid routes, raw malformed-percent
       `400`, byte-identical HTTP API decoding, MCP `app_url`, explicit-versus-derived
       PublicURL, Chromium history/authentication/focus/scroll behavior, and zero read-lifecycle
-      writes through the OCI revision/platform receipts to the exact deployed index.
-      Freshly re-observe `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT` and the production environment:
-      exact running digest and recovery identity, strict-FQDN direct/public root and
-      unauthenticated Doctor readiness, Go-owned security-header parity with Caddy
-      pass-through/non-ownership, unchanged named `/data` volume, canonical duplicate-free
-      route, explicit production PublicURL from the running container CLI argv, canonical
-      special-ID/dot/dispatchable-invalid static fallback without redirect or asset
-      substitution, raw `/items/%ZZ` server `400` through an HTTP/1.1 path-as-is request,
-      unauthenticated API and MCP rejection, one existing-item credential-free production
-      MCP `app_url` shape, zero verifier mutation, and nondisclosure. A durable or
-      nonpersistent production special-character item fixture is forbidden and absence
-      of that row is not a blocker.
+      writes is bound through the OCI revision/platform/index receipts to the exact
+      deployed index. Freshly re-observe the five ordered scopes `deployment and immutable
+      identity`, `strict-FQDN readiness headers and Caddy ownership`, `volume route
+      PublicURL and recovery`, `production codec static API and MCP round trip`, and
+      `read-only state and nondisclosure`, with exactly the three requirement rows
+      `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT`, `ITEM-DEEP-LINK-TAILNET-RUNTIME`, and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`.
+      A production special-character item fixture, authenticated production response
+      body, deployment, or mutation is neither required nor authorized.
 
 
-      Boundary: `integration-verifier` owns exactly one ultimate fresh read-only verification
-      run against `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`,
-      the exact registry/deployment identities above, and Tela profile `common` provider
-      `resofeed` only while it is freshly observed connected. It may read the admitted
-      producer receipts; perform strict-existing-key read-only SSH observations; issue
-      public HTTP GET/HEAD probes; and use only the provider''s read-only item discovery/read
-      tools (`list_candidate_items`, `search_items`, `read_item`) to select one already-existing
-      item and validate normalized `app_url` shape. It has no direct owner-token,
-      credential, account, config-value, paid-service, or authenticated production
-      HTTP API authority. It must not retain API/MCP item or content bodies, provider
-      payloads, Authorization/cookie values, owner tokens, host telemetry, raw Serve
-      JSON, `.env` content/path, secret-source paths, full container environment/command
-      arrays, or unrelated configuration values. It may retain only the secret-safe
-      normalized facts required by this contract, including the exact public origin
-      already fixed here and booleans for its argv binding. It may not create or reobserve
-      a synthetic/special-ID row; deploy, roll back, restart, replace, stage, repair,
-      or mutate repository/Git, registry, builders, containers, routes, Serve/Caddy,
-      procedures, credentials/accounts/trust, secrets, databases, volumes, items,
-      item/read-lifecycle state, owner-token state, or any external/runtime configuration.
-      No alternate target or provider is authorized.
+      Boundary: The current-conversation user reply `好 授权`, given after the terminal
+      report requested authority for one corrected read-only verifier run and its
+      in-place Plan repair, authorizes exactly one additional complete corrected fresh
+      `integration-verifier` run for this existing step. It authorizes no other retry,
+      deployment, repository/product, registry, builder, container/process/service,
+      route/Serve/Caddy, procedure/configuration, credential/account/trust, token/secret,
+      database/volume/item/read-lifecycle, provider, or external/runtime mutation.
+      `integration-verifier` owns only this read-only operation against `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`,
+      the exact immutable identities above, and Tela profile `common` provider `resofeed`
+      while freshly observed connected. It may read admitted receipts and tracked
+      repository evidence, perform strict-existing-key read-only SSH observations,
+      issue public HTTP GET/HEAD probes, and use only `list_candidate_items`, `search_items`,
+      and `read_item` to select one already-existing item and validate normalized
+      `app_url` shape. No alternate target, provider, profile, account, endpoint,
+      or identity source is authorized. It must not retain API/MCP item or content
+      bodies, provider payloads, item identifiers beyond transient selection, Authorization/cookie
+      values, owner tokens, host telemetry, raw Serve JSON, `.env` content or path,
+      secret-source paths, full container command/environment arrays, unrelated configuration
+      values, or any credential/secret value; retained evidence is limited to the
+      fixed public origin, declared immutable identities, statuses, counts, exact
+      permitted header values, classifications, hashes, and booleans required here.
 
 
-      Admit: Consume and authenticate the production-admitted local receipt `/tmp/larva-agent-artifacts/item-deep-links-local-integration-verification/semantic-receipt-retry.json`
+      Admit: Consume the production-admitted local receipt `/tmp/larva-agent-artifacts/item-deep-links-local-integration-verification/semantic-receipt-retry.json`
       and report `/tmp/larva-agent-artifacts/item-deep-links-local-integration-verification/integration-verifier-report.md`,
-      the production-admitted OCI receipt `/tmp/larva-agent-artifacts/item-deep-links-oci-verification/semantic-receipt.json`,
+      OCI receipt `/tmp/larva-agent-artifacts/item-deep-links-oci-verification/semantic-receipt.json`,
       and deployment receipt `/tmp/larva-agent-artifacts/item-deep-links-tailnet-deployment/deployment-receipt.json`.
-      Before any probe, strictly parse the preserved historical runtime receipt `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt.json`,
-      that local receipt, and that OCI receipt, and compare each Gate `semantic_receipt_sha256`
-      only to SHA-256 of `json.dumps(object, sort_keys=True, separators=(",", ":"),
-      ensure_ascii=False).encode("utf-8", "surrogateescape")` with no trailing newline.
-      Require the exact Gate-bound canonical digests `sha256:ae203486247fa1e7ad31a9e462b77887a209efee23ffbdd4da891fef2e4184d0`
+      Before probes, strictly parse the preserved historical runtime receipt `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt.json`,
+      the local receipt, the OCI receipt, and the historical ultimate receipt `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-ultimate.json`;
+      compare each Gate `semantic_receipt_sha256` only to SHA-256 of `json.dumps(object,
+      sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8", "surrogateescape")`
+      with no trailing newline. Require exact Gate canonical digests `sha256:ae203486247fa1e7ad31a9e462b77887a209efee23ffbdd4da891fef2e4184d0`
       for the historical runtime receipt, `sha256:dce423496afa1a8bc7eeba4cf17236ceb1bbd398c26913679e2ca2493b96cf64`
-      for the local integration receipt, and `sha256:2a209400f87aaf6924534ea6fab1cd35cdd3c6cf28560051f83a8340eac6f8f6`
-      for the OCI receipt. Raw presentation/file byte hashes are artifact-integrity
-      metadata; they are neither required to equal nor evidence against Gate canonical
-      binding. Preserve all three raw receipt files unchanged. Require their exact
-      Gate verdicts, commit/tree/tag/index/platform/revision chain, deployment target,
-      and producer artifact identities before probes. The local receipt is the independent
-      semantic source for the special raw-ID/API/MCP/browser/explicit-versus-derived/read-only
-      atoms; OCI revision labels bind those atoms to both platform manifests and the
-      index; the deployment receipt plus fresh running-digest observation binds that
-      exact index to production; fresh public/strict-FQDN observations independently
-      prove the environment-specific proxy, static, readiness, header, volume, route,
-      PublicURL, recovery, and nondisclosure atoms.
+      for local integration, `sha256:2a209400f87aaf6924534ea6fab1cd35cdd3c6cf28560051f83a8340eac6f8f6`
+      for OCI, and `sha256:5e7967ee7c4c21975115c72bd8c8897a7d51ccbc5ce7ac885ca6d4dbf2242f63`
+      plus Gate `REJECTED` for the ultimate receipt. Raw file hashes are artifact-integrity
+      metadata, not Gate semantic identities. Require the producer verdicts, commit/tree/tag/index/platform/revision
+      chain, deployment target, and producer artifact identities before probes. The
+      ultimate run''s passing observations may be read only as immutable historical
+      context; none may satisfy, be cited as, or be promoted into fresh completion
+      proof. Every scope and before/after reconciliation atom must be observed again
+      in this authorized run.
 
 
-      The fresh PublicURL observation must parse `docker container inspect` `Config.Cmd`
-      as JSON, require an array with exactly one argv equal to `--public-url`, require
-      an immediately following argv, and require that adjacent value to equal exactly
-      `https://resofeed.tefx.one`; a second `--public-url`, missing adjacent argv,
-      non-array value, or any other adjacent value is a deterministic mismatch. Do
-      not infer this atom from `Config.Env`: absence or presence of `PUBLIC_URL=https://resofeed.tefx.one`,
-      `RESOFEED_PUBLIC_URL=https://resofeed.tefx.one`, or any other environment entry
-      is neither proof nor disproof because the authoritative contract uses CLI argv.
-      Do not retain the full command or environment arrays.
+      The running deployment identity atom must parse `docker container inspect` JSON
+      and require `Config.Image` to be a string equal exactly to `docker.io/tefx/resofeed@sha256:19dca62bdbb8fc8c22c7b72d604519023da6f9c115ed7cb1cf2d61d96b19a50d`
+      before and after probes. Container top-level `RepoDigests`, image ID, local
+      image/manifest digest, suffix or substring matching, and any inferred registry
+      identity are explicitly inadmissible for this atom. The fresh PublicURL atom
+      must parse `Config.Cmd` as JSON, require an array containing exactly one argv
+      equal to `--public-url`, and require its immediately adjacent following argv
+      to equal exactly `https://resofeed.tefx.one`; a duplicate flag, missing adjacent
+      argv, non-array, or other value fails. Never infer PublicURL from `Config.Env`,
+      and never retain either full array.
 
 
       Every loopback direct-Caddy request must use curl HTTP/1.1 with path-as-is semantics,
-      `-k`, `--resolve resofeed.tefx.one:8443:127.0.0.1`, and a URL whose origin is
-      exactly `https://resofeed.tefx.one:8443`; the SSH FQDN and `127.0.0.1` are transport
-      addresses, never the URL host or TLS SNI. Public requests use origin exactly
-      `https://resofeed.tefx.one`, and any exact-path public probe also uses HTTP/1.1
-      with path-as-is semantics. Fresh static checks use exact encoded path `/items/%7Eslash%2F%25%3Fhash%23%E9%9B%AA`,
+      `-k`, `--resolve resofeed.tefx.one:8443:127.0.0.1`, and URL origin exactly `https://resofeed.tefx.one:8443`;
+      the SSH FQDN and `127.0.0.1` are transport addresses, never URL host or TLS
+      SNI. Public requests use origin exactly `https://resofeed.tefx.one`, and exact-path
+      public probes also use HTTP/1.1 with path-as-is semantics. Fresh readiness requires
+      direct and public root `200` plus direct and public exact `/api/doctor` unauthenticated
+      `401`; SPA route `/doctor` is excluded from readiness and from all Doctor evidence.
+      Fresh static checks use exact encoded path `/items/%7Eslash%2F%25%3Fhash%23%E9%9B%AA`,
       dot sentinels `/items/!.` and `/items/!..`, and one documented extra-segment
       dispatchable-invalid route; compare status, `Location`, content type, and secret-safe
-      index identity without retaining response bodies. The malformed-percent check
-      must send raw `/items/%ZZ` through HTTP/1.1 with path-as-is semantics and observe
-      server `400` before SPA dispatch. The connected `common`/`resofeed` provider
-      check may retain only normalized booleans proving an already-existing item''s
-      `app_url` is non-null, credential-free, rooted at exact explicit `https://resofeed.tefx.one`,
-      and uses the canonical item path; it must retain no item/content body. Re-observe
-      exact digest, volume, route, CLI-argv PublicURL, recovery readiness, owner-token-state
-      classification, and zero verifier mutation after probes.
+      index identity without retaining bodies. Send raw `/items/%ZZ` through the admitted
+      HTTP/1.1 path-as-is binding and require server `400` before SPA dispatch. Freshly
+      require unauthenticated API and `/mcp` rejection without retaining response
+      bodies.
 
 
-      Preserve `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt.json`,
-      its Gate verdict with semantic receipt `sha256:ae203486247fa1e7ad31a9e462b77887a209efee23ffbdd4da891fef2e4184d0`,
-      report, and evidence as immutable historical `REJECTED` provenance. Also preserve
-      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-composed.json`,
-      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-composed.json`,
-      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-composed.md`,
-      and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-composed.json`
-      as immutable historical no-probe methodology-FAIL evidence. Preserve `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-final.json`,
-      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-final.json`,
-      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-final.md`,
-      and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-final.json`
-      as immutable historical read-only SSH methodology-FAIL evidence that stopped
-      before static HTTP, API, MCP, or Tela product probes. None of those historical
-      artifacts can satisfy fresh observations, be overwritten, relabeled, normalized,
-      replaced, restored, or promoted. Produce fresh non-overwriting mode-`0600` ultimate
-      artifacts at `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-ultimate.json`,
-      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-ultimate.json`,
-      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-ultimate.md`,
-      and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-ultimate.json`,
-      including one fresh production-admitted `vectl.verifier.semantic.v1` object
-      with `verifier_id=integration-verifier`, `step_id=item-deep-links-tailnet-runtime-proof`,
-      ordered scope [`deployment and immutable identity`, `strict-FQDN readiness headers
-      and Caddy ownership`, `volume route PublicURL and recovery`, `production codec
-      static API and MCP round trip`, `read-only state and nondisclosure`], and exactly
-      three outcome-consistent coverage rows for `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT`,
-      `ITEM-DEEP-LINK-TAILNET-RUNTIME`, and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`. Scope
-      four is admitted only through the exact local-semantics → OCI revision/platform/index
-      → deployed-index chain plus the fresh production static, malformed-percent,
-      unauthenticated-boundary, and existing-item MCP-shape observations; it does
-      not require an authenticated production API body or a special-ID production
-      row.
+      The security-header contract contains exactly four Go-owned headers. Parse raw
+      direct/public response header fields into ordered value arrays and require one
+      effective value at each side for each name, equal direct-to-public: one nonempty
+      `Content-Security-Policy`; `X-Content-Type-Options: nosniff`; `Referrer-Policy:
+      no-referrer`; and `X-Frame-Options: DENY`. Before probes, require worktree,
+      index, and `HEAD` bytes for `deploy/resofeed-caddy/caddy/Caddyfile` to be identical
+      with SHA-256 `cd35f54f3d29164fe9b957eed74d03b04fae2ca253ff78eeab8a6ea310928218`,
+      require the fresh deployed Caddyfile identity to remain that value, and require
+      the maintained Caddyfile to contain no Caddy `header` ownership directive. Caddy
+      pass-through/nonownership is proved by that absence plus exact direct/public
+      ordered-array equality. `Permissions-Policy`, the `Server` header, `Server:
+      Caddy`, and any other header are explicitly outside admission and cannot prove
+      or disprove this atom.
 
 
-      Recovery: The composed methodology run stopped before SSH, HTTP, Tela, API,
-      or MCP probes. The final run performed only read-only strict-existing-key SSH
-      observations, then evaluated the PublicURL on an unauthorized environment surface
-      and stopped before static HTTP, API, MCP, or Tela product probes. Both runs
-      produced zero repository, runtime, or external effects; their immutable FAIL
-      evidence does not authorize completion. This third and last runtime-proof Plan
-      repair authorizes exactly one ultimate fresh verification run. No fourth planning
-      repair, replacement artifact suffix, or later verification run is authorized
-      after the ultimate run encounters another harness/method failure, produces any
-      actual deterministic product/provider observation, or observes an unknown effect;
-      deterministic passing observations may continue within the same ultimate run
-      to complete its admitted scope but cannot seed a later run.
+      Freshly re-observe the exact named `/data` volume, duplicate-free route, recovery
+      identity/readiness, owner-token-state classification, immutable container identity,
+      CLI-argv PublicURL, tracked/deployed Caddyfile identity, and zero mutation before
+      and after probes. The connected `common`/`resofeed` provider check may retain
+      only booleans proving one already-existing item''s `app_url` is non-null, credential-free,
+      rooted at exact `https://resofeed.tefx.one`, and uses the canonical item path;
+      retain no item ID, item/content body, or provider payload. Produce only new
+      non-overwriting mode-`0600` artifacts at `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-authorized.json`,
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-authorized.json`,
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-authorized.md`,
+      and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-authorized.json`.
+      The receipt must be one fresh production-admitted `vectl.verifier.semantic.v1`
+      object with `verifier_id=integration-verifier`, `step_id=item-deep-links-tailnet-runtime-proof`,
+      the exact ordered five-scope list and exactly the three requirement rows above;
+      completion requires an outcome-consistent PASS receipt admitted by the production
+      Gate.
 
 
-      At most three additional probe attempts total are allowed only within that ultimate
-      run, only after a retained, demonstrably transient, non-mutating transport failure
-      on the exact admitted method, and only after fresh proof that target, digest,
-      volume, route, CLI-argv PublicURL, provider identity, and zero-mutation state
-      remain unchanged. The first direct-Caddy attempt and every direct-Caddy retry
-      use the required HTTP/1.1, path-as-is, public-host SNI/`--resolve`, and `-k`
-      binding; the malformed-percent probe uses HTTP/1.1 path-as-is on its first fresh
-      attempt. The retained HTTP/2 curl exit `92`, the local-Caddy TLS error without
-      required public-host SNI, and environment-surface PublicURL false remain historical
-      methodology observations and are never classified as product/configuration results.
-      A deterministic HTTP status, correctly observed CLI-argv PublicURL mismatch,
-      identity mismatch, unavailable or canonically conflicting producer receipt,
-      provider/profile drift, missing existing-item MCP shape, readiness/header/Caddy/volume/route/recovery
-      defect, disclosure, observed mutation, fixture requirement, or unknown state
-      stops FAIL/BLOCKED without repair, alternate binding, broader authority, or
-      another run. After every attempt, retain secret-safe raw evidence, reconcile
-      any verifier-owned local process, and re-observe the immutable production boundary.
-      If producer evidence reports successful prior-digest/readiness restoration,
-      verify that reconciled state and return outcome-consistent failure; rollback
-      is not release success.'
-    verification: One ultimate fresh production-admitted `integration-verifier` receipt
-      first authenticates the historical runtime, local integration, and OCI semantic
-      receipts by Gate canonical sorted/minified UTF-8 JSON digests `ae203486247fa1e7ad31a9e462b77887a209efee23ffbdd4da891fef2e4184d0`,
-      `dce423496afa1a8bc7eeba4cf17236ceb1bbd398c26913679e2ca2493b96cf64`, and `2a209400f87aaf6924534ea6fab1cd35cdd3c6cf28560051f83a8340eac6f8f6`
-      while preserving raw producer receipts and all prior historical, composed, and
-      final FAIL artifacts unchanged. It then preserves the exact five ordered scopes
-      and three requirement rows; proves the immutable commit/tree → platform revisions
-      → index → running Tailnet target chain; derives explicit PublicURL only from
-      exactly one `Config.Cmd` `--public-url` plus its immediately adjacent exact
-      `https://resofeed.tefx.one` argv and never from `Config.Env`; uses the required
-      HTTP/1.1 path-as-is public-host SNI/`--resolve` binding for direct Caddy; freshly
-      proves readiness, Go/Caddy header ownership, volume/route/recovery, special/dot/invalid
-      static routing, malformed-percent `400`, unauthenticated API/MCP rejection,
-      safe existing-item MCP `app_url` shape, zero mutation, and nondisclosure; produces
-      only new non-overwriting ultimate artifacts; and requires or creates neither
-      a production special-ID fixture nor authenticated production response bodies.
+      Preserve unchanged every prior file in `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/`:
+      base generation `semantic-receipt.json`, `semantic-verdict.json`, `integration-verifier-report.md`,
+      `evidence.json`; composed generation `semantic-receipt-composed.json`, `semantic-verdict-composed.json`,
+      `integration-verifier-report-composed.md`, `evidence-composed.json`; final generation
+      `semantic-receipt-final.json`, `semantic-verdict-final.json`, `integration-verifier-report-final.md`,
+      `evidence-final.json`; and ultimate generation `semantic-receipt-ultimate.json`,
+      `semantic-verdict-ultimate.json`, `integration-verifier-report-ultimate.md`,
+      `evidence-ultimate.json`. They cannot be overwritten, renamed, relabeled, normalized,
+      restored, or used as fresh proof.
+
+
+      Recovery: Rollback class is `TRIVIAL` only while the authorized run remains
+      read-only and every before/after production boundary observation is equal. At
+      most three additional probe attempts total are allowed within this one run only
+      after retained evidence proves a transient, non-mutating transport failure on
+      the exact admitted method; before each retry, freshly prove unchanged target,
+      exact `Config.Image`, volume, route, CLI-argv PublicURL, tracked/deployed Caddyfile,
+      provider identity, and zero-mutation state. Every direct-Caddy attempt uses
+      the required HTTP/1.1 path-as-is public-host SNI/`--resolve` binding, and every
+      Doctor attempt uses exact `/api/doctor`. A deterministic product/provider mismatch,
+      identity or producer conflict, unavailable provider/profile, disclosure, observed
+      mutation, fixture requirement, unknown state/effect, or harness/method failure
+      terminates this authorized run without alternate binding, automatic retry outside
+      the narrow transient predicate, later verification run, or further Planner repair.
+      Passing observations may continue only inside this same run until its complete
+      fresh scope is closed. After every attempt, retain secret-safe raw evidence,
+      reconcile verifier-owned local processes, and re-observe the immutable production
+      boundary. Unknown or unequal state stops for orchestrator reconciliation; it
+      grants no replay or mutation authority. No subsequent artifact suffix or run
+      is authorized.'
+    verification: 'One newly user-authorized fresh production-admitted `integration-verifier`
+      receipt at `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-authorized.json`
+      must preserve every prior artifact generation, authenticate the historical runtime,
+      local integration, OCI, deployment, and ultimate-REJECTED identities, and freshly
+      close the exact five ordered scopes with exactly the three required coverage
+      rows. Fresh proof must bind running identity only to exact parsed `Config.Image
+      = docker.io/tefx/resofeed@sha256:19dca62bdbb8fc8c22c7b72d604519023da6f9c115ed7cb1cf2d61d96b19a50d`;
+      bind PublicURL only to the exact `Config.Cmd` adjacency rule; use the required
+      HTTP/1.1 path-as-is public-host SNI/`--resolve` direct-Caddy requests; require
+      direct/public root `200` and exact `/api/doctor` unauthenticated `401`; and
+      require one equal direct/public ordered value for exactly `Content-Security-Policy`
+      (nonempty), `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`,
+      and `X-Frame-Options: DENY`, with unchanged tracked/deployed Caddyfile and no
+      Caddy header directive. `RepoDigests`, image ID or local digest, `/doctor`,
+      `Permissions-Policy`, and `Server` are inadmissible. The same fresh run must
+      re-prove volume/route/recovery, special/dot/invalid static routing, malformed-percent
+      `400`, unauthenticated API/MCP rejection, safe existing-item MCP `app_url` shape,
+      before/after zero mutation, and nondisclosure; no ultimate observation may substitute
+      for fresh proof. Completion requires the new receipt to be Gate-admitted as
+      PASS; any deterministic failure, harness/method failure, disclosure, mutation,
+      or unknown state stops without another Plan repair or run.'
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
