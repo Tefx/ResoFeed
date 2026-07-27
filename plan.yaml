@@ -197193,7 +197193,7 @@ phases:
       mutation, or material unplanned cost.'
   - id: item-deep-links-final-release-review
     name: Review Integrated Item Deep-Link Release
-    status: pending
+    status: claimed
     description: 'step_type: review
 
       repo_change_policy: no_repo_change
@@ -197255,6 +197255,8 @@ phases:
     depends_on:
     - item-deep-links-tailnet-runtime-proof
     agent: spec-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-27T11:01:54.067013Z'
   - id: item-deep-links-browser-acceptance-probe-correction
     name: Correct Protected Browser Acceptance Probe Lifecycle
     status: done
