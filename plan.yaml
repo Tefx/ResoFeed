@@ -196856,7 +196856,7 @@ phases:
     agent: integration-verifier
   - id: item-deep-links-oci-verification
     name: Independently Verify the Published Immutable OCI Identity
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -196900,6 +196900,19 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T08:22:40.210749Z'
+    done_at: '2026-07-27T08:28:25.324478+00:00'
+    evidence: Independent read-only integration-verifier receipt /tmp/larva-agent-artifacts/item-deep-links-oci-verification/semantic-receipt.json
+      is production-admitted; child and parent semantic verdicts are CONFORMANT with
+      semantic_completion_admissible=true. It independently bound the mode-0600 producer
+      log/preflight/receipt and registry metadata, proving tag/index equality for
+      docker.io/tefx/resofeed:git-5a9837e9bf8932098ef1bac0a77bc6a47a4af84c and index
+      sha256:19dca62bdbb8fc8c22c7b72d604519023da6f9c115ed7cb1cf2d61d96b19a50d, exactly
+      linux/amd64 sha256:1bdd353cb25d35c8138fa19dfb86ba27015d460888f27aae6d324635d4ec0576
+      and linux/arm64 sha256:eaeaac4657bd449b0faa159ea0a0fd837cce40289d518668ea27a292ab8cac28,
+      distinct exact revision labels for commit 5a9837e9bf8932098ef1bac0a77bc6a47a4af84c,
+      source tree binding, no moving alias in producer invocation, nondisclosure,
+      and zero verifier mutation. Evidence/report/receipt/verdict files are mode 0600;
+      repository tracked state unchanged.
   - id: item-deep-links-tailnet-deployment
     name: Deploy the Verified Deep-Link Digest to the Tailnet/Caddy Stack
     status: pending
