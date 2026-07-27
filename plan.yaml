@@ -196253,7 +196253,7 @@ phases:
       passed. Exactly seven authorized paths changed; no external/runtime effect occurred.'
   - id: item-deep-links-backend-api-mcp
     name: Implement Backend, HTTP API, MCP, and PublicURL Deep-Link Semantics
-    status: pending
+    status: claimed
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Implement `ITEM-DEEP-LINK-BACKEND` after the protected contract lock: canonical\
@@ -196353,6 +196353,8 @@ phases:
     depends_on:
     - item-deep-links-expected-red-contracts
     agent: golang-developer
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-27T02:04:15.743031Z'
   - id: item-deep-links-frontend-browser
     name: Implement Browser Routes, Inspector Lifecycle, History, and Accessibility
     status: pending
