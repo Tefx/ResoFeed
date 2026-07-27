@@ -196667,7 +196667,7 @@ phases:
       mutation remains.'
   - id: item-deep-links-publish-immutable-oci
     name: Publish the Integrated Deep-Link Image as an Immutable OCI Index
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -196773,6 +196773,23 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T08:13:21.335241Z'
+    done_at: '2026-07-27T08:22:12.578997+00:00'
+    evidence: 'Published verified commit 5a9837e9bf8932098ef1bac0a77bc6a47a4af84c
+      / tree 0a03a5e6f07ded1820bb2cdaf13fc12a4e85aa78 as docker.io/tefx/resofeed:git-5a9837e9bf8932098ef1bac0a77bc6a47a4af84c.
+      The historical selected-docker-driver attempt remains mode-0600 no_effect evidence.
+      The Plan-authorized fresh attempt used exactly one unique local docker-container
+      builder create/bootstrap, one explicit-builder build-and-push for linux/amd64+linux/arm64
+      with matching revision label and provenance/SBOM disabled, and one builder cleanup.
+      Read-only verification proved index sha256:19dca62bdbb8fc8c22c7b72d604519023da6f9c115ed7cb1cf2d61d96b19a50d,
+      amd64 sha256:1bdd353cb25d35c8138fa19dfb86ba27015d460888f27aae6d324635d4ec0576,
+      arm64 sha256:eaeaac4657bd449b0faa159ea0a0fd837cce40289d518668ea27a292ab8cac28,
+      exact two-platform index, tag/digest identity parity, and duplicate-aware valid
+      revision labels on both manifests. Builder resofeed-publish-5a9837e9-a and attributable
+      container are absent; selected context/daemon/active builder and unrelated builder/container
+      identities match before/after. Tailnet remains on prior digest sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b.
+      No moving alias, registry deletion, cloud/paid builder, repository/deployment/data
+      effect, credential read, or secret disclosure. Evidence: mode-0600 raw-build-transient.log,
+      preflight-transient.json, publication-receipt-success.json under /tmp/larva-agent-artifacts/item-deep-links-publish-immutable-oci/.'
   - id: item-deep-links-tailnet-runtime-proof
     name: Independently Prove Tailnet/Caddy Deep-Link Runtime Semantics
     status: pending
