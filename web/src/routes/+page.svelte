@@ -4,7 +4,7 @@
   import type { SearchRequestParams } from '$lib/api-client';
   import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
   import { formatCurrentOperationStatus, formatOperationConflictStatus, idleOperation, normalizeCurrentOperationInfo } from '$lib/current-operation';
-  import { itemRoutePath, normalizeSearchRequestParams, resolveWorkbenchRoute, searchQueryString, workbenchDocumentTitle, type WorkbenchSurface } from '$lib/workbench-route';
+  import { itemAppPath, normalizeSearchRequestParams, resolveWorkbenchRoute, searchQueryString, searchResultActivationLabel, workbenchDocumentTitle, type WorkbenchHistoryState, type WorkbenchSurface } from '$lib/workbench-route';
   import OwnerTokenPrompt from './components/OwnerTokenPrompt.svelte';
   import FirstUseEmptyState from './components/FirstUseEmptyState.svelte';
   import Feed from './components/Feed.svelte';
@@ -73,6 +73,7 @@
   let steerCommand = $state('');
   let searchRouteParams = $state<SearchRequestParams | null>(initialRoute.searchParams);
   let searchRouteError = $state<string | null>(initialRoute.searchError);
+  let searchResultItems = $state<ItemSummary[]>([]);
   let steerFeedback = $state<SteerFeedback>({ kind: 'idle' });
   let undoStatus = $state('');
   let agentSteeringRules = $state<SteerRule[]>([]);
@@ -110,11 +111,16 @@
   let openRouterModelListState = $state<'loading' | 'available' | 'unavailable'>('unavailable');
   let itemDetailRequestSequence = 0;
   let inspectionMarkerRequestSequence = 0;
+  let navigationGeneration = 0;
   let steerErrorAttemptSequence = 0;
 
   const hasOwnerToken = $derived(ownerToken.length > 0 && promptState !== 'rejected');
   const documentTitle = $derived(browserRouteResolved ? workbenchDocumentTitle(currentSurface) : 'RESOFEED');
   const ownerTokenRejected = $derived(promptState === 'rejected');
+  const inspectorOrigin = $derived(historyItemOrigin(windowHistoryState()));
+  const inspectorReturnLabel = $derived(processingLanguage.code === 'zh'
+    ? inspectorOrigin === 'feed' ? '返回今日' : inspectorOrigin === 'search' ? '返回搜索' : '返回列表'
+    : inspectorOrigin === 'feed' ? 'Return to TODAY' : inspectorOrigin === 'search' ? 'Return to Search' : 'Return to Feed');
   const firstUseState = $derived<FirstUseState>(
     sources.length === 0
       ? 'no-sources'
@@ -163,7 +169,6 @@
   const browserLegacyEnglishA11y = $derived(true);
   const todayScrollLabel = $derived(browserLegacyEnglishA11y ? 'TODAY surface independent scroll' : shellChrome.todayScroll);
   const inspectorScrollLabel = $derived(browserLegacyEnglishA11y ? 'INSPECTOR independent scroll' : shellChrome.inspectorScroll);
-  const backTodayLabel = $derived(browserLegacyEnglishA11y ? 'back to TODAY' : shellChrome.backToday);
   const steerErrorText = $derived(steerFeedback.kind === 'error'
     ? steerFeedback.reason === 'invalid-source'
       ? (processingLanguage.code === 'zh' ? '需要 URL' : 'URL required')
@@ -173,8 +178,42 @@
     : '');
   const steerErrorRenderKey = $derived(steerFeedback.kind === 'error' ? `${steerFeedback.attemptId}:${processingLanguage.code}` : 'idle');
 
-  function itemIdForPath(pathname: string): string | null {
-    return resolveWorkbenchRoute(pathname).itemId;
+  function windowHistoryState(): unknown {
+    return typeof window === 'undefined' ? null : window.history.state;
+  }
+
+  function validCoordinate(value: unknown): value is number {
+    return typeof value === 'number' && Number.isFinite(value) && value >= 0;
+  }
+
+  function boundedHistoryState(value: unknown): WorkbenchHistoryState | null {
+    if (typeof value !== 'object' || value === null) return null;
+    const candidate = value as Partial<WorkbenchHistoryState>;
+    if (candidate.version !== 1 || (candidate.surface !== 'feed' && candidate.surface !== 'search' && candidate.surface !== 'inspector')) return null;
+    if (candidate.originSurface !== null && candidate.originSurface !== 'feed' && candidate.originSurface !== 'search') return null;
+    if (!validCoordinate(candidate.feedPaneScrollTop) || !validCoordinate(candidate.windowScrollY) || !validCoordinate(candidate.searchRegionScrollTop)) return null;
+    if (candidate.itemId !== null && typeof candidate.itemId !== 'string') return null;
+    if (candidate.returnFocusItemId !== null && typeof candidate.returnFocusItemId !== 'string') return null;
+    return candidate as WorkbenchHistoryState;
+  }
+
+  function historyItemOrigin(value: unknown): 'feed' | 'search' | null {
+    const state = boundedHistoryState(value);
+    return state?.surface === 'inspector' ? state.originSurface : null;
+  }
+
+  function historyState(surface: WorkbenchHistoryState['surface'], itemId: string | null, originSurface: WorkbenchHistoryState['originSurface'], returnFocusItemId: string | null): WorkbenchHistoryState {
+    const searchRegion = document.querySelector<HTMLElement>('.contract-search');
+    return {
+      version: 1,
+      surface,
+      itemId,
+      originSurface,
+      feedPaneScrollTop: Math.max(0, feedPaneElement?.scrollTop ?? preservedFeedScrollTop),
+      windowScrollY: Math.max(0, window.scrollY),
+      searchRegionScrollTop: Math.max(0, searchRegion?.scrollTop ?? preservedSearchWindowScrollY),
+      returnFocusItemId
+    };
   }
 
   function canonicalPathForSurface(surface: Surface): string | null {
@@ -184,41 +223,76 @@
     return null;
   }
 
-  function replaceSurfaceFromLocation(state: unknown = window.history.state): void {
+  function localizedInvalidItemLink(): string {
+    return processingLanguage.code === 'zh' ? '无效的文章链接' : 'Invalid item link';
+  }
+
+  async function replaceSurfaceFromLocation(state: unknown = window.history.state): Promise<void> {
+    const generation = ++navigationGeneration;
     const route = resolveWorkbenchRoute(window.location.pathname, window.location.search, state);
-    if (route.surface === 'search') {
-      searchRouteParams = route.searchParams ?? {};
-      searchRouteError = route.searchError;
-      if (typeof state === 'object' && state !== null && 'searchScrollY' in state && typeof (state as { searchScrollY?: unknown }).searchScrollY === 'number') {
-        preservedSearchWindowScrollY = (state as { searchScrollY: number }).searchScrollY;
-      }
-    } else {
+    if (route.surface === 'inspector') {
+      currentSurface = 'inspector';
       searchRouteError = null;
-    }
-    if (route.surface === 'inspector' && route.itemId) {
+      if (route.itemRouteKind === 'legacy' && route.canonicalPath) {
+        window.history.replaceState(
+          boundedHistoryState(state) ?? historyState('inspector', route.itemId, null, null),
+          '',
+          route.canonicalPath
+        );
+      }
+      if (!route.itemId) {
+        clearSelectedInspectorContext();
+        inspectorState = 'error';
+        inspectorError = localizedInvalidItemLink();
+        if (hasOwnerToken) {
+          inspectorFocusRequestId += 1;
+          await focusActiveSurface('inspector');
+        }
+        return;
+      }
       selectedItemId = route.itemId;
       setSelectedItemPreview(items.find((item) => item.id === route.itemId) ?? null);
-      if (hasOwnerToken && loadState === 'ready') void loadItemDetail(route.itemId);
+      if (hasOwnerToken && loadState === 'ready') {
+        await loadItemDetail(route.itemId);
+        if (generation === navigationGeneration) inspectorFocusRequestId += 1;
+      }
+      return;
     }
-    if (route.surface !== currentSurface) currentSurface = route.surface;
-    if (route.surface === 'search') void restoreSearchScrollPosition();
+
+    if (route.surface === 'search') {
+      currentSurface = 'search';
+      searchRouteParams = route.searchParams ?? {};
+      searchRouteError = route.searchError;
+      const recorded = boundedHistoryState(state);
+      if (recorded?.surface === 'search') preservedSearchWindowScrollY = recorded.searchRegionScrollTop;
+      return;
+    }
+
+    searchRouteError = null;
+    currentSurface = route.surface;
+    if (route.surface === 'feed') await restoreFeedFromHistory(boundedHistoryState(state), generation);
   }
 
   function syncSearchHistory(params: SearchRequestParams, scrollY = preservedSearchWindowScrollY, mode: 'push' | 'replace' = 'replace'): void {
     const query = searchQueryString(params);
-    const nextUrl = `/${query ? `?${query}` : ''}`;
-    const state = { surface: 'search', searchQuery: params.q ?? '', searchScrollY: scrollY };
+    const nextUrl = `/?${query}`;
+    const state = historyState('search', selectedItemId, null, selectedItemId);
+    state.searchRegionScrollTop = Math.max(0, scrollY);
     if (mode === 'push') window.history.pushState(state, '', nextUrl);
     else window.history.replaceState(state, '', nextUrl);
   }
 
   async function restoreSearchScrollPosition(): Promise<void> {
-    if (!isNarrow || currentSurface !== 'search') return;
+    if (currentSurface !== 'search') return;
     await tick();
-    if (typeof requestAnimationFrame === 'function') {
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    if (typeof requestAnimationFrame === 'function') await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    const searchRegion = document.querySelector<HTMLElement>('.contract-search');
+    if (isNarrow) {
+      const maximum = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      window.scrollTo(0, Math.min(preservedSearchWindowScrollY, maximum));
+    } else if (searchRegion) {
+      searchRegion.scrollTop = Math.min(preservedSearchWindowScrollY, Math.max(0, searchRegion.scrollHeight - searchRegion.clientHeight));
     }
-    window.scrollTo(0, preservedSearchWindowScrollY);
   }
 
   async function focusActiveSurface(surface = currentSurface): Promise<void> {
@@ -231,6 +305,45 @@
       doctor: 'doctor-heading'
     };
     document.getElementById(headingIdBySurface[surface])?.focus({ preventScroll: true });
+  }
+
+  function itemActivationButton(itemId: string): HTMLButtonElement | null {
+    const item = [...searchResultItems, ...items].find((candidate) => candidate.id === itemId);
+    return Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((button) =>
+      button.getAttribute('aria-label') === searchResultActivationLabel(item?.title ?? '', processingLanguage.code)
+      || (button.getAttribute('aria-label')?.startsWith('Open Inspector for:') && button.closest(`[data-item-id="${CSS.escape(itemId)}"]`))
+    ) ?? null;
+  }
+
+  function labelSearchResultActivationButtons(results: ItemSummary[]): void {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.contract-search-result > .contract-feed-open');
+    buttons.forEach((button, index) => {
+      const item = results[index];
+      if (item) button.setAttribute('aria-label', searchResultActivationLabel(item.title, processingLanguage.code));
+    });
+  }
+
+  async function restoreFeedFromHistory(recorded: WorkbenchHistoryState | null, generation: number): Promise<void> {
+    await tick();
+    if (generation !== navigationGeneration || currentSurface !== 'feed') return;
+    const selectedExists = recorded?.itemId ? items.some((item) => item.id === recorded.itemId) : false;
+    const focusExists = recorded?.returnFocusItemId ? items.some((item) => item.id === recorded.returnFocusItemId) : false;
+    if (selectedExists && focusExists && recorded) {
+      selectedItemId = recorded.itemId;
+      setSelectedItemPreview(items.find((item) => item.id === recorded.itemId) ?? null);
+    } else {
+      const first = items[0] ?? null;
+      selectedItemId = isNarrow ? null : first?.id ?? null;
+      setSelectedItemPreview(isNarrow ? null : first);
+    }
+    if (recorded) {
+      preservedFeedScrollTop = recorded.feedPaneScrollTop;
+      preservedWindowScrollY = recorded.windowScrollY;
+    }
+    await restoreFeedScrollPosition();
+    const focusId = selectedExists && focusExists && recorded ? recorded.returnFocusItemId : items[0]?.id ?? null;
+    if (focusId) itemActivationButton(focusId)?.focus({ preventScroll: true });
+    else steerInput?.focus({ preventScroll: true });
   }
 
   function apiClient(token = ownerToken): ResoFeedApiClient {
@@ -283,6 +396,7 @@
   function resetSearchSurfaceState(): void {
     searchRouteParams = null;
     searchRouteError = null;
+    searchResultItems = [];
     steerCommand = '';
     preservedSearchWindowScrollY = 0;
     if (steerFeedback.kind === 'receipt' && steerFeedback.route === 'search') steerFeedback = { kind: 'idle' };
@@ -320,10 +434,12 @@
   }
 
   function reconcileSelectedFeedItem(feedItems: ItemSummary[]): void {
-    const routeItemId = itemIdForPath(window.location.pathname);
-    if (routeItemId) {
-      selectedItemId = routeItemId;
-      selectedItemPreview = feedItems.find((item) => item.id === routeItemId) ?? selectedItemPreview;
+    const route = resolveWorkbenchRoute(window.location.pathname, window.location.search, window.history.state);
+    if (route.surface === 'inspector') {
+      if (route.itemId) {
+        selectedItemId = route.itemId;
+        selectedItemPreview = feedItems.find((item) => item.id === route.itemId) ?? selectedItemPreview;
+      }
       return;
     }
     if (currentSurface === 'search') return;
@@ -634,23 +750,22 @@
       setDocumentLanguage(languageResponse.code);
       applyCurrentOperationSnapshot(currentOperationResponse);
       agentSteeringRules = await loadAgentSteeringRules(client);
-      replaceSurfaceFromLocation();
+      if (syncRoute) await replaceSurfaceFromLocation();
       reconcileSelectedFeedItem(feedResponse.items);
       promptState = 'accepted';
       window.localStorage.setItem(tokenStorageKey, token);
-      if (syncRoute) replaceSurfaceFromLocation();
-      if (currentSurface === 'doctor') {
-        steerFeedback = { kind: 'doctor', text: await loadDoctorDiagnostics(client) };
-      }
+      if (currentSurface === 'doctor') steerFeedback = { kind: 'doctor', text: await loadDoctorDiagnostics(client) };
       loadState = 'ready';
-      if (selectedItemId) {
-        await loadItemDetail(selectedItemId, token);
-      }
+      const activeRoute = resolveWorkbenchRoute(window.location.pathname, window.location.search, window.history.state);
+      if (activeRoute.surface === 'inspector' && activeRoute.itemId) await loadItemDetail(activeRoute.itemId, token);
       await tick();
-      const activeText = document.activeElement?.textContent?.trim();
-      if (!focusAfterLoad) {
+      if (activeRoute.surface === 'inspector') {
+        inspectorFocusRequestId += 1;
+        await focusActiveSurface('inspector');
         return;
       }
+      if (!focusAfterLoad) return;
+      const activeText = document.activeElement?.textContent?.trim();
       if (document.activeElement === document.body || document.activeElement?.id === 'owner-token-input' || activeText === 'submit' || activeText === '[SUBMIT]') {
         steerInput?.focus();
       } else if (currentSurface !== 'feed') {
@@ -771,6 +886,13 @@
     }
   }
 
+  function localizedItemReadError(error: unknown): string {
+    if (error instanceof ResoFeedApiError && error.status === 404) {
+      return processingLanguage.code === 'zh' ? '文章不存在或已被删除' : 'Item does not exist or was deleted';
+    }
+    return processingLanguage.code === 'zh' ? '文章暂时不可用' : 'Item temporarily unavailable';
+  }
+
   async function loadItemDetail(itemId: string, token = ownerToken): Promise<void> {
     const requestSequence = ++itemDetailRequestSequence;
     inspectorState = 'loading';
@@ -780,57 +902,51 @@
       if (requestSequence !== itemDetailRequestSequence || itemId !== selectedItemId) return;
       selectedItemDetail = response.item;
       inspectorState = 'ready';
+      if (requestSequence !== itemDetailRequestSequence || itemId !== selectedItemId) return;
       await tick();
       if (detailPaneElement) detailPaneElement.scrollTop = 0;
     } catch (error) {
       if (requestSequence !== itemDetailRequestSequence || itemId !== selectedItemId) return;
+      if (error instanceof ResoFeedApiError && error.status === 401) {
+        window.localStorage.removeItem(tokenStorageKey);
+        ownerToken = '';
+        promptState = 'rejected';
+        loadState = 'error';
+        return;
+      }
       inspectorState = 'error';
-      inspectorError = error instanceof Error ? error.message : 'err: item unavailable';
+      inspectorError = localizedItemReadError(error);
     }
   }
 
-  async function selectItem(item: ItemSummary): Promise<void> {
-    rememberFeedScrollPosition();
+  function openItemHistory(item: ItemSummary, origin: 'feed' | 'search'): void {
+    if (origin === 'feed') rememberFeedScrollPosition();
+    const originState = historyState(origin, item.id, null, item.id);
+    window.history.replaceState(originState, '', `${window.location.pathname}${window.location.search}`);
+    window.history.pushState(historyState('inspector', item.id, origin, item.id), '', itemAppPath(item.id));
+  }
+
+  async function activateItem(item: ItemSummary, origin: 'feed' | 'search'): Promise<void> {
+    openItemHistory(item, origin);
+    navigationGeneration += 1;
     selectedItemId = item.id;
     setSelectedItemPreview(item);
     inspectorActivated = true;
     currentSurface = 'inspector';
     inspectorFocusRequestId += 1;
     if (detailPaneElement) detailPaneElement.scrollTop = 0;
-    const routePath = itemRoutePath(item.id);
-    if (isNarrow && window.location.pathname !== routePath) {
-      window.history.pushState({}, '', routePath);
-    }
-    void markItemInspected(item.id);
-    await loadItemDetail(item.id);
-    if (isNarrow && window.location.pathname !== routePath) return;
-    currentSurface = 'inspector';
-    await restoreFeedScrollPosition();
+    const inspection = markItemInspected(item.id);
+    await Promise.all([loadItemDetail(item.id, ownerToken), inspection]);
+  }
+
+  async function selectItem(item: ItemSummary): Promise<void> {
+    await activateItem(item, 'feed');
   }
 
   async function selectSearchItem(item: ItemSummary): Promise<void> {
-    preservedSearchWindowScrollY = window.scrollY;
-    if (isNarrow) {
-      if (searchRouteParams) syncSearchHistory(searchRouteParams, preservedSearchWindowScrollY);
-      window.history.pushState({}, '', itemRoutePath(item.id));
-      await selectItem(item);
-      return;
-    }
     const searchRegion = document.querySelector<HTMLElement>('.contract-search');
-    const preservedSearchScrollTop = searchRegion?.scrollTop ?? 0;
-    selectedItemId = item.id;
-    setSelectedItemPreview(item);
-    inspectorFocusRequestId += 1;
-    if (detailPaneElement) detailPaneElement.scrollTop = 0;
-    void markItemInspected(item.id);
-    await loadItemDetail(item.id);
-    currentSurface = 'search';
-    await tick();
-    if (searchRegion) searchRegion.scrollTop = preservedSearchScrollTop;
-    if (typeof requestAnimationFrame === 'function') {
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    }
-    if (searchRegion) searchRegion.scrollTop = preservedSearchScrollTop;
+    preservedSearchWindowScrollY = isNarrow ? window.scrollY : searchRegion?.scrollTop ?? 0;
+    await activateItem(item, 'search');
   }
 
   async function loadMoreFeedItems(): Promise<void> {
@@ -845,6 +961,33 @@
     } finally {
       feedLoadingMore = false;
     }
+  }
+
+  async function closeInspector(): Promise<void> {
+    const origin = historyItemOrigin(window.history.state);
+    if (origin) {
+      window.history.back();
+      return;
+    }
+    navigationGeneration += 1;
+    preservedFeedScrollTop = 0;
+    preservedWindowScrollY = 0;
+    currentSurface = 'feed';
+    inspectorActivated = false;
+    inspectorState = 'idle';
+    inspectorError = null;
+    const first = items[0] ?? null;
+    selectedItemId = isNarrow ? null : first?.id ?? null;
+    setSelectedItemPreview(isNarrow ? null : first);
+    window.history.replaceState(historyState('feed', selectedItemId, null, first?.id ?? null), '', '/');
+    await restoreFeedScrollPosition();
+    if (first) itemActivationButton(first.id)?.focus({ preventScroll: true });
+    else steerInput?.focus({ preventScroll: true });
+  }
+
+  async function retryItemRead(): Promise<void> {
+    const route = resolveWorkbenchRoute(window.location.pathname, window.location.search, window.history.state);
+    if (route.surface === 'inspector' && route.itemId) await loadItemDetail(route.itemId);
   }
 
   function showSurface(surface: Surface, updateUrl = true): void {
@@ -1163,11 +1306,31 @@
     return apiClient().search(normalized.params);
   }
 
-  async function handleSearchResults(items: ItemSummary[], state: 'ready' | 'error'): Promise<void> {
-    if (isNarrow || currentSurface !== 'search') return;
-    if (state === 'error' || items.length === 0) {
+  async function handleSearchResults(results: ItemSummary[], state: 'ready' | 'error'): Promise<void> {
+    if (currentSurface !== 'search') return;
+    searchResultItems = state === 'ready' ? results : [];
+    const recorded = boundedHistoryState(window.history.state);
+    if (state === 'error' || results.length === 0) {
       clearSelectedInspectorContext();
+      await tick();
+      document.querySelector<HTMLInputElement>('input[type="search"]')?.focus({ preventScroll: true });
+      return;
     }
+    await tick();
+    labelSearchResultActivationButtons(results);
+    const selectedExists = recorded?.itemId ? results.some((item) => item.id === recorded.itemId) : false;
+    const focusExists = recorded?.returnFocusItemId ? results.some((item) => item.id === recorded.returnFocusItemId) : false;
+    if (recorded?.surface === 'search' && selectedExists && focusExists) {
+      selectedItemId = recorded.itemId;
+      setSelectedItemPreview(results.find((item) => item.id === recorded.itemId) ?? null);
+      await tick();
+      itemActivationButton(recorded.returnFocusItemId ?? '')?.focus({ preventScroll: true });
+    } else if (recorded?.surface === 'search') {
+      clearSelectedInspectorContext();
+      await tick();
+      document.querySelector<HTMLInputElement>('input[type="search"]')?.focus({ preventScroll: true });
+    }
+    await restoreSearchScrollPosition();
   }
 
   async function updateProcessingLanguage(): Promise<void> {
@@ -1250,8 +1413,14 @@
     document.addEventListener('mousedown', preserveKeyboardFocusModality);
     document.addEventListener('keydown', handleGlobalEscape, true);
 
-    const handlePopState = (event: PopStateEvent) => replaceSurfaceFromLocation(event.state);
+    const handlePopState = (event: PopStateEvent) => { void replaceSurfaceFromLocation(event.state); };
     window.addEventListener('popstate', handlePopState);
+
+    const mountedRoute = resolveWorkbenchRoute(window.location.pathname, window.location.search, window.history.state);
+    if (mountedRoute.surface === 'inspector') {
+      const mountedState = boundedHistoryState(window.history.state) ?? historyState('inspector', mountedRoute.itemId, null, null);
+      window.history.replaceState(mountedState, '', mountedRoute.itemRouteKind === 'legacy' && mountedRoute.canonicalPath ? mountedRoute.canonicalPath : `${window.location.pathname}${window.location.search}`);
+    }
 
     const storedToken = window.localStorage.getItem(tokenStorageKey);
     if (storedToken) {
@@ -1437,7 +1606,7 @@
         {#if !feedPaneInactive || currentSurface === 'inspector'}
           <p id="feed-heading" class="visually-hidden" tabindex="-1">TODAY feed</p>
           {#if currentSurface === 'search' && !isNarrow}
-            <SearchRetrieval items={items} routeParams={searchRouteParams} routeError={searchRouteError} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} autoSelectFirstResult={true} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
+            <SearchRetrieval items={items} routeParams={searchRouteParams} routeError={searchRouteError} sources={sources} language={processingLanguage.code} onSearch={searchItems} onSelect={selectSearchItem} onResultsSettled={handleSearchResults} onResonanceToggle={toggleResonance} selectedItemId={selectedItemId} autoSelectFirstResult={false} compactFilters={false} suppressStatusRole={steerFeedback.kind === 'receipt' && processingLanguage.code !== 'zh'} />
           {:else if apiError && !ownerTokenRejected}
             <p class="contract-feedback-error" role="alert">{apiError}</p>
           {:else if items.length === 0}
@@ -1451,12 +1620,9 @@
       <!-- svelte-ignore a11y_no_noninteractive_tabindex: docs/DESIGN.md requires the desktop Inspector scroll region itself to be keyboard-focusable. -->
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions: detail scroll region owns desktop Inspector Escape close per DESIGN.md. -->
       <aside bind:this={detailPaneElement} role="region" class="detail-pane" class:active-panel={currentSurface === 'feed' || currentSurface === 'inspector' || (!isNarrow && currentSurface === 'search')} class:detail-pane--closed={currentSurface === 'feed' && !inspectorItem} aria-label={inspectorScrollLabel} aria-hidden={detailPaneInactive ? 'true' : undefined} inert={detailPaneInactive} tabindex="0" data-scroll-region="inspector-independent" onkeydown={handleGlobalEscape}>
-        {#if currentSurface === 'inspector'}
-          <button class="back-command" type="button" aria-label={backTodayLabel} onclick={() => showSurface('feed')}>{shellChrome.backToday}</button>
-        {/if}
-        {#if inspectorItem}
+        {#if inspectorItem || currentSurface === 'inspector'}
           <section class="inspector-stable-landmark" role="complementary" aria-label="INSPECTOR">
-            <Inspector item={inspectorItem} landmarkLabel={inspectorInnerLandmarkLabel(inspectorItem)} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} inspectionMarkerError={inspectionMarkerError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} onEscape={() => { if (isNarrow) showSurface('feed'); else focusFeedFromDesktopInspector(); }} showReingest={inspectorActivated} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} />
+            <Inspector item={inspectorItem} landmarkLabel={inspectorItem ? inspectorInnerLandmarkLabel(inspectorItem) : 'INSPECTOR'} mode={isNarrow ? 'mobile-route' : 'desktop-split'} language={processingLanguage.code} groupedSourceCandidates={items} sources={sources} loading={inspectorState === 'loading'} error={inspectorError} inspectionMarkerError={inspectionMarkerError} focusHeading={currentSurface === 'inspector'} focusRequestId={inspectorFocusRequestId} onResonanceToggle={toggleResonance} onReingestItem={reingestSelectedItem} onEscape={() => { if (isNarrow) showSurface('feed'); else focusFeedFromDesktopInspector(); }} showReingest={inspectorActivated} openRouterModels={openRouterModels} openRouterModelListState={openRouterModelListState} returnLabel={currentSurface === 'inspector' ? inspectorReturnLabel : null} onReturn={currentSurface === 'inspector' ? closeInspector : undefined} onRetry={currentSurface === 'inspector' && inspectorError && selectedItemId ? retryItemRead : undefined} />
           </section>
         {:else}
           <p class="contract-label inspector-empty-placeholder">INSPECTOR</p>

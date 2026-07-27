@@ -18,7 +18,7 @@ ResoFeed is not a team SaaS, OAuth app, notification system, folder/tag reader, 
 
 ## What you get
 - **TODAY** — a dense daily surface for fresh feed items.
-- **INSPECTOR** — an immediate source-backed preview that remains readable while detail and inspection requests complete independently.
+- **INSPECTOR** — an immediate source-backed preview with copyable `/items/{encoded-item-id}` deep links and a consistent `Open Inspector for:` activation on TODAY and Search results. Direct links preserve the Inspector route through owner-token entry, refresh, Retry, Back/Forward, and route-aware return without recording an inspection unless a user deliberately opens the item from TODAY or Search.
 - **SOURCE LEDGER** — active sources, import-only OPML intake, JSON State export/import, manual source fetch, and all-source ingest.
 - **Steer** — natural-language source add/search/policy commands with localized accessible validation after invalid submission.
 - **SQLite FTS5 search** — lexical search with metadata filters; no embeddings or vector database.

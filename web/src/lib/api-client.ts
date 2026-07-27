@@ -38,7 +38,7 @@ import type {
 } from '$lib/api-contract';
 import { processingLanguageRuntimeContract } from '$lib/api-contract';
 import { normalizeCurrentOperationInfo } from '$lib/current-operation';
-import { itemRoutePath, type SearchRequestParams } from '$lib/workbench-route';
+import { itemAPIPath, type SearchRequestParams } from '$lib/workbench-route';
 
 export type { SearchRequestParams } from '$lib/workbench-route';
 
@@ -224,11 +224,11 @@ export class ResoFeedApiClient {
   }
 
   async item(id: OpaqueId): Promise<ItemDetailResponse> {
-    return this.request<ItemDetailResponse>(`/api${itemRoutePath(id)}`);
+    return this.request<ItemDetailResponse>(itemAPIPath(id));
   }
 
   async inspect(id: OpaqueId, request?: Partial<InspectRequest>): Promise<InspectResponse> {
-    return this.request<InspectResponse>(`/api${itemRoutePath(id)}/inspect`, {
+    return this.request<InspectResponse>(`${itemAPIPath(id)}/inspect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -247,7 +247,7 @@ export class ResoFeedApiClient {
     const promptFields = compatibilityRequest && Object.prototype.hasOwnProperty.call(compatibilityRequest, 'extra_prompt')
       ? { extra_prompt: extraPrompt.length > 0 ? extraPrompt : null }
       : { prompt: prompt.length > 0 ? prompt : null };
-    return this.request<ItemReingestResponse>(`/api${itemRoutePath(id)}/reingest`, {
+    return this.request<ItemReingestResponse>(`${itemAPIPath(id)}/reingest`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -261,7 +261,7 @@ export class ResoFeedApiClient {
   }
 
   async resonance(id: OpaqueId, resonated: boolean, request?: Partial<ResonanceRequest>): Promise<ResonanceResponse> {
-    return this.request<ResonanceResponse>(`/api${itemRoutePath(id)}/resonance`, {
+    return this.request<ResonanceResponse>(`${itemAPIPath(id)}/resonance`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

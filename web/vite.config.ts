@@ -10,6 +10,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const buildIdentity = resolveSvelteBuildIdentity(repoRoot);
 
 const commitHash = buildIdentity.slice(3, 11);
+const nodeFilesystemTests = [
+  'src/lib/__tests__/item-deep-links.expected-red.test.ts',
+  'src/lib/__tests__/workbench-route.test.ts'
+];
 let pkgVersion = 'unknown';
 try {
   const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
@@ -28,8 +32,24 @@ export default defineConfig({
     conditions: ['browser']
   },
   test: {
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    exclude: ['**/node_modules/**', '**/.git/**', 'tests/e2e/**']
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node-filesystem',
+          environment: 'node',
+          include: nodeFilesystemTests
+        }
+      },
+      {
+        extends: true,
+        test: {
+          name: 'browser-components',
+          environment: 'jsdom',
+          setupFiles: ['./src/test/setup.ts'],
+          exclude: ['**/node_modules/**', '**/.git/**', 'tests/e2e/**', ...nodeFilesystemTests]
+        }
+      }
+    ]
   }
 });

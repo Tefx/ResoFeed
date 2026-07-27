@@ -3,6 +3,7 @@
   import { processingLanguageRuntimeContract, type CurrentOperationInfo, type ExtractionSource, type GroupedSourceItem, type ItemDetail, type ItemReingestResponse, type ItemSummary, type ModelStatus, type OpenRouterModelOption, type Source } from '$lib/api-contract';
   import { ResoFeedApiError } from '$lib/api-client';
   import { operationDetails } from '$lib/current-operation';
+  import { itemAppUrl } from '$lib/workbench-route';
   import { itemAnatomyChrome } from './item-anatomy';
 
   type InspectorMode = 'desktop-split' | 'mobile-route';
@@ -32,9 +33,12 @@
     openRouterModels?: OpenRouterModelOption[];
     openRouterModelListState?: 'loading' | 'available' | 'unavailable';
     landmarkLabel?: string | null;
+    returnLabel?: string | null;
+    onReturn?: () => Promise<void> | void;
+    onRetry?: () => Promise<void> | void;
   }
 
-  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, inspectionMarkerError = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, onEscape, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable', landmarkLabel = null }: Props = $props();
+  let { item, mode, language = 'en', groupedSourceCandidates = [], sources = [], loading = false, error = null, inspectionMarkerError = null, focusHeading = true, focusRequestId = 0, onResonanceToggle, onReingestItem, onEscape, showReingest = false, openRouterModels = [], openRouterModelListState = 'unavailable', landmarkLabel = null, returnLabel = null, onReturn, onRetry }: Props = $props();
   let heading = $state<HTMLHeadingElement | undefined>();
   let pending = $state(false);
   let reingestModel = $state('default');
@@ -46,6 +50,7 @@
   let reingestModelSelect = $state<HTMLSelectElement | undefined>();
   let reingestItemId = $state<string | null>(null);
   let handledFocusRequestId = $state(-1);
+  let copyStatus = $state('');
   const sourceTitleTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('source_title') ? 'no' : undefined;
   const sourceUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.source_url') ? 'no' : undefined;
   const originalUrlTranslate = processingLanguageRuntimeContract.sourceIdentifierNonTranslation.includes('provenance.original_url') ? 'no' : undefined;
@@ -783,6 +788,16 @@
     }
   });
 
+  async function copyItemLink(): Promise<void> {
+    if (!item) return;
+    try {
+      await navigator.clipboard.writeText(itemAppUrl(item.id));
+      copyStatus = localizedChrome('Item link copied', '文章链接已复制');
+    } catch {
+      copyStatus = localizedChrome('Unable to copy item link', '无法复制文章链接');
+    }
+  }
+
   async function toggleResonance(): Promise<void> {
     if (!item || !onResonanceToggle) return;
     pending = true;
@@ -799,6 +814,9 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex: on mobile route the Inspector surface remains a focusable route-level reading region. -->
 <aside class="contract-region contract-inspector" aria-label={item ? (landmarkLabel ?? localizedDisplayTitle(item)) : 'INSPECTOR'} tabindex={mode === 'mobile-route' ? 0 : undefined} data-scroll-region={mode === 'mobile-route' ? 'inspector-reading-independent' : undefined} onkeydown={handleInspectorEscape}>
   <p id="inspector-region-label" class="visually-hidden contract-label">{item ? inspectorChromeLabel(item) : localizedChrome('INSPECTOR', '检查器')}</p>
+  {#if returnLabel && onReturn}
+    <button class={mode === 'mobile-route' ? 'back-command' : 'bracket-action inspector-return-command'} type="button" aria-label={returnLabel} onclick={() => void onReturn?.()}>{returnLabel}</button>
+  {/if}
   {#if loading}
     <p class="contract-muted inspector-transition-status" role="status">{localizedChrome('loading', '加载中')}</p>
   {/if}
@@ -806,7 +824,10 @@
     <p class="contract-feedback-error inspector-inspection-marker-error" role="alert">{inspectionMarkerError}</p>
   {/if}
   {#if error}
-    <p class="contract-feedback-error inspector-detail-error" role="alert">{error}</p>
+    <p class="contract-feedback-error inspector-detail-error" role="alert" tabindex="-1">{error}</p>
+    {#if onRetry}
+      <button class="bracket-action" type="button" onclick={() => void onRetry?.()}>{localizedChrome('[RETRY]', '[重试]')}</button>
+    {/if}
   {/if}
   {#if item}
     <div class="inspector-header-row">
@@ -816,12 +837,16 @@
     </div>
     <div class="inspector-title-row">
       <h2 id="inspector-heading" bind:this={heading} tabindex="-1">{localizedDisplayTitle(item)}</h2>
+      <button class="bracket-action" type="button" aria-label={localizedChrome('Copy item link', '复制文章链接')} onclick={() => void copyItemLink()}>{localizedChrome('[COPY LINK]', '[复制链接]')}</button>
       {#if mode === 'mobile-route' && onResonanceToggle}
         <button class="contract-resonate" type="button" disabled={pending} aria-pressed={item.is_resonated ? 'true' : 'false'} aria-label={browserLegacyEnglishA11y() ? (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`) : language === 'zh' ? (item.is_resonated ? `取消星标：${item.title}` : `标星：${item.title}`) : (item.is_resonated ? `Remove resonance: ${item.title}` : `Resonate item: ${item.title}`)} onclick={() => void toggleResonance()}>
           {item.is_resonated ? '★' : '☆'}
         </button>
       {/if}
     </div>
+    {#if copyStatus}
+      <p class="visually-hidden" role="status">{copyStatus}</p>
+    {/if}
     {#if language === 'zh'}
       <p class="visually-hidden" aria-label={`本地化标题：${localizedDisplayTitle(item)}`}></p>
     {:else}

@@ -5,6 +5,7 @@ import { render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ResoFeedApiClient, ResoFeedApiError } from '$lib/api-client';
+import { itemAPIPath } from '$lib/workbench-route';
 import {
   type CurrentOperationInfo,
   type CurrentOperationResponse,
@@ -66,6 +67,22 @@ function jsonResponse(
 }
 
 describe('ResoFeed API client and rendered sinks', () => {
+  it('keeps item operations on the independent API token path', async () => {
+    const itemId = '~slash/%?hash#雪';
+    const fetcher = vi.fn<typeof fetch>(async () => new Response(JSON.stringify({ item: expectedRedItem }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json; charset=utf-8' }
+    }));
+    const client = new ResoFeedApiClient({ ownerToken: 'owner-token-123456789012345678901234', fetcher });
+
+    await client.item(itemId);
+
+    expect(fetcher).toHaveBeenCalledWith(itemAPIPath(itemId), {
+      headers: { Authorization: 'Bearer owner-token-123456789012345678901234' }
+    });
+    expect(itemAPIPath(itemId)).toMatch(/^\/api\/items\/~[A-Za-z0-9_-]+$/u);
+  });
+
   it('pins Tavily extraction-source summary and nullable detail evidence contracts without leaking detail evidence into summaries', () => {
     expect(extractionSourceValues).toEqual(['local_readable', 'feed_excerpt', 'external_tavily', 'none']);
 
