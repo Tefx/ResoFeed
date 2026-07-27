@@ -196667,7 +196667,7 @@ phases:
       mutation remains.'
   - id: item-deep-links-publish-immutable-oci
     name: Publish the Integrated Deep-Link Image as an Immutable OCI Index
-    status: pending
+    status: claimed
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -196771,6 +196771,8 @@ phases:
     depends_on:
     - item-deep-links-local-integration-verification
     agent: vectl-orchestrator
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-27T08:13:21.335241Z'
   - id: item-deep-links-tailnet-runtime-proof
     name: Independently Prove Tailnet/Caddy Deep-Link Runtime Semantics
     status: pending
