@@ -196367,7 +196367,7 @@ phases:
       external/runtime effect occurred.
   - id: item-deep-links-frontend-browser
     name: Implement Browser Routes, Inspector Lifecycle, History, and Accessibility
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Deliver `ITEM-DEEP-LINK-FRONTEND` while preserving the current canonical application\
@@ -196543,6 +196543,20 @@ phases:
     agent: frontend-engineer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T06:54:37.284793Z'
+    done_at: '2026-07-27T07:04:11.580857+00:00'
+    evidence: Integrated frontend product commit 9e74b7d0875c27d340bb76c3f38dd1a9f1b6c36b
+      and proof-harness restoration commit 914d4baea64e0e7a14ba56ef8592a66c00eac2e5.
+      Product changes are exactly the nine authorized README/frontend/test/Vite paths;
+      harness changes are exactly scripts/vectl-check.mjs and scripts/vectl-check.test.mjs
+      under the repaired pending contract. Fresh Worker-v2 receipt /tmp/larva-agent-artifacts/item-deep-links-frontend-adapter-restoration2/worker-receipt.json
+      and parent production verdict worker-parent-verdict.json are CONFORMANT. The
+      focused restoration check exited 0 with ITEM_DEEP_LINK_FRONTEND_RESTORATION=complete;
+      selected execution ran both exact identities and emitted all seven ITEM_DEEP_LINK_*
+      markers with exit 0. Protected acceptance tests/configs/fixtures/backend/docs
+      remained unchanged. Integrated Gate integrated-verdict.json is CONFORMANT at
+      main HEAD 914d4baea64e0e7a14ba56ef8592a66c00eac2e5; before/after tracked status
+      was clean and .webui-stage residue count was 0. No runtime/external/deployment
+      effects occurred.
   - id: item-deep-links-local-integration-verification
     name: Independently Verify Local HTTP, MCP, SQLite, and Browser Integration
     status: pending
