@@ -196915,7 +196915,7 @@ phases:
       repository tracked state unchanged.
   - id: item-deep-links-tailnet-deployment
     name: Deploy the Verified Deep-Link Digest to the Tailnet/Caddy Stack
-    status: claimed
+    status: done
     description: 'step_type: implementation
 
       repo_change_policy: runtime_state_only
@@ -197017,6 +197017,29 @@ phases:
     agent: vectl-orchestrator
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T09:06:21.370927Z'
+    done_at: '2026-07-27T09:10:12.993420+00:00'
+    evidence: 'ITEM-DEEP-LINK-TAILNET-DEPLOYMENT succeeded through the maintained
+      strict-FQDN remote `./deploy.sh` interface. The prior unsupported-option parser
+      call remains immutable no-effect evidence at `/tmp/larva-agent-artifacts/item-deep-links-tailnet-deployment/deployment-raw.log`
+      (mode 0600, sha256:d65994a39abdbd2715a25c5713d292aca4f803cfee6679cc20b4af7a7bf3efd2);
+      independent reconciliation proved prior digest `sha256:3a349acbf1d9bb4a65d81ee2bd2c645a962fb8da8cf963aff0f6520d0639159b`,
+      direct 200/401, named `/data` volume, route, Caddy hash, owner-token state,
+      procedure, and secrets unchanged. Exactly one repaired corrected invocation
+      used `--index-digest`, `--amd64-digest`, and `--arm64-digest`, exited 0, emitted
+      `RESULT_CLASSIFICATION=success`, captured prior-digest/readiness rollback, and
+      deployed `docker.io/tefx/resofeed@sha256:19dca62bdbb8fc8c22c7b72d604519023da6f9c115ed7cb1cf2d61d96b19a50d`
+      for commit `5a9837e9bf8932098ef1bac0a77bc6a47a4af84c`. Corrected raw log: `/tmp/larva-agent-artifacts/item-deep-links-tailnet-deployment/deployment-corrected-raw.log`
+      (mode 0600). Parent post-observation proved exact final image; `https://resofeed.tefx.one`;
+      direct and public root 200 / unauthenticated Doctor 401; unchanged `resofeed-caddy_resofeed-data:/data`;
+      canonical duplicate-free `TCP.443.TCPForward=127.0.0.1:8443`; unchanged Caddyfile
+      sha256:cd35f54f3d29164fe9b957eed74d03b04fae2ca253ff78eeab8a6ea310928218; unchanged
+      procedure hashes/modes; masked secret presence; empty unchanged owner-token
+      state; absent transaction lock; and zero database copy/snapshot/export/restore/delete
+      operations. Sanitized mode-0600 receipt: `/tmp/larva-agent-artifacts/item-deep-links-tailnet-deployment/deployment-receipt.json`
+      sha256:6db9075cf4f6c830b1919f8271f77872f839a0276b8d30b77daa50e4e4a1da4d. Post-state:
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-deployment/post-deployment-state.txt`.
+      No replay, procedure/route/Caddy/database/credential/trust/registry/repository
+      mutation, or material unplanned cost.'
   - id: item-deep-links-final-release-review
     name: Review Integrated Item Deep-Link Release
     status: pending
