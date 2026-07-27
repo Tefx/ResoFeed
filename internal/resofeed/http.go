@@ -510,12 +510,12 @@ func (h apiHandler) handleItemPath(w http.ResponseWriter, r *http.Request) {
 	parts[0] = itemID
 	if len(parts) == 1 && r.Method == http.MethodGet {
 		itemID := parts[0]
-		detail, err := ReadItemDetail(r.Context(), h.cfg.DB, itemID)
+		result, err := ReadItemResult(r.Context(), h.cfg.DB, itemID)
 		if err != nil {
 			writeNotFoundOrInternal(w, itemID, err)
 			return
 		}
-		writeJSON(w, http.StatusOK, ItemResponse{Item: detail})
+		writeJSON(w, http.StatusOK, result)
 		return
 	}
 	if len(parts) == 2 && r.Method == http.MethodPost && parts[1] == "inspect" {
@@ -1370,8 +1370,11 @@ type TodayFeedResponse struct {
 
 // ItemResponse is GET /api/items/{id} and MCP read_item.
 type ItemResponse struct {
-	Item           ItemDetail `json:"item"`
-	FallbackReason string     `json:"fallback_reason,omitempty"`
+	Item                     ItemDetail `json:"item"`
+	ResolvedFromItemID       *string    `json:"resolved_from_item_id"`
+	DuplicateTargetItemID    *string    `json:"duplicate_target_item_id"`
+	DuplicateTargetAvailable *bool      `json:"duplicate_target_available"`
+	FallbackReason           string     `json:"fallback_reason,omitempty"`
 }
 
 // SourcesResponse is GET /api/sources and resofeed://sources. Empty result sets

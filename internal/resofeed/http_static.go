@@ -180,6 +180,11 @@ func staticUIHandler() http.Handler {
 			return
 		}
 
+		if escapedPath := r.URL.EscapedPath(); strings.HasPrefix(escapedPath, "/items/") && escapedPath != "/items/" {
+			serveEmbeddedIndex(w, r, index)
+			return
+		}
+
 		requestPath := path.Clean(r.URL.Path)
 		if requestPath != r.URL.Path && !(r.URL.Path == "" && requestPath == ".") {
 			writeStaticStatus(w, r, http.StatusNotFound)

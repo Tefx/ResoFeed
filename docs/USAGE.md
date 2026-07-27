@@ -82,7 +82,6 @@ Local `.env` parsing is intentionally minimal: only `KEY=VALUE` lines are suppor
 When `TAVILY_API_KEY` is configured, ResoFeed will attempt Tavily Extract once after local readable extraction and RSS excerpt fallback fail for an eligible HTTP(S) item URL. Tavily is used only to recover source evidence; OpenRouter still performs target-language generated item understanding. External-recovered items should produce the same complete generated fields in the current processing language as locally extracted items.
 
 ### 3. Run with OpenRouter
-
 ```bash
 ./bin/resofeed serve \
   --addr 127.0.0.1:8080 \
@@ -96,6 +95,8 @@ When `TAVILY_API_KEY` is configured, ResoFeed will attempt Tavily Extract once a
 
 `--first-fetch-limit` caps how many items are stored on a brand-new source's first fetch. It defaults to `50`, may fall back to `RESOFEED_FIRST_FETCH_LIMIT` when the flag is omitted, allows `0` for unlimited, and has a maximum of `500`. Non-integer, negative, or greater-than-`500` values are invalid startup configuration and exit before binding with a safe stderr diagnostic. Incremental fetches after any item already exists are uncapped.
 
+`--public-url` is normalized as an HTTP(S) origin before startup and supplies credential-free absolute item links in MCP output. It rejects credentials, paths, queries, fragments, wildcard hosts, Unicode host spelling, malformed IP literals, and invalid ports before binding. When omitted, ResoFeed derives an HTTP origin from `--addr`; wildcard bind hosts map to loopback, so container and Tailnet deployments should set the externally reachable URL explicitly.
+
 `serve` starts everything: web UI, JSON HTTP API, MCP Streamable HTTP at `/mcp`, background ingestion, SQLite open/migrate, and static asset serving.
 
 There are intentionally no separate `migrate`, `worker`, `doctor`, `admin`, or `sync` processes. Migrations run during `serve`; diagnostics are exposed through Steer `/doctor` and `GET /api/doctor`.
@@ -105,12 +106,11 @@ Flags:
 | Flag | Required? | Purpose |
 |---|---:|---|
 | `--addr` | No | Bind address for web UI, HTTP API, and MCP endpoint. Default: `127.0.0.1:8080`. |
-| `--public-url` | No | Base URL external agents should use. Default derives from `--addr` for local use. |
+| `--public-url` | No | Validated HTTP(S) origin used for MCP item links. Default derives from `--addr` for local use. |
 | `--db` | No | SQLite database file path. Default: `./data/resofeed.sqlite3`. |
 | `--openrouter-model` | No | Optional OpenRouter model. Empty or omitted means account default; provided values are passed through unchanged. |
 | `--owner-token` | No | Explicit owner token. If omitted, ResoFeed generates or reuses one automatically. |
 | `--first-fetch-limit` | No | Maximum items to store on a brand-new source's first fetch. Default: `50`; env fallback: `RESOFEED_FIRST_FETCH_LIMIT`; `0` means unlimited; max `500`. |
-
 ### 4. Owner token behavior
 
 If `--owner-token` is provided, ResoFeed uses that plaintext token for this startup, stores only its SHA-256 hash as the current owner-token verifier, and never stores the plaintext token.
@@ -315,11 +315,14 @@ Supported query parameters:
 
 Invalid, duplicate, or unknown query parameters return `400 bad_request` with the canonical JSON error body from `docs/ARCHITECTURE.md §6`.
 ### Read an item
+HTTP item operations use an opaque API token, separate from the readable browser application path. Encode the raw item ID as unpadded RFC 4648 base64url and prefix it with `~`:
 
 ```bash
-curl -sS "http://127.0.0.1:8080/api/items/ITEM_ID" \
+curl -sS "http://127.0.0.1:8080/api/items/~BASE64URL_ITEM_ID" \
   -H "Authorization: Bearer <OWNER_TOKEN>"
 ```
+
+The response always includes the duplicate-resolution fields. A valid direct duplicate returns the authoritative target as `item`, records the requested duplicate in `resolved_from_item_id`, and makes returned `item.id` the effective target for later Inspector mutations. A missing duplicate target leaves the requested item in place and reports `duplicate_target_available: false`. Reads do not mark inspection, delivery, or resonance state.
 
 Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
 
@@ -336,10 +339,12 @@ Abridged example response; canonical schema is in `docs/ARCHITECTURE.md §6`:
     "extraction_status": "full",
     "model_status": "ok",
     "is_resonated": false
-  }
+  },
+  "resolved_from_item_id": null,
+  "duplicate_target_item_id": null,
+  "duplicate_target_available": null
 }
 ```
-
 ### List OpenRouter models for one-time item re-ingest
 The current provider-backed model-list path is HTTP `GET /api/runtime/openrouter-models`. A compatibility path, `GET /api/runtime/openrouter/models`, is also accepted with the same owner-token auth, query rejection, response shape, and redaction rules. These routes are for request-time model selector display only; model lists and selected model state are not persisted. MCP `list_openrouter_models` uses the same request-time OpenRouter model-list operation and returns the same `{ "models": [{ "id", "name" }] }` envelope, with `{ "models": [] }` when no runtime OpenRouter key is resolved.
 
@@ -1221,6 +1226,11 @@ Agent rules:
 - repeated requests with the same idempotency key should not duplicate mutation effects;
 - repeated requests with the same live idempotency key but different request fingerprints fail with `bad_request` / `request_fingerprint_mismatch` rather than overwriting the stored receipt result;
 - human corrections take precedence over agent-mediated signals.
+### MCP item application URLs
+
+Every item returned by `list_candidate_items`, `search_items`, or `read_item` includes a required `app_url`. ResoFeed derives it from the validated effective `--public-url` and the canonical percent-encoded browser item path. The URL contains no owner token, credentials, query string, or fragment and is not persisted to SQLite, FTS, state bundles, or receipts.
+
+`read_item` returns the same four-field duplicate-resolution envelope as HTTP. For a resolved duplicate, `item.app_url` identifies the authoritative returned `item.id`; the requested duplicate remains in `resolved_from_item_id`.
 ## What ResoFeed Deliberately Does Not Do
 
 ResoFeed intentionally excludes:

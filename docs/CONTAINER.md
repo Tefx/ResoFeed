@@ -174,7 +174,6 @@ There is no provider selector. OpenRouter is the only LLM backend in the current
 There is no `RESOFEED_FEEDS` startup variable. RSS sources are product state and should be added through Steer, OPML import, HTTP/MCP operations, state import, or an existing SQLite volume.
 
 ## `--addr` vs `--public-url`
-
 `--addr` is where the Go process listens.
 
 Example:
@@ -183,7 +182,7 @@ Example:
 --addr 0.0.0.0:8080
 ```
 
-`--public-url` is the externally reachable base URL that humans and MCP clients should use.
+`--public-url` is the externally reachable HTTP(S) origin that humans and MCP clients use. It also supplies the origin for credential-free `app_url` fields returned by MCP item reads.
 
 Examples:
 
@@ -193,8 +192,9 @@ Examples:
 --public-url https://device.tailnet-name.ts.net
 ```
 
-These values are often different in containers. The process listens on `0.0.0.0:8080`, but external clients use a LAN IP, domain, or Tailscale HTTPS name.
+Startup validates and normalizes both values before binding. Bind addresses accept ASCII DNS, canonical IPv4, or bracketed IPv6 plus a decimal port. Public URLs reject credentials, wildcard/unspecified hosts, Unicode host spelling, non-root paths, queries, fragments, and invalid ports; scheme and DNS case, IPv6 spelling, default ports, and leading-zero ports are normalized.
 
+When `--public-url` is omitted, ResoFeed derives an HTTP origin from `--addr`. `0.0.0.0` maps to `127.0.0.1` and `[::]` maps to `[::1]`. Those loopback origins are unsuitable for externally reached containers, so container and Tailnet deployments should pass the external LAN, DNS, or Tailscale HTTPS origin explicitly.
 ## Owner Token Behavior in Containers
 
 If `--owner-token` is omitted, first startup generates a token and prints it once to stdout:

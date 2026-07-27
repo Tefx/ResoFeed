@@ -59,6 +59,33 @@ type MCPReadItemInput struct {
 	ItemID string `json:"item_id"`
 }
 
+type mcpItemSummary struct {
+	ItemSummary
+	AppURL string `json:"app_url"`
+}
+
+type mcpItemDetail struct {
+	ItemDetail
+	AppURL string `json:"app_url"`
+}
+
+type mcpTodayFeedResponse struct {
+	Items []mcpItemSummary `json:"items"`
+}
+
+type mcpSearchResponse struct {
+	Items []mcpItemSummary `json:"items"`
+	Query SearchQueryEcho  `json:"query"`
+}
+
+type mcpItemResponse struct {
+	Item                     mcpItemDetail `json:"item"`
+	ResolvedFromItemID       *string       `json:"resolved_from_item_id"`
+	DuplicateTargetItemID    *string       `json:"duplicate_target_item_id"`
+	DuplicateTargetAvailable *bool         `json:"duplicate_target_available"`
+	FallbackReason           string        `json:"fallback_reason,omitempty"`
+}
+
 // MCPMarkInspectedInput is the mark_inspected input schema.
 type MCPMarkInspectedInput struct {
 	ItemID         string `json:"item_id"`
@@ -128,6 +155,48 @@ func SearchItemsResponseForMCP(ctx context.Context, db *sql.DB, input MCPSearchI
 	return SearchResponse{Items: items, Query: echo}, nil
 }
 
+func projectMCPFeed(feed TodayFeedResponse, publicURL string) (mcpTodayFeedResponse, error) {
+	items := make([]mcpItemSummary, 0, len(feed.Items))
+	for _, item := range feed.Items {
+		appURL, err := itemAppURL(publicURL, item.ID)
+		if err != nil {
+			return mcpTodayFeedResponse{}, err
+		}
+		items = append(items, mcpItemSummary{ItemSummary: item, AppURL: appURL})
+	}
+	return mcpTodayFeedResponse{Items: items}, nil
+}
+
+func projectMCPSearch(search SearchResponse, publicURL string) (mcpSearchResponse, error) {
+	feed, err := projectMCPFeed(TodayFeedResponse{Items: search.Items}, publicURL)
+	if err != nil {
+		return mcpSearchResponse{}, err
+	}
+	return mcpSearchResponse{Items: feed.Items, Query: search.Query}, nil
+}
+
+func projectMCPItem(result ItemResponse, publicURL string) (mcpItemResponse, error) {
+	appURL, err := itemAppURL(publicURL, result.Item.ID)
+	if err != nil {
+		return mcpItemResponse{}, err
+	}
+	return mcpItemResponse{
+		Item:                     mcpItemDetail{ItemDetail: result.Item, AppURL: appURL},
+		ResolvedFromItemID:       result.ResolvedFromItemID,
+		DuplicateTargetItemID:    result.DuplicateTargetItemID,
+		DuplicateTargetAvailable: result.DuplicateTargetAvailable,
+		FallbackReason:           result.FallbackReason,
+	}, nil
+}
+
+func itemAppURL(publicURL string, itemID string) (string, error) {
+	path, err := itemAppPath(itemID)
+	if err != nil {
+		return "", fmt.Errorf("build MCP item app_url: %w", err)
+	}
+	return publicURL + path, nil
+}
+
 // GetProcessingLanguageForMCP returns the authenticated runtime language
 // metadata without accepting per-call overrides.
 func GetProcessingLanguageForMCP(ctx context.Context, db *sql.DB) (ProcessingLanguageResponse, error) {
@@ -156,23 +225,19 @@ func ReprocessLibraryForMCP(ctx context.Context, db *sql.DB, llm LLMClient, inpu
 	return ReprocessLibrary(context.WithoutCancel(ctx), db, llm, req)
 }
 
-// ReadItemForMCP returns canonical item detail and provenance.
+// ReadItemForMCP returns canonical item detail and duplicate resolution.
 func ReadItemForMCP(ctx context.Context, db *sql.DB, input MCPReadItemInput) (ItemResponse, error) {
 	if strings.TrimSpace(input.ItemID) == "" {
 		return ItemResponse{}, fieldError("item_id")
 	}
-	if err := ensureItemExists(ctx, db, input.ItemID); err != nil {
-		return ItemResponse{}, err
-	}
-	item, err := ReadItemDetail(ctx, db, input.ItemID)
+	result, err := ReadItemResult(ctx, db, input.ItemID)
 	if err != nil {
 		return ItemResponse{}, err
 	}
-	resp := ItemResponse{Item: item}
-	if item.ExtractionStatus == extractionStatusFull && strings.TrimSpace(derefString(item.ExtractedText)) == "" {
-		resp.FallbackReason = "raw source text not persisted; extraction_status reflects source acquisition"
+	if result.Item.ExtractionStatus == extractionStatusFull && strings.TrimSpace(derefString(result.Item.ExtractedText)) == "" {
+		result.FallbackReason = "raw source text not persisted; extraction_status reflects source acquisition"
 	}
-	return resp, nil
+	return result, nil
 }
 
 // MarkInspectedForMCP forwards a human inspection from an external context.
@@ -458,7 +523,11 @@ func (h *mcpHandler) initializeResult() map[string]any {
 }
 
 func normalizePublicURLForMetadata(raw string) string {
-	return strings.TrimRight(strings.TrimSpace(raw), "/")
+	normalized, err := normalizeAndValidatePublicURL(raw)
+	if err != nil {
+		return ""
+	}
+	return normalized
 }
 
 func mcpEndpointFromPublicURL(publicURL string) string {
@@ -549,7 +618,13 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		var input MCPListCandidateItemsInput
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
-			result, err = ListCandidateItemsForMCP(ctx, h.db, input)
+			var feed TodayFeedResponse
+			feed, err = ListCandidateItemsForMCP(ctx, h.db, input)
+			if err == nil && h.publicURL != "" {
+				result, err = projectMCPFeed(feed, h.publicURL)
+			} else {
+				result = feed
+			}
 		}
 	case "search_items":
 		if !rawHasField(envelope.Arguments, "query") {
@@ -558,13 +633,25 @@ func (h *mcpHandler) callTool(ctx context.Context, params json.RawMessage) (any,
 		var input MCPSearchItemsInput
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
-			result, err = SearchItemsResponseForMCP(ctx, h.db, input)
+			var search SearchResponse
+			search, err = SearchItemsResponseForMCP(ctx, h.db, input)
+			if err == nil && h.publicURL != "" {
+				result, err = projectMCPSearch(search, h.publicURL)
+			} else {
+				result = search
+			}
 		}
 	case "read_item":
 		var input MCPReadItemInput
 		err = decodeRaw(envelope.Arguments, &input)
 		if err == nil {
-			result, err = ReadItemForMCP(ctx, h.db, input)
+			var item ItemResponse
+			item, err = ReadItemForMCP(ctx, h.db, input)
+			if err == nil && h.publicURL != "" {
+				result, err = projectMCPItem(item, h.publicURL)
+			} else {
+				result = item
+			}
 		}
 	case "mark_inspected":
 		var input MCPMarkInspectedInput

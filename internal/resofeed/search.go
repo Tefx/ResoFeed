@@ -180,6 +180,38 @@ where i.id = ?`, itemID)
 	return detail, nil
 }
 
+// ReadItemResult resolves one direct duplicate for HTTP and MCP while keeping
+// ReadItemDetail as the direct storage-row capability.
+func ReadItemResult(ctx context.Context, db *sql.DB, requestedItemID string) (ItemResponse, error) {
+	requested, err := ReadItemDetail(ctx, db, requestedItemID)
+	if err != nil {
+		return ItemResponse{}, err
+	}
+	result := ItemResponse{Item: requested}
+	if requested.DuplicateOfItemID == nil {
+		return result, nil
+	}
+
+	targetID := *requested.DuplicateOfItemID
+	result.DuplicateTargetItemID = &targetID
+	var exists bool
+	if err := db.QueryRowContext(ctx, `select exists(select 1 from items where id = ?)`, targetID).Scan(&exists); err != nil {
+		return ItemResponse{}, fmt.Errorf("resolve duplicate target: %w", err)
+	}
+	result.DuplicateTargetAvailable = &exists
+	if !exists {
+		return result, nil
+	}
+	target, err := ReadItemDetail(ctx, db, targetID)
+	if err != nil {
+		return ItemResponse{}, fmt.Errorf("read duplicate target: %w", err)
+	}
+	result.Item = target
+	resolvedFrom := requestedItemID
+	result.ResolvedFromItemID = &resolvedFrom
+	return result, nil
+}
+
 func readGroupedSourceItems(ctx context.Context, db *sql.DB, selectedItemID string, storyKey *string) ([]GroupedSourceItem, error) {
 	if storyKey == nil || strings.TrimSpace(*storyKey) == "" {
 		return []GroupedSourceItem{}, nil

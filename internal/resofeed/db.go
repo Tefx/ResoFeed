@@ -52,6 +52,12 @@ func Main(args []string, stdout io.Writer, stderr io.Writer) int {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
 			return 2
 		}
+		normalizedPublicURL, err := normalizeAndValidatePublicURL(cfg.PublicURL)
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
+			return 2
+		}
+		cfg.PublicURL = normalizedPublicURL
 		openRouterSecret, hasOpenRouterSecret, err := ResolveOpenRouterRuntimeSecretOptional()
 		if err != nil {
 			_, _ = fmt.Fprintf(stderr, "err: %s\n", err.Error())
@@ -292,37 +298,164 @@ func validateServeConfigBeforeSecret(cfg ServeConfig) error {
 }
 
 func validateAddr(addr string) error {
-	host, port, err := net.SplitHostPort(addr)
-	if err != nil || host == "" || port == "" {
+	if addr == "" || strings.TrimSpace(addr) != addr {
 		return errors.New("invalid_addr: expected HOST:PORT")
 	}
-	portNumber, err := strconv.Atoi(port)
-	if err != nil || portNumber < 1 || portNumber > 65535 {
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil || host == "" || !validPort(port) || !validOriginHost(host, strings.HasPrefix(addr, "["), true) {
 		return errors.New("invalid_addr: expected HOST:PORT")
 	}
 	return nil
 }
 
 func derivePublicURL(addr string) (string, error) {
-	host, port, err := net.SplitHostPort(addr)
-	if err != nil || host == "" || port == "" {
+	if err := validateAddr(addr); err != nil {
 		return "", err
 	}
-	if host == "0.0.0.0" || host == "::" || host == "[::]" {
+	host, port, _ := net.SplitHostPort(addr)
+	portNumber, _ := strconv.Atoi(port)
+	host = normalizedOriginHost(host)
+	if host == "0.0.0.0" {
 		host = "127.0.0.1"
+	} else if host == "::" {
+		host = "::1"
 	}
-	if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") {
-		host = "[" + host + "]"
-	}
-	return "http://" + net.JoinHostPort(strings.Trim(host, "[]"), port), nil
+	return "http://" + net.JoinHostPort(host, strconv.Itoa(portNumber)), nil
 }
 
 func validatePublicURL(raw string) error {
-	parsed, err := url.Parse(raw)
-	if err != nil || parsed == nil || !parsed.IsAbs() || parsed.Host == "" || (parsed.Scheme != "http" && parsed.Scheme != "https") || parsed.RawQuery != "" || parsed.Fragment != "" || (parsed.Path != "" && parsed.Path != "/") {
-		return errors.New("invalid_public_url: expected absolute http(s) URL without path/query/fragment")
+	_, err := normalizeAndValidatePublicURL(raw)
+	return err
+}
+
+func normalizeAndValidatePublicURL(raw string) (string, error) {
+	invalid := errors.New("invalid_public_url: expected absolute http(s) origin")
+	if raw == "" || strings.TrimSpace(raw) != raw {
+		return "", invalid
 	}
-	return nil
+	parsed, err := url.Parse(raw)
+	if err != nil || parsed == nil || !parsed.IsAbs() || parsed.Opaque != "" || parsed.Host == "" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" || (parsed.Path != "" && parsed.Path != "/") {
+		return "", invalid
+	}
+	scheme := strings.ToLower(parsed.Scheme)
+	if scheme != "http" && scheme != "https" {
+		return "", invalid
+	}
+	host := parsed.Hostname()
+	if host == "" || !validOriginHost(host, strings.HasPrefix(parsed.Host, "["), false) || host == "0.0.0.0" || host == "::" {
+		return "", invalid
+	}
+	port := parsed.Port()
+	if strings.Contains(parsed.Host, ":") && port == "" && !strings.HasPrefix(parsed.Host, "[") {
+		return "", invalid
+	}
+	if port != "" && !validPort(port) {
+		return "", invalid
+	}
+
+	host = normalizedOriginHost(host)
+	if port == "" || scheme == "http" && decimalPort(port) == 80 || scheme == "https" && decimalPort(port) == 443 {
+		if strings.Contains(host, ":") {
+			host = "[" + host + "]"
+		}
+		return scheme + "://" + host, nil
+	}
+	return scheme + "://" + net.JoinHostPort(host, strconv.Itoa(decimalPort(port))), nil
+}
+
+func validPort(port string) bool {
+	if port == "" {
+		return false
+	}
+	for _, value := range port {
+		if value < '0' || value > '9' {
+			return false
+		}
+	}
+	value, err := strconv.Atoi(port)
+	return err == nil && value >= 1 && value <= 65535
+}
+
+func decimalPort(port string) int {
+	value, _ := strconv.Atoi(port)
+	return value
+}
+
+func validOriginHost(host string, bracketed bool, allowUnspecified bool) bool {
+	if host == "" || host == "*" || strings.Contains(host, "%") || !isASCII(host) {
+		return false
+	}
+	if ip := net.ParseIP(host); ip != nil {
+		if ip.To4() != nil {
+			return !bracketed && validCanonicalIPv4(host) && (allowUnspecified || host != "0.0.0.0")
+		}
+		return bracketed && (allowUnspecified || !ip.IsUnspecified())
+	}
+	if strings.Contains(host, ":") || bracketed || strings.HasSuffix(host, ".") {
+		return false
+	}
+	if containsOnly(host, "0123456789.") {
+		return validCanonicalIPv4(host) && (allowUnspecified || host != "0.0.0.0")
+	}
+	if len(host) > 253 {
+		return false
+	}
+	for _, label := range strings.Split(host, ".") {
+		if label == "" || len(label) > 63 || label[0] == '-' || label[len(label)-1] == '-' {
+			return false
+		}
+		for _, value := range label {
+			if !(value >= 'a' && value <= 'z' || value >= 'A' && value <= 'Z' || value >= '0' && value <= '9' || value == '-') {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func validCanonicalIPv4(host string) bool {
+	parts := strings.Split(host, ".")
+	if len(parts) != 4 {
+		return false
+	}
+	for _, part := range parts {
+		if part == "" || len(part) > 1 && part[0] == '0' {
+			return false
+		}
+		value, err := strconv.Atoi(part)
+		if err != nil || value < 0 || value > 255 {
+			return false
+		}
+	}
+	return true
+}
+
+func normalizedOriginHost(host string) string {
+	if ip := net.ParseIP(host); ip != nil {
+		if ipv4 := ip.To4(); ipv4 != nil {
+			return ipv4.String()
+		}
+		return ip.String()
+	}
+	return strings.ToLower(host)
+}
+
+func containsOnly(value string, allowed string) bool {
+	for _, r := range value {
+		if !strings.ContainsRune(allowed, r) {
+			return false
+		}
+	}
+	return true
+}
+
+func isASCII(value string) bool {
+	for _, r := range value {
+		if r > unicode.MaxASCII {
+			return false
+		}
+	}
+	return true
 }
 
 func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
@@ -358,7 +491,7 @@ func runServe(cfg ServeConfig, stdout io.Writer, stderr io.Writer) int {
 	if strings.TrimSpace(cfg.OpenRouterKey) != "" {
 		llm = NewOpenRouterClient(OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()})
 	}
-	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: strings.TrimRight(cfg.PublicURL, "/"), DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm, OpenRouter: OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()}, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: true}
+	runtimeCfg := HTTPServerConfig{Addr: cfg.Addr, PublicURL: cfg.PublicURL, DB: db, OwnerToken: activePlaintextToken(cfg, resolution), OwnerTokenHash: resolution.TokenHash, LLM: llm, OpenRouter: OpenRouterConfig{APIKey: cfg.OpenRouterKey, Model: cfg.OpenRouterModel, Endpoint: deterministicOpenRouterEndpointForE2E()}, FirstFetchMaxItems: cfg.FirstFetchMaxItems, FirstFetchMaxItemsSet: true}
 	runtimeCfg.Lifecycle = &serveStartupConsoleLifecycle{stdout: stdout, cfg: cfg, publicURL: runtimeCfg.PublicURL, resolution: resolution}
 	runCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
