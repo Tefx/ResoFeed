@@ -122,9 +122,13 @@ function itemProjection(envelope: Record<string, unknown>): string {
   });
 }
 
+async function clearOwnerToken(page: Page, baseURL: string): Promise<void> {
+  await page.goto(baseURL);
+  await page.evaluate((key) => window.localStorage.removeItem(key), ownerTokenStorageKey);
+}
+
 async function installFirstSurfaceProbe(page: Page): Promise<void> {
-  await page.addInitScript((key) => {
-    window.localStorage.removeItem(key);
+  await page.addInitScript(() => {
     const samples: Array<{ surface: string; title: string }> = [];
     Object.defineProperty(window, '__itemDeepLinkFirstSurfaces', { value: samples, configurable: true });
     const record = () => {
@@ -136,7 +140,7 @@ async function installFirstSurfaceProbe(page: Page): Promise<void> {
     };
     new MutationObserver(record).observe(document, { childList: true, subtree: true, attributes: true });
     document.addEventListener('DOMContentLoaded', record);
-  }, ownerTokenStorageKey);
+  });
 }
 
 async function expectInspector(page: Page, title: string, path: string, baseURL: string): Promise<void> {
@@ -162,6 +166,7 @@ test('ITEM-DEEP-LINK browser history auth error read-only lifecycle', async ({ p
     if (url.pathname.startsWith('/api/items/')) wire.push({ method: candidate.method(), path: url.pathname });
   });
 
+  await clearOwnerToken(page, runtime.baseURL);
   await installFirstSurfaceProbe(page);
   const primaryPath = itemAppPath(primaryID);
   const coldResponse = await page.goto(`${runtime.baseURL}${primaryPath}`);
