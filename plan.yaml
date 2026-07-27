@@ -196921,10 +196921,13 @@ phases:
       repo_change_policy: runtime_state_only
 
 
-      Deliver: Perform `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT` once by deploying only
-      the independently verified `docker.io/tefx/resofeed@sha256:<index>` for the
-      integrated deep-link commit through the maintained remote `./deploy.sh` formal-deploy
-      interface. The existing `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
+      Deliver: Perform `ITEM-DEEP-LINK-TAILNET-DEPLOYMENT` once by making exactly
+      one final corrected invocation through the maintained remote `./deploy.sh` formal-deploy
+      interface and deploying only the independently verified `docker.io/tefx/resofeed@sha256:<index>`
+      for the integrated deep-link commit. The corrected invocation must use the maintained
+      parser spellings `--index-digest`, `--amd64-digest`, and `--arm64-digest` for
+      the independently verified digest inputs, alongside all other already admitted
+      exact parameters. The existing `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`
       stack must run that exact digest with explicit `--public-url https://resofeed.tefx.one`,
       direct root `200`, unauthenticated Doctor `401`, unchanged named SQLite volume
       `resofeed-caddy_resofeed-data` mounted at `/data`, untouched database and owner-token
@@ -196949,29 +196952,42 @@ phases:
 
       Admit: Consume the production-admitted OCI-verification receipt and current
       Plan authority; immediately revalidate source/tag/index/platform/revision, procedure
-      identity, strict endpoint, current recoverable prior image digest, direct root/Doctor
-      readiness pair, named volume `resofeed-caddy_resofeed-data` mounted at `/data`,
-      route, PublicURL, credential/account/trust, cost boundary, secret-safe environment,
-      and the maintained-interface exclusion of database copy/snapshot/export/restore/delete
-      operations. Retain one non-overwriting mode-0600 raw log and sanitized receipt
-      with exact operation/target/input identities, invocation count, prior/final
-      digest, PublicURL presence without secret/config disclosure, direct readiness,
-      unchanged `/data` volume/database/owner-token/route/Caddy/config state, prior-digest/readiness
-      recovery observations, and zero database copy/snapshot/export/restore/delete
+      identity, the maintained help/parser spellings `--index-digest`, `--amd64-digest`,
+      and `--arm64-digest`, strict endpoint, current recoverable prior image digest,
+      direct root/Doctor readiness pair, named volume `resofeed-caddy_resofeed-data`
+      mounted at `/data`, route, PublicURL, credential/account/trust, cost boundary,
+      secret-safe environment, and the maintained-interface exclusion of database
+      copy/snapshot/export/restore/delete operations. Keep the prior parser-rejection
+      evidence immutable; its authoritative `RESULT_CLASSIFICATION=no_effect` and
+      completed independent final-state reconciliation establish that it produced
+      no deployment effect and cannot satisfy this deployment outcome. Retain one
+      distinct non-overwriting mode-0600 raw log and sanitized receipt for the final
+      corrected invocation with exact operation/target/input identities, corrected
+      invocation count of one, prior/final digest, PublicURL presence without secret/config
+      disclosure, direct readiness, unchanged `/data` volume/database/owner-token/route/Caddy/config
+      state, prior-digest/readiness recovery observations, and zero database copy/snapshot/export/restore/delete
       operation. `item-deep-links-tailnet-runtime-proof` is the independent consumer.
 
 
-      Recovery: Budget exactly one formal deployment invocation. Repetition is unsafe
-      after pull/replacement may mutate persistent remote state. The maintained procedure
-      may perform only its bounded readiness checks and prior-image-digest/readiness
-      recovery while reusing the same attached named volume; it must not copy, snapshot,
-      export, restore, delete, or detach database contents. After every nonzero or
-      ambiguous return, observe final digest, direct `200/401`, named-volume attachment
-      at `/data`, route, PublicURL binding, and recovery result. Unknown/partial state,
-      unavailable prior image digest, missing/drifted/detached named volume, failed
-      readiness recovery, source/procedure/target/trust drift, material cost expansion,
-      disclosure, or forbidden mutation stops BLOCKED without alternate host, restaging,
-      Serve/Caddy repair, database operation, data deletion, or another invocation.
+      Recovery: Budget exactly one final corrected formal deployment invocation after
+      the fully reconciled parser-level no-effect call. The prior call remains immutable
+      `RESULT_CLASSIFICATION=no_effect` evidence; because argument parsing rejected
+      it before runtime configuration, registry inspection, environment writes, pull,
+      Compose, route, container, or another persistent operation and independent reconciliation
+      proved unchanged state, it does not count as a deployment effect and does not
+      consume this repaired final budget. This repaired budget authorizes no invocation
+      beyond the one corrected call. Repetition is unsafe after pull/replacement may
+      mutate persistent remote state. The maintained procedure may perform only its
+      bounded readiness checks and prior-image-digest/readiness recovery while reusing
+      the same attached named volume; it must not copy, snapshot, export, restore,
+      delete, or detach database contents. Any nonzero or ambiguous result from the
+      corrected invocation gets no replay; observe final digest, direct `200/401`,
+      named-volume attachment at `/data`, route, PublicURL binding, and recovery result.
+      Unknown/partial state, unavailable prior image digest, missing/drifted/detached
+      named volume, failed readiness recovery, source/procedure/target/trust drift,
+      material cost expansion, disclosure, or forbidden mutation stops BLOCKED without
+      alternate host, restaging, Serve/Caddy repair, database operation, data deletion,
+      or another invocation.
 
 
       <vectl_step_policy>
@@ -196986,14 +197002,16 @@ phases:
       remain preserved","modality":"runtime","seam":"real","check_id":"item_deep_links_tailnet_deployment","independent_step":"item-summary-deep-links-assurance-v2.item-deep-links-tailnet-runtime-proof"}],"test_authority":{"developer_test_globs":[],"acceptance_test_paths":[],"acceptance_check_ids":[],"acceptance_mutation":"FORBIDDEN","acceptance_authorizations":[]}}
 
       </vectl_step_policy>'
-    verification: The Orchestrator-owned mode-0600 log and sanitized receipt prove
-      one maintained strict-FQDN deployment of the independently verified digest,
-      explicit production PublicURL, final exact digest/readiness, a captured recoverable
-      prior image digest and prior-digest/readiness recovery readiness, the unchanged
-      named volume mounted at `/data` as the sole database-preservation mechanism,
-      volume/database/owner-token/route/Caddy/config/credential/trust/secret preservation,
-      zero database copy/snapshot/export/restore/delete operation, bounded cost, and
-      no replay or disclosure.
+    verification: The Orchestrator-owned mode-0600 logs and sanitized receipt prove
+      the immutable prior parser-level `RESULT_CLASSIFICATION=no_effect` evidence
+      remained separate and unchanged, followed by exactly one corrected maintained
+      strict-FQDN deployment invocation using `--index-digest`, `--amd64-digest`,
+      and `--arm64-digest` for the independently verified digest; explicit production
+      PublicURL; final exact digest/readiness; a captured recoverable prior image
+      digest and prior-digest/readiness recovery readiness; the unchanged named volume
+      mounted at `/data` as the sole database-preservation mechanism; volume/database/owner-token/route/Caddy/config/credential/trust/secret
+      preservation; zero database copy/snapshot/export/restore/delete operation; bounded
+      cost; and no replay or disclosure.
     depends_on:
     - item-deep-links-oci-verification
     agent: vectl-orchestrator
