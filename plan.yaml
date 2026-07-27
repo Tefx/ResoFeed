@@ -196579,29 +196579,58 @@ phases:
 
       Boundary: `integration-verifier` is read-only and may create only ephemeral
       isolated runtime/database/browser evidence outside the repository. It may not
-      edit repository files, protected acceptance, credentials, persistent data, registry,
-      deployment, or Tailnet state. At most two retries are allowed only for a demonstrably
-      transient isolated process/browser startup after retaining the failed observation
-      and re-proving the same HEAD, adapter identity, binary, and clean fixture.
+      edit repository files, product code, documentation, protected acceptance, credentials,
+      persistent data, registry, deployment, Tailnet state, topology, or owner, and
+      it has no external, destructive, or paid-service authority. Exactly one fresh
+      recovery attempt is authorized on the same immutable integrated target and selected/executed
+      adapter and binary identities. Its sole new runtime authority is a bounded isolated
+      lifecycle harness outside the repository that generates an ephemeral owner token,
+      SQLite database, and loopback port; launches the real `./cmd/resofeed serve`;
+      proves a live process and bound listener through substantive HTTP and Streamable
+      HTTP MCP operations; initiates the declared clean shutdown; reaps the child;
+      and exits `0` only after all lifecycle and cleanup observations pass. Record
+      the harness as the required command row and retain the child server''s actual
+      termination status separately in raw evidence. Retain the prior server command
+      with truthful eventual exit `-15` and the rejected receipt unchanged; never
+      rewrite, relabel, or promote that historical command. A signal other than the
+      declared shutdown signal, an unreaped child, listener/database/token/fixture
+      residue, or a nonzero harness exit fails the attempt. No subsequent retry is
+      authorized.
 
 
       Admit: Consume production-admitted expected-red, backend, and frontend worker
       receipts and their exact selected/executed identities. Confirm the corrected
       `docs/ITEM_DEEP_LINKS.md` authority contains no mandatory real-client/account
       matrix and retains generic URL-consumer, automated browser, Tailnet, and MCP
-      `app_url` requirements. Production semantic admission emits one `vectl.verifier.semantic.v1`
-      object with `verifier_id=integration-verifier`, `step_id=item-deep-links-local-integration-verification`,
+      `app_url` requirements. Reuse the existing immutable report, evidence, successful
+      command rows, and producer receipts for unchanged obligations only after re-proving
+      the same integrated target and evidence identities. Do not rerun Chromium or
+      broad tests while identity is unchanged; identity drift stops this attempt rather
+      than widening it. Required post-attempt observations are the live/bound server,
+      substantive HTTP and MCP results, the separately retained child termination
+      status, harness exit `0`, full process/listener/database/token/fixture cleanup,
+      unchanged tracked Git state, and no secret disclosure. Produce a fresh mode-`0600`
+      lifecycle artifact and a fresh mode-`0600` `vectl.verifier.semantic.v1` receipt
+      with `verifier_id=integration-verifier`, `step_id=item-deep-links-local-integration-verification`,
       ordered scope [`contract and authority correction`, `HTTP and static route boundary`,
       `SQLite relation and read-only state`, `MCP PublicURL app_url projection`, `real-browser
       history authentication errors focus and scroll`, `integrated identity and nondisclosure`],
       and exactly four coverage rows for `ITEM-DEEP-LINK-CONTRACT`, `ITEM-DEEP-LINK-BACKEND`,
-      `ITEM-DEEP-LINK-FRONTEND`, and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`.
+      `ITEM-DEEP-LINK-FRONTEND`, and `ITEM-DEEP-LINK-LOCAL-INTEGRATION`. A completion-candidate
+      receipt contains only required command rows whose recorded eventual exit is
+      `0`, including the lifecycle-harness row; the old `-15` remains historical evidence.
 
 
-      Recovery: Any retained ungrounded client mandate, deterministic route/token/envelope/PublicURL/browser/state
-      defect, identity mismatch, test skip, repository mutation, fixture leakage,
-      or unknown state stops FAIL/BLOCKED. Clean ephemeral processes and fixtures;
-      do not mutate product code, documentation, or acceptance.'
+      Recovery: The retry predicate is limited to the production-valid rejection caused
+      solely by the prior raw server row''s eventual exit `-15`, with the same integrated
+      target and independently observed full cleanup. The attempt budget is one. Any
+      retained ungrounded client mandate, deterministic route/token/envelope/PublicURL/browser/state
+      defect, identity mismatch, stale reused evidence, test skip, repository mutation,
+      fixture or listener leakage, unexpected child termination, secret disclosure,
+      nonzero harness result, or unknown state stops with a truthful valid FAIL/BLOCKED
+      receipt and no further attempt. Reconcile and clean every ephemeral process
+      and fixture before returning; retain secret-safe raw lifecycle logs at mode
+      `0600`; do not mutate product code, documentation, or acceptance.'
     verification: A production-admitted integration-verifier receipt binds integrated
       HEAD and the admitted contract/backend/frontend receipts, covers all six scopes
       and exactly four requirement rows, proves corrected authority plus real binary/SQLite/HTTP/MCP/Chromium
