@@ -196370,80 +196370,114 @@ phases:
     status: pending
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
-      \ Implement `ITEM-DEEP-LINK-FRONTEND` from the corrected protected contract:\
-      \ canonical application paths and dot/leading-`!`/leading-`~` rules; legacy\
-      \ parsing with `replaceState`; separate API-token helpers; route-first Inspector\
-      \ identity/title; token recovery and retry generations; deliberate-at-most-once\
-      \ inspection; Back/Forward and route-aware Close; canonical Search re-retrieval;\
-      \ current-corpus Feed/Search restoration; bounded history, clamped scroll, focus/origin\
-      \ fallback, stale-response exclusion; localized invalid/not-found/temporary/duplicate/broken\
-      \ states; effective mutation targets; copy link; accessibility; and read-only\
-      \ cold-load/refresh/recovery/retry/navigation lifecycle. Synchronize README\
-      \ behavior without changing frozen docs or protected acceptance.\n\nBoundary:\
-      \ `frontend-engineer` owns only the frontend, developer-test, README, and test-only\
-      \ Vite configuration paths in the contract. Dispatch and completion use `vectl.worker.dispatch.v2`\
-      \ and `vectl.worker.execution.v2`. `web/vite.config.ts` may change only to route\
-      \ the two exact Node filesystem-reading suites through a Vitest 4 node-environment\
-      \ project while preserving jsdom and `web/src/test/setup.ts` for browser/component\
-      \ suites; this correction must not change production build behavior. The adapter,\
-      \ Svelte/Playwright configs, fixture chain, setup file, corrected protected\
-      \ acceptance from `item-deep-links-browser-acceptance-probe-correction`, backend,\
-      \ canonical docs, deployment, runtime state, credentials, and secrets are immutable.\
-      \ Rollback reverts the frontend/test/README/config unit without coupling browser\
-      \ and API codecs or the protected acceptance correction.\n\nAdmit: Current suite/check\
-      \ `item-deep-links-frontend` / `item_deep_links_frontend_green` selects exactly\
-      \ the codec and real-browser identities through the tracked adapter, trusted\
-      \ Svelte identity derivation, current Vite/Svelte and CI-safe Playwright configs,\
-      \ and real-binary fixture. It consumes the unit expected-red file from the completed\
-      \ contract producer, the corrected current tracked browser acceptance only after\
-      \ Git integration and completion of `item-deep-links-browser-acceptance-probe-correction`,\
-      \ and current and produced developer tests. The existing developer suite `web/src/lib/__tests__/workbench-route.test.ts`\
-      \ and protected `web/src/lib/__tests__/item-deep-links.expected-red.test.ts`\
-      \ must execute with file-scheme `import.meta.url`; all other render/component\
-      \ tests retain jsdom setup. Selected execution must emit all seven frontend\
-      \ markers with no route interception or skipped case. `item-deep-links-local-integration-verification`\
-      \ is the independent consumer.\n\nRecovery: A corrected-path/config identity\
-      \ mismatch, non-file module URL in either authorized Node filesystem-reading\
-      \ suite, jsdom regression outside those suites, production-build behavior change,\
-      \ TODAY/Search first-surface flash, token deletion on authenticated refresh,\
-      \ duplicate write, stale navigation, app/API codec coupling, skipped browser\
-      \ case, accessibility/history/focus defect, protected acceptance mutation, or\
-      \ out-of-scope change stops this step. Fix only within the authorized frontend/config\
-      \ unit; do not alter the corrected protected probe or add another token store.\n\
-      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
-      \ intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
-      scope:\n  allowed_paths: [web/vite.config.ts, web/src/lib/workbench-route.ts,\
-      \ web/src/lib/api-client.ts, web/src/lib/api-client.test.ts, web/src/lib/__tests__/workbench-route.test.ts,\
-      \ web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte, web/src/routes/components/__tests__/item-deep-links.test.ts,\
-      \ README.md]\n  blocked_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
-      \ scripts/resofeed-svelte-build-identity.mjs, web/svelte.config.js, web/playwright.ci-safe.config.ts,\
-      \ web/playwright.config.ts, web/playwright.base.config.ts, web/src/test/setup.ts,\
-      \ web/tests/e2e/fixtures/**, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
-      \ docs/DESIGN.md, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
-      \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, internal/**, cmd/**,\
-      \ docs/USAGE.md, docs/CONTAINER.md, deploy/**]\n  ignored_runtime_paths: [.git/,\
-      \ .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-FRONTEND]\nchecks:\n  -\
-      \ id: item_deep_links_frontend_green\n    run: {command: [node, scripts/vectl-check.mjs,\
-      \ run, item-deep-links-frontend, item_deep_links_frontend_green], timeout_seconds:\
-      \ 1800}\n    evidence:\n      mode: selected_execution\n      path_bindings:\n\
-      \        - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
+      \ Deliver `ITEM-DEEP-LINK-FRONTEND` while preserving the current canonical application\
+      \ paths and dot/leading-`!`/leading-`~` rules; legacy parsing with `replaceState`;\
+      \ separate API-token helpers; route-first Inspector identity/title; token recovery\
+      \ and retry generations; deliberate-at-most-once inspection; Back/Forward and\
+      \ route-aware Close; canonical Search re-retrieval; current-corpus Feed/Search\
+      \ restoration; bounded history, clamped scroll, focus/origin fallback, stale-response\
+      \ exclusion; localized invalid/not-found/temporary/duplicate/broken states;\
+      \ effective mutation targets; copy link; accessibility; and read-only cold-load/refresh/recovery/retry/navigation\
+      \ lifecycle. Preserve the current Vite/Vitest split in which the two filesystem-reading\
+      \ suites use the Node environment and all render/component suites retain jsdom\
+      \ setup. Modify only the tracked adapter and its developer test so the existing\
+      \ `item-deep-links-frontend` / `item_deep_links_frontend_green` native profile\
+      \ executes inside the existing `withGeneratedTreeRestoration` lifecycle on both\
+      \ success and failure. Preserve that profile's exact two selected identities,\
+      \ command list, seven required markers, direct run and selection argv, matcher\
+      \ semantics, and production behavior. Add a focused frontend-profile restoration\
+      \ subtest under the current exact Node identity `RF-BUG-010 deterministic profile\
+      \ self-restoration contract`; emit `ITEM_DEEP_LINK_FRONTEND_RESTORATION=complete`\
+      \ only after the subtest proves exact restoration of `web/build`, `internal/resofeed/webui`,\
+      \ `.webui-stage.*` residue, and tracked status after successful and failing\
+      \ profile work.\n\nBoundary: `frontend-engineer` owns exactly `scripts/vectl-check.mjs`\
+      \ and `scripts/vectl-check.test.mjs` for this repair. Specialist-first comparison\
+      \ resolved the live Worker-v2-compatible candidates `frontend-engineer` and\
+      \ `general`: `frontend-engineer` covers the dominant Svelte/TypeScript/browser\
+      \ outcome and its Node adapter regression, while `general` is broader and leaves\
+      \ no frontend or harness surface uncovered by the specialist. The adapter/test\
+      \ correction has the same owner, selected profile, independent consumer, no-effect\
+      \ repository boundary, and rollback/reconciliation unit as the frontend outcome,\
+      \ so no owner or topology split is introduced. Dispatch and completion use `vectl.worker.dispatch.v2`\
+      \ and `vectl.worker.execution.v2`. Product logic, Vite/Svelte/Playwright configs\
+      \ and fixtures, setup, protected acceptance, backend, generated baselines, public\
+      \ documentation, deployment, runtime state, credentials, and secrets are immutable.\
+      \ This change affects only internal proof-harness lifecycle behavior; no product\
+      \ or public documentation update is required, and synchronous developer coverage\
+      \ in `scripts/vectl-check.test.mjs` is mandatory. Rollback remains `NONTRIVIAL`\
+      \ and reverts the adapter and focused developer-test change together only after\
+      \ generated trees, stage residue, and tracked status are reconciled to their\
+      \ pre-attempt state.\n\nAdmit: First run command-outcome check `item_deep_links_frontend_adapter_restoration_green`\
+      \ through the tracked test file and the existing exact top-level Node test identity\
+      \ `RF-BUG-010 deterministic profile self-restoration contract`. The test must\
+      \ materially execute the tracked adapter's frontend-profile branch, exercise\
+      \ successful and failing operations against real temporary filesystem and Git\
+      \ state, assert byte/path/mode restoration for both generated trees, remove\
+      \ all `.webui-stage.*` residue, preserve the pre-attempt tracked status, and\
+      \ emit `ITEM_DEEP_LINK_FRONTEND_RESTORATION=complete` only after those assertions\
+      \ pass. Then run the unchanged direct selected-execution command for `item-deep-links-frontend`\
+      \ / `item_deep_links_frontend_green` through the tracked adapter, trusted Svelte\
+      \ identity derivation, current Vite/Svelte and CI-safe Playwright configs, and\
+      \ real-binary fixture. It consumes current protected expected-red/browser acceptance\
+      \ and current developer tests, including `web/src/routes/components/__tests__/item-deep-links.test.ts`;\
+      \ selection remains exactly the two admitted identities and execution emits\
+      \ all seven frontend markers with no route interception or skipped case. Final\
+      \ admission requires both checks green and the repository's generated trees,\
+      \ stage residue, index, and tracked status clean. `item-deep-links-local-integration-verification`\
+      \ independently consumes the complete frontend outcome and both local evidence\
+      \ rows.\n\nRecovery: Any adapter branch that omits restoration for either frontend-profile\
+      \ success or failure, restoration mismatch in bytes/paths/modes, retained `.webui-stage.*`\
+      \ residue, tracked-status or index drift, changed selected identity/command/marker/matcher,\
+      \ multiple or missing evidence envelope, protected/current test mutation, product/config/documentation\
+      \ mutation, TODAY/Search first-surface flash, token deletion on authenticated\
+      \ refresh, duplicate write, stale navigation, app/API codec coupling, skipped\
+      \ browser case, accessibility/history/focus defect, or out-of-scope change stops\
+      \ this step. After any failed attempt, observe and reconcile `web/build`, `internal/resofeed/webui`,\
+      \ stage residue, index, and tracked status before a safe same-contract rerun;\
+      \ unknown or incomplete restoration stops without replay. Do not replace the\
+      \ direct adapter argv with `node --eval` or another wrapper, weaken final-clean\
+      \ admission, alter product code, or add another token store. Rollback reverts\
+      \ only `scripts/vectl-check.mjs` and `scripts/vectl-check.test.mjs` after repository\
+      \ reconciliation.\n\n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\n\
+      matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs]\n\
+      \  blocked_paths: [scripts/resofeed-svelte-build-identity.mjs, scripts/build-resofeed.sh,\
+      \ web/**, internal/**, cmd/**, tests/**, README.md, docs/**, deploy/**, .agents/**]\n\
+      \  ignored_runtime_paths: [.git/, .vectl/, .agent/, .venv/]\nclaims: [ITEM-DEEP-LINK-FRONTEND]\n\
+      checks:\n  - id: item_deep_links_frontend_adapter_restoration_green\n    run:\n\
+      \      command: [node, --test, '--test-name-pattern=RF-BUG-010 deterministic\
+      \ profile self-restoration contract', scripts/vectl-check.test.mjs]\n      timeout_seconds:\
+      \ 300\n    evidence:\n      mode: command_outcome\n      path_bindings:\n  \
+      \      - {path: scripts/vectl-check.mjs, access: execute, availability: current}\n\
       \        - {path: scripts/vectl-check.test.mjs, access: read, availability:\
-      \ current}\n        - {path: web/package.json, access: read, availability: current}\n\
-      \        - {path: web/vite.config.ts, access: read, availability: current}\n\
-      \        - {path: web/svelte.config.js, access: read, availability: current}\n\
-      \        - {path: web/playwright.ci-safe.config.ts, access: read, availability:\
-      \ current}\n        - {path: web/playwright.config.ts, access: read, availability:\
-      \ current}\n        - {path: web/playwright.base.config.ts, access: read, availability:\
-      \ current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs, access:\
-      \ execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
+      \ current}\n      test_bindings:\n        - {path: scripts/vectl-check.test.mjs,\
+      \ classification: developer, availability: current}\n    expect:\n      outcome:\
+      \ green\n      exit_codes: [0]\n      stdout_or_stderr:\n        contains_all:\
+      \ [{literal: RF-BUG-010 deterministic profile self-restoration contract}, {literal:\
+      \ ITEM_DEEP_LINK_FRONTEND_RESTORATION=complete}]\n        contains_any: []\n\
+      \        forbids: [{literal: ITEM_DEEP_LINK_FRONTEND_RESTORATION=incomplete},\
+      \ {literal: ERR_TEST_FAILURE}, {literal: no tests to run}, {literal: not ok}]\n\
+      \    proves: [ITEM-DEEP-LINK-FRONTEND]\n  - id: item_deep_links_frontend_green\n\
+      \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-frontend,\
+      \ item_deep_links_frontend_green], timeout_seconds: 1800}\n    evidence:\n \
+      \     mode: selected_execution\n      path_bindings:\n        - {path: scripts/vectl-check.mjs,\
+      \ access: execute, availability: current}\n        - {path: scripts/vectl-check.test.mjs,\
+      \ access: read, availability: current}\n        - {path: web/package.json, access:\
+      \ read, availability: current}\n        - {path: web/vite.config.ts, access:\
+      \ read, availability: current}\n        - {path: web/svelte.config.js, access:\
+      \ read, availability: current}\n        - {path: web/playwright.ci-safe.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/playwright.config.ts,\
+      \ access: read, availability: current}\n        - {path: web/playwright.base.config.ts,\
+      \ access: read, availability: current}\n        - {path: scripts/resofeed-svelte-build-identity.mjs,\
+      \ access: execute, availability: current}\n        - {path: web/tests/e2e/fixtures/runtime-fixture.ts,\
       \ access: read, availability: current}\n      test_bindings:\n        - {path:\
       \ web/src/lib/__tests__/item-deep-links.expected-red.test.ts, classification:\
       \ acceptance, availability: current}\n        - {path: web/tests/e2e/item-deep-links.browser-contract.spec.ts,\
       \ classification: acceptance, availability: current}\n        - {path: web/src/lib/api-client.test.ts,\
       \ classification: developer, availability: current}\n        - {path: web/src/lib/__tests__/workbench-route.test.ts,\
       \ classification: developer, availability: current}\n        - {path: web/src/routes/components/__tests__/item-deep-links.test.ts,\
-      \ classification: developer, availability: produced_by_step}\n      selection:\n\
-      \        command: [node, scripts/vectl-check.mjs, select, item-deep-links-frontend,\
+      \ classification: developer, availability: current}\n      selection:\n    \
+      \    command: [node, scripts/vectl-check.mjs, select, item-deep-links-frontend,\
       \ item_deep_links_frontend_green]\n        timeout_seconds: 30\n        cardinality:\
       \ {exact: 2}\n        required_ids: ['ITEM-DEEP-LINK app codec and API domain\
       \ separation', 'ITEM-DEEP-LINK browser history auth error read-only lifecycle']\n\
@@ -196463,22 +196497,32 @@ phases:
       risk_tier\":\"R2\",\"risk_reasons\":[\"public_browser_route\",\"history_and_auth_state_machine\"\
       ,\"accessibility_focus_scroll\",\"cross_component_api_wiring\"],\"primary_outcome\"\
       :\"ITEM-DEEP-LINK-FRONTEND\",\"rollback_class\":\"NONTRIVIAL\",\"observation_ledger\"\
-      :[{\"requirement_id\":\"ITEM-DEEP-LINK-FRONTEND\",\"atom\":\"real browser routes\
+      :[{\"requirement_id\":\"ITEM-DEEP-LINK-FRONTEND\",\"atom\":\"the tracked frontend\
+      \ adapter executes the exact current item-deep-links-frontend profile inside\
+      \ generated-tree restoration on success and failure, restores both generated\
+      \ trees and tracked status, and removes stage residue without changing selected\
+      \ identities, commands, markers, matchers, or production behavior\",\"modality\"\
+      :\"test_contract\",\"seam\":\"real\",\"check_id\":\"item_deep_links_frontend_adapter_restoration_green\"\
+      ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification\"\
+      },{\"requirement_id\":\"ITEM-DEEP-LINK-FRONTEND\",\"atom\":\"real browser routes\
       \ preserve Inspector-first identity, auth recovery, history, error labels, focus,\
       \ scroll, origin, read-only lifecycle, and effective mutation targets\",\"modality\"\
       :\"rendered_runtime\",\"seam\":\"real\",\"check_id\":\"item_deep_links_frontend_green\"\
       ,\"independent_step\":\"item-summary-deep-links-assurance-v2.item-deep-links-local-integration-verification\"\
       }],\"test_authority\":{\"developer_test_globs\":[\"web/src/lib/api-client.test.ts\"\
       ,\"web/src/lib/__tests__/workbench-route.test.ts\",\"web/src/routes/components/__tests__/item-deep-links.test.ts\"\
-      ],\"acceptance_test_paths\":[\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\"\
+      ,\"scripts/vectl-check.test.mjs\"],\"acceptance_test_paths\":[\"web/src/lib/__tests__/item-deep-links.expected-red.test.ts\"\
       ,\"web/tests/e2e/item-deep-links.browser-contract.spec.ts\"],\"acceptance_check_ids\"\
       :[\"item_deep_links_frontend_green\"],\"acceptance_mutation\":\"FORBIDDEN\"\
       ,\"acceptance_authorizations\":[]}}\n</vectl_step_policy>"
-    verification: The generic adapter runs pure codec/component/API-client checks
-      and the corrected isolated real-binary Playwright matrix for desktop and narrow
-      layouts; all seven ITEM_DEEP_LINK_* browser markers pass with zero route interception,
-      skipped cases, duplicate writes, stale navigation, frozen/protected-file mutation,
-      or secondary token storage.
+    verification: Run `node --test --test-name-pattern=RF-BUG-010 deterministic profile
+      self-restoration contract scripts/vectl-check.test.mjs` and require `ITEM_DEEP_LINK_FRONTEND_RESTORATION=complete`
+      after success/failure restoration of `web/build`, `internal/resofeed/webui`,
+      stage residue, and tracked status. Then run the unchanged direct selected-execution
+      adapter command for `item-deep-links-frontend` / `item_deep_links_frontend_green`;
+      all seven ITEM_DEEP_LINK_* markers must pass with the exact two selected identities,
+      zero route interception/skips/duplicate writes/stale navigation/protected mutation,
+      and clean final repository admission.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
@@ -196492,6 +196536,8 @@ phases:
     - web/src/routes/components/Inspector.svelte
     - web/tests/e2e/item-deep-links.browser-contract.spec.ts
     - README.md
+    - scripts/vectl-check.mjs
+    - scripts/vectl-check.test.mjs
     depends_on:
     - item-deep-links-browser-acceptance-probe-correction
     agent: frontend-engineer
