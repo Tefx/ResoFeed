@@ -196266,15 +196266,18 @@ phases:
       \ rejecting excluded origins before bind. Keep application and API codecs separate\
       \ and synchronize HTTP/MCP/PublicURL usage docs.\n\nBoundary: `golang-developer`\
       \ owns the bounded Go, developer-test, command-package, and usage-doc paths\
-      \ in the contract. Dispatch and completion use `vectl.worker.dispatch.v2` and\
-      \ `vectl.worker.execution.v2`. Protected acceptance, adapter/profile, frozen\
-      \ canonical docs, frontend, deployment, runtime state, credentials, and secrets\
-      \ are immutable. Rollback reverts this backend/test/docs unit atomically.\n\n\
-      Admit: Current suite/check `item-deep-links-backend` / `item_deep_links_backend_green`\
-      \ selects the exact backend identity through the tracked adapter. It consumes\
-      \ the expected-red Go file from `item-deep-links-expected-red-contracts`, current\
-      \ token/HTTP tests, and this step's two produced developer tests. Selected execution\
-      \ must emit all six `ITEM_DEEP_LINK_*` backend markers. `item-deep-links-local-integration-verification`\
+      \ in the contract, including only the existing same-package PublicURL validation\
+      \ and derivation helper surface in `internal/resofeed/db.go`. Dispatch and completion\
+      \ use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`. Protected\
+      \ acceptance, adapter/profile, frozen canonical docs, frontend, deployment,\
+      \ runtime state, credentials, and secrets are immutable. Rollback reverts this\
+      \ backend/test/docs unit atomically.\n\nAdmit: Current suite/check `item-deep-links-backend`\
+      \ / `item_deep_links_backend_green` selects the exact backend identity through\
+      \ the tracked adapter. It consumes the expected-red Go file from `item-deep-links-expected-red-contracts`,\
+      \ current token/HTTP tests, and this step's two produced developer tests, including\
+      \ command-package regression evidence for explicit and derived PublicURL validation\
+      \ and normalization through the existing `internal/resofeed/db.go` helpers.\
+      \ Selected execution must emit all six `ITEM_DEEP_LINK_*` backend markers. `item-deep-links-local-integration-verification`\
       \ is the independent consumer.\n\nRecovery: A producer mismatch, noncanonical-token\
       \ acceptance, state mutation, app_url persistence/leak, startup-bind ordering\
       \ defect, selected/executed identity drift, or out-of-scope change stops this\
@@ -196283,12 +196286,12 @@ phases:
       matcher_semantics: intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
       scope:\n  allowed_paths: [internal/resofeed/item_route_token.go, internal/resofeed/item_route_token_test.go,\
       \ internal/resofeed/types.go, internal/resofeed/search.go, internal/resofeed/http.go,\
-      \ internal/resofeed/http_static.go, internal/resofeed/mcp.go, internal/resofeed/http_impl_test.go,\
-      \ internal/resofeed/item_deep_links_test.go, cmd/resofeed/main.go, cmd/resofeed/item_deep_links_test.go,\
-      \ docs/USAGE.md, docs/CONTAINER.md]\n  blocked_paths: [scripts/vectl-check.mjs,\
-      \ scripts/vectl-check.test.mjs, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
-      \ docs/DESIGN.md, internal/resofeed/item_deep_links_expected_red_test.go, web/**,\
-      \ README.md, deploy/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
+      \ internal/resofeed/http_static.go, internal/resofeed/mcp.go, internal/resofeed/db.go,\
+      \ internal/resofeed/http_impl_test.go, internal/resofeed/item_deep_links_test.go,\
+      \ cmd/resofeed/main.go, cmd/resofeed/item_deep_links_test.go, docs/USAGE.md,\
+      \ docs/CONTAINER.md]\n  blocked_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
+      \ docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md, docs/DESIGN.md, internal/resofeed/item_deep_links_expected_red_test.go,\
+      \ web/**, README.md, deploy/**]\n  ignored_runtime_paths: [.git/, .vectl/, .agent/,\
       \ .venv/]\nclaims: [ITEM-DEEP-LINK-BACKEND]\nchecks:\n  - id: item_deep_links_backend_green\n\
       \    run: {command: [node, scripts/vectl-check.mjs, run, item-deep-links-backend,\
       \ item_deep_links_backend_green], timeout_seconds: 1800}\n    evidence:\n  \
@@ -196344,6 +196347,7 @@ phases:
     - internal/resofeed/search.go
     - internal/resofeed/http.go
     - internal/resofeed/mcp.go
+    - internal/resofeed/db.go
     - cmd/resofeed/main.go
     - docs/CONTAINER.md
     depends_on:
@@ -196364,29 +196368,39 @@ phases:
       \ states; effective mutation targets; copy link; accessibility; and read-only\
       \ cold-load/refresh/recovery/retry/navigation lifecycle. Synchronize README\
       \ behavior without changing frozen docs.\n\nBoundary: `frontend-engineer` owns\
-      \ only the frontend, developer-test, and README paths in the contract. Dispatch\
-      \ and completion use `vectl.worker.dispatch.v2` and `vectl.worker.execution.v2`.\
-      \ The adapter/config/fixture chain, protected acceptance, backend, canonical\
-      \ docs, deployment, runtime state, credentials, and secrets are immutable. Rollback\
-      \ reverts the frontend/test/README unit without coupling browser and API codecs.\n\
-      \nAdmit: Current suite/check `item-deep-links-frontend` / `item_deep_links_frontend_green`\
-      \ selects exactly the codec and real-browser identities through the tracked\
-      \ adapter, trusted Svelte identity derivation, current Vite/Svelte and CI-safe\
-      \ Playwright configs, and real-binary fixture. It consumes the two expected-red\
-      \ files from the contract producer plus current and produced developer tests.\
-      \ Selected execution must emit all seven frontend markers with no route interception\
-      \ or skipped case. `item-deep-links-local-integration-verification` is the independent\
-      \ consumer.\n\nRecovery: A producer/config identity mismatch, TODAY/Search first-surface\
-      \ flash, duplicate write, stale navigation, app/API codec coupling, skipped\
-      \ browser case, accessibility/history/focus defect, or out-of-scope change stops\
-      \ this step. Fix only within the authorized frontend unit.\n\n<intent_closure_contract>\n\
-      schema_version: intent_closure.contract.v2\nmatcher_semantics: intent_closure.matchers.v2\n\
-      profile: implementation_closes_expected_red\nscope:\n  allowed_paths: [web/src/lib/workbench-route.ts,\
+      \ only the frontend, developer-test, README, and test-only Vite configuration\
+      \ paths in the contract. Dispatch and completion use `vectl.worker.dispatch.v2`\
+      \ and `vectl.worker.execution.v2`. `web/vite.config.ts` may change only to route\
+      \ the two exact Node filesystem-reading suites through a Vitest 4 node-environment\
+      \ project while preserving jsdom and `web/src/test/setup.ts` for browser/component\
+      \ suites; this correction must not change production build behavior. The adapter,\
+      \ Svelte/Playwright configs, fixture chain, setup file, protected acceptance,\
+      \ backend, canonical docs, deployment, runtime state, credentials, and secrets\
+      \ are immutable. Rollback reverts the frontend/test/README/config unit without\
+      \ coupling browser and API codecs.\n\nAdmit: Current suite/check `item-deep-links-frontend`\
+      \ / `item_deep_links_frontend_green` selects exactly the codec and real-browser\
+      \ identities through the tracked adapter, trusted Svelte identity derivation,\
+      \ current Vite/Svelte and CI-safe Playwright configs, and real-binary fixture.\
+      \ It consumes the two expected-red files from the contract producer plus current\
+      \ and produced developer tests. The existing developer suite `web/src/lib/__tests__/workbench-route.test.ts`\
+      \ and protected `web/src/lib/__tests__/item-deep-links.expected-red.test.ts`\
+      \ must execute with file-scheme `import.meta.url`; all other render/component\
+      \ tests retain jsdom setup. Selected execution must emit all seven frontend\
+      \ markers with no route interception or skipped case. `item-deep-links-local-integration-verification`\
+      \ is the independent consumer.\n\nRecovery: A producer/config identity mismatch,\
+      \ non-file module URL in either authorized Node filesystem-reading suite, jsdom\
+      \ regression outside those suites, production-build behavior change, TODAY/Search\
+      \ first-surface flash, duplicate write, stale navigation, app/API codec coupling,\
+      \ skipped browser case, accessibility/history/focus defect, or out-of-scope\
+      \ change stops this step. Fix only within the authorized frontend/config unit.\n\
+      \n<intent_closure_contract>\nschema_version: intent_closure.contract.v2\nmatcher_semantics:\
+      \ intent_closure.matchers.v2\nprofile: implementation_closes_expected_red\n\
+      scope:\n  allowed_paths: [web/vite.config.ts, web/src/lib/workbench-route.ts,\
       \ web/src/lib/api-client.ts, web/src/lib/api-client.test.ts, web/src/lib/__tests__/workbench-route.test.ts,\
       \ web/src/routes/+page.svelte, web/src/routes/components/Inspector.svelte, web/src/routes/components/__tests__/item-deep-links.test.ts,\
       \ README.md]\n  blocked_paths: [scripts/vectl-check.mjs, scripts/vectl-check.test.mjs,\
-      \ scripts/resofeed-svelte-build-identity.mjs, web/vite.config.ts, web/svelte.config.js,\
-      \ web/playwright.ci-safe.config.ts, web/playwright.config.ts, web/playwright.base.config.ts,\
+      \ scripts/resofeed-svelte-build-identity.mjs, web/svelte.config.js, web/playwright.ci-safe.config.ts,\
+      \ web/playwright.config.ts, web/playwright.base.config.ts, web/src/test/setup.ts,\
       \ web/tests/e2e/fixtures/**, docs/ITEM_DEEP_LINKS.md, docs/ARCHITECTURE.md,\
       \ docs/DESIGN.md, web/src/lib/__tests__/item-deep-links.expected-red.test.ts,\
       \ web/tests/e2e/item-deep-links.browser-contract.spec.ts, internal/**, cmd/**,\
@@ -196453,6 +196467,7 @@ phases:
     - docs/ITEM_DEEP_LINKS.md
     - docs/ARCHITECTURE.md
     - docs/DESIGN.md
+    - web/vite.config.ts
     - web/src/lib/workbench-route.ts
     - web/src/lib/api-client.ts
     - web/src/lib/api-client.test.ts
