@@ -196792,7 +196792,7 @@ phases:
       preflight-transient.json, publication-receipt-success.json under /tmp/larva-agent-artifacts/item-deep-links-publish-immutable-oci/.'
   - id: item-deep-links-tailnet-runtime-proof
     name: Independently Prove Tailnet/Caddy Deep-Link Runtime Semantics
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -196987,6 +196987,24 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T10:53:02.763941Z'
+    done_at: '2026-07-27T11:01:39.047394+00:00'
+    evidence: 'Fresh user-authorized `integration-verifier` audit completed PASS and
+      parent production semantic admission returned `CONFORMANT`, `semantic_completion_admissible=true`,
+      receipt canonical SHA `sha256:d57501c2d9b49f79db2c81d5b345ff9593f1a6bd323e7cc67f681dfbde9a4019`.
+      Evidence: `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-authorized.json`,
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-authorized.json`,
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-authorized.md`,
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-authorized.json`.
+      Fresh strict-FQDN read-only observations proved exact `Config.Image` deployed
+      index and `Config.Cmd` PublicURL before/after; direct/public root 200 and exact
+      `/api/doctor` unauthenticated 401; exactly four Go-owned security headers with
+      one equal direct/public value; unchanged tracked/deployed Caddyfile and no Caddy
+      header ownership; exact named volume/route/recovery; special encoded, dot-sentinel,
+      and dispatchable-invalid static fallback; raw malformed-percent 400; unauthenticated
+      API/MCP rejection; connected `common`/`resofeed` existing-item credential-free
+      canonical app_url shape; immutable local→OCI→deployed identity composition;
+      zero verifier mutation and nondisclosure. All prior rejected/methodology artifacts
+      remain immutable historical context and were not promoted as fresh proof.'
   - id: item-deep-links-oci-verification
     name: Independently Verify the Published Immutable OCI Identity
     status: done
