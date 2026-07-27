@@ -196792,7 +196792,7 @@ phases:
       preflight-transient.json, publication-receipt-success.json under /tmp/larva-agent-artifacts/item-deep-links-publish-immutable-oci/.'
   - id: item-deep-links-tailnet-runtime-proof
     name: Independently Prove Tailnet/Caddy Deep-Link Runtime Semantics
-    status: pending
+    status: claimed
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -196854,6 +196854,8 @@ phases:
     depends_on:
     - item-deep-links-tailnet-deployment
     agent: integration-verifier
+    claimed_by: vectl-orchestrator
+    claimed_at: '2026-07-27T09:12:23.231666Z'
   - id: item-deep-links-oci-verification
     name: Independently Verify the Published Immutable OCI Identity
     status: done
