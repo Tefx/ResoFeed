@@ -196813,15 +196813,16 @@ phases:
       exact running digest and recovery identity, strict-FQDN direct/public root and
       unauthenticated Doctor readiness, Go-owned security-header parity with Caddy
       pass-through/non-ownership, unchanged named `/data` volume, canonical duplicate-free
-      route, explicit production PublicURL, canonical special-ID/dot/dispatchable-invalid
-      static fallback without redirect or asset substitution, raw `/items/%ZZ` server
-      `400` through an HTTP/1.1 path-as-is request, unauthenticated API and MCP rejection,
-      one existing-item credential-free production MCP `app_url` shape, zero verifier
-      mutation, and nondisclosure. A durable or nonpersistent production special-character
-      item fixture is forbidden and absence of that row is not a blocker.
+      route, explicit production PublicURL from the running container CLI argv, canonical
+      special-ID/dot/dispatchable-invalid static fallback without redirect or asset
+      substitution, raw `/items/%ZZ` server `400` through an HTTP/1.1 path-as-is request,
+      unauthenticated API and MCP rejection, one existing-item credential-free production
+      MCP `app_url` shape, zero verifier mutation, and nondisclosure. A durable or
+      nonpersistent production special-character item fixture is forbidden and absence
+      of that row is not a blocker.
 
 
-      Boundary: `integration-verifier` owns exactly one final fresh read-only verification
+      Boundary: `integration-verifier` owns exactly one ultimate fresh read-only verification
       run against `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`,
       the exact registry/deployment identities above, and Tela profile `common` provider
       `resofeed` only while it is freshly observed connected. It may read the admitted
@@ -196832,12 +196833,15 @@ phases:
       credential, account, config-value, paid-service, or authenticated production
       HTTP API authority. It must not retain API/MCP item or content bodies, provider
       payloads, Authorization/cookie values, owner tokens, host telemetry, raw Serve
-      JSON, `.env` content/path, secret-source paths, or configuration values. It
-      may not create or reobserve a synthetic/special-ID row; deploy, roll back, restart,
-      replace, stage, repair, or mutate repository/Git, registry, builders, containers,
-      routes, Serve/Caddy, procedures, credentials/accounts/trust, secrets, databases,
-      volumes, items, item/read-lifecycle state, owner-token state, or any external/runtime
-      configuration. No alternate target or provider is authorized.
+      JSON, `.env` content/path, secret-source paths, full container environment/command
+      arrays, or unrelated configuration values. It may retain only the secret-safe
+      normalized facts required by this contract, including the exact public origin
+      already fixed here and booleans for its argv binding. It may not create or reobserve
+      a synthetic/special-ID row; deploy, roll back, restart, replace, stage, repair,
+      or mutate repository/Git, registry, builders, containers, routes, Serve/Caddy,
+      procedures, credentials/accounts/trust, secrets, databases, volumes, items,
+      item/read-lifecycle state, owner-token state, or any external/runtime configuration.
+      No alternate target or provider is authorized.
 
 
       Admit: Consume and authenticate the production-admitted local receipt `/tmp/larva-agent-artifacts/item-deep-links-local-integration-verification/semantic-receipt-retry.json`
@@ -196861,18 +196865,36 @@ phases:
       index; the deployment receipt plus fresh running-digest observation binds that
       exact index to production; fresh public/strict-FQDN observations independently
       prove the environment-specific proxy, static, readiness, header, volume, route,
-      PublicURL, recovery, and nondisclosure atoms. Fresh static checks use exact
-      encoded path `/items/%7Eslash%2F%25%3Fhash%23%E9%9B%AA`, dot sentinels `/items/!.`
-      and `/items/!..`, and one documented extra-segment dispatchable-invalid route;
-      compare status, `Location`, content type, and secret-safe index identity without
-      retaining response bodies. The malformed-percent check must send raw `/items/%ZZ`
-      through HTTP/1.1 with path-as-is semantics and observe server `400` before SPA
-      dispatch. The connected `common`/`resofeed` provider check may retain only normalized
-      booleans proving an already-existing item''s `app_url` is non-null, credential-free,
-      rooted at exact explicit `https://resofeed.tefx.one`, and uses the canonical
-      item path; it must retain no item/content body. Re-observe exact digest, volume,
-      route, PublicURL, recovery readiness, owner-token-state classification, and
-      zero verifier mutation after probes.
+      PublicURL, recovery, and nondisclosure atoms.
+
+
+      The fresh PublicURL observation must parse `docker container inspect` `Config.Cmd`
+      as JSON, require an array with exactly one argv equal to `--public-url`, require
+      an immediately following argv, and require that adjacent value to equal exactly
+      `https://resofeed.tefx.one`; a second `--public-url`, missing adjacent argv,
+      non-array value, or any other adjacent value is a deterministic mismatch. Do
+      not infer this atom from `Config.Env`: absence or presence of `PUBLIC_URL=https://resofeed.tefx.one`,
+      `RESOFEED_PUBLIC_URL=https://resofeed.tefx.one`, or any other environment entry
+      is neither proof nor disproof because the authoritative contract uses CLI argv.
+      Do not retain the full command or environment arrays.
+
+
+      Every loopback direct-Caddy request must use curl HTTP/1.1 with path-as-is semantics,
+      `-k`, `--resolve resofeed.tefx.one:8443:127.0.0.1`, and a URL whose origin is
+      exactly `https://resofeed.tefx.one:8443`; the SSH FQDN and `127.0.0.1` are transport
+      addresses, never the URL host or TLS SNI. Public requests use origin exactly
+      `https://resofeed.tefx.one`, and any exact-path public probe also uses HTTP/1.1
+      with path-as-is semantics. Fresh static checks use exact encoded path `/items/%7Eslash%2F%25%3Fhash%23%E9%9B%AA`,
+      dot sentinels `/items/!.` and `/items/!..`, and one documented extra-segment
+      dispatchable-invalid route; compare status, `Location`, content type, and secret-safe
+      index identity without retaining response bodies. The malformed-percent check
+      must send raw `/items/%ZZ` through HTTP/1.1 with path-as-is semantics and observe
+      server `400` before SPA dispatch. The connected `common`/`resofeed` provider
+      check may retain only normalized booleans proving an already-existing item''s
+      `app_url` is non-null, credential-free, rooted at exact explicit `https://resofeed.tefx.one`,
+      and uses the canonical item path; it must retain no item/content body. Re-observe
+      exact digest, volume, route, CLI-argv PublicURL, recovery readiness, owner-token-state
+      classification, and zero verifier mutation after probes.
 
 
       Preserve `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt.json`,
@@ -196882,13 +196904,18 @@ phases:
       `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-composed.json`,
       `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-composed.md`,
       and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-composed.json`
-      as immutable historical no-probe methodology-FAIL evidence. None of those historical
-      artifacts can satisfy fresh observations, be overwritten, relabeled, normalized,
-      replaced, restored, or promoted. Produce fresh non-overwriting mode-`0600` final
-      artifacts at `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-final.json`,
+      as immutable historical no-probe methodology-FAIL evidence. Preserve `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-final.json`,
       `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-final.json`,
       `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-final.md`,
-      and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-final.json`,
+      and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-final.json`
+      as immutable historical read-only SSH methodology-FAIL evidence that stopped
+      before static HTTP, API, MCP, or Tela product probes. None of those historical
+      artifacts can satisfy fresh observations, be overwritten, relabeled, normalized,
+      replaced, restored, or promoted. Produce fresh non-overwriting mode-`0600` ultimate
+      artifacts at `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-receipt-ultimate.json`,
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/semantic-verdict-ultimate.json`,
+      `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/integration-verifier-report-ultimate.md`,
+      and `/tmp/larva-agent-artifacts/item-deep-links-tailnet-runtime-proof/evidence-ultimate.json`,
       including one fresh production-admitted `vectl.verifier.semantic.v1` object
       with `verifier_id=integration-verifier`, `step_id=item-deep-links-tailnet-runtime-proof`,
       ordered scope [`deployment and immutable identity`, `strict-FQDN readiness headers
@@ -196904,39 +196931,55 @@ phases:
 
 
       Recovery: The composed methodology run stopped before SSH, HTTP, Tela, API,
-      or MCP probes and produced zero repository, runtime, or external effects; its
-      immutable FAIL evidence does not authorize completion. The repaired budget authorizes
-      exactly one final fresh verification run. At most three additional probe attempts
-      total are allowed only within that final run, only after a retained, demonstrably
-      transient, non-mutating transport failure, and only after fresh proof that target,
-      digest, volume, route, PublicURL, provider identity, and zero-mutation state
-      remain unchanged. The malformed-percent probe uses HTTP/1.1 path-as-is on its
-      first fresh attempt; the retained HTTP/2 curl exit `92` remains a historical
-      protocol-binding observation and is never classified as a product result. A
-      deterministic HTTP status, identity mismatch, unavailable or canonically conflicting
-      producer receipt, provider/profile drift, missing existing-item MCP shape, readiness/header/Caddy/volume/route/PublicURL/recovery
+      or MCP probes. The final run performed only read-only strict-existing-key SSH
+      observations, then evaluated the PublicURL on an unauthorized environment surface
+      and stopped before static HTTP, API, MCP, or Tela product probes. Both runs
+      produced zero repository, runtime, or external effects; their immutable FAIL
+      evidence does not authorize completion. This third and last runtime-proof Plan
+      repair authorizes exactly one ultimate fresh verification run. No fourth planning
+      repair, replacement artifact suffix, or later verification run is authorized
+      after the ultimate run encounters another harness/method failure, produces any
+      actual deterministic product/provider observation, or observes an unknown effect;
+      deterministic passing observations may continue within the same ultimate run
+      to complete its admitted scope but cannot seed a later run.
+
+
+      At most three additional probe attempts total are allowed only within that ultimate
+      run, only after a retained, demonstrably transient, non-mutating transport failure
+      on the exact admitted method, and only after fresh proof that target, digest,
+      volume, route, CLI-argv PublicURL, provider identity, and zero-mutation state
+      remain unchanged. The first direct-Caddy attempt and every direct-Caddy retry
+      use the required HTTP/1.1, path-as-is, public-host SNI/`--resolve`, and `-k`
+      binding; the malformed-percent probe uses HTTP/1.1 path-as-is on its first fresh
+      attempt. The retained HTTP/2 curl exit `92`, the local-Caddy TLS error without
+      required public-host SNI, and environment-surface PublicURL false remain historical
+      methodology observations and are never classified as product/configuration results.
+      A deterministic HTTP status, correctly observed CLI-argv PublicURL mismatch,
+      identity mismatch, unavailable or canonically conflicting producer receipt,
+      provider/profile drift, missing existing-item MCP shape, readiness/header/Caddy/volume/route/recovery
       defect, disclosure, observed mutation, fixture requirement, or unknown state
-      stops FAIL/BLOCKED without repair, alternate binding, or broader authority.
-      After the final run produces any actual deterministic product/provider result,
-      or after any unknown effect, no further verification run is authorized. After
-      every attempt, retain secret-safe raw evidence, reconcile any verifier-owned
-      local process, and re-observe the immutable production boundary. If producer
-      evidence reports successful prior-digest/readiness restoration, verify that
-      reconciled state and return outcome-consistent failure; rollback is not release
-      success.'
-    verification: One final fresh production-admitted `integration-verifier` receipt
+      stops FAIL/BLOCKED without repair, alternate binding, broader authority, or
+      another run. After every attempt, retain secret-safe raw evidence, reconcile
+      any verifier-owned local process, and re-observe the immutable production boundary.
+      If producer evidence reports successful prior-digest/readiness restoration,
+      verify that reconciled state and return outcome-consistent failure; rollback
+      is not release success.'
+    verification: One ultimate fresh production-admitted `integration-verifier` receipt
       first authenticates the historical runtime, local integration, and OCI semantic
       receipts by Gate canonical sorted/minified UTF-8 JSON digests `ae203486247fa1e7ad31a9e462b77887a209efee23ffbdd4da891fef2e4184d0`,
       `dce423496afa1a8bc7eeba4cf17236ceb1bbd398c26913679e2ca2493b96cf64`, and `2a209400f87aaf6924534ea6fab1cd35cdd3c6cf28560051f83a8340eac6f8f6`
-      while preserving raw files and all prior/composed no-probe FAIL artifacts unchanged.
-      It then preserves the exact five ordered scopes and three requirement rows;
-      proves the immutable commit/tree → platform revisions → index → running Tailnet
-      target chain; freshly proves readiness, Go/Caddy header ownership, volume/route/PublicURL/recovery,
-      special/dot/invalid static routing, HTTP/1.1 path-as-is malformed-percent `400`,
-      unauthenticated API/MCP rejection, safe existing-item MCP `app_url` shape, zero
-      mutation, and nondisclosure; produces only new non-overwriting final artifacts;
-      and requires or creates neither a production special-ID fixture nor authenticated
-      production response bodies.
+      while preserving raw producer receipts and all prior historical, composed, and
+      final FAIL artifacts unchanged. It then preserves the exact five ordered scopes
+      and three requirement rows; proves the immutable commit/tree → platform revisions
+      → index → running Tailnet target chain; derives explicit PublicURL only from
+      exactly one `Config.Cmd` `--public-url` plus its immediately adjacent exact
+      `https://resofeed.tefx.one` argv and never from `Config.Env`; uses the required
+      HTTP/1.1 path-as-is public-host SNI/`--resolve` binding for direct Caddy; freshly
+      proves readiness, Go/Caddy header ownership, volume/route/recovery, special/dot/invalid
+      static routing, malformed-percent `400`, unauthenticated API/MCP rejection,
+      safe existing-item MCP `app_url` shape, zero mutation, and nondisclosure; produces
+      only new non-overwriting ultimate artifacts; and requires or creates neither
+      a production special-ID fixture nor authenticated production response bodies.
     refs:
     - AGENTS.md
     - docs/ITEM_DEEP_LINKS.md
