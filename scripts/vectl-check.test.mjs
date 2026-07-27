@@ -18,6 +18,7 @@ import {
   parseEvidenceOutput,
   parseSelectionOutput,
   probeBuildIdentityRejection,
+  runNative,
   runPromptingHarness,
   runTokenParityHarness,
   inventoryClosureRequirements,
@@ -1999,6 +2000,79 @@ test('RF-BUG-010 deterministic profile self-restoration contract', async (contex
     assert.equal(output.trim().split(/\r?\n/u).length, 1);
     assert.throws(() => parseEvidenceOutput(`${output}${output}`, profile, 'green'), /expected one vectl.check.evidence.v1 envelope/u);
   });
+
+  await context.test('item-deep-links frontend native profile restores success and failure exactly', () => {
+    const frontendProfile = findProfile('item-deep-links-frontend', 'item_deep_links_frontend_green');
+    assert.ok(frontendProfile);
+    assert.deepEqual(frontendProfile.identities, [
+      'ITEM-DEEP-LINK app codec and API domain separation',
+      'ITEM-DEEP-LINK browser history auth error read-only lifecycle'
+    ]);
+    assert.deepEqual(frontendProfile.commands, [
+      ['npm', '--prefix', 'web', 'run', 'test:render', '--', 'src/lib/__tests__/item-deep-links.expected-red.test.ts', 'src/lib/api-client.test.ts', 'src/lib/__tests__/workbench-route.test.ts', 'src/routes/components/__tests__/item-deep-links.test.ts'],
+      ['npm', '--prefix', 'web', 'exec', '--', 'playwright', 'test', '--config', 'web/playwright.ci-safe.config.ts', '--project=chromium-ci-safe', '--retries=0', '--reporter=line', 'web/tests/e2e/item-deep-links.browser-contract.spec.ts']
+    ]);
+
+    function gitOutput(root, args) {
+      const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+      assert.equal(result.status, 0, result.stderr);
+      return result.stdout;
+    }
+
+    function repositoryState(current) {
+      return {
+        trees: captureGeneratedTreeState(current.root),
+        status: current.readStatus(),
+        indexTree: gitOutput(current.root, ['write-tree']),
+        indexPatch: gitOutput(current.root, ['diff', '--cached', '--binary']),
+        trackedPatch: gitOutput(current.root, ['diff', '--binary'])
+      };
+    }
+
+    function exercise({ fails }) {
+      const current = fixture({ preexisting: true });
+      try {
+        fs.writeFileSync(path.join(current.root, 'tracked.txt'), 'staged baseline\n');
+        gitOutput(current.root, ['add', 'tracked.txt']);
+        fs.appendFileSync(path.join(current.root, 'tracked.txt'), 'unstaged baseline\n');
+        const before = repositoryState(current);
+        let callIndex = 0;
+        const run = (_profile, command, args) => {
+          const expected = frontendProfile.commands[callIndex];
+          assert.equal(command, expected[0]);
+          assert.deepEqual(args, expected.slice(1));
+          callIndex += 1;
+          if (callIndex === 1) mutate(current);
+          if (fails && callIndex === frontendProfile.commands.length) throw new Error('frontend-profile-operation-failure');
+          return frontendProfile.requiredOutput.join('\n');
+        };
+
+        if (fails) {
+          assert.throws(
+            () => runNative(frontendProfile, run, current.root, current.readStatus),
+            /frontend-profile-operation-failure/u
+          );
+        } else {
+          const result = runNative(frontendProfile, run, current.root, current.readStatus);
+          assert.equal(result.outcome, 'green');
+          assert.deepEqual(result.observations, [...frontendProfile.requiredOutput, 'VECTL_GENERIC_EVIDENCE=valid']);
+        }
+        assert.equal(callIndex, frontendProfile.commands.length);
+        assert.deepEqual(repositoryState(current), before);
+        assert.deepEqual(
+          fs.readdirSync(path.join(current.root, 'internal', 'resofeed')).filter((name) => name.startsWith('.webui-stage.')),
+          []
+        );
+      } finally {
+        fs.rmSync(current.root, { recursive: true, force: true });
+      }
+    }
+
+    exercise({ fails: false });
+    exercise({ fails: true });
+  });
+
+  console.log('ITEM_DEEP_LINK_FRONTEND_RESTORATION=complete');
 });
 
 test('RF-BUG-010 deterministic adapter identity integration contract', () => {

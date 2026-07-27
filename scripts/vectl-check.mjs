@@ -2382,12 +2382,12 @@ export function runClosureReport(profile, run = execute) {
   };
 }
 
-function runNative(profile) {
+export function runNative(profile, run = execute, root = repoRoot, readStatus) {
   const operation = () => {
     const outputs = [];
     for (const commandRow of profile.commands) {
       const command = Array.isArray(commandRow) ? commandRow : commandRow.argv;
-      outputs.push(execute(profile, command[0], command.slice(1), {
+      outputs.push(run(profile, command[0], command.slice(1), {
         expectedStatus: Array.isArray(commandRow) ? 0 : commandRow.expectedStatus,
         timeout: commandRow.timeout
       }));
@@ -2402,8 +2402,8 @@ function runNative(profile) {
       artifacts: []
     };
   };
-  return profile.suite === 'item-deep-links-contract'
-    ? withGeneratedTreeRestoration(repoRoot, operation)
+  return ['item-deep-links-contract', 'item-deep-links-frontend'].includes(profile.suite)
+    ? withGeneratedTreeRestoration(root, operation, readStatus)
     : operation();
 }
 
