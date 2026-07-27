@@ -196253,7 +196253,7 @@ phases:
       passed. Exactly seven authorized paths changed; no external/runtime effect occurred.'
   - id: item-deep-links-backend-api-mcp
     name: Implement Backend, HTTP API, MCP, and PublicURL Deep-Link Semantics
-    status: claimed
+    status: done
     description: "step_type: implementation\nrepo_change_policy: modifies_repo\n\n\
       [REQUIRES_SKILL: vectl-assurance-worker]\n[VECTL_WORKER_PROTOCOL:v2]\n\nDeliver:\
       \ Implement `ITEM-DEEP-LINK-BACKEND` after the protected contract lock: canonical\
@@ -196355,6 +196355,16 @@ phases:
     agent: golang-developer
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T02:04:15.743031Z'
+    done_at: '2026-07-27T02:22:10.826838+00:00'
+    evidence: Integrated commit 33c4fe1813114909a466fa931ee19284c193946e on main.
+      Production dispatch sha256:d8b2dca789823c6be9185dcf177f9b594782140718ef8aeed073787eddb33929
+      and unchanged worker receipt sha256:5392e9ae57b847501b1f9272f9def42ce2d58c93f0e3c6d776c21f03aa4d5c6d
+      admitted CONFORMANT. Parent receipt admission reran item_deep_links_backend_green
+      with exact selected/executed identity and green/0. Clean integrated base 34ecfc7b39021929e31cbd6f5773b8afcd996614
+      -> HEAD 33c4fe1813114909a466fa931ee19284c193946e passed full installed Gate
+      with contract, assurance policy, and clean-final admission; status unchanged.
+      Ten authorized paths changed, protected acceptance remained immutable, and no
+      external/runtime effect occurred.
   - id: item-deep-links-frontend-browser
     name: Implement Browser Routes, Inspector Lifecycle, History, and Accessibility
     status: claimed
