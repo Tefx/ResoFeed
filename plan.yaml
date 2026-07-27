@@ -196559,7 +196559,7 @@ phases:
       effects occurred.
   - id: item-deep-links-local-integration-verification
     name: Independently Verify Local HTTP, MCP, SQLite, and Browser Integration
-    status: claimed
+    status: done
     description: 'step_type: verification
 
       repo_change_policy: no_repo_change
@@ -196652,6 +196652,19 @@ phases:
     agent: integration-verifier
     claimed_by: vectl-orchestrator
     claimed_at: '2026-07-27T07:45:52.981496Z'
+    done_at: '2026-07-27T07:50:59.200453+00:00'
+    evidence: 'Production-admitted integration-verifier receipt /tmp/larva-agent-artifacts/item-deep-links-local-integration-verification/semantic-receipt-retry.json
+      covers the exact six ordered scopes and four requirement rows with PASS. Parent
+      revalidation semantic-verdict-parent.json is CONFORMANT and semantic_completion_admissible=true.
+      Existing L1/L2/L3 evidence proves real Go binary, SQLite, HTTP/static, Streamable
+      HTTP MCP, isolated Chromium, authority correction, browser lifecycle, read-only
+      state, PublicURL/app_url, and nondisclosure. The one Plan-authorized lifecycle
+      recovery generated lifecycle-retry.json: a bounded one-shot harness exited 0
+      after real server bind, authenticated HTTP and MCP operations, declared SIGTERM
+      child shutdown, reap, listener/database/temp cleanup, and tracked Git invariance;
+      the historical raw -15 row and valid REJECTED receipt remain unchanged. All
+      fresh artifacts are mode 0600; no resofeed/Playwright process or tracked repository
+      mutation remains.'
   - id: item-deep-links-publish-immutable-oci
     name: Publish the Integrated Deep-Link Image as an Immutable OCI Index
     status: pending
