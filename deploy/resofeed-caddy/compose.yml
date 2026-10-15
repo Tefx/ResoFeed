@@ -36,6 +36,8 @@ services:
       - https://${RESOFEED_DOMAIN:?set RESOFEED_DOMAIN in .env}
       - --db
       - /data/resofeed.sqlite3
+      - --openrouter-model
+      - google/gemini-4-argon
     volumes:
       - resofeed-data:/data
     networks:

@@ -1,6 +1,8 @@
 # ResoFeed on a custom domain with Tailnet-only HTTPS
 This deployment runs ResoFeed behind the existing Caddy/Tailscale stack on `tefx-mbp-personal.platy-atlas.ts.net:~/Projects/resofeed-caddy`. Caddy publishes HTTPS on host loopback; Tailscale Serve forwards Tailnet TCP/443 to that listener. The ResoFeed service accepts only `docker.io/tefx/resofeed@sha256:<index-digest>`.
 
+The Compose service pins OpenRouter processing to `google/gemini-4-argon` through `--openrouter-model`; it does not depend on the OpenRouter account default. This applies to future ingestion, steering translation, and reprocessing without a request-scoped model override. Redeploying this configuration preserves the existing SQLite volume and does not automatically reprocess stored items.
+
 ## Topology
 
 ```text
