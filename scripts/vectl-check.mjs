@@ -510,7 +510,7 @@ const STAGED_PROCEDURE_FILES = Object.freeze([
   Object.freeze({
     path: 'deploy/resofeed-caddy/compose.yml',
     mode: 0o644,
-    sha256: 'sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c'
+    sha256: 'sha256:158c026e45bc7ca9cd44be7afed964d7b99ac343e43fba19c49007c8c6682bed'
   })
 ]);
 

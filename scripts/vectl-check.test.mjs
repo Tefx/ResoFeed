@@ -191,6 +191,49 @@ test('VECTL-ADAPTER pending-profile-discovery', () => {
   }
 });
 
+test('Caddy refuses a missing configuration bind source', (context) => {
+  // Exercise Docker's bind-mount behavior, without pulling images or starting services.
+  const image = spawnSync('docker', ['image', 'inspect', 'caddy:2', '--format', '{{.Id}}'], { encoding: 'utf8' });
+  if (image.status !== 0) {
+    context.skip('requires Docker and a locally cached caddy:2 image');
+    return;
+  }
+  const root = fs.mkdtempSync(path.join(process.env.TMPDIR ?? '/tmp', 'resofeed-bind-'));
+  const project = `resofeed-bind-${process.pid}`;
+  const environment = {
+    ...process.env,
+    CADDY_LOCAL_HTTPS_PORT: '8443',
+    CF_API_TOKEN: 'test-placeholder',
+    RESOFEED_DOMAIN: 'probe.invalid',
+    RESOFEED_IMAGE: `docker.io/tefx/resofeed@sha256:${'0'.repeat(64)}`
+  };
+  fs.copyFileSync(path.join(repoRoot, 'deploy/resofeed-caddy/compose.yml'), path.join(root, 'compose.yml'));
+  fs.writeFileSync(path.join(root, 'override.json'), JSON.stringify({
+    services: { caddy: { image: image.stdout.trim(), container_name: `${project}-caddy` } },
+    networks: { 'resofeed-private': { name: `${project}-private` } }
+  }));
+  const args = ['compose', '--project-name', project, '--project-directory', root, '--env-file', '/dev/null',
+    '-f', path.join(root, 'compose.yml'), '-f', path.join(root, 'override.json')];
+  try {
+    const result = spawnSync('docker', [...args, 'up', '--no-start', '--no-build', '--no-deps', '--pull', 'never', 'caddy'], {
+      env: environment, encoding: 'utf8', timeout: 30_000
+    });
+    assert.notEqual(result.status, 0, 'missing Caddyfile must reject container creation');
+    assert.match(result.stderr, /bind source path does not exist/u);
+    assert.equal(fs.existsSync(path.join(root, 'caddy', 'Caddyfile')), false,
+      'Docker must not replace the missing file with a directory');
+  } finally {
+    try {
+      const cleanup = spawnSync('docker', [...args, 'down', '--volumes', '--remove-orphans'], {
+        env: environment, encoding: 'utf8', timeout: 30_000
+      });
+      assert.equal(cleanup.status, 0, cleanup.stderr);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  }
+});
+
 test('immutable OCI and Tailnet deployment procedure', () => {
   const profile = findProfile(
     'rf-bug-v2-immutable-deployment-procedure',
@@ -260,7 +303,7 @@ test('immutable OCI and Tailnet deployment procedure', () => {
   const stagedDeployPath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'deploy.sh');
   const stagedComposePath = path.join(repoRoot, 'deploy', 'resofeed-caddy', 'compose.yml');
   assert.equal(fileSHA256(stagedDeployPath), 'sha256:e27bc178546bdc0e0410a18a55d6501bc38ff3122b5782db9c7e94754380ff27');
-  assert.equal(fileSHA256(stagedComposePath), 'sha256:eaefdf63415a722a426a33a48e46f5c7ab9bce9304628fd4547695f5f672517c');
+  assert.equal(fileSHA256(stagedComposePath), 'sha256:158c026e45bc7ca9cd44be7afed964d7b99ac343e43fba19c49007c8c6682bed');
   assert.equal(fs.statSync(stagedDeployPath).mode & 0o777, 0o755);
   assert.equal(fs.statSync(stagedComposePath).mode & 0o777, 0o644);
 

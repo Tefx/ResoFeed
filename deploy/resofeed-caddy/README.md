@@ -19,6 +19,22 @@ resofeed-caddy_resofeed-data:/data/resofeed.sqlite3
 
 No alternate host, repository, stack, or volume is part of this procedure.
 
+Keep the host stack directory and its configuration files for the lifetime of the
+containers. They are deployment inputs, not disposable build scratch. Caddy uses
+a read-only bind mount with `create_host_path: false`: if `caddy/Caddyfile` is
+missing, Compose must reject container creation rather than silently creating a
+directory at that path. This does not prevent an external cleanup from deleting
+files, nor does changing Compose update the mounts of an existing container.
+
+If the deployment directory is lost, named volumes can remain intact and the
+application can keep running while the HTTPS proxy fails on its next start. Do
+not run `down -v`, generate replacement credentials, or blindly restart the stack.
+Recover deployment files and runtime inputs from an authorized backup or an
+explicitly authorized incident recovery, preserving the running image digest and
+secret values without printing them. If procedure backups are also missing, the
+normal staging/recovery interface cannot bootstrap the lost directory; report
+that boundary and obtain an incident-specific exception before rebuilding it.
+
 ## Cloudflare boundary
 
 Create a DNS-only A record for `RESOFEED_DOMAIN` pointing to the Mac's Tailscale IP. Give `CF_API_TOKEN` only `Zone / Zone / Read` and `Zone / DNS / Edit` for the owning zone. The token is used by Caddy for DNS-01 only.
